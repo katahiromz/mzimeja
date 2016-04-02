@@ -338,11 +338,11 @@ BOOL PASCAL IsCandidate(LPINPUTCONTEXT lpIMC);
 void PASCAL UpdateIndicIcon(HIMC hIMC);
 void PASCAL lmemset(LPBYTE, BYTE, UINT);
 #if defined(UNICODE)
-int PASCAL MylstrcmpW(LPWSTR lp0, LPWSTR lp1);
-int PASCAL MylstrcpyW(LPWSTR lp0, LPWSTR lp1);
-LPWSTR PASCAL MyCharPrevW(LPWSTR lpStart, LPWSTR lpCur);
-LPWSTR PASCAL MyCharNextW(LPWSTR lp);
-LPWSTR PASCAL MylstrcpynW(LPWSTR lp0, LPWSTR lp1, int nCount);
+int PASCAL MylstrcmpW(LPCWSTR lp0, LPCWSTR lp1);
+int PASCAL MylstrcpyW(LPWSTR lp0, LPCWSTR lp1);
+LPWSTR PASCAL MyCharPrevW(LPCWSTR lpStart, LPCWSTR lpCur);
+LPWSTR PASCAL MyCharNextW(LPCWSTR lp);
+LPWSTR PASCAL MylstrcpynW(LPWSTR lp0, LPCWSTR lp1, int nCount);
 #endif
 HFONT CheckNativeCharset(HDC hDC);
 
@@ -467,7 +467,7 @@ WORD PASCAL DeleteWord(LPSTR, LPSTR);
 int DebugPrint(LPCTSTR lpszFormat, ...);
 void SetDwordToSetting(LPCTSTR lpszFlag, DWORD dwFlag);
 void PASCAL SetGlobalFlags();
-void PASCAL ImeLog(DWORD dwFlag, LPTSTR lpStr);
+void PASCAL ImeLog(DWORD dwFlag, LPCTSTR lpStr);
 #else
 #define MyDebugPrint(x)
 #define SetDwordToSetting() FALSE

@@ -28,7 +28,7 @@ int DebugPrint(LPCTSTR lpszFormat, ...) {
   return nCount;
 }
 
-DWORD PASCAL GetDwordFromSetting(LPTSTR lpszFlag) {
+DWORD PASCAL GetDwordFromSetting(LPCTSTR lpszFlag) {
   HKEY hkey;
   DWORD dwRegType, dwData, dwDataSize, dwRet;
 
@@ -47,7 +47,7 @@ DWORD PASCAL GetDwordFromSetting(LPTSTR lpszFlag) {
 
 void SetDwordToSetting(LPCTSTR lpszFlag, DWORD dwFlag) {
   HKEY hkey;
-  DWORD dwDataSize, dwRet;
+  DWORD dwRet;
 
   if (ERROR_SUCCESS ==
       RegOpenKeyEx(HKEY_LOCAL_MACHINE, g_szRegInfoPath, 0, KEY_WRITE, &hkey)) {
@@ -64,7 +64,7 @@ void PASCAL SetGlobalFlags() {
   dwDebugFlag = GetDwordFromSetting(TEXT("DebugFlag"));
 }
 
-void PASCAL ImeLog(DWORD dwFlag, LPTSTR lpStr) {
+void PASCAL ImeLog(DWORD dwFlag, LPCTSTR lpStr) {
   TCHAR szBuf[80];
 
   if (dwFlag & dwLogFlag) {

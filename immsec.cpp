@@ -45,9 +45,9 @@ POSVERSIONINFO GetVersionInfo(VOID);
 #endif
 
 #ifdef DEBUG
-VOID WarnOut(PTSTR pStr) { OutputDebugString(pStr); }
+VOID WarnOut(LPCTSTR pStr) { OutputDebugString(pStr); }
 
-VOID ErrorOut(PTSTR pStr) {
+VOID ErrorOut(LPCTSTR pStr) {
   DWORD dwError;
   DWORD dwResult;
   TCHAR buf1[512];
@@ -99,7 +99,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
   PSID psid;
   BOOL fResult;
 
-  INT i, j;
+  //INT i, j;
 
   if (!IsNT()) return NULL;
 

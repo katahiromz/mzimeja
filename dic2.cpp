@@ -258,11 +258,12 @@ WORD PASCAL HanToZen(WORD code, DWORD fdwConversion)
     if (code >= 0x3a && 0x3f >= code) return (table2[code - 0x3a]);
     if (code >= 0x5b && 0x60 >= code) return (table3[code - 0x5b]);
     if (code >= 0x7b && 0x7e >= code) return (table4[code - 0x7b]);
-    if (code >= 0xFF61 && 0xFF9F >= code)
+    if (code >= 0xFF61 && 0xFF9F >= code) {
       if (flag)
         return (table5[code - 0xFF61]);
       else
         return (table6[code - 0xFF61]);
+    }
     return (code);
   }
 #else

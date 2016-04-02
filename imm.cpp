@@ -142,7 +142,8 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   fOpen = lpIMC->fOpen;
 
   if (fOpen) {
-    if (lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)) {
+    lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+    if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen))
         fCompStr = TRUE;
@@ -189,7 +190,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   LPMYSTR lpstr;
   TRANSMSG GnMsg;
   int i = 0;
-  LPDWORD lpdw;
+  //LPDWORD lpdw;
 
   ImeLog(LOGF_API, TEXT("NotifyIME"));
 
@@ -253,7 +254,8 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           return FALSE;
         }
 
-        if (lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo)) {
+        lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+        if (lpCandInfo) {
 //
 // Get the candidate strings from dic file.
 //
@@ -284,7 +286,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
               (DWORD)((LPSTR) & ((LPMYCAND)lpCandInfo)->cl - (LPSTR)lpCandInfo);
           lpCandList =
               (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
-          lpdw = (LPDWORD) & (lpCandList->dwOffset);
+          //lpdw = (LPDWORD) & (lpCandList->dwOffset);
 
           lpstr = &szBuf[0];
           while (*lpstr && (i < MAXCANDSTRNUM)) {
@@ -342,7 +344,8 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
 
       if (dwIndex == 1 && IsCandidate(lpIMC)) {
-        if (lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo)) {
+        lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+        if (lpCandInfo) {
           lpCandList =
               (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
           if (lpCandList->dwCount > dwValue) {
@@ -377,7 +380,8 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       if (dwIndex == 1 && IsCandidate(lpIMC)) {
         if (dwValue > MAXCANDPAGESIZE) return FALSE;
 
-        if (lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo)) {
+        lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+        if (lpCandInfo) {
           lpCandList =
               (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
           if (lpCandList->dwCount > dwValue) {
@@ -404,7 +408,8 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       if (dwIndex == 1 && IsCandidate(lpIMC)) {
         if (dwValue > MAXCANDPAGESIZE) return FALSE;
 
-        if (lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo)) {
+        lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+        if (lpCandInfo) {
           lpCandList =
               (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
           if (lpCandList->dwCount > dwValue) {
@@ -460,7 +465,8 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
   // it's NULL context.
   if (!hIMC) return TRUE;
 
-  if (lpIMC = ImmLockIMC(hIMC)) {
+  lpIMC = ImmLockIMC(hIMC);
+  if (lpIMC) {
     if (fSelect) {
       LPCOMPOSITIONSTRING lpCompStr;
       LPCANDIDATEINFO lpCandInfo;
@@ -478,12 +484,14 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
       }
 
       lpIMC->hCompStr = ImmReSizeIMCC(lpIMC->hCompStr, sizeof(MYCOMPSTR));
-      if (lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)) {
+      lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+      if (lpCompStr) {
         lpCompStr->dwSize = sizeof(MYCOMPSTR);
         ImmUnlockIMCC(lpIMC->hCompStr);
       }
       lpIMC->hCandInfo = ImmReSizeIMCC(lpIMC->hCandInfo, sizeof(MYCAND));
-      if (lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo)) {
+      lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+      if (lpCandInfo) {
         lpCandInfo->dwSize = sizeof(MYCAND);
         ImmUnlockIMCC(lpIMC->hCandInfo);
       }
