@@ -25,7 +25,7 @@
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-MZIMEICON             	ICON    DISCARDABLE     "res\\mzimeja.ico"
+MZIMEICON               ICON    DISCARDABLE     "res\\mzimeja.ico"
 INDICOPENICON           ICON    DISCARDABLE     "res\\penindic.ico"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -181,8 +181,31 @@ RIGHTCLKMENU MENU DISCARDABLE
 BEGIN
     POPUP ""
     BEGIN
+        MENUITEM "非表示",                      IDM_HIDE
+        MENUITEM SEPARATOR
+        MENUITEM "単語登録",                    IDM_ADD_WORD
         MENUITEM "再変換",                      IDM_RECONVERT
-        MENUITEM "About",                       IDM_ABOUT
+        MENUITEM "プロパティ",                  IDM_PROPERTY
+        MENUITEM SEPARATOR
+        POPUP "入力モード"
+        BEGIN
+            MENUITEM "ひらがな",                IDM_HIRAGANA
+            MENUITEM "全角カタカナ",            IDM_ZEN_KATAKANA
+            MENUITEM "全角英数",                IDM_ZEN_ALNUM
+            MENUITEM "半角カタカナ",            IDM_HAN_KATAKANA
+            MENUITEM "半角英数",                IDM_ALNUM
+            MENUITEM "直接入力",                IDM_DIRECT
+        END
+        POPUP "ローマ字入力"
+        BEGIN
+            MENUITEM "ローマ字入力",            IDM_ROMAJI_INPUT
+            MENUITEM "かな入力",                IDM_KANA_INPUT
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "ヘルプ",                      IDM_HELP
+        MENUITEM "バージョン情報",              IDM_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "キャンセル",                  IDM_CANCEL
     END
 END
 
@@ -203,6 +226,8 @@ BEGIN
     BEGIN
         MENUITEM "ローマ字入力",                IDM_ROMAJI_INPUT
         MENUITEM "かな入力",                    IDM_KANA_INPUT
+        MENUITEM SEPARATOR
+        MENUITEM "キャンセル",                  IDM_CANCEL
     END
 END
 
