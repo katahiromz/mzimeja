@@ -98,7 +98,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8001429"
-     inkscape:cx="3.5310294"
+     inkscape:cx="-55.930222"
      inkscape:cy="63.146827"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -136,7 +136,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -145,6 +145,13 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(3.4842904e-6,-860.36217)">
+    <rect
+       style="opacity:0.95999995;fill:#afffaf;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.45631068"
+       id="rect3378-1"
+       width="24"
+       height="24.000008"
+       x="-1.207981e-005"
+       y="1028.3622" />
     <g
        id="g4177"
        transform="matrix(0.42333346,0,0,0.42333346,-1.0665393e-5,558.86203)">
@@ -359,13 +366,6 @@
        height="24.000008"
        x="-1.2162644e-005"
        y="1004.3622" />
-    <rect
-       style="opacity:0.95999995;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.45631068"
-       id="rect3378-2"
-       width="24"
-       height="24.000008"
-       x="-1.2074148e-005"
-       y="1028.3622" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:18.95616531px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
