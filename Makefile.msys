@@ -56,7 +56,7 @@ TARGET = mzimeja.ime
 #############################################################################
 
 $(TARGET): $(OBJS)
-	$(CXX) -mdll -o $(TARGET) $(CXXFLAGS) $(OBJS) $(LIBS)
+	$(CXX) -mdll -o $(TARGET) $(CXXFLAGS) $(OBJS) $(LIBS) mzimeja.def
 
 config$(DOTOBJ): config.cpp
 	$(CXX) -c $(CXXFLAGS) -o config$(DOTOBJ) config.cpp
