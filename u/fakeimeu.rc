@@ -27,19 +27,19 @@
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-FAKEIMEICON             ICON    DISCARDABLE     "..\\fakeimeu.ico"
-INDICOPENICON           ICON    DISCARDABLE     "..\\penindic.ico"
+FAKEIMEICON             ICON    DISCARDABLE     "..\\res\\fakeimeu.ico"
+INDICOPENICON           ICON    DISCARDABLE     "..\\res\\penindic.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-STATUSBMP               BITMAP  DISCARDABLE     "..\\status.bmp"
-CLOSEBMP                BITMAP  DISCARDABLE     "..\\close.bmp"
-CHECKBMP                BITMAP  DISCARDABLE     "..\\check.bmp"
-UNCHECKBMP              BITMAP  DISCARDABLE     "..\\uncheck.bmp"
-FACEBMP                 BITMAP  DISCARDABLE     "..\\face.bmp"
+STATUSBMP               BITMAP  DISCARDABLE     "..\\res\\status.bmp"
+CLOSEBMP                BITMAP  DISCARDABLE     "..\\res\\close.bmp"
+CHECKBMP                BITMAP  DISCARDABLE     "..\\res\\check.bmp"
+UNCHECKBMP              BITMAP  DISCARDABLE     "..\\res\\uncheck.bmp"
+FACEBMP                 BITMAP  DISCARDABLE     "..\\res\\face.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
