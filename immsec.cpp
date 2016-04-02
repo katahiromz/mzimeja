@@ -36,7 +36,7 @@ POSVERSIONINFO GetVersionInfo(VOID);
 //
 // debug functions
 //
-#ifdef DEBUG
+#ifdef _DEBUG
 #define ERROROUT(x) ErrorOut(x)
 #define WARNOUT(x) WarnOut(x)
 #else
@@ -44,7 +44,7 @@ POSVERSIONINFO GetVersionInfo(VOID);
 #define WARNOUT(x)
 #endif
 
-#ifdef DEBUG
+#ifdef _DEBUG
 VOID WarnOut(LPCTSTR pStr) { OutputDebugString(pStr); }
 
 VOID ErrorOut(LPCTSTR pStr) {

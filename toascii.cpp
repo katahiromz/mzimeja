@@ -57,7 +57,7 @@ itae_exit:
   // If trans key buffer that is allocated by USER.EXE full up,
   // the return value is the negative number.
   if (fOverTransKey) {
-#ifdef DEBUG
+#ifdef _DEBUG
     OutputDebugString(
         (LPTSTR)TEXT("***************************************\r\n"));
     OutputDebugString(

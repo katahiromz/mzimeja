@@ -44,7 +44,7 @@ MYGUIDELINE glTable[] = {
 /* for DIC */
 TCHAR szDicFileName[256]; /* Dictionary file name stored buffer */
 
-#ifdef DEBUG
+#ifdef _DEBUG
 /* for DebugOptions */
 #pragma data_seg("SHAREDDATA")
 DWORD dwLogFlag = 0L;
@@ -59,7 +59,7 @@ extern "C" {
 /**********************************************************************/
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   LPTSTR lpDicFileName;
-#ifdef DEBUG
+#ifdef _DEBUG
   TCHAR szDev[80];
 #endif
   MyDebugPrint((TEXT("DLLEntry:dwFunc=%d\n"), dwFunction));
@@ -96,7 +96,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
 
       SetGlobalFlags();
 
-#ifdef DEBUG
+#ifdef _DEBUG
       wsprintf(szDev, TEXT("DLLEntry Process Attach hInst is %lx"), hInst);
       ImeLog(LOGF_ENTRY, szDev);
 #endif
@@ -108,21 +108,21 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
       UnregisterClass(szCandClassName, hInst);
       UnregisterClass(szStatusClassName, hInst);
       if (hMutex) CloseHandle(hMutex);
-#ifdef DEBUG
+#ifdef _DEBUG
       wsprintf(szDev, TEXT("DLLEntry Process Detach hInst is %lx"), hInst);
       ImeLog(LOGF_ENTRY, szDev);
 #endif
       break;
 
     case DLL_THREAD_ATTACH:
-#ifdef DEBUG
+#ifdef _DEBUG
       wsprintf(szDev, TEXT("DLLEntry Thread Attach hInst is %lx"), hInst);
       ImeLog(LOGF_ENTRY, szDev);
 #endif
       break;
 
     case DLL_THREAD_DETACH:
-#ifdef DEBUG
+#ifdef _DEBUG
       wsprintf(szDev, TEXT("DLLEntry Thread Detach hInst is %lx"), hInst);
       ImeLog(LOGF_ENTRY, szDev);
 #endif

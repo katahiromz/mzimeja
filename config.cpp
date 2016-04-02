@@ -62,7 +62,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
       AddPage(&psh, DLG_REGISTERWORD, RegWordDlgProc);
       AddPage(&psh, DLG_SELECTDICTIONARY, SelectDictionaryDlgProc);
       AddPage(&psh, DLG_ABOUT, AboutDlgProc);
-#ifdef DEBUG
+#ifdef _DEBUG
       AddPage(&psh, DLG_DEBUG, DebugOptionDlgProc);
 #endif
       PropertySheet(&psh);
@@ -401,7 +401,7 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
           break;
 
         case PSN_APPLY:
-#ifdef DEBUG
+#ifdef _DEBUG
           dwTemp = 0;
           if (IsDlgButtonChecked(hDlg, IDC_LOGF_ENTRY)) dwTemp |= LOGF_ENTRY;
           if (IsDlgButtonChecked(hDlg, IDC_LOGF_API)) dwTemp |= LOGF_API;
@@ -436,7 +436,7 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
       SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
       //lpPropSheet = (LPPROPSHEETPAGE)lParam;
 
-#ifdef DEBUG
+#ifdef _DEBUG
       CheckDlgButton(hDlg, IDC_LOGF_ENTRY, (dwLogFlag & LOGF_ENTRY) ? 1 : 0);
       CheckDlgButton(hDlg, IDC_LOGF_API, (dwLogFlag & LOGF_API) ? 1 : 0);
       CheckDlgButton(hDlg, IDC_LOGF_KEY, (dwLogFlag & LOGF_KEY) ? 1 : 0);

@@ -431,7 +431,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       break;
 
     case NI_IMEMENUSELECTED:
-#ifdef DEBUG
+#ifdef _DEBUG
     {
       TCHAR szDev[80];
       OutputDebugString((LPTSTR)TEXT("NotifyIME IMEMENUSELECTED\r\n"));
@@ -502,7 +502,7 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
   return TRUE;
 }
 
-#ifdef DEBUG
+#ifdef _DEBUG
 void DumpRS(LPRECONVERTSTRING lpRS) {
   TCHAR szDev[80];
   LPMYSTR lpDump = ((LPMYSTR)lpRS) + lpRS->dwStrOffset;
@@ -538,7 +538,7 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
 
   switch (dwIndex) {
     case SCS_QUERYRECONVERTSTRING:
-#ifdef DEBUG
+#ifdef _DEBUG
       OutputDebugString(TEXT("SCS_QUERYRECONVERTSTRING\r\n"));
       if (lpComp) DumpRS((LPRECONVERTSTRING)lpComp);
       if (lpRead) DumpRS((LPRECONVERTSTRING)lpRead);
@@ -546,7 +546,7 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
       break;
 
     case SCS_SETRECONVERTSTRING:
-#ifdef DEBUG
+#ifdef _DEBUG
       OutputDebugString(TEXT("SCS_SETRECONVERTSTRING\r\n"));
       if (lpComp) DumpRS((LPRECONVERTSTRING)lpComp);
       if (lpRead) DumpRS((LPRECONVERTSTRING)lpRead);

@@ -373,7 +373,7 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
               dwSize = (DWORD)MyImmRequestMessage(hIMC, IMR_RECONVERTSTRING,
                                                   (LPARAM)lpRS);
               if (dwSize) {
-#ifdef DEBUG
+#ifdef _DEBUG
                 {
                   TCHAR szDev[80];
                   LPMYSTR lpDump = (LPMYSTR)(((LPSTR)lpRS) + lpRS->dwStrOffset);
@@ -411,7 +411,7 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
                 MyImmRequestMessage(hIMC, IMR_CONFIRMRECONVERTSTRING,
                                     (LPARAM)lpRS);
               }
-#ifdef DEBUG
+#ifdef _DEBUG
               else
                 OutputDebugString(TEXT("ImmRequestMessage returned 0\r\n"));
 #endif

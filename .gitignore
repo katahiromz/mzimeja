@@ -1,6 +1,7 @@
 *.o
 *.user
 *.suo
+*.ncb
 *.ime
 *.log
 *.err

@@ -7,6 +7,7 @@ Module Name:
     DIC.C
 
 ++*/
+#define _CRT_SECURE_NO_WARNINGS
 #include "mzimeja.h"
 #include "immsec.h"
 #include "vksub.h"
@@ -912,7 +913,7 @@ BOOL PASCAL DicKeydownHandler(HIMC hIMC, UINT wParam, LPARAM lParam,
       break;
 
     case VK_G:
-#ifdef DEBUG
+#ifdef _DEBUG
       if (dwDebugFlag & DEBF_GUIDELINE) {
         if (IsCTLPushed(lpbKeyState)) {
           MakeGuideLine(hIMC, MYGL_TESTGUIDELINE);

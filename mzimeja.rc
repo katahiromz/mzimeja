@@ -6,11 +6,9 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "winuser.h"
-#include "immdev.h"
+#include <windows.h>
 #include "mzimeja.h"
 #include "resource.h"
-#include "winver.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -159,11 +157,9 @@ END
 
 2 TEXTINCLUDE DISCARDABLE 
 BEGIN
-    "#include ""winuser.h""\r\n"
-    "#include ""immdev.h""\r\n"
+    "#include "<windows.h>"\r\n"
     "#include ""mzimeja.h""\r\n"
     "#include ""resource.h""\r\n"
-    "#include ""winver.h""\r\n"
     "\0"
 END
 

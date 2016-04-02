@@ -12,7 +12,7 @@ Module Name:
 
 extern "C" {
 
-#ifdef DEBUG
+#ifdef _DEBUG
 
 const LPTSTR g_szRegInfoPath = TEXT("software\\Katayama Hirofumi MZ\\mzimeja");
 
@@ -79,6 +79,6 @@ void PASCAL ImeLog(DWORD dwFlag, LPCTSTR lpStr) {
   }
 }
 
-#endif  // DEBUG
+#endif  // _DEBUG
 
 }  // extern "C"

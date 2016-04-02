@@ -462,19 +462,19 @@ WORD PASCAL GetWordNum(LPSTR);
 WORD PASCAL DeleteWord(LPSTR, LPSTR);
 
 /* FDEBUG.C      */
-#ifdef DEBUG
-#define MyDebugPrint(x) DebugPrint x
-int DebugPrint(LPCTSTR lpszFormat, ...);
-void SetDwordToSetting(LPCTSTR lpszFlag, DWORD dwFlag);
-void PASCAL SetGlobalFlags();
-void PASCAL ImeLog(DWORD dwFlag, LPCTSTR lpStr);
+#ifdef _DEBUG
+  #define MyDebugPrint(x) DebugPrint x
+  int DebugPrint(LPCTSTR lpszFormat, ...);
+  void SetDwordToSetting(LPCTSTR lpszFlag, DWORD dwFlag);
+  void PASCAL SetGlobalFlags();
+  void PASCAL ImeLog(DWORD dwFlag, LPCTSTR lpStr);
 #else
-#define MyDebugPrint(x)
-#define SetDwordToSetting() FALSE
-//#define SetDwordToSetting(lpszFlag, dwFlag) FALSE
-#define SetGlobalFlags() FALSE
-//#define ImeLog() FALSE
-#define ImeLog(dwFlag, lpStr) FALSE
+  #define MyDebugPrint(x)
+  #define SetDwordToSetting() FALSE
+  //#define SetDwordToSetting(lpszFlag, dwFlag) FALSE
+  #define SetGlobalFlags() FALSE
+  //#define ImeLog() FALSE
+  #define ImeLog(dwFlag, lpStr) FALSE
 #endif
 
 }  // extern "C"

@@ -14,7 +14,7 @@ Module Name:
 extern "C" {
 
 void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag);
-#ifdef DEBUG
+#ifdef _DEBUG
 void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra);
 #endif
 
@@ -784,7 +784,7 @@ void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag) {
 
   GlobalUnlock(hUIExtra);
 }
-#ifdef DEBUG
+#ifdef _DEBUG
 void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra) {
   TCHAR szDev[80];
   int i;
