@@ -1,0 +1,103 @@
+# Makefile for MSYS
+# Usage: make -f Makefile.msys
+#############################################################################
+
+DOTOBJ = .o
+DOTEXE = .exe
+
+DEFS1 = -static -m32 -mthreads
+
+DEFS2 = -municode -DUNICODE -D_UNICODE
+
+DEFS3 = -g -ggdb -O0 -DDEBUG=1 -D_DEBUG=1
+#DEFS3 = -O9 -DNDEBUG=1
+
+DEFS4 = -DJAPAN -finput-charset=CP932 -fexec-charset=CP932
+
+#############################################################################
+
+CXX = g++
+CXXFLAGS = -Wall -pedantic -Iinclude $(DEFS1) $(DEFS2) $(DEFS3) $(DEFS4)
+
+RC = windres
+RCFLAGS = -Iinclude -F pe-i386            # x86
+#RCFLAGS = -Iinclude -F pe-x86-64         # x64
+
+OBJS = \
+	config$(DOTOBJ) \
+	dic$(DOTOBJ) \
+	dic2$(DOTOBJ) \
+	mzimeja$(DOTOBJ) \
+	fdebug$(DOTOBJ) \
+	imm$(DOTOBJ) \
+	immsec$(DOTOBJ) \
+	input$(DOTOBJ) \
+	process$(DOTOBJ) \
+	regword$(DOTOBJ) \
+	subs$(DOTOBJ) \
+	toascii$(DOTOBJ) \
+	ui$(DOTOBJ) \
+	uicand$(DOTOBJ) \
+	uicomp$(DOTOBJ) \
+	uiguide$(DOTOBJ) \
+	uistate$(DOTOBJ) \
+	mzimeja_res$(DOTOBJ) \
+
+LIBS = \
+	-lkernel32 \
+	-luser32 \
+	-lgdi32 \
+	-ladvapi32 \
+	-lcomctl32 \
+	-limm32 \
+
+TARGET = mzimeja.ime
+
+#############################################################################
+
+$(TARGET): $(OBJS)
+	$(CXX) -mdll -o $(TARGET) $(CXXFLAGS) $(OBJS) $(LIBS)
+
+config$(DOTOBJ): config.cpp
+	$(CXX) -c $(CXXFLAGS) -o config$(DOTOBJ) config.cpp
+dic$(DOTOBJ): dic.cpp
+	$(CXX) -c $(CXXFLAGS) -o dic$(DOTOBJ) dic.cpp
+dic2$(DOTOBJ): dic2.cpp
+	$(CXX) -c $(CXXFLAGS) -o dic2$(DOTOBJ) dic2.cpp
+mzimeja$(DOTOBJ): mzimeja.cpp
+	$(CXX) -c $(CXXFLAGS) -o mzimeja$(DOTOBJ) mzimeja.cpp
+fdebug$(DOTOBJ): fdebug.cpp
+	$(CXX) -c $(CXXFLAGS) -o fdebug$(DOTOBJ) fdebug.cpp
+imm$(DOTOBJ): imm.cpp
+	$(CXX) -c $(CXXFLAGS) -o imm$(DOTOBJ) imm.cpp
+immsec$(DOTOBJ): immsec.cpp
+	$(CXX) -c $(CXXFLAGS) -o immsec$(DOTOBJ) immsec.cpp
+input$(DOTOBJ): input.cpp
+	$(CXX) -c $(CXXFLAGS) -o input$(DOTOBJ) input.cpp
+process$(DOTOBJ): process.cpp
+	$(CXX) -c $(CXXFLAGS) -o process$(DOTOBJ) process.cpp
+regword$(DOTOBJ): regword.cpp
+	$(CXX) -c $(CXXFLAGS) -o regword$(DOTOBJ) regword.cpp
+subs$(DOTOBJ): subs.cpp
+	$(CXX) -c $(CXXFLAGS) -o subs$(DOTOBJ) subs.cpp
+toascii$(DOTOBJ): toascii.cpp
+	$(CXX) -c $(CXXFLAGS) -o toascii$(DOTOBJ) toascii.cpp
+ui$(DOTOBJ): ui.cpp
+	$(CXX) -c $(CXXFLAGS) -o ui$(DOTOBJ) ui.cpp
+uicand$(DOTOBJ): uicand.cpp
+	$(CXX) -c $(CXXFLAGS) -o uicand$(DOTOBJ) uicand.cpp
+uicomp$(DOTOBJ): uicomp.cpp
+	$(CXX) -c $(CXXFLAGS) -o uicomp$(DOTOBJ) uicomp.cpp
+uiguide$(DOTOBJ): uiguide.cpp
+	$(CXX) -c $(CXXFLAGS) -o uiguide$(DOTOBJ) uiguide.cpp
+uistate$(DOTOBJ): uistate.cpp
+	$(CXX) -c $(CXXFLAGS) -o uistate$(DOTOBJ) uistate.cpp
+
+mzimeja_res$(DOTOBJ): mzimeja.rc
+	$(RC) $(RCFLAGS) -i mzimeja.rc -o mzimeja_res$(DOTOBJ)
+
+clean:
+	rm -f *$(DOTOBJ)
+	rm -f *.res
+
+#############################################################################
