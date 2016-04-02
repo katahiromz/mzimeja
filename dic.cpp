@@ -4,7 +4,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "mzimeja.h"
 #include "immsec.h"
-#include "vksub.h"
 
 extern "C" {
 
@@ -672,101 +671,6 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
 ac_exit:
   ImmUnlockIMCC(lpIMC->hCompStr);
   ImmUnlockIMC(hIMC);
-}
-
-/**********************************************************************/
-/*                                                                    */
-/* DicKeydownHandler()                                                */
-/*                                                                    */
-/* WM_KEYDOWN handler for dictionary routine                          */
-/*                                                                    */
-/* wParam                                                             */
-/* virtual key                                                        */
-/*                                                                    */
-/* lParam                                                             */
-/* differ depending on wParam                                         */
-/*                                                                    */
-/**********************************************************************/
-BOOL PASCAL DicKeydownHandler(HIMC hIMC, UINT wParam, LPARAM lParam,
-                              LPBYTE lpbKeyState) {
-  LPINPUTCONTEXT lpIMC;
-
-  switch (wParam) {
-    case VK_ESCAPE:
-      FlushText(hIMC);
-      break;
-
-    case VK_DELETE:
-    case VK_BACK:
-      DeleteChar(hIMC, wParam);
-      break;
-
-    case VK_SPACE:
-      ConvKanji(hIMC);
-      break;
-
-    case VK_F3:
-      if (IsCTLPushed(lpbKeyState)) ChangeMode(hIMC, TO_CMODE_ROMAN);
-      break;
-
-    case VK_F6:
-      if (IsCTLPushed(lpbKeyState))
-        ChangeMode(hIMC, TO_CMODE_HIRAGANA);
-      else
-        ChangeCompStr(hIMC, TO_CMODE_HIRAGANA);
-      break;
-
-    case VK_F7:
-      if (IsCTLPushed(lpbKeyState))
-        ChangeMode(hIMC, TO_CMODE_KATAKANA);
-      else
-        ChangeCompStr(hIMC, TO_CMODE_KATAKANA);
-      break;
-
-    case VK_F8:
-      if (IsCTLPushed(lpbKeyState))
-        ChangeMode(hIMC, TO_CMODE_FULLSHAPE);
-      else
-        ChangeCompStr(hIMC, TO_CMODE_FULLSHAPE);
-      break;
-
-    case VK_F9:
-      if (IsCTLPushed(lpbKeyState))
-        ChangeMode(hIMC, TO_CMODE_ALPHANUMERIC);
-      else
-        ChangeCompStr(hIMC, TO_CMODE_ALPHANUMERIC);
-      break;
-
-    case VK_RETURN:
-      lpIMC = ImmLockIMC(hIMC);
-
-      if (!(lpIMC->fdwConversion & IME_CMODE_CHARCODE))
-        MakeResultString(hIMC, TRUE);
-      else
-        FlushText(hIMC);
-
-      ImmUnlockIMC(hIMC);
-      break;
-
-    case VK_G:
-      //if (IsCTLPushed(lpbKeyState)) {
-      //  MakeGuideLine(hIMC, MYGL_TESTGUIDELINE);
-      //  return (TRUE);
-      //}
-      break;
-
-    default:
-      break;
-  }
-
-  if ((VK_0 <= wParam && VK_9 >= wParam) ||
-      (VK_A <= wParam && VK_Z >= wParam) ||
-      (VK_NUMPAD0 <= wParam && VK_NUMPAD9 >= wParam) ||
-      (VK_OEM_1 <= wParam && VK_OEM_9 >= wParam) ||
-      (VK_MULTIPLY <= wParam && VK_DIVIDE >= wParam)) {
-    return (FALSE);
-  } else
-    return (TRUE);
 }
 
 BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {

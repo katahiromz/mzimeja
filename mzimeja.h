@@ -364,7 +364,7 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 
 // dic.c
 BOOL PASCAL IsEat(WORD);
-BOOL PASCAL DicKeydownHandler(HIMC, UINT, LPARAM, LPBYTE);
+BOOL PASCAL DicKeydownHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 void PASCAL DeleteChar(HIMC hIMC, UINT uVKey);
 void PASCAL FlushText(HIMC hIMC);
 void PASCAL RevertText(HIMC hIMC);
