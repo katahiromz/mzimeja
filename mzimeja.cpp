@@ -1,13 +1,3 @@
-/*++
-
-Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
-
-Module Name:
-
-    mzimeja.c
-
-++*/
-
 #include "mzimeja.h"
 #include "immsec.h"
 #include "resource.h"

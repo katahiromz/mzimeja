@@ -1,12 +1,5 @@
-/*++
-
-Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
-
-Module Name:
-
-    VKSUB.H
-
-++*/
+#ifndef VKSUB_H_
+#define VKSUB_H_
 
 #define VK_0    0x030
 #define VK_1    0x031
@@ -52,3 +45,4 @@ Module Name:
 #define VK_OEM_9        0x0E0           // next available
 #define VK_OEM_BSLASH   0x0E2           // additional Back Slash key for AX.
 
+#endif  // ndef VKSUB_H_

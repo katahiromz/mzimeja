@@ -8,11 +8,9 @@
 #ifndef _IMMDEV_
 #define _IMMDEV_
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 #ifndef _IMM_SDK_DEFINED_
 #define _IMM_SDK_DEFINED_

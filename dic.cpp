@@ -1,15 +1,5 @@
-/*++
-
-Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
-
-Module Name:
-
-    DIC.C
-
-++*/
 #define _CRT_SECURE_NO_WARNINGS
-#include "mzimeja.h"
-#include "immsec.h"
+#include "mzimeja.h"#include "immsec.h"
 #include "vksub.h"
 
 extern "C" {

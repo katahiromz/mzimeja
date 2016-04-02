@@ -1,13 +1,3 @@
-/*++
-
-Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
-
-Module Name:
-
-    mzimeja.h
-
-++*/
-
 #ifndef MZIMEJA_H_
 #define MZIMEJA_H_
 

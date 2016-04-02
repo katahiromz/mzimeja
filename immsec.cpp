@@ -1,23 +1,3 @@
-/*++
-
-Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
-
-Module Name:
-
-    IMMSEC.C
-
-Abstract:
-
-    security code called by IMEs
-
-Author:
-
-    Takao Kitano [takaok] 01-May-1996
-
-Revision History:
-
-++*/
-
 #include "immsec.h"
 #include <stdio.h>
 #include <windows.h>

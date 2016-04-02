@@ -1,12 +1,3 @@
-/*++
-
-Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
-
-Module Name:
-
-    CONFIG.c
-
-++*/
 #include "mzimeja.h"
 #include <prsht.h>
 #include "resource.h"

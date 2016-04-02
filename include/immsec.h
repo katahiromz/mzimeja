@@ -1,12 +1,5 @@
-/*++
-
-Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
-
-Module Name:
-
-    IMMSEC.H
-    
-++*/
+#ifndef IMMSEC_H_
+#define IMMSEC_H_
 
 #ifndef _INC_WINDOWS
   #include <windows.h>
@@ -15,7 +8,9 @@ Module Name:
 extern "C" {
 
 PSECURITY_ATTRIBUTES CreateSecurityAttributes(VOID);
-VOID FreeSecurityAttributes( PSECURITY_ATTRIBUTES psa);
+VOID FreeSecurityAttributes(PSECURITY_ATTRIBUTES psa);
 BOOL IsNT(VOID);
 
 } // extern "C"
+
+#endif  // ndef IMMSEC_H_

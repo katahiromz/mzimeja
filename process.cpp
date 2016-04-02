@@ -1,13 +1,3 @@
-/*++
-
-Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
-
-Module Name:
-
-    PROCESS.C
-
-++*/
-
 /**********************************************************************/
 /* These tables are for ImeProcessKey(). And IMEProcessKey function   */
 /* refer this table and deside the VKey is needed for MZ-IME or not. */

@@ -1,14 +1,3 @@
-/*++
-
-Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
-
-Module Name:
-
-    UIGUIDE.C
-
-++*/
-
-/**********************************************************************/
 #include "mzimeja.h"
 
 extern "C" {

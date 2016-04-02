@@ -1,13 +1,3 @@
-/*++
-
-Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
-
-Module Name:
-
-    DEBUG.C
-
-++*/
-
 #include "mzimeja.h"
 
 extern "C" {
