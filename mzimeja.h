@@ -275,8 +275,6 @@ extern BYTE bNoComp[];
 extern BYTE bNoCompCtl[];
 extern BYTE bNoCompSht[];
 extern BYTE bNoCompAlt[];
-extern DWORD dwLogFlag;
-extern DWORD dwDebugFlag;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -401,11 +399,16 @@ WORD PASCAL KataToHira(WORD);
 void PASCAL lZenToHan(LPTSTR, LPTSTR);
 void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
 
-// fdebug.c
 #ifdef _DEBUG
   int DebugPrint(LPCTSTR lpszFormat, ...);
+  VOID WarnOut(LPCTSTR pStr);
+  VOID ErrorOut(LPCTSTR pStr);
+  #define ERROROUT(x) ErrorOut(x)
+  #define WARNOUT(x) WarnOut(x)
 #else
   #define DebugPrint (void)
+  #define ERROROUT(x)
+  #define WARNOUT(x)
 #endif
 
 //////////////////////////////////////////////////////////////////////////////

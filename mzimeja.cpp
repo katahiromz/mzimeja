@@ -32,17 +32,10 @@ MYGUIDELINE glTable[] = {
 /* for DIC */
 TCHAR szDicFileName[256]; /* Dictionary file name stored buffer */
 
-#ifdef _DEBUG
-  /* for DebugOptions */
-  #pragma data_seg("SHAREDDATA")
-  DWORD dwLogFlag = 0L;
-  DWORD dwDebugFlag = 0L;
-  #pragma data_seg()
-#endif
+extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
-
-extern "C" {
+// for debugging
 
 #ifdef _DEBUG
 int DebugPrint(LPCTSTR lpszFormat, ...) {
@@ -71,12 +64,37 @@ int DebugPrint(LPCTSTR lpszFormat, ...) {
 }
 #endif  // def _DEBUG
 
+#ifdef _DEBUG
+VOID WarnOut(LPCTSTR pStr) {
+  DebugPrint(TEXT("%s"), pStr);
+}
+#endif  // def _DEBUG
+
+#ifdef _DEBUG
+VOID ErrorOut(LPCTSTR pStr) {
+  DWORD dwError;
+  DWORD dwResult;
+  TCHAR buf1[512];
+
+  dwError = GetLastError();
+  dwResult =
+      FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwError,
+                    MAKELANGID(LANG_ENGLISH, LANG_NEUTRAL), buf1, 512, NULL);
+
+  if (dwResult > 0) {
+    DebugPrint(TEXT("%s:%s(0x%x)"), pStr, buf1, dwError);
+  } else {
+    DebugPrint(TEXT("%s:(0x%x)"), pStr, dwError);
+  }
+}
+#endif  // def _DEBUG
+
+//////////////////////////////////////////////////////////////////////////////
+// DLL entry point
+
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   PSECURITY_ATTRIBUTES psa;
   LPTSTR lpDicFileName;
-#ifdef _DEBUG
-  TCHAR szDev[80];
-#endif
   DebugPrint(TEXT("DLLEntry:dwFunc=%d\n"), dwFunction);
 
   switch (dwFunction) {

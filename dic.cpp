@@ -749,14 +749,10 @@ BOOL PASCAL DicKeydownHandler(HIMC hIMC, UINT wParam, LPARAM lParam,
       break;
 
     case VK_G:
-#ifdef _DEBUG
-      if (dwDebugFlag & DEBF_GUIDELINE) {
-        if (IsCTLPushed(lpbKeyState)) {
-          MakeGuideLine(hIMC, MYGL_TESTGUIDELINE);
-          return (TRUE);
-        }
-      }
-#endif
+      //if (IsCTLPushed(lpbKeyState)) {
+      //  MakeGuideLine(hIMC, MYGL_TESTGUIDELINE);
+      //  return (TRUE);
+      //}
       break;
 
     default:

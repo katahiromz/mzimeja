@@ -418,17 +418,6 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
     case WM_INITDIALOG:
       SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
       //lpPropSheet = (LPPROPSHEETPAGE)lParam;
-
-#ifdef _DEBUG
-      CheckDlgButton(hDlg, IDC_LOGF_ENTRY, (dwLogFlag & LOGF_ENTRY) ? 1 : 0);
-      CheckDlgButton(hDlg, IDC_LOGF_API, (dwLogFlag & LOGF_API) ? 1 : 0);
-      CheckDlgButton(hDlg, IDC_LOGF_KEY, (dwLogFlag & LOGF_KEY) ? 1 : 0);
-
-      CheckDlgButton(hDlg, IDC_DEBF_THREADID,
-                     (dwDebugFlag & DEBF_THREADID) ? 1 : 0);
-      CheckDlgButton(hDlg, IDC_DEBF_GUIDELINE,
-                     (dwDebugFlag & DEBF_GUIDELINE) ? 1 : 0);
-#endif
       break;
 
     case WM_DESTROY:

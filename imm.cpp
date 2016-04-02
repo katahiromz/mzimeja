@@ -694,19 +694,11 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       break;
 
     case NI_IMEMENUSELECTED:
-#ifdef _DEBUG
-    {
-      TCHAR szDev[80];
-      OutputDebugString(TEXT("NotifyIME IMEMENUSELECTED\r\n"));
-      wsprintf(szDev, TEXT("\thIMC is 0x%x\r\n"), hIMC);
-      OutputDebugString(szDev);
-      wsprintf(szDev, TEXT("\tdwIndex is 0x%x\r\n"), dwIndex);
-      OutputDebugString(szDev);
-      wsprintf(szDev, TEXT("\tdwValue is 0x%x\r\n"), dwValue);
-      OutputDebugString(szDev);
-    }
-#endif
-    break;
+      DebugPrint(TEXT("NotifyIME IMEMENUSELECTED"));
+      DebugPrint(TEXT("\thIMC is 0x%x"), hIMC);
+      DebugPrint(TEXT("\tdwIndex is 0x%x"), dwIndex);
+      DebugPrint(TEXT("\tdwValue is 0x%x"), dwValue);
+      break;
 
     default:
       break;
@@ -779,29 +771,20 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
 
 #ifdef _DEBUG
 void DumpRS(LPRECONVERTSTRING lpRS) {
-  TCHAR szDev[80];
   LPTSTR lpDump = ((LPTSTR)lpRS) + lpRS->dwStrOffset;
   *(LPTSTR)(lpDump + lpRS->dwStrLen) = 0;
 
-  OutputDebugString(TEXT("DumpRS\r\n"));
-  wsprintf(szDev, TEXT("dwSize            %x\r\n"), lpRS->dwSize);
-  OutputDebugString(szDev);
-  wsprintf(szDev, TEXT("dwStrLen          %x\r\n"), lpRS->dwStrLen);
-  OutputDebugString(szDev);
-  wsprintf(szDev, TEXT("dwStrOffset       %x\r\n"), lpRS->dwStrOffset);
-  OutputDebugString(szDev);
-  wsprintf(szDev, TEXT("dwCompStrLen      %x\r\n"), lpRS->dwCompStrLen);
-  OutputDebugString(szDev);
-  wsprintf(szDev, TEXT("dwCompStrOffset   %x\r\n"), lpRS->dwCompStrOffset);
-  OutputDebugString(szDev);
-  wsprintf(szDev, TEXT("dwTargetStrLen    %x\r\n"), lpRS->dwTargetStrLen);
-  OutputDebugString(szDev);
-  wsprintf(szDev, TEXT("dwTargetStrOffset %x\r\n"), lpRS->dwTargetStrOffset);
-  OutputDebugString(szDev);
-  OutputDebugString(lpDump);
-  OutputDebugString(TEXT("\r\n"));
+  DebugPrint(TEXT("DumpRS"));
+  DebugPrint(TEXT("dwSize            %x"), lpRS->dwSize);
+  DebugPrint(TEXT("dwStrLen          %x"), lpRS->dwStrLen);
+  DebugPrint(TEXT("dwStrOffset       %x"), lpRS->dwStrOffset);
+  DebugPrint(TEXT("dwCompStrLen      %x"), lpRS->dwCompStrLen);
+  DebugPrint(TEXT("dwCompStrOffset   %x"), lpRS->dwCompStrOffset);
+  DebugPrint(TEXT("dwTargetStrLen    %x"), lpRS->dwTargetStrLen);
+  DebugPrint(TEXT("dwTargetStrOffset %x"), lpRS->dwTargetStrOffset);
+  DebugPrint(TEXT("%s"), lpDump);
 }
-#endif
+#endif  // def _DEBUG
 
 //  ImeSetCompositionString ()
 //  ImeSetCompositionString 関数はアプリケーションに lpComp やlpRead パ
@@ -875,16 +858,16 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
 
   switch (dwIndex) {
     case SCS_QUERYRECONVERTSTRING:
+      DebugPrint(TEXT("SCS_QUERYRECONVERTSTRING"));
 #ifdef _DEBUG
-      OutputDebugString(TEXT("SCS_QUERYRECONVERTSTRING\r\n"));
       if (lpComp) DumpRS((LPRECONVERTSTRING)lpComp);
       if (lpRead) DumpRS((LPRECONVERTSTRING)lpRead);
 #endif
       break;
 
     case SCS_SETRECONVERTSTRING:
+      DebugPrint(TEXT("SCS_SETRECONVERTSTRING"));
 #ifdef _DEBUG
-      OutputDebugString(TEXT("SCS_SETRECONVERTSTRING\r\n"));
       if (lpComp) DumpRS((LPRECONVERTSTRING)lpComp);
       if (lpRead) DumpRS((LPRECONVERTSTRING)lpRead);
 #endif

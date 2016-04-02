@@ -41,34 +41,25 @@ void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag) {
 
 #ifdef _DEBUG
 void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra) {
-  TCHAR szDev[80];
-  int i;
+  DebugPrint(TEXT("Status hWnd %lX  [%d,%d]"),
+             lpUIExtra->uiStatus.hWnd, lpUIExtra->uiStatus.pt.x,
+             lpUIExtra->uiStatus.pt.y);
 
-  wsprintf(szDev, TEXT("Status hWnd %lX  [%d,%d]\r\n"),
-           lpUIExtra->uiStatus.hWnd, lpUIExtra->uiStatus.pt.x,
-           lpUIExtra->uiStatus.pt.y);
-  OutputDebugString(szDev);
+  DebugPrint(TEXT("Cand hWnd %lX  [%d,%d]"),
+             lpUIExtra->uiCand.hWnd, lpUIExtra->uiCand.pt.x,
+             lpUIExtra->uiCand.pt.y);
 
-  wsprintf(szDev, TEXT("Cand hWnd %lX  [%d,%d]\r\n"),
-           lpUIExtra->uiCand.hWnd, lpUIExtra->uiCand.pt.x,
-           lpUIExtra->uiCand.pt.y);
-  OutputDebugString(szDev);
+  DebugPrint(TEXT("CompStyle hWnd %lX]"), lpUIExtra->dwCompStyle);
 
-  wsprintf(szDev, TEXT("CompStyle hWnd %lX]\r\n"),
-           lpUIExtra->dwCompStyle);
-  OutputDebugString(szDev);
+  DebugPrint(TEXT("DefComp hWnd %lX  [%d,%d]"),
+             lpUIExtra->uiDefComp.hWnd, lpUIExtra->uiDefComp.pt.x,
+             lpUIExtra->uiDefComp.pt.y);
 
-  wsprintf(szDev, TEXT("DefComp hWnd %lX  [%d,%d]\r\n"),
-           lpUIExtra->uiDefComp.hWnd, lpUIExtra->uiDefComp.pt.x,
-           lpUIExtra->uiDefComp.pt.y);
-  OutputDebugString(szDev);
-
-  for (i = 0; i < 5; i++) {
-    wsprintf(szDev, TEXT("Comp hWnd %lX  [%d,%d]-[%d,%d]\r\n"),
-             lpUIExtra->uiComp[i].hWnd, lpUIExtra->uiComp[i].rc.left,
-             lpUIExtra->uiComp[i].rc.top, lpUIExtra->uiComp[i].rc.right,
-             lpUIExtra->uiComp[i].rc.bottom);
-    OutputDebugString(szDev);
+  for (int i = 0; i < 5; i++) {
+    DebugPrint(TEXT("Comp hWnd %lX  [%d,%d]-[%d,%d]"),
+               lpUIExtra->uiComp[i].hWnd, lpUIExtra->uiComp[i].rc.left,
+               lpUIExtra->uiComp[i].rc.top, lpUIExtra->uiComp[i].rc.right,
+               lpUIExtra->uiComp[i].rc.bottom);
   }
 }
 #endif  // def _DEBUG
@@ -182,20 +173,11 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       case WM_IME_COMPOSITIONFULL:
       case WM_IME_SELECT:
       case WM_IME_CHAR:
-#ifdef _DEBUG
-      {
-        TCHAR szDev[80];
-        OutputDebugString(TEXT("Why hUICurIMC is NULL????\r\n"));
-        wsprintf(szDev, TEXT("\thWnd is %x\r\n"), hWnd);
-        OutputDebugString(szDev);
-        wsprintf(szDev, TEXT("\tmessage is %x\r\n"), message);
-        OutputDebugString(szDev);
-        wsprintf(szDev, TEXT("\twParam is %x\r\n"), wParam);
-        OutputDebugString(szDev);
-        wsprintf(szDev, TEXT("\tlParam is %x\r\n"), lParam);
-        OutputDebugString(szDev);
-      }
-#endif
+        DebugPrint(TEXT("Why hUICurIMC is NULL????"));
+        DebugPrint(TEXT("\thWnd is %x"), hWnd);
+        DebugPrint(TEXT("\tmessage is %x"), message);
+        DebugPrint(TEXT("\twParam is %x"), wParam);
+        DebugPrint(TEXT("\tlParam is %x"), lParam);
         return 0L;
       default:
         break;

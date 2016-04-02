@@ -84,16 +84,10 @@ itae_exit:
   // If trans key buffer that is allocated by USER.EXE full up,
   // the return value is the negative number.
   if (fOverTransKey) {
-#ifdef _DEBUG
-    OutputDebugString(
-        TEXT("***************************************\r\n"));
-    OutputDebugString(
-        TEXT("*   TransKey OVER FLOW Messages!!!    *\r\n"));
-    OutputDebugString(
-        TEXT("*                by MZIMEJA.DLL       *\r\n"));
-    OutputDebugString(
-        TEXT("***************************************\r\n"));
-#endif
+    DebugPrint(TEXT("***************************************"));
+    DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *"));
+    DebugPrint(TEXT("*                by MZIMEJA.DLL       *"));
+    DebugPrint(TEXT("***************************************"));
     return (int)uNumTransKey;
   }
 

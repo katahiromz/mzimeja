@@ -338,48 +338,25 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
               dwSize = (DWORD)ImmRequestMessage(hIMC, IMR_RECONVERTSTRING,
                                                 (LPARAM)lpRS);
               if (dwSize) {
-#ifdef _DEBUG
-                {
-                  TCHAR szDev[80];
-                  LPTSTR lpDump = (LPTSTR)(((LPSTR)lpRS) + lpRS->dwStrOffset);
-                  *(LPTSTR)(lpDump + lpRS->dwStrLen) = 0;
+                LPTSTR lpDump = (LPTSTR)(((LPSTR)lpRS) + lpRS->dwStrOffset);
+                *(LPTSTR)(lpDump + lpRS->dwStrLen) = 0;
 
-                  OutputDebugString(TEXT("IMR_RECONVERTSTRING\r\n"));
-                  wsprintf(szDev, TEXT("dwSize            %x\r\n"),
-                           lpRS->dwSize);
-                  OutputDebugString(szDev);
-                  wsprintf(szDev, TEXT("dwVersion         %x\r\n"),
-                           lpRS->dwVersion);
-                  OutputDebugString(szDev);
-                  wsprintf(szDev, TEXT("dwStrLen          %x\r\n"),
-                           lpRS->dwStrLen);
-                  OutputDebugString(szDev);
-                  wsprintf(szDev, TEXT("dwStrOffset       %x\r\n"),
-                           lpRS->dwStrOffset);
-                  OutputDebugString(szDev);
-                  wsprintf(szDev, TEXT("dwCompStrLen      %x\r\n"),
-                           lpRS->dwCompStrLen);
-                  OutputDebugString(szDev);
-                  wsprintf(szDev, TEXT("dwCompStrOffset   %x\r\n"),
-                           lpRS->dwCompStrOffset);
-                  OutputDebugString(szDev);
-                  wsprintf(szDev, TEXT("dwTargetStrLen    %x\r\n"),
-                           lpRS->dwTargetStrLen);
-                  OutputDebugString(szDev);
-                  wsprintf(szDev, TEXT("dwTargetStrOffset %x\r\n"),
-                           lpRS->dwTargetStrOffset);
-                  OutputDebugString(szDev);
-                  OutputDebugString(lpDump);
-                  OutputDebugString(TEXT("\r\n"));
-                }
-#endif
+                DebugPrint(TEXT("IMR_RECONVERTSTRING\r\n"));
+                DebugPrint(TEXT("dwSize            %x"), lpRS->dwSize);
+                DebugPrint(TEXT("dwVersion         %x"), lpRS->dwVersion);
+                DebugPrint(TEXT("dwStrLen          %x"), lpRS->dwStrLen);
+                DebugPrint(TEXT("dwStrOffset       %x"), lpRS->dwStrOffset);
+                DebugPrint(TEXT("dwCompStrLen      %x"), lpRS->dwCompStrLen);
+                DebugPrint(TEXT("dwCompStrOffset   %x"), lpRS->dwCompStrOffset);
+                DebugPrint(TEXT("dwTargetStrLen    %x"), lpRS->dwTargetStrLen);
+                DebugPrint(TEXT("dwTargetStrOffset %x"), lpRS->dwTargetStrOffset);
+                DebugPrint(TEXT("%s"), lpDump);
+
                 ImmRequestMessage(hIMC, IMR_CONFIRMRECONVERTSTRING,
                                   (LPARAM)lpRS);
               }
-#ifdef _DEBUG
               else
-                OutputDebugString(TEXT("ImmRequestMessage returned 0\r\n"));
-#endif
+                DebugPrint(TEXT("ImmRequestMessage returned 0\r\n"));
               GlobalFree((HANDLE)lpRS);
             }
             break;
