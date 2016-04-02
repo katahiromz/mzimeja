@@ -13,6 +13,7 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
 
 #define FAKEWORD_NOUN  IME_REGWORD_STYLE_USER_FIRST
 #define FAKEWORD_VERB  (IME_REGWORD_STYLE_USER_FIRST+1)
@@ -95,3 +96,4 @@ UINT    WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead, DW
     return uRet;
 }
 
+} // extern "C"

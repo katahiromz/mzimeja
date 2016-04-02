@@ -14,17 +14,16 @@ Module Name:
 #include "fakeime.h"
 #include "resource.h"
 
+extern "C" {
+
 /**********************************************************************/
 /*                                                                    */
 /* StatusWndProc()                                                    */
 /* IME UI window procedure                                            */
 /*                                                                    */
 /**********************************************************************/
-LRESULT CALLBACK StatusWndProc( hWnd, message, wParam, lParam )
-HWND hWnd;
-UINT message;
-WPARAM wParam;
-LPARAM lParam;
+LRESULT CALLBACK
+StatusWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
     PAINTSTRUCT ps;
     HWND hUIWnd;
@@ -180,7 +179,7 @@ void PASCAL PaintStatus( HWND hStatusWnd , HDC hDC, LPPOINT lppt, DWORD dwPushed
 
         // Paint Caption.
         hBrush = CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION));
-        hOldBrush = SelectObject(hDC,hBrush);
+        hOldBrush = (HBRUSH)SelectObject(hDC,hBrush);
         rc.top = rc.left = 0;
         rc.right = BTX*3;
         rc.bottom = nCyCap;
@@ -190,7 +189,7 @@ void PASCAL PaintStatus( HWND hStatusWnd , HDC hDC, LPPOINT lppt, DWORD dwPushed
 
         // Paint CloseButton.
         hbmpStatus = (HBITMAP)GetWindowLongPtr(hStatusWnd,FIGWL_CLOSEBMP);
-        hbmpOld = SelectObject(hMemDC,hbmpStatus);
+        hbmpOld = (HBITMAP)SelectObject(hMemDC,hbmpStatus);
 
         if (!(dwPushedStatus & PUSHED_STATUS_CLOSE))
             BitBlt(hDC,STCLBT_X,STCLBT_Y,STCLBT_DX,STCLBT_DY,
@@ -526,3 +525,4 @@ void PASCAL UpdateStatusWindow(LPUIEXTRA lpUIExtra)
         SendMessage(lpUIExtra->uiStatus.hWnd,WM_UI_UPDATE,0,0L);
 }
 
+} // extern "C"

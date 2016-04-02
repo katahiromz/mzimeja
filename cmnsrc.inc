@@ -15,27 +15,27 @@ USE_MSVCRT=1
 NO_NTDLL=1
 
 INCLUDES=..; \
-         $(BASEDIR)\src\ime\inc;
+         ..\include;
 
 SOURCES= \
-        ..\config.cc \
-        ..\data.cc \
-        ..\dic.cc \
-        ..\dic2.cc \
-        ..\fakeime.cc \
-        ..\fdebug.cc \
-        ..\imm.cc \
-        ..\immsec.cc \
-        ..\input.cc \
-        ..\process.cc \
-        ..\regword.cc \
-        ../subs.cc \
-        ../toascii.cc \
-        ../ui.cc \
-        ../uicand.cc \
-        ../uicomp.cc \
-        ../uiguide.cc \
-        ../uistate.cc \
+        ..\config.cpp \
+        ..\data.cpp \
+        ..\dic.cpp \
+        ..\dic2.cpp \
+        ..\fakeime.cpp \
+        ..\fdebug.cpp \
+        ..\imm.cpp \
+        ..\immsec.cpp \
+        ..\input.cpp \
+        ..\process.cpp \
+        ..\regword.cpp \
+        ../subs.cpp \
+        ../toascii.cpp \
+        ../ui.cpp \
+        ../uicand.cpp \
+        ../uicomp.cpp \
+        ../uiguide.cpp \
+        ../uistate.cpp \
 
 TARGETLIBS= \
         $(SDK_LIB_PATH)\advapi32.lib \

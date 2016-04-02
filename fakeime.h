@@ -334,6 +334,9 @@ extern DWORD dwDebugFlag;
 /*      Functions                                                     */
 /*                                                                    */
 /**********************************************************************/
+
+extern "C" {
+
 /*   fakeime.c     */
 int PASCAL Init(void);
 
@@ -371,7 +374,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC,WPARAM,LPARAM,LPBYTE);
 BOOL PASCAL IMEKeyupHandler(HIMC,WPARAM,LPARAM,LPBYTE);
 
 /*   ui.c        */
-BOOL IMERegisterClass(HANDLE hInstance);
+BOOL IMERegisterClass(HINSTANCE hInstance);
 LRESULT CALLBACK FAKEIMEWndProc(HWND,UINT,WPARAM,LPARAM);
 LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 LONG PASCAL ControlCommand(HIMC hUICurIMC, HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
@@ -420,7 +423,7 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message , WPARAM wParam, LPA
 BOOL PASCAL IsEat(WORD);
 BOOL PASCAL DicKeydownHandler(HIMC,UINT,LPARAM,LPBYTE);
 void PASCAL DeleteChar( HIMC hIMC ,UINT uVKey);
-void PASCAL FlushText();
+void PASCAL FlushText(HIMC hIMC);
 void PASCAL RevertText(HIMC hIMC);
 void PASCAL AddChar(HIMC,WORD);
 BOOL PASCAL ConvKanji(HIMC);
@@ -481,3 +484,4 @@ void PASCAL MyOutputDebugStringW(LPWSTR lpw);
 #endif
 #endif
 
+} // extern "C"

@@ -11,6 +11,8 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
+
 #if defined(FAKEIMEM) || defined(UNICODE)
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf, DWORD dwBufLen, LPTSTR szDicFileName);
 #endif
@@ -774,3 +776,5 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType, LPMYIMEM
     return 0;
 }
 
+
+} // extern "C"

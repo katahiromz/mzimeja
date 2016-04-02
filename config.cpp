@@ -15,6 +15,8 @@ Module Name:
 
 #define MAX_PAGES 5
 
+extern "C" {
+
 /**********************************************************************/
 /*                                                                    */
 /*      AddPage()                                                     */
@@ -487,3 +489,4 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message , WPARAM wParam, LPA
     return TRUE;
 } 
 
+} // extern "C"

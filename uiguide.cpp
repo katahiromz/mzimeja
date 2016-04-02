@@ -13,17 +13,16 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
+
 /**********************************************************************/
 /*                                                                    */
 /* GuideWndProc()                                                     */
 /* IME UI window procedure                                            */
 /*                                                                    */
 /**********************************************************************/
-LRESULT CALLBACK GuideWndProc( hWnd, message, wParam, lParam )
-HWND hWnd;
-UINT message;
-WPARAM wParam;
-LPARAM lParam;
+LRESULT CALLBACK
+GuideWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
     PAINTSTRUCT ps;
     HWND hUIWnd;
@@ -145,7 +144,7 @@ void PASCAL PaintGuide( HWND hGuideWnd , HDC hDC, LPPOINT lppt, DWORD dwPushedGu
 
         // Paint Caption.
         hBrush = CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION));
-        hOldBrush = SelectObject(hDC,hBrush);
+        hOldBrush = (HBRUSH)SelectObject(hDC,hBrush);
         GetClientRect(hGuideWnd,&rc);
         //rc.top = rc.left = 0;
         //rc.right = BTX*3;
@@ -156,7 +155,7 @@ void PASCAL PaintGuide( HWND hGuideWnd , HDC hDC, LPPOINT lppt, DWORD dwPushedGu
 
         // Paint CloseButton.
         hbmpGuide = (HBITMAP)GetWindowLongPtr(hGuideWnd,FIGWL_CLOSEBMP);
-        hbmpOld = SelectObject(hMemDC,hbmpGuide);
+        hbmpOld = (HBITMAP)SelectObject(hMemDC,hbmpGuide);
 
         if (!(dwPushedGuide & PUSHED_STATUS_CLOSE))
             BitBlt(hDC,rc.right-STCLBT_DX-2,STCLBT_Y,STCLBT_DX,STCLBT_DY,
@@ -175,11 +174,10 @@ void PASCAL PaintGuide( HWND hGuideWnd , HDC hDC, LPPOINT lppt, DWORD dwPushedGu
                 if (lpGLStr = (LPTSTR)GlobalLock(hGLStr))
                 {
                     COLORREF rgb = 0;
-                    HBRUSH hbrLGR = GetStockObject(LTGRAY_BRUSH);
+                    HBRUSH hbrLGR = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
                     HBRUSH hbr;
 
-
-                    hbr = SelectObject(hDC,hbrLGR);
+                    hbr = (HBRUSH)SelectObject(hDC,hbrLGR);
                     GetClientRect(hGuideWnd,&rc);
                     PatBlt(hDC,0,nCyCap,rc.right,rc.bottom-nCyCap,PATCOPY);
                     SelectObject(hDC,hbr);
@@ -331,4 +329,4 @@ void PASCAL UpdateGuideWindow(LPUIEXTRA lpUIExtra)
         SendMessage(lpUIExtra->uiGuide.hWnd,WM_UI_UPDATE,0,0L);
 }
 
-
+} // extern "C"

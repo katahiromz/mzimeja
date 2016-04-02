@@ -13,6 +13,8 @@ Module Name:
 #include "vksub.h"
 #include "immsec.h"
 
+extern "C" {
+
 #if defined(FAKEIMEM) || defined(UNICODE)
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf, DWORD dwBufLen, LPTSTR szDicFileName);
 #endif
@@ -34,7 +36,6 @@ BOOL GetAnsiPathName(LPCWSTR lpszUniPath,LPSTR lpszAnsiPath,UINT nMaxLen)
     }
 
 }
-
 
 /**********************************************************************/
 /*                                                                    */
@@ -417,8 +418,7 @@ cvk_exit10:
 /* IsEat( code )                                                      */
 /*                                                                    */
 /**********************************************************************/
-BOOL PASCAL IsEat( code )
-register WORD code;
+BOOL PASCAL IsEat( WORD code )
 {
 #if defined(FAKEIMEM) || defined(UNICODE)
     return TRUE;
@@ -573,9 +573,7 @@ dc_exit:
 /* One character add function                                         */
 /*                                                                    */
 /**********************************************************************/
-void PASCAL AddChar( hIMC, code )
-HIMC hIMC;
-WORD code;
+void PASCAL AddChar(HIMC hIMC, WORD code)
 {
     LPMYSTR lpchText;
     LPMYSTR lpread;
@@ -991,11 +989,8 @@ ac_exit:
 /* differ depending on wParam                                         */
 /*                                                                    */
 /**********************************************************************/
-BOOL PASCAL DicKeydownHandler( hIMC, wParam, lParam ,lpbKeyState)
-HIMC hIMC;
-UINT wParam;
-LPARAM lParam;
-LPBYTE lpbKeyState;
+BOOL PASCAL
+DicKeydownHandler(HIMC hIMC, UINT wParam, LPARAM lParam, LPBYTE lpbKeyState)
 {
     LPINPUTCONTEXT lpIMC;
 
@@ -1460,3 +1455,5 @@ Err0:
 
 #endif
 
+
+} // extern "C"

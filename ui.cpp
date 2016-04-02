@@ -13,6 +13,8 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
+
 void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag);
 #ifdef DEBUG
 void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra);
@@ -28,8 +30,7 @@ void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra);
 /*    Create global GDI objects.                                      */
 /*                                                                    */
 /**********************************************************************/
-BOOL IMERegisterClass( hInstance )
-HANDLE hInstance;
+BOOL IMERegisterClass( HINSTANCE hInstance )
 {
     WNDCLASSEX wc;
 
@@ -63,8 +64,8 @@ HANDLE hInstance;
     wc.hInstance      = hInstance;
     wc.hCursor        = LoadCursor( NULL, IDC_ARROW );
     wc.hIcon          = NULL;
-    wc.lpszMenuName   = (LPTSTR)NULL;
-    wc.lpszClassName  = (LPTSTR)szCompStrClassName;
+    wc.lpszMenuName   = NULL;
+    wc.lpszClassName  = szCompStrClassName;
     wc.hbrBackground  = NULL;
     wc.hIconSm        = NULL;
 
@@ -82,9 +83,9 @@ HANDLE hInstance;
     wc.hInstance      = hInstance;
     wc.hCursor        = LoadCursor( NULL, IDC_ARROW );
     wc.hIcon          = NULL;
-    wc.lpszMenuName   = (LPTSTR)NULL;
-    wc.lpszClassName  = (LPTSTR)szCandClassName;
-    wc.hbrBackground  = GetStockObject(LTGRAY_BRUSH);
+    wc.lpszMenuName   = NULL;
+    wc.lpszClassName  = szCandClassName;
+    wc.hbrBackground  = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
     wc.hIconSm        = NULL;
 
     if( !RegisterClassEx( (LPWNDCLASSEX)&wc ) )
@@ -101,10 +102,10 @@ HANDLE hInstance;
     wc.hInstance      = hInstance;
     wc.hCursor        = LoadCursor( NULL, IDC_ARROW );
     wc.hIcon          = NULL;
-    wc.lpszMenuName   = (LPTSTR)NULL;
-    wc.lpszClassName  = (LPTSTR)szStatusClassName;
+    wc.lpszMenuName   = NULL;
+    wc.lpszClassName  = szStatusClassName;
     wc.hbrBackground  = NULL;
-    wc.hbrBackground  = GetStockObject(LTGRAY_BRUSH);
+    wc.hbrBackground  = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
     wc.hIconSm        = NULL;
 
     if( !RegisterClassEx( (LPWNDCLASSEX)&wc ) )
@@ -121,8 +122,8 @@ HANDLE hInstance;
     wc.hInstance      = hInstance;
     wc.hCursor        = LoadCursor( NULL, IDC_ARROW );
     wc.hIcon          = NULL;
-    wc.lpszMenuName   = (LPTSTR)NULL;
-    wc.lpszClassName  = (LPTSTR)szGuideClassName;
+    wc.lpszMenuName   = NULL;
+    wc.lpszClassName  = szGuideClassName;
     wc.hbrBackground  = NULL;
     //wc.hbrBackground  = GetStockObject(LTGRAY_BRUSH);
     wc.hIconSm        = NULL;
@@ -140,11 +141,8 @@ HANDLE hInstance;
 /* IME UI window procedure                                            */
 /*                                                                    */
 /**********************************************************************/
-LRESULT CALLBACK FAKEIMEWndProc( hWnd, message, wParam, lParam )
-HWND hWnd;
-UINT message;
-WPARAM wParam;
-LPARAM lParam;
+LRESULT CALLBACK
+FAKEIMEWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
     HIMC           hUICurIMC;
     LPINPUTCONTEXT lpIMC;
@@ -443,7 +441,7 @@ int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra)
     hIC = CreateIC(TEXT("DISPLAY"),NULL,NULL,NULL);
 
     if (lpUIExtra->hFont)
-        hOldFont = SelectObject(hIC,lpUIExtra->hFont);
+        hOldFont = (HFONT)SelectObject(hIC,lpUIExtra->hFont);
     GetTextExtentPoint(hIC,TEXT("A"),1,&sz);
 
     if (hOldFont)
@@ -910,3 +908,4 @@ void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra)
 }
 #endif
 
+} // extern "C"

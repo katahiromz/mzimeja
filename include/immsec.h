@@ -8,8 +8,10 @@ Module Name:
     
 ++*/
 
-PSECURITY_ATTRIBUTES CreateSecurityAttributes( );
+extern "C" {
+
+PSECURITY_ATTRIBUTES CreateSecurityAttributes(VOID);
 VOID FreeSecurityAttributes( PSECURITY_ATTRIBUTES psa);
-BOOL IsNT();
+BOOL IsNT(VOID);
 
-
+} // extern "C"

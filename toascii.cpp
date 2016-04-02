@@ -13,6 +13,8 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
+
 /**********************************************************************/
 /*      ImeToAsciiEx                                                  */
 /*                                                                    */
@@ -97,4 +99,4 @@ BOOL PASCAL GenerateMessageToTransKey(LPTRANSMSGLIST lpTransBuf,LPTRANSMSG lpGen
     return TRUE;
 }
 
-
+} // extern "C"

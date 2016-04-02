@@ -12,6 +12,8 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
+
 #ifdef DEBUG
 
 #ifdef FAKEIMEM
@@ -110,3 +112,5 @@ void PASCAL MyOutputDebugStringW(LPWSTR lpw)
 
 #endif //DEBUG
 
+
+} // extern "C"

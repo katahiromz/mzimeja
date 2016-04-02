@@ -2,6 +2,7 @@
 *.user
 *.suo
 *.ime
+*.log
 Debug
 Release
 x64

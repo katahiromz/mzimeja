@@ -13,6 +13,8 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
+
 int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra);
 
 /**********************************************************************/
@@ -21,11 +23,8 @@ int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra);
 /* IME UI window procedure                                            */
 /*                                                                    */
 /**********************************************************************/
-LRESULT CALLBACK CandWndProc( hWnd, message, wParam, lParam )
-HWND hWnd;
-UINT message;
-WPARAM wParam;
-LPARAM lParam;
+LRESULT CALLBACK
+CandWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
     HWND hUIWnd;
 
@@ -186,7 +185,7 @@ void PASCAL PaintCandWindow( HWND hCandWnd)
     SIZE sz;
     HWND hSvrWnd;
     HBRUSH hbrHightLight = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
-    HBRUSH hbrLGR = GetStockObject(LTGRAY_BRUSH);
+    HBRUSH hbrLGR = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
     HFONT hOldFont;
 
     GetClientRect(hCandWnd,&rc);
@@ -209,14 +208,14 @@ void PASCAL PaintCandWindow( HWND hCandWnd)
                 MyGetTextExtentPoint(hDC,lpstr,Mylstrlen(lpstr),&sz);
                 if (((LPMYCAND)lpCandInfo)->cl.dwSelection == (DWORD)i)
                 {
-                    hbr = SelectObject(hDC,hbrHightLight);
+                    hbr = (HBRUSH)SelectObject(hDC,hbrHightLight);
                     PatBlt(hDC,0,height,rc.right,sz.cy,PATCOPY);
                     SelectObject(hDC,hbr);
                     SetTextColor(hDC,GetSysColor(COLOR_HIGHLIGHTTEXT));
                 }
                 else
                 {
-                    hbr = SelectObject(hDC,hbrLGR);
+                    hbr = (HBRUSH)SelectObject(hDC,hbrLGR);
                     PatBlt(hDC,0,height,rc.right,sz.cy,PATCOPY);
                     SelectObject(hDC,hbr);
                     SetTextColor(hDC,RGB(0,0,0));
@@ -418,3 +417,5 @@ void PASCAL MoveCandWindow(HWND hUIWnd, LPINPUTCONTEXT lpIMC, LPUIEXTRA lpUIExtr
     }
 }
 
+
+} // extern "C"

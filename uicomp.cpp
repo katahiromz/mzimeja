@@ -13,6 +13,8 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
+
 /**********************************************************************/
 /*                                                                    */
 /* CompStrWndProc()                                                   */
@@ -20,11 +22,8 @@ Module Name:
 /* IME UI window procedure                                            */
 /*                                                                    */
 /**********************************************************************/
-LRESULT CALLBACK CompStrWndProc( hWnd, message, wParam, lParam )
-HWND   hWnd;
-UINT   message;
-WPARAM wParam;
-LPARAM lParam;
+LRESULT CALLBACK
+CompStrWndProc( HWND   hWnd, UINT   message, WPARAM wParam, LPARAM lParam )
 {
     HWND hUIWnd;
 
@@ -308,7 +307,7 @@ void PASCAL MoveCompWindow( LPUIEXTRA lpUIExtra,LPINPUTCONTEXT lpIMC )
                     hDC = GetDC(lpUIExtra->uiComp[i].hWnd);
 
                     if (hFont = (HFONT)GetWindowLongPtr(lpUIExtra->uiComp[i].hWnd,FIGWL_FONT))
-                        hOldFont = SelectObject(hDC,hFont);
+                        hOldFont = (HFONT)SelectObject(hDC,hFont);
 
                     sz.cy = 0;
                     oldrc = lpUIExtra->uiComp[i].rc;
@@ -376,7 +375,7 @@ void PASCAL MoveCompWindow( LPUIEXTRA lpUIExtra,LPINPUTCONTEXT lpIMC )
                     hDC = GetDC(lpUIExtra->uiComp[i].hWnd);
 
                     if (hFont = (HFONT)GetWindowLongPtr(lpUIExtra->uiComp[i].hWnd,FIGWL_FONT))
-                        hOldFont = SelectObject(hDC,hFont);
+                        hOldFont = (HFONT)SelectObject(hDC,hFont);
 
                     sz.cy = 0;
 
@@ -607,7 +606,7 @@ void PASCAL PaintCompWindow( HWND hCompWnd)
     hDC = BeginPaint(hCompWnd,&ps);
 
     if (hFont = (HFONT)GetWindowLongPtr(hCompWnd,FIGWL_FONT))
-        hOldFont = SelectObject(hDC,hFont);
+        hOldFont = (HFONT)SelectObject(hDC,hFont);
 
     hSvrWnd = (HWND)GetWindowLongPtr(hCompWnd,FIGWL_SVRWND);
 
@@ -710,3 +709,4 @@ void PASCAL SetFontCompWindow(LPUIEXTRA lpUIExtra)
 
 }
 
+} // extern "C"

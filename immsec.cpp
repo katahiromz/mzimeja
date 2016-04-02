@@ -22,14 +22,16 @@ Revision History:
 #include <stdio.h>
 #include "immsec.h"
 
+extern "C" {
+
 #define MEMALLOC(x)      LocalAlloc(LMEM_FIXED, x)
 #define MEMFREE(x)       LocalFree(x)
 
 //
 // internal functions
 //
-PSID MyCreateSid();
-POSVERSIONINFO GetVersionInfo();
+PSID MyCreateSid(VOID);
+POSVERSIONINFO GetVersionInfo(VOID);
 
 //
 // debug functions
@@ -128,7 +130,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes()
              (sizeof(ACCESS_ALLOWED_ACE) - sizeof(DWORD)) + 
              GetLengthSid(psid);
 
-    pacl = MEMALLOC( cbacl );
+    pacl = (PACL)MEMALLOC( cbacl );
     if ( pacl == NULL ) {
         ERROROUT( TEXT("CreateSecurityAttributes:LocalAlloc for ACL failed") );
         FreeSid ( psid );
@@ -239,7 +241,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes()
     return psa;
 }
 
-PSID MyCreateSid()
+PSID MyCreateSid(VOID)
 {
     PSID        psid;
     BOOL        fResult;
@@ -313,12 +315,12 @@ VOID FreeSecurityAttributes( PSECURITY_ATTRIBUTES psa )
 //      You need to modify the function if you call the function in 
 //      multi-thread environment.
 //
-BOOL IsNT()
+BOOL IsNT(VOID)
 {
     return GetVersionInfo()->dwPlatformId == VER_PLATFORM_WIN32_NT;
 }
 
-POSVERSIONINFO GetVersionInfo()
+POSVERSIONINFO GetVersionInfo(VOID)
 {
     static BOOL fFirstCall = TRUE;
     static OSVERSIONINFO os;
@@ -332,3 +334,5 @@ POSVERSIONINFO GetVersionInfo()
     return &os;
 }
 
+
+} // extern "C"

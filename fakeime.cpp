@@ -15,6 +15,9 @@ Module Name:
 #include "immsec.h"
 
 extern HANDLE hMutex;
+
+extern "C" {
+
 /**********************************************************************/
 /*    DLLEntry()                                                      */
 /**********************************************************************/
@@ -100,3 +103,4 @@ BOOL WINAPI DllMain (
     return TRUE;
 }
 
+} // extern "C"

@@ -11,6 +11,8 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
+
 /**********************************************************************/
 /*                                                                    */
 /* ConvChar()                                                         */
@@ -18,9 +20,7 @@ Module Name:
 /* Roman character Kana converting function                           */
 /*                                                                    */
 /**********************************************************************/
-WORD PASCAL ConvChar( hIMC, ch1, ch2 )
-HIMC hIMC;
-WORD ch1, ch2;
+WORD PASCAL ConvChar(HIMC hIMC, WORD ch1, WORD ch2)
 {
     int num1, num2;
 #if defined(FAKEIMEM) || defined(UNICODE)
@@ -87,8 +87,7 @@ WORD ch1, ch2;
 /* A function which judges the vowels                                 */
 /*                                                                    */
 /**********************************************************************/
-int PASCAL IsFirst( ch )
-register WORD ch;
+int PASCAL IsFirst(WORD ch)
 {
     register int i;
 #if defined(FAKEIMEM) || defined(UNICODE)
@@ -123,8 +122,7 @@ register WORD ch;
 /* A function which judges the consonants                             */
 /*                                                                    */
 /**********************************************************************/
-int PASCAL IsSecond( ch )
-register WORD ch;
+int PASCAL IsSecond(WORD ch)
 {
     register int i;
 #if defined(FAKEIMEM) || defined(UNICODE)
@@ -265,14 +263,9 @@ static WORD table8[] = {        /* sonant char part 2 */
 /*                                                                    */
 /**********************************************************************/
 #if defined(FAKEIMEM) || defined(UNICODE)
-WORD PASCAL HanToZen( code, KatakanaLetter,fdwConversion )
-register WORD code;
-register WORD KatakanaLetter;
-DWORD fdwConversion;
+WORD PASCAL HanToZen( WORD code, WORD KatakanaLetter,DWORD fdwConversion )
 #else
-WORD PASCAL HanToZen( code, fdwConversion )
-register WORD code;
-DWORD fdwConversion;
+WORD PASCAL HanToZen( WORD code, DWORD fdwConversion )
 #endif
 {
     BOOL flag;
@@ -361,8 +354,7 @@ DWORD fdwConversion;
 /* Return half size character code                                    */
 /*                                                                    */
 /**********************************************************************/
-WORD PASCAL ZenToHan( code )
-WORD code;
+WORD PASCAL ZenToHan( WORD code )
 {
     int i;
 #if defined(FAKEIMEM) || defined(UNICODE)
@@ -422,8 +414,7 @@ WORD code;
 }
 
 
-BOOL PASCAL IsTenten( code )
-WORD code;
+BOOL PASCAL IsTenten( WORD code )
 {
     register int i;
 
@@ -434,8 +425,7 @@ WORD code;
 }
 
 
-WORD PASCAL ConvTenten( code )
-WORD code;
+WORD PASCAL ConvTenten( WORD code )
 {
     if( IsTenten( code ) )
         return( code + 1 );
@@ -443,8 +433,7 @@ WORD code;
 }
 
 
-BOOL PASCAL IsMaru( code )
-WORD code;
+BOOL PASCAL IsMaru( WORD code )
 {
     register int i;
 
@@ -455,8 +444,7 @@ WORD code;
 }
 
 
-WORD PASCAL ConvMaru( code )
-WORD code;
+WORD PASCAL ConvMaru( WORD code )
 {
     if( IsMaru( code ) )
         return( code + 2 );
@@ -652,3 +640,4 @@ void PASCAL lHanToZen(LPMYSTR lpDst,LPMYSTR lpSrc,DWORD fdwConversion)
 #endif
 }
 
+} // extern "C"

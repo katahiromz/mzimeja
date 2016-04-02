@@ -14,6 +14,8 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
+
 /**********************************************************************/
 /*                                                                    */
 /*      InitCompStr()                                                  */
@@ -253,7 +255,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode)
 #endif
         goto ccs_exit30;
 
-    if (!(lpDst = GlobalLock(hDst)))
+    if (!(lpDst = (LPMYSTR)GlobalLock(hDst)))
         goto ccs_exit20;
 
 
@@ -602,7 +604,7 @@ HFONT CheckNativeCharset(HDC hDC)
     LOGFONT lfFont;
     HFONT hOldFont;
 
-    hOldFont = GetCurrentObject(hDC, OBJ_FONT);
+    hOldFont = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
     GetObject(hOldFont, sizeof(LOGFONT), &lfFont);
 
     if (lfFont.lfCharSet != NATIVE_CHARSET) {
@@ -617,3 +619,5 @@ HFONT CheckNativeCharset(HDC hDC)
     return hOldFont;
 }
 
+
+} // extern "C"

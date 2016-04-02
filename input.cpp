@@ -13,6 +13,8 @@ Module Name:
 #include "immdev.h"
 #include "fakeime.h"
 
+extern "C" {
+
 /**********************************************************************/
 /*                                                                    */
 /* IMEKeydownHandler()                                                */
@@ -20,11 +22,8 @@ Module Name:
 /* A function which handles WM_IMEKEYDOWN                             */
 /*                                                                    */
 /**********************************************************************/
-BOOL PASCAL IMEKeydownHandler( hIMC, wParam, lParam,lpbKeyState)
-HIMC hIMC;
-WPARAM wParam;
-LPARAM lParam;
-LPBYTE lpbKeyState;
+BOOL PASCAL
+IMEKeydownHandler( HIMC hIMC, WPARAM wParam, LPARAM lParam,LPBYTE lpbKeyState)
 {
     WORD wVKey;
 
@@ -57,13 +56,10 @@ LPBYTE lpbKeyState;
 /* A function which handles WM_IMEKEYUP                               */
 /*                                                                    */
 /**********************************************************************/
-BOOL PASCAL IMEKeyupHandler( hIMC, wParam, lParam ,lpbKeyState)
-HIMC hIMC;
-WPARAM wParam;
-LPARAM lParam;
-LPBYTE lpbKeyState;
+BOOL PASCAL
+IMEKeyupHandler( HIMC hIMC, WPARAM wParam, LPARAM lParam , LPBYTE lpbKeyState)
 {
     return FALSE;
 }
 
-
+} // extern "C"
