@@ -22,13 +22,13 @@ MzIme.win.install=25 ; to Windows
 
 [MZIMEJA_Reg]
 HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","layout file",,kbdjp.kbd
-HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","layout text",,"日本語 (mzimeja)"
+HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","layout text",,"日本語 (MZ-IME)"
 HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","IME file",,"mzimeja.ime"
 HKLM,"software\Katayama Hirofumi MZ\mzimeja"
 
 [MZIMEJA_Reg_NT]
 HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","layout file",,kbdjpn.dll
-HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","layout text",,"日本語 (mzimeja)"
+HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","layout text",,"日本語 (MZ-IME)"
 HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","IME file",,"mzimeja.ime"
 HKLM,"software\Katayama Hirofumi MZ\mzimeja"
 

@@ -51,12 +51,20 @@ LIBS = \
 	-lcomctl32 \
 	-limm32 \
 
-TARGET = mzimeja.ime
+IME_FILE = mzimeja.ime
+
+SETUP_OBJS = setup$(DOTOBJ)
+SETUP_FILE = setup.exe
 
 #############################################################################
 
-$(TARGET): $(OBJS)
-	$(CXX) -mdll -o $(TARGET) $(CXXFLAGS) $(OBJS) $(LIBS) mzimeja.def
+all: $(IME_FILE) $(SETUP_FILE)
+
+$(IME_FILE): $(OBJS)
+	$(CXX) -mdll -o $(IME_FILE) $(CXXFLAGS) $(OBJS) $(LIBS) mzimeja.def
+
+$(SETUP_FILE): $(SETUP_OBJS)
+	$(CXX) -mdll -o $(SETUP_FILE) $(CXXFLAGS) $(OBJS) $(LIBS) mzimeja.def
 
 config$(DOTOBJ): config.cpp
 	$(CXX) -c $(CXXFLAGS) -o config$(DOTOBJ) config.cpp
@@ -92,6 +100,9 @@ uiguide$(DOTOBJ): uiguide.cpp
 	$(CXX) -c $(CXXFLAGS) -o uiguide$(DOTOBJ) uiguide.cpp
 uistate$(DOTOBJ): uistate.cpp
 	$(CXX) -c $(CXXFLAGS) -o uistate$(DOTOBJ) uistate.cpp
+
+setup$(DOTOBJ): setup.cpp
+	$(CXX) -c $(CXXFLAGS) -o setup$(DOTOBJ) setup.cpp
 
 mzimeja_res$(DOTOBJ): mzimeja.rc
 	$(RC) $(RCFLAGS) -i mzimeja.rc -o mzimeja_res$(DOTOBJ)
