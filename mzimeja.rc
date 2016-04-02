@@ -195,9 +195,7 @@ BEGIN
             MENUITEM "半角カタカナ",            IDM_HAN_KATAKANA
             MENUITEM "半角英数",                IDM_ALNUM
             MENUITEM "直接入力",                IDM_DIRECT
-        END
-        POPUP "ローマ字入力"
-        BEGIN
+            MENUITEM SEPARATOR
             MENUITEM "ローマ字入力",            IDM_ROMAJI_INPUT
             MENUITEM "かな入力",                IDM_KANA_INPUT
         END
