@@ -7,7 +7,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// A function which handles WM_IMEKEYDOWN
+// A function which handles WM_IME_KEYDOWN
 BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                               LPBYTE lpbKeyState) {
   WORD wVKey;
@@ -20,7 +20,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
 
     default:
       if (!DicKeydownHandler(hIMC, wVKey, lParam, lpbKeyState)) {
-        // This WM_IMEKEYDOWN has actual character code in itself.
+        // This WM_IME_KEYDOWN has actual character code in itself.
         AddChar(hIMC, HIWORD(wParam));
         // CharHandler( hIMC,  (WORD)((BYTE)HIBYTE(wParam)), lParam );
       }
@@ -29,7 +29,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   return TRUE;
 }
 
-// A function which handles WM_IMEKEYUP
+// A function which handles WM_IME_KEYUP
 BOOL PASCAL IMEKeyupHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                             LPBYTE lpbKeyState) {
   return FALSE;
