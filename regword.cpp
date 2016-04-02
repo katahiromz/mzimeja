@@ -158,13 +158,13 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
 
   if (!lpfn) return 0;
 
-  lpBuf = (LPTSTR)szBuf;
+  lpBuf = szBuf;
 
   if (!dw || (dw == FAKEWORD_NOUN)) {
     if (lpRead) {
       nBufLen = GetPrivateProfileString(
-          lpRead, NULL, TEXT(""), (LPTSTR)szBuf,
-          sizeof(szBuf) / sizeof(szBuf[0]), (LPTSTR)szDicFileName);
+          lpRead, NULL, TEXT(""), szBuf,
+          sizeof(szBuf) / sizeof(szBuf[0]), szDicFileName);
 
       if (nBufLen) {
         while (*lpBuf) {

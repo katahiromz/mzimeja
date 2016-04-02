@@ -44,31 +44,31 @@ void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra) {
   TCHAR szDev[80];
   int i;
 
-  wsprintf((LPTSTR)szDev, TEXT("Status hWnd %lX  [%d,%d]\r\n"),
+  wsprintf(szDev, TEXT("Status hWnd %lX  [%d,%d]\r\n"),
            lpUIExtra->uiStatus.hWnd, lpUIExtra->uiStatus.pt.x,
            lpUIExtra->uiStatus.pt.y);
-  OutputDebugString((LPTSTR)szDev);
+  OutputDebugString(szDev);
 
-  wsprintf((LPTSTR)szDev, TEXT("Cand hWnd %lX  [%d,%d]\r\n"),
+  wsprintf(szDev, TEXT("Cand hWnd %lX  [%d,%d]\r\n"),
            lpUIExtra->uiCand.hWnd, lpUIExtra->uiCand.pt.x,
            lpUIExtra->uiCand.pt.y);
-  OutputDebugString((LPTSTR)szDev);
+  OutputDebugString(szDev);
 
-  wsprintf((LPTSTR)szDev, TEXT("CompStyle hWnd %lX]\r\n"),
+  wsprintf(szDev, TEXT("CompStyle hWnd %lX]\r\n"),
            lpUIExtra->dwCompStyle);
-  OutputDebugString((LPTSTR)szDev);
+  OutputDebugString(szDev);
 
-  wsprintf((LPTSTR)szDev, TEXT("DefComp hWnd %lX  [%d,%d]\r\n"),
+  wsprintf(szDev, TEXT("DefComp hWnd %lX  [%d,%d]\r\n"),
            lpUIExtra->uiDefComp.hWnd, lpUIExtra->uiDefComp.pt.x,
            lpUIExtra->uiDefComp.pt.y);
-  OutputDebugString((LPTSTR)szDev);
+  OutputDebugString(szDev);
 
   for (i = 0; i < 5; i++) {
-    wsprintf((LPTSTR)szDev, TEXT("Comp hWnd %lX  [%d,%d]-[%d,%d]\r\n"),
+    wsprintf(szDev, TEXT("Comp hWnd %lX  [%d,%d]-[%d,%d]\r\n"),
              lpUIExtra->uiComp[i].hWnd, lpUIExtra->uiComp[i].rc.left,
              lpUIExtra->uiComp[i].rc.top, lpUIExtra->uiComp[i].rc.right,
              lpUIExtra->uiComp[i].rc.bottom);
-    OutputDebugString((LPTSTR)szDev);
+    OutputDebugString(szDev);
   }
 }
 #endif  // def _DEBUG
@@ -185,15 +185,15 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 #ifdef _DEBUG
       {
         TCHAR szDev[80];
-        OutputDebugString((LPTSTR)TEXT("Why hUICurIMC is NULL????\r\n"));
-        wsprintf((LPTSTR)szDev, TEXT("\thWnd is %x\r\n"), hWnd);
-        OutputDebugString((LPTSTR)szDev);
-        wsprintf((LPTSTR)szDev, TEXT("\tmessage is %x\r\n"), message);
-        OutputDebugString((LPTSTR)szDev);
-        wsprintf((LPTSTR)szDev, TEXT("\twParam is %x\r\n"), wParam);
-        OutputDebugString((LPTSTR)szDev);
-        wsprintf((LPTSTR)szDev, TEXT("\tlParam is %x\r\n"), lParam);
-        OutputDebugString((LPTSTR)szDev);
+        OutputDebugString(TEXT("Why hUICurIMC is NULL????\r\n"));
+        wsprintf(szDev, TEXT("\thWnd is %x\r\n"), hWnd);
+        OutputDebugString(szDev);
+        wsprintf(szDev, TEXT("\tmessage is %x\r\n"), message);
+        OutputDebugString(szDev);
+        wsprintf(szDev, TEXT("\twParam is %x\r\n"), wParam);
+        OutputDebugString(szDev);
+        wsprintf(szDev, TEXT("\tlParam is %x\r\n"), lParam);
+        OutputDebugString(szDev);
       }
 #endif
         return 0L;
@@ -454,7 +454,7 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
       }
       if (!IsWindow(lpUIExtra->uiStatus.hWnd)) {
         lpUIExtra->uiStatus.hWnd = CreateWindowEx(
-            WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME, (LPTSTR)szStatusClassName,
+            WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME, szStatusClassName,
             NULL, WS_DISABLED | WS_POPUP | WS_BORDER, lpUIExtra->uiStatus.pt.x,
             lpUIExtra->uiStatus.pt.y,
             BTX * 3 + 2 * GetSystemMetrics(SM_CXBORDER) +
@@ -540,7 +540,7 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
           DeleteDC(hdcIC);
 
           lpUIExtra->uiGuide.hWnd = CreateWindowEx(
-              WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME, (LPTSTR)szGuideClassName,
+              WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME, szGuideClassName,
               NULL, WS_DISABLED | WS_POPUP | WS_BORDER, lpUIExtra->uiGuide.pt.x,
               lpUIExtra->uiGuide.pt.y, dx + 2 * GetSystemMetrics(SM_CXBORDER) +
                                            2 * GetSystemMetrics(SM_CXEDGE),

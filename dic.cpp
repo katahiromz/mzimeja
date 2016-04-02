@@ -162,8 +162,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   //
   szBuf[256] = 0;  // Double NULL-terminate
   szBuf[257] = 0;  // Double NULL-terminate
-  nBufLen = GetCandidateStringsFromDictionary(lpT2, szBuf, 256,
-                                              (LPTSTR)szDicFileName);
+  nBufLen = GetCandidateStringsFromDictionary(lpT2, szBuf, 256, szDicFileName);
   //
   // Check the result of dic. Because my candidate list has only MAXCANDSTRNUM
   // candidate strings.
@@ -203,7 +202,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     goto cvk_exit40;
   }
 
-  lpstr = (LPTSTR)szBuf;
+  lpstr = szBuf;
   if (!*lpb) {
     //
     // String is not converted yet.

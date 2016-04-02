@@ -97,7 +97,7 @@ void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
 
   if (!IsWindow(lpUIExtra->uiCand.hWnd)) {
     lpUIExtra->uiCand.hWnd =
-        CreateWindowEx(WS_EX_WINDOWEDGE, (LPTSTR)szCandClassName, NULL,
+        CreateWindowEx(WS_EX_WINDOWEDGE, szCandClassName, NULL,
                        WS_COMPDEFAULT | WS_DLGFRAME, lpUIExtra->uiCand.pt.x,
                        lpUIExtra->uiCand.pt.y, 1, 1, hUIWnd, NULL, hInst, NULL);
   }

@@ -530,8 +530,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 // Get the candidate strings from dic file.
 //
           nBufLen = GetCandidateStringsFromDictionary(
-              GETLPCOMPREADSTR(lpCompStr), (LPTSTR)szBuf, 256,
-              (LPTSTR)szDicFileName);
+              GETLPCOMPREADSTR(lpCompStr), szBuf, 256, szDicFileName);
 
           //
           // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
@@ -698,13 +697,13 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 #ifdef _DEBUG
     {
       TCHAR szDev[80];
-      OutputDebugString((LPTSTR)TEXT("NotifyIME IMEMENUSELECTED\r\n"));
-      wsprintf((LPTSTR)szDev, TEXT("\thIMC is 0x%x\r\n"), hIMC);
-      OutputDebugString((LPTSTR)szDev);
-      wsprintf((LPTSTR)szDev, TEXT("\tdwIndex is 0x%x\r\n"), dwIndex);
-      OutputDebugString((LPTSTR)szDev);
-      wsprintf((LPTSTR)szDev, TEXT("\tdwValue is 0x%x\r\n"), dwValue);
-      OutputDebugString((LPTSTR)szDev);
+      OutputDebugString(TEXT("NotifyIME IMEMENUSELECTED\r\n"));
+      wsprintf(szDev, TEXT("\thIMC is 0x%x\r\n"), hIMC);
+      OutputDebugString(szDev);
+      wsprintf(szDev, TEXT("\tdwIndex is 0x%x\r\n"), dwIndex);
+      OutputDebugString(szDev);
+      wsprintf(szDev, TEXT("\tdwValue is 0x%x\r\n"), dwValue);
+      OutputDebugString(szDev);
     }
 #endif
     break;

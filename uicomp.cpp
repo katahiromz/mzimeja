@@ -51,7 +51,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
   for (i = 0; i < MAXCOMPWND; i++) {
     if (!IsWindow(lpUIExtra->uiComp[i].hWnd)) {
       lpUIExtra->uiComp[i].hWnd =
-          CreateWindowEx(0, (LPTSTR)szCompStrClassName, NULL, WS_COMPNODEFAULT,
+          CreateWindowEx(0, szCompStrClassName, NULL, WS_COMPNODEFAULT,
                          0, 0, 1, 1, hUIWnd, NULL, hInst, NULL);
     }
     lpUIExtra->uiComp[i].rc.left = 0;
@@ -73,7 +73,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
 
   if (!IsWindow(lpUIExtra->uiDefComp.hWnd)) {
     lpUIExtra->uiDefComp.hWnd = CreateWindowEx(
-        WS_EX_WINDOWEDGE, (LPTSTR)szCompStrClassName, NULL,
+        WS_EX_WINDOWEDGE, szCompStrClassName, NULL,
         WS_COMPDEFAULT | WS_DLGFRAME, lpUIExtra->uiDefComp.pt.x,
         lpUIExtra->uiDefComp.pt.y, 1, 1, hUIWnd, NULL, hInst, NULL);
   }

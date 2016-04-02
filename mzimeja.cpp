@@ -75,7 +75,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
       IMERegisterClass(hInst);
 
       // Initialize for MZ-IME.
-      lpDicFileName = (LPTSTR)&szDicFileName;
+      lpDicFileName = szDicFileName;
       lpDicFileName += GetWindowsDirectory(lpDicFileName, 256);
       if (*(lpDicFileName - 1) != TEXT('\\')) *lpDicFileName++ = TEXT('\\');
       LoadString(hInst, IDS_DICFILENAME, lpDicFileName, 128);
