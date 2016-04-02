@@ -800,25 +800,22 @@ void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow) {
 
   lpCompStr = lpIMC->LockCompStr();
   if (lpCompStr) {
-    // Temp! Error, if the string is already converted.
-    if (CheckAttr(lpCompStr)) goto hsa_exit;
+    if (!CheckAttr(lpCompStr)) {
+      lpstart = GETLPCOMPSTR(lpCompStr);
+      lpstr = lpstart + lpCompStr->dwCursorPos;
+      lpend = lpstart + lstrlen(lpstart);
 
-    lpstart = GETLPCOMPSTR(lpCompStr);
-    lpstr = lpstart + lpCompStr->dwCursorPos;
-    lpend = lpstart + lstrlen(lpstart);
+      if (fArrow == ARR_RIGHT) {
+        if (lpstr < lpend) lpstr = CharNext(lpstr);
+      } else {
+        if (lpstr > lpstart) lpstr = CharPrev(lpstart, lpstr);
+      }
 
-    if (fArrow == ARR_RIGHT) {
-      if (lpstr < lpend) lpstr = CharNext(lpstr);
-    } else {
-      if (lpstr > lpstart) lpstr = CharPrev(lpstart, lpstr);
+      lpCompStr->dwCursorPos = (DWORD)(lpstr - lpstart);
+      MakeAttrClause(lpCompStr);
     }
-
-    lpCompStr->dwCursorPos = (DWORD)(lpstr - lpstart);
-    MakeAttrClause(lpCompStr);
+    lpIMC->UnlockCompStr();
   }
-
-hsa_exit:
-  lpIMC->UnlockCompStr();
   ImmUnlockIMC(hIMC);
 }
 
