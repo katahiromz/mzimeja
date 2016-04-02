@@ -13,7 +13,6 @@ AppSupportURL=http://katahiromz.web.fc2.com/
 AppUpdatesURL=http://katahiromz.web.fc2.com/
 DefaultDirName={pf}\mzimeja
 DefaultGroupName=MZ-IME日本語入力
-DisableProgramGroupPage=yes
 OutputDir=.
 OutputBaseFilename=mzimeja-0.0-setup
 Compression=lzma
@@ -38,4 +37,3 @@ Name: "{group}\アンインストール"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\setup.exe"; Description: "{cm:LaunchProgram,MZ-IME日本語入力}"; Flags: nowait postinstall
-
