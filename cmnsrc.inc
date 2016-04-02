@@ -18,24 +18,24 @@ INCLUDES=..; \
          $(BASEDIR)\src\ime\inc;
 
 SOURCES= \
-        ..\config.c \
-        ..\data.c \
-        ..\dic.c \
-        ..\dic2.c \
-        ..\fakeime.c \
-        ..\fdebug.c \
-        ..\imm.c \
-        ..\immsec.c \
-        ..\input.c \
-        ..\process.c \
-        ..\regword.c \
-        ../subs.c \
-        ../toascii.c \
-        ../ui.c \
-        ../uicand.c \
-        ../uicomp.c \
-        ../uiguide.c \
-        ../uistate.c \
+        ..\config.cc \
+        ..\data.cc \
+        ..\dic.cc \
+        ..\dic2.cc \
+        ..\fakeime.cc \
+        ..\fdebug.cc \
+        ..\imm.cc \
+        ..\immsec.cc \
+        ..\input.cc \
+        ..\process.cc \
+        ..\regword.cc \
+        ../subs.cc \
+        ../toascii.cc \
+        ../ui.cc \
+        ../uicand.cc \
+        ../uicomp.cc \
+        ../uiguide.cc \
+        ../uistate.cc \
 
 TARGETLIBS= \
         $(SDK_LIB_PATH)\advapi32.lib \
