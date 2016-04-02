@@ -421,6 +421,8 @@ BOOL PASCAL GenerateMessage(HIMC, LPINPUTCONTEXT, LPTRANSMSGLIST, LPTRANSMSG);
 BOOL PASCAL CheckAttr(LPCOMPOSITIONSTRING lpCompStr);
 void PASCAL MakeAttrClause(LPCOMPOSITIONSTRING lpCompStr);
 void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow);
+int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
+                                      DWORD dwBufLen, LPTSTR szDicFileName);
 
 /* DIC2.C        */
 BOOL OneCharZenToHan(WCHAR, WCHAR *, WCHAR *);

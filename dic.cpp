@@ -14,18 +14,6 @@ Module Name:
 
 extern "C" {
 
-int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
-                                      DWORD dwBufLen, LPTSTR szDicFileName);
-
-BOOL GetAnsiPathName(LPCWSTR lpszUniPath, LPSTR lpszAnsiPath, UINT nMaxLen) {
-  if (WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lpszUniPath, -1,
-                          lpszAnsiPath, nMaxLen, NULL, NULL) != 0) {
-    return TRUE;
-  } else {
-    return FALSE;
-  }
-}
-
 /**********************************************************************/
 /*                                                                    */
 /* FlushText()                                                        */

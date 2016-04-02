@@ -480,7 +480,6 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                      (dwDebugFlag & DEBF_THREADID) ? 1 : 0);
       CheckDlgButton(hDlg, IDC_DEBF_GUIDELINE,
                      (dwDebugFlag & DEBF_GUIDELINE) ? 1 : 0);
-
 #endif
       break;
 

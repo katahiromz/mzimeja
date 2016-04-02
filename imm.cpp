@@ -11,9 +11,6 @@ Module Name:
 
 extern "C" {
 
-int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
-                                      DWORD dwBufLen, LPTSTR szDicFileName);
-
 //  ImeInquire ()
 //    For Windows 95, Windows 98, and Windows NT 3.51
 //  ImeInquire ŠÖ”‚Í IME ‚Ì‰Šú‰»‚ğæ‚èˆµ‚¤B‚Ü‚½AImeInquire ŠÖ”‚Í
