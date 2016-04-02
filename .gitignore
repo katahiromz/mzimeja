@@ -5,6 +5,7 @@
 *.ncb
 *.ime
 *.log
+*.wrn
 *.err
 Debug
 Release
