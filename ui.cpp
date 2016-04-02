@@ -11,7 +11,7 @@ Module Name:
 /**********************************************************************/
 #include "windows.h"
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 
 extern "C" {
 
@@ -20,7 +20,7 @@ void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag);
 void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra);
 #endif
 
-#define CS_FAKEIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
+#define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
 /**********************************************************************/
 /*                                                                    */
 /* IMERegisterClass()                                                 */
@@ -38,8 +38,8 @@ BOOL IMERegisterClass( HINSTANCE hInstance )
     // register class of UI window.
     //
     wc.cbSize         = sizeof(WNDCLASSEX);
-    wc.style          = CS_FAKEIME;
-    wc.lpfnWndProc    = FAKEIMEWndProc;
+    wc.style          = CS_MZIME;
+    wc.lpfnWndProc    = MZIMEWndProc;
     wc.cbClsExtra     = 0;
     wc.cbWndExtra     = 8;
     wc.hInstance      = hInstance;
@@ -57,7 +57,7 @@ BOOL IMERegisterClass( HINSTANCE hInstance )
     // register class of composition window.
     //
     wc.cbSize         = sizeof(WNDCLASSEX);
-    wc.style          = CS_FAKEIME;
+    wc.style          = CS_MZIME;
     wc.lpfnWndProc    = CompStrWndProc;
     wc.cbClsExtra     = 0;
     wc.cbWndExtra     = UIEXTRASIZE;
@@ -76,7 +76,7 @@ BOOL IMERegisterClass( HINSTANCE hInstance )
     // register class of candidate window.
     //
     wc.cbSize         = sizeof(WNDCLASSEX);
-    wc.style          = CS_FAKEIME;
+    wc.style          = CS_MZIME;
     wc.lpfnWndProc    = CandWndProc;
     wc.cbClsExtra     = 0;
     wc.cbWndExtra     = UIEXTRASIZE;
@@ -95,7 +95,7 @@ BOOL IMERegisterClass( HINSTANCE hInstance )
     // register class of status window.
     //
     wc.cbSize         = sizeof(WNDCLASSEX);
-    wc.style          = CS_FAKEIME;
+    wc.style          = CS_MZIME;
     wc.lpfnWndProc    = StatusWndProc;
     wc.cbClsExtra     = 0;
     wc.cbWndExtra     = UIEXTRASIZE;
@@ -115,7 +115,7 @@ BOOL IMERegisterClass( HINSTANCE hInstance )
     // register class of guideline window.
     //
     wc.cbSize         = sizeof(WNDCLASSEX);
-    wc.style          = CS_FAKEIME;
+    wc.style          = CS_MZIME;
     wc.lpfnWndProc    = GuideWndProc;
     wc.cbClsExtra     = 0;
     wc.cbWndExtra     = UIEXTRASIZE;
@@ -136,13 +136,13 @@ BOOL IMERegisterClass( HINSTANCE hInstance )
 
 /**********************************************************************/
 /*                                                                    */
-/* FAKEIMEWndProc()                                                   */
+/* MZIMEWndProc()                                                   */
 /*                                                                    */
 /* IME UI window procedure                                            */
 /*                                                                    */
 /**********************************************************************/
 LRESULT CALLBACK
-FAKEIMEWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+MZIMEWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
     HIMC           hUICurIMC;
     LPINPUTCONTEXT lpIMC;
@@ -614,7 +614,7 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message, WPARAM wParam
             break;
 
         case IMN_SETCANDIDATEPOS:
-            // FAKEIME supports only one candidate list.
+            // MZ-IME supports only one candidate list.
             if (lParam != 0x01)
                 break;
 
@@ -666,7 +666,7 @@ LONG PASCAL ControlCommand(HIMC hUICurIMC, HWND hWnd, UINT message, WPARAM wPara
         case IMC_GETCANDIDATEPOS:
             if (IsWindow(lpUIExtra->uiCand.hWnd))
             {
-                // FAKEIME has only one candidate list.
+                // MZ-IME has only one candidate list.
                 *(LPCANDIDATEFORM)lParam  = lpIMC->cfCandForm[0]; 
                 lRet = 0;
             }

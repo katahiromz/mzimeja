@@ -1,14 +1,6 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                                                                    ;;
-;;      FAKEIME.DEF - Windows 95 FAKEIME                              ;;
-;;                                                                    ;;
-;;      Copyright (c) 1994-1995  Microsoft Corporation                ;;
-;;                                                                    ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-LIBRARY         FAKEIMEU
+LIBRARY         MZIMEJA
 
 EXPORTS
-
                 ; IME DDI
                 ImeConversionList
                 ImeConfigure
@@ -27,7 +19,7 @@ EXPORTS
                 ImeSetCompositionString
                 ImeGetImeMenuItems
 
-                FAKEIMEWndProc
+                MZIMEWndProc
                 CompStrWndProc
                 StatusWndProc
                 CandWndProc

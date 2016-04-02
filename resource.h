@@ -10,7 +10,7 @@ Module Name:
 
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by Fakeime0.rc
+// Used by mzimeja.rc
 //
 #define VER_DEBUG                       0
 

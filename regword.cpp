@@ -11,7 +11,7 @@ Module Name:
 /**********************************************************************/
 #include "windows.h"
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 
 extern "C" {
 

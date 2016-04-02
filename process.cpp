@@ -10,7 +10,7 @@ Module Name:
 
 /**********************************************************************/
 /* These tables are for ImeProcessKey(). And IMEProcessKey function   */
-/* refer this table and deside the VKey is needed for FAKEIME or not. */
+/* refer this table and deside the VKey is needed for MZ-IME or not. */
 /*                                                                    */
 /**********************************************************************/
 #include "windows.h"

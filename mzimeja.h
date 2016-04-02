@@ -4,7 +4,7 @@ Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
 
 Module Name:
 
-    FAKEIME.H
+    mzimeja.h
     
 ++*/
 
@@ -29,48 +29,27 @@ Module Name:
 /*                                                                    */
 /**********************************************************************/
 
-/* for Unicode FAKEIME */
-#ifdef FAKEIMEM
-typedef LPWSTR            LPMYSTR;
-typedef WCHAR             MYCHAR;
-#define MYTEXT(x)         L ## x
-#define Mylstrlen(x)      lstrlenW(x)
-#define Mylstrcpy(x, y)   MylstrcpyW((x), (y))
-#define Mylstrcmp(x, y)   MylstrcmpW((x), (y))
-#define MyCharPrev(x, y)  MyCharPrevW((x), (y))
-#define MyCharNext(x)     MyCharNextW(x)
-#include <string.h>
-#define Mystrtok          wcstok
-#define Mylstrcpyn        MylstrcpynW
-#define Mystrchr          wcschr
-#define MyTextOut         TextOutW
-#define MyGetTextExtentPoint  GetTextExtentPointW
-#define LPMYIMEMENUITEMINFO LPIMEMENUITEMINFOW
-#define MyImmRequestMessage ImmRequestMessageW
-#define MyOutputDebugString MyOutputDebugStringW
-#define MyFileName        "fakeimem.ime"
-#else
 typedef LPTSTR            LPMYSTR;
 typedef TCHAR             MYCHAR;
 #define MYTEXT(x)         TEXT(x)
 #define Mylstrlen(x)      lstrlen(x)
 #ifdef UNICODE
-#define Mylstrcpy(x, y)   MylstrcpyW((x), (y))
-#define Mylstrcmp(x, y)   MylstrcmpW((x), (y))
-#define MyCharPrev(x, y)  MyCharPrevW((x), (y))
-#define MyCharPrev(x, y)  MyCharPrevW((x), (y))
-#define MyCharNext(x)     MyCharNextW(x)
-#include <string.h>
-#define Mystrtok          wcstok
-#define Mystrchr          wcschr
+    #define Mylstrcpy(x, y)   MylstrcpyW((x), (y))
+    #define Mylstrcmp(x, y)   MylstrcmpW((x), (y))
+    #define MyCharPrev(x, y)  MyCharPrevW((x), (y))
+    #define MyCharPrev(x, y)  MyCharPrevW((x), (y))
+    #define MyCharNext(x)     MyCharNextW(x)
+    #include <string.h>
+    #define Mystrtok          wcstok
+    #define Mystrchr          wcschr
 #else
-#define Mylstrcpy(x, y)   lstrcpy((x), (y))
-#define Mylstrcmp(x, y)   lstrcmp((x), (y))
-#define MyCharPrev(x, y)  AnsiPrev((x), (y))
-#define MyCharNext(x)     AnsiNext(x)
-#include <mbstring.h>
-#define Mystrtok          _mbstrtok
-#define Mystrchr          _mbschr
+    #define Mylstrcpy(x, y)   lstrcpy((x), (y))
+    #define Mylstrcmp(x, y)   lstrcmp((x), (y))
+    #define MyCharPrev(x, y)  AnsiPrev((x), (y))
+    #define MyCharNext(x)     AnsiNext(x)
+    #include <mbstring.h>
+    #define Mystrtok          _mbstrtok
+    #define Mystrchr          _mbschr
 #endif
 #define Mylstrcpyn        lstrcpyn
 #define MyTextOut         TextOut
@@ -78,14 +57,9 @@ typedef TCHAR             MYCHAR;
 #define LPMYIMEMENUITEMINFO LPIMEMENUITEMINFO
 #define MyImmRequestMessage ImmRequestMessage
 #define MyOutputDebugString OutputDebugString
-#ifdef UNICODE
-#define MyFileName        TEXT("fakeimeu.ime")
-#else
-#define MyFileName        TEXT("fakeime.ime")
-#endif
-#endif
+#define MyFileName        TEXT("mzimeja.ime")
 
-/* for limit of FAKEIME */
+/* for limit of MZ-IME */
 #define MAXCOMPWND              10
 #define MAXCOMPSIZE             128
 #define MAXCLAUSESIZE           16
@@ -307,9 +281,6 @@ extern HKL hMyKL;
 extern LPTRANSMSGLIST lpCurTransKey;
 extern UINT uNumTransKey;
 extern BOOL fOverTransKey;
-#ifdef FAKEIMEM
-extern WCHAR wszUIClassName[];
-#endif
 extern TCHAR szUIClassName[];
 extern TCHAR szCompStrClassName[];
 extern TCHAR szCandClassName[];
@@ -337,7 +308,7 @@ extern DWORD dwDebugFlag;
 
 extern "C" {
 
-/*   fakeime.c     */
+/* mzimeja.c     */
 int PASCAL Init(void);
 
 /*   subs.c     */
@@ -351,7 +322,7 @@ BOOL PASCAL IsConvertedCompStr(HIMC hIMC);
 BOOL PASCAL IsCandidate(LPINPUTCONTEXT lpIMC);
 void PASCAL UpdateIndicIcon(HIMC hIMC);
 void PASCAL lmemset(LPBYTE,BYTE,UINT);
-#if defined(FAKEIMEM) || defined(UNICODE) 
+#if defined(UNICODE) 
 int PASCAL MylstrcmpW(LPWSTR lp0, LPWSTR lp1);
 int PASCAL MylstrcpyW(LPWSTR lp0, LPWSTR lp1);
 LPWSTR PASCAL MyCharPrevW(LPWSTR lpStart, LPWSTR lpCur);
@@ -375,7 +346,7 @@ BOOL PASCAL IMEKeyupHandler(HIMC,WPARAM,LPARAM,LPBYTE);
 
 /*   ui.c        */
 BOOL IMERegisterClass(HINSTANCE hInstance);
-LRESULT CALLBACK FAKEIMEWndProc(HWND,UINT,WPARAM,LPARAM);
+LRESULT CALLBACK MZIMEWndProc(HWND,UINT,WPARAM,LPARAM);
 LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 LONG PASCAL ControlCommand(HIMC hUICurIMC, HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 void PASCAL DrawUIBorder( LPRECT lprc );
@@ -435,7 +406,7 @@ void PASCAL MakeAttrClause( LPCOMPOSITIONSTRING lpCompStr);
 void PASCAL HandleShiftArrow( HIMC hIMC, BOOL fArrow);
 
 /* DIC2.C        */
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
 BOOL OneCharZenToHan(WCHAR ,WCHAR* ,WCHAR* );
 WORD PASCAL HanToZen(WORD,WORD,DWORD);
 #else
@@ -468,9 +439,6 @@ int DebugPrint(LPCTSTR lpszFormat, ...);
 void SetDwordToSetting(LPCTSTR lpszFlag, DWORD dwFlag);
 void PASCAL SetGlobalFlags();
 void PASCAL ImeLog(DWORD dwFlag, LPTSTR lpStr);
-#ifdef FAKEIMEM
-void PASCAL MyOutputDebugStringW(LPWSTR lpw);
-#endif
 #else
 #define MyDebugPrint(x)
 #define SetDwordToSetting() FALSE
@@ -478,10 +446,6 @@ void PASCAL MyOutputDebugStringW(LPWSTR lpw);
 #define SetGlobalFlags() FALSE
 //#define ImeLog() FALSE
 #define ImeLog(dwFlag, lpStr) FALSE
-#ifdef FAKEIMEM
-#define MyOutputDebugStringW() FALSE
-//#define MyOutputDebugStringW(lpw) FALSE
-#endif
 #endif
 
 } // extern "C"

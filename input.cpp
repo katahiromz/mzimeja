@@ -11,7 +11,7 @@ Module Name:
 /**********************************************************************/
 #include "windows.h"
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 
 extern "C" {
 
@@ -37,7 +37,7 @@ IMEKeydownHandler( HIMC hIMC, WPARAM wParam, LPARAM lParam,LPBYTE lpbKeyState)
         default:
             if( !DicKeydownHandler( hIMC, wVKey, lParam, lpbKeyState ) ) {
                 // This WM_IMEKEYDOWN has actual character code in itself.
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                 AddChar( hIMC,  HIWORD(wParam));
 #else
                 AddChar( hIMC,  (WORD)((BYTE)HIBYTE(wParam)));

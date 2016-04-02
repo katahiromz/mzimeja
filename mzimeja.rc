@@ -8,7 +8,7 @@
 //
 #include "winuser.h"
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 #include "resource.h"
 #include "winver.h"
 
@@ -27,7 +27,7 @@
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-FAKEIMEICON             ICON    DISCARDABLE     "..\\res\\fakeimeu.ico"
+MZIMEICON             	ICON    DISCARDABLE     "..\\res\\mzimeja.ico"
 INDICOPENICON           ICON    DISCARDABLE     "..\\res\\penindic.ico"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -111,8 +111,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 4,0,0,0
- PRODUCTVERSION 4,0,0,0
+ FILEVERSION 0,0,0,0
+ PRODUCTVERSION 0,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0xbL
@@ -127,14 +127,14 @@ BEGIN
     BEGIN
         BLOCK "041103A4"
         BEGIN
-            VALUE "CompanyName", "Microsoft Corporation\0"
-            VALUE "FileDescription", "FAKEIME 4.0 Unicode Edition\0"
-            VALUE "FileVersion", "4.00\0"
-            VALUE "InternalName", "Fake Input Method Editor\0"
-            VALUE "LegalCopyright", "Copyright (C) Microsoft Corp. \0"
-            VALUE "OriginalFilename", "FAKEIME.IME\0"
-            VALUE "ProductName", "FAKEIME\0"
-            VALUE "ProductVersion", "4.00\0"
+            VALUE "CompanyName", "Katayama Hirofumi MZ\0"
+            VALUE "FileDescription", "mzimeja 0.0\0"
+            VALUE "FileVersion", "0.0\0"
+            VALUE "InternalName", "mzimeja\0"
+            VALUE "LegalCopyright", "Copyright (C) 2016 Katayama Hirofumi MZ. \0"
+            VALUE "OriginalFilename", "mzimeja.ime\0"
+            VALUE "ProductName", "MZ-IME Japanese Input\0"
+            VALUE "ProductVersion", "0.0\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -161,7 +161,7 @@ END
 BEGIN
     "#include ""winuser.h""\r\n"
     "#include ""immdev.h""\r\n"
-    "#include ""fakeime.h""\r\n"
+    "#include ""mzimeja.h""\r\n"
     "#include ""resource.h""\r\n"
     "#include ""winver.h""\r\n"
     "\0"
@@ -197,8 +197,8 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_DICFILENAME         "FAKEIMEU.DIC"
-    IDS_CONFIGNAME          "FAKEIME.DLL"
+    IDS_DICFILENAME         "mzimeja.DIC"
+    IDS_CONFIGNAME          "mzimeja.DLL"
 END
 
 STRINGTABLE DISCARDABLE 

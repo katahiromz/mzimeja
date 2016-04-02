@@ -10,19 +10,13 @@ Module Name:
 
 #include <windows.h>
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 
 extern "C" {
 
 #ifdef DEBUG
 
-#ifdef FAKEIMEM
-const LPTSTR g_szRegInfoPath = TEXT("software\\microsoft\\fakeime\\m");
-#elif UNICODE
-const LPTSTR g_szRegInfoPath = TEXT("software\\microsoft\\fakeime\\u");
-#else
-const LPTSTR g_szRegInfoPath = TEXT("software\\microsoft\\fakeime\\a");
-#endif
+const LPTSTR g_szRegInfoPath = TEXT("software\\Katayama Hirofumi MZ\\mzimeja");
 
 int DebugPrint(LPCTSTR lpszFormat, ...)
 {
@@ -87,28 +81,6 @@ void PASCAL ImeLog(DWORD dwFlag, LPTSTR lpStr)
         OutputDebugString(TEXT("\r\n"));
     }
 }
-
-#ifdef FAKEIMEM
-void PASCAL MyOutputDebugStringW(LPWSTR lpw)
-{
-    DWORD dwSize = (lstrlenW(lpw) + 1) * 2;
-    LPSTR lpStr;
-    int n;
-
-    lpStr = GlobalAlloc(GPTR, dwSize);
-
-    if (!lpStr)
-         return;
-
-
-    n = WideCharToMultiByte(CP_ACP, 0, lpw, lstrlenW(lpw), lpStr, dwSize, NULL, NULL);
-
-    *(lpStr + n) = '\0';
-
-    OutputDebugString(lpStr);
-    GlobalFree((HANDLE)lpStr);
-}
-#endif
 
 #endif //DEBUG
 

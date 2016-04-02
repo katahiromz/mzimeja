@@ -11,7 +11,7 @@ Module Name:
 /**********************************************************************/
 #include "windows.h"
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 
 extern "C" {
 
@@ -141,7 +141,7 @@ int PASCAL NumCharInDX(HDC hDC,LPMYSTR lp,int dx)
     {
         num = numT;
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
         numT++;
         GetTextExtentPointW(hDC,lp,numT,&sz);
 #else
@@ -180,7 +180,7 @@ int PASCAL NumCharInDY(HDC hDC,LPMYSTR lp,int dy)
     while ((width < dy) && *(lp + numT))
     {
         num = numT;
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
         numT++;
         
         GetTextExtentPointW(hDC,lp,numT,&sz);
@@ -280,7 +280,7 @@ void PASCAL MoveCompWindow( LPUIEXTRA lpUIExtra,LPINPUTCONTEXT lpIMC )
         }
 
         lpt = lpstr = GETLPCOMPSTR(lpCompStr);
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
         num = 1;
 #else
         if (IsDBCSLeadByte(*lpt))
@@ -314,11 +314,7 @@ void PASCAL MoveCompWindow( LPUIEXTRA lpUIExtra,LPINPUTCONTEXT lpIMC )
 
                     if (num = NumCharInDX(hDC,lpt,dx))
                     {
-#ifdef FAKEIMEM
-                        GetTextExtentPointW(hDC,lpt,num,&sz);
-#else
                         GetTextExtentPoint(hDC,lpt,num,&sz);
-#endif
 
                         lpUIExtra->uiComp[i].rc.left    = curx;
                         lpUIExtra->uiComp[i].rc.top     = cury;
@@ -381,11 +377,7 @@ void PASCAL MoveCompWindow( LPUIEXTRA lpUIExtra,LPINPUTCONTEXT lpIMC )
 
                     if (num = NumCharInDY(hDC,lpt,dy))
                     {
-#ifdef FAKEIMEM
-                        GetTextExtentPointW(hDC,lpt,num,&sz);
-#else
                         GetTextExtentPoint(hDC,lpt,num,&sz);
-#endif
 
                         lpUIExtra->uiComp[i].rc.left    = curx - sz.cy;
                         lpUIExtra->uiComp[i].rc.top     = cury;
@@ -456,11 +448,7 @@ void PASCAL MoveCompWindow( LPUIEXTRA lpUIExtra,LPINPUTCONTEXT lpIMC )
                    && (lpCompStr->dwCompStrLen > 0))
                 {
                     lpstr = GETLPCOMPSTR(lpCompStr);
-#ifdef FAKEIMEM
-                    GetTextExtentPointW(hDC,lpstr,lstrlenW(lpstr),&sz);
-#else
                     GetTextExtentPoint(hDC,lpstr,lstrlen(lpstr),&sz);
-#endif
                     width = sz.cx;
                     height = sz.cy;
                 }
@@ -533,34 +521,20 @@ void PASCAL DrawTextOneLine( HWND hCompWnd, HDC hDC, LPMYSTR lpstr, LPBYTE lpatt
 
             case ATTR_TARGET_CONVERTED:
                 SetTextColor(hDC,RGB(127,127,127));
-#ifdef FAKEIMEM
-                if (!fVert)
-                    TextOutW(hDC,x + 1,y + 1,lpstr,cnt);
-                else
-                    TextOutW(hDC,x - 1,y + 1,lpstr,cnt);
-#else
                 if (!fVert)
                     TextOut(hDC,x + 1,y + 1,lpstr,cnt);
                 else
                     TextOut(hDC,x - 1,y + 1,lpstr,cnt);
-#endif
                 SetTextColor(hDC,RGB(0,0,0));
                 SetBkMode(hDC,TRANSPARENT);
                 break;
 
             case ATTR_CONVERTED:
                 SetTextColor(hDC,RGB(127,127,127));
-#ifdef FAKEIMEM
-                if (!fVert)
-                    TextOutW(hDC,x + 1,y + 1,lpstr,cnt);
-                else
-                    TextOutW(hDC,x - 1,y + 1,lpstr,cnt);
-#else
                 if (!fVert)
                     TextOut(hDC,x + 1,y + 1,lpstr,cnt);
                 else
                     TextOut(hDC,x - 1,y + 1,lpstr,cnt);
-#endif
                 SetTextColor(hDC,RGB(0,0,255));
                 SetBkMode(hDC,TRANSPARENT);
                 break;
@@ -569,13 +543,8 @@ void PASCAL DrawTextOneLine( HWND hCompWnd, HDC hDC, LPMYSTR lpstr, LPBYTE lpatt
                 break;
         }
 
-#ifdef FAKEIMEM
-        TextOutW(hDC,x,y,lpstr,cnt);
-        GetTextExtentPointW(hDC,lpstr,cnt,&sz);
-#else
         TextOut(hDC,x,y,lpstr,cnt);
         GetTextExtentPoint(hDC,lpstr,cnt,&sz);
-#endif
         lpstr += cnt;
 
         if (!fVert)

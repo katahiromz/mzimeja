@@ -9,7 +9,7 @@ Module Name:
 ++*/
 #include "windows.h"
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 
 extern "C" {
 
@@ -23,7 +23,7 @@ extern "C" {
 WORD PASCAL ConvChar(HIMC hIMC, WORD ch1, WORD ch2)
 {
     int num1, num2;
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     static WCHAR table[15][5] = {
         { 0x30A2, 0x30A4, 0x30A6, 0x30A8, 0x30AA },     //  A
         { 0x30AB, 0x30AD, 0x30AF, 0x30B1, 0x30B3 },     //  K
@@ -68,7 +68,7 @@ WORD PASCAL ConvChar(HIMC hIMC, WORD ch1, WORD ch2)
     num1 = IsFirst( ch1 );
     num2 = IsSecond( ch2 );
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     return( (WORD)table[num1][num2-1] );
 #else
     if( num1 <= 9 )
@@ -90,7 +90,7 @@ WORD PASCAL ConvChar(HIMC hIMC, WORD ch1, WORD ch2)
 int PASCAL IsFirst(WORD ch)
 {
     register int i;
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     static WCHAR table0[] = MYTEXT("KSTNHMYRWGZDBP");
     static WCHAR table1[] = MYTEXT("kstnhmyrwgzdbp");
 #else
@@ -101,7 +101,7 @@ int PASCAL IsFirst(WORD ch)
 
 
     for( i = 0; table0[i]; i++ ){
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
         if( table0[i] == (WCHAR)ch )
             return( i+1 );
 
@@ -125,7 +125,7 @@ int PASCAL IsFirst(WORD ch)
 int PASCAL IsSecond(WORD ch)
 {
     register int i;
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     static WCHAR table0[] = MYTEXT("AIUEO");
     static WCHAR table1[] = MYTEXT("aiueo");
 #else
@@ -136,7 +136,7 @@ int PASCAL IsSecond(WORD ch)
 
 
     for( i = 0; table0[i]; i++ ){
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
         if( table0[i] == (WCHAR)ch )
             return( i+1 );
 
@@ -150,7 +150,7 @@ int PASCAL IsSecond(WORD ch)
     return 0;
 }
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
 static WORD table1[] = {
     0x3000, 0xFF01, 0x201D, 0xFF03, 0xFF04, 0xFF05, 0xFF06, 0x2019, 
     0xFF08, 0xFF09, 0xFF0A, 0xFF0B, 0xFF0C, 0xFF0D, 0xFF0E, 0x00F7
@@ -262,7 +262,7 @@ static WORD table8[] = {        /* sonant char part 2 */
 /* Return full size character code                                    */
 /*                                                                    */
 /**********************************************************************/
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
 WORD PASCAL HanToZen( WORD code, WORD KatakanaLetter,DWORD fdwConversion )
 #else
 WORD PASCAL HanToZen( WORD code, DWORD fdwConversion )
@@ -272,7 +272,7 @@ WORD PASCAL HanToZen( WORD code, DWORD fdwConversion )
 
     flag = !(fdwConversion & IME_CMODE_KATAKANA);
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     if (KatakanaLetter) {
         WORD code2, code3;
         code2 = HanToZen( KatakanaLetter, 0, fdwConversion );
@@ -357,7 +357,7 @@ WORD PASCAL HanToZen( WORD code, DWORD fdwConversion )
 WORD PASCAL ZenToHan( WORD code )
 {
     int i;
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     if( code >= 0xFF10 && code <= 0xFF19 )
         return( code - 0xFF10 + 0x30 );
     if( code >= 0xFF21 && code <= 0xFF3A )
@@ -492,7 +492,7 @@ WORD PASCAL KataToHira(WORD code)
     return code;
 }
 
-#if defined (FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
 BOOL OneCharZenToHan(WCHAR code,WCHAR* pKatakanaLetter,WCHAR* pSound)
 {
     WCHAR NewCode;
@@ -531,7 +531,7 @@ void PASCAL lZenToHan(LPMYSTR lpDst,LPMYSTR lpSrc)
 {
     WORD code;
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     while(*lpSrc)
     {
         code = *lpSrc;
@@ -598,7 +598,7 @@ void PASCAL lHanToZen(LPMYSTR lpDst,LPMYSTR lpSrc,DWORD fdwConversion)
     WORD code0;
     WORD code1;
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     while(*lpSrc)
     {
         WORD KatakanaLetter;

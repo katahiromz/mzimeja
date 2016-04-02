@@ -1,0 +1,36 @@
+[version]
+signature="$CHICAGO$"
+SetupClass=BASE
+
+[DefaultInstall]
+CopyFiles=MzIme.sys.install, MzIme.win.install
+AddReg=MZIMEJA_Reg
+
+[DefaultInstall.nt]
+CopyFiles=MzIme.sys.install, MzIme.win.install
+AddReg=MZIMEJA_Reg_NT
+
+[MzIme.sys.install]
+mzimeja.ime
+
+[MzIme.win.install]
+mzimeja.dic
+
+[DestinationDirs]
+MzIme.sys.install=11 ; to System (Memphis) or System32 (NT)
+MzIme.win.install=25 ; to Windows
+
+[MZIMEJA_Reg]
+HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","layout file",,kbdjp.kbd
+HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","layout text",,"“ú–{Œê (mzimeja)"
+HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","IME file",,"mzimeja.ime"
+HKLM,"software\Katayama Hirofumi MZ\mzimeja"
+
+[MZIMEJA_Reg_NT]
+HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","layout file",,kbdjpn.dll
+HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","layout text",,"“ú–{Œê (mzimeja)"
+HKLM,"system\currentcontrolset\control\keyboard layouts\E0120411","IME file",,"mzimeja.ime"
+HKLM,"software\Katayama Hirofumi MZ\mzimeja"
+
+[SourceDisksNames]
+55="MZ-IME Performance4.1.","",1

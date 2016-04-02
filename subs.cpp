@@ -12,7 +12,7 @@ Module Name:
 
 #include <windows.h>
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 
 extern "C" {
 
@@ -248,7 +248,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode)
 
     fdwConversion = lpIMC->fdwConversion;
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     if (!(hDst = GlobalAlloc(GHND,(lpCompStr->dwCompStrLen+1)*sizeof(WCHAR))))
 #else
     if (!(hDst = GlobalAlloc(GHND,lpCompStr->dwCompStrLen*2)))
@@ -270,7 +270,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode)
             lpDst0 = lpDst;
             while (*lpSrc)
             {
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                 *lpDst++ = HiraToKata(*lpSrc);
                 lpSrc++;
 #else
@@ -300,7 +300,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode)
             lpDst0 = lpDst;
             while (*lpSrc)
             {
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                 *lpDst++ = KataToHira(*lpSrc);
                 lpSrc++;
 #else
@@ -504,7 +504,7 @@ void PASCAL UpdateIndicIcon(HIMC hIMC)
     {
         ATOM atomTip;
 
-        atomTip = GlobalAddAtom(TEXT("FakeIME Open"));
+        atomTip = GlobalAddAtom(TEXT("MZ-IME Open"));
         PostMessage(hwndIndicate, INDICM_SETIMEICON, 
                     fOpen ? 1 : (-1), (LPARAM)hMyKL);
         PostMessage(hwndIndicate, INDICM_SETIMETOOLTIPS, 
@@ -528,7 +528,7 @@ void PASCAL lmemset(LPBYTE lp, BYTE b, UINT cnt)
         *lp++ = bt;
 }
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
 /*****************************************************************************
 *                                                                            *
 * MylstrcmpW( )                                                              *

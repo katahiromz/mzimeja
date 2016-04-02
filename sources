@@ -20,7 +20,7 @@ SOURCES= \
         config.cpp \
         dic.cpp \
         dic2.cpp \
-        fakeime.cpp \
+        mzimeja.cpp \
         fdebug.cpp \
         imm.cpp \
         immsec.cpp \
@@ -34,7 +34,7 @@ SOURCES= \
         uicomp.cpp \
         uiguide.cpp \
         uistate.cpp \
-        fakeimeu.rc \
+        mzimeja.rc \
 
 TARGETLIBS= \
         $(SDK_LIB_PATH)\advapi32.lib \
@@ -46,4 +46,4 @@ TARGETLIBS= \
 
 NTTARGETFILES=
 
-TARGETNAME=fakeimeu
+TARGETNAME=mzimeja

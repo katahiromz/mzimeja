@@ -9,7 +9,7 @@ Module Name:
 ++*/
 #include "windows.h"
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 #include "prsht.h"
 #include "resource.h"
 

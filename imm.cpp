@@ -9,11 +9,11 @@ Module Name:
 ++*/
 #include "windows.h"
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 
 extern "C" {
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf, DWORD dwBufLen, LPTSTR szDicFileName);
 #endif
 
@@ -28,7 +28,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo,LPTSTR lpszClassName,DWORD dwSystemIn
     // Init IMEINFO Structure.
     lpIMEInfo->dwPrivateDataSize = sizeof(UIEXTRA);
     lpIMEInfo->fdwProperty = IME_PROP_KBD_CHAR_FIRST |
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                              IME_PROP_UNICODE |
 #endif
                              IME_PROP_AT_CARET;
@@ -45,13 +45,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo,LPTSTR lpszClassName,DWORD dwSystemIn
 
     lpIMEInfo->fdwSelectCaps = SELECT_CAP_CONVERSION;
 
-#ifdef FAKEIMEM
-    memcpy((LPWSTR)lpszClassName,(LPWSTR)wszUIClassName,
-                   (lstrlenW((LPWSTR)wszUIClassName) + 1) * sizeof(WCHAR));
-#else
     lstrcpy(lpszClassName,(LPTSTR)szUIClassName);
-#endif
-
 
     return TRUE;
 }
@@ -111,7 +105,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC,UINT uSubFunc,LPVOID lpData)
             break;
 
         case IME_ESC_GETHELPFILENAME:
-            Mylstrcpy((LPMYSTR)lpData, MYTEXT("fakeime.hlp"));
+            Mylstrcpy((LPMYSTR)lpData, MYTEXT("mzimeja.hlp"));
             lRet = TRUE;
             break;
 
@@ -298,7 +292,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC,DWORD dwAction,DWORD dwIndex,DWORD dwValue)
                      //
                      // Get the candidate strings from dic file.
                      //
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                      nBufLen = GetCandidateStringsFromDictionary(GETLPCOMPREADSTR(lpCompStr),
                                                                  (LPMYSTR)szBuf,256,
                                                                  (LPTSTR)szDicFileName );

@@ -4,14 +4,14 @@ Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
 
 Module Name:
 
-    FAKEIME.C
+    mzimeja.c
     
 ++*/
 
 #include <windows.h>
 #include "immdev.h"
 #define _NO_EXTERN_
-#include "fakeime.h"
+#include "mzimeja.h"
 #include "resource.h"
 #include "immsec.h"
 
@@ -25,26 +25,18 @@ LPTRANSMSGLIST lpCurTransKey= NULL;
 UINT    uNumTransKey;
 BOOL    fOverTransKey = FALSE;
 
-/* for UI */
-#ifdef FAKEIMEM
-WCHAR   wszUIClassName[]     = L"FAKEIMEMUI";
-char    szUIClassName[]      = "FAKEIMEMUI";
-char    szCompStrClassName[] = "FAKEIMEMCompStr";
-char    szCandClassName[]    = "FAKEIMEMCand";
-char    szStatusClassName[]  = "FAKEIMEMStatus";
-char    szGuideClassName[]   = "FAKEIMEMGuide";
-#elif defined(UNICODE)
-TCHAR    szUIClassName[]      = TEXT("FAKEIMEUUI");
-TCHAR    szCompStrClassName[] = TEXT("FAKEIMEUCompStr");
-TCHAR    szCandClassName[]    = TEXT("FAKEIMEUCand");
-TCHAR    szStatusClassName[]  = TEXT("FAKEIMEUStatus");
-TCHAR    szGuideClassName[]   = TEXT("FAKEIMEUGuide");
+#ifdef UNICODE
+TCHAR    szUIClassName[]      = TEXT("MZIMEUUI");
+TCHAR    szCompStrClassName[] = TEXT("MZIMEUCompStr");
+TCHAR    szCandClassName[]    = TEXT("MZIMEUCand");
+TCHAR    szStatusClassName[]  = TEXT("MZIMEUStatus");
+TCHAR    szGuideClassName[]   = TEXT("MZIMEUGuide");
 #else
-char    szUIClassName[]      = "FAKEIMEUI";
-char    szCompStrClassName[] = "FAKEIMECompStr";
-char    szCandClassName[]    = "FAKEIMECand";
-char    szStatusClassName[]  = "FAKEIMEStatus";
-char    szGuideClassName[]   = "FAKEIMEGuide";
+char    szUIClassName[]      = "MZIMEUI";
+char    szCompStrClassName[] = "MZIMECompStr";
+char    szCandClassName[]    = "MZIMECand";
+char    szStatusClassName[]  = "MZIMEStatus";
+char    szGuideClassName[]   = "MZIMEGuide";
 #endif
 
 
@@ -95,7 +87,7 @@ BOOL WINAPI DllMain (
             //
             psa = CreateSecurityAttributes();
             if ( psa != NULL ) {
-                 hMutex = CreateMutex( psa, FALSE, TEXT("FakeIme_Mutex"));
+                 hMutex = CreateMutex( psa, FALSE, TEXT("mzimeja_mutex"));
                  FreeSecurityAttributes( psa );
                  if ( hMutex == NULL ) {
                  // Failed
@@ -108,7 +100,7 @@ BOOL WINAPI DllMain (
             hInst= hInstDLL;
             IMERegisterClass( hInst );
 
-            // Initialize for FAKEIME.
+            // Initialize for MZ-IME.
             lpDicFileName = (LPTSTR)&szDicFileName;
             lpDicFileName += GetWindowsDirectory(lpDicFileName,256);
             if (*(lpDicFileName-1) != TEXT('\\'))

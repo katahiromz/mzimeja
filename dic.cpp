@@ -9,13 +9,13 @@ Module Name:
 ++*/
 #include <windows.h>
 #include <immdev.h>
-#include "fakeime.h"
+#include "mzimeja.h"
 #include "vksub.h"
 #include "immsec.h"
 
 extern "C" {
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf, DWORD dwBufLen, LPTSTR szDicFileName);
 #endif
 
@@ -218,7 +218,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC)
     //
     szBuf[256] = 0;    // Double NULL-terminate
     szBuf[257] = 0;    // Double NULL-terminate
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     nBufLen = GetCandidateStringsFromDictionary(lpT2, szBuf, 256, (LPTSTR)szDicFileName);
 #else
     nBufLen = GetPrivateProfileString(lpT2, NULL,(LPSTR)"",
@@ -293,7 +293,7 @@ set_compstr:
                 //
                 lpCompStr->dwCompStrLen = Mylstrlen(lpstr);
                 lpCompStr->dwCursorPos = 0;
-                // Because FAKEIME does not support clause, DeltaStart is 0 anytime.
+                // Because MZ-IME does not support clause, DeltaStart is 0 anytime.
                 lpCompStr->dwDeltaStart = 0;
 
                 //
@@ -420,7 +420,7 @@ cvk_exit10:
 /**********************************************************************/
 BOOL PASCAL IsEat( WORD code )
 {
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     return TRUE;
 #else
     return( (code >= 0x20 && 0x7f >= code) || (code >= 0x0a1 && 0x0df >= code) ? TRUE : FALSE );
@@ -463,7 +463,7 @@ void PASCAL DeleteChar( HIMC hIMC ,UINT uVKey)
             goto dc_exit;
 
         lpptr = MyCharPrev( lpstr, lpstr+dwCurPos );
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
         nChar = 1;
 #else
         nChar = IsDBCSLeadByte( *lpptr ) ? 2 : 1;
@@ -486,7 +486,7 @@ void PASCAL DeleteChar( HIMC hIMC ,UINT uVKey)
         if( dwCurPos == (DWORD)Mylstrlen(lpstr) )
             goto dc_exit;
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
         nChar = 1;
 #else
         nChar = IsDBCSLeadByte( *(lpstr+dwCurPos) ) ? 2 : 1;
@@ -588,7 +588,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code)
     DWORD dwSize;
     TRANSMSG GnMsg;
     DWORD dwGCR = 0L;
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     WCHAR Katakana, Sound;
 #endif
 
@@ -654,7 +654,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code)
             if ( fdwConversion & IME_CMODE_ROMAN  &&
                  fdwConversion & IME_CMODE_NATIVE )
             {
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                 if (*lpprev) {
                      code2 = *lpprev;
                 }
@@ -769,7 +769,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code)
 DBCS_BETA:
                 if( code == MYTEXT('^') )
                 {
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                     code2 = *lpprev;
 #else
                     code2 = MAKEWORD( *(lpprev+1), *lpprev );
@@ -777,7 +777,7 @@ DBCS_BETA:
                     if( IsTenten( code2 ) == FALSE )
                         goto DBCS_BETA2;
                     code2 = ConvTenten( code2 );
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                     *lpprev++ = code2;
 #else
                     if( HIBYTE( code2 ) )
@@ -787,7 +787,7 @@ DBCS_BETA:
                 }
                 else if( code == MYTEXT('_') )
                 {
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                     code2 = *lpprev;
 #else
                     code2 = MAKEWORD( *(lpprev+1), *lpprev );
@@ -795,7 +795,7 @@ DBCS_BETA:
                     if( IsMaru( code2 ) == FALSE )
                         goto DBCS_BETA2;
                     code2 = ConvMaru( code2 );
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                     *lpprev = code2;
 #else
                     if( HIBYTE( code2 ) )
@@ -805,11 +805,11 @@ DBCS_BETA:
                 }
                 else
                 {
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                     code = HanToZen(code,0,fdwConversion);
 #endif
 DBCS_BETA2:
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                     *lpstr++ = code;
                     lpCompStr->dwCursorPos += 1;
 #else
@@ -833,7 +833,7 @@ DBCS_BETA2:
                     if (IsFirst( *lpprev ) &&
                        (code2 = ConvChar(hIMC,*lpprev,code)))
                     {
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                         if (OneCharZenToHan(code2,&Katakana, &Sound))
                         {
                             *lpprev = Katakana;
@@ -868,7 +868,7 @@ DBCS_BETA2:
                 }
                 else
                 {
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                     if( (WORD)(LONG_PTR)CharUpperW( (LPMYSTR)(LONG_PTR)code ) == 'N'
                       && (WORD)(LONG_PTR)CharUpperW( (LPMYSTR)(LONG_PTR)(code2 = *lpprev ) ) == 'N' )
                     {
@@ -889,7 +889,7 @@ DBCS_BETA2:
             else
             {
 SBCS_BETA:
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
                 if (OneCharZenToHan(code,&Katakana,&Sound)) 
                 {
                     *lpstr++ = Katakana;
@@ -915,7 +915,7 @@ SBCS_BETA:
     // make reading string.
     lpstr = GETLPCOMPSTR(lpCompStr);
     lpread = GETLPCOMPREADSTR(lpCompStr);
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
     if (fdwConversion & IME_CMODE_KATAKANA) 
     {
         if (fdwConversion & IME_CMODE_FULLSHAPE)
@@ -1165,9 +1165,6 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID)
     TRANSMSG GnMsg;
     DWORD dwSize = sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(MYCHAR)) * 2 * sizeof(MYCHAR);
     LPMYSTR lpStr;
-#ifdef FAKEIMEM
-    char szBuf[MAXGLCHAR+1];
-#endif
 
     lpIMC = ImmLockIMC(hIMC);
     lpIMC->hGuideLine = ImmReSizeIMCC(lpIMC->hGuideLine,dwSize);
@@ -1179,24 +1176,14 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID)
     lpGuideLine->dwIndex = glTable[dwID].dwIndex;
     lpGuideLine->dwStrOffset = sizeof(GUIDELINE);
     lpStr = (LPMYSTR)(((LPSTR)lpGuideLine) + lpGuideLine->dwStrOffset);
-#ifdef FAKEIMEM
-    LoadString(hInst, glTable[dwID].dwStrID, szBuf, MAXGLCHAR);
-    MultiByteToWideChar(CP_ACP, 0, szBuf, -1, lpStr, MAXGLCHAR);
-#else
     LoadString(hInst,glTable[dwID].dwStrID,lpStr, MAXGLCHAR);
-#endif
     lpGuideLine->dwStrLen = Mylstrlen(lpStr);
 
     if (glTable[dwID].dwPrivateID)
     {
         lpGuideLine->dwPrivateOffset = sizeof(GUIDELINE) + (MAXGLCHAR + 1) * sizeof(MYCHAR);
         lpStr = (LPMYSTR)(((LPSTR)lpGuideLine) + lpGuideLine->dwPrivateOffset);
-#ifdef FAKEIMEM
-        LoadString(hInst, glTable[dwID].dwStrID, szBuf, MAXGLCHAR);
-        MultiByteToWideChar(CP_ACP, 0, szBuf, -1, lpStr, MAXGLCHAR);
-#else
         LoadString(hInst,glTable[dwID].dwStrID,lpStr, MAXGLCHAR);
-#endif
         lpGuideLine->dwPrivateSize = Mylstrlen(lpStr) * sizeof(MYCHAR);
     }
     else
@@ -1358,7 +1345,7 @@ hsa_exit:
     ImmUnlockIMC(hIMC);
 }
 
-#if defined(FAKEIMEM) || defined(UNICODE)
+#if defined(UNICODE)
 
 int CopyCandidateStringsFromDictionary(LPMYSTR lpDic, LPMYSTR lpRead, LPMYSTR lpBuf, DWORD dwBufLen)
 {
@@ -1454,6 +1441,5 @@ Err0:
 }
 
 #endif
-
 
 } // extern "C"

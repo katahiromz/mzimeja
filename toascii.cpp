@@ -11,7 +11,7 @@ Module Name:
 /**********************************************************************/
 #include "windows.h"
 #include "immdev.h"
-#include "fakeime.h"
+#include "mzimeja.h"
 
 extern "C" {
 
@@ -67,7 +67,7 @@ itae_exit:
 #ifdef DEBUG
 OutputDebugString((LPTSTR)TEXT("***************************************\r\n"));
 OutputDebugString((LPTSTR)TEXT("*   TransKey OVER FLOW Messages!!!    *\r\n"));
-OutputDebugString((LPTSTR)TEXT("*                by FAKEIME.DLL       *\r\n"));
+OutputDebugString((LPTSTR)TEXT("*                by MZIMEJA.DLL       *\r\n"));
 OutputDebugString((LPTSTR)TEXT("***************************************\r\n"));
 #endif
         return (int)uNumTransKey;
