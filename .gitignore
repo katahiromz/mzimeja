@@ -3,6 +3,7 @@
 *.suo
 *.ime
 *.log
+*.err
 Debug
 Release
 x64
