@@ -10,9 +10,8 @@ extern "C" {
 // A function which handles WM_IME_KEYDOWN
 BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                               LPBYTE lpbKeyState) {
-  WORD wVKey;
-
-  switch (wVKey = (LOWORD(wParam) & 0x00FF)) {
+  WORD wVKey = (wParam & 0x00FF);
+  switch (wVKey) {
     case VK_SHIFT:
     case VK_CONTROL:
       // goto not_proccessed;
