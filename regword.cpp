@@ -5,95 +5,81 @@ Copyright (c) 1990-1998 Microsoft Corporation, All Rights Reserved
 Module Name:
 
     REGWORD.C
-    
+
 ++*/
 
 /**********************************************************************/
-#include "windows.h"
 #include "immdev.h"
 #include "mzimeja.h"
+#include "windows.h"
 
 extern "C" {
 
-#define FAKEWORD_NOUN  IME_REGWORD_STYLE_USER_FIRST
-#define FAKEWORD_VERB  (IME_REGWORD_STYLE_USER_FIRST+1)
+#define FAKEWORD_NOUN IME_REGWORD_STYLE_USER_FIRST
+#define FAKEWORD_VERB (IME_REGWORD_STYLE_USER_FIRST + 1)
 
-BOOL    WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
-{
-    if ((dw == FAKEWORD_NOUN) || (dw== FAKEWORD_VERB))
-        return WritePrivateProfileString(lpRead,lpStr,lpStr,szDicFileName);
+BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
+  if ((dw == FAKEWORD_NOUN) || (dw == FAKEWORD_VERB))
+    return WritePrivateProfileString(lpRead, lpStr, lpStr, szDicFileName);
 
-    return FALSE;
+  return FALSE;
 }
-BOOL    WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
-{
-    if ((dw == FAKEWORD_NOUN) || (dw== FAKEWORD_VERB))
+BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
+  if ((dw == FAKEWORD_NOUN) || (dw == FAKEWORD_VERB))
 
-        return WritePrivateProfileString(lpRead,lpStr,NULL,szDicFileName);
+    return WritePrivateProfileString(lpRead, lpStr, NULL, szDicFileName);
 
-    return FALSE;
+  return FALSE;
 }
-UINT    WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp)
-{
-    UINT uRet = 0;
+UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
+  UINT uRet = 0;
 
-    if (u > 0 && lp)
-    {
-        lp->dwStyle = FAKEWORD_NOUN; 
-        lstrcpy(lp->szDescription,TEXT("NOUN"));
-   
-        if (u > 1)
-        {
-            lp++;
-            lp->dwStyle = FAKEWORD_VERB; 
-            lstrcpy(lp->szDescription,TEXT("VERB"));
-        }
+  if (u > 0 && lp) {
+    lp->dwStyle = FAKEWORD_NOUN;
+    lstrcpy(lp->szDescription, TEXT("NOUN"));
+
+    if (u > 1) {
+      lp++;
+      lp->dwStyle = FAKEWORD_VERB;
+      lstrcpy(lp->szDescription, TEXT("VERB"));
     }
-    else
-        uRet = 2;
+  } else
+    uRet = 2;
 
-    return uRet;
+  return uRet;
 }
-UINT    WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID lpData)
-{
-    UINT uRet = 0;
-    TCHAR szBuf[256];
-    int nBufLen;
-    LPTSTR lpBuf;
+UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
+                                DWORD dw, LPCTSTR lpStr, LPVOID lpData) {
+  UINT uRet = 0;
+  TCHAR szBuf[256];
+  int nBufLen;
+  LPTSTR lpBuf;
 
-    if (! lpfn)
-        return 0;
+  if (!lpfn) return 0;
 
-    lpBuf = (LPTSTR)szBuf;
+  lpBuf = (LPTSTR)szBuf;
 
-    if (!dw || (dw == FAKEWORD_NOUN))
-    {
-        if (lpRead)
-        {
-            nBufLen = GetPrivateProfileString(lpRead, NULL,(LPTSTR)TEXT(""),
-                            (LPTSTR)szBuf,sizeof(szBuf)/sizeof(szBuf[0]),(LPTSTR)szDicFileName );
+  if (!dw || (dw == FAKEWORD_NOUN)) {
+    if (lpRead) {
+      nBufLen = GetPrivateProfileString(
+          lpRead, NULL, (LPTSTR)TEXT(""), (LPTSTR)szBuf,
+          sizeof(szBuf) / sizeof(szBuf[0]), (LPTSTR)szDicFileName);
 
-            if (nBufLen)
-            {
-                while (*lpBuf)
-                {
-                    if (lpStr && lstrcmp(lpStr, lpBuf))
-                        continue;
+      if (nBufLen) {
+        while (*lpBuf) {
+          if (lpStr && lstrcmp(lpStr, lpBuf)) continue;
 
-                    uRet = (*lpfn)(lpRead, dw, lpBuf, lpData);
-                    lpBuf += (lstrlen(lpBuf) + 1);
+          uRet = (*lpfn)(lpRead, dw, lpBuf, lpData);
+          lpBuf += (lstrlen(lpBuf) + 1);
 
-                    if (!uRet)
-                        break;
-                }
-            }
+          if (!uRet) break;
         }
-        else
-        {
-        }
+      }
+    } else {
     }
+  }
 
-    return uRet;
+  return uRet;
 }
 
-} // extern "C"
+}  // extern "C"
