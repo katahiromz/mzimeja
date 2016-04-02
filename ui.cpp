@@ -1,142 +1,177 @@
+// ui.cpp
+//////////////////////////////////////////////////////////////////////////////
+
 #include "mzimeja.h"
 
 extern "C" {
 
-void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag);
+//////////////////////////////////////////////////////////////////////////////
+
+void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag) {
+  HGLOBAL hUIExtra;
+  LPUIEXTRA lpUIExtra;
+  int nsw = fFlag ? SW_SHOWNOACTIVATE : SW_HIDE;
+
+  if (!(hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE))) return;
+
+  if (!(lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra))) return;
+
+  if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
+    ShowWindow(lpUIExtra->uiStatus.hWnd, nsw);
+    lpUIExtra->uiStatus.bShow = fFlag;
+  }
+
+  if (IsWindow(lpUIExtra->uiCand.hWnd)) {
+    ShowWindow(lpUIExtra->uiCand.hWnd, nsw);
+    lpUIExtra->uiCand.bShow = fFlag;
+  }
+
+  if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
+    ShowWindow(lpUIExtra->uiDefComp.hWnd, nsw);
+    lpUIExtra->uiDefComp.bShow = fFlag;
+  }
+
+  if (IsWindow(lpUIExtra->uiGuide.hWnd)) {
+    ShowWindow(lpUIExtra->uiGuide.hWnd, nsw);
+    lpUIExtra->uiGuide.bShow = fFlag;
+  }
+
+  GlobalUnlock(hUIExtra);
+}
+
 #ifdef _DEBUG
-void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra);
-#endif
+void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra) {
+  TCHAR szDev[80];
+  int i;
+
+  wsprintf((LPTSTR)szDev, TEXT("Status hWnd %lX  [%d,%d]\r\n"),
+           lpUIExtra->uiStatus.hWnd, lpUIExtra->uiStatus.pt.x,
+           lpUIExtra->uiStatus.pt.y);
+  OutputDebugString((LPTSTR)szDev);
+
+  wsprintf((LPTSTR)szDev, TEXT("Cand hWnd %lX  [%d,%d]\r\n"),
+           lpUIExtra->uiCand.hWnd, lpUIExtra->uiCand.pt.x,
+           lpUIExtra->uiCand.pt.y);
+  OutputDebugString((LPTSTR)szDev);
+
+  wsprintf((LPTSTR)szDev, TEXT("CompStyle hWnd %lX]\r\n"),
+           lpUIExtra->dwCompStyle);
+  OutputDebugString((LPTSTR)szDev);
+
+  wsprintf((LPTSTR)szDev, TEXT("DefComp hWnd %lX  [%d,%d]\r\n"),
+           lpUIExtra->uiDefComp.hWnd, lpUIExtra->uiDefComp.pt.x,
+           lpUIExtra->uiDefComp.pt.y);
+  OutputDebugString((LPTSTR)szDev);
+
+  for (i = 0; i < 5; i++) {
+    wsprintf((LPTSTR)szDev, TEXT("Comp hWnd %lX  [%d,%d]-[%d,%d]\r\n"),
+             lpUIExtra->uiComp[i].hWnd, lpUIExtra->uiComp[i].rc.left,
+             lpUIExtra->uiComp[i].rc.top, lpUIExtra->uiComp[i].rc.right,
+             lpUIExtra->uiComp[i].rc.bottom);
+    OutputDebugString((LPTSTR)szDev);
+  }
+}
+#endif  // def _DEBUG
 
 #define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
-/**********************************************************************/
-/*                                                                    */
-/* IMERegisterClass()                                                 */
-/*                                                                    */
-/* This function is called by IMMInquire.                             */
-/*    Register the classes for the child windows.                     */
-/*    Create global GDI objects.                                      */
-/*                                                                    */
-/**********************************************************************/
+
+// This function is called by IMMInquire, register the classes
 BOOL IMERegisterClass(HINSTANCE hInstance) {
-  WNDCLASSEX wc;
+  WNDCLASSEX wcx;
 
-  //
   // register class of UI window.
-  //
-  wc.cbSize = sizeof(WNDCLASSEX);
-  wc.style = CS_MZIME;
-  wc.lpfnWndProc = MZIMEWndProc;
-  wc.cbClsExtra = 0;
-  wc.cbWndExtra = 8;
-  wc.hInstance = hInstance;
-  wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wc.hIcon = NULL;
-  wc.lpszMenuName = (LPTSTR)NULL;
-  wc.lpszClassName = (LPTSTR)szUIClassName;
-  wc.hbrBackground = NULL;
-  wc.hIconSm = NULL;
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = MZIMEWndProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = 8;
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szUIClassName;
+  wcx.hbrBackground = NULL;
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
 
-  if (!RegisterClassEx((LPWNDCLASSEX)&wc)) return FALSE;
-
-  //
   // register class of composition window.
-  //
-  wc.cbSize = sizeof(WNDCLASSEX);
-  wc.style = CS_MZIME;
-  wc.lpfnWndProc = CompStrWndProc;
-  wc.cbClsExtra = 0;
-  wc.cbWndExtra = UIEXTRASIZE;
-  wc.hInstance = hInstance;
-  wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wc.hIcon = NULL;
-  wc.lpszMenuName = NULL;
-  wc.lpszClassName = szCompStrClassName;
-  wc.hbrBackground = NULL;
-  wc.hIconSm = NULL;
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = CompStrWndProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = UIEXTRASIZE;
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szCompStrClassName;
+  wcx.hbrBackground = NULL;
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
 
-  if (!RegisterClassEx((LPWNDCLASSEX)&wc)) return FALSE;
-
-  //
   // register class of candidate window.
-  //
-  wc.cbSize = sizeof(WNDCLASSEX);
-  wc.style = CS_MZIME;
-  wc.lpfnWndProc = CandWndProc;
-  wc.cbClsExtra = 0;
-  wc.cbWndExtra = UIEXTRASIZE;
-  wc.hInstance = hInstance;
-  wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wc.hIcon = NULL;
-  wc.lpszMenuName = NULL;
-  wc.lpszClassName = szCandClassName;
-  wc.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
-  wc.hIconSm = NULL;
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = CandWndProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = UIEXTRASIZE;
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szCandClassName;
+  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
 
-  if (!RegisterClassEx((LPWNDCLASSEX)&wc)) return FALSE;
-
-  //
   // register class of status window.
-  //
-  wc.cbSize = sizeof(WNDCLASSEX);
-  wc.style = CS_MZIME;
-  wc.lpfnWndProc = StatusWndProc;
-  wc.cbClsExtra = 0;
-  wc.cbWndExtra = UIEXTRASIZE;
-  wc.hInstance = hInstance;
-  wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wc.hIcon = NULL;
-  wc.lpszMenuName = NULL;
-  wc.lpszClassName = szStatusClassName;
-  wc.hbrBackground = NULL;
-  wc.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
-  wc.hIconSm = NULL;
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = StatusWndProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = UIEXTRASIZE;
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szStatusClassName;
+  wcx.hbrBackground = NULL;
+  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
 
-  if (!RegisterClassEx((LPWNDCLASSEX)&wc)) return FALSE;
-
-  //
   // register class of guideline window.
-  //
-  wc.cbSize = sizeof(WNDCLASSEX);
-  wc.style = CS_MZIME;
-  wc.lpfnWndProc = GuideWndProc;
-  wc.cbClsExtra = 0;
-  wc.cbWndExtra = UIEXTRASIZE;
-  wc.hInstance = hInstance;
-  wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wc.hIcon = NULL;
-  wc.lpszMenuName = NULL;
-  wc.lpszClassName = szGuideClassName;
-  wc.hbrBackground = NULL;
-  // wc.hbrBackground  = GetStockObject(LTGRAY_BRUSH);
-  wc.hIconSm = NULL;
-
-  if (!RegisterClassEx((LPWNDCLASSEX)&wc)) return FALSE;
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = GuideWndProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = UIEXTRASIZE;
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szGuideClassName;
+  wcx.hbrBackground = NULL;
+  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
 
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* MZIMEWndProc()                                                   */
-/*                                                                    */
-/* IME UI window procedure                                            */
-/*                                                                    */
-/**********************************************************************/
+// IME UI window procedure
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
-  HIMC hUICurIMC;
   LPINPUTCONTEXT lpIMC;
   LPUIEXTRA lpUIExtra;
   HGLOBAL hUIExtra;
   LONG lRet = 0L;
   int i;
 
-  hUICurIMC = (HIMC)GetWindowLongPtr(hWnd, IMMGWLP_IMC);
+  HIMC hUICurIMC = (HIMC)GetWindowLongPtr(hWnd, IMMGWLP_IMC);
 
-  //
   // Even if there is no current UI. these messages should not be pass to
   // DefWindowProc().
-  //
   if (!hUICurIMC) {
     switch (message) {
       case WM_IME_STARTCOMPOSITION:
@@ -169,15 +204,11 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
   switch (message) {
     case WM_CREATE:
-      //
       // Allocate UI's extra memory block.
-      //
       hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
 
-      //
       // Initialize the extra memory block.
-      //
       lpUIExtra->uiStatus.pt.x = -1;
       lpUIExtra->uiStatus.pt.y = -1;
       lpUIExtra->uiDefComp.pt.x = -1;
@@ -190,7 +221,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
       GlobalUnlock(hUIExtra);
       SetWindowLongPtr(hWnd, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
-
       break;
 
     case WM_IME_SETCONTEXT:
@@ -205,7 +235,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
           // input context was chenged.
           // if there are the child windows, the diplay have to be
           // updated.
-          //
           lpIMC = ImmLockIMC(hUICurIMC);
           if (lpIMC) {
             LPCOMPOSITIONSTRING lpCompStr;
@@ -250,9 +279,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_IME_STARTCOMPOSITION:
-      //
       // Start composition! Ready to display the composition string.
-      //
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       lpIMC = ImmLockIMC(hUICurIMC);
@@ -262,9 +289,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_IME_COMPOSITION:
-      //
       // Update to display the composition string.
-      //
       lpIMC = ImmLockIMC(hUICurIMC);
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
@@ -275,9 +300,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_IME_ENDCOMPOSITION:
-      //
       // Finish to display the composition string.
-      //
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       HideCompWindow(lpUIExtra);
@@ -332,10 +355,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_UI_STATEMOVE:
-      //
       // Set the position of the status window to UIExtra.
       // This message is sent by the status window.
-      //
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       lpUIExtra->uiStatus.pt.x = (long)LOWORD(lParam);
@@ -344,10 +365,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_UI_DEFCOMPMOVE:
-      //
       // Set the position of the composition window to UIExtra.
       // This message is sent by the composition window.
-      //
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       if (!lpUIExtra->dwCompStyle) {
@@ -358,10 +377,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_UI_CANDMOVE:
-      //
       // Set the position of the candidate window to UIExtra.
       // This message is sent by the candidate window.
-      //
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       lpUIExtra->uiCand.pt.x = (long)LOWORD(lParam);
@@ -370,10 +387,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_UI_GUIDEMOVE:
-      //
       // Set the position of the status window to UIExtra.
       // This message is sent by the status window.
-      //
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       lpUIExtra->uiGuide.pt.x = (long)LOWORD(lParam);
@@ -405,13 +420,7 @@ int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra) {
   return sz.cy;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* NotifyCommand()                                                    */
-/*                                                                    */
-/* Handle WM_IME_NOTIFY messages.                                     */
-/*                                                                    */
-/**********************************************************************/
+// Handle WM_IME_NOTIFY messages
 LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
                           WPARAM wParam, LPARAM lParam) {
   LONG lRet = 0L;
@@ -573,14 +582,9 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
   return lRet;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* ControlCommand()                                                   */
-/*                                                                    */
-/* Handle WM_IME_CONTROL messages.                                    */
-/*                                                                    */
-/**********************************************************************/
-#define lpcfCandForm ((LPCANDIDATEFORM)lParam)
+//#define lpcfCandForm ((LPCANDIDATEFORM)lParam)
+
+// Handle WM_IME_CONTROL messages
 LONG PASCAL ControlCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
                            WPARAM wParam, LPARAM lParam) {
   LONG lRet = 1L;
@@ -620,13 +624,8 @@ LONG PASCAL ControlCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
 
   return lRet;
 }
-/**********************************************************************/
-/*                                                                    */
-/* DrawUIBorder()                                                     */
-/*                                                                    */
-/* When draging the child window, this function draws the border.     */
-/*                                                                    */
-/**********************************************************************/
+
+// When draging the child window, this function draws the border
 void PASCAL DrawUIBorder(LPRECT lprc) {
   HDC hDC;
   int sbx, sby;
@@ -646,13 +645,7 @@ void PASCAL DrawUIBorder(LPRECT lprc) {
   DeleteDC(hDC);
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* DragUI(hWnd,message,wParam,lParam)                                 */
-/*                                                                    */
-/* Handling mouse messages for the child windows.                     */
-/*                                                                    */
-/**********************************************************************/
+// Handling mouse messages for the child windows
 void PASCAL DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   POINT pt;
   static POINT ptdif;
@@ -709,13 +702,7 @@ void PASCAL DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   }
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* MyIsIMEMessage(message)                                            */
-/*                                                                    */
-/* Any UI window should not pass the IME messages to DefWindowProc.   */
-/*                                                                    */
-/**********************************************************************/
+// Any UI window should not pass the IME messages to DefWindowProc
 BOOL PASCAL MyIsIMEMessage(UINT message) {
   switch (message) {
     case WM_IME_STARTCOMPOSITION:
@@ -733,74 +720,8 @@ BOOL PASCAL MyIsIMEMessage(UINT message) {
   return FALSE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* ShowUIWindows(hWnd,fFlag)                                          */
-/*                                                                    */
-/**********************************************************************/
-void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag) {
-  HGLOBAL hUIExtra;
-  LPUIEXTRA lpUIExtra;
-  int nsw = fFlag ? SW_SHOWNOACTIVATE : SW_HIDE;
-
-  if (!(hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE))) return;
-
-  if (!(lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra))) return;
-
-  if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
-    ShowWindow(lpUIExtra->uiStatus.hWnd, nsw);
-    lpUIExtra->uiStatus.bShow = fFlag;
-  }
-
-  if (IsWindow(lpUIExtra->uiCand.hWnd)) {
-    ShowWindow(lpUIExtra->uiCand.hWnd, nsw);
-    lpUIExtra->uiCand.bShow = fFlag;
-  }
-
-  if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
-    ShowWindow(lpUIExtra->uiDefComp.hWnd, nsw);
-    lpUIExtra->uiDefComp.bShow = fFlag;
-  }
-
-  if (IsWindow(lpUIExtra->uiGuide.hWnd)) {
-    ShowWindow(lpUIExtra->uiGuide.hWnd, nsw);
-    lpUIExtra->uiGuide.bShow = fFlag;
-  }
-
-  GlobalUnlock(hUIExtra);
-}
-#ifdef _DEBUG
-void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra) {
-  TCHAR szDev[80];
-  int i;
-
-  wsprintf((LPTSTR)szDev, TEXT("Status hWnd %lX  [%d,%d]\r\n"),
-           lpUIExtra->uiStatus.hWnd, lpUIExtra->uiStatus.pt.x,
-           lpUIExtra->uiStatus.pt.y);
-  OutputDebugString((LPTSTR)szDev);
-
-  wsprintf((LPTSTR)szDev, TEXT("Cand hWnd %lX  [%d,%d]\r\n"),
-           lpUIExtra->uiCand.hWnd, lpUIExtra->uiCand.pt.x,
-           lpUIExtra->uiCand.pt.y);
-  OutputDebugString((LPTSTR)szDev);
-
-  wsprintf((LPTSTR)szDev, TEXT("CompStyle hWnd %lX]\r\n"),
-           lpUIExtra->dwCompStyle);
-  OutputDebugString((LPTSTR)szDev);
-
-  wsprintf((LPTSTR)szDev, TEXT("DefComp hWnd %lX  [%d,%d]\r\n"),
-           lpUIExtra->uiDefComp.hWnd, lpUIExtra->uiDefComp.pt.x,
-           lpUIExtra->uiDefComp.pt.y);
-  OutputDebugString((LPTSTR)szDev);
-
-  for (i = 0; i < 5; i++) {
-    wsprintf((LPTSTR)szDev, TEXT("Comp hWnd %lX  [%d,%d]-[%d,%d]\r\n"),
-             lpUIExtra->uiComp[i].hWnd, lpUIExtra->uiComp[i].rc.left,
-             lpUIExtra->uiComp[i].rc.top, lpUIExtra->uiComp[i].rc.right,
-             lpUIExtra->uiComp[i].rc.bottom);
-    OutputDebugString((LPTSTR)szDev);
-  }
-}
-#endif
+//////////////////////////////////////////////////////////////////////////////
 
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

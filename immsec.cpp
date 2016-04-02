@@ -1,27 +1,26 @@
+// immsec.cpp
 #include "immsec.h"
 #include <stdio.h>
 #include <windows.h>
 
-extern "C" {
-
 #define MEMALLOC(x) LocalAlloc(LMEM_FIXED, x)
 #define MEMFREE(x) LocalFree(x)
 
-//
+extern "C" {
+
+//////////////////////////////////////////////////////////////////////////////
+
 // internal functions
-//
 PSID MyCreateSid(VOID);
 POSVERSIONINFO GetVersionInfo(VOID);
 
-//
 // debug functions
-//
 #ifdef _DEBUG
-#define ERROROUT(x) ErrorOut(x)
-#define WARNOUT(x) WarnOut(x)
+  #define ERROROUT(x) ErrorOut(x)
+  #define WARNOUT(x) WarnOut(x)
 #else
-#define ERROROUT(x)
-#define WARNOUT(x)
+  #define ERROROUT(x)
+  #define WARNOUT(x)
 #endif
 
 #ifdef _DEBUG
@@ -283,4 +282,8 @@ POSVERSIONINFO GetVersionInfo(VOID) {
   return &os;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

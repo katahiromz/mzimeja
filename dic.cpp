@@ -1,14 +1,15 @@
+// dic.cpp
+//////////////////////////////////////////////////////////////////////////////
+
 #define _CRT_SECURE_NO_WARNINGS
-#include "mzimeja.h"#include "immsec.h"
+#include "mzimeja.h"
+#include "immsec.h"
 #include "vksub.h"
 
 extern "C" {
 
-/**********************************************************************/
-/*                                                                    */
-/* FlushText()                                                        */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+
 void PASCAL FlushText(HIMC hIMC) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
@@ -53,11 +54,6 @@ void PASCAL FlushText(HIMC hIMC) {
   ImmUnlockIMC(hIMC);
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* RevertText()                                                       */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL RevertText(HIMC hIMC) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
@@ -124,13 +120,6 @@ void PASCAL RevertText(HIMC hIMC) {
   ImmUnlockIMC(hIMC);
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* ConvKanji()                                                        */
-/*                                                                    */
-/* VK_KANJI Key handling function                                     */
-/*                                                                    */
-/**********************************************************************/
 BOOL PASCAL ConvKanji(HIMC hIMC) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
@@ -346,20 +335,10 @@ cvk_exit10:
   return bRc;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* IsEat( code )                                                      */
-/*                                                                    */
-/**********************************************************************/
 BOOL PASCAL IsEat(WORD code) {
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* DeleteChar()                                                       */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
@@ -467,13 +446,6 @@ dc_exit:
   ImmUnlockIMC(hIMC);
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* AddChar()                                                          */
-/*                                                                    */
-/* One character add function                                         */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL AddChar(HIMC hIMC, WORD code) {
   LPMYSTR lpchText;
   LPMYSTR lpread;
@@ -803,11 +775,6 @@ BOOL PASCAL DicKeydownHandler(HIMC hIMC, UINT wParam, LPARAM lParam,
     return (TRUE);
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*  Entry    : MakeResultString( HIMC)                                */
-/*                                                                    */
-/**********************************************************************/
 BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
   TRANSMSG GnMsg;
   LPCOMPOSITIONSTRING lpCompStr;
@@ -867,13 +834,7 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      MakeGuideLine()                                               */
-/*                                                                    */
-/*      Update the transrate key buffer.                              */
-/*                                                                    */
-/**********************************************************************/
+// Update the transrate key buffer
 BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   LPINPUTCONTEXT lpIMC;
   LPGUIDELINE lpGuideLine;
@@ -916,13 +877,7 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      GenerateMessage()                                             */
-/*                                                                    */
-/*      Update the transrate key buffer.                              */
-/*                                                                    */
-/**********************************************************************/
+// Update the transrate key buffer
 BOOL PASCAL GenerateMessage(HIMC hIMC, LPINPUTCONTEXT lpIMC,
                             LPTRANSMSGLIST lpTransBuf, LPTRANSMSG lpGeneMsg) {
   if (lpTransBuf) return GenerateMessageToTransKey(lpTransBuf, lpGeneMsg);
@@ -944,11 +899,6 @@ BOOL PASCAL GenerateMessage(HIMC hIMC, LPINPUTCONTEXT lpIMC,
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*  Entry    : CheckAttr( LPCOMPOSITIONSTRING)                           */
-/*                                                                    */
-/**********************************************************************/
 BOOL PASCAL CheckAttr(LPCOMPOSITIONSTRING lpCompStr) {
   int i, len;
   LPBYTE lpb = GETLPCOMPATTR(lpCompStr);
@@ -960,11 +910,6 @@ BOOL PASCAL CheckAttr(LPCOMPOSITIONSTRING lpCompStr) {
   return FALSE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*  Entry    : MakeAttrClause( LPCOMPOSITIONSTRING)                         */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL MakeAttrClause(LPCOMPOSITIONSTRING lpCompStr) {
   int len = lpCompStr->dwCompAttrLen;
   int readlen = lpCompStr->dwCompReadAttrLen;
@@ -1002,11 +947,6 @@ void PASCAL MakeAttrClause(LPCOMPOSITIONSTRING lpCompStr) {
   *lpdw++ = len;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*  Entry    : HandleShiftArrow( HIMC, fArrow)                        */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
@@ -1118,4 +1058,8 @@ Err0:
   return nSize;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

@@ -25,19 +25,19 @@
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-MZIMEICON             	ICON    DISCARDABLE     "..\\res\\mzimeja.ico"
-INDICOPENICON           ICON    DISCARDABLE     "..\\res\\penindic.ico"
+MZIMEICON             	ICON    DISCARDABLE     "res\\mzimeja.ico"
+INDICOPENICON           ICON    DISCARDABLE     "res\\penindic.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-STATUSBMP               BITMAP  DISCARDABLE     "..\\res\\status.bmp"
-CLOSEBMP                BITMAP  DISCARDABLE     "..\\res\\close.bmp"
-CHECKBMP                BITMAP  DISCARDABLE     "..\\res\\check.bmp"
-UNCHECKBMP              BITMAP  DISCARDABLE     "..\\res\\uncheck.bmp"
-FACEBMP                 BITMAP  DISCARDABLE     "..\\res\\face.bmp"
+STATUSBMP               BITMAP  DISCARDABLE     "res\\status.bmp"
+CLOSEBMP                BITMAP  DISCARDABLE     "res\\close.bmp"
+CHECKBMP                BITMAP  DISCARDABLE     "res\\check.bmp"
+UNCHECKBMP              BITMAP  DISCARDABLE     "res\\uncheck.bmp"
+FACEBMP                 BITMAP  DISCARDABLE     "res\\face.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

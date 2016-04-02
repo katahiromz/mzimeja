@@ -1,14 +1,13 @@
+// uistate.cpp
+//////////////////////////////////////////////////////////////////////////////
+
 #include "mzimeja.h"
 #include "resource.h"
 
 extern "C" {
 
-/**********************************************************************/
-/*                                                                    */
-/* StatusWndProc()                                                    */
-/* IME UI window procedure                                            */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+
 LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam,
                                LPARAM lParam) {
   PAINTSTRUCT ps;
@@ -69,11 +68,6 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam,
   return 0;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* CheckPushedStatus()                                                   */
-/*                                                                    */
-/**********************************************************************/
 DWORD PASCAL CheckPushedStatus(HWND hStatusWnd, LPPOINT lppt) {
   POINT pt;
   RECT rc;
@@ -102,11 +96,6 @@ DWORD PASCAL CheckPushedStatus(HWND hStatusWnd, LPPOINT lppt) {
   return 0;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* BTXFromCmode()                                                     */
-/*                                                                    */
-/**********************************************************************/
 int PASCAL BTXFromCmode(DWORD dwCmode) {
   if (dwCmode & IME_CMODE_FULLSHAPE) {
     if (!(dwCmode & IME_CMODE_LANGUAGE))
@@ -122,11 +111,7 @@ int PASCAL BTXFromCmode(DWORD dwCmode) {
       return BTHKATA;
   }
 }
-/**********************************************************************/
-/*                                                                    */
-/* PaintStatus()                                                      */
-/*                                                                    */
-/**********************************************************************/
+
 void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
                         DWORD dwPushedStatus) {
   HIMC hIMC;
@@ -204,11 +189,6 @@ void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
   }
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* GetUINextMode(hWnd,message,wParam,lParam)                          */
-/*                                                                    */
-/**********************************************************************/
 DWORD PASCAL GetUINextMode(DWORD fdwConversion, DWORD dwPushed) {
   DWORD dwTemp;
   BOOL fFullShape = ((fdwConversion & IME_CMODE_FULLSHAPE) != 0);
@@ -256,11 +236,7 @@ DWORD PASCAL GetUINextMode(DWORD fdwConversion, DWORD dwPushed) {
   }
   return fdwConversion;
 }
-/**********************************************************************/
-/*                                                                    */
-/* ButtonStatus(hStatusWnd,message,wParam,lParam)                     */
-/*                                                                    */
-/**********************************************************************/
+
 void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
                          LPARAM lParam) {
   POINT pt;
@@ -456,14 +432,14 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
   }
   ReleaseDC(hStatusWnd, hDC);
 }
-/**********************************************************************/
-/*                                                                    */
-/* UpdateStatusWindow(lpUIExtra)                                      */
-/*                                                                    */
-/**********************************************************************/
+
 void PASCAL UpdateStatusWindow(LPUIEXTRA lpUIExtra) {
   if (IsWindow(lpUIExtra->uiStatus.hWnd))
     SendMessage(lpUIExtra->uiStatus.hWnd, WM_UI_UPDATE, 0, 0L);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

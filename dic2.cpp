@@ -1,14 +1,13 @@
+// dic2.cpp
+//////////////////////////////////////////////////////////////////////////////
+
 #include "mzimeja.h"
 
 extern "C" {
 
-/**********************************************************************/
-/*                                                                    */
-/* ConvChar()                                                         */
-/*                                                                    */
-/* Roman character Kana converting function                           */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+
+// Roman character Kana converting function
 WORD PASCAL ConvChar(HIMC hIMC, WORD ch1, WORD ch2) {
   int num1, num2;
   static WCHAR table[15][5] = {
@@ -35,13 +34,7 @@ WORD PASCAL ConvChar(HIMC hIMC, WORD ch1, WORD ch2) {
   return ((WORD)table[num1][num2 - 1]);
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* IsFirst()                                                          */
-/*                                                                    */
-/* A function which judges the vowels                                 */
-/*                                                                    */
-/**********************************************************************/
+// A function which judges the vowels
 int PASCAL IsFirst(WORD ch) {
   register int i;
   static WCHAR table0[] = MYTEXT("KSTNHMYRWGZDBP");
@@ -55,13 +48,7 @@ int PASCAL IsFirst(WORD ch) {
   return 0;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* IsSecond()                                                         */
-/*                                                                    */
-/* A function which judges the consonants                             */
-/*                                                                    */
-/**********************************************************************/
+// A function which judges the consonants
 int PASCAL IsSecond(WORD ch) {
   register int i;
   static WCHAR table0[] = MYTEXT("AIUEO");
@@ -326,4 +313,8 @@ void PASCAL lHanToZen(LPMYSTR lpDst, LPMYSTR lpSrc, DWORD fdwConversion) {
   *lpDst = MYTEXT('\0');
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

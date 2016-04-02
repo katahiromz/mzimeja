@@ -1,3 +1,6 @@
+// process.cpp
+//////////////////////////////////////////////////////////////////////////////
+
 /**********************************************************************/
 /* These tables are for ImeProcessKey(). And IMEProcessKey function   */
 /* refer this table and deside the VKey is needed for MZ-IME or not. */

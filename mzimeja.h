@@ -1,3 +1,6 @@
+// mzimeja.h --- MZ-IME Japanese Input
+//////////////////////////////////////////////////////////////////////////////
+
 #ifndef MZIMEJA_H_
 #define MZIMEJA_H_
 
@@ -7,11 +10,9 @@
 #include "indicml.h"
 #include "immdev.h"
 
-/**********************************************************************/
-/*                                                                    */
-/*      DebugOptions                                                  */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+// Debugging related
+
 #define DEBF_THREADID 0x00000001
 #define DEBF_GUIDELINE 0x00000002
 
@@ -20,11 +21,7 @@
 #define LOGF_APIOUT 0x00000004
 #define LOGF_KEY 0x00000008
 
-/**********************************************************************/
-/*                                                                    */
-/*      Define                                                        */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
 
 typedef LPTSTR LPMYSTR;
 typedef TCHAR MYCHAR;
@@ -156,6 +153,8 @@ typedef TCHAR MYCHAR;
 #define CLR_UNDET 2
 #define CLR_RESULT_AND_UNDET 3
 
+//////////////////////////////////////////////////////////////////////////////
+
 /* define GET LP for COMPOSITIONSTRING members. */
 #define GETLPCOMPREADATTR(lpcs) \
   (LPBYTE)((LPBYTE)(lpcs) + (lpcs)->dwCompReadAttrOffset)
@@ -182,11 +181,15 @@ typedef TCHAR MYCHAR;
     *((LPDWORD)(lpdw) + 1) = num; \
   }
 
+//////////////////////////////////////////////////////////////////////////////
+
 #define GCS_COMPALL                                                  \
   (GCS_COMPSTR | GCS_COMPATTR | GCS_COMPREADSTR | GCS_COMPREADATTR | \
    GCS_COMPCLAUSE | GCS_COMPREADCLAUSE)
 #define GCS_RESULTALL \
   (GCS_RESULTSTR | GCS_RESULTREADSTR | GCS_RESULTCLAUSE | GCS_RESULTREADCLAUSE)
+
+//////////////////////////////////////////////////////////////////////////////
 
 // ImeMenu Define
 #define NUM_ROOT_MENU_L 3
@@ -207,11 +210,9 @@ typedef TCHAR MYCHAR;
 
 #define NATIVE_CHARSET SHIFTJIS_CHARSET
 
-/**********************************************************************/
-/*                                                                    */
-/*      Structures                                                    */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+// Structures
+
 typedef struct _tagMYCOMPSTR {
   COMPOSITIONSTRING cs;
   MYCHAR szCompReadStr[MAXCOMPSIZE];
@@ -265,12 +266,9 @@ typedef struct _tagMYGUIDELINE {
   DWORD dwPrivateID;
 } MYGUIDELINE, NEAR *PMYGUIDELINE, FAR *LPMYGUIDELINE;
 
-/**********************************************************************/
-/*                                                                    */
-/*      Externs                                                       */
-/*                                                                    */
-/**********************************************************************/
-#ifndef _NO_EXTERN_
+//////////////////////////////////////////////////////////////////////////////
+// externs
+
 extern HINSTANCE hInst;
 extern HKL hMyKL;
 extern LPTRANSMSGLIST lpCurTransKey;
@@ -293,13 +291,8 @@ extern BYTE bNoCompSht[];
 extern BYTE bNoCompAlt[];
 extern DWORD dwLogFlag;
 extern DWORD dwDebugFlag;
-#endif  //_NO_EXTERN_
 
-/**********************************************************************/
-/*                                                                    */
-/*      Functions                                                     */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
 
 extern "C" {
 
@@ -347,6 +340,7 @@ LONG PASCAL ControlCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
                            WPARAM wParam, LPARAM lParam);
 void PASCAL DrawUIBorder(LPRECT lprc);
 void PASCAL DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra);
 
 /*   uistate.c   */
 LRESULT CALLBACK StatusWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -453,6 +447,10 @@ WORD PASCAL DeleteWord(LPSTR, LPSTR);
   #define ImeLog(dwFlag, lpStr) FALSE
 #endif
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
 
 #endif  // ndef MZIMEJA_H_
+
+//////////////////////////////////////////////////////////////////////////////

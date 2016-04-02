@@ -1,14 +1,13 @@
+// input.cpp
+//////////////////////////////////////////////////////////////////////////////
+
 #include "mzimeja.h"
 
 extern "C" {
 
-/**********************************************************************/
-/*                                                                    */
-/* IMEKeydownHandler()                                                */
-/*                                                                    */
-/* A function which handles WM_IMEKEYDOWN                             */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+
+// A function which handles WM_IMEKEYDOWN
 BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                               LPBYTE lpbKeyState) {
   WORD wVKey;
@@ -30,16 +29,14 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* IMEKeyupHandler()                                                  */
-/*                                                                    */
-/* A function which handles WM_IMEKEYUP                               */
-/*                                                                    */
-/**********************************************************************/
+// A function which handles WM_IMEKEYUP
 BOOL PASCAL IMEKeyupHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                             LPBYTE lpbKeyState) {
   return FALSE;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

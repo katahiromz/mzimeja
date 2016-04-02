@@ -1,14 +1,12 @@
+// uicomp.cpp
+//////////////////////////////////////////////////////////////////////////////
+
 #include "mzimeja.h"
 
 extern "C" {
 
-/**********************************************************************/
-/*                                                                    */
-/* CompStrWndProc()                                                   */
-/*                                                                    */
-/* IME UI window procedure                                            */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+
 LRESULT CALLBACK CompStrWndProc(HWND hWnd, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
   HWND hUIWnd;
@@ -44,11 +42,6 @@ LRESULT CALLBACK CompStrWndProc(HWND hWnd, UINT message, WPARAM wParam,
   return 0;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* CreateCompWindow()                                                 */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
                              LPINPUTCONTEXT lpIMC) {
   int i;
@@ -93,13 +86,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
   return;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* NumCharInDX()                                                      */
-/*                                                                    */
-/* Count how may the char can be arranged in DX.                      */
-/*                                                                    */
-/**********************************************************************/
+// Count how may the char can be arranged in DX
 int PASCAL NumCharInDX(HDC hDC, LPMYSTR lp, int dx) {
   SIZE sz;
   int width = 0;
@@ -120,13 +107,8 @@ int PASCAL NumCharInDX(HDC hDC, LPMYSTR lp, int dx) {
 
   return num;
 }
-/**********************************************************************/
-/*                                                                    */
-/* NumCharInDY()                                                      */
-/*                                                                    */
-/* Count how may the char can be arranged in DY.                      */
-/*                                                                    */
-/**********************************************************************/
+
+// Count how may the char can be arranged in DY
 int PASCAL NumCharInDY(HDC hDC, LPMYSTR lp, int dy) {
   SIZE sz;
   int width = 0;
@@ -145,13 +127,8 @@ int PASCAL NumCharInDY(HDC hDC, LPMYSTR lp, int dy) {
 
   return num;
 }
-/**********************************************************************/
-/*                                                                    */
-/* MoveCompWindow()                                                   */
-/*                                                                    */
-/* Calc the position of composition windows and move them.            */
-/*                                                                    */
-/**********************************************************************/
+
+// Calc the position of composition windows and move them
 void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
   HDC hDC;
   HFONT hFont = (HFONT)NULL;
@@ -165,9 +142,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
   int height;
   int i;
 
-  //
   // Save the composition form style into lpUIExtra.
-  //
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
 
   if (lpIMC->cfCompForm.dwStyle)  // Style is not DEFAULT.
@@ -181,24 +156,18 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
     int curx;
     int cury;
 
-    //
     // Lock the COMPOSITIONSTRING structure.
-    //
     if (!(lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)))
       return;
 
-    //
     // If there is no composition string, don't display anything.
-    //
     if ((lpCompStr->dwSize <= sizeof(COMPOSITIONSTRING)) ||
         (lpCompStr->dwCompStrLen == 0)) {
       ImmUnlockIMCC(lpIMC->hCompStr);
       return;
     }
 
-    //
     // Set the rectangle for the composition string.
-    //
     if (lpIMC->cfCompForm.dwStyle & CFS_RECT)
       rcSrc = lpIMC->cfCompForm.rcArea;
     else
@@ -207,17 +176,14 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
     ClientToScreen(lpIMC->hWnd, &ptSrc);
     ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.left);
     ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.right);
-    //
+
     // Check the start position.
-    //
     if (!PtInRect((LPRECT)&rcSrc, ptSrc)) {
       ImmUnlockIMCC(lpIMC->hCompStr);
       return;
     }
 
-    //
     // Hide the default composition window.
-    //
     if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
       ShowWindow(lpUIExtra->uiDefComp.hWnd, SW_HIDE);
       lpUIExtra->uiDefComp.bShow = FALSE;
@@ -231,11 +197,9 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
       curx = ptSrc.x;
       cury = ptSrc.y;
 
-      //
       // Set the composition string to each composition window.
       // The composition windows that are given the compostion string
       // will be moved and shown.
-      //
       for (i = 0; i < MAXCOMPWND; i++) {
         if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
           hDC = GetDC(lpUIExtra->uiComp[i].hWnd);
@@ -345,9 +309,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
 
     ImmUnlockIMCC(lpIMC->hCompStr);
   } else {
-    //
     // When the style is DEFAULT, show the default composition window.
-    //
     if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
       for (i = 0; i < MAXCOMPWND; i++) {
         if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
@@ -386,11 +348,6 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
   }
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* DrawTextOneLine(hDC, lpstr, lpattr, num)                           */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPMYSTR lpstr,
                             LPBYTE lpattr, int num, BOOL fVert) {
   //LPMYSTR lpStart = lpstr;
@@ -458,11 +415,6 @@ void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPMYSTR lpstr,
   }
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* PaintCompWindow(hCompWnd)                                          */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL PaintCompWindow(HWND hCompWnd) {
   PAINTSTRUCT ps;
   HIMC hIMC;
@@ -530,11 +482,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
   if (hFont && hOldFont) SelectObject(hDC, hOldFont);
   EndPaint(hCompWnd, &ps);
 }
-/**********************************************************************/
-/*                                                                    */
-/* HideCompWindow(lpUIExtra)                                          */
-/*                                                                    */
-/**********************************************************************/
+
 void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra) {
   int i;
   RECT rc;
@@ -555,11 +503,6 @@ void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra) {
   }
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* SetFontCompWindow(lpUIExtra)                                       */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL SetFontCompWindow(LPUIEXTRA lpUIExtra) {
   int i;
 
@@ -569,4 +512,8 @@ void PASCAL SetFontCompWindow(LPUIEXTRA lpUIExtra) {
                        (LONG_PTR)lpUIExtra->hFont);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

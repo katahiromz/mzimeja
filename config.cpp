@@ -1,3 +1,6 @@
+// config.cpp
+//////////////////////////////////////////////////////////////////////////////
+
 #include "mzimeja.h"
 #include <prsht.h>
 #include "resource.h"
@@ -6,11 +9,8 @@
 
 extern "C" {
 
-/**********************************************************************/
-/*                                                                    */
-/*      AddPage()                                                     */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+
 void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
   if (ppsh->nPages < MAX_PAGES) {
     PROPSHEETPAGE psp;
@@ -113,11 +113,6 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      RegWordConfigure()                                            */
-/*                                                                    */
-/**********************************************************************/
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
   NMHDR FAR *lpnm;
@@ -229,11 +224,6 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      SelectDictionaryConfigure()                                   */
-/*                                                                    */
-/**********************************************************************/
 INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                          LPARAM lParam) {
   NMHDR FAR *lpnm;
@@ -287,11 +277,6 @@ INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      AboutConfigure()                                            */
-/*                                                                    */
-/**********************************************************************/
 INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                               LPARAM lParam) {
   NMHDR FAR *lpnm;
@@ -345,11 +330,6 @@ INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      GeneralConfigure()                                            */
-/*                                                                    */
-/**********************************************************************/
 INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
   NMHDR FAR *lpnm;
@@ -403,11 +383,6 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
   return TRUE;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      DebugOptionDlgProc()                                          */
-/*                                                                    */
-/**********************************************************************/
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
   DWORD dwTemp;
@@ -492,4 +467,8 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
   return TRUE;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

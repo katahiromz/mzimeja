@@ -1,13 +1,12 @@
+// uiguide.cpp
+//////////////////////////////////////////////////////////////////////////////
+
 #include "mzimeja.h"
 
 extern "C" {
 
-/**********************************************************************/
-/*                                                                    */
-/* GuideWndProc()                                                     */
-/* IME UI window procedure                                            */
-/*                                                                    */
-/**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+
 LRESULT CALLBACK GuideWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
   PAINTSTRUCT ps;
@@ -70,11 +69,6 @@ LRESULT CALLBACK GuideWndProc(HWND hWnd, UINT message, WPARAM wParam,
   return 0;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* CheckPushedGuide()                                                 */
-/*                                                                    */
-/**********************************************************************/
 DWORD PASCAL CheckPushedGuide(HWND hGuideWnd, LPPOINT lppt) {
   POINT pt;
   RECT rc;
@@ -94,11 +88,6 @@ DWORD PASCAL CheckPushedGuide(HWND hGuideWnd, LPPOINT lppt) {
   return 0;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* PaintGuide()                                                       */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
                        DWORD dwPushedGuide) {
   HIMC hIMC;
@@ -189,11 +178,6 @@ void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
   }
 }
 
-/**********************************************************************/
-/*                                                                    */
-/* ButtonGuide(hGuideWnd,message,wParam,lParam)                       */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL ButtonGuide(HWND hGuideWnd, UINT message, WPARAM wParam,
                         LPARAM lParam) {
   POINT pt;
@@ -282,14 +266,14 @@ void PASCAL ButtonGuide(HWND hGuideWnd, UINT message, WPARAM wParam,
   }
   ReleaseDC(hGuideWnd, hDC);
 }
-/**********************************************************************/
-/*                                                                    */
-/* UpdateGuideWindow(lpUIExtra)                                      */
-/*                                                                    */
-/**********************************************************************/
+
 void PASCAL UpdateGuideWindow(LPUIEXTRA lpUIExtra) {
   if (IsWindow(lpUIExtra->uiGuide.hWnd))
     SendMessage(lpUIExtra->uiGuide.hWnd, WM_UI_UPDATE, 0, 0L);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

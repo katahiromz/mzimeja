@@ -1,6 +1,11 @@
+// mzimeja.cpp --- MZ-IME Japanese Input
+//////////////////////////////////////////////////////////////////////////////
+
 #include "mzimeja.h"
 #include "immsec.h"
 #include "resource.h"
+
+//////////////////////////////////////////////////////////////////////////////
 
 HINSTANCE hInst;
 HANDLE hMutex = NULL;
@@ -18,27 +23,26 @@ TCHAR szStatusClassName[] = TEXT("MZIMEUStatus");
 TCHAR szGuideClassName[] = TEXT("MZIMEUGuide");
 
 MYGUIDELINE glTable[] = {
-    {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},
-    {GL_LEVEL_WARNING, GL_ID_TYPINGERROR, IDS_GL_TYPINGERROR, 0},
-    {GL_LEVEL_WARNING, GL_ID_PRIVATE_FIRST, IDS_GL_TESTGUIDELINESTR,
-     IDS_GL_TESTGUIDELINEPRIVATE}};
+  {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},
+  {GL_LEVEL_WARNING, GL_ID_TYPINGERROR, IDS_GL_TYPINGERROR, 0},
+  {GL_LEVEL_WARNING, GL_ID_PRIVATE_FIRST, IDS_GL_TESTGUIDELINESTR,
+   IDS_GL_TESTGUIDELINEPRIVATE}};
 
 /* for DIC */
 TCHAR szDicFileName[256]; /* Dictionary file name stored buffer */
 
 #ifdef _DEBUG
-/* for DebugOptions */
-#pragma data_seg("SHAREDDATA")
-DWORD dwLogFlag = 0L;
-DWORD dwDebugFlag = 0L;
-#pragma data_seg()
+  /* for DebugOptions */
+  #pragma data_seg("SHAREDDATA")
+  DWORD dwLogFlag = 0L;
+  DWORD dwDebugFlag = 0L;
+  #pragma data_seg()
 #endif
+
+//////////////////////////////////////////////////////////////////////////////
 
 extern "C" {
 
-/**********************************************************************/
-/*    DLLEntry()                                                      */
-/**********************************************************************/
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   LPTSTR lpDicFileName;
 #ifdef _DEBUG
@@ -113,4 +117,8 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   return TRUE;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

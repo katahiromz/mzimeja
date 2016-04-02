@@ -1,12 +1,10 @@
+// subs.cpp
+//////////////////////////////////////////////////////////////////////////////
+
 #include "mzimeja.h"
 
 extern "C" {
 
-/**********************************************************************/
-/*                                                                    */
-/*      InitCompStr()                                                  */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL InitCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
   lpCompStr->dwSize = sizeof(MYCOMPSTR);
 
@@ -63,11 +61,6 @@ void PASCAL InitCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
   }
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      ClearCompStr()                                                */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL ClearCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
   lpCompStr->dwSize = sizeof(MYCOMPSTR);
 
@@ -103,11 +96,6 @@ void PASCAL ClearCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
   }
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      ClearCandidate()                                              */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL ClearCandidate(LPCANDIDATEINFO lpCandInfo) {
   lpCandInfo->dwSize = 0L;
   lpCandInfo->dwCount = 0L;
@@ -121,13 +109,8 @@ void PASCAL ClearCandidate(LPCANDIDATEINFO lpCandInfo) {
   ((LPMYCAND)lpCandInfo)->cl.dwPageSize = 0L;
   ((LPMYCAND)lpCandInfo)->cl.dwOffset[0] = 0L;
 }
-/**********************************************************************/
-/*                                                                    */
-/*      ChangeMode()                                                  */
-/*                                                                    */
-/*    return value: fdwConversion                                        */
-/*                                                                    */
-/**********************************************************************/
+
+// return value: fdwConversion
 void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
   LPINPUTCONTEXT lpIMC;
   DWORD fdwConversion;
@@ -194,11 +177,6 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
   return;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      ChangeCompStr()                                               */
-/*                                                                    */
-/**********************************************************************/
 void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
@@ -279,11 +257,6 @@ ccs_exit40:
   return;
 }
 
-/*****************************************************************************
-*                                                                            *
-* IsCompStr( hIMC )                                                          *
-*                                                                            *
-*****************************************************************************/
 BOOL PASCAL IsCompStr(HIMC hIMC) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
@@ -305,11 +278,7 @@ BOOL PASCAL IsCompStr(HIMC hIMC) {
 
   return fRet;
 }
-/*****************************************************************************
-*                                                                            *
-* IsConvertedCompStr( hIMC )                                                 *
-*                                                                            *
-*****************************************************************************/
+
 BOOL PASCAL IsConvertedCompStr(HIMC hIMC) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
@@ -332,11 +301,7 @@ BOOL PASCAL IsConvertedCompStr(HIMC hIMC) {
 
   return fRet;
 }
-/*****************************************************************************
-*                                                                            *
-* IsCandidate( lpIMC )                                                       *
-*                                                                            *
-*****************************************************************************/
+
 BOOL PASCAL IsCandidate(LPINPUTCONTEXT lpIMC) {
   LPCANDIDATEINFO lpCandInfo;
   BOOL fRet = FALSE;
@@ -351,11 +316,6 @@ BOOL PASCAL IsCandidate(LPINPUTCONTEXT lpIMC) {
   return fRet;
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      GetMyHKL()                                                    */
-/*                                                                    */
-/**********************************************************************/
 HKL PASCAL GetMyHKL() {
   DWORD dwSize;
   DWORD dwi;
@@ -385,11 +345,7 @@ exit:
   GlobalFree((HANDLE)lphkl);
   return hKL;
 }
-/*****************************************************************************
-*                                                                            *
-* UpdateIndicIcon( hIMC )                                                    *
-*                                                                            *
-*****************************************************************************/
+
 void PASCAL UpdateIndicIcon(HIMC hIMC) {
   HWND hwndIndicate;
   BOOL fOpen = FALSE;
@@ -424,22 +380,12 @@ void PASCAL UpdateIndicIcon(HIMC hIMC) {
   }
 }
 
-/*****************************************************************************
-*                                                                            *
-* lememset( )                                                                *
-*                                                                            *
-*****************************************************************************/
 void PASCAL lmemset(LPBYTE lp, BYTE b, UINT cnt) {
   register UINT i;
   register BYTE bt = b;
   for (i = 0; i < cnt; i++) *lp++ = bt;
 }
 
-/*****************************************************************************
-*                                                                            *
-* MylstrcmpW( )                                                              *
-*                                                                            *
-*****************************************************************************/
 int PASCAL MylstrcmpW(LPCWSTR lp0, LPCWSTR lp1) {
   while (*lp0 && *lp1 && (*lp0 == *lp1)) {
     lp0++;
@@ -447,11 +393,7 @@ int PASCAL MylstrcmpW(LPCWSTR lp0, LPCWSTR lp1) {
   }
   return (*lp0 - *lp1);
 }
-/*****************************************************************************
-*                                                                            *
-* MylstrcpyW( )                                                              *
-*                                                                            *
-*****************************************************************************/
+
 int PASCAL MylstrcpyW(LPWSTR lp0, LPCWSTR lp1) {
   int n = 0;
 
@@ -464,31 +406,19 @@ int PASCAL MylstrcpyW(LPWSTR lp0, LPCWSTR lp1) {
   *lp0 = *lp1;
   return n;
 }
-/*****************************************************************************
-*                                                                            *
-* MyCharPrevW( )                                                             *
-*                                                                            *
-*****************************************************************************/
+
 LPWSTR PASCAL MyCharPrevW(LPCWSTR lpStart, LPCWSTR lpCur) {
   LPCWSTR lpRet = lpStart;
   if (lpCur > lpStart) lpRet = lpCur - 1;
 
   return (LPWSTR)lpRet;
 }
-/*****************************************************************************
-*                                                                            *
-* MyCharNextW( )                                                             *
-*                                                                            *
-*****************************************************************************/
+
 LPWSTR PASCAL MyCharNextW(LPCWSTR lp) {
   if (*lp) lp += 1;
   return (LPWSTR)lp;
 }
-/*****************************************************************************
-*                                                                            *
-* MylstrcpynW( )                                                             *
-*                                                                            *
-*****************************************************************************/
+
 LPWSTR PASCAL MylstrcpynW(LPWSTR lp0, LPCWSTR lp1, int nCount) {
   int n;
   for (n = 0; *lp1 && n < nCount - 1; *lp0++ = *lp1++, n++)
@@ -517,4 +447,8 @@ HFONT CheckNativeCharset(HDC hDC) {
   return hOldFont;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////
