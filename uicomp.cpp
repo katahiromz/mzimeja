@@ -131,8 +131,8 @@ int PASCAL NumCharInDY(HDC hDC, LPTSTR lp, int dy) {
 // Calc the position of composition windows and move them
 void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
   HDC hDC;
-  HFONT hFont = (HFONT)NULL;
-  HFONT hOldFont = (HFONT)NULL;
+  HFONT hFont = NULL;
+  HFONT hOldFont = NULL;
   LPCOMPOSITIONSTRING lpCompStr;
   LPTSTR lpstr;
   RECT rc;
@@ -422,8 +422,8 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
   LPCOMPOSITIONSTRING lpCompStr;
   HDC hDC;
   RECT rc;
-  HFONT hFont = (HFONT)NULL;
-  HFONT hOldFont = (HFONT)NULL;
+  HFONT hFont = NULL;
+  HFONT hOldFont = NULL;
   HWND hSvrWnd;
 
   hDC = BeginPaint(hCompWnd, &ps);

@@ -1029,14 +1029,14 @@ int GetCandidateStringsFromDictionary(LPTSTR lpRead, LPTSTR lpBuf,
   psa = CreateSecurityAttributes();
 
   hTblFile = CreateFile(lpFilename, GENERIC_READ, FILE_SHARE_READ, NULL,
-                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
+                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
   if (hTblFile == INVALID_HANDLE_VALUE) {
     goto Err0;
   }
 
   if (dwBufLen > 2) {
-    if ((dwFileSize = GetFileSize(hTblFile, (LPDWORD)NULL)) != 0xffffffff) {
+    if ((dwFileSize = GetFileSize(hTblFile, NULL)) != 0xffffffff) {
       if ((lpDic = (LPTSTR)GlobalAlloc(GPTR, dwFileSize + 2))) {
         if (ReadFile(hTblFile, lpDic, dwFileSize, &dwRead, NULL)) {
           if (*lpDic == 0xfeff) {

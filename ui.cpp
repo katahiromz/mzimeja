@@ -217,7 +217,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       lpUIExtra->uiCand.pt.y = -1;
       lpUIExtra->uiGuide.pt.x = -1;
       lpUIExtra->uiGuide.pt.y = -1;
-      lpUIExtra->hFont = (HFONT)NULL;
+      lpUIExtra->hFont = NULL;
 
       GlobalUnlock(hUIExtra);
       SetWindowLongPtr(hWnd, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
