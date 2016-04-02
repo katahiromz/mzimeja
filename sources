@@ -1,0 +1,52 @@
+TARGETPATH=obj
+TARGETTYPE=DYNLINK
+TARGETEXT=ime
+UMTYPE=windows
+DLLENTRY=_DllMainCRTStartup
+DLLBASE=0x00500000
+
+C_DEFINES=-DWINVER=0x40A
+
+!if "$(DDKBUILDENV)" == "checked"
+C_DEFINES=$(C_DEFINES) -DDEBUG=1
+!endif
+USE_MSVCRT=1
+
+NO_NTDLL=1
+
+INCLUDES=include;
+
+SOURCES= \
+        config.cpp \
+        data.cpp \
+        dic.cpp \
+        dic2.cpp \
+        fakeime.cpp \
+        fdebug.cpp \
+        imm.cpp \
+        immsec.cpp \
+        input.cpp \
+        process.cpp \
+        regword.cpp \
+        subs.cpp \
+        toascii.cpp \
+        ui.cpp \
+        uicand.cpp \
+        uicomp.cpp \
+        uiguide.cpp \
+        uistate.cpp \
+
+TARGETLIBS= \
+        $(SDK_LIB_PATH)\advapi32.lib \
+        $(SDK_LIB_PATH)\comctl32.lib \
+        $(SDK_LIB_PATH)\gdi32.lib \
+        $(SDK_LIB_PATH)\imm32.lib \
+        $(SDK_LIB_PATH)\kernel32.lib \
+        $(SDK_LIB_PATH)\user32.lib
+
+NTTARGETFILES=
+
+TARGETNAME=fakeimeu
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+SOURCES= $(SOURCES) \
+        fakeimeu.rc
