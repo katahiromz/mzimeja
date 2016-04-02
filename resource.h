@@ -41,6 +41,13 @@
 
 #define IDM_RECONVERT 40001
 #define IDM_ABOUT 40002
+#define IDM_HIRAGANA 40003
+#define IDM_ZEN_KATAKANA 40004
+#define IDM_ZEN_ALNUM 40005
+#define IDM_HAN_KATAKANA 40006
+#define IDM_ALNUM 40007
+#define IDM_DIRECT 40008
+#define IDM_CANCEL 40009
 
 // Next default values for new objects
 //
