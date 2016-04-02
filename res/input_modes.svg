@@ -11,7 +11,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="24"
-   height="144"
+   height="192"
    viewBox="0 0 0 96.000003"
    id="svg4144"
    version="1.1"
@@ -98,8 +98,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8001429"
-     inkscape:cx="50.850043"
-     inkscape:cy="72.47525"
+     inkscape:cx="3.5310294"
+     inkscape:cy="63.146827"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -126,7 +126,8 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     units="px" />
+     units="px"
+     inkscape:snap-global="true" />
   <metadata
      id="metadata4149">
     <rdf:RDF>
@@ -143,10 +144,10 @@
      inkscape:label="レイヤー 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(3.4842904e-6,-908.36217)">
+     transform="translate(3.4842904e-6,-860.36217)">
     <g
        id="g4177"
-       transform="matrix(0.42333346,0,0,0.42333346,-2.0092737e-6,606.86203)">
+       transform="matrix(0.42333346,0,0,0.42333346,-1.0665393e-5,558.86203)">
       <g
          inkscape:label="レイヤー 1"
          id="layer1-9"
@@ -351,5 +352,43 @@
         </g>
       </g>
     </g>
+    <rect
+       style="opacity:0.95999995;fill:#afffaf;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.45631068"
+       id="rect3378"
+       width="24"
+       height="24.000008"
+       x="-1.2162644e-005"
+       y="1004.3622" />
+    <rect
+       style="opacity:0.95999995;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.45631068"
+       id="rect3378-2"
+       width="24"
+       height="24.000008"
+       x="-1.2074148e-005"
+       y="1028.3622" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:18.95616531px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="0.494358"
+       y="818.74518"
+       id="text4195"
+       sodipodi:linespacing="125%"
+       transform="scale(0.79959023,1.2506406)"><tspan
+         sodipodi:role="line"
+         id="tspan4197"
+         x="0.494358"
+         y="818.74518">ﾛｰﾏ</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:13.84764957px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="1.2952534"
+       y="836.94812"
+       id="text4195-1"
+       sodipodi:linespacing="125%"
+       transform="scale(0.79959023,1.2506406)"><tspan
+         sodipodi:role="line"
+         id="tspan4197-4"
+         x="1.2952534"
+         y="836.94812">かな</tspan></text>
   </g>
 </svg>
