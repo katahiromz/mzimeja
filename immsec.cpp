@@ -1,4 +1,6 @@
-// immsec.cpp
+// immsec.cpp --- IMM security related
+//////////////////////////////////////////////////////////////////////////////
+
 #include "immsec.h"
 #include <stdio.h>
 #include <windows.h>
@@ -9,10 +11,46 @@
 extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
-
 // internal functions
-PSID MyCreateSid(VOID);
-POSVERSIONINFO GetVersionInfo(VOID);
+
+PSID MyCreateSid(VOID) {
+  PSID psid;
+  BOOL fResult;
+  SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_WORLD_SID_AUTHORITY;
+
+  //
+  // allocate and initialize an SID
+  //
+  fResult = AllocateAndInitializeSid(&SidAuthority, 1, SECURITY_WORLD_RID, 0, 0,
+                                     0, 0, 0, 0, 0, &psid);
+  if (!fResult) {
+    ERROROUT(TEXT("MyCreateSid:AllocateAndInitializeSid failed"));
+    return NULL;
+  }
+
+  if (!IsValidSid(psid)) {
+    WARNOUT(TEXT("MyCreateSid:AllocateAndInitializeSid returns bogus sid"));
+    FreeSid(psid);
+    return NULL;
+  }
+
+  return psid;
+}
+
+POSVERSIONINFO GetVersionInfo(VOID) {
+  static BOOL fFirstCall = TRUE;
+  static OSVERSIONINFO os;
+
+  if (fFirstCall) {
+    os.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    if (GetVersionEx(&os)) {
+      fFirstCall = FALSE;
+    }
+  }
+  return &os;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 // debug functions
 #ifdef _DEBUG
@@ -44,7 +82,7 @@ VOID ErrorOut(LPCTSTR pStr) {
   }
   OutputDebugString(buf2);
 }
-#endif
+#endif  // def _DEBUG
 
 //
 // CreateSecurityAttributes()
@@ -200,30 +238,6 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
   return psa;
 }
 
-PSID MyCreateSid(VOID) {
-  PSID psid;
-  BOOL fResult;
-  SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_WORLD_SID_AUTHORITY;
-
-  //
-  // allocate and initialize an SID
-  //
-  fResult = AllocateAndInitializeSid(&SidAuthority, 1, SECURITY_WORLD_RID, 0, 0,
-                                     0, 0, 0, 0, 0, &psid);
-  if (!fResult) {
-    ERROROUT(TEXT("MyCreateSid:AllocateAndInitializeSid failed"));
-    return NULL;
-  }
-
-  if (!IsValidSid(psid)) {
-    WARNOUT(TEXT("MyCreateSid:AllocateAndInitializeSid returns bogus sid"));
-    FreeSid(psid);
-    return NULL;
-  }
-
-  return psid;
-}
-
 //
 // FreeSecurityAttributes()
 //
@@ -267,19 +281,6 @@ VOID FreeSecurityAttributes(PSECURITY_ATTRIBUTES psa) {
 //
 BOOL IsNT(VOID) {
   return GetVersionInfo()->dwPlatformId == VER_PLATFORM_WIN32_NT;
-}
-
-POSVERSIONINFO GetVersionInfo(VOID) {
-  static BOOL fFirstCall = TRUE;
-  static OSVERSIONINFO os;
-
-  if (fFirstCall) {
-    os.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if (GetVersionEx(&os)) {
-      fFirstCall = FALSE;
-    }
-  }
-  return &os;
 }
 
 //////////////////////////////////////////////////////////////////////////////
