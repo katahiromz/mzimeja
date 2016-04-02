@@ -5,20 +5,19 @@ UMTYPE=windows
 DLLENTRY=_DllMainCRTStartup
 DLLBASE=0x00500000
 
-C_DEFINES=-DWINVER=0x40A
+C_DEFINES=-DWINVER=0x40A -DUNICODE -D_UNICODE
 
 !if "$(DDKBUILDENV)" == "checked"
-C_DEFINES=$(C_DEFINES) -DDEBUG=1
+C_DEFINES=$(C_DEFINES) -DDEBUG=1 -D_DEBUG=1
 !endif
-USE_MSVCRT=1
 
+USE_MSVCRT=1
 NO_NTDLL=1
 
 INCLUDES=include;
 
 SOURCES= \
         config.cpp \
-        data.cpp \
         dic.cpp \
         dic2.cpp \
         fakeime.cpp \
@@ -35,6 +34,7 @@ SOURCES= \
         uicomp.cpp \
         uiguide.cpp \
         uistate.cpp \
+        fakeimeu.rc \
 
 TARGETLIBS= \
         $(SDK_LIB_PATH)\advapi32.lib \
@@ -47,6 +47,3 @@ TARGETLIBS= \
 NTTARGETFILES=
 
 TARGETNAME=fakeimeu
-C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
-SOURCES= $(SOURCES) \
-        fakeimeu.rc
