@@ -13,7 +13,7 @@ Module Name:
 /* refer this table and deside the VKey is needed for MZ-IME or not. */
 /*                                                                    */
 /**********************************************************************/
-#include "windows.h"
+#include <windows.h>
 
 BYTE bNoComp[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 10-1F

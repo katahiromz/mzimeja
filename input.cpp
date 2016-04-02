@@ -9,9 +9,7 @@ Module Name:
 ++*/
 
 /**********************************************************************/
-#include "immdev.h"
 #include "mzimeja.h"
-#include "windows.h"
 
 extern "C" {
 

@@ -8,7 +8,15 @@ Module Name:
 
 ++*/
 
-#include <indicml.h>
+#ifndef MZIMEJA_H_
+#define MZIMEJA_H_
+
+#ifndef _INC_WINDOWS
+  #include <windows.h>
+#endif
+#include "indicml.h"
+#include "immdev.h"
+
 /**********************************************************************/
 /*                                                                    */
 /*      DebugOptions                                                  */
@@ -470,3 +478,5 @@ void PASCAL ImeLog(DWORD dwFlag, LPTSTR lpStr);
 #endif
 
 }  // extern "C"
+
+#endif  // ndef MZIMEJA_H_

@@ -9,9 +9,7 @@ Module Name:
 ++*/
 
 /**********************************************************************/
-#include "immdev.h"
 #include "mzimeja.h"
-#include "windows.h"
 
 extern "C" {
 
@@ -168,10 +166,12 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
   SetBkMode(hDC, TRANSPARENT);
   hSvrWnd = (HWND)GetWindowLongPtr(hCandWnd, FIGWL_SVRWND);
 
-  if (hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC)) {
+  hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+  if (hIMC) {
     lpIMC = ImmLockIMC(hIMC);
     hOldFont = CheckNativeCharset(hDC);
-    if (lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo)) {
+    lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+    if (lpCandInfo) {
       height = GetSystemMetrics(SM_CYEDGE);
       lpCandList =
           (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
@@ -228,7 +228,8 @@ void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
     hDC = GetDC(lpUIExtra->uiCand.hWnd);
     hOldFont = CheckNativeCharset(hDC);
 
-    if (lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo)) {
+    lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+    if (lpCandInfo) {
       width = 0;
       height = 0;
       lpCandList =
@@ -295,7 +296,7 @@ void PASCAL MoveCandWindow(HWND hUIWnd, LPINPUTCONTEXT lpIMC,
   }
 
   // Not initialized !!
-  if (lpIMC->cfCandForm[0].dwIndex == -1) {
+  if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
     if (GetCandPosFromCompWnd(lpUIExtra, &pt)) {
       lpUIExtra->uiCand.pt.x = pt.x;
       lpUIExtra->uiCand.pt.y = pt.y;

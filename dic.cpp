@@ -7,10 +7,8 @@ Module Name:
     DIC.C
 
 ++*/
-#include <immdev.h>
-#include <windows.h>
-#include "immsec.h"
 #include "mzimeja.h"
+#include "immsec.h"
 #include "vksub.h"
 
 extern "C" {
@@ -57,7 +55,8 @@ void PASCAL FlushText(HIMC hIMC) {
     GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
   }
 
-  if (lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)) {
+  lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+  if (lpCompStr) {
     //
     // Flush composition strings.
     //
@@ -106,7 +105,8 @@ void PASCAL RevertText(HIMC hIMC) {
     GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
   }
 
-  if (lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)) {
+  lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+  if (lpCompStr) {
     lpstr = GETLPCOMPSTR(lpCompStr);
     lpread = GETLPCOMPREADSTR(lpCompStr);
     lHanToZen(lpstr, lpread, lpIMC->fdwConversion);
@@ -164,7 +164,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   LPMYSTR lpstr;
   TRANSMSG GnMsg;
   LPBYTE lpb;
-  OFSTRUCT ofs;
+  //OFSTRUCT ofs;
   LPMYSTR lpT, lpT2;
   int cnt;
   BOOL bRc = FALSE;
@@ -299,7 +299,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     // String is converted, so that open candidate.
     //
     int i = 0;
-    LPDWORD lpdw;
+    //LPDWORD lpdw;
 
     //
     // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
@@ -319,7 +319,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     lpCandInfo->dwOffset[0] =
         (DWORD)((LPSTR) & ((LPMYCAND)lpCandInfo)->cl - (LPSTR)lpCandInfo);
     lpCandList = (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
-    lpdw = (LPDWORD) & (lpCandList->dwOffset);
+    //lpdw = (LPDWORD) & (lpCandList->dwOffset);
     while (*lpstr) {
       lpCandList->dwOffset[i] =
           (DWORD)((LPSTR)((LPMYCAND)lpCandInfo)->szCand[i] - (LPSTR)lpCandList);
@@ -1143,13 +1143,14 @@ void PASCAL MakeAttrClause(LPCOMPOSITIONSTRING lpCompStr) {
 void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
-  DWORD dwStartClause = 0;
-  DWORD dwEndClause = 0;
+  //DWORD dwStartClause = 0;
+  //DWORD dwEndClause = 0;
   LPMYSTR lpstart, lpstr, lpend;
 
   if (!(lpIMC = ImmLockIMC(hIMC))) return;
 
-  if (lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)) {
+  lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+  if (lpCompStr) {
     // Temp! Error, if the string is already converted.
     if (CheckAttr(lpCompStr)) goto hsa_exit;
 

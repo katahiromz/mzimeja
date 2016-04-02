@@ -10,8 +10,6 @@ Module Name:
 
 /**********************************************************************/
 
-#include <windows.h>
-#include "immdev.h"
 #include "mzimeja.h"
 
 extern "C" {
@@ -216,14 +214,14 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
 void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
-  DWORD fdwConversion;
+  //DWORD fdwConversion;
   TRANSMSG GnMsg;
   HANDLE hDst;
   LPMYSTR lpSrc;
   LPMYSTR lpDst;
   LPMYSTR lpSrc0;
   LPMYSTR lpDst0;
-  WORD wCode;
+  //WORD wCode;
   BOOL fChange = FALSE;
 
   if (!(lpIMC = ImmLockIMC(hIMC))) return;
@@ -231,7 +229,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
   if (!(lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)))
     goto ccs_exit40;
 
-  fdwConversion = lpIMC->fdwConversion;
+  //fdwConversion = lpIMC->fdwConversion;
 
 #if defined(UNICODE)
   if (!(hDst =

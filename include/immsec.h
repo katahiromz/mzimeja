@@ -8,6 +8,10 @@ Module Name:
     
 ++*/
 
+#ifndef _INC_WINDOWS
+  #include <windows.h>
+#endif
+
 extern "C" {
 
 PSECURITY_ATTRIBUTES CreateSecurityAttributes(VOID);

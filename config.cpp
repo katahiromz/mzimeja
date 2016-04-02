@@ -7,11 +7,9 @@ Module Name:
     CONFIG.c
 
 ++*/
-#include "immdev.h"
 #include "mzimeja.h"
-#include "prsht.h"
+#include <prsht.h>
 #include "resource.h"
-#include "windows.h"
 
 #define MAX_PAGES 5
 
@@ -97,8 +95,8 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
   NMHDR FAR *lpnm;
-  LPPROPSHEETPAGE lpPropSheet =
-      (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+  //LPPROPSHEETPAGE lpPropSheet =
+  //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
   UINT nItem;
   UINT i;
   LRESULT dwIndex;
@@ -159,9 +157,10 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 
     case WM_INITDIALOG:
       SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
-      lpPropSheet = (LPPROPSHEETPAGE)lParam;
+      //lpPropSheet = (LPPROPSHEETPAGE)lParam;
 
-      if (nItem = ImeGetRegisterWordStyle(0, NULL)) {
+      nItem = ImeGetRegisterWordStyle(0, NULL);
+      if (nItem) {
         LPSTYLEBUF lpStyleBuf =
             (LPSTYLEBUF)GlobalAlloc(GPTR, nItem * sizeof(STYLEBUF));
 
@@ -212,8 +211,8 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                          LPARAM lParam) {
   NMHDR FAR *lpnm;
-  LPPROPSHEETPAGE lpPropSheet =
-      (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+  //LPPROPSHEETPAGE lpPropSheet =
+  //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
 
   switch (message) {
     case WM_NOTIFY:
@@ -241,7 +240,7 @@ INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 
     case WM_INITDIALOG:
       SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
-      lpPropSheet = (LPPROPSHEETPAGE)lParam;
+      //lpPropSheet = (LPPROPSHEETPAGE)lParam;
       break;
 
     case WM_DESTROY:
@@ -270,8 +269,8 @@ INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                               LPARAM lParam) {
   NMHDR FAR *lpnm;
-  LPPROPSHEETPAGE lpPropSheet =
-      (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+  //LPPROPSHEETPAGE lpPropSheet =
+  //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
 
   switch (message) {
     case WM_NOTIFY:
@@ -299,7 +298,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 
     case WM_INITDIALOG:
       SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
-      lpPropSheet = (LPPROPSHEETPAGE)lParam;
+      //lpPropSheet = (LPPROPSHEETPAGE)lParam;
       break;
 
     case WM_DESTROY:
@@ -328,8 +327,8 @@ INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
   NMHDR FAR *lpnm;
-  LPPROPSHEETPAGE lpPropSheet =
-      (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+  //LPPROPSHEETPAGE lpPropSheet =
+  //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
 
   switch (message) {
     case WM_NOTIFY:
@@ -357,7 +356,7 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 
     case WM_INITDIALOG:
       SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
-      lpPropSheet = (LPPROPSHEETPAGE)lParam;
+      //lpPropSheet = (LPPROPSHEETPAGE)lParam;
       break;
 
     case WM_DESTROY:
@@ -386,10 +385,10 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
   DWORD dwTemp;
-  TCHAR szBuf[128];
+  //TCHAR szBuf[128];
   NMHDR FAR *lpnm;
-  LPPROPSHEETPAGE lpPropSheet =
-      (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+  //LPPROPSHEETPAGE lpPropSheet =
+  //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
 
   switch (message) {
     case WM_NOTIFY:
@@ -435,7 +434,7 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 
     case WM_INITDIALOG:
       SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
-      lpPropSheet = (LPPROPSHEETPAGE)lParam;
+      //lpPropSheet = (LPPROPSHEETPAGE)lParam;
 
 #ifdef DEBUG
       CheckDlgButton(hDlg, IDC_LOGF_ENTRY, (dwLogFlag & LOGF_ENTRY) ? 1 : 0);

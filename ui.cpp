@@ -9,9 +9,7 @@ Module Name:
 ++*/
 
 /**********************************************************************/
-#include "immdev.h"
 #include "mzimeja.h"
-#include "windows.h"
 
 extern "C" {
 
@@ -213,7 +211,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         lpUIExtra->hIMC = hUICurIMC;
 
         if (hUICurIMC) {
-          LPINPUTCONTEXT lpIMCT = NULL;
+          //LPINPUTCONTEXT lpIMCT = NULL;
           //
           // input context was chenged.
           // if there are the child windows, the diplay have to be

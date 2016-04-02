@@ -8,11 +8,8 @@ Module Name:
 
 ++*/
 
-#include <windows.h>
-#include "immdev.h"
-#define _NO_EXTERN_
-#include "immsec.h"
 #include "mzimeja.h"
+#include "immsec.h"
 #include "resource.h"
 
 HINSTANCE hInst;

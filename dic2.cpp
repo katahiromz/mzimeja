@@ -7,9 +7,7 @@ Module Name:
     DICT2.C
 
 ++*/
-#include "immdev.h"
 #include "mzimeja.h"
-#include "windows.h"
 
 extern "C" {
 

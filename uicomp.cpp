@@ -9,9 +9,7 @@ Module Name:
 ++*/
 
 /**********************************************************************/
-#include "immdev.h"
 #include "mzimeja.h"
-#include "windows.h"
 
 extern "C" {
 
@@ -278,14 +276,16 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
         if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
           hDC = GetDC(lpUIExtra->uiComp[i].hWnd);
 
-          if (hFont = (HFONT)GetWindowLongPtr(lpUIExtra->uiComp[i].hWnd,
-                                              FIGWL_FONT))
+          hFont = (HFONT)GetWindowLongPtr(lpUIExtra->uiComp[i].hWnd,
+                                          FIGWL_FONT);
+          if (hFont)
             hOldFont = (HFONT)SelectObject(hDC, hFont);
 
           sz.cy = 0;
           oldrc = lpUIExtra->uiComp[i].rc;
 
-          if (num = NumCharInDX(hDC, lpt, dx)) {
+          num = NumCharInDX(hDC, lpt, dx);
+          if (num) {
             GetTextExtentPoint(hDC, lpt, num, &sz);
 
             lpUIExtra->uiComp[i].rc.left = curx;
@@ -333,13 +333,14 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
         if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
           hDC = GetDC(lpUIExtra->uiComp[i].hWnd);
 
-          if (hFont = (HFONT)GetWindowLongPtr(lpUIExtra->uiComp[i].hWnd,
-                                              FIGWL_FONT))
+          hFont = (HFONT)GetWindowLongPtr(lpUIExtra->uiComp[i].hWnd,
+                                          FIGWL_FONT);
+          if (hFont)
             hOldFont = (HFONT)SelectObject(hDC, hFont);
 
           sz.cy = 0;
-
-          if (num = NumCharInDY(hDC, lpt, dy)) {
+          num = NumCharInDY(hDC, lpt, dy);
+          if (num) {
             GetTextExtentPoint(hDC, lpt, num, &sz);
 
             lpUIExtra->uiComp[i].rc.left = curx - sz.cy;
@@ -393,7 +394,8 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
 
       hDC = GetDC(lpUIExtra->uiDefComp.hWnd);
 
-      if (lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)) {
+      lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+      if (lpCompStr) {
         if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
             (lpCompStr->dwCompStrLen > 0)) {
           lpstr = GETLPCOMPSTR(lpCompStr);
@@ -427,7 +429,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
 /**********************************************************************/
 void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPMYSTR lpstr,
                             LPBYTE lpattr, int num, BOOL fVert) {
-  LPMYSTR lpStart = lpstr;
+  //LPMYSTR lpStart = lpstr;
   LPMYSTR lpEnd = lpstr + num - 1;
   int x, y;
   RECT rc;
@@ -510,14 +512,17 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
 
   hDC = BeginPaint(hCompWnd, &ps);
 
-  if (hFont = (HFONT)GetWindowLongPtr(hCompWnd, FIGWL_FONT))
+  hFont = (HFONT)GetWindowLongPtr(hCompWnd, FIGWL_FONT);
+  if (hFont)
     hOldFont = (HFONT)SelectObject(hDC, hFont);
 
   hSvrWnd = (HWND)GetWindowLongPtr(hCompWnd, FIGWL_SVRWND);
 
-  if (hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC)) {
+  hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+  if (hIMC) {
     lpIMC = ImmLockIMC(hIMC);
-    if (lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)) {
+    lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+    if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen > 0)) {
         LPMYSTR lpstr;

@@ -9,9 +9,7 @@ Module Name:
 ++*/
 
 /**********************************************************************/
-#include "immdev.h"
 #include "mzimeja.h"
-#include "windows.h"
 
 extern "C" {
 
@@ -125,7 +123,8 @@ void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
 
   hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWL_SVRWND);
 
-  if (hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC)) {
+  hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+  if (hIMC) {
     HBITMAP hbmpGuide;
     HBRUSH hOldBrush, hBrush;
     int nCyCap = GetSystemMetrics(SM_CYSMCAPTION);
@@ -155,10 +154,12 @@ void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
       BitBlt(hDC, rc.right - STCLBT_DX - 2, STCLBT_Y, STCLBT_DX, STCLBT_DY,
              hMemDC, STCLBT_DX, 0, SRCCOPY);
 
-    if (dwLevel = ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0)) {
+    dwLevel = ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0);
+    if (dwLevel) {
       dwSize = ImmGetGuideLine(hIMC, GGL_STRING, NULL, 0) + 1;
       if ((dwSize > 1) && (hGLStr = GlobalAlloc(GHND, dwSize))) {
-        if (lpGLStr = (LPTSTR)GlobalLock(hGLStr)) {
+        lpGLStr = (LPTSTR)GlobalLock(hGLStr);
+        if (lpGLStr) {
           COLORREF rgb = 0;
           HBRUSH hbrLGR = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
           HBRUSH hbr;
@@ -182,7 +183,8 @@ void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
               break;
           }
 
-          if (dwSize = ImmGetGuideLine(hIMC, GGL_STRING, lpGLStr, dwSize)) {
+          dwSize = ImmGetGuideLine(hIMC, GGL_STRING, lpGLStr, dwSize);
+          if (dwSize) {
             SetTextColor(hDC, rgb);
             SetBkMode(hDC, TRANSPARENT);
             TextOut(hDC, 0, nCyCap, lpGLStr, dwSize);
@@ -276,7 +278,8 @@ void PASCAL ButtonGuide(HWND hGuideWnd, UINT message, WPARAM wParam,
       }
       hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWL_SVRWND);
 
-      if (hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC)) {
+      hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+      if (hIMC) {
         GetCursorPos(&pt);
         dwPushedGuide = GetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS);
         dwPushedGuide &= CheckPushedGuide(hGuideWnd, &pt);
