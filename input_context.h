@@ -24,6 +24,9 @@ struct InputContext : public INPUTCONTEXT {
   LPTRANSMSG LockTransMsg();
   void UnlockTransMsg();
 
+        DWORD& NumTransMsg();
+  const DWORD& NumTransMsg() const;
+
   LPGUIDELINE LockGuideLine();
   void UnlockGuideLine();
 };

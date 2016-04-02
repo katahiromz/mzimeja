@@ -726,16 +726,15 @@ BOOL PASCAL GenerateMessage(HIMC hIMC, InputContext *lpIMC,
   if (lpTransBuf) return GenerateMessageToTransKey(lpTransBuf, lpGeneMsg);
 
   if (IsWindow(lpIMC->hWnd)) {
-    if (!(lpIMC->hMsgBuf = ImmReSizeIMCC(
-              lpIMC->hMsgBuf, sizeof(TRANSMSG) * (lpIMC->dwNumMsgBuf + 1))))
+    DWORD dwNewSize = sizeof(TRANSMSG) * (lpIMC->NumTransMsg() + 1);
+    if (!(lpIMC->hMsgBuf = ImmReSizeIMCC(lpIMC->hMsgBuf, dwNewSize)))
       return FALSE;
 
     LPTRANSMSG lpTransMsg = lpIMC->LockTransMsg();
     if (NULL == lpTransMsg) return FALSE;
-    lpTransMsg[lpIMC->dwNumMsgBuf] = *lpGeneMsg;
+    lpTransMsg[lpIMC->NumTransMsg()] = *lpGeneMsg;
+    lpIMC->NumTransMsg()++;
     lpIMC->UnlockTransMsg();
-
-    lpIMC->dwNumMsgBuf++;
 
     ImmGenerateMessage(hIMC);
   }

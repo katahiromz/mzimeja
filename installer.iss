@@ -32,8 +32,7 @@ Source: "mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
 [Icons]
 Name: "{group}\README.txt"; Filename: "{app}\README.txt"
 Name: "{group}\LICENSE.txt"; Filename: "{app}\LICENSE.txt"
-Name: "{group}\MZ-IME日本語入力"; Filename: "{app}\setup.exe"
 Name: "{group}\アンインストール"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\setup.exe"; Description: "{cm:LaunchProgram,MZ-IME日本語入力}"; Flags: nowait postinstall
+Filename: "{app}\setup.exe"; Description: "{cm:LaunchProgram,MZ-IME日本語入力}"; Flags: nowait

@@ -46,6 +46,14 @@ void InputContext::UnlockTransMsg() {
     ImmUnlockIMCC(hMsgBuf);
 }
 
+DWORD& InputContext::NumTransMsg() {
+  return dwNumMsgBuf;
+}
+
+const DWORD& InputContext::NumTransMsg() const {
+  return dwNumMsgBuf;
+}
+
 LPGUIDELINE InputContext::LockGuideLine() {
   return (LPGUIDELINE)ImmLockIMCC(hGuideLine);
 }
