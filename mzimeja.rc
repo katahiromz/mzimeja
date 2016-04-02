@@ -181,7 +181,7 @@ RIGHTCLKMENU MENU DISCARDABLE
 BEGIN
     POPUP ""
     BEGIN
-        MENUITEM "îÒï\é¶",                      IDM_HIDE
+        MENUITEM "îÒï\é¶Ç…Ç∑ÇÈ",                IDM_HIDE
         MENUITEM SEPARATOR
         MENUITEM "íPåÍìoò^",                    IDM_ADD_WORD
         MENUITEM "çƒïœä∑",                      IDM_RECONVERT
