@@ -11,6 +11,40 @@
 extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
+// debug functions
+
+#ifdef _DEBUG
+  #define ERROROUT(x) ErrorOut(x)
+  #define WARNOUT(x) WarnOut(x)
+#else
+  #define ERROROUT(x)
+  #define WARNOUT(x)
+#endif
+
+#ifdef _DEBUG
+VOID WarnOut(LPCTSTR pStr) { OutputDebugString(pStr); }
+
+VOID ErrorOut(LPCTSTR pStr) {
+  DWORD dwError;
+  DWORD dwResult;
+  TCHAR buf1[512];
+  TCHAR buf2[512];
+
+  dwError = GetLastError();
+  dwResult =
+      FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwError,
+                    MAKELANGID(LANG_ENGLISH, LANG_NEUTRAL), buf1, 512, NULL);
+
+  if (dwResult > 0) {
+    wsprintf(buf2, TEXT("%s:%s(0x%x)"), pStr, buf1, dwError);
+  } else {
+    wsprintf(buf2, TEXT("%s:(0x%x)"), pStr, dwError);
+  }
+  OutputDebugString(buf2);
+}
+#endif  // def _DEBUG
+
+//////////////////////////////////////////////////////////////////////////////
 // internal functions
 
 PSID MyCreateSid(VOID) {
@@ -49,40 +83,6 @@ POSVERSIONINFO GetVersionInfo(VOID) {
   }
   return &os;
 }
-
-//////////////////////////////////////////////////////////////////////////////
-
-// debug functions
-#ifdef _DEBUG
-  #define ERROROUT(x) ErrorOut(x)
-  #define WARNOUT(x) WarnOut(x)
-#else
-  #define ERROROUT(x)
-  #define WARNOUT(x)
-#endif
-
-#ifdef _DEBUG
-VOID WarnOut(LPCTSTR pStr) { OutputDebugString(pStr); }
-
-VOID ErrorOut(LPCTSTR pStr) {
-  DWORD dwError;
-  DWORD dwResult;
-  TCHAR buf1[512];
-  TCHAR buf2[512];
-
-  dwError = GetLastError();
-  dwResult =
-      FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwError,
-                    MAKELANGID(LANG_ENGLISH, LANG_NEUTRAL), buf1, 512, NULL);
-
-  if (dwResult > 0) {
-    wsprintf(buf2, TEXT("%s:%s(0x%x)"), pStr, buf1, dwError);
-  } else {
-    wsprintf(buf2, TEXT("%s:(0x%x)"), pStr, dwError);
-  }
-  OutputDebugString(buf2);
-}
-#endif  // def _DEBUG
 
 //
 // CreateSecurityAttributes()
