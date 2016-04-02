@@ -304,7 +304,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 BOOL PASCAL IMEKeyupHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 
 // ui.c
-BOOL IMERegisterClass(HINSTANCE hInstance);
+BOOL IMERegisterClasses(HINSTANCE hInstance);
 LRESULT CALLBACK MZIMEWndProc(HWND, UINT, WPARAM, LPARAM);
 LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
                           WPARAM wParam, LPARAM lParam);

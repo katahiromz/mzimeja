@@ -67,7 +67,7 @@ void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra) {
 #define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
 
 // This function is called by IMMInquire, register the classes
-BOOL IMERegisterClass(HINSTANCE hInstance) {
+BOOL IMERegisterClasses(HINSTANCE hInstance) {
   WNDCLASSEX wcx;
 
   // register class of UI window.

@@ -109,7 +109,7 @@ static inline BOOL MZIME_Init(HINSTANCE hInstance) {
     return FALSE;
   }
 
-  IMERegisterClass(hInst);
+  IMERegisterClasses(hInst);
 
   LPTSTR lpDicFileName = szDicFileName;
   lpDicFileName += GetWindowsDirectory(lpDicFileName, 256);
