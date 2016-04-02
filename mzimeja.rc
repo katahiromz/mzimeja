@@ -183,23 +183,20 @@ BEGIN
     BEGIN
         MENUITEM "非表示にする",                IDM_HIDE
         MENUITEM SEPARATOR
+        MENUITEM "ひらがな",                    IDM_HIRAGANA
+        MENUITEM "全角カタカナ",                IDM_ZEN_KATAKANA
+        MENUITEM "全角英数",                    IDM_ZEN_ALNUM
+        MENUITEM "半角カタカナ",                IDM_HAN_KATAKANA
+        MENUITEM "半角英数",                    IDM_ALNUM
+        MENUITEM "直接入力",                    IDM_DIRECT
+        MENUITEM SEPARATOR
+        MENUITEM "ローマ字入力",                IDM_ROMAJI_INPUT
+        MENUITEM "かな入力",                    IDM_KANA_INPUT
+        MENUITEM SEPARATOR
         MENUITEM "単語登録",                    IDM_ADD_WORD
         MENUITEM "再変換",                      IDM_RECONVERT
+        MENUITEM SEPARATOR
         MENUITEM "プロパティ",                  IDM_PROPERTY
-        MENUITEM SEPARATOR
-        POPUP "入力モード"
-        BEGIN
-            MENUITEM "ひらがな",                IDM_HIRAGANA
-            MENUITEM "全角カタカナ",            IDM_ZEN_KATAKANA
-            MENUITEM "全角英数",                IDM_ZEN_ALNUM
-            MENUITEM "半角カタカナ",            IDM_HAN_KATAKANA
-            MENUITEM "半角英数",                IDM_ALNUM
-            MENUITEM "直接入力",                IDM_DIRECT
-            MENUITEM SEPARATOR
-            MENUITEM "ローマ字入力",            IDM_ROMAJI_INPUT
-            MENUITEM "かな入力",                IDM_KANA_INPUT
-        END
-        MENUITEM SEPARATOR
         MENUITEM "ヘルプ",                      IDM_HELP
         MENUITEM "バージョン情報",              IDM_ABOUT
         MENUITEM SEPARATOR
