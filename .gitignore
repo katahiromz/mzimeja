@@ -1,0 +1,9 @@
+*.o
+*.user
+*.suo
+*.ime
+Debug
+Release
+x64
+objfre_w2k_x86
+.vs
