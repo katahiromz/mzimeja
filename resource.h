@@ -48,6 +48,8 @@
 #define IDM_ALNUM 40007
 #define IDM_DIRECT 40008
 #define IDM_CANCEL 40009
+#define IDM_ROMAJI_INPUT 40010
+#define IDM_KANA_INPUT 40011
 
 // Next default values for new objects
 //

@@ -199,6 +199,11 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "キャンセル",                  IDM_CANCEL
     END
+    POPUP ""
+    BEGIN
+        MENUITEM "ローマ字入力",                IDM_ROMAJI_INPUT
+        MENUITEM "かな入力",                    IDM_KANA_INPUT
+    END
 END
 
 /////////////////////////////////////////////////////////////////////////////
