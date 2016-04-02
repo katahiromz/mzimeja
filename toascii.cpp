@@ -51,7 +51,7 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
   LPINPUTCONTEXT lpIMC;
   BOOL fOpen;
 
-  ImeLog(LOGF_KEY | LOGF_API, TEXT("ImeToAsciiEx"));
+  DebugPrint(TEXT("ImeToAsciiEx"));
 
   lpCurTransKey = lpTransBuf;
   lParam = ((DWORD)uScanCode << 16) + 1L;

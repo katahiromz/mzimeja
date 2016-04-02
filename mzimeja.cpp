@@ -2,6 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
+#include <cstdio>
 #include "immsec.h"
 #include "resource.h"
 
@@ -43,23 +44,47 @@ TCHAR szDicFileName[256]; /* Dictionary file name stored buffer */
 
 extern "C" {
 
+#ifdef _DEBUG
+int DebugPrint(LPCTSTR lpszFormat, ...) {
+  int nCount;
+  TCHAR szMsg[1024];
+
+  va_list marker;
+  va_start(marker, lpszFormat);
+  nCount = wvsprintf(szMsg, lpszFormat, marker);
+  va_end(marker);
+
+  //OutputDebugString(szMsg);
+  FILE *fp = fopen("C:\\mzimeja.log", "ab");
+  if (fp) {
+#ifdef UNICODE
+    CHAR szAnsi[1024];
+    szAnsi[0] = 0;
+    WideCharToMultiByte(CP_ACP, 0, szMsg, -1, szAnsi, 1024, NULL, NULL);
+    fprintf(fp, "%s\r\n", szAnsi);
+#else
+    fprintf(fp, "%s\r\n", szMsg);
+#endif
+    fclose(fp);
+  }
+  return nCount;
+}
+#endif  // def _DEBUG
+
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
+  PSECURITY_ATTRIBUTES psa;
   LPTSTR lpDicFileName;
 #ifdef _DEBUG
   TCHAR szDev[80];
 #endif
-  MyDebugPrint((TEXT("DLLEntry:dwFunc=%d\n"), dwFunction));
+  DebugPrint(TEXT("DLLEntry:dwFunc=%d\n"), dwFunction);
 
   switch (dwFunction) {
-    PSECURITY_ATTRIBUTES psa;
-
     case DLL_PROCESS_ATTACH:
-      //
       // Create/open a system global named mutex.
       // The initial ownership is not needed.
       // CreateSecurityAttributes() will create
       // the proper security attribute for IME.
-      //
       psa = CreateSecurityAttributes();
       if (psa != NULL) {
         hMutex = CreateMutex(psa, FALSE, TEXT("mzimeja_mutex"));
@@ -80,12 +105,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
       if (*(lpDicFileName - 1) != TEXT('\\')) *lpDicFileName++ = TEXT('\\');
       LoadString(hInst, IDS_DICFILENAME, lpDicFileName, 128);
 
-      SetGlobalFlags();
-
-#ifdef _DEBUG
-      wsprintf(szDev, TEXT("DLLEntry Process Attach hInst is %lx"), hInst);
-      ImeLog(LOGF_ENTRY, szDev);
-#endif
+      DebugPrint(TEXT("DLLEntry Process Attach hInst is %lx"), hInst);
       break;
 
     case DLL_PROCESS_DETACH:
@@ -94,24 +114,15 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
       UnregisterClass(szCandClassName, hInst);
       UnregisterClass(szStatusClassName, hInst);
       if (hMutex) CloseHandle(hMutex);
-#ifdef _DEBUG
-      wsprintf(szDev, TEXT("DLLEntry Process Detach hInst is %lx"), hInst);
-      ImeLog(LOGF_ENTRY, szDev);
-#endif
+      DebugPrint(TEXT("DLLEntry Process Detach hInst is %lx"), hInst);
       break;
 
     case DLL_THREAD_ATTACH:
-#ifdef _DEBUG
-      wsprintf(szDev, TEXT("DLLEntry Thread Attach hInst is %lx"), hInst);
-      ImeLog(LOGF_ENTRY, szDev);
-#endif
+      DebugPrint(TEXT("DLLEntry Thread Attach hInst is %lx"), hInst);
       break;
 
     case DLL_THREAD_DETACH:
-#ifdef _DEBUG
-      wsprintf(szDev, TEXT("DLLEntry Thread Detach hInst is %lx"), hInst);
-      ImeLog(LOGF_ENTRY, szDev);
-#endif
+      DebugPrint(TEXT("DLLEntry Thread Detach hInst is %lx"), hInst);
       break;
   }
   return TRUE;

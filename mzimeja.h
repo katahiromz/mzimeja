@@ -7,6 +7,9 @@
 #ifndef _INC_WINDOWS
   #include <windows.h>
 #endif
+#ifndef _INC_TCHAR
+  #include <tchar.h>
+#endif
 #include "indicml.h"
 #include "immdev.h"
 
@@ -279,10 +282,7 @@ extern DWORD dwDebugFlag;
 
 extern "C" {
 
-/* mzimeja.c     */
-int PASCAL Init(void);
-
-/*   subs.c     */
+// subs.c
 void PASCAL InitCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag);
 void PASCAL ClearCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag);
 void PASCAL ClearCandidate(LPCANDIDATEINFO lpCandInfo);
@@ -294,21 +294,21 @@ BOOL PASCAL IsCandidate(LPINPUTCONTEXT lpIMC);
 void PASCAL UpdateIndicIcon(HIMC hIMC);
 HFONT CheckNativeCharset(HDC hDC);
 
-/*   toascii.c   */
+// toascii.c
 BOOL PASCAL GenerateMessageToTransKey(LPTRANSMSGLIST lpTrabsKey,
                                       LPTRANSMSG lpGeneMsg);
 BOOL PASCAL GenerateOverFlowMessage(LPTRANSMSGLIST lpTransKey);
 
-/*   notify.c    */
+// notify.c
 BOOL PASCAL NotifyUCSetOpen(HIMC hIMC);
 BOOL PASCAL NotifyUCConversionMode(HIMC hIMC);
 BOOL PASCAL NotifyUCSetCompositionWindow(HIMC hIMC);
 
-/*   input.c     */
+// input.c
 BOOL PASCAL IMEKeydownHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 BOOL PASCAL IMEKeyupHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 
-/*   ui.c        */
+// ui.c
 BOOL IMERegisterClass(HINSTANCE hInstance);
 LRESULT CALLBACK MZIMEWndProc(HWND, UINT, WPARAM, LPARAM);
 LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
@@ -319,7 +319,7 @@ void PASCAL DrawUIBorder(LPRECT lprc);
 void PASCAL DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra);
 
-/*   uistate.c   */
+// uistate.c
 LRESULT CALLBACK StatusWndProc(HWND, UINT, WPARAM, LPARAM);
 void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
                         DWORD dwPushedStatus);
@@ -327,7 +327,7 @@ void PASCAL ButtonStatus(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL PASCAL MyIsIMEMessage(UINT message);
 void PASCAL UpdateStatusWindow(LPUIEXTRA lpUIExtra);
 
-/* uicand.c      */
+// uicand.c
 LRESULT CALLBACK CandWndProc(HWND, UINT, WPARAM, LPARAM);
 void PASCAL PaintCandWindow(HWND hCandWnd);
 BOOL PASCAL GetCandPosFromComp(LPINPUTCONTEXT lpIMC, LPUIEXTRA lpUIExtra,
@@ -339,7 +339,7 @@ void PASCAL HideCandWindow(LPUIEXTRA lpUIExtra);
 void PASCAL MoveCandWindow(HWND hUIWnd, LPINPUTCONTEXT lpIMC,
                            LPUIEXTRA lpUIExtra, BOOL fForceComp);
 
-/* uicomp.c      */
+// uicomp.c
 LRESULT CALLBACK CompStrWndProc(HWND, UINT, WPARAM, LPARAM);
 void PASCAL PaintCompWindow(HWND hCompWnd);
 void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
@@ -348,7 +348,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC);
 void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra);
 void PASCAL SetFontCompWindow(LPUIEXTRA lpUIExtra);
 
-/*   uiguide.c   */
+// uiguide.c
 LRESULT CALLBACK GuideWndProc(HWND, UINT, WPARAM, LPARAM);
 void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
                        DWORD dwPushedGuide);
@@ -356,7 +356,7 @@ void PASCAL ButtonGuide(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void PASCAL UpdateGuideWindow(LPUIEXTRA lpUIExtra);
 LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
 
-/* config.c      */
+// config.c
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam);
 INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
@@ -368,7 +368,7 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam);
 
-/* DIC.C         */
+// dic.c
 BOOL PASCAL IsEat(WORD);
 BOOL PASCAL DicKeydownHandler(HIMC, UINT, LPARAM, LPBYTE);
 void PASCAL DeleteChar(HIMC hIMC, UINT uVKey);
@@ -385,7 +385,7 @@ void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow);
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
                                       DWORD dwBufLen, LPTSTR szDicFileName);
 
-/* DIC2.C        */
+// dic2.c
 BOOL OneCharZenToHan(WCHAR, WCHAR *, WCHAR *);
 WORD PASCAL HanToZen(WORD, WORD, DWORD);
 WORD PASCAL ZenToHan(WORD);
@@ -401,27 +401,11 @@ WORD PASCAL KataToHira(WORD);
 void PASCAL lZenToHan(LPTSTR, LPTSTR);
 void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
 
-/* DIC3.C        */
-WORD PASCAL AddWord(LPSTR, LPSTR);
-WORD PASCAL GetWord(LPSTR, LPSTR, WORD, WORD);
-WORD PASCAL GetWordCount(LPSTR);
-WORD PASCAL GetWordNum(LPSTR);
-WORD PASCAL DeleteWord(LPSTR, LPSTR);
-
-/* FDEBUG.C      */
+// fdebug.c
 #ifdef _DEBUG
-  #define MyDebugPrint(x) DebugPrint x
   int DebugPrint(LPCTSTR lpszFormat, ...);
-  void SetDwordToSetting(LPCTSTR lpszFlag, DWORD dwFlag);
-  void PASCAL SetGlobalFlags();
-  void PASCAL ImeLog(DWORD dwFlag, LPCTSTR lpStr);
 #else
-  #define MyDebugPrint(x)
-  #define SetDwordToSetting() FALSE
-  //#define SetDwordToSetting(lpszFlag, dwFlag) FALSE
-  #define SetGlobalFlags() FALSE
-  //#define ImeLog() FALSE
-  #define ImeLog(dwFlag, lpStr) FALSE
+  #define DebugPrint (void)
 #endif
 
 //////////////////////////////////////////////////////////////////////////////

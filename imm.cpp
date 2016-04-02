@@ -53,7 +53,7 @@ extern "C" {
 //    成功すれば、TRUE。そうでなければ、FALSE。
 BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
                        DWORD dwSystemInfoFlags) {
-  ImeLog(LOGF_ENTRY | LOGF_API, TEXT("ImeInquire"));
+  DebugPrint(TEXT("ImeInquire"));
 
   // Init IMEINFO Structure.
   lpIMEInfo->dwPrivateDataSize = sizeof(UIEXTRA);
@@ -130,7 +130,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
 DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
                                LPCANDIDATELIST lpCandList, DWORD dwBufLen,
                                UINT uFlags) {
-  ImeLog(LOGF_API, TEXT("ImeConversionList"));
+  DebugPrint(TEXT("ImeConversionList"));
 
   return 0;
 }
@@ -148,7 +148,7 @@ DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
 //  Return Values
 //    関数が成功したら、TRUE。そうじゃなかったら、FALSE。
 BOOL WINAPI ImeDestroy(UINT uForce) {
-  ImeLog(LOGF_ENTRY | LOGF_API, TEXT("ImeDestroy"));
+  DebugPrint(TEXT("ImeDestroy"));
 
   return TRUE;
 }
@@ -221,7 +221,7 @@ BOOL WINAPI ImeDestroy(UINT uForce) {
 LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
   LRESULT lRet = FALSE;
 
-  ImeLog(LOGF_API, TEXT("ImeEscape"));
+  DebugPrint(TEXT("ImeEscape"));
 
   switch (uSubFunc) {
     case IME_ESC_QUERY_SUPPORT:
@@ -277,7 +277,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
 //  See Also
 //    ImeSetActiveContext
 BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
-  ImeLog(LOGF_API, TEXT("ImeSetActiveContext"));
+  DebugPrint(TEXT("ImeSetActiveContext"));
 
   UpdateIndicIcon(hIMC);
 
@@ -322,7 +322,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
 
-  ImeLog(LOGF_KEY | LOGF_API, TEXT("ImeProcessKey"));
+  DebugPrint(TEXT("ImeProcessKey"));
 
   if (lKeyData & 0x80000000) return FALSE;
 
@@ -462,7 +462,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   int i = 0;
   //LPDWORD lpdw;
 
-  ImeLog(LOGF_API, TEXT("NotifyIME"));
+  DebugPrint(TEXT("NotifyIME"));
 
   switch (dwAction) {
     case NI_CONTEXTUPDATED:
@@ -733,7 +733,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
   LPINPUTCONTEXT lpIMC;
 
-  ImeLog(LOGF_ENTRY | LOGF_API, TEXT("ImeSelect"));
+  DebugPrint(TEXT("ImeSelect"));
 
   if (fSelect) UpdateIndicIcon(hIMC);
 
@@ -866,7 +866,7 @@ void DumpRS(LPRECONVERTSTRING lpRS) {
 //    このプロパティは ImmGetProperty 関数を使うことで得ることができる。
 BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
                                     DWORD dwComp, LPVOID lpRead, DWORD dwRead) {
-  ImeLog(LOGF_API, TEXT("ImeSetCompositionString"));
+  DebugPrint(TEXT("ImeSetCompositionString"));
 
   // サイズがおまかせの場合には、取り敢えずは dwStrLen に
   // あわせる。kakasi とこの位置で連携した方がいいのかもし
@@ -961,7 +961,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
   //   return  0 ;
   //
   // このコードを有効にするかどうかは微妙だ。
-  ImeLog(LOGF_API, TEXT("ImeGetImeMenuItems"));
+  DebugPrint(TEXT("ImeGetImeMenuItems"));
 
   if (!lpImeMenu) {
     if (!lpImeParentMenu) {

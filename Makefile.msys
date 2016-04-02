@@ -28,7 +28,6 @@ OBJS = \
 	dic$(DOTOBJ) \
 	dic2$(DOTOBJ) \
 	mzimeja$(DOTOBJ) \
-	fdebug$(DOTOBJ) \
 	imm$(DOTOBJ) \
 	immsec$(DOTOBJ) \
 	input$(DOTOBJ) \
@@ -79,8 +78,6 @@ dic2$(DOTOBJ): dic2.cpp
 	$(CXX) -c $(CXXFLAGS) -o dic2$(DOTOBJ) dic2.cpp
 mzimeja$(DOTOBJ): mzimeja.cpp
 	$(CXX) -c $(CXXFLAGS) -o mzimeja$(DOTOBJ) mzimeja.cpp
-fdebug$(DOTOBJ): fdebug.cpp
-	$(CXX) -c $(CXXFLAGS) -o fdebug$(DOTOBJ) fdebug.cpp
 imm$(DOTOBJ): imm.cpp
 	$(CXX) -c $(CXXFLAGS) -o imm$(DOTOBJ) imm.cpp
 immsec$(DOTOBJ): immsec.cpp

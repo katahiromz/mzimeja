@@ -71,7 +71,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
   HPROPSHEETPAGE rPages[MAX_PAGES];
   PROPSHEETHEADER psh;
 
-  ImeLog(LOGF_API, TEXT("ImeConfigure"));
+  DebugPrint(TEXT("ImeConfigure"));
 
   psh.dwSize = sizeof(psh);
   psh.dwFlags = PSH_PROPTITLE;
@@ -385,7 +385,7 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
-  DWORD dwTemp;
+  //DWORD dwTemp;
   //TCHAR szBuf[128];
   NMHDR FAR *lpnm;
   //LPPROPSHEETPAGE lpPropSheet =
@@ -402,24 +402,6 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
           break;
 
         case PSN_APPLY:
-#ifdef _DEBUG
-          dwTemp = 0;
-          if (IsDlgButtonChecked(hDlg, IDC_LOGF_ENTRY)) dwTemp |= LOGF_ENTRY;
-          if (IsDlgButtonChecked(hDlg, IDC_LOGF_API)) dwTemp |= LOGF_API;
-          if (IsDlgButtonChecked(hDlg, IDC_LOGF_KEY)) dwTemp |= LOGF_KEY;
-          dwLogFlag = dwTemp;
-
-          dwTemp = 0;
-          if (IsDlgButtonChecked(hDlg, IDC_DEBF_THREADID))
-            dwTemp |= DEBF_THREADID;
-          if (IsDlgButtonChecked(hDlg, IDC_DEBF_GUIDELINE))
-            dwTemp |= DEBF_GUIDELINE;
-          dwDebugFlag = dwTemp;
-
-          SetDwordToSetting(TEXT("LogFlag"), dwLogFlag);
-          SetDwordToSetting(TEXT("DebugFlag"), dwDebugFlag);
-#endif
-
           break;
 
         case PSN_RESET:

@@ -21,7 +21,6 @@ SOURCES= \
         dic.cpp \
         dic2.cpp \
         mzimeja.cpp \
-        fdebug.cpp \
         imm.cpp \
         immsec.cpp \
         input.cpp \
