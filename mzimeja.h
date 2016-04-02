@@ -299,6 +299,7 @@ BOOL PASCAL NotifyUCConversionMode(HIMC hIMC);
 BOOL PASCAL NotifyUCSetCompositionWindow(HIMC hIMC);
 
 // input.c
+BOOL PASCAL DicKeydownHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 BOOL PASCAL IMEKeydownHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 BOOL PASCAL IMEKeyupHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 
@@ -363,8 +364,6 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam);
 
 // dic.c
-BOOL PASCAL IsEat(WORD);
-BOOL PASCAL DicKeydownHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 void PASCAL DeleteChar(HIMC hIMC, UINT uVKey);
 void PASCAL FlushText(HIMC hIMC);
 void PASCAL RevertText(HIMC hIMC);

@@ -333,10 +333,6 @@ cvk_exit10:
   return bRc;
 }
 
-BOOL PASCAL IsEat(WORD code) {
-  return TRUE;
-}
-
 void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
@@ -489,136 +485,134 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
     dwGCR = GCS_RESULTALL;
   }
 
-  if (IsEat(code)) {
-    // Get ConvMode from IMC.
-    fdwConversion = lpIMC->fdwConversion;
+  // Get ConvMode from IMC.
+  fdwConversion = lpIMC->fdwConversion;
 
-    lpchText = GETLPCOMPSTR(lpCompStr);
-    lpstr = lpchText;
-    if (lpCompStr->dwCursorPos) lpstr += lpCompStr->dwCursorPos;
-    lpstr = lpchText + lstrlen(lpchText);
-    lpprev = CharPrev(lpchText, lpstr);
+  lpchText = GETLPCOMPSTR(lpCompStr);
+  lpstr = lpchText;
+  if (lpCompStr->dwCursorPos) lpstr += lpCompStr->dwCursorPos;
+  lpstr = lpchText + lstrlen(lpchText);
+  lpprev = CharPrev(lpchText, lpstr);
 
-    if (fdwConversion & IME_CMODE_CHARCODE) {
-      code = (WORD)(LONG_PTR)AnsiUpper((LPSTR)(LONG_PTR)code);
-      if (!((code >= TEXT('0') && code <= TEXT('9')) ||
-            (code >= TEXT('A') && code <= TEXT('F'))) ||
-          lpCompStr->dwCursorPos >= 4) {
-        MessageBeep(0);
-        goto ac_exit;
-      }
-      *lpstr++ = (BYTE)code;
-      lpCompStr->dwCursorPos++;
-    } else if (fdwConversion & IME_CMODE_FULLSHAPE) {
-      if (fdwConversion & IME_CMODE_ROMAN && fdwConversion & IME_CMODE_NATIVE) {
-        if (*lpprev) {
-          code2 = *lpprev;
-        } else {
-          if (IsSecond(code)) {
-            code = ConvChar(hIMC, 0, code);
-            if (!(fdwConversion & IME_CMODE_KATAKANA)) {
-              code = KataToHira(code);
-            }
-          }
-          goto DBCS_BETA;
-        }
-
-        if (!(code2 = ZenToHan(code2))) {
-          if (IsSecond(code)) {
-            code = ConvChar(hIMC, 0, code);
-            if (!(fdwConversion & IME_CMODE_KATAKANA)) {
-              code = KataToHira(code);
-            }
-          }
-          goto DBCS_BETA;
-        }
-
+  if (fdwConversion & IME_CMODE_CHARCODE) {
+    code = (WORD)(LONG_PTR)AnsiUpper((LPSTR)(LONG_PTR)code);
+    if (!((code >= TEXT('0') && code <= TEXT('9')) ||
+          (code >= TEXT('A') && code <= TEXT('F'))) ||
+        lpCompStr->dwCursorPos >= 4) {
+      MessageBeep(0);
+      goto ac_exit;
+    }
+    *lpstr++ = (BYTE)code;
+    lpCompStr->dwCursorPos++;
+  } else if (fdwConversion & IME_CMODE_FULLSHAPE) {
+    if (fdwConversion & IME_CMODE_ROMAN && fdwConversion & IME_CMODE_NATIVE) {
+      if (*lpprev) {
+        code2 = *lpprev;
+      } else {
         if (IsSecond(code)) {
-          if (IsFirst(code2) && (code3 = ConvChar(hIMC, code2, code))) {
-            if (fdwConversion & IME_CMODE_KATAKANA) {
-              *lpprev = code3;
-            } else {
-              *lpprev = KataToHira(code3);
+          code = ConvChar(hIMC, 0, code);
+          if (!(fdwConversion & IME_CMODE_KATAKANA)) {
+            code = KataToHira(code);
+          }
+        }
+        goto DBCS_BETA;
+      }
+
+      if (!(code2 = ZenToHan(code2))) {
+        if (IsSecond(code)) {
+          code = ConvChar(hIMC, 0, code);
+          if (!(fdwConversion & IME_CMODE_KATAKANA)) {
+            code = KataToHira(code);
+          }
+        }
+        goto DBCS_BETA;
+      }
+
+      if (IsSecond(code)) {
+        if (IsFirst(code2) && (code3 = ConvChar(hIMC, code2, code))) {
+          if (fdwConversion & IME_CMODE_KATAKANA) {
+            *lpprev = code3;
+          } else {
+            *lpprev = KataToHira(code3);
+          }
+        } else {
+          code = ConvChar(hIMC, 0, code);
+
+          if (!(fdwConversion & IME_CMODE_KATAKANA)) {
+            code = KataToHira(code);
+          }
+          goto DBCS_BETA;
+        }
+      } else if ((WORD)(LONG_PTR)CharUpper((LPTSTR)(LONG_PTR)code) == 'N' &&
+                 (WORD)(LONG_PTR)CharUpper((LPTSTR)(LONG_PTR)code2) == 'N') {
+        code3 = 0xFF9D;
+        code2 = HanToZen(code3, 0, fdwConversion);
+        *lpprev = code2;
+      } else
+        goto DBCS_BETA;
+    } else {
+    DBCS_BETA:
+      if (code == TEXT('^')) {
+        code2 = *lpprev;
+        if (IsTenten(code2) == FALSE) goto DBCS_BETA2;
+        code2 = ConvTenten(code2);
+        *lpprev++ = code2;
+      } else if (code == TEXT('_')) {
+        code2 = *lpprev;
+        if (IsMaru(code2) == FALSE) goto DBCS_BETA2;
+        code2 = ConvMaru(code2);
+        *lpprev = code2;
+      } else {
+        code = HanToZen(code, 0, fdwConversion);
+      DBCS_BETA2:
+        *lpstr++ = code;
+        lpCompStr->dwCursorPos += 1;
+      }
+    }
+  } else {
+    if (fdwConversion & IME_CMODE_ROMAN && fdwConversion & IME_CMODE_NATIVE) {
+      if (IsSecond(code)) {
+        if (IsFirst(*lpprev) && (code2 = ConvChar(hIMC, *lpprev, code))) {
+          if (OneCharZenToHan(code2, &Katakana, &Sound)) {
+            *lpprev = Katakana;
+            if (Sound) {
+              *lpstr++ = Sound;
+              lpCompStr->dwCursorPos++;
             }
           } else {
             code = ConvChar(hIMC, 0, code);
-
-            if (!(fdwConversion & IME_CMODE_KATAKANA)) {
-              code = KataToHira(code);
-            }
-            goto DBCS_BETA;
+            goto SBCS_BETA;
           }
-        } else if ((WORD)(LONG_PTR)CharUpper((LPTSTR)(LONG_PTR)code) == 'N' &&
-                   (WORD)(LONG_PTR)CharUpper((LPTSTR)(LONG_PTR)code2) == 'N') {
-          code3 = 0xFF9D;
-          code2 = HanToZen(code3, 0, fdwConversion);
-          *lpprev = code2;
-        } else
-          goto DBCS_BETA;
-      } else {
-      DBCS_BETA:
-        if (code == TEXT('^')) {
-          code2 = *lpprev;
-          if (IsTenten(code2) == FALSE) goto DBCS_BETA2;
-          code2 = ConvTenten(code2);
-          *lpprev++ = code2;
-        } else if (code == TEXT('_')) {
-          code2 = *lpprev;
-          if (IsMaru(code2) == FALSE) goto DBCS_BETA2;
-          code2 = ConvMaru(code2);
-          *lpprev = code2;
         } else {
-          code = HanToZen(code, 0, fdwConversion);
-        DBCS_BETA2:
-          *lpstr++ = code;
-          lpCompStr->dwCursorPos += 1;
+          code = ConvChar(hIMC, 0, code);
+          // MakeGuideLine(hIMC,MYGL_TYPINGERROR);
+          goto SBCS_BETA;
+        }
+      } else {
+        if ((WORD)(LONG_PTR)CharUpper((LPTSTR)(LONG_PTR)code) == 'N' &&
+            (WORD)(LONG_PTR)CharUpper(
+                (LPTSTR)(LONG_PTR)(code2 = *lpprev)) == 'N') {
+          *lpprev = (TCHAR)0xFF9D;
+        } else {
+          // MakeGuideLine(hIMC,MYGL_TYPINGERROR);
+          goto SBCS_BETA;
         }
       }
     } else {
-      if (fdwConversion & IME_CMODE_ROMAN && fdwConversion & IME_CMODE_NATIVE) {
-        if (IsSecond(code)) {
-          if (IsFirst(*lpprev) && (code2 = ConvChar(hIMC, *lpprev, code))) {
-            if (OneCharZenToHan(code2, &Katakana, &Sound)) {
-              *lpprev = Katakana;
-              if (Sound) {
-                *lpstr++ = Sound;
-                lpCompStr->dwCursorPos++;
-              }
-            } else {
-              code = ConvChar(hIMC, 0, code);
-              goto SBCS_BETA;
-            }
-          } else {
-            code = ConvChar(hIMC, 0, code);
-            // MakeGuideLine(hIMC,MYGL_TYPINGERROR);
-            goto SBCS_BETA;
-          }
-        } else {
-          if ((WORD)(LONG_PTR)CharUpper((LPTSTR)(LONG_PTR)code) == 'N' &&
-              (WORD)(LONG_PTR)CharUpper(
-                  (LPTSTR)(LONG_PTR)(code2 = *lpprev)) == 'N') {
-            *lpprev = (TCHAR)0xFF9D;
-          } else {
-            // MakeGuideLine(hIMC,MYGL_TYPINGERROR);
-            goto SBCS_BETA;
-          }
+    SBCS_BETA:
+      if (OneCharZenToHan(code, &Katakana, &Sound)) {
+        *lpstr++ = Katakana;
+        if (Sound) {
+          *lpstr++ = Sound;
+          lpCompStr->dwCursorPos++;
         }
       } else {
-      SBCS_BETA:
-        if (OneCharZenToHan(code, &Katakana, &Sound)) {
-          *lpstr++ = Katakana;
-          if (Sound) {
-            *lpstr++ = Sound;
-            lpCompStr->dwCursorPos++;
-          }
-        } else {
-          *lpstr++ = code;
-        }
-        lpCompStr->dwCursorPos++;
+        *lpstr++ = code;
       }
+      lpCompStr->dwCursorPos++;
     }
-    *lpstr = 0;
   }
+  *lpstr = 0;
 
   // make reading string.
   lpstr = GETLPCOMPSTR(lpCompStr);
