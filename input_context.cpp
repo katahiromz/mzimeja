@@ -1,12 +1,35 @@
 // input_context.cpp --- input context
 //////////////////////////////////////////////////////////////////////////////
 
+#include "mzimeja.h"
 #include "input_context.h"
 
 //////////////////////////////////////////////////////////////////////////////
 
 void InputContext::Initialize() {
-  // TODO:
+  if (!HasLogFont()) {
+    lfFont.W.lfCharSet = SHIFTJIS_CHARSET;
+    SetsLogFont();
+  }
+
+  if (!HasConversion()) {
+    fdwConversion = IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_NATIVE;
+    SetsConversion();
+  }
+
+  hCompStr = ImmReSizeIMCC(hCompStr, sizeof(MZCOMPSTR));
+  LPCOMPOSITIONSTRING lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->dwSize = sizeof(MZCOMPSTR);
+    UnlockCompStr();
+  }
+
+  hCandInfo = ImmReSizeIMCC(hCandInfo, sizeof(MZCAND));
+  LPCANDIDATEINFO lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->dwSize = sizeof(MZCAND);
+    UnlockCandInfo();
+  }
 }
 
 BOOL InputContext::IsCandidate() {

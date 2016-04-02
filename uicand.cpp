@@ -65,7 +65,7 @@ BOOL PASCAL GetCandPosFromCompWnd(LPUIEXTRA lpUIExtra, LPPOINT lppt) {
 BOOL PASCAL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                                    LPPOINT lppt) {
   if (lpUIExtra->dwCompStyle) {
-    if (lpIMC && lpIMC->fdwInit & INIT_COMPFORM) {
+    if (lpIMC && lpIMC->HasCompForm()) {
       if (!lpUIExtra->bVertical) {
         lppt->x = lpIMC->cfCompForm.ptCurrentPos.x;
         lppt->y =

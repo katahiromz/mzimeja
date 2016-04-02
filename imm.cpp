@@ -731,32 +731,7 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
   InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
   if (lpIMC) {
     if (fSelect) {
-      if (!(lpIMC->fdwInit & INIT_LOGFONT)) {
-        lpIMC->lfFont.A.lfCharSet = SHIFTJIS_CHARSET;
-        lpIMC->fdwInit |= INIT_LOGFONT;
-      }
-
-      if (!(lpIMC->fdwInit & INIT_CONVERSION)) {
-        lpIMC->fdwConversion =
-            IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_NATIVE;
-        lpIMC->fdwInit |= INIT_CONVERSION;
-      }
-
-      lpIMC->hCompStr = ImmReSizeIMCC(lpIMC->hCompStr, sizeof(MZCOMPSTR));
-
-      LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
-      if (lpCompStr) {
-        lpCompStr->dwSize = sizeof(MZCOMPSTR);
-        lpIMC->UnlockCompStr();
-      }
-      lpIMC->hCandInfo = ImmReSizeIMCC(lpIMC->hCandInfo, sizeof(MZCAND));
-
-      LPCANDIDATEINFO lpCandInfo;
-      lpCandInfo = lpIMC->LockCandInfo();
-      if (lpCandInfo) {
-        lpCandInfo->dwSize = sizeof(MZCAND);
-        lpIMC->UnlockCandInfo();
-      }
+      lpIMC->Initialize();
     }
     ImmUnlockIMC(hIMC);
   }
