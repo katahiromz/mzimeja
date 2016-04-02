@@ -205,6 +205,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\input_context.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mzimeja.cpp"
 				>
 			</File>
@@ -260,6 +264,10 @@
 			</File>
 			<File
 				RelativePath=".\include\indicml.h"
+				>
+			</File>
+			<File
+				RelativePath=".\input_context.h"
 				>
 			</File>
 			<File

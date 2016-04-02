@@ -114,11 +114,11 @@ void PASCAL ClearCandidate(LPCANDIDATEINFO lpCandInfo) {
 
 // return value: fdwConversion
 void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
-  LPINPUTCONTEXT lpIMC;
   DWORD fdwConversion;
   TRANSMSG GnMsg;
 
-  if (!(lpIMC = ImmLockIMC(hIMC))) return;
+  InputContext *lpIMC;
+  if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return;
 
   fdwConversion = lpIMC->fdwConversion;
 
@@ -180,7 +180,7 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
 }
 
 void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
-  LPINPUTCONTEXT lpIMC;
+  InputContext *lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
   //DWORD fdwConversion;
   TRANSMSG GnMsg;
@@ -191,16 +191,17 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
   LPTSTR lpDst0;
   //WORD wCode;
   BOOL fChange = FALSE;
+  DWORD dwSize;
 
-  if (!(lpIMC = ImmLockIMC(hIMC))) return;
+  if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return;
 
-  if (!(lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)))
+  if (!(lpCompStr = lpIMC->LockCompStr()))
     goto ccs_exit40;
 
   //fdwConversion = lpIMC->fdwConversion;
 
-  if (!(hDst =
-            GlobalAlloc(GHND, (lpCompStr->dwCompStrLen + 1) * sizeof(WCHAR))))
+  dwSize = (lpCompStr->dwCompStrLen + 1) * sizeof(WCHAR);
+  if (!(hDst = GlobalAlloc(GHND, dwSize)))
     goto ccs_exit30;
 
   if (!(lpDst = (LPTSTR)GlobalLock(hDst))) goto ccs_exit20;
@@ -253,68 +254,53 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
 ccs_exit20:
   GlobalFree(hDst);
 ccs_exit30:
-  ImmUnlockIMCC(lpIMC->hCompStr);
+  lpIMC->UnlockCompStr();
 ccs_exit40:
   ImmUnlockIMC(hIMC);
   return;
 }
 
 BOOL PASCAL IsCompStr(HIMC hIMC) {
-  LPINPUTCONTEXT lpIMC;
-  LPCOMPOSITIONSTRING lpCompStr;
   BOOL fRet = FALSE;
 
-  if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
+  InputContext *lpIMC;
+  if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
 
   if (ImmGetIMCCSize(lpIMC->hCompStr) < sizeof(COMPOSITIONSTRING)) {
     ImmUnlockIMC(hIMC);
     return FALSE;
   }
 
-  lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+  LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
+  if (lpCompStr) {
+    fRet = (lpCompStr->dwCompStrLen > 0);
+    lpIMC->UnlockCompStr();
+  }
 
-  fRet = (lpCompStr->dwCompStrLen > 0);
-
-  ImmUnlockIMCC(lpIMC->hCompStr);
   ImmUnlockIMC(hIMC);
 
   return fRet;
 }
 
 BOOL PASCAL IsConvertedCompStr(HIMC hIMC) {
-  LPINPUTCONTEXT lpIMC;
-  LPCOMPOSITIONSTRING lpCompStr;
   BOOL fRet = FALSE;
 
-  if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
+  InputContext *lpIMC;
+  if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
 
   if (ImmGetIMCCSize(lpIMC->hCompStr) < sizeof(MZCOMPSTR)) {
     ImmUnlockIMC(hIMC);
     return FALSE;
   }
 
-  lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+  LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
 
   if (lpCompStr->dwCompStrLen > 0)
     fRet = (((LPMZCOMPSTR)lpCompStr)->bCompAttr[0] > 0);
 
-  ImmUnlockIMCC(lpIMC->hCompStr);
+  lpIMC->UnlockCompStr();
   ImmUnlockIMC(hIMC);
 
-  return fRet;
-}
-
-BOOL PASCAL IsCandidate(LPINPUTCONTEXT lpIMC) {
-  LPCANDIDATEINFO lpCandInfo;
-  BOOL fRet = FALSE;
-
-  if (ImmGetIMCCSize(lpIMC->hCandInfo) < sizeof(CANDIDATEINFO)) return FALSE;
-
-  lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
-  if (lpCandInfo) {
-    fRet = (lpCandInfo->dwCount > 0);
-    ImmUnlockIMCC(lpIMC->hCandInfo);
-  }
   return fRet;
 }
 
@@ -350,10 +336,9 @@ void PASCAL UpdateIndicIcon(HIMC hIMC) {
 
   HWND hwndIndicate = FindWindow(INDICATOR_CLASS, NULL);
 
-  LPINPUTCONTEXT lpIMC;
   BOOL fOpen = FALSE;
   if (hIMC) {
-    lpIMC = ImmLockIMC(hIMC);
+    InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
     if (lpIMC) {
       fOpen = lpIMC->fOpen;
       ImmUnlockIMC(hIMC);

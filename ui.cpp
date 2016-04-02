@@ -153,7 +153,7 @@ BOOL IMERegisterClasses(HINSTANCE hInstance) {
 // IME UI window procedure
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
-  LPINPUTCONTEXT lpIMC;
+  InputContext *lpIMC;
   LPUIEXTRA lpUIExtra;
   HGLOBAL hUIExtra;
   LONG lRet = 0L;
@@ -217,12 +217,10 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
           // input context was chenged.
           // if there are the child windows, the diplay have to be
           // updated.
-          lpIMC = ImmLockIMC(hUICurIMC);
+          lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
           if (lpIMC) {
-            LPCOMPOSITIONSTRING lpCompStr;
-            LPCANDIDATEINFO lpCandInfo;
-            lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
-            lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+            LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
+            LPCANDIDATEINFO lpCandInfo = lpIMC->LockCandInfo();
             if (IsWindow(lpUIExtra->uiCand.hWnd)) HideCandWindow(lpUIExtra);
             if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
               if (lpCandInfo->dwCount) {
@@ -240,9 +238,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                 MoveCompWindow(lpUIExtra, lpIMC);
               }
             }
-
-            ImmUnlockIMCC(lpIMC->hCompStr);
-            ImmUnlockIMCC(lpIMC->hCandInfo);
+            lpIMC->UnlockCompStr();
+            lpIMC->UnlockCandInfo();
           } else {
             HideCandWindow(lpUIExtra);
             HideCompWindow(lpUIExtra);
@@ -264,7 +261,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       // Start composition! Ready to display the composition string.
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
-      lpIMC = ImmLockIMC(hUICurIMC);
+      lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
       CreateCompWindow(hWnd, lpUIExtra, lpIMC);
       ImmUnlockIMC(hUICurIMC);
       GlobalUnlock(hUIExtra);
@@ -272,7 +269,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
     case WM_IME_COMPOSITION:
       // Update to display the composition string.
-      lpIMC = ImmLockIMC(hUICurIMC);
+      lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       MoveCompWindow(lpUIExtra, lpIMC);
@@ -406,13 +403,13 @@ int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra) {
 LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
                           WPARAM wParam, LPARAM lParam) {
   LONG lRet = 0L;
-  LPINPUTCONTEXT lpIMC;
   HGLOBAL hUIExtra;
   LPUIEXTRA lpUIExtra;
   RECT rc;
   LOGFONT lf;
 
-  if (!(lpIMC = ImmLockIMC(hUICurIMC))) return 0L;
+  InputContext *lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
+  if (NULL == lpIMC) return 0L;
 
   hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
   lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
@@ -570,11 +567,12 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
 LONG PASCAL ControlCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
                            WPARAM wParam, LPARAM lParam) {
   LONG lRet = 1L;
-  LPINPUTCONTEXT lpIMC;
+  InputContext *lpIMC;
   HGLOBAL hUIExtra;
   LPUIEXTRA lpUIExtra;
 
-  if (!(lpIMC = ImmLockIMC(hUICurIMC))) return 1L;
+  lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
+  if (NULL == lpIMC) return 1L;
 
   hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
   lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);

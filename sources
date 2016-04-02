@@ -33,6 +33,7 @@ SOURCES= \
         uicomp.cpp \
         uiguide.cpp \
         uistate.cpp \
+        input_context.cpp \
         mzimeja.rc \
 
 TARGETLIBS= \

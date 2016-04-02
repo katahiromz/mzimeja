@@ -10,35 +10,30 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 void PASCAL FlushText(HIMC hIMC) {
-  LPINPUTCONTEXT lpIMC;
-  LPCOMPOSITIONSTRING lpCompStr;
-  LPCANDIDATEINFO lpCandInfo;
-  TRANSMSG GnMsg;
-
   if (!IsCompStr(hIMC)) return;
 
-  if (!(lpIMC = ImmLockIMC(hIMC))) return;
+  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+  if (NULL == lpIMC) return;
 
-  if (IsCandidate(lpIMC)) {
-    //
+  TRANSMSG GnMsg;
+  if (lpIMC->IsCandidate()) {
     // Flush candidate lists.
-    //
-    lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
-    ClearCandidate(lpCandInfo);
-    ImmUnlockIMCC(lpIMC->hCandInfo);
+    LPCANDIDATEINFO lpCandInfo = lpIMC->LockCandInfo();
+    if (lpCandInfo) {
+      ClearCandidate(lpCandInfo);
+      lpIMC->UnlockCandInfo();
+    }
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CLOSECANDIDATE;
     GnMsg.lParam = 1;
     GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
   }
 
-  lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+  LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
   if (lpCompStr) {
-    //
     // Flush composition strings.
-    //
     ClearCompStr(lpCompStr, CLR_RESULT_AND_UNDET);
-    ImmUnlockIMCC(lpIMC->hCompStr);
+    lpIMC->UnlockCompStr();
 
     GnMsg.message = WM_IME_COMPOSITION;
     GnMsg.wParam = 0;
@@ -54,7 +49,6 @@ void PASCAL FlushText(HIMC hIMC) {
 }
 
 void PASCAL RevertText(HIMC hIMC) {
-  LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
   LPCANDIDATEINFO lpCandInfo;
   TRANSMSG GnMsg;
@@ -62,30 +56,29 @@ void PASCAL RevertText(HIMC hIMC) {
 
   if (!IsCompStr(hIMC)) return;
 
-  if (!(lpIMC = ImmLockIMC(hIMC))) return;
+  InputContext *lpIMC;
+  if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return;
 
-  if (IsCandidate(lpIMC)) {
-    //
+  if (lpIMC->IsCandidate()) {
     // Flush candidate lists.
-    //
-    lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
-    ClearCandidate(lpCandInfo);
-    ImmUnlockIMCC(lpIMC->hCandInfo);
+    lpCandInfo = lpIMC->LockCandInfo();
+    if (lpCandInfo) {
+      ClearCandidate(lpCandInfo);
+      lpIMC->UnlockCandInfo();
+    }
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CLOSECANDIDATE;
     GnMsg.lParam = 1;
     GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
   }
 
-  lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+  lpCompStr = lpIMC->LockCompStr();
   if (lpCompStr) {
     lpstr = GETLPCOMPSTR(lpCompStr);
     lpread = GETLPCOMPREADSTR(lpCompStr);
     lHanToZen(lpstr, lpread, lpIMC->fdwConversion);
 
-    //
     // make attribute
-    //
     lpCompStr->dwCursorPos = lstrlen(lpstr);
     // DeltaStart is 0 at RevertText time.
     lpCompStr->dwDeltaStart = 0;
@@ -98,32 +91,24 @@ void PASCAL RevertText(HIMC hIMC) {
     lpCompStr->dwCompClauseLen = 8;
     lpCompStr->dwCompReadClauseLen = 8;
 
-    //
     // make length
-    //
     lpCompStr->dwCompStrLen = lstrlen(lpstr);
     lpCompStr->dwCompReadStrLen = lstrlen(lpread);
     lpCompStr->dwCompAttrLen = lstrlen(lpstr);
     lpCompStr->dwCompReadAttrLen = lstrlen(lpread);
 
-    //
     // Generate messages.
-    //
     GnMsg.message = WM_IME_COMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
     GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
-    ImmUnlockIMCC(lpIMC->hCompStr);
+    lpIMC->UnlockCompStr();
   }
   ImmUnlockIMC(hIMC);
 }
 
 BOOL PASCAL ConvKanji(HIMC hIMC) {
-  LPINPUTCONTEXT lpIMC;
-  LPCOMPOSITIONSTRING lpCompStr;
-  LPCANDIDATEINFO lpCandInfo;
-  LPCANDIDATELIST lpCandList;
   TCHAR szBuf[256 + 2];
   int nBufLen;
   LPTSTR lpstr;
@@ -141,12 +126,15 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
 
   if (!IsCompStr(hIMC)) return FALSE;
 
-  if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
+  InputContext *lpIMC;
+  if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
 
-  if (!(lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)))
+  LPCOMPOSITIONSTRING lpCompStr;
+  if (!(lpCompStr = lpIMC->LockCompStr()))
     goto cvk_exit10;
 
-  if (!(lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo)))
+  LPCANDIDATEINFO lpCandInfo;
+  if (!(lpCandInfo = lpIMC->LockCandInfo()))
     goto cvk_exit20;
 
   //
@@ -203,46 +191,34 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
 
   lpstr = szBuf;
   if (!*lpb) {
-    //
     // String is not converted yet.
-    //
     while (*lpstr) {
       if (0 != lstrcmp(lpstr, GETLPCOMPSTR(lpCompStr))) {
       set_compstr:
-        //
         // Set the composition string to the structure.
-        //
         lstrcpy(GETLPCOMPSTR(lpCompStr), lpstr);
 
         lpstr = GETLPCOMPSTR(lpCompStr);
 
-        //
         // Set the length and cursor position to the structure.
-        //
         lpCompStr->dwCompStrLen = lstrlen(lpstr);
         lpCompStr->dwCursorPos = 0;
         // Because MZ-IME does not support clause, DeltaStart is 0 anytime.
         lpCompStr->dwDeltaStart = 0;
 
-        //
         // make attribute
-        //
         memset((LPBYTE)GETLPCOMPATTR(lpCompStr), 1, lstrlen(lpstr));
         memset((LPBYTE)GETLPCOMPREADATTR(lpCompStr), 1,
                 lstrlen(GETLPCOMPREADSTR(lpCompStr)));
 
-        //
         // make clause info
-        //
         SetClause(GETLPCOMPCLAUSE(lpCompStr), lstrlen(lpstr));
         SetClause(GETLPCOMPREADCLAUSE(lpCompStr),
                   lstrlen(GETLPCOMPREADSTR(lpCompStr)));
         lpCompStr->dwCompClauseLen = 8;
         lpCompStr->dwCompReadClauseLen = 8;
 
-        //
         // Generate messages.
-        //
         GnMsg.message = WM_IME_COMPOSITION;
         GnMsg.wParam = 0;
         GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
@@ -254,25 +230,20 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
       lpstr += (lstrlen(lpstr) + 1);
     }
   } else {
-    //
     // String is converted, so that open candidate.
-    //
     int i = 0;
     //LPDWORD lpdw;
 
-    //
     // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
-    //
-    if (!IsCandidate(lpIMC)) {
+    if (!lpIMC->IsCandidate()) {
       GnMsg.message = WM_IME_NOTIFY;
       GnMsg.wParam = IMN_OPENCANDIDATE;
       GnMsg.lParam = 1L;
       GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
     }
 
-    //
     // Make candidate structures.
-    //
+    LPCANDIDATELIST lpCandList;
     lpCandInfo->dwSize = sizeof(MZCAND);
     lpCandInfo->dwCount = 1;
     lpCandInfo->dwOffset[0] =
@@ -305,28 +276,24 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
         lpCandList->dwPageStart++;
     }
 
-    //
     // Generate messages.
-    //
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CHANGECANDIDATE;
     GnMsg.lParam = 1L;
     GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
-    //
     // If the selected candidate string is changed, the composition string
     // should be updated.
-    //
     lpstr = (LPTSTR)((LPBYTE)lpCandList +
                      lpCandList->dwOffset[lpCandList->dwSelection]);
     goto set_compstr;
   }
 
 cvk_exit40:
-  ImmUnlockIMCC(lpIMC->hCandInfo);
+  lpIMC->UnlockCandInfo();
 
 cvk_exit20:
-  ImmUnlockIMCC(lpIMC->hCompStr);
+  lpIMC->UnlockCompStr();
 
 cvk_exit10:
   ImmUnlockIMC(hIMC);
@@ -334,12 +301,7 @@ cvk_exit10:
 }
 
 void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
-  LPINPUTCONTEXT lpIMC;
-  LPCOMPOSITIONSTRING lpCompStr;
-  LPCANDIDATEINFO lpCandInfo;
-  LPTSTR lpstr;
-  LPTSTR lpread;
-  LPTSTR lpptr;
+  LPTSTR lpstr, lpread, lpptr;
   int nChar;
   BOOL fDone = FALSE;
   DWORD dwCurPos;
@@ -347,9 +309,9 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
 
   if (!IsCompStr(hIMC)) return;
 
-  if (!(lpIMC = ImmLockIMC(hIMC))) return;
-
-  lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+  InputContext *lpIMC;
+  if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return;
+  LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
 
   dwCurPos = lpCompStr->dwCursorPos;
   lpstr = GETLPCOMPSTR(lpCompStr);
@@ -411,14 +373,14 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
       GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
       GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
     } else {
-      if (IsCandidate(lpIMC)) {
-        lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+      if (lpIMC->IsCandidate()) {
+        LPCANDIDATEINFO lpCandInfo = lpIMC->LockCandInfo();
         ClearCandidate(lpCandInfo);
         GnMsg.message = WM_IME_NOTIFY;
         GnMsg.wParam = IMN_CLOSECANDIDATE;
         GnMsg.lParam = 1;
         GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
-        ImmUnlockIMCC(lpIMC->hCandInfo);
+        lpIMC->UnlockCandInfo();
       }
 
       ClearCompStr(lpCompStr, CLR_RESULT_AND_UNDET);
@@ -436,19 +398,15 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
   }
 
 dc_exit:
-  ImmUnlockIMCC(lpIMC->hCompStr);
+  lpIMC->UnlockCompStr();
   ImmUnlockIMC(hIMC);
 }
 
 void PASCAL AddChar(HIMC hIMC, WORD code) {
   LPTSTR lpchText;
-  LPTSTR lpread;
-  LPTSTR lpstr;
-  LPTSTR lpprev;
-  WORD code2 = 0;
-  WORD code3;
+  LPTSTR lpread, lpstr, lpprev;
+  WORD code2 = 0, code3;
   DWORD fdwConversion;
-  LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
   DWORD dwStrLen;
   DWORD dwSize;
@@ -456,22 +414,21 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   DWORD dwGCR = 0L;
   WCHAR Katakana, Sound;
 
-  lpIMC = ImmLockIMC(hIMC);
+  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
 
   if (ImmGetIMCCSize(lpIMC->hCompStr) < sizeof(MZCOMPSTR)) {
     // Init time.
     dwSize = sizeof(MZCOMPSTR);
     lpIMC->hCompStr = ImmReSizeIMCC(lpIMC->hCompStr, dwSize);
-    lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+    lpCompStr = lpIMC->LockCompStr();
     lpCompStr->dwSize = dwSize;
   } else {
-    lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+    lpCompStr = lpIMC->LockCompStr();
   }
 
   dwStrLen = lpCompStr->dwCompStrLen;
 
   if (!dwStrLen) {
-    // lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
     InitCompStr(lpCompStr, CLR_RESULT_AND_UNDET);
 
     GnMsg.message = WM_IME_STARTCOMPOSITION;
@@ -649,9 +606,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   lpCompStr->dwCompAttrLen = lstrlen(lpstr);
   lpCompStr->dwCompReadAttrLen = lstrlen(lpread);
 
-  //
   // make clause info
-  //
   SetClause(GETLPCOMPCLAUSE(lpCompStr), lstrlen(lpstr));
   SetClause(GETLPCOMPREADCLAUSE(lpCompStr), lstrlen(lpread));
   lpCompStr->dwCompClauseLen = 8;
@@ -663,26 +618,24 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
 ac_exit:
-  ImmUnlockIMCC(lpIMC->hCompStr);
+  lpIMC->UnlockCompStr();
   ImmUnlockIMC(hIMC);
 }
 
 BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
   TRANSMSG GnMsg;
-  LPCOMPOSITIONSTRING lpCompStr;
-  LPCANDIDATEINFO lpCandInfo;
-  LPINPUTCONTEXT lpIMC;
 
   if (!IsCompStr(hIMC)) return FALSE;
 
-  lpIMC = ImmLockIMC(hIMC);
+  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+  LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
 
-  lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
-
-  if (IsCandidate(lpIMC)) {
-    lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
-    ClearCandidate(lpCandInfo);
-    ImmUnlockIMCC(lpIMC->hCandInfo);
+  if (lpIMC->IsCandidate()) {
+    LPCANDIDATEINFO lpCandInfo = lpIMC->LockCandInfo();
+    if (lpCandInfo) {
+      ClearCandidate(lpCandInfo);
+      lpIMC->UnlockCandInfo();
+    }
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CLOSECANDIDATE;
     GnMsg.lParam = 1L;
@@ -707,7 +660,7 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
   lpCompStr->dwResultClauseLen = 8;
   lpCompStr->dwResultReadClauseLen = 8;
 
-  ImmUnlockIMCC(lpIMC->hCompStr);
+  lpIMC->UnlockCompStr();
 
   if (fFlag) {
     GnMsg.message = WM_IME_COMPOSITION;
@@ -728,16 +681,14 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
 
 // Update the transrate key buffer
 BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
-  LPINPUTCONTEXT lpIMC;
-  LPGUIDELINE lpGuideLine;
   TRANSMSG GnMsg;
   DWORD dwSize =
       sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(TCHAR)) * 2 * sizeof(TCHAR);
   LPTSTR lpStr;
 
-  lpIMC = ImmLockIMC(hIMC);
+  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
   lpIMC->hGuideLine = ImmReSizeIMCC(lpIMC->hGuideLine, dwSize);
-  lpGuideLine = (LPGUIDELINE)ImmLockIMCC(lpIMC->hGuideLine);
+  LPGUIDELINE lpGuideLine = lpIMC->LockGuideLine();
 
   lpGuideLine->dwSize = dwSize;
   lpGuideLine->dwLevel = glTable[dwID].dwLevel;
@@ -763,27 +714,27 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   GnMsg.lParam = 0;
   GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
-  ImmUnlockIMCC(lpIMC->hGuideLine);
+  lpIMC->UnlockGuideLine();
   ImmUnlockIMC(hIMC);
 
   return TRUE;
 }
 
 // Update the transrate key buffer
-BOOL PASCAL GenerateMessage(HIMC hIMC, LPINPUTCONTEXT lpIMC,
+BOOL PASCAL GenerateMessage(HIMC hIMC, InputContext *lpIMC,
                             LPTRANSMSGLIST lpTransBuf, LPTRANSMSG lpGeneMsg) {
   if (lpTransBuf) return GenerateMessageToTransKey(lpTransBuf, lpGeneMsg);
 
   if (IsWindow(lpIMC->hWnd)) {
-    LPTRANSMSG lpTransMsg;
     if (!(lpIMC->hMsgBuf = ImmReSizeIMCC(
               lpIMC->hMsgBuf, sizeof(TRANSMSG) * (lpIMC->dwNumMsgBuf + 1))))
       return FALSE;
 
-    if (!(lpTransMsg = (LPTRANSMSG)ImmLockIMCC(lpIMC->hMsgBuf))) return FALSE;
-
+    LPTRANSMSG lpTransMsg = lpIMC->LockTransMsg();
+    if (NULL == lpTransMsg) return FALSE;
     lpTransMsg[lpIMC->dwNumMsgBuf] = *lpGeneMsg;
-    ImmUnlockIMCC(lpIMC->hMsgBuf);
+    lpIMC->UnlockTransMsg();
+
     lpIMC->dwNumMsgBuf++;
 
     ImmGenerateMessage(hIMC);
@@ -840,15 +791,15 @@ void PASCAL MakeAttrClause(LPCOMPOSITIONSTRING lpCompStr) {
 }
 
 void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow) {
-  LPINPUTCONTEXT lpIMC;
+  InputContext *lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
   //DWORD dwStartClause = 0;
   //DWORD dwEndClause = 0;
   LPTSTR lpstart, lpstr, lpend;
 
-  if (!(lpIMC = ImmLockIMC(hIMC))) return;
+  if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return;
 
-  lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+  lpCompStr = lpIMC->LockCompStr();
   if (lpCompStr) {
     // Temp! Error, if the string is already converted.
     if (CheckAttr(lpCompStr)) goto hsa_exit;
@@ -868,7 +819,7 @@ void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow) {
   }
 
 hsa_exit:
-  ImmUnlockIMCC(lpIMC->hCompStr);
+  lpIMC->UnlockCompStr();
   ImmUnlockIMC(hIMC);
 }
 

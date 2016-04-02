@@ -40,6 +40,7 @@ OBJS = \
 	uicomp$(DOTOBJ) \
 	uiguide$(DOTOBJ) \
 	uistate$(DOTOBJ) \
+	input_context$(DOTOBJ) \
 	mzimeja_res$(DOTOBJ) \
 
 LIBS = \
@@ -102,6 +103,8 @@ uiguide$(DOTOBJ): uiguide.cpp
 	$(CXX) -c $(CXXFLAGS) -o uiguide$(DOTOBJ) uiguide.cpp
 uistate$(DOTOBJ): uistate.cpp
 	$(CXX) -c $(CXXFLAGS) -o uistate$(DOTOBJ) uistate.cpp
+input_context$(DOTOBJ): input_context.cpp
+	$(CXX) -c $(CXXFLAGS) -o input_context$(DOTOBJ) input_context.cpp
 
 setup$(DOTOBJ): setup.cpp
 	$(CXX) -c $(CXXFLAGS) -o setup$(DOTOBJ) setup.cpp

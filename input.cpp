@@ -10,7 +10,7 @@ extern "C" {
 
 BOOL PASCAL DicKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                               LPBYTE lpbKeyState) {
-  LPINPUTCONTEXT lpIMC;
+  InputContext *lpIMC;
 
   switch (wParam) {
     case VK_ESCAPE:
@@ -59,14 +59,15 @@ BOOL PASCAL DicKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
       break;
 
     case VK_RETURN:
-      lpIMC = ImmLockIMC(hIMC);
+      lpIMC = (InputContext *)ImmLockIMC(hIMC);
+      if (lpIMC) {
+        if (!(lpIMC->fdwConversion & IME_CMODE_CHARCODE))
+          MakeResultString(hIMC, TRUE);
+        else
+          FlushText(hIMC);
 
-      if (!(lpIMC->fdwConversion & IME_CMODE_CHARCODE))
-        MakeResultString(hIMC, TRUE);
-      else
-        FlushText(hIMC);
-
-      ImmUnlockIMC(hIMC);
+        ImmUnlockIMC(hIMC);
+      }
       break;
 
     case VK_G:

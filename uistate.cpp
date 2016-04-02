@@ -115,7 +115,6 @@ int PASCAL BTXFromCmode(DWORD dwCmode) {
 void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
                         DWORD dwPushedStatus) {
   HIMC hIMC;
-  LPINPUTCONTEXT lpIMC;
   HDC hMemDC;
   HBITMAP hbmpOld;
   int x;
@@ -130,7 +129,7 @@ void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
     int nCyCap = GetSystemMetrics(SM_CYSMCAPTION);
     RECT rc;
 
-    lpIMC = ImmLockIMC(hIMC);
+    InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
     hMemDC = CreateCompatibleDC(hDC);
 
     // Paint Caption.

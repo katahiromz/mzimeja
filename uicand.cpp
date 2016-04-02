@@ -62,7 +62,7 @@ BOOL PASCAL GetCandPosFromCompWnd(LPUIEXTRA lpUIExtra, LPPOINT lppt) {
   return FALSE;
 }
 
-BOOL PASCAL GetCandPosFromCompForm(LPINPUTCONTEXT lpIMC, LPUIEXTRA lpUIExtra,
+BOOL PASCAL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                                    LPPOINT lppt) {
   if (lpUIExtra->dwCompStyle) {
     if (lpIMC && lpIMC->fdwInit & INIT_COMPFORM) {
@@ -87,7 +87,7 @@ BOOL PASCAL GetCandPosFromCompForm(LPINPUTCONTEXT lpIMC, LPUIEXTRA lpUIExtra,
 }
 
 void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
-                             LPINPUTCONTEXT lpIMC) {
+                             InputContext *lpIMC) {
   POINT pt;
 
   if (GetCandPosFromCompWnd(lpUIExtra, &pt)) {
@@ -112,7 +112,6 @@ void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
 void PASCAL PaintCandWindow(HWND hCandWnd) {
   PAINTSTRUCT ps;
   HIMC hIMC;
-  LPINPUTCONTEXT lpIMC;
   LPCANDIDATEINFO lpCandInfo;
   LPCANDIDATELIST lpCandList;
   HBRUSH hbr;
@@ -134,9 +133,9 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
 
   hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
-    lpIMC = ImmLockIMC(hIMC);
+    InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
     hOldFont = CheckNativeCharset(hDC);
-    lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+    lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
       height = GetSystemMetrics(SM_CYEDGE);
       lpCandList =
@@ -160,7 +159,7 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
                 lstrlen(lpstr));
         height += sz.cy;
       }
-      ImmUnlockIMCC(lpIMC->hCandInfo);
+      lpIMC->UnlockCandInfo();
     }
     if (hOldFont) {
       DeleteObject(SelectObject(hDC, hOldFont));
@@ -172,7 +171,7 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
   DeleteObject(hbrHightLight);
 }
 
-void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
+void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   LPCANDIDATEINFO lpCandInfo;
   LPCANDIDATELIST lpCandList;
   HDC hDC;
@@ -189,7 +188,7 @@ void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
     hDC = GetDC(lpUIExtra->uiCand.hWnd);
     hOldFont = CheckNativeCharset(hDC);
 
-    lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+    lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
       width = 0;
       height = 0;
@@ -202,7 +201,7 @@ void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
         if (width < sz.cx) width = sz.cx;
         height += sz.cy;
       }
-      ImmUnlockIMCC(lpIMC->hCandInfo);
+      lpIMC->UnlockCandInfo();
     }
     if (hOldFont) {
       DeleteObject(SelectObject(hDC, hOldFont));
@@ -229,7 +228,7 @@ void PASCAL HideCandWindow(LPUIEXTRA lpUIExtra) {
   }
 }
 
-void PASCAL MoveCandWindow(HWND hUIWnd, LPINPUTCONTEXT lpIMC,
+void PASCAL MoveCandWindow(HWND hUIWnd, InputContext *lpIMC,
                            LPUIEXTRA lpUIExtra, BOOL fForceComp) {
   RECT rc;
   POINT pt;
@@ -262,7 +261,7 @@ void PASCAL MoveCandWindow(HWND hUIWnd, LPINPUTCONTEXT lpIMC,
     return;
   }
 
-  if (!IsCandidate(lpIMC)) return;
+  if (!lpIMC->IsCandidate()) return;
 
   if (lpIMC->cfCandForm[0].dwStyle == CFS_EXCLUDE) {
     RECT rcWork;

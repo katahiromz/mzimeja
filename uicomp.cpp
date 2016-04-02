@@ -43,7 +43,7 @@ LRESULT CALLBACK CompStrWndProc(HWND hWnd, UINT message, WPARAM wParam,
 }
 
 void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
-                             LPINPUTCONTEXT lpIMC) {
+                             InputContext *lpIMC) {
   int i;
   RECT rc;
 
@@ -129,7 +129,7 @@ int PASCAL NumCharInDY(HDC hDC, LPTSTR lp, int dy) {
 }
 
 // Calc the position of composition windows and move them
-void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
+void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   HDC hDC;
   HFONT hFont = NULL;
   HFONT hOldFont = NULL;
@@ -157,13 +157,13 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
     int cury;
 
     // Lock the COMPOSITIONSTRING structure.
-    if (!(lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr)))
+    if (!(lpCompStr = lpIMC->LockCompStr()))
       return;
 
     // If there is no composition string, don't display anything.
     if ((lpCompStr->dwSize <= sizeof(COMPOSITIONSTRING)) ||
         (lpCompStr->dwCompStrLen == 0)) {
-      ImmUnlockIMCC(lpIMC->hCompStr);
+      lpIMC->UnlockCompStr();
       return;
     }
 
@@ -178,8 +178,8 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
     ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.right);
 
     // Check the start position.
-    if (!PtInRect((LPRECT)&rcSrc, ptSrc)) {
-      ImmUnlockIMCC(lpIMC->hCompStr);
+    if (!PtInRect(&rcSrc, ptSrc)) {
+      lpIMC->UnlockCompStr();
       return;
     }
 
@@ -307,7 +307,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
       }
     }
 
-    ImmUnlockIMCC(lpIMC->hCompStr);
+    lpIMC->UnlockCompStr();
   } else {
     // When the style is DEFAULT, show the default composition window.
     if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
@@ -320,7 +320,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
 
       hDC = GetDC(lpUIExtra->uiDefComp.hWnd);
 
-      lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+      lpCompStr = lpIMC->LockCompStr();
       if (lpCompStr) {
         if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
             (lpCompStr->dwCompStrLen > 0)) {
@@ -329,7 +329,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
           width = sz.cx;
           height = sz.cy;
         }
-        ImmUnlockIMCC(lpIMC->hCompStr);
+        lpIMC->UnlockCompStr();
       }
 
       ReleaseDC(lpUIExtra->uiDefComp.hWnd, hDC);
@@ -416,28 +416,24 @@ void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
 }
 
 void PASCAL PaintCompWindow(HWND hCompWnd) {
-  PAINTSTRUCT ps;
   HIMC hIMC;
-  LPINPUTCONTEXT lpIMC;
-  LPCOMPOSITIONSTRING lpCompStr;
   HDC hDC;
   RECT rc;
-  HFONT hFont = NULL;
   HFONT hOldFont = NULL;
-  HWND hSvrWnd;
 
+  PAINTSTRUCT ps;
   hDC = BeginPaint(hCompWnd, &ps);
 
-  hFont = (HFONT)GetWindowLongPtr(hCompWnd, FIGWL_FONT);
+  HFONT hFont = (HFONT)GetWindowLongPtr(hCompWnd, FIGWL_FONT);
   if (hFont)
     hOldFont = (HFONT)SelectObject(hDC, hFont);
 
-  hSvrWnd = (HWND)GetWindowLongPtr(hCompWnd, FIGWL_SVRWND);
+  HWND hSvrWnd = (HWND)GetWindowLongPtr(hCompWnd, FIGWL_SVRWND);
 
   hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
-    lpIMC = ImmLockIMC(hIMC);
-    lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+    InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+    LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
     if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen > 0)) {
@@ -475,7 +471,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
         }
       }
     end_pcw:
-      ImmUnlockIMCC(lpIMC->hCompStr);
+      lpIMC->UnlockCompStr();
     }
     ImmUnlockIMC(hIMC);
   }

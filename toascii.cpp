@@ -47,14 +47,10 @@ extern "C" {
 //    ImmToAsciiEx
 UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
                          LPTRANSMSGLIST lpTransBuf, UINT fuState, HIMC hIMC) {
-  LPARAM lParam;
-  LPINPUTCONTEXT lpIMC;
-  BOOL fOpen;
-
   DebugPrint(TEXT("ImeToAsciiEx"));
 
   lpCurTransKey = lpTransBuf;
-  lParam = ((DWORD)uScanCode << 16) + 1L;
+  LPARAM lParam = ((DWORD)uScanCode << 16) + 1L;
 
   // Init uNumTransKey here.
   uNumTransKey = 0;
@@ -62,24 +58,20 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
   // if hIMC is NULL, this means DISABLE IME.
   if (!hIMC) return 0;
 
-  if (!(lpIMC = ImmLockIMC(hIMC))) return 0;
-
-  fOpen = lpIMC->fOpen;
-
+  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+  if (NULL == lpIMC) return 0;
+  BOOL fOpen = lpIMC->fOpen;
   ImmUnlockIMC(hIMC);
 
-  // The current status of IME is "closed".
-  if (!fOpen) goto itae_exit;
+  if (fOpen) {
+    if (uScanCode & 0x8000)
+      IMEKeyupHandler(hIMC, uVKey, lParam, lpbKeyState);
+    else
+      IMEKeydownHandler(hIMC, uVKey, lParam, lpbKeyState);
 
-  if (uScanCode & 0x8000)
-    IMEKeyupHandler(hIMC, uVKey, lParam, lpbKeyState);
-  else
-    IMEKeydownHandler(hIMC, uVKey, lParam, lpbKeyState);
-
-  // Clear static value, no more generated message!
-  lpCurTransKey = NULL;
-
-itae_exit:
+    // Clear static value, no more generated message!
+    lpCurTransKey = NULL;
+  }
 
   // If trans key buffer that is allocated by USER.EXE full up,
   // the return value is the negative number.

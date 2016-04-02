@@ -324,14 +324,13 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 
   if (lKeyData & 0x80000000) return FALSE;
 
-  LPINPUTCONTEXT lpIMC = ImmLockIMC(hIMC);
+  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
   if (lpIMC == NULL) return FALSE;
 
   BOOL fOpen = lpIMC->fOpen;
   BOOL fCompStr = FALSE;
   if (fOpen) {
-    LPCOMPOSITIONSTRING lpCompStr;
-    lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+    LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
     if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen))
@@ -357,7 +356,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
         fRet = (BOOL)bNoComp[vKey];
     }
 
-    if (lpCompStr) ImmUnlockIMCC(lpIMC->hCompStr);
+    if (lpCompStr) lpIMC->UnlockCompStr();
   }
 
   ImmUnlockIMC(hIMC);
@@ -450,13 +449,12 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 //  See Also
 //    ImmNotifyIME
 BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
-  LPINPUTCONTEXT lpIMC;
+  InputContext *lpIMC;
   BOOL bRet = FALSE;
   LPCOMPOSITIONSTRING lpCompStr;
   LPCANDIDATEINFO lpCandInfo;
   LPCANDIDATELIST lpCandList;
   TCHAR szBuf[256];
-  int nBufLen;
   LPTSTR lpstr;
   TRANSMSG GnMsg;
   int i = 0;
@@ -469,7 +467,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("NI_CONTEXTUPDATED"));
       switch (dwValue) {
         case IMC_SETOPENSTATUS:
-          lpIMC = ImmLockIMC(hIMC);
+          lpIMC = (InputContext *)ImmLockIMC(hIMC);
           if (lpIMC) {
             if (!lpIMC->fOpen && IsCompStr(hIMC)) FlushText(hIMC);
             ImmUnlockIMC(hIMC);
@@ -520,19 +518,18 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     case NI_OPENCANDIDATE:
       DebugPrint(TEXT("NI_OPENCANDIDATE"));
       if (IsConvertedCompStr(hIMC)) {
-        if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
-
-        if (!(lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr))) {
+        if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
+        if (!(lpCompStr = lpIMC->LockCompStr())) {
           ImmUnlockIMC(hIMC);
           return FALSE;
         }
 
-        lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+        lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
           //
           // Get the candidate strings from dic file.
           //
-          nBufLen = GetCandidateStringsFromDictionary(
+          GetCandidateStringsFromDictionary(
               GETLPCOMPREADSTR(lpCompStr), szBuf, 256, szDicFileName);
 
           //
@@ -586,7 +583,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           GnMsg.lParam = 1L;
           GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
-          ImmUnlockIMCC(lpIMC->hCandInfo);
+          lpIMC->UnlockCandInfo();
           ImmUnlockIMC(hIMC);
 
           bRet = TRUE;
@@ -596,8 +593,8 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
     case NI_CLOSECANDIDATE:
       DebugPrint(TEXT("NI_CLOSECANDIDATE"));
-      if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
-      if (IsCandidate(lpIMC)) {
+      if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
+      if (lpIMC->IsCandidate()) {
         GnMsg.message = WM_IME_NOTIFY;
         GnMsg.wParam = IMN_CLOSECANDIDATE;
         GnMsg.lParam = 1L;
@@ -609,10 +606,10 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
     case NI_SELECTCANDIDATESTR:
       DebugPrint(TEXT("NI_SELECTCANDIDATESTR"));
-      if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
+      if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
 
-      if (dwIndex == 1 && IsCandidate(lpIMC)) {
-        lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+      if (dwIndex == 1 && lpIMC->IsCandidate()) {
+        lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
           lpCandList =
               (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
@@ -620,15 +617,13 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             lpCandList->dwSelection = dwValue;
             bRet = TRUE;
 
-            //
             // Generate messages.
-            //
             GnMsg.message = WM_IME_NOTIFY;
             GnMsg.wParam = IMN_CHANGECANDIDATE;
             GnMsg.lParam = 1L;
             GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
           }
-          ImmUnlockIMCC(lpIMC->hCandInfo);
+          lpIMC->UnlockCandInfo();
         }
       }
       ImmUnlockIMC(hIMC);
@@ -636,18 +631,18 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
     case NI_CHANGECANDIDATELIST:
       DebugPrint(TEXT("NI_CHANGECANDIDATELIST"));
-      if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
-      if (dwIndex == 1 && IsCandidate(lpIMC)) bRet = TRUE;
+      if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
+      if (dwIndex == 1 && lpIMC->IsCandidate()) bRet = TRUE;
       ImmUnlockIMC(hIMC);
       break;
 
     case NI_SETCANDIDATE_PAGESIZE:
       DebugPrint(TEXT("NI_SETCANDIDATE_PAGESIZE"));
-      if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
-      if (dwIndex == 1 && IsCandidate(lpIMC)) {
+      if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
+      if (dwIndex == 1 && lpIMC->IsCandidate()) {
         if (dwValue > MAXCANDPAGESIZE) return FALSE;
 
-        lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+        lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
           lpCandList =
               (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
@@ -663,7 +658,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             GnMsg.lParam = 1L;
             GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
           }
-          ImmUnlockIMCC(lpIMC->hCandInfo);
+          lpIMC->UnlockCandInfo();
         }
       }
       ImmUnlockIMC(hIMC);
@@ -671,11 +666,11 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
     case NI_SETCANDIDATE_PAGESTART:
       DebugPrint(TEXT("NI_SETCANDIDATE_PAGESTART"));
-      if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
-      if (dwIndex == 1 && IsCandidate(lpIMC)) {
+      if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
+      if (dwIndex == 1 && lpIMC->IsCandidate()) {
         if (dwValue > MAXCANDPAGESIZE) return FALSE;
 
-        lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+        lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
           lpCandList =
               (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
@@ -691,7 +686,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             GnMsg.lParam = 1L;
             GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
           }
-          ImmUnlockIMCC(lpIMC->hCandInfo);
+          lpIMC->UnlockCandInfo();
         }
       }
       ImmUnlockIMC(hIMC);
@@ -733,7 +728,7 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
   if (fSelect) UpdateIndicIcon(hIMC);
 
   if (NULL == hIMC) return TRUE;
-  LPINPUTCONTEXT lpIMC = ImmLockIMC(hIMC);
+  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
   if (lpIMC) {
     if (fSelect) {
       if (!(lpIMC->fdwInit & INIT_LOGFONT)) {
@@ -749,19 +744,18 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
 
       lpIMC->hCompStr = ImmReSizeIMCC(lpIMC->hCompStr, sizeof(MZCOMPSTR));
 
-      LPCOMPOSITIONSTRING lpCompStr;
-      lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
+      LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
       if (lpCompStr) {
         lpCompStr->dwSize = sizeof(MZCOMPSTR);
-        ImmUnlockIMCC(lpIMC->hCompStr);
+        lpIMC->UnlockCompStr();
       }
       lpIMC->hCandInfo = ImmReSizeIMCC(lpIMC->hCandInfo, sizeof(MZCAND));
 
       LPCANDIDATEINFO lpCandInfo;
-      lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
+      lpCandInfo = lpIMC->LockCandInfo();
       if (lpCandInfo) {
         lpCandInfo->dwSize = sizeof(MZCAND);
-        ImmUnlockIMCC(lpIMC->hCandInfo);
+        lpIMC->UnlockCandInfo();
       }
     }
     ImmUnlockIMC(hIMC);

@@ -19,6 +19,7 @@
 
 #include "indicml.h"
 #include "immdev.h"
+#include "input_context.h"
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -284,7 +285,6 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode);
 void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode);
 BOOL PASCAL IsCompStr(HIMC hIMC);
 BOOL PASCAL IsConvertedCompStr(HIMC hIMC);
-BOOL PASCAL IsCandidate(LPINPUTCONTEXT lpIMC);
 void PASCAL UpdateIndicIcon(HIMC hIMC);
 HFONT CheckNativeCharset(HDC hDC);
 
@@ -325,21 +325,21 @@ void PASCAL UpdateStatusWindow(LPUIEXTRA lpUIExtra);
 // uicand.c
 LRESULT CALLBACK CandWndProc(HWND, UINT, WPARAM, LPARAM);
 void PASCAL PaintCandWindow(HWND hCandWnd);
-BOOL PASCAL GetCandPosFromComp(LPINPUTCONTEXT lpIMC, LPUIEXTRA lpUIExtra,
+BOOL PASCAL GetCandPosFromComp(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                                LPPOINT lppt);
 void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
-                             LPINPUTCONTEXT lpIMC);
-void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC);
+                             InputContext *lpIMC);
+void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void PASCAL HideCandWindow(LPUIEXTRA lpUIExtra);
-void PASCAL MoveCandWindow(HWND hUIWnd, LPINPUTCONTEXT lpIMC,
+void PASCAL MoveCandWindow(HWND hUIWnd, InputContext *lpIMC,
                            LPUIEXTRA lpUIExtra, BOOL fForceComp);
 
 // uicomp.c
 LRESULT CALLBACK CompStrWndProc(HWND, UINT, WPARAM, LPARAM);
 void PASCAL PaintCompWindow(HWND hCompWnd);
 void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
-                             LPINPUTCONTEXT lpIMC);
-void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC);
+                             InputContext *lpIMC);
+void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra);
 void PASCAL SetFontCompWindow(LPUIEXTRA lpUIExtra);
 
@@ -371,7 +371,7 @@ void PASCAL AddChar(HIMC, WORD);
 BOOL PASCAL ConvKanji(HIMC);
 BOOL WINAPI MakeResultString(HIMC, BOOL);
 BOOL PASCAL MakeGuideLine(HIMC, DWORD);
-BOOL PASCAL GenerateMessage(HIMC, LPINPUTCONTEXT, LPTRANSMSGLIST, LPTRANSMSG);
+BOOL PASCAL GenerateMessage(HIMC, InputContext *, LPTRANSMSGLIST, LPTRANSMSG);
 BOOL PASCAL CheckAttr(LPCOMPOSITIONSTRING lpCompStr);
 void PASCAL MakeAttrClause(LPCOMPOSITIONSTRING lpCompStr);
 void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow);
