@@ -21,19 +21,11 @@ LPTRANSMSGLIST lpCurTransKey = NULL;
 UINT uNumTransKey;
 BOOL fOverTransKey = FALSE;
 
-#ifdef UNICODE
 TCHAR szUIClassName[] = TEXT("MZIMEUUI");
 TCHAR szCompStrClassName[] = TEXT("MZIMEUCompStr");
 TCHAR szCandClassName[] = TEXT("MZIMEUCand");
 TCHAR szStatusClassName[] = TEXT("MZIMEUStatus");
 TCHAR szGuideClassName[] = TEXT("MZIMEUGuide");
-#else
-char szUIClassName[] = "MZIMEUI";
-char szCompStrClassName[] = "MZIMECompStr";
-char szCandClassName[] = "MZIMECand";
-char szStatusClassName[] = "MZIMEStatus";
-char szGuideClassName[] = "MZIMEGuide";
-#endif
 
 MYGUIDELINE glTable[] = {
     {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},

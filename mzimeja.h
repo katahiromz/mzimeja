@@ -40,7 +40,6 @@ typedef LPTSTR LPMYSTR;
 typedef TCHAR MYCHAR;
 #define MYTEXT(x) TEXT(x)
 #define Mylstrlen(x) lstrlen(x)
-#ifdef UNICODE
 #define Mylstrcpy(x, y) MylstrcpyW((x), (y))
 #define Mylstrcmp(x, y) MylstrcmpW((x), (y))
 #define MyCharPrev(x, y) MyCharPrevW((x), (y))
@@ -49,15 +48,6 @@ typedef TCHAR MYCHAR;
 #include <string.h>
 #define Mystrtok wcstok
 #define Mystrchr wcschr
-#else
-#define Mylstrcpy(x, y) lstrcpy((x), (y))
-#define Mylstrcmp(x, y) lstrcmp((x), (y))
-#define MyCharPrev(x, y) AnsiPrev((x), (y))
-#define MyCharNext(x) AnsiNext(x)
-#include <mbstring.h>
-#define Mystrtok _mbstrtok
-#define Mystrchr _mbschr
-#endif
 #define Mylstrcpyn lstrcpyn
 #define MyTextOut TextOut
 #define MyGetTextExtentPoint GetTextExtentPoint
@@ -337,13 +327,11 @@ BOOL PASCAL IsConvertedCompStr(HIMC hIMC);
 BOOL PASCAL IsCandidate(LPINPUTCONTEXT lpIMC);
 void PASCAL UpdateIndicIcon(HIMC hIMC);
 void PASCAL lmemset(LPBYTE, BYTE, UINT);
-#if defined(UNICODE)
 int PASCAL MylstrcmpW(LPCWSTR lp0, LPCWSTR lp1);
 int PASCAL MylstrcpyW(LPWSTR lp0, LPCWSTR lp1);
 LPWSTR PASCAL MyCharPrevW(LPCWSTR lpStart, LPCWSTR lpCur);
 LPWSTR PASCAL MyCharNextW(LPCWSTR lp);
 LPWSTR PASCAL MylstrcpynW(LPWSTR lp0, LPCWSTR lp1, int nCount);
-#endif
 HFONT CheckNativeCharset(HDC hDC);
 
 /*   toascii.c   */
@@ -435,12 +423,8 @@ void PASCAL MakeAttrClause(LPCOMPOSITIONSTRING lpCompStr);
 void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow);
 
 /* DIC2.C        */
-#if defined(UNICODE)
 BOOL OneCharZenToHan(WCHAR, WCHAR *, WCHAR *);
 WORD PASCAL HanToZen(WORD, WORD, DWORD);
-#else
-WORD PASCAL HanToZen(WORD, DWORD);
-#endif
 WORD PASCAL ZenToHan(WORD);
 int PASCAL IsFirst(WORD);
 int PASCAL IsSecond(WORD);

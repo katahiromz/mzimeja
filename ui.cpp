@@ -480,11 +480,7 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
       break;
 
     case IMN_SETCOMPOSITIONFONT:
-#if defined(UNICODE)
       lf = lpIMC->lfFont.W;
-#else
-      lf = lpIMC->lfFont.A;
-#endif
       if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont);
 
       if (lf.lfEscapement == 2700)

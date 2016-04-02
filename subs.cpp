@@ -231,12 +231,8 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
 
   //fdwConversion = lpIMC->fdwConversion;
 
-#if defined(UNICODE)
   if (!(hDst =
             GlobalAlloc(GHND, (lpCompStr->dwCompStrLen + 1) * sizeof(WCHAR))))
-#else
-  if (!(hDst = GlobalAlloc(GHND, lpCompStr->dwCompStrLen * 2)))
-#endif
     goto ccs_exit30;
 
   if (!(lpDst = (LPMYSTR)GlobalLock(hDst))) goto ccs_exit20;
@@ -250,23 +246,8 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
       lpSrc0 = lpSrc;
       lpDst0 = lpDst;
       while (*lpSrc) {
-#if defined(UNICODE)
         *lpDst++ = HiraToKata(*lpSrc);
         lpSrc++;
-#else
-        if (IsDBCSLeadByte(*lpSrc))
-          wCode = (((WORD)*lpSrc << 8) + (WORD)(unsigned char)*(lpSrc + 1));
-        else
-          wCode = (WORD)(unsigned char)*lpSrc & 0xFF;
-
-        wCode = HiraToKata(wCode);
-
-        if (IsDBCSLeadByte((BYTE)(wCode >> 8))) *lpDst++ = (BYTE)(wCode >> 8);
-
-        *lpDst++ = (BYTE)(wCode & 0xFF);
-
-        lpSrc = AnsiNext(lpSrc);
-#endif
       }
       Mylstrcpy(lpSrc0, lpDst0);
       lpCompStr->dwCompStrLen = Mylstrlen(lpSrc0);
@@ -278,23 +259,8 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
       lpSrc0 = lpSrc;
       lpDst0 = lpDst;
       while (*lpSrc) {
-#if defined(UNICODE)
         *lpDst++ = KataToHira(*lpSrc);
         lpSrc++;
-#else
-
-        if (IsDBCSLeadByte(*lpSrc))
-          wCode = ((WORD)(*lpSrc << 8) + (WORD)(unsigned char)*(lpSrc + 1));
-        else
-          wCode = (WORD)(unsigned char)*lpSrc & 0xFF;
-
-        wCode = KataToHira(wCode);
-        if (IsDBCSLeadByte((BYTE)(wCode >> 8))) *lpDst++ = (BYTE)(wCode >> 8);
-
-        *lpDst++ = (BYTE)(wCode & 0xFF);
-
-        lpSrc = AnsiNext(lpSrc);
-#endif
       }
       Mylstrcpy(lpSrc0, lpDst0);
       lpCompStr->dwCompStrLen = Mylstrlen(lpSrc0);
@@ -481,7 +447,6 @@ void PASCAL lmemset(LPBYTE lp, BYTE b, UINT cnt) {
   for (i = 0; i < cnt; i++) *lp++ = bt;
 }
 
-#if defined(UNICODE)
 /*****************************************************************************
 *                                                                            *
 * MylstrcmpW( )                                                              *
@@ -543,7 +508,6 @@ LPWSTR PASCAL MylstrcpynW(LPWSTR lp0, LPCWSTR lp1, int nCount) {
   *lp0 = L'\0';
   return (LPWSTR)lp0;
 }
-#endif
 
 HFONT CheckNativeCharset(HDC hDC) {
   //BOOL bDiffCharSet = FALSE;

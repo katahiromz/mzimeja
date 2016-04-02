@@ -14,10 +14,8 @@ Module Name:
 
 extern "C" {
 
-#if defined(UNICODE)
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
                                       DWORD dwBufLen, LPTSTR szDicFileName);
-#endif
 
 BOOL GetAnsiPathName(LPCWSTR lpszUniPath, LPSTR lpszAnsiPath, UINT nMaxLen) {
   if (WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lpszUniPath, -1,
@@ -197,13 +195,8 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   //
   szBuf[256] = 0;  // Double NULL-terminate
   szBuf[257] = 0;  // Double NULL-terminate
-#if defined(UNICODE)
   nBufLen = GetCandidateStringsFromDictionary(lpT2, szBuf, 256,
                                               (LPTSTR)szDicFileName);
-#else
-  nBufLen = GetPrivateProfileString(lpT2, NULL, (LPSTR) "", (LPSTR)szBuf, 256,
-                                    (LPSTR)szDicFileName);
-#endif
   //
   // Check the result of dic. Because my candidate list has only MAXCANDSTRNUM
   // candidate strings.
@@ -381,13 +374,7 @@ cvk_exit10:
 /*                                                                    */
 /**********************************************************************/
 BOOL PASCAL IsEat(WORD code) {
-#if defined(UNICODE)
   return TRUE;
-#else
-  return ((code >= 0x20 && 0x7f >= code) || (code >= 0x0a1 && 0x0df >= code)
-              ? TRUE
-              : FALSE);
-#endif
 }
 
 /**********************************************************************/
@@ -420,11 +407,7 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
     if (dwCurPos == 0) goto dc_exit;
 
     lpptr = MyCharPrev(lpstr, lpstr + dwCurPos);
-#if defined(UNICODE)
     nChar = 1;
-#else
-    nChar = IsDBCSLeadByte(*lpptr) ? 2 : 1;
-#endif
     if (lpstr == lpptr && Mylstrlen(lpstr) == nChar) {
       dwCurPos = 0;
       *lpstr = MYTEXT('\0');
@@ -437,11 +420,7 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
   } else if (uVKey == VK_DELETE) {
     if (dwCurPos == (DWORD)Mylstrlen(lpstr)) goto dc_exit;
 
-#if defined(UNICODE)
     nChar = 1;
-#else
-    nChar = IsDBCSLeadByte(*(lpstr + dwCurPos)) ? 2 : 1;
-#endif
     Mylstrcpy(lpstr + dwCurPos, lpstr + dwCurPos + nChar);
 
     fDone = TRUE;
@@ -531,9 +510,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   DWORD dwSize;
   TRANSMSG GnMsg;
   DWORD dwGCR = 0L;
-#if defined(UNICODE)
   WCHAR Katakana, Sound;
-#endif
 
   lpIMC = ImmLockIMC(hIMC);
 
@@ -586,7 +563,6 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
       lpCompStr->dwCursorPos++;
     } else if (fdwConversion & IME_CMODE_FULLSHAPE) {
       if (fdwConversion & IME_CMODE_ROMAN && fdwConversion & IME_CMODE_NATIVE) {
-#if defined(UNICODE)
         if (*lpprev) {
           code2 = *lpprev;
         } else {
@@ -632,91 +608,29 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
           *lpprev = code2;
         } else
           goto DBCS_BETA;
-#else
-        if (IsDBCSLeadByte(*lpprev))
-          code2 = MAKEWORD(*(lpprev + 1), *lpprev);
-        else {
-          if (IsSecond(code)) code = ConvChar(hIMC, 0, code);
-          goto DBCS_BETA;
-        }
-
-        if (!(code2 = ZenToHan(code2))) {
-          if (IsSecond(code)) code = ConvChar(hIMC, 0, code);
-          goto DBCS_BETA;
-        }
-
-        if (IsSecond(code)) {
-          if (IsFirst(code2) && (code3 = ConvChar(hIMC, code2, code))) {
-            code2 = HanToZen(code3, fdwConversion);
-            *lpprev++ = HIBYTE(code2);
-            *lpprev = LOBYTE(code2);
-          } else {
-            code = ConvChar(hIMC, 0, code);
-            goto DBCS_BETA;
-          }
-        } else if ((WORD)(LONG_PTR)AnsiUpper((LPSTR)(LONG_PTR)code) == 'N' &&
-                   (WORD)(LONG_PTR)AnsiUpper((LPSTR)(LONG_PTR)code2) == 'N') {
-          code3 = 0xdd;
-          code2 = HanToZen(code3, fdwConversion);
-          *lpprev++ = HIBYTE(code2);
-          *lpprev = LOBYTE(code2);
-        } else {
-          // if (!IsFirst( code ))
-          //    MakeGuideLine(hIMC,MYGL_TYPINGERROR);
-          goto DBCS_BETA;
-        }
-#endif
       } else {
       DBCS_BETA:
         if (code == MYTEXT('^')) {
-#if defined(UNICODE)
           code2 = *lpprev;
-#else
-          code2 = MAKEWORD(*(lpprev + 1), *lpprev);
-#endif
           if (IsTenten(code2) == FALSE) goto DBCS_BETA2;
           code2 = ConvTenten(code2);
-#if defined(UNICODE)
           *lpprev++ = code2;
-#else
-          if (HIBYTE(code2)) *lpprev++ = HIBYTE(code2);
-          *lpprev++ = LOBYTE(code2);
-#endif
         } else if (code == MYTEXT('_')) {
-#if defined(UNICODE)
           code2 = *lpprev;
-#else
-          code2 = MAKEWORD(*(lpprev + 1), *lpprev);
-#endif
           if (IsMaru(code2) == FALSE) goto DBCS_BETA2;
           code2 = ConvMaru(code2);
-#if defined(UNICODE)
           *lpprev = code2;
-#else
-          if (HIBYTE(code2)) *lpprev++ = HIBYTE(code2);
-          *lpprev = LOBYTE(code2);
-#endif
         } else {
-#if defined(UNICODE)
           code = HanToZen(code, 0, fdwConversion);
-#endif
         DBCS_BETA2:
-#if defined(UNICODE)
           *lpstr++ = code;
           lpCompStr->dwCursorPos += 1;
-#else
-          code2 = HanToZen(code, fdwConversion);
-          if (HIBYTE(code2)) *lpstr++ = HIBYTE(code2);
-          *lpstr++ = LOBYTE(code2);
-          lpCompStr->dwCursorPos += 2;
-#endif
         }
       }
     } else {
       if (fdwConversion & IME_CMODE_ROMAN && fdwConversion & IME_CMODE_NATIVE) {
         if (IsSecond(code)) {
           if (IsFirst(*lpprev) && (code2 = ConvChar(hIMC, *lpprev, code))) {
-#if defined(UNICODE)
             if (OneCharZenToHan(code2, &Katakana, &Sound)) {
               *lpprev = Katakana;
               if (Sound) {
@@ -727,41 +641,23 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
               code = ConvChar(hIMC, 0, code);
               goto SBCS_BETA;
             }
-#else
-            /* half size ' ' matching code */
-            if (HIBYTE(code2)) {
-              *lpprev = HIBYTE(code2);
-              *lpstr++ = LOBYTE(code2);
-              lpCompStr->dwCursorPos++;
-            } else
-              *lpprev = (BYTE)code2;
-#endif
           } else {
             code = ConvChar(hIMC, 0, code);
             // MakeGuideLine(hIMC,MYGL_TYPINGERROR);
             goto SBCS_BETA;
           }
         } else {
-#if defined(UNICODE)
           if ((WORD)(LONG_PTR)CharUpperW((LPMYSTR)(LONG_PTR)code) == 'N' &&
               (WORD)(LONG_PTR)CharUpperW(
                   (LPMYSTR)(LONG_PTR)(code2 = *lpprev)) == 'N') {
             *lpprev = (MYCHAR)0xFF9D;
-          }
-#else
-          if ((WORD)(LONG_PTR)AnsiUpper((LPSTR)(LONG_PTR)code) == 'N' &&
-              (WORD)(LONG_PTR)AnsiUpper((LPSTR)(LONG_PTR)(code2 = *lpprev)) ==
-                  'N')
-            *lpprev = (unsigned char)0xdd;
-#endif
-          else {
+          } else {
             // MakeGuideLine(hIMC,MYGL_TYPINGERROR);
             goto SBCS_BETA;
           }
         }
       } else {
       SBCS_BETA:
-#if defined(UNICODE)
         if (OneCharZenToHan(code, &Katakana, &Sound)) {
           *lpstr++ = Katakana;
           if (Sound) {
@@ -771,9 +667,6 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
         } else {
           *lpstr++ = code;
         }
-#else
-        *lpstr++ = (BYTE)code;
-#endif
         lpCompStr->dwCursorPos++;
       }
     }
@@ -783,7 +676,6 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   // make reading string.
   lpstr = GETLPCOMPSTR(lpCompStr);
   lpread = GETLPCOMPREADSTR(lpCompStr);
-#if defined(UNICODE)
   if (fdwConversion & IME_CMODE_KATAKANA) {
     if (fdwConversion & IME_CMODE_FULLSHAPE) {
       Mylstrcpy(lpread, lpstr);
@@ -800,10 +692,6 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
     }
     *pDst = (MYCHAR)0;
   }
-
-#else
-  lZenToHan(lpread, lpstr);
-#endif
 
   // make attribute
   lpCompStr->dwCursorPos = Mylstrlen(lpstr);
@@ -1174,8 +1062,6 @@ hsa_exit:
   ImmUnlockIMC(hIMC);
 }
 
-#if defined(UNICODE)
-
 int CopyCandidateStringsFromDictionary(LPMYSTR lpDic, LPMYSTR lpRead,
                                        LPMYSTR lpBuf, DWORD dwBufLen) {
   DWORD dwWritten = 0;
@@ -1253,7 +1139,5 @@ Err0:
   FreeSecurityAttributes(psa);
   return nSize;
 }
-
-#endif
 
 }  // extern "C"

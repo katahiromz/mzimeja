@@ -122,17 +122,8 @@ int PASCAL NumCharInDX(HDC hDC, LPMYSTR lp, int dx) {
   while ((width < dx) && *(lp + numT)) {
     num = numT;
 
-#if defined(UNICODE)
     numT++;
     GetTextExtentPointW(hDC, lp, numT, &sz);
-#else
-    if (IsDBCSLeadByte(*(lp + numT)))
-      numT += 2;
-    else
-      numT++;
-
-    GetTextExtentPoint(hDC, lp, numT, &sz);
-#endif
     width = sz.cx;
   }
 
@@ -157,18 +148,9 @@ int PASCAL NumCharInDY(HDC hDC, LPMYSTR lp, int dy) {
 
   while ((width < dy) && *(lp + numT)) {
     num = numT;
-#if defined(UNICODE)
     numT++;
 
     GetTextExtentPointW(hDC, lp, numT, &sz);
-#else
-    if (IsDBCSLeadByte(*(lp + numT)))
-      numT += 2;
-    else
-      numT++;
-
-    GetTextExtentPoint(hDC, lp, numT, &sz);
-#endif
     width = sz.cy;
   }
 
@@ -253,14 +235,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
     }
 
     lpt = lpstr = GETLPCOMPSTR(lpCompStr);
-#if defined(UNICODE)
     num = 1;
-#else
-    if (IsDBCSLeadByte(*lpt))
-      num = 2;
-    else
-      num = 1;
-#endif
 
     if (!lpUIExtra->bVertical) {
       dx = rcSrc.right - ptSrc.x;

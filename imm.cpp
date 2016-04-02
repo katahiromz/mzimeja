@@ -11,10 +11,8 @@ Module Name:
 
 extern "C" {
 
-#if defined(UNICODE)
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
                                       DWORD dwBufLen, LPTSTR szDicFileName);
-#endif
 
 //  ImeInquire ()
 //    For Windows 95, Windows 98, and Windows NT 3.51
@@ -67,10 +65,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
   // Init IMEINFO Structure.
   lpIMEInfo->dwPrivateDataSize = sizeof(UIEXTRA);
   lpIMEInfo->fdwProperty = IME_PROP_KBD_CHAR_FIRST |
-#if defined(UNICODE)
-                           IME_PROP_UNICODE |
-#endif
-                           IME_PROP_AT_CARET;
+                           IME_PROP_UNICODE | IME_PROP_AT_CARET;
   lpIMEInfo->fdwConversionCaps = IME_CMODE_LANGUAGE | IME_CMODE_FULLSHAPE |
                                  IME_CMODE_ROMAN | IME_CMODE_CHARCODE;
   lpIMEInfo->fdwSentenceCaps = 0L;
@@ -541,15 +536,9 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 //
 // Get the candidate strings from dic file.
 //
-#if defined(UNICODE)
           nBufLen = GetCandidateStringsFromDictionary(
               GETLPCOMPREADSTR(lpCompStr), (LPMYSTR)szBuf, 256,
               (LPTSTR)szDicFileName);
-#else
-          nBufLen = GetPrivateProfileString(GETLPCOMPREADSTR(lpCompStr), NULL,
-                                            (LPSTR) "", (LPSTR)szBuf, 256,
-                                            (LPSTR)szDicFileName);
-#endif
 
           //
           // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
