@@ -99,7 +99,7 @@ BOOL PASCAL GenerateMessageToTransKey(LPTRANSMSGLIST lpTransBuf,
                                       LPTRANSMSG lpGeneMsg) {
   LPTRANSMSG lpgmT0;
 
-  uNumTransKey++;
+  ++uNumTransKey;
   if (uNumTransKey >= lpTransBuf->uMsgCount) {
     fOverTransKey = TRUE;
     return FALSE;

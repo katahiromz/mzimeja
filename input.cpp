@@ -20,7 +20,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
 
     default:
       if (!DicKeydownHandler(hIMC, wVKey, lParam, lpbKeyState)) {
-// This WM_IMEKEYDOWN has actual character code in itself.
+        // This WM_IMEKEYDOWN has actual character code in itself.
         AddChar(hIMC, HIWORD(wParam));
         // CharHandler( hIMC,  (WORD)((BYTE)HIBYTE(wParam)), lParam );
       }

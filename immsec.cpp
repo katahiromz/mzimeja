@@ -18,9 +18,7 @@ PSID MyCreateSid(VOID) {
   BOOL fResult;
   SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_WORLD_SID_AUTHORITY;
 
-  //
   // allocate and initialize an SID
-  //
   fResult = AllocateAndInitializeSid(&SidAuthority, 1, SECURITY_WORLD_RID, 0, 0,
                                      0, 0, 0, 0, 0, &psid);
   if (!fResult) {
@@ -50,57 +48,39 @@ POSVERSIONINFO GetVersionInfo(VOID) {
   return &os;
 }
 
-//
 // CreateSecurityAttributes()
 //
 // The purpose of this function:
-//
 //      Allocate and set the security attributes that is
 //      appropriate for named objects created by an IME.
 //      The security attributes will give GENERIC_ALL
 //      access for everyone
 //
-//
 // Return value:
-//
 //      If the function succeeds, the return value is a
 //      pointer to SECURITY_ATTRIBUTES. If the function fails,
 //      the return value is NULL. To get extended error
 //      information, call GetLastError().
 //
 // Remarks:
-//
 //      FreeSecurityAttributes() should be called to free up the
 //      SECURITY_ATTRIBUTES allocated by this function.
-//
 PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
-  PSECURITY_ATTRIBUTES psa;
-  PSECURITY_DESCRIPTOR psd;
-  PACL pacl;
-  DWORD cbacl;
-
-  PSID psid;
-  BOOL fResult;
-
-  //INT i, j;
-
   if (!IsNT()) return NULL;
 
-  //
   // create a sid for everyone access
-  //
-  psid = MyCreateSid();
+  PSID psid = MyCreateSid();
   if (psid == NULL) {
     return NULL;
   }
 
-  //
   // allocate and initialize an access control list (ACL) that will
   // contain the SID we've just created.
-  //
+  DWORD cbacl;
   cbacl = sizeof(ACL) + (sizeof(ACCESS_ALLOWED_ACE) - sizeof(DWORD)) +
           GetLengthSid(psid);
 
+  PACL pacl;
   pacl = (PACL)MEMALLOC(cbacl);
   if (pacl == NULL) {
     ERROROUT(TEXT("CreateSecurityAttributes:LocalAlloc for ACL failed"));
@@ -108,7 +88,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
     return NULL;
   }
 
-  fResult = InitializeAcl(pacl, cbacl, ACL_REVISION);
+  BOOL fResult = InitializeAcl(pacl, cbacl, ACL_REVISION);
   if (!fResult) {
     ERROROUT(TEXT("CreateSecurityAttributes:InitializeAcl failed"));
     FreeSid(psid);
@@ -120,7 +100,6 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
   // adds an access-allowed ACE for interactive users to the ACL
   //
   fResult = AddAccessAllowedAce(pacl, ACL_REVISION, GENERIC_ALL, psid);
-
   if (!fResult) {
     ERROROUT(TEXT("CreateSecurityAttributes:AddAccessAllowedAce failed"));
     MEMFREE(pacl);
@@ -128,23 +107,18 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
     return NULL;
   }
 
-  //
   // Those SIDs have been copied into the ACL. We don't need'em any more.
-  //
   FreeSid(psid);
 
-  //
   // Let's make sure that our ACL is valid.
-  //
   if (!IsValidAcl(pacl)) {
     WARNOUT(TEXT("CreateSecurityAttributes:IsValidAcl returns FALSE!"));
     MEMFREE(pacl);
     return NULL;
   }
 
-  //
   // allocate security attribute
-  //
+  PSECURITY_ATTRIBUTES psa;
   psa = (PSECURITY_ATTRIBUTES)MEMALLOC(sizeof(SECURITY_ATTRIBUTES));
   if (psa == NULL) {
     ERROROUT(TEXT("CreateSecurityAttributes:LocalAlloc for psa failed"));
@@ -152,9 +126,8 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
     return NULL;
   }
 
-  //
   // allocate and initialize a new security descriptor
-  //
+  PSECURITY_DESCRIPTOR psd;
   psd = MEMALLOC(SECURITY_DESCRIPTOR_MIN_LENGTH);
   if (psd == NULL) {
     ERROROUT(TEXT("CreateSecurityAttributes:LocalAlloc for psd failed"));
@@ -172,12 +145,10 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
     return NULL;
   }
 
-  fResult = SetSecurityDescriptorDacl(psd, TRUE, pacl, FALSE);
-
   // The discretionary ACL is referenced by, not copied
   // into, the security descriptor. We shouldn't free up ACL
   // after the SetSecurityDescriptorDacl call.
-
+  fResult = SetSecurityDescriptorDacl(psd, TRUE, pacl, FALSE);
   if (!fResult) {
     ERROROUT(TEXT("CreateSecurityAttributes:SetSecurityDescriptorDacl failed"));
     MEMFREE(pacl);
@@ -194,32 +165,26 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
     return NULL;
   }
 
-  //
   // everything is done
-  //
   psa->nLength = sizeof(SECURITY_ATTRIBUTES);
-  psa->lpSecurityDescriptor = (PVOID)psd;
+  psa->lpSecurityDescriptor = psd;
   psa->bInheritHandle = TRUE;
 
   return psa;
 }
 
-//
 // FreeSecurityAttributes()
 //
 // The purpose of this function:
-//
 //      Frees the memory objects allocated by previous
 //      CreateSecurityAttributes() call.
-//
 VOID FreeSecurityAttributes(PSECURITY_ATTRIBUTES psa) {
+  if (psa == NULL) return;
+
   BOOL fResult;
   BOOL fDaclPresent;
   BOOL fDaclDefaulted;
   PACL pacl;
-
-  if (psa == NULL) return;
-
   fResult = GetSecurityDescriptorDacl(psa->lpSecurityDescriptor, &fDaclPresent,
                                       &pacl, &fDaclDefaulted);
   if (fResult) {
@@ -232,19 +197,15 @@ VOID FreeSecurityAttributes(PSECURITY_ATTRIBUTES psa) {
   MEMFREE(psa);
 }
 
-//
 // IsNT()
 //
 // Return value:
-//
 //      TRUE if the current system is Windows NT
 //
 // Remarks:
-//
 //      The implementation of this function is not multi-thread safe.
 //      You need to modify the function if you call the function in
 //      multi-thread environment.
-//
 BOOL IsNT(VOID) {
   return GetVersionInfo()->dwPlatformId == VER_PLATFORM_WIN32_NT;
 }

@@ -5,25 +5,27 @@
 
 extern "C" {
 
+//////////////////////////////////////////////////////////////////////////////
+
 void PASCAL InitCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
-  lpCompStr->dwSize = sizeof(MYCOMPSTR);
+  lpCompStr->dwSize = sizeof(MZCOMPSTR);
 
   if (dwClrFlag & CLR_UNDET) {
     lpCompStr->dwCompReadAttrOffset =
-        (DWORD)((LONG_PTR)((LPMYCOMPSTR)lpCompStr)->bCompReadAttr -
+        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->bCompReadAttr -
                 (LONG_PTR)lpCompStr);
     lpCompStr->dwCompReadClauseOffset =
-        (DWORD)((LONG_PTR)((LPMYCOMPSTR)lpCompStr)->dwCompReadClause -
+        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->dwCompReadClause -
                 (LONG_PTR)lpCompStr);
     lpCompStr->dwCompReadStrOffset =
-        (DWORD)((LONG_PTR)((LPMYCOMPSTR)lpCompStr)->szCompReadStr -
+        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->szCompReadStr -
                 (LONG_PTR)lpCompStr);
     lpCompStr->dwCompAttrOffset = (DWORD)(
-        (LONG_PTR)((LPMYCOMPSTR)lpCompStr)->bCompAttr - (LONG_PTR)lpCompStr);
+        (LONG_PTR)((LPMZCOMPSTR)lpCompStr)->bCompAttr - (LONG_PTR)lpCompStr);
     lpCompStr->dwCompClauseOffset = (DWORD)(
-        (LONG_PTR)((LPMYCOMPSTR)lpCompStr)->dwCompClause - (LONG_PTR)lpCompStr);
+        (LONG_PTR)((LPMZCOMPSTR)lpCompStr)->dwCompClause - (LONG_PTR)lpCompStr);
     lpCompStr->dwCompStrOffset = (DWORD)(
-        (LONG_PTR)((LPMYCOMPSTR)lpCompStr)->szCompStr - (LONG_PTR)lpCompStr);
+        (LONG_PTR)((LPMZCOMPSTR)lpCompStr)->szCompStr - (LONG_PTR)lpCompStr);
 
     lpCompStr->dwCompStrLen = 0;
     lpCompStr->dwCompReadStrLen = 0;
@@ -40,15 +42,15 @@ void PASCAL InitCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
 
   if (dwClrFlag & CLR_RESULT) {
     lpCompStr->dwResultStrOffset = (DWORD)(
-        (LONG_PTR)((LPMYCOMPSTR)lpCompStr)->szResultStr - (LONG_PTR)lpCompStr);
+        (LONG_PTR)((LPMZCOMPSTR)lpCompStr)->szResultStr - (LONG_PTR)lpCompStr);
     lpCompStr->dwResultClauseOffset =
-        (DWORD)((LONG_PTR)((LPMYCOMPSTR)lpCompStr)->dwResultClause -
+        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->dwResultClause -
                 (LONG_PTR)lpCompStr);
     lpCompStr->dwResultReadStrOffset =
-        (DWORD)((LONG_PTR)((LPMYCOMPSTR)lpCompStr)->szResultReadStr -
+        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->szResultReadStr -
                 (LONG_PTR)lpCompStr);
     lpCompStr->dwResultReadClauseOffset =
-        (DWORD)((LONG_PTR)((LPMYCOMPSTR)lpCompStr)->dwResultReadClause -
+        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->dwResultReadClause -
                 (LONG_PTR)lpCompStr);
 
     lpCompStr->dwResultStrLen = 0;
@@ -62,7 +64,7 @@ void PASCAL InitCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
 }
 
 void PASCAL ClearCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
-  lpCompStr->dwSize = sizeof(MYCOMPSTR);
+  lpCompStr->dwSize = sizeof(MZCOMPSTR);
 
   if (dwClrFlag & CLR_UNDET) {
     lpCompStr->dwCompStrOffset = 0;
@@ -77,8 +79,8 @@ void PASCAL ClearCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
     lpCompStr->dwCompReadStrLen = 0;
     lpCompStr->dwCompReadClauseLen = 0;
     lpCompStr->dwCompReadAttrLen = 0;
-    ((LPMYCOMPSTR)lpCompStr)->szCompStr[0] = 0;
-    ((LPMYCOMPSTR)lpCompStr)->szCompReadStr[0] = 0;
+    ((LPMZCOMPSTR)lpCompStr)->szCompStr[0] = 0;
+    ((LPMZCOMPSTR)lpCompStr)->szCompReadStr[0] = 0;
     lpCompStr->dwCursorPos = 0;
   }
 
@@ -91,8 +93,8 @@ void PASCAL ClearCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
     lpCompStr->dwResultClauseLen = 0;
     lpCompStr->dwResultReadStrLen = 0;
     lpCompStr->dwResultReadClauseLen = 0;
-    ((LPMYCOMPSTR)lpCompStr)->szResultStr[0] = 0;
-    ((LPMYCOMPSTR)lpCompStr)->szResultReadStr[0] = 0;
+    ((LPMZCOMPSTR)lpCompStr)->szResultStr[0] = 0;
+    ((LPMZCOMPSTR)lpCompStr)->szResultReadStr[0] = 0;
   }
 }
 
@@ -101,13 +103,13 @@ void PASCAL ClearCandidate(LPCANDIDATEINFO lpCandInfo) {
   lpCandInfo->dwCount = 0L;
   lpCandInfo->dwOffset[0] = 0L;
 
-  ((LPMYCAND)lpCandInfo)->cl.dwSize = 0L;
-  ((LPMYCAND)lpCandInfo)->cl.dwStyle = 0L;
-  ((LPMYCAND)lpCandInfo)->cl.dwCount = 0L;
-  ((LPMYCAND)lpCandInfo)->cl.dwSelection = 0L;
-  ((LPMYCAND)lpCandInfo)->cl.dwPageStart = 0L;
-  ((LPMYCAND)lpCandInfo)->cl.dwPageSize = 0L;
-  ((LPMYCAND)lpCandInfo)->cl.dwOffset[0] = 0L;
+  ((LPMZCAND)lpCandInfo)->cl.dwSize = 0L;
+  ((LPMZCAND)lpCandInfo)->cl.dwStyle = 0L;
+  ((LPMZCAND)lpCandInfo)->cl.dwCount = 0L;
+  ((LPMZCAND)lpCandInfo)->cl.dwSelection = 0L;
+  ((LPMZCAND)lpCandInfo)->cl.dwPageStart = 0L;
+  ((LPMZCAND)lpCandInfo)->cl.dwPageSize = 0L;
+  ((LPMZCAND)lpCandInfo)->cl.dwOffset[0] = 0L;
 }
 
 // return value: fdwConversion
@@ -170,7 +172,7 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_SETCONVERSIONMODE;
     GnMsg.lParam = 0L;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
   }
 
   ImmUnlockIMC(hIMC);
@@ -208,7 +210,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
       break;
 
     case TO_CMODE_KATAKANA:
-      lpSrc = ((LPMYCOMPSTR)lpCompStr)->szCompStr;
+      lpSrc = ((LPMZCOMPSTR)lpCompStr)->szCompStr;
       lpSrc0 = lpSrc;
       lpDst0 = lpDst;
       while (*lpSrc) {
@@ -221,7 +223,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
       break;
 
     case TO_CMODE_HIRAGANA:
-      lpSrc = ((LPMYCOMPSTR)lpCompStr)->szCompStr;
+      lpSrc = ((LPMZCOMPSTR)lpCompStr)->szCompStr;
       lpSrc0 = lpSrc;
       lpDst0 = lpDst;
       while (*lpSrc) {
@@ -244,7 +246,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
     GnMsg.message = WM_IME_COMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = GCS_COMPSTR;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
   }
 
   GlobalUnlock(hDst);
@@ -286,7 +288,7 @@ BOOL PASCAL IsConvertedCompStr(HIMC hIMC) {
 
   if (!(lpIMC = ImmLockIMC(hIMC))) return FALSE;
 
-  if (ImmGetIMCCSize(lpIMC->hCompStr) < sizeof(MYCOMPSTR)) {
+  if (ImmGetIMCCSize(lpIMC->hCompStr) < sizeof(MZCOMPSTR)) {
     ImmUnlockIMC(hIMC);
     return FALSE;
   }
@@ -294,7 +296,7 @@ BOOL PASCAL IsConvertedCompStr(HIMC hIMC) {
   lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
 
   if (lpCompStr->dwCompStrLen > 0)
-    fRet = (((LPMYCOMPSTR)lpCompStr)->bCompAttr[0] > 0);
+    fRet = (((LPMZCOMPSTR)lpCompStr)->bCompAttr[0] > 0);
 
   ImmUnlockIMCC(lpIMC->hCompStr);
   ImmUnlockIMC(hIMC);
@@ -309,55 +311,47 @@ BOOL PASCAL IsCandidate(LPINPUTCONTEXT lpIMC) {
   if (ImmGetIMCCSize(lpIMC->hCandInfo) < sizeof(CANDIDATEINFO)) return FALSE;
 
   lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
-
-  fRet = (lpCandInfo->dwCount > 0);
-
-  ImmUnlockIMCC(lpIMC->hCandInfo);
+  if (lpCandInfo) {
+    fRet = (lpCandInfo->dwCount > 0);
+    ImmUnlockIMCC(lpIMC->hCandInfo);
+  }
   return fRet;
 }
 
 HKL PASCAL GetMyHKL() {
-  DWORD dwSize;
-  DWORD dwi;
-  HKL hKL = 0;
-  HKL *lphkl;
+  HKL hKL = 0, *lphkl;
 
-  dwSize = GetKeyboardLayoutList(0, NULL);
-
+  DWORD dwSize = GetKeyboardLayoutList(0, NULL);
   lphkl = (HKL *)GlobalAlloc(GPTR, dwSize * sizeof(DWORD));
-
   if (!lphkl) return NULL;
 
   GetKeyboardLayoutList(dwSize, lphkl);
 
-  for (dwi = 0; dwi < dwSize; dwi++) {
-    TCHAR szFile[32];
+  TCHAR szFile[32];
+  for (DWORD dwi = 0; dwi < dwSize; dwi++) {
     HKL hKLTemp = *(lphkl + dwi);
     ImmGetIMEFileName(hKLTemp, szFile, sizeof(szFile) / sizeof(szFile[0]));
 
-    if (!lstrcmp(szFile, MyFileName)) {
+    if (!lstrcmp(szFile, MZIME_FILENAME)) {
       hKL = hKLTemp;
-      goto exit;
+      break;
     }
   }
-exit:
 
   GlobalFree((HANDLE)lphkl);
   return hKL;
 }
 
 void PASCAL UpdateIndicIcon(HIMC hIMC) {
-  HWND hwndIndicate;
-  BOOL fOpen = FALSE;
-  LPINPUTCONTEXT lpIMC;
-
   if (!hMyKL) {
     hMyKL = GetMyHKL();
     if (!hMyKL) return;
   }
 
-  hwndIndicate = FindWindow(INDICATOR_CLASS, NULL);
+  HWND hwndIndicate = FindWindow(INDICATOR_CLASS, NULL);
 
+  LPINPUTCONTEXT lpIMC;
+  BOOL fOpen = FALSE;
   if (hIMC) {
     lpIMC = ImmLockIMC(hIMC);
     if (lpIMC) {
@@ -381,15 +375,12 @@ void PASCAL UpdateIndicIcon(HIMC hIMC) {
 }
 
 HFONT CheckNativeCharset(HDC hDC) {
-  //BOOL bDiffCharSet = FALSE;
-  LOGFONT lfFont;
-  HFONT hOldFont;
+  HFONT hOldFont = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
 
-  hOldFont = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
+  LOGFONT lfFont;
   GetObject(hOldFont, sizeof(LOGFONT), &lfFont);
 
   if (lfFont.lfCharSet != NATIVE_CHARSET) {
-    //bDiffCharSet = TRUE;
     lfFont.lfWeight = FW_NORMAL;
     lfFont.lfCharSet = NATIVE_CHARSET;
     lfFont.lfFaceName[0] = 0;

@@ -11,29 +11,20 @@
   #include <tchar.h>
 #endif
 
-#include <cstdio>
-#include <cassert>
+#ifndef RC_INVOKED
+  #include <cstdio>
+  #include <cassert>
+  #include <cstring>
+#endif
 
 #include "indicml.h"
 #include "immdev.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// Debugging related
 
-#define DEBF_THREADID 0x00000001
-#define DEBF_GUIDELINE 0x00000002
+#define MZIME_FILENAME  TEXT("mzimeja.ime")
 
-#define LOGF_ENTRY 0x00000001
-#define LOGF_API 0x00000002
-#define LOGF_APIOUT 0x00000004
-#define LOGF_KEY 0x00000008
-
-//////////////////////////////////////////////////////////////////////////////
-
-#include <string.h>
-#define MyFileName TEXT("mzimeja.ime")
-
-/* for limit of MZ-IME */
+// for limit of MZ-IME
 #define MAXCOMPWND 10
 #define MAXCOMPSIZE 128
 #define MAXCLAUSESIZE 16
@@ -42,10 +33,10 @@
 #define MAXGLCHAR 32
 #define MAXCANDSTRNUM 32
 
-/* for GlobalAlloc */
+// for GlobalAlloc
 #define GHIME (GHND | GMEM_SHARE)
 
-/* special messages */
+// special messages
 #define WM_UI_UPDATE (WM_USER + 500)
 #define WM_UI_HIDE (WM_USER + 501)
 
@@ -54,39 +45,39 @@
 #define WM_UI_CANDMOVE (WM_USER + 603)
 #define WM_UI_GUIDEMOVE (WM_USER + 604)
 
-/* Escape Functions */
+// Escape Functions
 #define IME_ESC_PRI_GETDWORDTEST (IME_ESC_PRIVATE_FIRST + 0)
 
-/* special style */
+// special style
 #define WS_COMPDEFAULT (WS_DISABLED | WS_POPUP)
 #define WS_COMPNODEFAULT (WS_DISABLED | WS_POPUP)
 
-/* macro for me! */
+// macro for me!
 #define IsCTLPushed(x) ((x)[VK_CONTROL] & 0x80)
 #define IsSHFTPushed(x) ((x)[VK_SHIFT] & 0x80)
 #define IsALTPushed(x) ((x)[VK_ALT] & 0x80)
 
-/* update context */
+// update context
 #define UPDATE_MODE 0x01
 #define UPDATE_SYSTEM 0x02
 #define UPDATE_TEXT 0x04
 #define UPDATE_FORCE 0x08
 #define UPDATE_ALL (UPDATE_MODE | UPDATE_SYSTEM | UPDATE_TEXT)
 
-/* advise context */
-#define ADVISE_MODE 0x0001   /* advise about Mode requested   */
-#define ADVISE_ISOPEN 0x0002 /* advise about IsOpen requested */
+// advise context
+#define ADVISE_MODE 0x0001   // advise about Mode requested  
+#define ADVISE_ISOPEN 0x0002 // advise about IsOpen requested
 
-/* key state context */
+// key state context
 #define KS_SHIFT 0x01
 #define KS_CONTROL 0x02
 
-/* ID of guideline table */
+// ID of guideline table
 #define MYGL_NODICTIONARY 0
 #define MYGL_TYPINGERROR 1
 #define MYGL_TESTGUIDELINE 2
 
-/* Change Mode index */
+// Change Mode index
 #define TO_CMODE_ALPHANUMERIC 0x0001
 #define TO_CMODE_KATAKANA 0x0002
 #define TO_CMODE_HIRAGANA 0x0003
@@ -95,7 +86,7 @@
 #define TO_CMODE_CHARCODE 0x0020
 #define TO_CMODE_TOOLBAR 0x0100
 
-/* WndExtra of child UI windows */
+// WndExtra of child UI windows
 #define FIGWL_MOUSE 0
 #define FIGWL_SVRWND (FIGWL_MOUSE + sizeof(LONG))
 #define FIGWL_FONT (FIGWL_SVRWND + sizeof(LONG_PTR))
@@ -107,17 +98,17 @@
 #define FIGWL_CHILDWND (FIGWL_PUSHSTATUS + sizeof(LONG))
 #define UIEXTRASIZE (FIGWL_CHILDWND + sizeof(LONG_PTR))
 
-/* The flags of FIGWL_MOUSE */
+// The flags of FIGWL_MOUSE
 #define FIM_CAPUTURED 0x01
 #define FIM_MOVED 0x02
 
-/* The flags of the button of Status Window */
+// The flags of the button of Status Window
 #define PUSHED_STATUS_HDR 0x01
 #define PUSHED_STATUS_MODE 0x02
 #define PUSHED_STATUS_ROMAN 0x04
 #define PUSHED_STATUS_CLOSE 0x08
 
-/* Status Button Pos */
+// Status Button Pos
 #define BTX 20
 #define BTY 20
 #define BTFHIRA 20
@@ -128,24 +119,24 @@
 #define BTROMA 120
 #define BTEMPT 140
 
-/* Statue Close Button */
+// Statue Close Button
 #define STCLBT_X (BTX * 2 + 3)
 #define STCLBT_Y 1
 #define STCLBT_DX 12
 #define STCLBT_DY 12
 
-/* define Shift Arrow right-left */
+// define Shift Arrow right-left
 #define ARR_RIGHT 1
 #define ARR_LEFT 2
 
-/* Init or Clear Structure Flag */
+// Init or Clear Structure Flag
 #define CLR_RESULT 1
 #define CLR_UNDET 2
 #define CLR_RESULT_AND_UNDET 3
 
 //////////////////////////////////////////////////////////////////////////////
 
-/* define GET LP for COMPOSITIONSTRING members. */
+// define GET LP for COMPOSITIONSTRING members.
 #define GETLPCOMPREADATTR(lpcs) \
   (LPBYTE)((LPBYTE)(lpcs) + (lpcs)->dwCompReadAttrOffset)
 #define GETLPCOMPREADCLAUSE(lpcs) \
@@ -203,27 +194,27 @@
 //////////////////////////////////////////////////////////////////////////////
 // Structures
 
-typedef struct _tagMYCOMPSTR {
+typedef struct _tagMZCOMPSTR {
   COMPOSITIONSTRING cs;
-  TCHAR szCompReadStr[MAXCOMPSIZE];
-  BYTE bCompReadAttr[MAXCOMPSIZE];
-  DWORD dwCompReadClause[MAXCLAUSESIZE];
-  TCHAR szCompStr[MAXCOMPSIZE];
-  BYTE bCompAttr[MAXCOMPSIZE];
-  DWORD dwCompClause[MAXCLAUSESIZE];
-  char szTypeInfo[MAXCOMPSIZE];
-  TCHAR szResultReadStr[MAXCOMPSIZE];
-  DWORD dwResultReadClause[MAXCOMPSIZE];
-  TCHAR szResultStr[MAXCOMPSIZE];
-  DWORD dwResultClause[MAXCOMPSIZE];
-} MYCOMPSTR, NEAR *PMYCOMPSTR, FAR *LPMYCOMPSTR;
+  TCHAR   szCompReadStr[MAXCOMPSIZE];
+  BYTE    bCompReadAttr[MAXCOMPSIZE];
+  DWORD   dwCompReadClause[MAXCLAUSESIZE];
+  TCHAR   szCompStr[MAXCOMPSIZE];
+  BYTE    bCompAttr[MAXCOMPSIZE];
+  DWORD   dwCompClause[MAXCLAUSESIZE];
+  char    szTypeInfo[MAXCOMPSIZE];
+  TCHAR   szResultReadStr[MAXCOMPSIZE];
+  DWORD   dwResultReadClause[MAXCOMPSIZE];
+  TCHAR   szResultStr[MAXCOMPSIZE];
+  DWORD   dwResultClause[MAXCOMPSIZE];
+} MZCOMPSTR, NEAR *PMZCOMPSTR, FAR *LPMZCOMPSTR;
 
-typedef struct _tagMYCAND {
+typedef struct _tagMZCAND {
   CANDIDATEINFO ci;
   CANDIDATELIST cl;
   DWORD offset[MAXCANDSTRNUM];
   TCHAR szCand[MAXCANDSTRNUM][MAXCANDSTRSIZE];
-} MYCAND, NEAR *PMYCAND, FAR *LPMYCAND;
+} MZCAND, NEAR *PMZCAND, FAR *LPMZCAND;
 
 typedef struct _tagUICHILD {
   HWND hWnd;
@@ -249,18 +240,19 @@ typedef struct _tagUIEXTRA {
   UICHILD uiGuide;
 } UIEXTRA, NEAR *PUIEXTRA, FAR *LPUIEXTRA;
 
-typedef struct _tagMYGUIDELINE {
+typedef struct _tagMZGUIDELINE {
   DWORD dwLevel;
   DWORD dwIndex;
   DWORD dwStrID;
   DWORD dwPrivateID;
-} MYGUIDELINE, NEAR *PMYGUIDELINE, FAR *LPMYGUIDELINE;
+} MZGUIDELINE, NEAR *PMZGUIDELINE, FAR *LPMZGUIDELINE;
 
 //////////////////////////////////////////////////////////////////////////////
 // externs
 
 extern HINSTANCE hInst;
 extern HKL hMyKL;
+extern BOOL bWinLogOn;
 extern LPTRANSMSGLIST lpCurTransKey;
 extern UINT uNumTransKey;
 extern BOOL fOverTransKey;
@@ -269,7 +261,7 @@ extern TCHAR szCompStrClassName[];
 extern TCHAR szCandClassName[];
 extern TCHAR szStatusClassName[];
 extern TCHAR szGuideClassName[];
-extern MYGUIDELINE glTable[];
+extern MZGUIDELINE glTable[];
 extern TCHAR szDicFileName[];
 extern BYTE bComp[];
 extern BYTE bCompCtl[];

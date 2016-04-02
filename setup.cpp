@@ -7,6 +7,13 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+LPCTSTR DoLoadString(HINSTANCE hInstance, INT nID) {
+  static WCHAR s_szBuf[1024];
+  s_szBuf[0] = 0;
+  LoadStringW(hInstance, nID, s_szBuf, 1024);
+  return s_szBuf[0] ? s_szBuf : L"Internal Error";
+}
+
 INT DoCopyFiles(VOID) {
   WCHAR szPathSrc[MAX_PATH], szPathDest[MAX_PATH], *pch;
 
@@ -84,23 +91,19 @@ wWinMain(
   INT       nCmdShow)
 {
   if (0 != DoSetRegistry()) {
-    MessageBox(NULL,
-      L"レジストリの設定に失敗しました。管理者権限で実行して下さい。",
-      NULL, MB_ICONERROR);
+    MessageBox(NULL, DoLoadString(hInstance, 2), NULL, MB_ICONERROR);
     return 2;
   }
 
   if (0 != DoCopyFiles()) {
-    MessageBox(NULL,
-      L"ファイルのコピーに失敗しました。管理者権限で実行して下さい。",
-      NULL, MB_ICONERROR);
+    MessageBox(NULL, DoLoadString(hInstance, 3), NULL, MB_ICONERROR);
     return 1;
   }
 
   WCHAR szPath[MAX_PATH];
   GetSystemDirectory(szPath, MAX_PATH);
   wcscat(szPath, L"\\mzimeja.ime");
-  ImmInstallIME(szPath, TEXT("日本語 (MZ-IME)"));
+  ImmInstallIME(szPath, DoLoadString(hInstance, 4));
 
   return 0;
 }

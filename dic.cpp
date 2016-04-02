@@ -30,7 +30,7 @@ void PASCAL FlushText(HIMC hIMC) {
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CLOSECANDIDATE;
     GnMsg.lParam = 1;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
   }
 
   lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
@@ -44,12 +44,12 @@ void PASCAL FlushText(HIMC hIMC) {
     GnMsg.message = WM_IME_COMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = 0;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
     GnMsg.message = WM_IME_ENDCOMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = 0;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
   }
   ImmUnlockIMC(hIMC);
 }
@@ -75,7 +75,7 @@ void PASCAL RevertText(HIMC hIMC) {
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CLOSECANDIDATE;
     GnMsg.lParam = 1;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
   }
 
   lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
@@ -113,7 +113,7 @@ void PASCAL RevertText(HIMC hIMC) {
     GnMsg.message = WM_IME_COMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
     ImmUnlockIMCC(lpIMC->hCompStr);
   }
@@ -196,7 +196,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
       GnMsg.wParam = 0;
       GnMsg.lParam =
           GCS_COMPSTR | GCS_CURSORPOS | GCS_COMPATTR | GCS_COMPREADATTR;
-      GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+      GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
     }
 
     goto cvk_exit40;
@@ -247,7 +247,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
         GnMsg.message = WM_IME_COMPOSITION;
         GnMsg.wParam = 0;
         GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-        GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+        GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
         bRc = TRUE;
         goto cvk_exit40;
@@ -268,22 +268,22 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
       GnMsg.message = WM_IME_NOTIFY;
       GnMsg.wParam = IMN_OPENCANDIDATE;
       GnMsg.lParam = 1L;
-      GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+      GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
     }
 
     //
     // Make candidate structures.
     //
-    lpCandInfo->dwSize = sizeof(MYCAND);
+    lpCandInfo->dwSize = sizeof(MZCAND);
     lpCandInfo->dwCount = 1;
     lpCandInfo->dwOffset[0] =
-        (DWORD)((LPSTR) & ((LPMYCAND)lpCandInfo)->cl - (LPSTR)lpCandInfo);
-    lpCandList = (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
+        (DWORD)((LPSTR) & ((LPMZCAND)lpCandInfo)->cl - (LPSTR)lpCandInfo);
+    lpCandList = (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
     //lpdw = (LPDWORD) & (lpCandList->dwOffset);
     while (*lpstr) {
       lpCandList->dwOffset[i] =
-          (DWORD)((LPSTR)((LPMYCAND)lpCandInfo)->szCand[i] - (LPSTR)lpCandList);
-      lstrcpy((LPTSTR)((LPSTR)lpCandList + lpCandList->dwOffset[i]), lpstr);
+          (DWORD)((LPBYTE)((LPMZCAND)lpCandInfo)->szCand[i] - (LPBYTE)lpCandList);
+      lstrcpy((LPTSTR)((LPBYTE)lpCandList + lpCandList->dwOffset[i]), lpstr);
       lpstr += (lstrlen(lpstr) + 1);
       i++;
     }
@@ -312,14 +312,14 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CHANGECANDIDATE;
     GnMsg.lParam = 1L;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
     //
     // If the selected candidate string is changed, the composition string
     // should be updated.
     //
-    lpstr = (LPTSTR)((LPSTR)lpCandList +
-                      lpCandList->dwOffset[lpCandList->dwSelection]);
+    lpstr = (LPTSTR)((LPBYTE)lpCandList +
+                     lpCandList->dwOffset[lpCandList->dwSelection]);
     goto set_compstr;
   }
 
@@ -414,7 +414,7 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
       GnMsg.message = WM_IME_COMPOSITION;
       GnMsg.wParam = 0;
       GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-      GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+      GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
     } else {
       if (IsCandidate(lpIMC)) {
         lpCandInfo = (LPCANDIDATEINFO)ImmLockIMCC(lpIMC->hCandInfo);
@@ -422,7 +422,7 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
         GnMsg.message = WM_IME_NOTIFY;
         GnMsg.wParam = IMN_CLOSECANDIDATE;
         GnMsg.lParam = 1;
-        GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+        GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
         ImmUnlockIMCC(lpIMC->hCandInfo);
       }
 
@@ -431,12 +431,12 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
       GnMsg.message = WM_IME_COMPOSITION;
       GnMsg.wParam = 0;
       GnMsg.lParam = 0;
-      GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+      GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
       GnMsg.message = WM_IME_ENDCOMPOSITION;
       GnMsg.wParam = 0;
       GnMsg.lParam = 0;
-      GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+      GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
     }
   }
 
@@ -463,9 +463,9 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
 
   lpIMC = ImmLockIMC(hIMC);
 
-  if (ImmGetIMCCSize(lpIMC->hCompStr) < sizeof(MYCOMPSTR)) {
+  if (ImmGetIMCCSize(lpIMC->hCompStr) < sizeof(MZCOMPSTR)) {
     // Init time.
-    dwSize = sizeof(MYCOMPSTR);
+    dwSize = sizeof(MZCOMPSTR);
     lpIMC->hCompStr = ImmReSizeIMCC(lpIMC->hCompStr, dwSize);
     lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(lpIMC->hCompStr);
     lpCompStr->dwSize = dwSize;
@@ -482,7 +482,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
     GnMsg.message = WM_IME_STARTCOMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = 0;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
   } else if (IsConvertedCompStr(hIMC)) {
     MakeResultString(hIMC, FALSE);
@@ -667,7 +667,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   GnMsg.message = WM_IME_COMPOSITION;
   GnMsg.wParam = 0;
   GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART | dwGCR;
-  GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+  GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
 ac_exit:
   ImmUnlockIMCC(lpIMC->hCompStr);
@@ -788,7 +788,7 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CLOSECANDIDATE;
     GnMsg.lParam = 1L;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
   }
 
   lstrcpy(GETLPRESULTSTR(lpCompStr), GETLPCOMPSTR(lpCompStr));
@@ -815,12 +815,12 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
     GnMsg.message = WM_IME_COMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = GCS_RESULTALL;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
     GnMsg.message = WM_IME_ENDCOMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = 0;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
   }
 
   ImmUnlockIMC(hIMC);
@@ -845,14 +845,14 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   lpGuideLine->dwLevel = glTable[dwID].dwLevel;
   lpGuideLine->dwIndex = glTable[dwID].dwIndex;
   lpGuideLine->dwStrOffset = sizeof(GUIDELINE);
-  lpStr = (LPTSTR)(((LPSTR)lpGuideLine) + lpGuideLine->dwStrOffset);
+  lpStr = (LPTSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwStrOffset);
   LoadString(hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
   lpGuideLine->dwStrLen = lstrlen(lpStr);
 
   if (glTable[dwID].dwPrivateID) {
     lpGuideLine->dwPrivateOffset =
         sizeof(GUIDELINE) + (MAXGLCHAR + 1) * sizeof(TCHAR);
-    lpStr = (LPTSTR)(((LPSTR)lpGuideLine) + lpGuideLine->dwPrivateOffset);
+    lpStr = (LPTSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwPrivateOffset);
     LoadString(hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
     lpGuideLine->dwPrivateSize = lstrlen(lpStr) * sizeof(TCHAR);
   } else {
@@ -863,7 +863,7 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   GnMsg.message = WM_IME_NOTIFY;
   GnMsg.wParam = IMN_GUIDELINE;
   GnMsg.lParam = 0;
-  GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
+  GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
   ImmUnlockIMCC(lpIMC->hGuideLine);
   ImmUnlockIMC(hIMC);

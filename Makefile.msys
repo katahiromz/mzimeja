@@ -52,7 +52,7 @@ LIBS = \
 
 IME_FILE = mzimeja.ime
 
-SETUP_OBJS = setup$(DOTOBJ)
+SETUP_OBJS = setup$(DOTOBJ) setup_res$(DOTOBJ)
 SETUP_LIBS = \
 	-lkernel32 \
 	-luser32 \
@@ -108,6 +108,9 @@ setup$(DOTOBJ): setup.cpp
 
 mzimeja_res$(DOTOBJ): mzimeja.rc
 	$(RC) $(RCFLAGS) -i mzimeja.rc -o mzimeja_res$(DOTOBJ)
+
+setup_res$(DOTOBJ): setup.rc
+	$(RC) $(RCFLAGS) -i setup.rc -o setup_res$(DOTOBJ)
 
 clean:
 	rm -f *$(DOTOBJ)

@@ -1,35 +1,36 @@
 // mzimeja.cpp --- MZ-IME Japanese Input
 //////////////////////////////////////////////////////////////////////////////
 
+#define _CRT_SECURE_NO_WARNINGS
 #include "mzimeja.h"
 #include "immsec.h"
 #include "resource.h"
 
 //////////////////////////////////////////////////////////////////////////////
 
-HINSTANCE hInst;
-HANDLE hMutex = NULL;
-HKL hMyKL = 0;
+HINSTANCE   hInst;
+HANDLE      hMutex = NULL;
+HKL         hMyKL = 0;
+BOOL        bWinLogOn = FALSE;
 
-/* for Translat */
 LPTRANSMSGLIST lpCurTransKey = NULL;
 UINT uNumTransKey;
 BOOL fOverTransKey = FALSE;
 
-TCHAR szUIClassName[] = TEXT("MZIMEUUI");
-TCHAR szCompStrClassName[] = TEXT("MZIMEUCompStr");
-TCHAR szCandClassName[] = TEXT("MZIMEUCand");
-TCHAR szStatusClassName[] = TEXT("MZIMEUStatus");
-TCHAR szGuideClassName[] = TEXT("MZIMEUGuide");
+TCHAR szUIClassName[]       = TEXT("MZIMEUUI");
+TCHAR szCompStrClassName[]  = TEXT("MZIMEUCompStr");
+TCHAR szCandClassName[]     = TEXT("MZIMEUCand");
+TCHAR szStatusClassName[]   = TEXT("MZIMEUStatus");
+TCHAR szGuideClassName[]    = TEXT("MZIMEUGuide");
 
-MYGUIDELINE glTable[] = {
+MZGUIDELINE glTable[] = {
   {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},
   {GL_LEVEL_WARNING, GL_ID_TYPINGERROR, IDS_GL_TYPINGERROR, 0},
   {GL_LEVEL_WARNING, GL_ID_PRIVATE_FIRST, IDS_GL_TESTGUIDELINESTR,
    IDS_GL_TESTGUIDELINEPRIVATE}};
 
-/* for DIC */
-TCHAR szDicFileName[256]; /* Dictionary file name stored buffer */
+// dictionary file name
+TCHAR szDicFileName[256];
 
 extern "C" {
 
@@ -90,7 +91,7 @@ VOID ErrorOut(LPCTSTR pStr) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL InitMZIME(HINSTANCE hInstance) {
+static inline BOOL MZIME_Init(HINSTANCE hInstance) {
   hInst = hInstance;
 
   // Create/open a system global named mutex.
@@ -117,7 +118,7 @@ BOOL InitMZIME(HINSTANCE hInstance) {
   return TRUE;
 }
 
-VOID DestroyMZIME(VOID) {
+static inline VOID MZIME_Destroy(VOID) {
   UnregisterClass(szUIClassName, hInst);
   UnregisterClass(szCompStrClassName, hInst);
   UnregisterClass(szCandClassName, hInst);
@@ -133,12 +134,12 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
 
   switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
-      InitMZIME(hInstDLL);
+      MZIME_Init(hInstDLL);
       DebugPrint(TEXT("DLLEntry Process Attach hInst is %lx"), hInst);
       break;
 
     case DLL_PROCESS_DETACH:
-      DestroyMZIME();
+      MZIME_Destroy();
       DebugPrint(TEXT("DLLEntry Process Detach hInst is %lx"), hInst);
       break;
 

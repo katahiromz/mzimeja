@@ -338,7 +338,7 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
               dwSize = (DWORD)ImmRequestMessage(hIMC, IMR_RECONVERTSTRING,
                                                 (LPARAM)lpRS);
               if (dwSize) {
-                LPTSTR lpDump = (LPTSTR)(((LPSTR)lpRS) + lpRS->dwStrOffset);
+                LPTSTR lpDump = (LPTSTR)((LPBYTE)lpRS + lpRS->dwStrOffset);
                 *(LPTSTR)(lpDump + lpRS->dwStrLen) = 0;
 
                 DebugPrint(TEXT("IMR_RECONVERTSTRING\r\n"));

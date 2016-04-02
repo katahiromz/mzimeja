@@ -114,25 +114,25 @@ VS_VERSION_INFO VERSIONINFO
  PRODUCTVERSION 0,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS 0xbL
+ FILEFLAGS VS_FF_DEBUG | VS_FF_PRERELEASE | VS_FF_PRIVATEBUILD
 #else
- FILEFLAGS 0xaL
+ FILEFLAGS VS_FF_PRERELEASE | VS_FF_PRIVATEBUILD
 #endif
- FILEOS 0x4L
- FILETYPE 0x3L
- FILESUBTYPE 0xbL
+ FILEOS VOS__WINDOWS32
+ FILETYPE VFT_DRV
+ FILESUBTYPE VFT2_DRV_INPUTMETHOD
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
         BLOCK "041103A4"
         BEGIN
-            VALUE "CompanyName", "Katayama Hirofumi MZ\0"
-            VALUE "FileDescription", "mzimeja 0.0\0"
+            VALUE "CompanyName", "片山博文MZ\0"
+            VALUE "FileDescription", "MZ-IME日本語入力 0.0\0"
             VALUE "FileVersion", "0.0\0"
             VALUE "InternalName", "mzimeja\0"
-            VALUE "LegalCopyright", "Copyright (C) 2016 Katayama Hirofumi MZ. \0"
+            VALUE "LegalCopyright", "Copyright (C) 2016 片山博文MZ.\0"
             VALUE "OriginalFilename", "mzimeja.ime\0"
-            VALUE "ProductName", "MZ-IME Japanese Input\0"
+            VALUE "ProductName", "MZ-IME日本語入力\0"
             VALUE "ProductVersion", "0.0\0"
         END
     END

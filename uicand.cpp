@@ -140,12 +140,12 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
     if (lpCandInfo) {
       height = GetSystemMetrics(SM_CYEDGE);
       lpCandList =
-          (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
+          (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
       for (i = lpCandList->dwPageStart;
            i < (lpCandList->dwPageStart + lpCandList->dwPageSize); i++) {
-        lpstr = (LPTSTR)((LPSTR)lpCandList + lpCandList->dwOffset[i]);
+        lpstr = (LPTSTR)((LPBYTE)lpCandList + lpCandList->dwOffset[i]);
         GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
-        if (((LPMYCAND)lpCandInfo)->cl.dwSelection == (DWORD)i) {
+        if (((LPMZCAND)lpCandInfo)->cl.dwSelection == (DWORD)i) {
           hbr = (HBRUSH)SelectObject(hDC, hbrHightLight);
           PatBlt(hDC, 0, height, rc.right, sz.cy, PATCOPY);
           SelectObject(hDC, hbr);
@@ -194,10 +194,10 @@ void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
       width = 0;
       height = 0;
       lpCandList =
-          (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
+          (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
       for (i = lpCandList->dwPageStart;
            i < (lpCandList->dwPageStart + lpCandList->dwPageSize); i++) {
-        lpstr = (LPTSTR)((LPSTR)lpCandList + lpCandList->dwOffset[i]);
+        lpstr = (LPTSTR)((LPBYTE)lpCandList + lpCandList->dwOffset[i]);
         GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
         if (width < sz.cx) width = sz.cx;
         height += sz.cy;
