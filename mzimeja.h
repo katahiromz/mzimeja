@@ -10,6 +10,10 @@
 #ifndef _INC_TCHAR
   #include <tchar.h>
 #endif
+
+#include <cstdio>
+#include <cassert>
+
 #include "indicml.h"
 #include "immdev.h"
 

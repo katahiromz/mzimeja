@@ -2,7 +2,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
-#include <cstdio>
 #include "immsec.h"
 #include "resource.h"
 
@@ -90,48 +89,56 @@ VOID ErrorOut(LPCTSTR pStr) {
 #endif  // def _DEBUG
 
 //////////////////////////////////////////////////////////////////////////////
+
+BOOL InitMZIME(HINSTANCE hInstance) {
+  hInst = hInstance;
+
+  // Create/open a system global named mutex.
+  // The initial ownership is not needed.
+  // CreateSecurityAttributes() will create
+  // the proper security attribute for IME.
+  PSECURITY_ATTRIBUTES psa = CreateSecurityAttributes();
+  if (psa != NULL) {
+    hMutex = CreateMutex(psa, FALSE, TEXT("mzimeja_mutex"));
+    FreeSecurityAttributes(psa);
+    assert(hMutex);
+  } else {
+    // Failed, not NT system
+    assert(0);
+    return FALSE;
+  }
+
+  IMERegisterClass(hInst);
+
+  LPTSTR lpDicFileName = szDicFileName;
+  lpDicFileName += GetWindowsDirectory(lpDicFileName, 256);
+  if (*(lpDicFileName - 1) != TEXT('\\')) *lpDicFileName++ = TEXT('\\');
+  LoadString(hInstance, IDS_DICFILENAME, lpDicFileName, 128);
+  return TRUE;
+}
+
+VOID DestroyMZIME(VOID) {
+  UnregisterClass(szUIClassName, hInst);
+  UnregisterClass(szCompStrClassName, hInst);
+  UnregisterClass(szCandClassName, hInst);
+  UnregisterClass(szStatusClassName, hInst);
+  if (hMutex) CloseHandle(hMutex);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // DLL entry point
 
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
-  PSECURITY_ATTRIBUTES psa;
-  LPTSTR lpDicFileName;
   DebugPrint(TEXT("DLLEntry:dwFunc=%d\n"), dwFunction);
 
   switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
-      // Create/open a system global named mutex.
-      // The initial ownership is not needed.
-      // CreateSecurityAttributes() will create
-      // the proper security attribute for IME.
-      psa = CreateSecurityAttributes();
-      if (psa != NULL) {
-        hMutex = CreateMutex(psa, FALSE, TEXT("mzimeja_mutex"));
-        FreeSecurityAttributes(psa);
-        if (hMutex == NULL) {
-          // Failed
-        }
-      } else {
-        // Failed, not NT system
-      }
-
-      hInst = hInstDLL;
-      IMERegisterClass(hInst);
-
-      // Initialize for MZ-IME.
-      lpDicFileName = szDicFileName;
-      lpDicFileName += GetWindowsDirectory(lpDicFileName, 256);
-      if (*(lpDicFileName - 1) != TEXT('\\')) *lpDicFileName++ = TEXT('\\');
-      LoadString(hInst, IDS_DICFILENAME, lpDicFileName, 128);
-
+      InitMZIME(hInstDLL);
       DebugPrint(TEXT("DLLEntry Process Attach hInst is %lx"), hInst);
       break;
 
     case DLL_PROCESS_DETACH:
-      UnregisterClass(szUIClassName, hInst);
-      UnregisterClass(szCompStrClassName, hInst);
-      UnregisterClass(szCandClassName, hInst);
-      UnregisterClass(szStatusClassName, hInst);
-      if (hMutex) CloseHandle(hMutex);
+      DestroyMZIME();
       DebugPrint(TEXT("DLLEntry Process Detach hInst is %lx"), hInst);
       break;
 
