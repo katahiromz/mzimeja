@@ -32,8 +32,8 @@ void PASCAL InitCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
     lpCompStr->dwCompClauseLen = 0;
     lpCompStr->dwCompReadClauseLen = 0;
 
-    *GETLPCOMPSTR(lpCompStr) = MYTEXT('\0');
-    *GETLPCOMPREADSTR(lpCompStr) = MYTEXT('\0');
+    *GETLPCOMPSTR(lpCompStr) = 0;
+    *GETLPCOMPREADSTR(lpCompStr) = 0;
 
     lpCompStr->dwCursorPos = 0;
   }
@@ -56,8 +56,8 @@ void PASCAL InitCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
     lpCompStr->dwResultReadStrLen = 0;
     lpCompStr->dwResultReadClauseLen = 0;
 
-    *GETLPRESULTSTR(lpCompStr) = MYTEXT('\0');
-    *GETLPRESULTREADSTR(lpCompStr) = MYTEXT('\0');
+    *GETLPRESULTSTR(lpCompStr) = 0;
+    *GETLPRESULTREADSTR(lpCompStr) = 0;
   }
 }
 
@@ -77,8 +77,8 @@ void PASCAL ClearCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
     lpCompStr->dwCompReadStrLen = 0;
     lpCompStr->dwCompReadClauseLen = 0;
     lpCompStr->dwCompReadAttrLen = 0;
-    ((LPMYCOMPSTR)lpCompStr)->szCompStr[0] = MYTEXT('\0');
-    ((LPMYCOMPSTR)lpCompStr)->szCompReadStr[0] = MYTEXT('\0');
+    ((LPMYCOMPSTR)lpCompStr)->szCompStr[0] = 0;
+    ((LPMYCOMPSTR)lpCompStr)->szCompReadStr[0] = 0;
     lpCompStr->dwCursorPos = 0;
   }
 
@@ -91,8 +91,8 @@ void PASCAL ClearCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
     lpCompStr->dwResultClauseLen = 0;
     lpCompStr->dwResultReadStrLen = 0;
     lpCompStr->dwResultReadClauseLen = 0;
-    ((LPMYCOMPSTR)lpCompStr)->szResultStr[0] = MYTEXT('\0');
-    ((LPMYCOMPSTR)lpCompStr)->szResultReadStr[0] = MYTEXT('\0');
+    ((LPMYCOMPSTR)lpCompStr)->szResultStr[0] = 0;
+    ((LPMYCOMPSTR)lpCompStr)->szResultReadStr[0] = 0;
   }
 }
 
@@ -183,10 +183,10 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
   //DWORD fdwConversion;
   TRANSMSG GnMsg;
   HANDLE hDst;
-  LPMYSTR lpSrc;
-  LPMYSTR lpDst;
-  LPMYSTR lpSrc0;
-  LPMYSTR lpDst0;
+  LPTSTR lpSrc;
+  LPTSTR lpDst;
+  LPTSTR lpSrc0;
+  LPTSTR lpDst0;
   //WORD wCode;
   BOOL fChange = FALSE;
 
@@ -201,7 +201,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
             GlobalAlloc(GHND, (lpCompStr->dwCompStrLen + 1) * sizeof(WCHAR))))
     goto ccs_exit30;
 
-  if (!(lpDst = (LPMYSTR)GlobalLock(hDst))) goto ccs_exit20;
+  if (!(lpDst = (LPTSTR)GlobalLock(hDst))) goto ccs_exit20;
 
   switch (dwToMode) {
     case TO_CMODE_ALPHANUMERIC:
@@ -215,8 +215,8 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
         *lpDst++ = HiraToKata(*lpSrc);
         lpSrc++;
       }
-      Mylstrcpy(lpSrc0, lpDst0);
-      lpCompStr->dwCompStrLen = Mylstrlen(lpSrc0);
+      lstrcpy(lpSrc0, lpDst0);
+      lpCompStr->dwCompStrLen = lstrlen(lpSrc0);
       fChange = TRUE;
       break;
 
@@ -228,8 +228,8 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
         *lpDst++ = KataToHira(*lpSrc);
         lpSrc++;
       }
-      Mylstrcpy(lpSrc0, lpDst0);
-      lpCompStr->dwCompStrLen = Mylstrlen(lpSrc0);
+      lstrcpy(lpSrc0, lpDst0);
+      lpCompStr->dwCompStrLen = lstrlen(lpSrc0);
       fChange = TRUE;
       break;
 
@@ -380,53 +380,6 @@ void PASCAL UpdateIndicIcon(HIMC hIMC) {
   }
 }
 
-void PASCAL lmemset(LPBYTE lp, BYTE b, UINT cnt) {
-  register UINT i;
-  register BYTE bt = b;
-  for (i = 0; i < cnt; i++) *lp++ = bt;
-}
-
-int PASCAL MylstrcmpW(LPCWSTR lp0, LPCWSTR lp1) {
-  while (*lp0 && *lp1 && (*lp0 == *lp1)) {
-    lp0++;
-    lp1++;
-  }
-  return (*lp0 - *lp1);
-}
-
-int PASCAL MylstrcpyW(LPWSTR lp0, LPCWSTR lp1) {
-  int n = 0;
-
-  while (*lp1) {
-    *lp0 = *lp1;
-    lp0++;
-    lp1++;
-    n++;
-  }
-  *lp0 = *lp1;
-  return n;
-}
-
-LPWSTR PASCAL MyCharPrevW(LPCWSTR lpStart, LPCWSTR lpCur) {
-  LPCWSTR lpRet = lpStart;
-  if (lpCur > lpStart) lpRet = lpCur - 1;
-
-  return (LPWSTR)lpRet;
-}
-
-LPWSTR PASCAL MyCharNextW(LPCWSTR lp) {
-  if (*lp) lp += 1;
-  return (LPWSTR)lp;
-}
-
-LPWSTR PASCAL MylstrcpynW(LPWSTR lp0, LPCWSTR lp1, int nCount) {
-  int n;
-  for (n = 0; *lp1 && n < nCount - 1; *lp0++ = *lp1++, n++)
-    ;
-  *lp0 = L'\0';
-  return (LPWSTR)lp0;
-}
-
 HFONT CheckNativeCharset(HDC hDC) {
   //BOOL bDiffCharSet = FALSE;
   LOGFONT lfFont;
@@ -439,7 +392,7 @@ HFONT CheckNativeCharset(HDC hDC) {
     //bDiffCharSet = TRUE;
     lfFont.lfWeight = FW_NORMAL;
     lfFont.lfCharSet = NATIVE_CHARSET;
-    lfFont.lfFaceName[0] = TEXT('\0');
+    lfFont.lfFaceName[0] = 0;
     SelectObject(hDC, CreateFontIndirect(&lfFont));
   } else {
     hOldFont = NULL;

@@ -328,21 +328,21 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
         switch (cmd) {
           case IDM_RECONVERT: {
             DWORD dwSize =
-                (DWORD)MyImmRequestMessage(hIMC, IMR_RECONVERTSTRING, 0);
+                (DWORD)ImmRequestMessage(hIMC, IMR_RECONVERTSTRING, 0);
             if (dwSize) {
               LPRECONVERTSTRING lpRS;
 
               lpRS = (LPRECONVERTSTRING)GlobalAlloc(GPTR, dwSize);
               lpRS->dwSize = dwSize;
 
-              dwSize = (DWORD)MyImmRequestMessage(hIMC, IMR_RECONVERTSTRING,
-                                                  (LPARAM)lpRS);
+              dwSize = (DWORD)ImmRequestMessage(hIMC, IMR_RECONVERTSTRING,
+                                                (LPARAM)lpRS);
               if (dwSize) {
 #ifdef _DEBUG
                 {
                   TCHAR szDev[80];
-                  LPMYSTR lpDump = (LPMYSTR)(((LPSTR)lpRS) + lpRS->dwStrOffset);
-                  *(LPMYSTR)(lpDump + lpRS->dwStrLen) = MYTEXT('\0');
+                  LPTSTR lpDump = (LPTSTR)(((LPSTR)lpRS) + lpRS->dwStrOffset);
+                  *(LPTSTR)(lpDump + lpRS->dwStrLen) = 0;
 
                   OutputDebugString(TEXT("IMR_RECONVERTSTRING\r\n"));
                   wsprintf(szDev, TEXT("dwSize            %x\r\n"),
@@ -369,12 +369,12 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
                   wsprintf(szDev, TEXT("dwTargetStrOffset %x\r\n"),
                            lpRS->dwTargetStrOffset);
                   OutputDebugString(szDev);
-                  MyOutputDebugString(lpDump);
+                  OutputDebugString(lpDump);
                   OutputDebugString(TEXT("\r\n"));
                 }
 #endif
-                MyImmRequestMessage(hIMC, IMR_CONFIRMRECONVERTSTRING,
-                                    (LPARAM)lpRS);
+                ImmRequestMessage(hIMC, IMR_CONFIRMRECONVERTSTRING,
+                                  (LPARAM)lpRS);
               }
 #ifdef _DEBUG
               else

@@ -37,8 +37,8 @@ WORD PASCAL ConvChar(HIMC hIMC, WORD ch1, WORD ch2) {
 // A function which judges the vowels
 int PASCAL IsFirst(WORD ch) {
   register int i;
-  static WCHAR table0[] = MYTEXT("KSTNHMYRWGZDBP");
-  static WCHAR table1[] = MYTEXT("kstnhmyrwgzdbp");
+  static WCHAR table0[] = TEXT("KSTNHMYRWGZDBP");
+  static WCHAR table1[] = TEXT("kstnhmyrwgzdbp");
 
   for (i = 0; table0[i]; i++) {
     if (table0[i] == (WCHAR)ch) return (i + 1);
@@ -51,8 +51,8 @@ int PASCAL IsFirst(WORD ch) {
 // A function which judges the consonants
 int PASCAL IsSecond(WORD ch) {
   register int i;
-  static WCHAR table0[] = MYTEXT("AIUEO");
-  static WCHAR table1[] = MYTEXT("aiueo");
+  static WCHAR table0[] = TEXT("AIUEO");
+  static WCHAR table1[] = TEXT("aiueo");
 
   for (i = 0; table0[i]; i++) {
     if (table0[i] == (WCHAR)ch) return (i + 1);
@@ -242,15 +242,15 @@ BOOL OneCharZenToHan(WCHAR code, WCHAR* pKatakanaLetter, WCHAR* pSound) {
   *pKatakanaLetter = 0;
   *pSound = 0;
 
-  NewCode = (MYCHAR)ZenToHan(code);
+  NewCode = (TCHAR)ZenToHan(code);
   if (!NewCode) {
     if (IsTenten((WORD)(code - 1))) {
-      *pKatakanaLetter = (MYCHAR)ZenToHan((WORD)(code - 1));
-      *pSound = (MYCHAR)0xFF9E;
+      *pKatakanaLetter = (TCHAR)ZenToHan((WORD)(code - 1));
+      *pSound = (TCHAR)0xFF9E;
       return TRUE;
     } else if (IsMaru((WORD)(code - 2))) {
-      *pKatakanaLetter = (MYCHAR)ZenToHan((WORD)(code - 2));
-      *pSound = (MYCHAR)0xFF9F;
+      *pKatakanaLetter = (TCHAR)ZenToHan((WORD)(code - 2));
+      *pSound = (TCHAR)0xFF9F;
       return TRUE;
     } else {
       return FALSE;
@@ -261,19 +261,19 @@ BOOL OneCharZenToHan(WCHAR code, WCHAR* pKatakanaLetter, WCHAR* pSound) {
   }
 }
 
-void PASCAL lZenToHan(LPMYSTR lpDst, LPMYSTR lpSrc) {
+void PASCAL lZenToHan(LPTSTR lpDst, LPTSTR lpSrc) {
   WORD code;
 
   while (*lpSrc) {
     code = *lpSrc;
-    *lpDst = (MYCHAR)ZenToHan(code);
+    *lpDst = (TCHAR)ZenToHan(code);
     if (!*lpDst) {
       if (IsTenten((WORD)(code - 1))) {
-        *lpDst++ = (MYCHAR)ZenToHan((WORD)(code - 1));
-        *lpDst++ = (MYCHAR)0xFF9E;
+        *lpDst++ = (TCHAR)ZenToHan((WORD)(code - 1));
+        *lpDst++ = (TCHAR)0xFF9E;
       } else if (IsMaru((WORD)(code - 2))) {
-        *lpDst++ = (MYCHAR)ZenToHan((WORD)(code - 2));
-        *lpDst++ = (MYCHAR)0xFF9F;
+        *lpDst++ = (TCHAR)ZenToHan((WORD)(code - 2));
+        *lpDst++ = (TCHAR)0xFF9F;
       } else {
         //
         // this case means it is not Japanese char
@@ -285,10 +285,10 @@ void PASCAL lZenToHan(LPMYSTR lpDst, LPMYSTR lpSrc) {
 
     lpSrc++;
   }
-  *lpDst = MYTEXT('\0');
+  *lpDst = 0;
 }
 
-void PASCAL lHanToZen(LPMYSTR lpDst, LPMYSTR lpSrc, DWORD fdwConversion) {
+void PASCAL lHanToZen(LPTSTR lpDst, LPTSTR lpSrc, DWORD fdwConversion) {
   WORD code;
   WORD code0;
   WORD code1;
@@ -310,7 +310,7 @@ void PASCAL lHanToZen(LPMYSTR lpDst, LPMYSTR lpSrc, DWORD fdwConversion) {
     code = HanToZen(code0, KatakanaLetter, fdwConversion);
     *lpDst++ = code;
   }
-  *lpDst = MYTEXT('\0');
+  *lpDst = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////

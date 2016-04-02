@@ -243,7 +243,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
       break;
 
     case IME_ESC_GETHELPFILENAME:
-      Mylstrcpy((LPMYSTR)lpData, MYTEXT("mzimeja.hlp"));
+      lstrcpy((LPTSTR)lpData, TEXT("mzimeja.hlp"));
       lRet = TRUE;
       break;
 
@@ -455,9 +455,9 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   LPCOMPOSITIONSTRING lpCompStr;
   LPCANDIDATEINFO lpCandInfo;
   LPCANDIDATELIST lpCandList;
-  MYCHAR szBuf[256];
+  TCHAR szBuf[256];
   int nBufLen;
-  LPMYSTR lpstr;
+  LPTSTR lpstr;
   TRANSMSG GnMsg;
   int i = 0;
   //LPDWORD lpdw;
@@ -530,7 +530,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 // Get the candidate strings from dic file.
 //
           nBufLen = GetCandidateStringsFromDictionary(
-              GETLPCOMPREADSTR(lpCompStr), (LPMYSTR)szBuf, 256,
+              GETLPCOMPREADSTR(lpCompStr), (LPTSTR)szBuf, 256,
               (LPTSTR)szDicFileName);
 
           //
@@ -556,9 +556,9 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           while (*lpstr && (i < MAXCANDSTRNUM)) {
             lpCandList->dwOffset[i] = (DWORD)(
                 (LPSTR)((LPMYCAND)lpCandInfo)->szCand[i] - (LPSTR)lpCandList);
-            Mylstrcpy((LPMYSTR)((LPMYSTR)lpCandList + lpCandList->dwOffset[i]),
+            lstrcpy((LPTSTR)((LPTSTR)lpCandList + lpCandList->dwOffset[i]),
                       lpstr);
-            lpstr += (Mylstrlen(lpstr) + 1);
+            lpstr += (lstrlen(lpstr) + 1);
             i++;
           }
 
@@ -781,8 +781,8 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
 #ifdef _DEBUG
 void DumpRS(LPRECONVERTSTRING lpRS) {
   TCHAR szDev[80];
-  LPMYSTR lpDump = ((LPMYSTR)lpRS) + lpRS->dwStrOffset;
-  *(LPMYSTR)(lpDump + lpRS->dwStrLen) = MYTEXT('\0');
+  LPTSTR lpDump = ((LPTSTR)lpRS) + lpRS->dwStrOffset;
+  *(LPTSTR)(lpDump + lpRS->dwStrLen) = 0;
 
   OutputDebugString(TEXT("DumpRS\r\n"));
   wsprintf(szDev, TEXT("dwSize            %x\r\n"), lpRS->dwSize);
@@ -799,7 +799,7 @@ void DumpRS(LPRECONVERTSTRING lpRS) {
   OutputDebugString(szDev);
   wsprintf(szDev, TEXT("dwTargetStrOffset %x\r\n"), lpRS->dwTargetStrOffset);
   OutputDebugString(szDev);
-  MyOutputDebugString(lpDump);
+  OutputDebugString(lpDump);
   OutputDebugString(TEXT("\r\n"));
 }
 #endif
@@ -953,8 +953,8 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
 //    の数を返す。
 //  ImeGetImeMenuItems は Windows'98 や Windows 2000 用の新しい関数である。
 DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
-                                LPMYIMEMENUITEMINFO lpImeParentMenu,
-                                LPMYIMEMENUITEMINFO lpImeMenu, DWORD dwSize) {
+                                LPIMEMENUITEMINFO lpImeParentMenu,
+                                LPIMEMENUITEMINFO lpImeMenu, DWORD dwSize) {
   // dwType を MSIME はチェックしていないようだ。それに合わせる。
   // ただ、TSF が生きていると、この method は常に動作してないように思えるが。
   //
@@ -988,7 +988,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->wID = IDIM_ROOT_MR_1;
       lpImeMenu->hbmpChecked = 0;
       lpImeMenu->hbmpUnchecked = 0;
-      Mylstrcpy(lpImeMenu->szString, MYTEXT("RootRightMenu1"));
+      lstrcpy(lpImeMenu->szString, TEXT("RootRightMenu1"));
       lpImeMenu->hbmpItem = 0;
 
       lpImeMenu++;
@@ -998,7 +998,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->wID = IDIM_ROOT_MR_2;
       lpImeMenu->hbmpChecked = 0;
       lpImeMenu->hbmpUnchecked = 0;
-      Mylstrcpy(lpImeMenu->szString, MYTEXT("RootRightMenu2"));
+      lstrcpy(lpImeMenu->szString, TEXT("RootRightMenu2"));
       lpImeMenu->hbmpItem = 0;
 
       lpImeMenu++;
@@ -1008,7 +1008,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->wID = IDIM_ROOT_MR_3;
       lpImeMenu->hbmpChecked = 0;
       lpImeMenu->hbmpUnchecked = 0;
-      Mylstrcpy(lpImeMenu->szString, MYTEXT("RootRightMenu3"));
+      lstrcpy(lpImeMenu->szString, TEXT("RootRightMenu3"));
       lpImeMenu->hbmpItem = 0;
 
       return NUM_ROOT_MENU_R;
@@ -1019,7 +1019,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->wID = IDIM_ROOT_ML_1;
       lpImeMenu->hbmpChecked = 0;
       lpImeMenu->hbmpUnchecked = 0;
-      Mylstrcpy(lpImeMenu->szString, MYTEXT("RootLeftMenu1"));
+      lstrcpy(lpImeMenu->szString, TEXT("RootLeftMenu1"));
       lpImeMenu->hbmpItem = 0;
 
       lpImeMenu++;
@@ -1029,7 +1029,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->wID = IDIM_ROOT_ML_2;
       lpImeMenu->hbmpChecked = 0;
       lpImeMenu->hbmpUnchecked = 0;
-      Mylstrcpy(lpImeMenu->szString, MYTEXT("RootLeftMenu2"));
+      lstrcpy(lpImeMenu->szString, TEXT("RootLeftMenu2"));
       lpImeMenu->hbmpItem = 0;
 
       lpImeMenu++;
@@ -1039,7 +1039,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->wID = IDIM_ROOT_ML_3;
       lpImeMenu->hbmpChecked = 0;
       lpImeMenu->hbmpUnchecked = 0;
-      Mylstrcpy(lpImeMenu->szString, MYTEXT("RootLeftMenu3"));
+      lstrcpy(lpImeMenu->szString, TEXT("RootLeftMenu3"));
       lpImeMenu->hbmpItem = LoadBitmap(hInst, TEXT("FACEBMP"));
 
       return NUM_ROOT_MENU_L;
@@ -1052,7 +1052,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->wID = IDIM_SUB_MR_1;
       lpImeMenu->hbmpChecked = 0;
       lpImeMenu->hbmpUnchecked = 0;
-      Mylstrcpy(lpImeMenu->szString, MYTEXT("SubRightMenu1"));
+      lstrcpy(lpImeMenu->szString, TEXT("SubRightMenu1"));
       lpImeMenu->hbmpItem = 0;
 
       lpImeMenu++;
@@ -1062,7 +1062,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->wID = IDIM_SUB_MR_2;
       lpImeMenu->hbmpChecked = 0;
       lpImeMenu->hbmpUnchecked = 0;
-      Mylstrcpy(lpImeMenu->szString, MYTEXT("SubRightMenu2"));
+      lstrcpy(lpImeMenu->szString, TEXT("SubRightMenu2"));
       lpImeMenu->hbmpItem = 0;
 
       return NUM_SUB_MENU_R;
@@ -1073,7 +1073,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->wID = IDIM_SUB_ML_1;
       lpImeMenu->hbmpChecked = 0;
       lpImeMenu->hbmpUnchecked = 0;
-      Mylstrcpy(lpImeMenu->szString, MYTEXT("SubLeftMenu1"));
+      lstrcpy(lpImeMenu->szString, TEXT("SubLeftMenu1"));
       lpImeMenu->hbmpItem = 0;
 
       lpImeMenu++;
@@ -1083,7 +1083,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->wID = IDIM_SUB_ML_2;
       lpImeMenu->hbmpChecked = LoadBitmap(hInst, TEXT("CHECKBMP"));
       lpImeMenu->hbmpUnchecked = LoadBitmap(hInst, TEXT("UNCHECKBMP"));
-      Mylstrcpy(lpImeMenu->szString, MYTEXT("SubLeftMenu2"));
+      lstrcpy(lpImeMenu->szString, TEXT("SubLeftMenu2"));
       lpImeMenu->hbmpItem = 0;
 
       return NUM_SUB_MENU_L;

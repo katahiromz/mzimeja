@@ -87,7 +87,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
 }
 
 // Count how may the char can be arranged in DX
-int PASCAL NumCharInDX(HDC hDC, LPMYSTR lp, int dx) {
+int PASCAL NumCharInDX(HDC hDC, LPTSTR lp, int dx) {
   SIZE sz;
   int width = 0;
   int num = 0;
@@ -109,7 +109,7 @@ int PASCAL NumCharInDX(HDC hDC, LPMYSTR lp, int dx) {
 }
 
 // Count how may the char can be arranged in DY
-int PASCAL NumCharInDY(HDC hDC, LPMYSTR lp, int dy) {
+int PASCAL NumCharInDY(HDC hDC, LPTSTR lp, int dy) {
   SIZE sz;
   int width = 0;
   int num;
@@ -134,7 +134,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
   HFONT hFont = (HFONT)NULL;
   HFONT hOldFont = (HFONT)NULL;
   LPCOMPOSITIONSTRING lpCompStr;
-  LPMYSTR lpstr;
+  LPTSTR lpstr;
   RECT rc;
   RECT oldrc;
   SIZE sz;
@@ -149,7 +149,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
   {
     POINT ptSrc = lpIMC->cfCompForm.ptCurrentPos;
     RECT rcSrc;
-    LPMYSTR lpt;
+    LPTSTR lpt;
     int dx;
     int dy;
     int num;
@@ -348,10 +348,10 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
   }
 }
 
-void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPMYSTR lpstr,
+void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
                             LPBYTE lpattr, int num, BOOL fVert) {
-  //LPMYSTR lpStart = lpstr;
-  LPMYSTR lpEnd = lpstr + num - 1;
+  //LPTSTR lpStart = lpstr;
+  LPTSTR lpEnd = lpstr + num - 1;
   int x, y;
   RECT rc;
 
@@ -441,7 +441,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
     if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen > 0)) {
-        LPMYSTR lpstr;
+        LPTSTR lpstr;
         LPBYTE lpattr;
         LONG lstart;
         LONG num;
@@ -463,14 +463,14 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
           lstart = GetWindowLong(hCompWnd, FIGWL_COMPSTARTSTR);
           num = GetWindowLong(hCompWnd, FIGWL_COMPSTARTNUM);
 
-          if (!num || ((lstart + num) > Mylstrlen(lpstr))) goto end_pcw;
+          if (!num || ((lstart + num) > lstrlen(lpstr))) goto end_pcw;
 
           lpstr += lstart;
           lpattr += lstart;
           DrawTextOneLine(hCompWnd, hDC, lpstr, lpattr, num, fVert);
           ReleaseDC(GetParent(hCompWnd), hPDC);
         } else {
-          num = Mylstrlen(lpstr);
+          num = lstrlen(lpstr);
           DrawTextOneLine(hCompWnd, hDC, lpstr, lpattr, num, fVert);
         }
       }

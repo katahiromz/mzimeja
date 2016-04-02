@@ -494,7 +494,7 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
       //
       if (lf.lfCharSet != NATIVE_CHARSET) {
         lf.lfCharSet = NATIVE_CHARSET;
-        lf.lfFaceName[0] = TEXT('\0');
+        lf.lfFaceName[0] = 0;
       }
 
       lpUIExtra->hFont = CreateFontIndirect((LPLOGFONT)&lf);

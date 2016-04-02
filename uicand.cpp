@@ -118,7 +118,7 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
   HBRUSH hbr;
   HDC hDC;
   RECT rc;
-  LPMYSTR lpstr;
+  LPTSTR lpstr;
   int height;
   DWORD i;
   SIZE sz;
@@ -143,8 +143,8 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
           (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
       for (i = lpCandList->dwPageStart;
            i < (lpCandList->dwPageStart + lpCandList->dwPageSize); i++) {
-        lpstr = (LPMYSTR)((LPSTR)lpCandList + lpCandList->dwOffset[i]);
-        MyGetTextExtentPoint(hDC, lpstr, Mylstrlen(lpstr), &sz);
+        lpstr = (LPTSTR)((LPSTR)lpCandList + lpCandList->dwOffset[i]);
+        GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
         if (((LPMYCAND)lpCandInfo)->cl.dwSelection == (DWORD)i) {
           hbr = (HBRUSH)SelectObject(hDC, hbrHightLight);
           PatBlt(hDC, 0, height, rc.right, sz.cy, PATCOPY);
@@ -156,8 +156,8 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
           SelectObject(hDC, hbr);
           SetTextColor(hDC, RGB(0, 0, 0));
         }
-        MyTextOut(hDC, GetSystemMetrics(SM_CXEDGE), height, lpstr,
-                  Mylstrlen(lpstr));
+        TextOut(hDC, GetSystemMetrics(SM_CXEDGE), height, lpstr,
+                lstrlen(lpstr));
         height += sz.cy;
       }
       ImmUnlockIMCC(lpIMC->hCandInfo);
@@ -176,7 +176,7 @@ void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
   LPCANDIDATEINFO lpCandInfo;
   LPCANDIDATELIST lpCandList;
   HDC hDC;
-  LPMYSTR lpstr;
+  LPTSTR lpstr;
   int width = 0;
   int height = 0;
   DWORD i;
@@ -197,8 +197,8 @@ void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, LPINPUTCONTEXT lpIMC) {
           (LPCANDIDATELIST)((LPSTR)lpCandInfo + lpCandInfo->dwOffset[0]);
       for (i = lpCandList->dwPageStart;
            i < (lpCandList->dwPageStart + lpCandList->dwPageSize); i++) {
-        lpstr = (LPMYSTR)((LPSTR)lpCandList + lpCandList->dwOffset[i]);
-        MyGetTextExtentPoint(hDC, lpstr, Mylstrlen(lpstr), &sz);
+        lpstr = (LPTSTR)((LPSTR)lpCandList + lpCandList->dwOffset[i]);
+        GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
         if (width < sz.cx) width = sz.cx;
         height += sz.cy;
       }

@@ -59,7 +59,7 @@ void PASCAL RevertText(HIMC hIMC) {
   LPCOMPOSITIONSTRING lpCompStr;
   LPCANDIDATEINFO lpCandInfo;
   TRANSMSG GnMsg;
-  LPMYSTR lpread, lpstr;
+  LPTSTR lpread, lpstr;
 
   if (!IsCompStr(hIMC)) return;
 
@@ -87,25 +87,25 @@ void PASCAL RevertText(HIMC hIMC) {
     //
     // make attribute
     //
-    lpCompStr->dwCursorPos = Mylstrlen(lpstr);
+    lpCompStr->dwCursorPos = lstrlen(lpstr);
     // DeltaStart is 0 at RevertText time.
     lpCompStr->dwDeltaStart = 0;
 
-    lmemset(GETLPCOMPATTR(lpCompStr), 0, Mylstrlen(lpstr));
-    lmemset(GETLPCOMPREADATTR(lpCompStr), 0, Mylstrlen(lpread));
+    memset(GETLPCOMPATTR(lpCompStr), 0, lstrlen(lpstr));
+    memset(GETLPCOMPREADATTR(lpCompStr), 0, lstrlen(lpread));
 
-    SetClause(GETLPCOMPCLAUSE(lpCompStr), Mylstrlen(lpstr));
-    SetClause(GETLPCOMPREADCLAUSE(lpCompStr), Mylstrlen(lpread));
+    SetClause(GETLPCOMPCLAUSE(lpCompStr), lstrlen(lpstr));
+    SetClause(GETLPCOMPREADCLAUSE(lpCompStr), lstrlen(lpread));
     lpCompStr->dwCompClauseLen = 8;
     lpCompStr->dwCompReadClauseLen = 8;
 
     //
     // make length
     //
-    lpCompStr->dwCompStrLen = Mylstrlen(lpstr);
-    lpCompStr->dwCompReadStrLen = Mylstrlen(lpread);
-    lpCompStr->dwCompAttrLen = Mylstrlen(lpstr);
-    lpCompStr->dwCompReadAttrLen = Mylstrlen(lpread);
+    lpCompStr->dwCompStrLen = lstrlen(lpstr);
+    lpCompStr->dwCompReadStrLen = lstrlen(lpread);
+    lpCompStr->dwCompAttrLen = lstrlen(lpstr);
+    lpCompStr->dwCompReadAttrLen = lstrlen(lpread);
 
     //
     // Generate messages.
@@ -125,13 +125,13 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   LPCOMPOSITIONSTRING lpCompStr;
   LPCANDIDATEINFO lpCandInfo;
   LPCANDIDATELIST lpCandList;
-  MYCHAR szBuf[256 + 2];
+  TCHAR szBuf[256 + 2];
   int nBufLen;
-  LPMYSTR lpstr;
+  LPTSTR lpstr;
   TRANSMSG GnMsg;
   LPBYTE lpb;
   //OFSTRUCT ofs;
-  LPMYSTR lpT, lpT2;
+  LPTSTR lpT, lpT2;
   int cnt;
   BOOL bRc = FALSE;
 
@@ -172,7 +172,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   cnt = 0;
   while (*lpT) {
     cnt++;
-    lpT += (Mylstrlen(lpT) + 1);
+    lpT += (lstrlen(lpT) + 1);
 
     if (cnt > MAXCANDSTRNUM) {
       //
@@ -189,9 +189,9 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
       //
       // make attribute
       //
-      lmemset(GETLPCOMPATTR(lpCompStr), 1, Mylstrlen(GETLPCOMPSTR(lpCompStr)));
-      lmemset(GETLPCOMPREADATTR(lpCompStr), 1,
-              Mylstrlen(GETLPCOMPREADSTR(lpCompStr)));
+      memset(GETLPCOMPATTR(lpCompStr), 1, lstrlen(GETLPCOMPSTR(lpCompStr)));
+      memset(GETLPCOMPREADATTR(lpCompStr), 1,
+              lstrlen(GETLPCOMPREADSTR(lpCompStr)));
 
       GnMsg.message = WM_IME_COMPOSITION;
       GnMsg.wParam = 0;
@@ -203,25 +203,25 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     goto cvk_exit40;
   }
 
-  lpstr = (LPMYSTR)szBuf;
+  lpstr = (LPTSTR)szBuf;
   if (!*lpb) {
     //
     // String is not converted yet.
     //
     while (*lpstr) {
-      if (0 != Mylstrcmp(lpstr, GETLPCOMPSTR(lpCompStr))) {
+      if (0 != lstrcmp(lpstr, GETLPCOMPSTR(lpCompStr))) {
       set_compstr:
         //
         // Set the composition string to the structure.
         //
-        Mylstrcpy(GETLPCOMPSTR(lpCompStr), lpstr);
+        lstrcpy(GETLPCOMPSTR(lpCompStr), lpstr);
 
         lpstr = GETLPCOMPSTR(lpCompStr);
 
         //
         // Set the length and cursor position to the structure.
         //
-        lpCompStr->dwCompStrLen = Mylstrlen(lpstr);
+        lpCompStr->dwCompStrLen = lstrlen(lpstr);
         lpCompStr->dwCursorPos = 0;
         // Because MZ-IME does not support clause, DeltaStart is 0 anytime.
         lpCompStr->dwDeltaStart = 0;
@@ -229,16 +229,16 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
         //
         // make attribute
         //
-        lmemset((LPBYTE)GETLPCOMPATTR(lpCompStr), 1, Mylstrlen(lpstr));
-        lmemset((LPBYTE)GETLPCOMPREADATTR(lpCompStr), 1,
-                Mylstrlen(GETLPCOMPREADSTR(lpCompStr)));
+        memset((LPBYTE)GETLPCOMPATTR(lpCompStr), 1, lstrlen(lpstr));
+        memset((LPBYTE)GETLPCOMPREADATTR(lpCompStr), 1,
+                lstrlen(GETLPCOMPREADSTR(lpCompStr)));
 
         //
         // make clause info
         //
-        SetClause(GETLPCOMPCLAUSE(lpCompStr), Mylstrlen(lpstr));
+        SetClause(GETLPCOMPCLAUSE(lpCompStr), lstrlen(lpstr));
         SetClause(GETLPCOMPREADCLAUSE(lpCompStr),
-                  Mylstrlen(GETLPCOMPREADSTR(lpCompStr)));
+                  lstrlen(GETLPCOMPREADSTR(lpCompStr)));
         lpCompStr->dwCompClauseLen = 8;
         lpCompStr->dwCompReadClauseLen = 8;
 
@@ -253,7 +253,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
         bRc = TRUE;
         goto cvk_exit40;
       }
-      lpstr += (Mylstrlen(lpstr) + 1);
+      lpstr += (lstrlen(lpstr) + 1);
     }
   } else {
     //
@@ -284,8 +284,8 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     while (*lpstr) {
       lpCandList->dwOffset[i] =
           (DWORD)((LPSTR)((LPMYCAND)lpCandInfo)->szCand[i] - (LPSTR)lpCandList);
-      Mylstrcpy((LPMYSTR)((LPSTR)lpCandList + lpCandList->dwOffset[i]), lpstr);
-      lpstr += (Mylstrlen(lpstr) + 1);
+      lstrcpy((LPTSTR)((LPSTR)lpCandList + lpCandList->dwOffset[i]), lpstr);
+      lpstr += (lstrlen(lpstr) + 1);
       i++;
     }
 
@@ -319,7 +319,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     // If the selected candidate string is changed, the composition string
     // should be updated.
     //
-    lpstr = (LPMYSTR)((LPSTR)lpCandList +
+    lpstr = (LPTSTR)((LPSTR)lpCandList +
                       lpCandList->dwOffset[lpCandList->dwSelection]);
     goto set_compstr;
   }
@@ -343,9 +343,9 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
   LPINPUTCONTEXT lpIMC;
   LPCOMPOSITIONSTRING lpCompStr;
   LPCANDIDATEINFO lpCandInfo;
-  LPMYSTR lpstr;
-  LPMYSTR lpread;
-  LPMYSTR lpptr;
+  LPTSTR lpstr;
+  LPTSTR lpread;
+  LPTSTR lpptr;
   int nChar;
   BOOL fDone = FALSE;
   DWORD dwCurPos;
@@ -363,22 +363,22 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
   if (uVKey == VK_BACK) {
     if (dwCurPos == 0) goto dc_exit;
 
-    lpptr = MyCharPrev(lpstr, lpstr + dwCurPos);
+    lpptr = CharPrev(lpstr, lpstr + dwCurPos);
     nChar = 1;
-    if (lpstr == lpptr && Mylstrlen(lpstr) == nChar) {
+    if (lpstr == lpptr && lstrlen(lpstr) == nChar) {
       dwCurPos = 0;
-      *lpstr = MYTEXT('\0');
+      *lpstr = 0;
     } else {
-      Mylstrcpy(lpptr, lpstr + dwCurPos);
+      lstrcpy(lpptr, lpstr + dwCurPos);
       dwCurPos -= nChar;
     }
 
     fDone = TRUE;
   } else if (uVKey == VK_DELETE) {
-    if (dwCurPos == (DWORD)Mylstrlen(lpstr)) goto dc_exit;
+    if (dwCurPos == (DWORD)lstrlen(lpstr)) goto dc_exit;
 
     nChar = 1;
-    Mylstrcpy(lpstr + dwCurPos, lpstr + dwCurPos + nChar);
+    lstrcpy(lpstr + dwCurPos, lpstr + dwCurPos + nChar);
 
     fDone = TRUE;
   }
@@ -388,16 +388,16 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
     lpread = GETLPCOMPREADSTR(lpCompStr);
     lZenToHan(lpread, lpstr);
 
-    lmemset(GETLPCOMPATTR(lpCompStr), 0, Mylstrlen(lpstr));
-    lmemset(GETLPCOMPREADATTR(lpCompStr), 0, Mylstrlen(lpread));
+    memset(GETLPCOMPATTR(lpCompStr), 0, lstrlen(lpstr));
+    memset(GETLPCOMPREADATTR(lpCompStr), 0, lstrlen(lpread));
 
     //
     // make length
     //
-    lpCompStr->dwCompStrLen = Mylstrlen(lpstr);
-    lpCompStr->dwCompReadStrLen = Mylstrlen(lpread);
-    lpCompStr->dwCompAttrLen = Mylstrlen(lpstr);
-    lpCompStr->dwCompReadAttrLen = Mylstrlen(lpread);
+    lpCompStr->dwCompStrLen = lstrlen(lpstr);
+    lpCompStr->dwCompReadStrLen = lstrlen(lpread);
+    lpCompStr->dwCompAttrLen = lstrlen(lpstr);
+    lpCompStr->dwCompReadAttrLen = lstrlen(lpread);
 
     lpCompStr->dwCursorPos = dwCurPos;
     // DeltaStart is same of Cursor Pos at DeleteChar time.
@@ -406,8 +406,8 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
     //
     // make clause info
     //
-    SetClause(GETLPCOMPCLAUSE(lpCompStr), Mylstrlen(lpstr));
-    SetClause(GETLPCOMPREADCLAUSE(lpCompStr), Mylstrlen(lpread));
+    SetClause(GETLPCOMPCLAUSE(lpCompStr), lstrlen(lpstr));
+    SetClause(GETLPCOMPREADCLAUSE(lpCompStr), lstrlen(lpread));
     lpCompStr->dwCompClauseLen = 8;
     lpCompStr->dwCompReadClauseLen = 8;
 
@@ -447,10 +447,10 @@ dc_exit:
 }
 
 void PASCAL AddChar(HIMC hIMC, WORD code) {
-  LPMYSTR lpchText;
-  LPMYSTR lpread;
-  LPMYSTR lpstr;
-  LPMYSTR lpprev;
+  LPTSTR lpchText;
+  LPTSTR lpread;
+  LPTSTR lpstr;
+  LPTSTR lpprev;
   WORD code2 = 0;
   WORD code3;
   DWORD fdwConversion;
@@ -498,13 +498,13 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
     lpchText = GETLPCOMPSTR(lpCompStr);
     lpstr = lpchText;
     if (lpCompStr->dwCursorPos) lpstr += lpCompStr->dwCursorPos;
-    lpstr = lpchText + Mylstrlen(lpchText);
-    lpprev = MyCharPrev(lpchText, lpstr);
+    lpstr = lpchText + lstrlen(lpchText);
+    lpprev = CharPrev(lpchText, lpstr);
 
     if (fdwConversion & IME_CMODE_CHARCODE) {
       code = (WORD)(LONG_PTR)AnsiUpper((LPSTR)(LONG_PTR)code);
-      if (!((code >= MYTEXT('0') && code <= MYTEXT('9')) ||
-            (code >= MYTEXT('A') && code <= MYTEXT('F'))) ||
+      if (!((code >= TEXT('0') && code <= TEXT('9')) ||
+            (code >= TEXT('A') && code <= TEXT('F'))) ||
           lpCompStr->dwCursorPos >= 4) {
         MessageBeep(0);
         goto ac_exit;
@@ -550,9 +550,8 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
             }
             goto DBCS_BETA;
           }
-        } else if ((WORD)(LONG_PTR)CharUpperW((LPMYSTR)(LONG_PTR)code) == 'N' &&
-                   (WORD)(LONG_PTR)CharUpperW((LPMYSTR)(LONG_PTR)code2) ==
-                       'N') {
+        } else if ((WORD)(LONG_PTR)CharUpper((LPTSTR)(LONG_PTR)code) == 'N' &&
+                   (WORD)(LONG_PTR)CharUpper((LPTSTR)(LONG_PTR)code2) == 'N') {
           code3 = 0xFF9D;
           code2 = HanToZen(code3, 0, fdwConversion);
           *lpprev = code2;
@@ -560,12 +559,12 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
           goto DBCS_BETA;
       } else {
       DBCS_BETA:
-        if (code == MYTEXT('^')) {
+        if (code == TEXT('^')) {
           code2 = *lpprev;
           if (IsTenten(code2) == FALSE) goto DBCS_BETA2;
           code2 = ConvTenten(code2);
           *lpprev++ = code2;
-        } else if (code == MYTEXT('_')) {
+        } else if (code == TEXT('_')) {
           code2 = *lpprev;
           if (IsMaru(code2) == FALSE) goto DBCS_BETA2;
           code2 = ConvMaru(code2);
@@ -597,10 +596,10 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
             goto SBCS_BETA;
           }
         } else {
-          if ((WORD)(LONG_PTR)CharUpperW((LPMYSTR)(LONG_PTR)code) == 'N' &&
-              (WORD)(LONG_PTR)CharUpperW(
-                  (LPMYSTR)(LONG_PTR)(code2 = *lpprev)) == 'N') {
-            *lpprev = (MYCHAR)0xFF9D;
+          if ((WORD)(LONG_PTR)CharUpper((LPTSTR)(LONG_PTR)code) == 'N' &&
+              (WORD)(LONG_PTR)CharUpper(
+                  (LPTSTR)(LONG_PTR)(code2 = *lpprev)) == 'N') {
+            *lpprev = (TCHAR)0xFF9D;
           } else {
             // MakeGuideLine(hIMC,MYGL_TYPINGERROR);
             goto SBCS_BETA;
@@ -620,7 +619,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
         lpCompStr->dwCursorPos++;
       }
     }
-    *lpstr = MYTEXT('\0');
+    *lpstr = 0;
   }
 
   // make reading string.
@@ -628,41 +627,41 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   lpread = GETLPCOMPREADSTR(lpCompStr);
   if (fdwConversion & IME_CMODE_KATAKANA) {
     if (fdwConversion & IME_CMODE_FULLSHAPE) {
-      Mylstrcpy(lpread, lpstr);
+      lstrcpy(lpread, lpstr);
     } else {
       lHanToZen(lpread, lpstr, fdwConversion);
     }
   } else {
-    LPMYSTR pSrc = lpstr;
-    LPMYSTR pDst = lpread;
+    LPTSTR pSrc = lpstr;
+    LPTSTR pDst = lpread;
 
     for (; *pSrc;) {
       *pDst++ = HiraToKata(*pSrc);
       pSrc++;
     }
-    *pDst = (MYCHAR)0;
+    *pDst = (TCHAR)0;
   }
 
   // make attribute
-  lpCompStr->dwCursorPos = Mylstrlen(lpstr);
+  lpCompStr->dwCursorPos = lstrlen(lpstr);
   lpCompStr->dwDeltaStart =
-      (DWORD)(MyCharPrev(lpstr, lpstr + Mylstrlen(lpstr)) - lpstr);
+      (DWORD)(CharPrev(lpstr, lpstr + lstrlen(lpstr)) - lpstr);
 
   // MakeAttrClause(lpCompStr);
-  lmemset((LPBYTE)GETLPCOMPATTR(lpCompStr), 0, Mylstrlen(lpstr));
-  lmemset((LPBYTE)GETLPCOMPREADATTR(lpCompStr), 0, Mylstrlen(lpread));
+  memset((LPBYTE)GETLPCOMPATTR(lpCompStr), 0, lstrlen(lpstr));
+  memset((LPBYTE)GETLPCOMPREADATTR(lpCompStr), 0, lstrlen(lpread));
 
   // make length
-  lpCompStr->dwCompStrLen = Mylstrlen(lpstr);
-  lpCompStr->dwCompReadStrLen = Mylstrlen(lpread);
-  lpCompStr->dwCompAttrLen = Mylstrlen(lpstr);
-  lpCompStr->dwCompReadAttrLen = Mylstrlen(lpread);
+  lpCompStr->dwCompStrLen = lstrlen(lpstr);
+  lpCompStr->dwCompReadStrLen = lstrlen(lpread);
+  lpCompStr->dwCompAttrLen = lstrlen(lpstr);
+  lpCompStr->dwCompReadAttrLen = lstrlen(lpread);
 
   //
   // make clause info
   //
-  SetClause(GETLPCOMPCLAUSE(lpCompStr), Mylstrlen(lpstr));
-  SetClause(GETLPCOMPREADCLAUSE(lpCompStr), Mylstrlen(lpread));
+  SetClause(GETLPCOMPCLAUSE(lpCompStr), lstrlen(lpstr));
+  SetClause(GETLPCOMPREADCLAUSE(lpCompStr), lstrlen(lpread));
   lpCompStr->dwCompClauseLen = 8;
   lpCompStr->dwCompReadClauseLen = 8;
 
@@ -797,8 +796,8 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
     GenerateMessage(hIMC, lpIMC, lpCurTransKey, (LPTRANSMSG)&GnMsg);
   }
 
-  Mylstrcpy(GETLPRESULTSTR(lpCompStr), GETLPCOMPSTR(lpCompStr));
-  Mylstrcpy(GETLPRESULTREADSTR(lpCompStr), GETLPCOMPREADSTR(lpCompStr));
+  lstrcpy(GETLPRESULTSTR(lpCompStr), GETLPCOMPSTR(lpCompStr));
+  lstrcpy(GETLPRESULTREADSTR(lpCompStr), GETLPCOMPREADSTR(lpCompStr));
 
   lpCompStr->dwResultStrLen = lpCompStr->dwCompStrLen;
   lpCompStr->dwResultReadStrLen = lpCompStr->dwCompReadStrLen;
@@ -809,9 +808,9 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
   //
   // make clause info
   //
-  SetClause(GETLPRESULTCLAUSE(lpCompStr), Mylstrlen(GETLPRESULTSTR(lpCompStr)));
+  SetClause(GETLPRESULTCLAUSE(lpCompStr), lstrlen(GETLPRESULTSTR(lpCompStr)));
   SetClause(GETLPRESULTREADCLAUSE(lpCompStr),
-            Mylstrlen(GETLPRESULTREADSTR(lpCompStr)));
+            lstrlen(GETLPRESULTREADSTR(lpCompStr)));
   lpCompStr->dwResultClauseLen = 8;
   lpCompStr->dwResultReadClauseLen = 8;
 
@@ -840,8 +839,8 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   LPGUIDELINE lpGuideLine;
   TRANSMSG GnMsg;
   DWORD dwSize =
-      sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(MYCHAR)) * 2 * sizeof(MYCHAR);
-  LPMYSTR lpStr;
+      sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(TCHAR)) * 2 * sizeof(TCHAR);
+  LPTSTR lpStr;
 
   lpIMC = ImmLockIMC(hIMC);
   lpIMC->hGuideLine = ImmReSizeIMCC(lpIMC->hGuideLine, dwSize);
@@ -851,16 +850,16 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   lpGuideLine->dwLevel = glTable[dwID].dwLevel;
   lpGuideLine->dwIndex = glTable[dwID].dwIndex;
   lpGuideLine->dwStrOffset = sizeof(GUIDELINE);
-  lpStr = (LPMYSTR)(((LPSTR)lpGuideLine) + lpGuideLine->dwStrOffset);
+  lpStr = (LPTSTR)(((LPSTR)lpGuideLine) + lpGuideLine->dwStrOffset);
   LoadString(hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
-  lpGuideLine->dwStrLen = Mylstrlen(lpStr);
+  lpGuideLine->dwStrLen = lstrlen(lpStr);
 
   if (glTable[dwID].dwPrivateID) {
     lpGuideLine->dwPrivateOffset =
-        sizeof(GUIDELINE) + (MAXGLCHAR + 1) * sizeof(MYCHAR);
-    lpStr = (LPMYSTR)(((LPSTR)lpGuideLine) + lpGuideLine->dwPrivateOffset);
+        sizeof(GUIDELINE) + (MAXGLCHAR + 1) * sizeof(TCHAR);
+    lpStr = (LPTSTR)(((LPSTR)lpGuideLine) + lpGuideLine->dwPrivateOffset);
     LoadString(hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
-    lpGuideLine->dwPrivateSize = Mylstrlen(lpStr) * sizeof(MYCHAR);
+    lpGuideLine->dwPrivateSize = lstrlen(lpStr) * sizeof(TCHAR);
   } else {
     lpGuideLine->dwPrivateOffset = 0L;
     lpGuideLine->dwPrivateSize = 0L;
@@ -952,7 +951,7 @@ void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow) {
   LPCOMPOSITIONSTRING lpCompStr;
   //DWORD dwStartClause = 0;
   //DWORD dwEndClause = 0;
-  LPMYSTR lpstart, lpstr, lpend;
+  LPTSTR lpstart, lpstr, lpend;
 
   if (!(lpIMC = ImmLockIMC(hIMC))) return;
 
@@ -963,12 +962,12 @@ void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow) {
 
     lpstart = GETLPCOMPSTR(lpCompStr);
     lpstr = lpstart + lpCompStr->dwCursorPos;
-    lpend = lpstart + Mylstrlen(lpstart);
+    lpend = lpstart + lstrlen(lpstart);
 
     if (fArrow == ARR_RIGHT) {
-      if (lpstr < lpend) lpstr = MyCharNext(lpstr);
+      if (lpstr < lpend) lpstr = CharNext(lpstr);
     } else {
-      if (lpstr > lpstart) lpstr = MyCharPrev(lpstart, lpstr);
+      if (lpstr > lpstart) lpstr = CharPrev(lpstart, lpstr);
     }
 
     lpCompStr->dwCursorPos = (DWORD)(lpstr - lpstart);
@@ -980,52 +979,52 @@ hsa_exit:
   ImmUnlockIMC(hIMC);
 }
 
-int CopyCandidateStringsFromDictionary(LPMYSTR lpDic, LPMYSTR lpRead,
-                                       LPMYSTR lpBuf, DWORD dwBufLen) {
+int CopyCandidateStringsFromDictionary(LPTSTR lpDic, LPTSTR lpRead,
+                                       LPTSTR lpBuf, DWORD dwBufLen) {
   DWORD dwWritten = 0;
-  LPMYSTR lpSection, lpTemp;
-  const LPMYSTR szSep = MYTEXT(" \r\n\t");
+  LPTSTR lpSection, lpTemp;
+  const LPTSTR szSep = TEXT(" \r\n\t");
 
-  LPMYSTR lpToken = Mystrtok(lpDic, szSep);
+  LPTSTR lpToken = wcstok(lpDic, szSep);
   while (NULL != lpToken) {
-    if (MYTEXT('[') == *lpToken) {
+    if (TEXT('[') == *lpToken) {
       lpSection = lpToken + 1;
-      if (NULL != (lpTemp = Mystrchr(lpSection, MYTEXT(']'))))
-        *lpTemp = MYTEXT('\0');
-      if (0 == Mylstrcmp(lpSection, lpRead)) {
-        lpToken = Mystrtok(NULL, szSep);
+      if (NULL != (lpTemp = wcschr(lpSection, TEXT(']'))))
+        *lpTemp = 0;
+      if (0 == lstrcmp(lpSection, lpRead)) {
+        lpToken = wcstok(NULL, szSep);
         break;  // found it.
       }
     }
-    lpToken = Mystrtok(NULL, szSep);
+    lpToken = wcstok(NULL, szSep);
   }
   if (NULL != lpToken) {
-    LPMYSTR lpWrite = lpBuf;
+    LPTSTR lpWrite = lpBuf;
     DWORD dwW;
     while ((NULL != lpToken) && ((dwBufLen - dwWritten) > 1) &&
-           (MYTEXT('[') != *lpToken)) {
-      if (NULL != (lpTemp = Mystrchr(lpToken, MYTEXT('='))))
-        *lpTemp = MYTEXT('\0');
-      Mylstrcpyn(lpWrite, lpToken, dwBufLen - dwWritten - 1);
-      dwW = Mylstrlen(lpToken) + 1;
+           (TEXT('[') != *lpToken)) {
+      if (NULL != (lpTemp = wcschr(lpToken, TEXT('='))))
+        *lpTemp = 0;
+      lstrcpyn(lpWrite, lpToken, dwBufLen - dwWritten - 1);
+      dwW = lstrlen(lpToken) + 1;
       lpWrite += dwW;
       dwWritten += dwW;
-      lpToken = Mystrtok(NULL, szSep);
+      lpToken = wcstok(NULL, szSep);
     }
-    *lpWrite = MYTEXT('\0');
+    *lpWrite = 0;
     dwWritten++;
     return dwWritten;
   }
   return 0;
 }
 
-int GetCandidateStringsFromDictionary(LPMYSTR lpRead, LPMYSTR lpBuf,
+int GetCandidateStringsFromDictionary(LPTSTR lpRead, LPTSTR lpBuf,
                                       DWORD dwBufLen, LPTSTR lpFilename) {
   HANDLE hTblFile;
   PSECURITY_ATTRIBUTES psa;
   int nSize = 0;
   DWORD dwFileSize, dwRead;
-  LPMYSTR lpDic;
+  LPTSTR lpDic;
 
   psa = CreateSecurityAttributes();
 
@@ -1038,10 +1037,10 @@ int GetCandidateStringsFromDictionary(LPMYSTR lpRead, LPMYSTR lpBuf,
 
   if (dwBufLen > 2) {
     if ((dwFileSize = GetFileSize(hTblFile, (LPDWORD)NULL)) != 0xffffffff) {
-      if ((lpDic = (LPMYSTR)GlobalAlloc(GPTR, dwFileSize + 2))) {
+      if ((lpDic = (LPTSTR)GlobalAlloc(GPTR, dwFileSize + 2))) {
         if (ReadFile(hTblFile, lpDic, dwFileSize, &dwRead, NULL)) {
           if (*lpDic == 0xfeff) {
-            *(LPWSTR)(((LPBYTE)lpDic) + dwFileSize) = MYTEXT('\0');
+            *(LPWSTR)(((LPBYTE)lpDic) + dwFileSize) = 0;
             nSize = CopyCandidateStringsFromDictionary(lpDic + 1, lpRead, lpBuf,
                                                        dwBufLen);
           }

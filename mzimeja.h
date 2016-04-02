@@ -23,24 +23,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-typedef LPTSTR LPMYSTR;
-typedef TCHAR MYCHAR;
-#define MYTEXT(x) TEXT(x)
-#define Mylstrlen(x) lstrlen(x)
-#define Mylstrcpy(x, y) MylstrcpyW((x), (y))
-#define Mylstrcmp(x, y) MylstrcmpW((x), (y))
-#define MyCharPrev(x, y) MyCharPrevW((x), (y))
-#define MyCharPrev(x, y) MyCharPrevW((x), (y))
-#define MyCharNext(x) MyCharNextW(x)
 #include <string.h>
-#define Mystrtok wcstok
-#define Mystrchr wcschr
-#define Mylstrcpyn lstrcpyn
-#define MyTextOut TextOut
-#define MyGetTextExtentPoint GetTextExtentPoint
-#define LPMYIMEMENUITEMINFO LPIMEMENUITEMINFO
-#define MyImmRequestMessage ImmRequestMessage
-#define MyOutputDebugString OutputDebugString
 #define MyFileName TEXT("mzimeja.ime")
 
 /* for limit of MZ-IME */
@@ -161,19 +144,19 @@ typedef TCHAR MYCHAR;
 #define GETLPCOMPREADCLAUSE(lpcs) \
   (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwCompReadClauseOffset)
 #define GETLPCOMPREADSTR(lpcs) \
-  (LPMYSTR)((LPBYTE)(lpcs) + (lpcs)->dwCompReadStrOffset)
+  (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwCompReadStrOffset)
 #define GETLPCOMPATTR(lpcs) (LPBYTE)((LPBYTE)(lpcs) + (lpcs)->dwCompAttrOffset)
 #define GETLPCOMPCLAUSE(lpcs) \
   (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwCompClauseOffset)
-#define GETLPCOMPSTR(lpcs) (LPMYSTR)((LPBYTE)(lpcs) + (lpcs)->dwCompStrOffset)
+#define GETLPCOMPSTR(lpcs) (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwCompStrOffset)
 #define GETLPRESULTREADCLAUSE(lpcs) \
   (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwResultReadClauseOffset)
 #define GETLPRESULTREADSTR(lpcs) \
-  (LPMYSTR)((LPBYTE)(lpcs) + (lpcs)->dwResultReadStrOffset)
+  (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwResultReadStrOffset)
 #define GETLPRESULTCLAUSE(lpcs) \
   (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwResultClauseOffset)
 #define GETLPRESULTSTR(lpcs) \
-  (LPMYSTR)((LPBYTE)(lpcs) + (lpcs)->dwResultStrOffset)
+  (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwResultStrOffset)
 
 #define SetClause(lpdw, num)      \
   {                               \
@@ -215,16 +198,16 @@ typedef TCHAR MYCHAR;
 
 typedef struct _tagMYCOMPSTR {
   COMPOSITIONSTRING cs;
-  MYCHAR szCompReadStr[MAXCOMPSIZE];
+  TCHAR szCompReadStr[MAXCOMPSIZE];
   BYTE bCompReadAttr[MAXCOMPSIZE];
   DWORD dwCompReadClause[MAXCLAUSESIZE];
-  MYCHAR szCompStr[MAXCOMPSIZE];
+  TCHAR szCompStr[MAXCOMPSIZE];
   BYTE bCompAttr[MAXCOMPSIZE];
   DWORD dwCompClause[MAXCLAUSESIZE];
   char szTypeInfo[MAXCOMPSIZE];
-  MYCHAR szResultReadStr[MAXCOMPSIZE];
+  TCHAR szResultReadStr[MAXCOMPSIZE];
   DWORD dwResultReadClause[MAXCOMPSIZE];
-  MYCHAR szResultStr[MAXCOMPSIZE];
+  TCHAR szResultStr[MAXCOMPSIZE];
   DWORD dwResultClause[MAXCOMPSIZE];
 } MYCOMPSTR, NEAR *PMYCOMPSTR, FAR *LPMYCOMPSTR;
 
@@ -309,12 +292,6 @@ BOOL PASCAL IsCompStr(HIMC hIMC);
 BOOL PASCAL IsConvertedCompStr(HIMC hIMC);
 BOOL PASCAL IsCandidate(LPINPUTCONTEXT lpIMC);
 void PASCAL UpdateIndicIcon(HIMC hIMC);
-void PASCAL lmemset(LPBYTE, BYTE, UINT);
-int PASCAL MylstrcmpW(LPCWSTR lp0, LPCWSTR lp1);
-int PASCAL MylstrcpyW(LPWSTR lp0, LPCWSTR lp1);
-LPWSTR PASCAL MyCharPrevW(LPCWSTR lpStart, LPCWSTR lpCur);
-LPWSTR PASCAL MyCharNextW(LPCWSTR lp);
-LPWSTR PASCAL MylstrcpynW(LPWSTR lp0, LPCWSTR lp1, int nCount);
 HFONT CheckNativeCharset(HDC hDC);
 
 /*   toascii.c   */
@@ -421,8 +398,8 @@ BOOL PASCAL IsMaru(WORD);
 WORD PASCAL ConvMaru(WORD);
 WORD PASCAL HiraToKata(WORD);
 WORD PASCAL KataToHira(WORD);
-void PASCAL lZenToHan(LPMYSTR, LPMYSTR);
-void PASCAL lHanToZen(LPMYSTR, LPMYSTR, DWORD);
+void PASCAL lZenToHan(LPTSTR, LPTSTR);
+void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
 
 /* DIC3.C        */
 WORD PASCAL AddWord(LPSTR, LPSTR);
