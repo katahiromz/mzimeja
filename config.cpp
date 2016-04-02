@@ -36,11 +36,46 @@ void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
   }
 }
 
-/**********************************************************************/
-/*                                                                    */
-/*      ImeConfigure()                                                */
-/*                                                                    */
-/**********************************************************************/
+//  ImeConfigure
+//    ImeConfigure 関数は IME に対して補足的な情報を要求するために使う
+//    Dialog Box を提供する？
+//  BOOL
+//    ImeConfigure(
+//    HKL hKL,
+//    HWND hWnd,
+//    DWORD dwMode,
+//    LPVOID lpData
+//    )
+//  Parameters
+//    hKL
+//      この IME の入力言語のハンドル。
+//    hWnd
+//      親 Window のハンドル。
+//    dwMode
+//      Dialog のモード。以下のようなフラグが与えられる。
+//      IME_CONFIG_GENERAL      一般 configuration のための Dialog
+//      IME_CONFIG_REGWORD      単語登録のための Dialog
+//      IME_CONFIG_SELECTDICTIONARY IME 辞書選択のための Dialog
+//    lpData
+//      VOID 型のポインタ。もし dwMode == IME_CONFIG_REGISTERWORD なら、
+//      REGISTERWORD 構造体へのポインタとなる。さもなくば無視される。
+//      initial string が与えられなかったら、IME_CONFIG_REGISTER モード
+//      であっても、NULL であってかまわない。
+//    Return Values
+//      この関数が成功したら、TRUE。さもなくば FALSE。
+//  Comments
+//    IME は次のような擬似コードでもって lpData をチェックする。
+//
+//  if (dwmode != IME_CONFIG_REGISTERWORD){
+//    // Does original execution
+//  } else if (IsBadReadPtr(lpdata, sizeof(REGISTERWORD))==FALSE){
+//    if (IsBadStringPtr(PREGISTERWORD(lpdata)->lpReading, (UINT)-1)==FALSE){
+//      // Set the reading string to word registering dialogbox
+//    }
+//    if (IsBadStringPtr(PREGISTERWORD(lpdata)->lpWord, (UINT)-1)==FALSE){
+//      // Set the word string to word registering dialogbox
+//    }
+//  }
 BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
   HPROPSHEETPAGE rPages[MAX_PAGES];
   PROPSHEETHEADER psh;
