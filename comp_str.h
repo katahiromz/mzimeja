@@ -28,28 +28,10 @@ typedef struct MZCOMPSTR : public COMPOSITIONSTRING {
   DWORD   dwResultClause[MAXCOMPSIZE];
 } MZCOMPSTR, *LPMZCOMPSTR;
 
-//////////////////////////////////////////////////////////////////////////////
-
-#if 0
-  #define GETLPCOMPREADATTR(lpcs) \
-    (LPBYTE)((LPBYTE)(lpcs) + (lpcs)->dwCompReadAttrOffset)
-  #define GETLPCOMPREADCLAUSE(lpcs) \
-    (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwCompReadClauseOffset)
-  #define GETLPCOMPREADSTR(lpcs) \
-    (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwCompReadStrOffset)
-  #define GETLPCOMPATTR(lpcs) (LPBYTE)((LPBYTE)(lpcs) + (lpcs)->dwCompAttrOffset)
-  #define GETLPCOMPCLAUSE(lpcs) \
-    (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwCompClauseOffset)
-  #define GETLPCOMPSTR(lpcs) (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwCompStrOffset)
-  #define GETLPRESULTREADCLAUSE(lpcs) \
-    (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwResultReadClauseOffset)
-  #define GETLPRESULTREADSTR(lpcs) \
-    (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwResultReadStrOffset)
-  #define GETLPRESULTCLAUSE(lpcs) \
-    (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwResultClauseOffset)
-  #define GETLPRESULTSTR(lpcs) \
-    (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwResultStrOffset)
-#endif
+inline void SetClause(LPDWORD lpdw, DWORD num) {
+  *lpdw = 0;
+  *(lpdw + 1) = num;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -90,6 +72,29 @@ struct CompStr : public MZCOMPSTR {
     return (LPTSTR)(GetBytes() + dwResultStrOffset);
   }
 };
+
+//////////////////////////////////////////////////////////////////////////////
+
+#if 0
+  #define GETLPCOMPREADATTR(lpcs) \
+    (LPBYTE)((LPBYTE)(lpcs) + (lpcs)->dwCompReadAttrOffset)
+  #define GETLPCOMPREADCLAUSE(lpcs) \
+    (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwCompReadClauseOffset)
+  #define GETLPCOMPREADSTR(lpcs) \
+    (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwCompReadStrOffset)
+  #define GETLPCOMPATTR(lpcs) (LPBYTE)((LPBYTE)(lpcs) + (lpcs)->dwCompAttrOffset)
+  #define GETLPCOMPCLAUSE(lpcs) \
+    (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwCompClauseOffset)
+  #define GETLPCOMPSTR(lpcs) (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwCompStrOffset)
+  #define GETLPRESULTREADCLAUSE(lpcs) \
+    (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwResultReadClauseOffset)
+  #define GETLPRESULTREADSTR(lpcs) \
+    (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwResultReadStrOffset)
+  #define GETLPRESULTCLAUSE(lpcs) \
+    (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwResultClauseOffset)
+  #define GETLPRESULTSTR(lpcs) \
+    (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwResultStrOffset)
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 

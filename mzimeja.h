@@ -136,13 +136,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-inline void SetClause(LPDWORD lpdw, DWORD num) {
-  *lpdw = 0;
-  *(lpdw + 1) = num;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
 #define GCS_COMPALL                                                  \
   (GCS_COMPSTR | GCS_COMPATTR | GCS_COMPREADSTR | GCS_COMPREADATTR | \
    GCS_COMPCLAUSE | GCS_COMPREADCLAUSE)
