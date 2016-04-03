@@ -328,7 +328,7 @@ ImeSetCompositionString関数が呼ばれるであろう。
 ==SCS_SETSTR
 
 ImeSetCompositionStringのdwIndexがSCS_SETSTRであれば、
-IME はhIMCのCOMPOSITIONSTR構造体のすべてを消去できる。
+IME はhIMCのCOMPOSITIONSTRING構造体のすべてを消去できる。
 
 必要なら、IMEは候補情報を更新したり、候補メッセージWM_IME_NOTIFYに
 IMN_OPENCANDIDATE、CHANGECANDIDATE、またはIMN_CLOSECANDIDATEサブメッセージを
@@ -593,4 +593,282 @@ Winlogonプロセスかどうかを、ImeInquire関数の
 チェックできる。
 
 =IMEファイル形式とデータ構造
+
+次のトピックスは、IMEファイル形式とIMEに使われているデータ構造を
+議論する。
+
+==IMEファイル形式
+
+IMEは、次のフィールドをバージョン情報リソース正しく指定する必要がある。
+これは、固定ファイル情報の部分と、可変長情報の部分を含む。
+バージョン情報リソースにおける詳しい情報については、
+Microsoft Platform SDKを参照されたい。
+
+以下が、IMEファイルが含むべき特定の設定である：
+
+ * dwFileOS
+
+   dwFileOSは、VOS__WINDOWS32であるべきだ。
+ 
+ * dwFileType
+ 
+   IMEでは、VFT_DRVを指定するべきだ。
+   
+ * dwFileSubtype
+ 
+   IMEでは、VFT2_DRV_INPUTMETHODを指定すべきだ。
+
+ * FileDescription
+  
+   FileDescriptionは、言語固有のブロックに指定される。
+   これはIMEの名前とバージョンであるべきだ。
+   この文字列は表示目的で使われる。
+   長さは32個分のTCHARである。
+ 
+ * ProductName
+ 
+   言語固有のブロックで指定される。文字通り製品名である。
+
+ * 文字セットID と 言語ID
+ 
+   コードページ（文字セットID; CharSet ID）と言語ID (Language ID)の対である。
+   複数のコードページが指定されるとIMEは最初の対を使用する。
+
+ファイル名は8.3形式でなければならない。
+
+==IMEレジストリ内容
+
+HKEY_CURRENT_USER レジストリは入力メソッドのキーを含む。
+次の表はこの入力メソッドの内容を説明する。
+
+(表は省略)
+
+==IMMとIMEのデータ構造
+
+次の構造体はIMM とIME の通信で使われる。
+IMEは、これらの構造体に直接アクセスできるが、アプリはできない。
+
+INPUTCONTEXT
+
+===メンバー
+
+hWnd
+   入力コンテキストを使うウィンドウハンドル。
+   入力コンテキストが共有ウィンドウを持っていれば、
+   これはアクティブなウィンドウのハンドルである。
+   ImmSetActiveContextで入力コンテキストをリセットできる。
+
+fOpen
+   IMEが開いているか、閉じているかの現在の状態。
+
+ptStatusWndPos
+   状態ウィンドウの位置。
+
+ptSoftKbdPos
+   ソフトキーボードの位置。
+
+fdwConversion
+   変換モード。
+
+fdwSentence
+   文モード。
+
+lfFont
+   変換文字列を描画するための論理フォント。LOGFONT構造体。
+
+cfCompForm
+    COMPOSITIONFORM構造体。
+    変換ウィンドウを作成するときに使われる。
+
+cfCandForm[4]
+    CANDIDATEFORM構造体。候補ウィンドウを作成するときに、
+    使われる。
+
+hCompStr
+    COMPOSITIONSTRING構造体を指すメモリーハンドル。
+    変換文字列があるとき利用可能。
+
+hCandInfo
+    CANDIDATEINFO構造体を指す候補のメモリーハンドル。
+    候補文字列があるとき、利用可能。
+
+hGuideLine
+    ガイドラインを表すGUIDELINE構造体を指すメモリーハンドル。
+    ガイドラインがあるとき利用可能。
+
+hPrivate
+    IMEのプライベートなメモリーハンドル。
+
+dwNumMsgBuf
+    hMsgBufに格納されたメッセージの個数。
+
+hMsgBuf
+    TRANSMSG構造体で表されたメッセージ列を指すメモリーブロック。
+    
+fdwInit
+    初期化フラグ。INPUTCONTEXT構造体を初期化するときに、
+    このビット列を見なければならない。
+
+    INIT_STATUSWNDPOS はptStatusWndPosを初期化する。
+    INIT_CONVERSION はfdwConversionを初期化する。
+    INIT_SENTENCE はfdwSentenceを初期化する。
+    INIT_LOGFONT はlfFontを初期化する。
+    INIT_COMPFORM はcfCompFormを初期化する。
+    INIT_SOFTKBDPOS はptSoftKbdPosを初期化する。
+
+dwReserve[3]
+    将来のため予約済み。
+
+注記：ImeToAsciiExを呼び出す間、IMEは、
+lpdwTransKeyバッファ内へメッセージ列を生成できる。
+しかしながら、もしIMEがアプリへメッセージを生成したければ、
+それは、メッセージ列をhMsgBuf内部へ格納して、ImmGenerateMessageを
+呼ぶことができる。ImmGenerateMessage 関数はそのとき、
+hMsgBuf内のメッセージをアプリへ送る。
+
+==COMPOSITIONSTRING構造体
+
+COMPOSITIONSTRING構造体は、変換文字列の情報を持つ。変換の間、
+IMEは変換情報をこの構造体へ格納する。
+
+dwSize
+    この構造体のメモリーブロックのサイズ。
+
+dwCompReadAttrLen
+    変換文字列の読みの文字列の属性情報の長さ。
+
+dwCompReadAttrOffset
+    この構造体の開始位置から属性へのオフセット。
+    属性情報はここに格納される。
+
+dwCompReadClsLen
+    変換文字列の読み文字列の文節情報の長さ。
+
+dwCompReadClsOffset
+    この構造体の開始位置から文節へのオフセット。
+    文節情報はここに格納される。
+
+dwCompReadStrLen
+    変換文字列の読み文字列の長さ。
+
+dwCompReadStrOffset
+    この構造体の開始位置から読み文字列へのオフセット。
+    変換文字列の読み文字列は、ここに格納される。
+
+dwCompAttrLen
+    変換文字列の属性情報の長さ。
+
+dwCompAttrOffset
+    この構造体の開始位置から属性へのオフセット。
+    属性情報はここに格納される。
+
+dwCompClsLen
+    変換文字列の文節情報の長さ。
+
+dwCompClsOffset
+    この構造体の開始位置から文節へのオフセット。
+    文節情報はここに格納される。
+
+dwCompStrLen
+    変換文字列の長さ。
+
+dwCompStrLen
+    この構造体の開始位置から変換文字列へのオフセット。
+    変換文字列はここに格納される。
+
+dwCursorPos
+    変換文字列におけるカーソルの位置。
+
+dwDeltaStart
+    変換文字列における変更部分の開始位置。
+    もし、変換文字列が以前の状態から変更されていれば、
+    その変更点の最初の位置がここに格納される。
+
+dwDeltaStart
+    結果文字列の読み文字列の文節情報の長さ。
+
+dwResultReadClsOffset
+    この構造体の開始位置から結果読み文節へのオフセット。
+    文節情報はここに格納される。
+
+dwResultReadStrLen
+    結果文字列の読み文字列の長さ。
+
+dwResultReadStrOffset
+    この構造体の開始位置から読み文字列へのオフセット。
+    結果文字列の読み文字列がここに格納される。
+
+dwResultClsLen
+    結果文字列の文節情報の長さ。
+
+dwResultClsOffset
+    この構造体の開始位置から結果文節へのオフセット。
+    文節情報はここに格納される。
+
+dwResultStrLen
+    結果文字列の長さ。
+
+dwResultStrLen
+    この構造体の開始位置から結果文字列へのオフセット。
+    結果文字列はここに格納される。
+
+dwPrivateSize
+    このメモリーブロックのプライベート領域のサイズ。
+
+dwPrivateOffset
+    この構造体の開始位置からプライベート領域へのオフセット。
+    プライベート領域はここに格納される。
+
+Unicodeの場合の注記：すべてのdw*StrLenメンバーは、対応するバッファ
+内のUnicode文字列の
+サイズである。その他のdw*Lenやdw*Offsetメンバーは、
+対応するバッファ内のバイト数である。
+
+属性（attribute）情報の形式は、各文字に対応するバイトの配列である。
+次の値が提供される。リストにないものは予約済みである。
+
+    -------------------------   ---------------------------------------------
+    値                          内容
+    -------------------------   ---------------------------------------------
+    ATTR_INPUT                  入力された文字。
+    ATTR_TARGET_CONVERTED       変換中ですでに変換済みの文字。
+    ATTR_CONVERTED              IMEにより変換された文字。
+    ATTR_TARGET_NOTCONVERTED    変換中で選択したがまだ変換済みではない文字。
+    ATTR_FIXEDCONVERTED         いかにも変換されない文字。
+    ATTR_INPUT_ERROR            子音の連続などのエラー文字で変換できない。
+    -------------------------   ---------------------------------------------
+
+==コメント
+
+(略)
+
+Windows NT Unicodeでは、属性情報の長さは、Unicode文字の個数での長さと同じだ。
+それぞれの属性バイトは、それぞれのUnicode文字に対応する。
+
+文節情報の形式は、ダブルワードの配列であり、文節の位置を表す数値を指定する。
+文節の位置は、その変換文字列の位置であり、それはこの位置から始まる文節を伴う。
+少なくとも、情報の長さは２ダブルワードある。
+これは、１つの文節情報の長さは8バイトであることを意味する。
+最初のダブルワード値は、ゼロであり、それは最初の文節の位置である。
+次のダブルワード値は、この文字列の長さでなければならない。
+例えば、文字列が３つの文節を持てば、文節情報は4ダブルワードを持つ。
+最初のダブルワードはゼロだ。
+二番目のダブルバイトは、二番目の文節の開始位置を表す。
+三番目のダブルバイトは、三番目の文節の開始位置を指定する。
+最後のダブルバイトは、この文字列の長さである。
+
+Windows NT Unicodeでは、それぞれの文節の位置と、その文字列の長さは、
+Unicode文字でカウントされる。
+
+dwCursorPos メンバーは、カーソル位置を指定し、
+文字列の個数で変換文字列のどこにカーソルが位置するのかを示す。
+カウントはゼロから始まる。もしカーソルが変換文字列の直後に
+位置していれば、この値は、変換文字列の長さに等しいはずだ。
+もしもカーソルがなければ、-1の値が指定される。
+変換文字列が存在しなければ、このメンバーは無効である。
+
+Windows NT Unicodeでは、カーソル位置はUnicode文字で数えられる。
+
+==CANDIDATEINFO構造体
+
 
