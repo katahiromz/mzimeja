@@ -299,8 +299,8 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
 
   if (!IsCompStr(hIMC)) return;
 
-  InputContext *lpIMC;
-  if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return;
+  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+  if (NULL == lpIMC) return;
   CompStr *lpCompStr = lpIMC->LockCompStr();
 
   dwCurPos = lpCompStr->dwCursorPos;
@@ -337,9 +337,7 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
     memset(lpCompStr->GetCompAttr(), 0, lstrlen(lpstr));
     memset(lpCompStr->GetCompReadAttr(), 0, lstrlen(lpread));
 
-    //
     // make length
-    //
     lpCompStr->dwCompStrLen = lstrlen(lpstr);
     lpCompStr->dwCompReadStrLen = lstrlen(lpread);
     lpCompStr->dwCompAttrLen = lstrlen(lpstr);
@@ -349,9 +347,7 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
     // DeltaStart is same of Cursor Pos at DeleteChar time.
     lpCompStr->dwDeltaStart = dwCurPos;
 
-    //
     // make clause info
-    //
     SetClause(lpCompStr->GetCompClause(), lstrlen(lpstr));
     SetClause(lpCompStr->GetCompReadClause(), lstrlen(lpread));
     lpCompStr->dwCompClauseLen = 8;
