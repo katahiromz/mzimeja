@@ -109,43 +109,36 @@ void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
 }
 
 void PASCAL PaintCandWindow(HWND hCandWnd) {
-  PAINTSTRUCT ps;
-  HIMC hIMC;
-  HBRUSH hbr;
-  HDC hDC;
   RECT rc;
-  LPTSTR lpstr;
-  int height;
-  DWORD i;
-  SIZE sz;
-  HWND hSvrWnd;
-  HBRUSH hbrHightLight = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
-  HBRUSH hbrLGR = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
-  HFONT hOldFont;
-
   GetClientRect(hCandWnd, &rc);
-  hDC = BeginPaint(hCandWnd, &ps);
-  SetBkMode(hDC, TRANSPARENT);
-  hSvrWnd = (HWND)GetWindowLongPtr(hCandWnd, FIGWL_SVRWND);
 
-  hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+  PAINTSTRUCT ps;
+  HDC hDC = BeginPaint(hCandWnd, &ps);
+  SetBkMode(hDC, TRANSPARENT);
+  HWND hSvrWnd = (HWND)GetWindowLongPtr(hCandWnd, FIGWL_SVRWND);
+
+  HBRUSH hbrHightLight = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
+  HIMC hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
     InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
-    hOldFont = CheckNativeCharset(hDC);
+    HFONT hOldFont = CheckNativeCharset(hDC);
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
-      height = GetSystemMetrics(SM_CYEDGE);
+      int height = GetSystemMetrics(SM_CYEDGE);
       CandList *lpCandList = lpCandInfo->GetList();
-      for (i = lpCandList->dwPageStart;
-           i < (lpCandList->dwPageStart + lpCandList->dwPageSize); i++) {
-        lpstr = (LPTSTR)((LPBYTE)lpCandList + lpCandList->dwOffset[i]);
+      for (DWORD i = lpCandList->dwPageStart;
+           i < lpCandList->GetPageEnd(); i++) {
+        SIZE sz;
+        HBRUSH hbr;
+        LPTSTR lpstr = lpCandList->GetCandString(i);
         GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
-        if (((LPMZCAND)lpCandInfo)->cl.dwSelection == (DWORD)i) {
+        if (lpCandInfo->cl.dwSelection == i) {
           hbr = (HBRUSH)SelectObject(hDC, hbrHightLight);
           PatBlt(hDC, 0, height, rc.right, sz.cy, PATCOPY);
           SelectObject(hDC, hbr);
           SetTextColor(hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
         } else {
+          HBRUSH hbrLGR = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
           hbr = (HBRUSH)SelectObject(hDC, hbrLGR);
           PatBlt(hDC, 0, height, rc.right, sz.cy, PATCOPY);
           SelectObject(hDC, hbr);
@@ -168,28 +161,17 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
 }
 
 void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
-  HDC hDC;
-  LPTSTR lpstr;
-  int width = 0;
-  int height = 0;
-  DWORD i;
-  RECT rc;
-  SIZE sz;
-
   if (IsWindow(lpUIExtra->uiCand.hWnd)) {
-    HFONT hOldFont;
-
-    hDC = GetDC(lpUIExtra->uiCand.hWnd);
-    hOldFont = CheckNativeCharset(hDC);
-
+    int width = 0, height = 0;
+    HDC hDC = GetDC(lpUIExtra->uiCand.hWnd);
+    HFONT hOldFont = CheckNativeCharset(hDC);
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
-      width = 0;
-      height = 0;
       CandList *lpCandList = lpCandInfo->GetList();
-      for (i = lpCandList->dwPageStart;
-           i < (lpCandList->dwPageStart + lpCandList->dwPageSize); i++) {
-        lpstr = (LPTSTR)((LPBYTE)lpCandList + lpCandList->dwOffset[i]);
+      for (DWORD i = lpCandList->dwPageStart;
+           i < lpCandList->GetPageEnd(); i++) {
+        LPTSTR lpstr = lpCandList->GetCandString(i);
+        SIZE sz;
         GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
         if (width < sz.cx) width = sz.cx;
         height += sz.cy;
@@ -201,6 +183,7 @@ void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     }
     ReleaseDC(lpUIExtra->uiCand.hWnd, hDC);
 
+    RECT rc;
     GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
     MoveWindow(lpUIExtra->uiCand.hWnd, rc.left, rc.top,
                width + 4 * GetSystemMetrics(SM_CXEDGE),

@@ -28,6 +28,7 @@ struct CandList : public CANDIDATELIST {
   LPBYTE GetBytes() { return (LPBYTE)this; }
   LPTSTR GetCandString(DWORD i) { return LPTSTR(GetBytes() + dwOffset[i]); }
   LPTSTR GetCurString() { return GetCandString(dwSelection); }
+  DWORD GetPageEnd() const { return dwPageStart + dwPageSize; }
 
 private:
   CandList();
@@ -40,6 +41,10 @@ private:
 struct CandInfo : public MZCAND {
   LPBYTE GetBytes() { return (LPBYTE)this; }
   CandList *GetList() { return (CandList *)(GetBytes() + cl.dwOffset[0]); }
+
+  DWORD GetCandOffset(DWORD i, LPCANDIDATELIST lpCandList) {
+    return DWORD(LPBYTE(szCand[i]) - LPBYTE(lpCandList));
+  }
 
   void Clear() {
     dwSize = 0L;

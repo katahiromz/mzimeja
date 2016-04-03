@@ -229,9 +229,6 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     }
   } else {
     // String is converted, so that open candidate.
-    int i = 0;
-    //LPDWORD lpdw;
-
     // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
     if (!lpIMC->IsCandidate()) {
       GnMsg.message = WM_IME_NOTIFY;
@@ -241,14 +238,13 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     }
 
     // Make candidate structures.
+    DWORD i = 0;
     lpCandInfo->dwSize = sizeof(MZCAND);
     lpCandInfo->dwCount = 1;
     lpCandInfo->dwOffset[0] = sizeof(CANDIDATEINFO);
     CandList *lpCandList = lpCandInfo->GetList();
-    //lpdw = (LPDWORD) & (lpCandList->dwOffset);
     while (*lpstr) {
-      lpCandList->dwOffset[i] =
-        DWORD(LPBYTE(lpCandInfo->szCand[i]) - LPBYTE(lpCandList));
+      lpCandList->dwOffset[i] = lpCandInfo->GetCandOffset(i, lpCandList);
       lstrcpy(lpCandList->GetCandString(i), lpstr);
       lpstr += (lstrlen(lpstr) + 1);
       i++;
@@ -264,7 +260,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
       lpCandList->dwPageSize = MAXCANDPAGESIZE;
 
     lpCandList->dwSelection++;
-    if (lpCandList->dwSelection == (DWORD)i) {
+    if (lpCandList->dwSelection == i) {
       lpCandList->dwPageStart = 0;
       lpCandList->dwSelection = 0;
     } else if (lpCandList->dwSelection >= MAXCANDPAGESIZE) {

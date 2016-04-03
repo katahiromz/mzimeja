@@ -457,7 +457,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   TCHAR szBuf[256];
   LPTSTR lpstr;
   TRANSMSG GnMsg;
-  int i = 0;
+  DWORD i = 0;
   //LPDWORD lpdw;
 
   DebugPrint(TEXT("NotifyIME"));
@@ -526,43 +526,33 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
-          //
           // Get the candidate strings from dic file.
-          //
           GetCandidateStringsFromDictionary(
               lpCompStr->GetCompReadStr(), szBuf, 256, szDicFileName);
 
-          //
           // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
-          //
           GnMsg.message = WM_IME_NOTIFY;
           GnMsg.wParam = IMN_OPENCANDIDATE;
           GnMsg.lParam = 1L;
           GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
-          //
           // Make candidate structures.
-          //
           lpCandInfo->dwSize = sizeof(MZCAND);
           lpCandInfo->dwCount = 1;
-          lpCandInfo->dwOffset[0] =
-              (DWORD)((LPSTR)&((LPMZCAND)lpCandInfo)->cl - (LPSTR)lpCandInfo);
+          lpCandInfo->dwOffset[0] = sizeof(CANDIDATEINFO);
           lpCandList = lpCandInfo->GetList();
-          //lpdw = (LPDWORD) & (lpCandList->dwOffset);
 
           lpstr = &szBuf[0];
           while (*lpstr && (i < MAXCANDSTRNUM)) {
-            lpCandList->dwOffset[i] = (DWORD)(
-                (LPBYTE)((LPMZCAND)lpCandInfo)->szCand[i] - (LPBYTE)lpCandList);
-            lstrcpy((LPTSTR)((LPTSTR)lpCandList + lpCandList->dwOffset[i]),
-                      lpstr);
+            lpCandList->dwOffset[i] = lpCandInfo->GetCandOffset(i, lpCandList);
+            lstrcpy(lpCandList->GetCandString(i), lpstr);
             lpstr += (lstrlen(lpstr) + 1);
             i++;
           }
 
-          lpCandList->dwSize =
-              sizeof(CANDIDATELIST) +
-              (MAXCANDSTRNUM * (sizeof(DWORD) + MAXCANDSTRSIZE));
+          lpCandList->dwSize = sizeof(CANDIDATELIST);
+          lpCandList->dwSize +=
+            (MAXCANDSTRNUM * (sizeof(DWORD) + MAXCANDSTRSIZE));
           lpCandList->dwStyle = IME_CAND_READ;
           lpCandList->dwCount = i;
           lpCandList->dwPageStart = 0;
@@ -572,7 +562,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             lpCandList->dwPageSize = MAXCANDPAGESIZE;
 
           lpCandList->dwSelection++;
-          if (lpCandList->dwSelection == (DWORD)i) lpCandList->dwSelection = 0;
+          if (lpCandList->dwSelection == i) lpCandList->dwSelection = 0;
 
           //
           // Generate messages.
