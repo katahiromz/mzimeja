@@ -18,9 +18,9 @@ void PASCAL FlushText(HIMC hIMC) {
   TRANSMSG GnMsg;
   if (lpIMC->IsCandidate()) {
     // Flush candidate lists.
-    LPCANDIDATEINFO lpCandInfo = lpIMC->LockCandInfo();
+    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
-      ClearCandidate(lpCandInfo);
+      lpCandInfo->Clear();
       lpIMC->UnlockCandInfo();
     }
     GnMsg.message = WM_IME_NOTIFY;
@@ -50,7 +50,6 @@ void PASCAL FlushText(HIMC hIMC) {
 
 void PASCAL RevertText(HIMC hIMC) {
   CompStr *lpCompStr;
-  LPCANDIDATEINFO lpCandInfo;
   TRANSMSG GnMsg;
   LPTSTR lpread, lpstr;
 
@@ -61,9 +60,9 @@ void PASCAL RevertText(HIMC hIMC) {
 
   if (lpIMC->IsCandidate()) {
     // Flush candidate lists.
-    lpCandInfo = lpIMC->LockCandInfo();
+    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
-      ClearCandidate(lpCandInfo);
+      lpCandInfo->Clear();
       lpIMC->UnlockCandInfo();
     }
     GnMsg.message = WM_IME_NOTIFY;
@@ -109,71 +108,65 @@ void PASCAL RevertText(HIMC hIMC) {
 }
 
 BOOL PASCAL ConvKanji(HIMC hIMC) {
-  TCHAR szBuf[256 + 2];
-  int nBufLen;
-  LPTSTR lpstr;
   TRANSMSG GnMsg;
-  LPBYTE lpb;
-  //OFSTRUCT ofs;
-  LPTSTR lpT, lpT2;
-  int cnt;
   BOOL bRc = FALSE;
 
   if ((GetFileAttributes(szDicFileName) == 0xFFFFFFFF) ||
-      (GetFileAttributes(szDicFileName) == FILE_ATTRIBUTE_DIRECTORY)) {
+      (GetFileAttributes(szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
     MakeGuideLine(hIMC, MYGL_NODICTIONARY);
   }
 
   if (!IsCompStr(hIMC)) return FALSE;
 
-  InputContext *lpIMC;
-  if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
+  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+  if (NULL == lpIMC) return FALSE;
 
-  CompStr *lpCompStr;
-  if (!(lpCompStr = lpIMC->LockCompStr()))
-    goto cvk_exit10;
+  CompStr *lpCompStr = lpIMC->LockCompStr();
+  if (NULL ==lpCompStr) {
+    ImmUnlockIMC(hIMC);
+    return bRc;
+  }
 
-  LPCANDIDATEINFO lpCandInfo;
-  if (!(lpCandInfo = lpIMC->LockCandInfo()))
-    goto cvk_exit20;
+  CandInfo *lpCandInfo = lpIMC->LockCandInfo();
+  if (NULL == lpCandInfo) {
+    lpIMC->UnlockCompStr();
+    ImmUnlockIMC(hIMC);
+    return bRc;
+  }
 
-  //
   // Since IME handles all string as Unicode, convert the CompReadStr
   // from Unicode into multibyte string. Also the dictionary holdsits data
   // as Hiragana, so map the string from Katakana to Hiragana.
-  //
-  lpT2 = lpCompStr->GetCompReadStr();
+  LPTSTR lpT2 = lpCompStr->GetCompReadStr();
 
-  //
   // Get the candidate strings from dic file.
-  //
+  TCHAR szBuf[256 + 2];
   szBuf[256] = 0;  // Double NULL-terminate
   szBuf[257] = 0;  // Double NULL-terminate
-  nBufLen = GetCandidateStringsFromDictionary(lpT2, szBuf, 256, szDicFileName);
-  //
+  int nBufLen =
+    GetCandidateStringsFromDictionary(lpT2, szBuf, 256, szDicFileName);
+
   // Check the result of dic. Because my candidate list has only MAXCANDSTRNUM
   // candidate strings.
-  //
-  lpT = &szBuf[0];
-  cnt = 0;
+  LPTSTR lpT = &szBuf[0];
+  int cnt = 0;
   while (*lpT) {
     cnt++;
     lpT += (lstrlen(lpT) + 1);
 
     if (cnt > MAXCANDSTRNUM) {
-      //
       // The dic is too big....
-      //
-      goto cvk_exit40;
+      lpIMC->UnlockCandInfo();
+      lpIMC->UnlockCompStr();
+      ImmUnlockIMC(hIMC);
+      return bRc;
     }
   }
 
-  lpb = lpCompStr->GetCompAttr();
+  LPBYTE lpb = lpCompStr->GetCompAttr();
   if (nBufLen < 1) {
     if (!*lpb) {
-      //
       // make attribute
-      //
       memset(lpCompStr->GetCompAttr(), 1, lstrlen(lpCompStr->GetCompStr()));
       memset(lpCompStr->GetCompReadAttr(), 1,
              lstrlen(lpCompStr->GetCompReadStr()));
@@ -181,14 +174,17 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
       GnMsg.message = WM_IME_COMPOSITION;
       GnMsg.wParam = 0;
       GnMsg.lParam =
-          GCS_COMPSTR | GCS_CURSORPOS | GCS_COMPATTR | GCS_COMPREADATTR;
+        GCS_COMPSTR | GCS_CURSORPOS | GCS_COMPATTR | GCS_COMPREADATTR;
       GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
     }
 
-    goto cvk_exit40;
+    lpIMC->UnlockCandInfo();
+    lpIMC->UnlockCompStr();
+    ImmUnlockIMC(hIMC);
+    return bRc;
   }
 
-  lpstr = szBuf;
+  LPTSTR lpstr = szBuf;
   if (!*lpb) {
     // String is not converted yet.
     while (*lpstr) {
@@ -224,7 +220,10 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
         GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
 
         bRc = TRUE;
-        goto cvk_exit40;
+        lpIMC->UnlockCandInfo();
+        lpIMC->UnlockCompStr();
+        ImmUnlockIMC(hIMC);
+        return bRc;
       }
       lpstr += (lstrlen(lpstr) + 1);
     }
@@ -242,17 +241,15 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     }
 
     // Make candidate structures.
-    LPCANDIDATELIST lpCandList;
     lpCandInfo->dwSize = sizeof(MZCAND);
     lpCandInfo->dwCount = 1;
-    lpCandInfo->dwOffset[0] =
-        (DWORD)((LPSTR) & ((LPMZCAND)lpCandInfo)->cl - (LPSTR)lpCandInfo);
-    lpCandList = (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
+    lpCandInfo->dwOffset[0] = sizeof(CANDIDATEINFO);
+    CandList *lpCandList = lpCandInfo->GetList();
     //lpdw = (LPDWORD) & (lpCandList->dwOffset);
     while (*lpstr) {
       lpCandList->dwOffset[i] =
-          (DWORD)((LPBYTE)((LPMZCAND)lpCandInfo)->szCand[i] - (LPBYTE)lpCandList);
-      lstrcpy((LPTSTR)((LPBYTE)lpCandList + lpCandList->dwOffset[i]), lpstr);
+        DWORD(LPBYTE(lpCandInfo->szCand[i]) - LPBYTE(lpCandList));
+      lstrcpy(lpCandList->GetCandString(i), lpstr);
       lpstr += (lstrlen(lpstr) + 1);
       i++;
     }
@@ -283,18 +280,12 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
 
     // If the selected candidate string is changed, the composition string
     // should be updated.
-    lpstr = (LPTSTR)((LPBYTE)lpCandList +
-                     lpCandList->dwOffset[lpCandList->dwSelection]);
+    lpstr = lpCandList->GetCurString();
     goto set_compstr;
   }
 
-cvk_exit40:
   lpIMC->UnlockCandInfo();
-
-cvk_exit20:
   lpIMC->UnlockCompStr();
-
-cvk_exit10:
   ImmUnlockIMC(hIMC);
   return bRc;
 }
@@ -373,8 +364,8 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
       GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
     } else {
       if (lpIMC->IsCandidate()) {
-        LPCANDIDATEINFO lpCandInfo = lpIMC->LockCandInfo();
-        ClearCandidate(lpCandInfo);
+        CandInfo *lpCandInfo = lpIMC->LockCandInfo();
+        lpCandInfo->Clear();
         GnMsg.message = WM_IME_NOTIFY;
         GnMsg.wParam = IMN_CLOSECANDIDATE;
         GnMsg.lParam = 1;
@@ -630,9 +621,9 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
   CompStr *lpCompStr = lpIMC->LockCompStr();
 
   if (lpIMC->IsCandidate()) {
-    LPCANDIDATEINFO lpCandInfo = lpIMC->LockCandInfo();
+    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
-      ClearCandidate(lpCandInfo);
+      lpCandInfo->Clear();
       lpIMC->UnlockCandInfo();
     }
     GnMsg.message = WM_IME_NOTIFY;

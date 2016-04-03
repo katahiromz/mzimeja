@@ -14,7 +14,7 @@
 #define MAXCOMPSIZE 128
 #define MAXCLAUSESIZE 16
 
-typedef struct MZCOMPSTR : public COMPOSITIONSTRING {
+struct MZCOMPSTR : public COMPOSITIONSTRING {
   TCHAR   szCompReadStr[MAXCOMPSIZE];
   BYTE    bCompReadAttr[MAXCOMPSIZE];
   DWORD   dwCompReadClause[MAXCLAUSESIZE];
@@ -26,7 +26,8 @@ typedef struct MZCOMPSTR : public COMPOSITIONSTRING {
   DWORD   dwResultReadClause[MAXCOMPSIZE];
   TCHAR   szResultStr[MAXCOMPSIZE];
   DWORD   dwResultClause[MAXCOMPSIZE];
-} MZCOMPSTR, *LPMZCOMPSTR;
+};
+typedef MZCOMPSTR *LPMZCOMPSTR;
 
 inline void SetClause(LPDWORD lpdw, DWORD num) {
   *lpdw = 0;

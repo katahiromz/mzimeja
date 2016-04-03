@@ -7,20 +7,6 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-void PASCAL ClearCandidate(LPCANDIDATEINFO lpCandInfo) {
-  lpCandInfo->dwSize = 0L;
-  lpCandInfo->dwCount = 0L;
-  lpCandInfo->dwOffset[0] = 0L;
-
-  ((LPMZCAND)lpCandInfo)->cl.dwSize = 0L;
-  ((LPMZCAND)lpCandInfo)->cl.dwStyle = 0L;
-  ((LPMZCAND)lpCandInfo)->cl.dwCount = 0L;
-  ((LPMZCAND)lpCandInfo)->cl.dwSelection = 0L;
-  ((LPMZCAND)lpCandInfo)->cl.dwPageStart = 0L;
-  ((LPMZCAND)lpCandInfo)->cl.dwPageSize = 0L;
-  ((LPMZCAND)lpCandInfo)->cl.dwOffset[0] = 0L;
-}
-
 // return value: fdwConversion
 void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
   DWORD fdwConversion;

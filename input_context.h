@@ -5,6 +5,7 @@
 #define INPUT_CONTEXT_H_
 
 #include "comp_str.h"
+#include "cand_info.h"
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -12,7 +13,7 @@ struct InputContext : public INPUTCONTEXT {
   void Initialize();
   BOOL IsCandidate();
 
-  LPCANDIDATEINFO LockCandInfo();
+  CandInfo *LockCandInfo();
   void UnlockCandInfo();
 
   CompStr *LockCompStr();

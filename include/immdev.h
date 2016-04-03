@@ -32,14 +32,12 @@ typedef struct tagCOMPOSITIONFORM {
     RECT  rcArea;
 } COMPOSITIONFORM, *PCOMPOSITIONFORM, NEAR *NPCOMPOSITIONFORM, FAR *LPCOMPOSITIONFORM;
 
-
 typedef struct tagCANDIDATEFORM {
     DWORD dwIndex;
     DWORD dwStyle;
     POINT ptCurrentPos;
     RECT  rcArea;
 } CANDIDATEFORM, *PCANDIDATEFORM, NEAR *NPCANDIDATEFORM, FAR *LPCANDIDATEFORM;
-
 
 typedef struct tagCANDIDATELIST {
     DWORD dwSize;
@@ -764,7 +762,6 @@ typedef struct tagCANDIDATEINFO {
     DWORD               dwPrivateSize;
     DWORD               dwPrivateOffset;
 } CANDIDATEINFO, *PCANDIDATEINFO, NEAR *NPCANDIDATEINFO, FAR *LPCANDIDATEINFO;
-
 
 typedef struct tagINPUTCONTEXT {
     HWND                hWnd;

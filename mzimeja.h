@@ -21,6 +21,7 @@
 #include "immdev.h"
 #include "input_context.h"
 #include "comp_str.h"
+#include "cand_info.h"
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -28,10 +29,7 @@
 
 // for limit of MZ-IME
 #define MAXCOMPWND 10
-#define MAXCANDPAGESIZE 9
-#define MAXCANDSTRSIZE 16
 #define MAXGLCHAR 32
-#define MAXCANDSTRNUM 32
 
 // for GlobalAlloc
 #define GHIME (GHND | GMEM_SHARE)
@@ -166,13 +164,6 @@
 //////////////////////////////////////////////////////////////////////////////
 // Structures
 
-typedef struct _tagMZCAND {
-  CANDIDATEINFO ci;
-  CANDIDATELIST cl;
-  DWORD offset[MAXCANDSTRNUM];
-  TCHAR szCand[MAXCANDSTRNUM][MAXCANDSTRSIZE];
-} MZCAND, NEAR *PMZCAND, FAR *LPMZCAND;
-
 typedef struct _tagUICHILD {
   HWND hWnd;
   BOOL bShow;
@@ -234,7 +225,6 @@ extern BYTE bNoCompAlt[];
 extern "C" {
 
 // subs.c
-void PASCAL ClearCandidate(LPCANDIDATEINFO lpCandInfo);
 void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode);
 void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode);
 BOOL PASCAL IsCompStr(HIMC hIMC);

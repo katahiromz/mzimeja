@@ -111,8 +111,6 @@ void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
 void PASCAL PaintCandWindow(HWND hCandWnd) {
   PAINTSTRUCT ps;
   HIMC hIMC;
-  LPCANDIDATEINFO lpCandInfo;
-  LPCANDIDATELIST lpCandList;
   HBRUSH hbr;
   HDC hDC;
   RECT rc;
@@ -134,11 +132,10 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
   if (hIMC) {
     InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
     hOldFont = CheckNativeCharset(hDC);
-    lpCandInfo = lpIMC->LockCandInfo();
+    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
       height = GetSystemMetrics(SM_CYEDGE);
-      lpCandList =
-          (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
+      CandList *lpCandList = lpCandInfo->GetList();
       for (i = lpCandList->dwPageStart;
            i < (lpCandList->dwPageStart + lpCandList->dwPageSize); i++) {
         lpstr = (LPTSTR)((LPBYTE)lpCandList + lpCandList->dwOffset[i]);
@@ -171,8 +168,6 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
 }
 
 void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
-  LPCANDIDATEINFO lpCandInfo;
-  LPCANDIDATELIST lpCandList;
   HDC hDC;
   LPTSTR lpstr;
   int width = 0;
@@ -187,12 +182,11 @@ void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     hDC = GetDC(lpUIExtra->uiCand.hWnd);
     hOldFont = CheckNativeCharset(hDC);
 
-    lpCandInfo = lpIMC->LockCandInfo();
+    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
       width = 0;
       height = 0;
-      lpCandList =
-          (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
+      CandList *lpCandList = lpCandInfo->GetList();
       for (i = lpCandList->dwPageStart;
            i < (lpCandList->dwPageStart + lpCandList->dwPageSize); i++) {
         lpstr = (LPTSTR)((LPBYTE)lpCandList + lpCandList->dwOffset[i]);

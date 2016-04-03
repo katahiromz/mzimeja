@@ -24,7 +24,7 @@ void InputContext::Initialize() {
   }
 
   hCandInfo = ImmReSizeIMCC(hCandInfo, sizeof(MZCAND));
-  LPCANDIDATEINFO lpCandInfo = LockCandInfo();
+  CandInfo *lpCandInfo = LockCandInfo();
   if (lpCandInfo) {
     lpCandInfo->dwSize = sizeof(MZCAND);
     UnlockCandInfo();
@@ -36,7 +36,7 @@ BOOL InputContext::IsCandidate() {
 
   if (ImmGetIMCCSize(hCandInfo) < sizeof(CANDIDATEINFO)) return FALSE;
 
-  LPCANDIDATEINFO lpCandInfo = LockCandInfo();
+  CandInfo *lpCandInfo = LockCandInfo();
   if (lpCandInfo) {
     fRet = (lpCandInfo->dwCount > 0);
     UnlockCandInfo();
@@ -44,8 +44,8 @@ BOOL InputContext::IsCandidate() {
   return fRet;
 }
 
-LPCANDIDATEINFO InputContext::LockCandInfo() {
-  return (LPCANDIDATEINFO)ImmLockIMCC(hCandInfo);
+CandInfo *InputContext::LockCandInfo() {
+  return (CandInfo *)ImmLockIMCC(hCandInfo);
 }
 
 void InputContext::UnlockCandInfo() {

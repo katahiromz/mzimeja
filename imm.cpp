@@ -452,8 +452,8 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   InputContext *lpIMC;
   BOOL bRet = FALSE;
   CompStr *lpCompStr;
-  LPCANDIDATEINFO lpCandInfo;
-  LPCANDIDATELIST lpCandList;
+  CandInfo *lpCandInfo;
+  CandList *lpCandList;
   TCHAR szBuf[256];
   LPTSTR lpstr;
   TRANSMSG GnMsg;
@@ -547,8 +547,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           lpCandInfo->dwCount = 1;
           lpCandInfo->dwOffset[0] =
               (DWORD)((LPSTR)&((LPMZCAND)lpCandInfo)->cl - (LPSTR)lpCandInfo);
-          lpCandList =
-              (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
+          lpCandList = lpCandInfo->GetList();
           //lpdw = (LPDWORD) & (lpCandList->dwOffset);
 
           lpstr = &szBuf[0];
@@ -611,8 +610,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       if (dwIndex == 1 && lpIMC->IsCandidate()) {
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
-          lpCandList =
-              (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
+          lpCandList = lpCandInfo->GetList();
           if (lpCandList->dwCount > dwValue) {
             lpCandList->dwSelection = dwValue;
             bRet = TRUE;
@@ -644,8 +642,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
-          lpCandList =
-              (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
+          lpCandList = lpCandInfo->GetList();
           if (lpCandList->dwCount > dwValue) {
             lpCandList->dwPageSize = dwValue;
             bRet = TRUE;
@@ -672,8 +669,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
-          lpCandList =
-              (LPCANDIDATELIST)((LPBYTE)lpCandInfo + lpCandInfo->dwOffset[0]);
+          lpCandList = lpCandInfo->GetList();
           if (lpCandList->dwCount > dwValue) {
             lpCandList->dwPageStart = dwValue;
             bRet = TRUE;
