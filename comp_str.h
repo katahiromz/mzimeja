@@ -73,6 +73,11 @@ struct CompStr : public MZCOMPSTR {
   LPTSTR GetResultStr() {
     return (LPTSTR)(GetBytes() + dwResultStrOffset);
   }
+
+private:
+  CompStr();
+  CompStr(const CompStr&);
+  CompStr& operator=(const CompStr&);
 };
 
 //////////////////////////////////////////////////////////////////////////////

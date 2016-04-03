@@ -40,6 +40,11 @@ struct InputContext : public INPUTCONTEXT {
   void SetsLogFont() { fdwInit |= INIT_LOGFONT; }
   void SetsCompForm() { fdwInit |= INIT_COMPFORM; }
   void SetsSoftKbdPos() { fdwInit |= INIT_SOFTKBDPOS; }
+
+private:
+  InputContext();
+  InputContext(const InputContext&);
+  InputContext& operator=(const InputContext&);
 };
 
 //////////////////////////////////////////////////////////////////////////////
