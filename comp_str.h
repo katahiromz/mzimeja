@@ -38,6 +38,8 @@ inline void SetClause(LPDWORD lpdw, DWORD num) {
 struct CompStr : public MZCOMPSTR {
   void Init(DWORD dwClrFlag);
   void Clear(DWORD dwClrFlag);
+  BOOL CheckAttr();
+  void MakeAttrClause();
 
   LPBYTE GetBytes() { return (LPBYTE)this; }
 

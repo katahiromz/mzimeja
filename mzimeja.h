@@ -326,8 +326,6 @@ BOOL PASCAL ConvKanji(HIMC);
 BOOL WINAPI MakeResultString(HIMC, BOOL);
 BOOL PASCAL MakeGuideLine(HIMC, DWORD);
 BOOL PASCAL GenerateMessage(HIMC, InputContext *, LPTRANSMSGLIST, LPTRANSMSG);
-BOOL PASCAL CheckAttr(CompStr *lpCompStr);
-void PASCAL MakeAttrClause(CompStr *lpCompStr);
 void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow);
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
                                       DWORD dwBufLen, LPTSTR szDicFileName);

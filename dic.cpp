@@ -740,60 +740,12 @@ BOOL PASCAL GenerateMessage(HIMC hIMC, InputContext *lpIMC,
   return TRUE;
 }
 
-BOOL PASCAL CheckAttr(CompStr *lpCompStr) {
-  int i, len;
-  LPBYTE lpb = lpCompStr->GetCompAttr();
-
-  len = lpCompStr->dwCompAttrLen;
-  for (i = 0; i < len; i++)
-    if (*lpb++ & 0x01) return TRUE;
-
-  return FALSE;
-}
-
-void PASCAL MakeAttrClause(CompStr *lpCompStr) {
-  int len = lpCompStr->dwCompAttrLen;
-  int readlen = lpCompStr->dwCompReadAttrLen;
-  LPDWORD lpdw;
-  LPBYTE lpb;
-  DWORD dwCursorPos = lpCompStr->dwCursorPos;
-  int i;
-
-  if (len != readlen) return;
-
-  lpb = lpCompStr->GetCompAttr();
-  for (i = 0; i < len; i++) {
-    if ((DWORD)i < dwCursorPos)
-      *lpb++ = 0x10;
-    else
-      *lpb++ = 0x00;
-  }
-
-  lpb = lpCompStr->GetCompReadAttr();
-  for (i = 0; i < readlen; i++) {
-    if ((DWORD)i < dwCursorPos)
-      *lpb++ = 0x10;
-    else
-      *lpb++ = 0x00;
-  }
-
-  lpdw = lpCompStr->GetCompClause();
-  *lpdw++ = 0;
-  *lpdw++ = (BYTE)dwCursorPos;
-  *lpdw++ = len;
-
-  lpdw = lpCompStr->GetCompReadClause();
-  *lpdw++ = 0;
-  *lpdw++ = (BYTE)dwCursorPos;
-  *lpdw++ = len;
-}
-
 void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow) {
   InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
   if (lpIMC) {
     CompStr *lpCompStr = lpIMC->LockCompStr();
     if (lpCompStr) {
-      if (!CheckAttr(lpCompStr)) {
+      if (!lpCompStr->CheckAttr()) {
         LPTSTR lpstart = lpCompStr->GetCompStr();
         LPTSTR lpstr = lpstart + lpCompStr->dwCursorPos;
         LPTSTR lpend = lpstart + lstrlen(lpstart);
@@ -805,7 +757,7 @@ void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow) {
         }
 
         lpCompStr->dwCursorPos = (DWORD)(lpstr - lpstart);
-        MakeAttrClause(lpCompStr);
+        lpCompStr->MakeAttrClause();
       }
       lpIMC->UnlockCompStr();
     }
