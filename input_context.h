@@ -4,10 +4,7 @@
 #ifndef INPUT_CONTEXT_H_
 #define INPUT_CONTEXT_H_
 
-#ifndef _INC_WINDOWS
-  #include <windows.h>
-#endif
-#include "immdev.h"
+#include "comp_str.h"
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -18,7 +15,7 @@ struct InputContext : public INPUTCONTEXT {
   LPCANDIDATEINFO LockCandInfo();
   void UnlockCandInfo();
 
-  LPCOMPOSITIONSTRING LockCompStr();
+  CompStr *LockCompStr();
   void UnlockCompStr();
 
   LPTRANSMSG LockTransMsg();

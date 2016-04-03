@@ -133,7 +133,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   HDC hDC;
   HFONT hFont = NULL;
   HFONT hOldFont = NULL;
-  LPCOMPOSITIONSTRING lpCompStr;
+  CompStr *lpCompStr;
   LPTSTR lpstr;
   RECT rc;
   RECT oldrc;
@@ -189,7 +189,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       lpUIExtra->uiDefComp.bShow = FALSE;
     }
 
-    lpt = lpstr = GETLPCOMPSTR(lpCompStr);
+    lpt = lpstr = lpCompStr->GetCompStr();
     num = 1;
 
     if (!lpUIExtra->bVertical) {
@@ -324,7 +324,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       if (lpCompStr) {
         if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
             (lpCompStr->dwCompStrLen > 0)) {
-          lpstr = GETLPCOMPSTR(lpCompStr);
+          lpstr = lpCompStr->GetCompStr();
           GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
           width = sz.cx;
           height = sz.cy;
@@ -433,7 +433,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
   hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
     InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
-    LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
+    CompStr *lpCompStr = lpIMC->LockCompStr();
     if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen > 0)) {
@@ -445,8 +445,8 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
 
         if (hFont) fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
 
-        lpstr = GETLPCOMPSTR(lpCompStr);
-        lpattr = GETLPCOMPATTR(lpCompStr);
+        lpstr = lpCompStr->GetCompStr();
+        lpattr = lpCompStr->GetCompAttr();
         SetBkMode(hDC, TRANSPARENT);
         if (lpIMC->cfCompForm.dwStyle) {
           HDC hPDC;

@@ -330,7 +330,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   BOOL fOpen = lpIMC->fOpen;
   BOOL fCompStr = FALSE;
   if (fOpen) {
-    LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
+    CompStr *lpCompStr = lpIMC->LockCompStr();
     if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen))
@@ -451,7 +451,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   InputContext *lpIMC;
   BOOL bRet = FALSE;
-  LPCOMPOSITIONSTRING lpCompStr;
+  CompStr *lpCompStr;
   LPCANDIDATEINFO lpCandInfo;
   LPCANDIDATELIST lpCandList;
   TCHAR szBuf[256];
@@ -530,7 +530,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           // Get the candidate strings from dic file.
           //
           GetCandidateStringsFromDictionary(
-              GETLPCOMPREADSTR(lpCompStr), szBuf, 256, szDicFileName);
+              lpCompStr->GetCompReadStr(), szBuf, 256, szDicFileName);
 
           //
           // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.

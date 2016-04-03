@@ -7,97 +7,6 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-void PASCAL InitCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
-  lpCompStr->dwSize = sizeof(MZCOMPSTR);
-
-  if (dwClrFlag & CLR_UNDET) {
-    lpCompStr->dwCompReadAttrOffset =
-        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->bCompReadAttr -
-                (LONG_PTR)lpCompStr);
-    lpCompStr->dwCompReadClauseOffset =
-        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->dwCompReadClause -
-                (LONG_PTR)lpCompStr);
-    lpCompStr->dwCompReadStrOffset =
-        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->szCompReadStr -
-                (LONG_PTR)lpCompStr);
-    lpCompStr->dwCompAttrOffset = (DWORD)(
-        (LONG_PTR)((LPMZCOMPSTR)lpCompStr)->bCompAttr - (LONG_PTR)lpCompStr);
-    lpCompStr->dwCompClauseOffset = (DWORD)(
-        (LONG_PTR)((LPMZCOMPSTR)lpCompStr)->dwCompClause - (LONG_PTR)lpCompStr);
-    lpCompStr->dwCompStrOffset = (DWORD)(
-        (LONG_PTR)((LPMZCOMPSTR)lpCompStr)->szCompStr - (LONG_PTR)lpCompStr);
-
-    lpCompStr->dwCompStrLen = 0;
-    lpCompStr->dwCompReadStrLen = 0;
-    lpCompStr->dwCompAttrLen = 0;
-    lpCompStr->dwCompReadAttrLen = 0;
-    lpCompStr->dwCompClauseLen = 0;
-    lpCompStr->dwCompReadClauseLen = 0;
-
-    *GETLPCOMPSTR(lpCompStr) = 0;
-    *GETLPCOMPREADSTR(lpCompStr) = 0;
-
-    lpCompStr->dwCursorPos = 0;
-  }
-
-  if (dwClrFlag & CLR_RESULT) {
-    lpCompStr->dwResultStrOffset = (DWORD)(
-        (LONG_PTR)((LPMZCOMPSTR)lpCompStr)->szResultStr - (LONG_PTR)lpCompStr);
-    lpCompStr->dwResultClauseOffset =
-        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->dwResultClause -
-                (LONG_PTR)lpCompStr);
-    lpCompStr->dwResultReadStrOffset =
-        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->szResultReadStr -
-                (LONG_PTR)lpCompStr);
-    lpCompStr->dwResultReadClauseOffset =
-        (DWORD)((LONG_PTR)((LPMZCOMPSTR)lpCompStr)->dwResultReadClause -
-                (LONG_PTR)lpCompStr);
-
-    lpCompStr->dwResultStrLen = 0;
-    lpCompStr->dwResultClauseLen = 0;
-    lpCompStr->dwResultReadStrLen = 0;
-    lpCompStr->dwResultReadClauseLen = 0;
-
-    *GETLPRESULTSTR(lpCompStr) = 0;
-    *GETLPRESULTREADSTR(lpCompStr) = 0;
-  }
-}
-
-void PASCAL ClearCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag) {
-  lpCompStr->dwSize = sizeof(MZCOMPSTR);
-
-  if (dwClrFlag & CLR_UNDET) {
-    lpCompStr->dwCompStrOffset = 0;
-    lpCompStr->dwCompClauseOffset = 0;
-    lpCompStr->dwCompAttrOffset = 0;
-    lpCompStr->dwCompReadStrOffset = 0;
-    lpCompStr->dwCompReadClauseOffset = 0;
-    lpCompStr->dwCompReadAttrOffset = 0;
-    lpCompStr->dwCompStrLen = 0;
-    lpCompStr->dwCompClauseLen = 0;
-    lpCompStr->dwCompAttrLen = 0;
-    lpCompStr->dwCompReadStrLen = 0;
-    lpCompStr->dwCompReadClauseLen = 0;
-    lpCompStr->dwCompReadAttrLen = 0;
-    ((LPMZCOMPSTR)lpCompStr)->szCompStr[0] = 0;
-    ((LPMZCOMPSTR)lpCompStr)->szCompReadStr[0] = 0;
-    lpCompStr->dwCursorPos = 0;
-  }
-
-  if (dwClrFlag & CLR_RESULT) {
-    lpCompStr->dwResultStrOffset = 0;
-    lpCompStr->dwResultClauseOffset = 0;
-    lpCompStr->dwResultReadStrOffset = 0;
-    lpCompStr->dwResultReadClauseOffset = 0;
-    lpCompStr->dwResultStrLen = 0;
-    lpCompStr->dwResultClauseLen = 0;
-    lpCompStr->dwResultReadStrLen = 0;
-    lpCompStr->dwResultReadClauseLen = 0;
-    ((LPMZCOMPSTR)lpCompStr)->szResultStr[0] = 0;
-    ((LPMZCOMPSTR)lpCompStr)->szResultReadStr[0] = 0;
-  }
-}
-
 void PASCAL ClearCandidate(LPCANDIDATEINFO lpCandInfo) {
   lpCandInfo->dwSize = 0L;
   lpCandInfo->dwCount = 0L;
@@ -181,7 +90,7 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
 
 void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
   InputContext *lpIMC;
-  LPCOMPOSITIONSTRING lpCompStr;
+  CompStr *lpCompStr;
   //DWORD fdwConversion;
   TRANSMSG GnMsg;
   HANDLE hDst;
@@ -271,7 +180,7 @@ BOOL PASCAL IsCompStr(HIMC hIMC) {
     return FALSE;
   }
 
-  LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
+  CompStr *lpCompStr = lpIMC->LockCompStr();
   if (lpCompStr) {
     fRet = (lpCompStr->dwCompStrLen > 0);
     lpIMC->UnlockCompStr();
@@ -293,8 +202,7 @@ BOOL PASCAL IsConvertedCompStr(HIMC hIMC) {
     return FALSE;
   }
 
-  LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
-
+  CompStr *lpCompStr = lpIMC->LockCompStr();
   if (lpCompStr->dwCompStrLen > 0)
     fRet = (((LPMZCOMPSTR)lpCompStr)->bCompAttr[0] > 0);
 

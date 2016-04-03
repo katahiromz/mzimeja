@@ -20,6 +20,7 @@
 #include "indicml.h"
 #include "immdev.h"
 #include "input_context.h"
+#include "comp_str.h"
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -27,8 +28,6 @@
 
 // for limit of MZ-IME
 #define MAXCOMPWND 10
-#define MAXCOMPSIZE 128
-#define MAXCLAUSESIZE 16
 #define MAXCANDPAGESIZE 9
 #define MAXCANDSTRSIZE 16
 #define MAXGLCHAR 32
@@ -137,26 +136,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-// define GET LP for COMPOSITIONSTRING members.
-#define GETLPCOMPREADATTR(lpcs) \
-  (LPBYTE)((LPBYTE)(lpcs) + (lpcs)->dwCompReadAttrOffset)
-#define GETLPCOMPREADCLAUSE(lpcs) \
-  (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwCompReadClauseOffset)
-#define GETLPCOMPREADSTR(lpcs) \
-  (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwCompReadStrOffset)
-#define GETLPCOMPATTR(lpcs) (LPBYTE)((LPBYTE)(lpcs) + (lpcs)->dwCompAttrOffset)
-#define GETLPCOMPCLAUSE(lpcs) \
-  (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwCompClauseOffset)
-#define GETLPCOMPSTR(lpcs) (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwCompStrOffset)
-#define GETLPRESULTREADCLAUSE(lpcs) \
-  (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwResultReadClauseOffset)
-#define GETLPRESULTREADSTR(lpcs) \
-  (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwResultReadStrOffset)
-#define GETLPRESULTCLAUSE(lpcs) \
-  (LPDWORD)((LPBYTE)(lpcs) + (lpcs)->dwResultClauseOffset)
-#define GETLPRESULTSTR(lpcs) \
-  (LPTSTR)((LPBYTE)(lpcs) + (lpcs)->dwResultStrOffset)
-
 #define SetClause(lpdw, num)      \
   {                               \
     *((LPDWORD)(lpdw)) = 0;       \
@@ -194,21 +173,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
 // Structures
-
-typedef struct _tagMZCOMPSTR {
-  COMPOSITIONSTRING cs;
-  TCHAR   szCompReadStr[MAXCOMPSIZE];
-  BYTE    bCompReadAttr[MAXCOMPSIZE];
-  DWORD   dwCompReadClause[MAXCLAUSESIZE];
-  TCHAR   szCompStr[MAXCOMPSIZE];
-  BYTE    bCompAttr[MAXCOMPSIZE];
-  DWORD   dwCompClause[MAXCLAUSESIZE];
-  char    szTypeInfo[MAXCOMPSIZE];
-  TCHAR   szResultReadStr[MAXCOMPSIZE];
-  DWORD   dwResultReadClause[MAXCOMPSIZE];
-  TCHAR   szResultStr[MAXCOMPSIZE];
-  DWORD   dwResultClause[MAXCOMPSIZE];
-} MZCOMPSTR, NEAR *PMZCOMPSTR, FAR *LPMZCOMPSTR;
 
 typedef struct _tagMZCAND {
   CANDIDATEINFO ci;
@@ -278,8 +242,6 @@ extern BYTE bNoCompAlt[];
 extern "C" {
 
 // subs.c
-void PASCAL InitCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag);
-void PASCAL ClearCompStr(LPCOMPOSITIONSTRING lpCompStr, DWORD dwClrFlag);
 void PASCAL ClearCandidate(LPCANDIDATEINFO lpCandInfo);
 void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode);
 void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode);
@@ -372,8 +334,8 @@ BOOL PASCAL ConvKanji(HIMC);
 BOOL WINAPI MakeResultString(HIMC, BOOL);
 BOOL PASCAL MakeGuideLine(HIMC, DWORD);
 BOOL PASCAL GenerateMessage(HIMC, InputContext *, LPTRANSMSGLIST, LPTRANSMSG);
-BOOL PASCAL CheckAttr(LPCOMPOSITIONSTRING lpCompStr);
-void PASCAL MakeAttrClause(LPCOMPOSITIONSTRING lpCompStr);
+BOOL PASCAL CheckAttr(CompStr *lpCompStr);
+void PASCAL MakeAttrClause(CompStr *lpCompStr);
 void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow);
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
                                       DWORD dwBufLen, LPTSTR szDicFileName);

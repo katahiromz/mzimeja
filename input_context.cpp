@@ -17,7 +17,7 @@ void InputContext::Initialize() {
   }
 
   hCompStr = ImmReSizeIMCC(hCompStr, sizeof(MZCOMPSTR));
-  LPCOMPOSITIONSTRING lpCompStr = LockCompStr();
+  CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
     lpCompStr->dwSize = sizeof(MZCOMPSTR);
     UnlockCompStr();
@@ -52,8 +52,8 @@ void InputContext::UnlockCandInfo() {
   ImmUnlockIMCC(hCandInfo);
 }
 
-LPCOMPOSITIONSTRING InputContext::LockCompStr() {
-  return (LPCOMPOSITIONSTRING)ImmLockIMCC(hCompStr);
+CompStr *InputContext::LockCompStr() {
+  return (CompStr *)ImmLockIMCC(hCompStr);
 }
 
 void InputContext::UnlockCompStr() {

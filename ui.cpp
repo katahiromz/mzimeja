@@ -219,7 +219,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
           // updated.
           lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
           if (lpIMC) {
-            LPCOMPOSITIONSTRING lpCompStr = lpIMC->LockCompStr();
+            CompStr *lpCompStr = lpIMC->LockCompStr();
             LPCANDIDATEINFO lpCandInfo = lpIMC->LockCandInfo();
             if (IsWindow(lpUIExtra->uiCand.hWnd)) HideCandWindow(lpUIExtra);
             if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
