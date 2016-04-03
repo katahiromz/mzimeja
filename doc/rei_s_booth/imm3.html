@@ -1,0 +1,89 @@
+<html><head>
+<title>IME Status - Rei's Booth.</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link rel=stylesheet href="style.css">
+</head>
+
+<body bgcolor="#ffffff" text="#000000" link="#0066cc" vlink="#6b8e23" alink="#ff4500"><center>
+
+<a name="top"></a>
+<table width=85% border=0 cellspacing=0 cellpadding=0><tr><td>
+<table width=100% border=0 cellspacing=0 cellpadding=0><tr>
+<td><font face="verdana,arial,helvetica" size=1 color="#666666">
+	<div class="ss"><a class="this" href= "index__2.html" ><b>Design</b></a>&gt;
+	<a class="nav" href= "index.html" >IMM Programming Tutorial</a>: 4
+	</div></font></td>
+<td><div align="right"><a href= "imm2.html" ><img src="../../lib/i-prev.png"
+	border=0 width=13 height=12 alt="[Previous]"></a>
+	<a href= "imm4.html" ><img src="../../lib/i-next.png"
+	border=0 width=13 height=12 alt="[Next]"></a>
+	<a href= "index.html" ><img src="../../lib/i-up.png"
+	border=0 width=13 height=13 alt="[Up]"></a>
+	<a href= "index__1.html" ><img src="../../lib/i-home.png"
+	border=0 width=13 height=13 alt="[Home]"></a>
+	<a href="http://thunder.prohosting.com/~reis/cgi-bin/reisbooth.cgi"><img src="../../lib/i-bbs.png"
+	border=0 width=13 height=13 alt="[BBS]"></a></td>
+</tr><tr>
+<td colspan=2><img src="../../lib/trans.png" width=1 height=2 alt=""></td>
+</tr><tr>
+<td colspan=2 bgcolor="#c0c0c0"><center><img src="../../lib/trans.png" width=1 height=2 alt="- - - - - - - - - - - - - - - - - - - -"></center></td>
+</tr></table><br>
+
+<table width=100% border=0 cellspacing=0 cellpadding=5 bgcolor="#eeeeee"><tr><td class="title">
+<font face="arial,helvetica"><b>IME Status</b></font>
+</td></tr></table><br>
+
+<font face="arial,helvetica" size=2>
+
+<table border=0 cellspacing=0 cellpadding=4 align="right"><tr>
+<td align="center"><img src="img/imestat.png" width=54 height=20 alt="(imestat.png, 1KB)"></td>
+</tr><tr>
+<td align="center"><font face="verdana,arial,helvetica" size=1 color="#666666" class="ss">IME status on taskbar<br>
+	(on, off, disabled)</font></td>
+</tr></table>
+
+<p>There are three types of IME status - on (opened), off (closed) and disabled. Looking at a pen icon on the taskbar notification area, you can see the current IME status of the current active window.<br>
+If the pen is red, IME is closed (but can be opened when needed). The red pen with a document indicates that IME is opened. And if the pen is grayed, IME is disabled - you can never open it.</p>
+
+<p>If the IME is opened or closed by the user's operation, your application window will receive <b>WM_IME_NOTIFY</b> message with <b>IMN_SETOPENSTATUS</b> value. You can use <b>ImmGetOpenStatus</b> to know the current IME status.</p>
+
+<blockquote><a href= "howto1.html" ><img src="../img/faq.png" border=0 width=24 height=16 alt="faQ:"> <u>How to open or close the IME?</u></a></blockquote>
+
+<p>Sometimes you may want to open IME automatically, for example, when the input focus moves to an edit control. Use <b>ImmSetOpenStatus</b> function for this purpose. A user can (re)open or close it anytime he want.</p>
+
+<blockquote><a href= "howto2.html" ><img src="../img/faq.png" border=0 width=24 height=16 alt="faQ:"> <u>How to disable the IME?</u></a></blockquote>
+
+<p>Sometimes you may want to disable the IME, that is, to prevent the user from turning IME on. To implement this behavior, associate the window with NULL context by <b>ImmAssociateContext</b>. This function returns the previous hIMC. If you want to restore the hIMC after some process has been completed, you can use the return value of the function.</p>
+
+<table border=0 cellspacing=0 cellpadding=0><tr valign="top">
+<td><font face="verdana,arial,helvetica" class="ss"><b>Win98</b></font></td>
+<td><img src="../../lib/trans.png" width=8 height=1 alt=":"></td>
+<td><font face="arial,helvetica" size=2><div>Windows 98 (and Windows 2000) has a new function called <b>ImmDisableIME</b>, which takes the thread ID as the only parameter. According to the description of the Platform SDK, it disables the IME for the specified thread or the current process.</div></font></td>
+</tr></table><br>
+
+</font>
+<p class="sp">&nbsp;</p>
+
+<table width=100% border=0 cellspacing=0 cellpadding=0><tr>
+<td colspan=2 bgcolor="#c0c0c0"><center><img src="../../lib/trans.png" width=1 height=2 alt="- - - - - - - - - - - - - - - - - - - -"></center></td>
+</tr><tr>
+<td colspan=2><img src="../../lib/trans.png" width=1 height=3 alt=""></td>
+</tr><tr>
+<td><font face="verdana,arial,helvetica" size=1 color="#666666">
+	<div class="ss"><a class="this" href= "index__2.html" ><b>Design</b></a>&gt;
+	<a class="nav" href= "index.html" >IMM Programming Tutorial</a>: 4
+	</div></font></td>
+<td><div align="right"><a href= "imm2.html" ><img src="../../lib/i-prev.png"
+	border=0 width=13 height=12 alt="[Previous]"></a>
+	<a href= "imm4.html" ><img src="../../lib/i-next.png" border=0
+	width=13 height=12 alt="[Next]"></a>
+	<a href= "index.html" ><img src="../../lib/i-up.png" border=0
+	width=13 height=13 alt="[Up]"></a>
+	<a href= "index__1.html" ><img src="../../lib/i-home.png"
+	border=0 width=13 height=13 alt="[Home]"></a>
+	<a href="http://thunder.prohosting.com/~reis/cgi-bin/reisbooth.cgi"><img src="../../lib/i-bbs.png" border=0
+	width=13 height=13 alt="[BBS]"></div></td>
+</tr></table>
+</td></tr></table>
+
+</center></body></html>

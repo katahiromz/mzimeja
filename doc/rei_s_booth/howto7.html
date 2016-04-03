@@ -1,0 +1,116 @@
+<html><head>
+<title>How to Activate a Specific IME - Rei's Booth.</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link rel=stylesheet href="style.css">
+</head>
+
+<body bgcolor="#ffffff" text="#000000" link="#0066cc" vlink="#6b8e23" alink="#ff4500"><center>
+
+<table width=85% border=0 cellspacing=0 cellpadding=0><tr><td>
+<table width=100% border=0 cellspacing=0 cellpadding=0><tr>
+<td><font face="verdana,arial,helvetica" size=1 color="#666666">
+	<div class="ss"><a class="this" href= "index__2.html" ><b>Design</b></a>&gt;
+	<a class="nav" href= "index.html" >IMM Programming Tutorial</a>&gt;
+	HowTo: 7<br></div></font></td>
+<td><div align="right"><a href= "howto6.html" ><img src="../../lib/i-prev.png"
+	border=0 width=13 height=12 alt="[Prev]"></a>
+	<img src="../../lib/d-next.png" border=0 width=13 height=12 alt="[Next]">
+	<a href= "index.html" ><img src="../../lib/i-up.png"
+	border=0 width=13 height=13 alt="[Up]"></a>
+	<a href= "index__1.html" ><img src="../../lib/i-home.png"
+	border=0 width=13 height=13 alt="[Home]"></a>
+	<a href="http://thunder.prohosting.com/~reis/cgi-bin/reisbooth.cgi"><img src="../../lib/i-bbs.png" border=0 width=13 height=13 alt="[BBS]"></a>
+	</div></td>
+</tr><tr>
+<td colspan=2><img src="../../lib/trans.png" width=1 height=2></td>
+</tr><tr>
+<td colspan=2 bgcolor="#c0c0c0"><center><img src="../../lib/trans.png" width=1 height=2 alt="- - - - - - - - - - - - - - - - - - - -"></center></td>
+</tr></table><br>
+
+<table width=100% border=0 cellspacing=0 cellpadding=5 bgcolor="#eeeeee"><tr><td class="title">
+<font face="arial,helvetica"><b>How to Activate a Specific IME</b></font>
+</td></tr></table><br>
+
+<font face="arial,helvetica" size=2>
+
+<p>Your application may want to activate the specific IME to provide its features integrated with the IME. It can be easily done by <b>ActivateKeyboardLayout</b> or <b>LoadKeyboardLayout</b> API.</p>
+
+<p>The easiest way to obtain the keyboard layout handle (hKL) is to call <b>GetKeyboardLayoutList</b> function. It retrieves the keyboard layouts already loaded into the system, that is, the same list as the [Language] tab on the [Keyboard] control panel.</p>
+
+<p>The hKL is also returned by <b>LoadKeyboardLayout</b>. Not only loading the keyboard layout, it can activate a keyboard layout. If the target layout is not loaded yet, you should use this API.<br>
+<b>LoadKeyboardLayout</b> requires the keyboard layout name as the 1st parameter. To determine the name to load, you can use <b>MAKELANGID</b> macro, if the layout is without an IME. To load a specific IME, you have to read the following registry keys to get the appropriate name:</p>
+
+<blockquote><code>HKLM\CurrentControlSet\Controls\Keyboard Layouts\&lt;<i>Keyboard Layout Name</i>&gt;</code></blockquote>
+
+<p>where &lt;<i>Keyboard Layout Name</i>&gt; is the name that can be passed to <b>LoadKeyboardLayout</b>. When the key is for an IME, it contains the REG_SZ value named &quot;IME File&quot; which specifies the IME filename (*.ime). This is the same string as <b>ImmGetIMEFileName</b> returns and can be used to see what this IME is.</p>
+
+<p>Here is a short code to activate MS-IME 98 for the current thread. The target keyboard layout is assumed to have been already loaded.</p>
+
+<p class="sp">&nbsp;</p>
+
+<blockquote><table border=0 cellspacing=0 cellpadding=2 bgcolor="#c0c0c0"><tr><td>
+<table border=0 cellspacing=0 cellpadding=5 bgcolor="#f5f5f5"><tr><td><pre>
+UINT cnt;
+HKL FAR *lpKL;
+char szImeName[13];
+
+cnt = GetKeyboardLayoutList(0, NULL);
+if (!cnt) {
+    /* error. */
+}
+
+lpKL = (HKL FAR *)LocalAlloc(LPTR, sizeof(HKL) * cnt);
+if (!lpKL) {
+    /* not enough memory. */
+}
+
+cnt = GetKeyboardLayoutList(cnt, lpKL);
+if (!cnt) {
+    /* error. */
+}
+
+while (0 < cnt) {
+    cnt--;
+    if (ImmGetIMEFileName(*(lpKL + cnt),
+            szImeName, sizeof(szImeName))
+        && !lstrcmpi("imejp98.ime", szImeName))
+        ActivateKeyboardLayout(hKL, 0);
+}
+
+LocalFree(lpKL);
+</pre></td></tr></table>
+</td></tr></table></blockquote>
+
+<p class="sp">&nbsp;</p>
+
+<table border=0 cellspacing=0 cellpadding=0><tr valign="top">
+<td><font face="verdana,arial,helvetica" class="ss"><b>Note</b></font></td>
+<td><img src="../../lib/trans.png" width=8 height=1 alt=":"></td>
+<td><font face="arial,helvetica" size=2><div>According to the SDK document, the implementations of keyboard layout functions in Windows 95 is different from that of Windows NT. I have not confirmed the result of the code above on Windows 95.</div></font></td>
+</tr></table>
+
+</font>
+<p class="sp">&nbsp;</p>
+
+<table width=100% border=0 cellspacing=0 cellpadding=0><tr>
+<td colspan=2 bgcolor="#c0c0c0"><center><img src="../../lib/trans.png" width=1 height=2 alt="- - - - - - - - - - - - - - - - - - - -"></center></td>
+</tr><tr>
+<td colspan=2><img src="../../lib/trans.png" width=1 height=3 alt=""></td>
+</tr><tr>
+<td><font face="verdana,arial,helvetica" size=1 color="#666666">
+	<div class="ss"><a class="this" href= "index__2.html" ><b>Design</b></a>&gt;
+	<a class="nav" href= "index.html" >IMM Programming Tutorial</a>&gt;
+	HowTo: 7<br></div></font></td>
+<td><div align="right"><a href= "howto6.html" ><img src="../../lib/i-prev.png"
+	border=0 width=13 height=12 alt="[Prev]"></a>
+	<img src="../../lib/d-next.png" border=0 width=13 height=12 alt="[Next]">
+	<a href= "index.html" ><img src="../../lib/i-up.png"
+	border=0 width=13 height=13 alt="[Up]"></a>
+	<a href= "index__1.html" ><img src="../../lib/i-home.png"
+	border=0 width=13 height=13 alt="[Home]"></a>
+	<a href="http://thunder.prohosting.com/~reis/cgi-bin/reisbooth.cgi"><img src="../../lib/i-bbs.png" border=0 width=13 height=13 alt="[BBS]"></a>
+	</div></td>
+</tr></table>
+</td></tr></table>
+
+</center></body></html>

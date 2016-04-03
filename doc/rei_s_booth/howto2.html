@@ -1,0 +1,94 @@
+<html><head>
+<title>How to Disable IME - Rei's Booth.</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link rel=stylesheet href="style.css">
+</head>
+
+<body bgcolor="#ffffff" text="#000000" link="#0066cc" vlink="#6b8e23" alink="#ff4500"><center>
+
+<table width=85% border=0 cellspacing=0 cellpadding=0><tr><td>
+<table width=100% border=0 cellspacing=0 cellpadding=0><tr>
+<td><font face="verdana,arial,helvetica" size=1 color="#666666">
+	<div class="ss"><a class="this" href= "index__2.html" ><b>Design</b></a>&gt;
+	<a class="nav" href= "index.html" >IMM Programming Tutorial</a>&gt;
+	HowTo: 2<br></div></font></td>
+<td><div align="right">
+	<a href= "howto1.html" ><img src="../../lib/i-prev.png"
+	border=0 width=13 height=12 alt="[Previous]"></a>
+	<a href= "howto3.html" ><img src="../../lib/i-next.png"
+	border=0 width=13 height=12 alt="[Next]"></a>
+	<a href= "index.html" ><img src="../../lib/i-up.png"
+	border=0 width=13 height=13 alt="[Up]"></a>
+	<a href= "index__1.html" ><img src="../../lib/i-home.png"
+	border=0 width=13 height=13 alt="[Home]"></a>
+	<a href="http://thunder.prohosting.com/~reis/cgi-bin/reisbooth.cgi"><img src="../../lib/i-bbs.png" border=0 width=13 height=13 alt="[BBS]"></a>
+	</div></td>
+</tr><tr>
+<td colspan=2><img src="../../lib/trans.png" width=1 height=2></td>
+</tr><tr>
+<td colspan=2 bgcolor="#c0c0c0"><center><img src="../../lib/trans.png" width=1 height=2 alt="- - - - - - - - - - - - - - - - - - - -"></center></td>
+</tr></table><br>
+
+<table width=100% border=0 cellspacing=0 cellpadding=5 bgcolor="#eeeeee"><tr><td class="title">
+<font face="arial,helvetica"><b>How to Disable IME</b></font>
+</td></tr></table><br>
+
+<font face="arial,helvetica" size=2>
+
+<p>IME can never be enabled on a window which has no <a href= "imm2.html" >input context</a>. Using this behavior, you can restrict the user input to ASCII characters only. It is useful on an edit control to input a price, percentage, phone number, logon user name, URL or something else.<br>
+To remove the input context from a window, associate a NULL context with it by <b>ImmAssociateContext</b>.</p>
+
+<p class="sp">&nbsp;</p>
+
+<blockquote><table border=0 cellspacing=0 cellpadding=2 bgcolor="#c0c0c0"><tr><td>
+<table border=0 cellspacing=0 cellpadding=5 bgcolor="#f5f5f5"><tr><td><pre>
+HIMC hIMC;
+
+/* disable IME. */
+hIMC = ImmAssociateContext(hWnd, NULL);
+
+/* do your process. */
+...
+
+/* restore the input context on clean-up. */
+ImmAssociateContext(hWnd, hIMC);
+</pre></td></tr></table>
+</td></tr></table></blockquote>
+
+<p class="sp">&nbsp;</p>
+
+<table border=0 cellspacing=0 cellpadding=0><tr valign="top">
+<td><font face="verdana,arial,helvetica" class="ss"><b>Win98</b></font></td>
+<td><img src="../../lib/trans.png" width=8 height=1 alt=":"></td>
+<td><font face="arial,helvetica" size=2><div>Windows 98 has a new function called <b>ImmDisableIME</b>, which takes the thread ID as the only parameter. According to the description of the Platform SDK, it disables the IME for the specified thread or the current process.</div></font></td>
+</tr></table><br>
+
+<p>SEE ALSO: <a href= "imm3.html" >IME Status</a>,
+<a href= "howto1.html" >How to Open/Close IME</a></p>
+
+</font>
+<p class="sp">&nbsp;</p>
+
+<table width=100% border=0 cellspacing=0 cellpadding=0><tr>
+<td colspan=2 bgcolor="#c0c0c0"><center><img src="../../lib/trans.png" width=1 height=2 alt="- - - - - - - - - - - - - - - - - - - -"></center></td>
+</tr><tr>
+<td colspan=2><img src="../../lib/trans.png" width=1 height=3 alt=""></td>
+</tr><tr>
+<td><font face="verdana,arial,helvetica" size=1 color="#666666">
+	<div class="ss"><a class="this" href= "index__2.html" ><b>Design</b></a>&gt;
+	<a class="nav" href= "index.html" >IMM Programming Tutorial</a>&gt;
+	HowTo: 2<br></div></font></td>
+<td><div align="right"><a href= "howto1.html" ><img src="../../lib/i-prev.png"
+	border=0 width=13 height=12 alt="[Previous]"></a>
+	<a href= "howto3.html" ><img src="../../lib/i-next.png"
+	border=0 width=13 height=12 alt="[Next]"></a>
+	<a href= "index.html" ><img src="../../lib/i-up.png"
+	border=0 width=13 height=13 alt="[Up]"></a>
+	<a href= "index__1.html" ><img src="../../lib/i-home.png"
+	border=0 width=13 height=13 alt="[Home]"></a>
+	<a href="http://thunder.prohosting.com/~reis/cgi-bin/reisbooth.cgi"><img src="../../lib/i-bbs.png"
+	border=0 width=13 height=13 alt="[BBS]"></a></div></td>
+</tr></table>
+</td></tr></table>
+
+</center></body></html>

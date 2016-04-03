@@ -1,0 +1,132 @@
+<html><head>
+<title>Candidate List - Rei's Booth.</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link rel=stylesheet href="style.css">
+</head>
+
+<body bgcolor="#ffffff" text="#000000" link="#0066cc" vlink="#6b8e23" alink="#ff4500"><center>
+
+<table width=85% border=0 cellspacing=0 cellpadding=0><tr><td>
+<table width=100% border=0 cellspacing=0 cellpadding=0><tr>
+<td><font face="verdana,arial,helvetica" size=1 color="#666666">
+	<div class="ss"><a class="this" href= "index__2.html" ><b>Design</b></a>:
+	<a class="nav" href= "index.html" >IMM Programming Tutorial</a>: 8
+	</div></font></td>
+<td nowrap><div align="right">
+	<a href= "imm6.html" ><img src="../../lib/i-prev.png"
+	border=0 width=13 height=12 alt="[Previous]"></a>
+	<a href= "imm8.html" ><img src="../../lib/i-next.png"
+	border=0 width=13 height=12 alt="[Next]"></a>
+	<a href= "index.html" ><img src="../../lib/i-up.png"
+	border=0 width=13 height=13 alt="[Up]"></a>
+	<a href= "index__1.html" ><img src="../../lib/i-home.png"
+	border=0 width=13 height=13 alt="[Home]"></a>
+	<a href="http://thunder.prohosting.com/~reis/cgi-bin/reisbooth.cgi"><img src="../../lib/i-bbs.png" border=0 width=13 height=13 alt="[BBS]"></a>
+	</div></td>
+</tr><tr>
+<td colspan=2><img src="../../lib/trans.png" width=1 height=2></td>
+</tr><tr>
+<td colspan=2 bgcolor="#c0c0c0"><center><img src="../../lib/trans.png" width=1 height=2 alt="- - - - - - - - - - - - - - - - - - - -"></center></td>
+</tr></table><br>
+
+<table width=100% border=0 cellspacing=0 cellpadding=5 bgcolor="#eeeeee"><tr><td class="title">
+<font face="arial,helvetica"><b>Candidate List</b></font>
+</td></tr></table><br>
+
+<font face="arial,helvetica" size=2>
+
+<table border=0 cellspacing=0 cellpadding=4 align="right"><tr>
+<td align="center"><img src="img/candlist.png" width=79 height=232 alt="(candlist.png, 2KB)"></td>
+</tr><tr>
+<td align="center"><font face="verdana,arial,helvetica" size=1 color="#666666" class="ss">Candidate list</font></td>
+</tr></table>
+
+<p>When the user (or your application) converts the <a href= "imm5.html" >composition string</a> several times, the &quot;<i>Candidate List</i>&quot; for the current target clause will appear. The time when it is shown up depends on each IME or the user's preference.</p>
+
+<p>When the candidate window is opened or closed, the IME will send the <b>WM_IME_NOTIFY</b> message to the application window with <b>IMN_OPENCANDIDATE</b> or <b>IMN_CLOSECANDIDATE</b> value. Also <b>IMN_CHANGECANDIDATE</b> will be notified if the content of the candidate window is changed.</p>
+
+<p>To open or close the candidate window, you can use <b>ImmNotifyIME</b> with <b>NI_OPENCANDIDATE</b> or <b>NI_CLOSECANDIDATE</b> value. To change the selection of the candidate list, use <b>ImmNotifyIME</b> with <b>NI_CHANGECANDIDATELIST</b> value. In this case, you should supply the index of a candidate to be selected in the 3rd parameter (<i>dwIndex</i>) of the function.</p>
+
+<p>However, these functions would not be so practical.<br>
+What you really want to know must be:</p>
+
+<blockquote><img src="../img/faq.png" width=24 height=16 alt="faQ:"> <u>How to retrieve the current candidate list?</u></blockquote>
+
+<p>It will be done by <b>ImmGetCandidateListCount</b> and <b>ImmGetCandidateList</b> APIs. <b>ImmGetCandidateListCount</b> retrieves the number of candidate lists available for the current target clause, and <b>ImmGetCandidateList</b> retrieves the candidates in one list.</p>
+
+<p>The following example gets the all candidates for the current target clause.</p>
+
+<p class="sp">&nbsp;</p>
+
+<blockquote><table border=0 cellspacing=0 cellpadding=2 bgcolor="#c0c0c0"><tr><td>
+<table border=0 cellspacing=0 cellpadding=5 bgcolor="#f5f5f5"><tr><td><pre>
+ HIMC hIMC;
+ DWORD cCandList; /* candidate list count */
+ DWORD dwSize; /* size of one list */
+ LPCANDIDATELIST lpCand;
+ DWORD i, j;
+ LPTSTR lpstr;
+
+ if ((hIMC = ImmGetContext(hWnd)) != NULL) {
+     /* get the number of the candidate lists. */
+     ImmGetCandidateListCount(hIMC, &cCandList);
+
+     for (i = 0; i < cCandList; i++) {
+         /* get the size in bytes of one list. */
+         dwSize = ImmGetCandidateList(hIMC, i, NULL, 0);&nbsp;
+         /* allocate the buffer. */
+         lpCand = (LPCANDIDATELIST)
+             GlobalAllocPtr(GHND, dwSize);
+
+         /* retrieve one candidate list. */
+         ImmGetCandidateList(hIMC, i, lpCand, dwSize);
+
+         /* output each candidate. */
+         for (j = 0; j < lpCand->dwCount; j++) {
+             lpstr = (LPTSTR)
+                 ((LPBYTE)lpCand + lpCand->dwOffset[i]);&nbsp;
+             OutputDebugString(lpstr);
+         }
+
+         GlobalFreePtr(lpCand);
+     }
+
+     ImmReleaseContext(hWnd, hIMC);
+ }
+</pre></td></tr></table>
+</td></tr></table></blockquote>
+
+<p class="sp">&nbsp;</p>
+
+<table border=0 cellspacing=0 cellpadding=0><tr valign="top">
+<td><font face="verdana,arial,helvetica" class="ss"><b>Note</b></font></td>
+<td><img src="../../lib/trans.png" width=8 height=1 alt=":"></td>
+<td><font face="arial,helvetica" size=2><div>A candidate list is not available when it has not been created by the IME. Typically an application uses <b>ImmGetCandidateListCount</b> and <b>ImmGetCandidateList</b> when it receives <b>WM_IME_NOTIFY</b> message with <b>IMN_OPENCANDIDATE</b> or <b>IMN_CHANGECANDIDATE</b>.</div></font></td>
+</tr></table>
+
+<p class="sp">&nbsp;</p>
+
+<table width=100% border=0 cellspacing=0 cellpadding=0><tr>
+<td colspan=2 bgcolor="#c0c0c0"><center><img src="../../lib/trans.png" width=1 height=2 alt="- - - - - - - - - - - - - - - - - - - -"></center></td>
+</tr><tr>
+<td colspan=2><img src="../../lib/trans.png" width=1 height=3 alt=""></td>
+</tr><tr>
+<td><font face="verdana,arial,helvetica" size=1 color="#666666">
+	<div class="ss"><a class="this" href= "index__2.html" ><b>Design</b></a>:
+	<a class="nav" href= "index.html" >IMM Programming Tutorial</a>: 8
+	</div></font></td>
+<td><div align="right">
+	<a href= "imm6.html" ><img src="../../lib/i-prev.png" border=0
+	width=13 height=12 alt="[Previous]"></a>
+	<a href= "imm8.html" ><img src="../../lib/i-next.png" border=0
+	width=13 height=12 alt="[Next]"></a>
+	<a href= "index.html" ><img src="../../lib/i-up.png" border=0
+	width=13 height=13 alt="[Up]"></a>
+	<a href= "index__1.html" ><img src="../../lib/i-home.png"
+	border=0 width=13 height=13 alt="[Home]"></a>
+	<a href="http://thunder.prohosting.com/~reis/cgi-bin/reisbooth.cgi"><img src="../../lib/i-bbs.png" border=0 width=13 height=13 alt="[BBS]"></a>
+	</div></td>
+</tr></table>
+</td></tr></table>
+
+</basefont></body></html>

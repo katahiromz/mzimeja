@@ -1,0 +1,71 @@
+<html><head>
+<title>How to Hide IME's Status Window - Rei's Booth.</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link rel=stylesheet href="style.css">
+</head>
+
+<body bgcolor="#ffffff" text="#000000" link="#0066cc" vlink="#6b8e23" alink="#ff4500"><center>
+
+<table width=85% border=0 cellspacing=0 cellpadding=0><tr><td>
+<table width=100% border=0 cellspacing=0 cellpadding=0><tr>
+<td><font face="verdana,arial,helvetica" size=1 color="#666666">
+	<div class="ss"><a class="this" href= "index__2.html" ><b>Design</b></a>&gt;
+	<a class="nav" href= "index.html" >IMM Programming Tutorial</a>&gt;
+	HowTo: 6<br></div></font></td>
+<td><div align="right"><a href= "howto5.html" ><img src="../../lib/i-prev.png"
+	border=0 width=13 height=12 alt="[Prev]"></a>
+	<a href= "howto7.html" ><img src="../../lib/i-next.png" border=0
+	width=13 height=12 alt="[Next]"></a>
+	<a href= "index.html" ><img src="../../lib/i-up.png"
+	border=0 width=13 height=13 alt="[Up]"></a>
+	<a href= "index__1.html" ><img src="../../lib/i-home.png"
+	border=0 width=13 height=13 alt="[Home]"></a>
+	<a href="http://thunder.prohosting.com/~reis/cgi-bin/reisbooth.cgi"><img src="../../lib/i-bbs.png" border=0 width=13 height=13 alt="[BBS]"></a>
+	</div></td>
+</tr><tr>
+<td colspan=2><img src="../../lib/trans.png" width=1 height=2></td>
+</tr><tr>
+<td colspan=2 bgcolor="#c0c0c0"><center><img src="../../lib/trans.png" width=1 height=2 alt="- - - - - - - - - - - - - - - - - - - -"></center></td>
+</tr></table><br>
+
+<table width=100% border=0 cellspacing=0 cellpadding=5 bgcolor="#eeeeee"><tr><td class="title">
+<font face="arial,helvetica"><b>How to Hide IME's Status Window</b></font>
+</td></tr></table><br>
+
+<font face="arial,helvetica" size=2>
+
+<p>Some IMEs always show their status windows even if closed or disabled, some do only when opened. We sometimes want to hide the IME's status window, because it might be an obstacle to the application window (if the window never uses the IME).</p>
+
+<p>Note that status window is usually the only way to show the current conversion mode. If your program *always* hide it, users may be forced to put up with inconvenience. Do not interfere with the Window's general user interface.</p>
+
+<p>As for Microsoft IMEs, MS-IME 97, MS-IME 98 and MS-IME 2000 have an user option to select when to show the status window. If the window is shown on the desktop even when the IME is closed, it may be the user's choise. MS-IME 95 does not have this option and always places the status window on the user's desktop. Most of other IMEs (in Japan) would display the status window only when the IME is opened.</p>
+
+<p>After considerating these specs, you may still need to hide the status window. It can be done by <b>WM_IME_CONTROL</b> message with <b>IMC_CLOSESTATUSWINDOW</b> in wParam.<br>
+However, the status window will appear again at some triggers - for example, when the user changes the current context and be back to your context. So you may need to monitor <b>WM_IME_NOTIFY</b> message to know when the status window is shown, and hide it again in response.</p>
+
+</font>
+<p class="sp">&nbsp;</p>
+
+<table width=100% border=0 cellspacing=0 cellpadding=0><tr>
+<td colspan=2 bgcolor="#c0c0c0"><center><img src="../../lib/trans.png" width=1 height=2 alt="- - - - - - - - - - - - - - - - - - - -"></center></td>
+</tr><tr>
+<td colspan=2><img src="../../lib/trans.png" width=1 height=3 alt=""></td>
+</tr><tr>
+<td><font face="verdana,arial,helvetica" size=1 color="#666666">
+	<div class="ss"><a class="this" href= "index__2.html" ><b>Design</b></a>&gt;
+	<a class="nav" href= "index.html" >IMM Programming Tutorial</a>&gt;
+	HowTo: 6<br></div></font></td>
+<td><div align="right"><a href= "howto5.html" ><img src="../../lib/i-prev.png"
+	border=0 width=13 height=12 alt="[Prev]"></a>
+	<a href= "howto7.html" ><img src="../../lib/i-next.png" border=0
+	width=13 height=12 alt="[Next]"></a>
+	<a href= "index.html" ><img src="../../lib/i-up.png"
+	border=0 width=13 height=13 alt="[Up]"></a>
+	<a href= "index__1.html" ><img src="../../lib/i-home.png"
+	border=0 width=13 height=13 alt="[Home]"></a>
+	<a href="http://thunder.prohosting.com/~reis/cgi-bin/reisbooth.cgi"><img src="../../lib/i-bbs.png" border=0 width=13 height=13 alt="[BBS]"></a>
+	</div></td>
+</tr></table>
+</td></tr></table>
+
+</center></body></html>

@@ -1,0 +1,89 @@
+(用語)	(説明1)	(説明2)
+DDK	Device Driver Kit
+HIMC	handle to Input Context
+IMC	Input Context
+IMCC	Components of Input Context
+IME	Input Method Editor	入力手段エディタ
+IME UI Window	IME UIウィンドウ
+IME aware appication	IMEを意識したアプリ
+IME class	IMEクラス
+IME full-aware appication	IMEを完全に意識したアプリ
+IME half-aware appication	IMEを半分意識したアプリ
+IME translated message	IMEが変換したメッセージ
+IME unaware appication	IMEを意識していないアプリ
+IME window	IMEウィンドウ
+IMM	Input Method Manager	入力手段管理
+IMM function	IMM関数
+Input Method Editor	入力手段エディタ
+Input Method Manager	入力手段管理
+UI	User Interface	操作系
+UI Window	UIウィンドウ
+application	アプリ
+application-created Input Context	アプリが作成した入力コンテキスト
+associate	関連付ける
+attr	attribution
+attribute	attribution
+attribution	属性
+buffer	バッファ
+call	呼び出す
+cand	candidate
+candidate	候補
+candidate list	候補リスト
+clause	文節
+cls	clause
+code	コード	暗号
+comp	composition
+composition string	変換中の文字列
+conversion	変換
+conversion mode	変換モード
+convert	変換する
+create	作成する
+default IME window	既定のIMEウィンドウ
+default Input Context	既定の入力コンテキスト
+extra	余分なもの
+form	フォーム	形式
+full-shape	全角
+generate	生成する
+guideline	ガイドライン
+hiragana	ひらがな
+ignore	無視する
+index	インデックス	索引
+indicate	表示する	指示する
+indication	表示	指示
+indicator	指示器
+information	情報
+input context	入力コンテキスト	入力文脈
+katakana	カタカナ
+kbd	keyboard
+keyboard	キーボード
+len	length
+length	長さ
+lock	ロック
+menu	メニュー
+message	メッセージ
+msg	message
+offset	オフセット	ずれ
+pos	position
+position	位置
+predefined	定義済み
+reading string	読み込み文字列
+reconversion	再変換
+reconvert	再変換する
+register	登録する
+respond	反応する
+result	結果
+select	選択する
+selection	選択
+sentence	文
+size	サイズ	大きさ
+soft keyboard	ソフトキーボード	ソフトウェアキーボード
+start	開始
+status	状態
+str	string
+string	文字列
+submessage	サブメッセージ
+trans	translation
+translate	変換する
+translation	変換	翻訳
+unlock	ロックを解除する
+virtual key	仮想キー
