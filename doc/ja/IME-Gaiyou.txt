@@ -246,3 +246,139 @@ IMEはImmDestroyIMCC関数を呼ぶことができる。
 (例は略)
 
 =メッセージの生成
+
+IMEはIMEメッセージを生成する必要がある。
+IMEが変換プロセスを初期化したとき、IMEは、
+WM_IME_STARTCOMPOSITIONメッセージを生成する必要がある。
+もし、IMEが変換文字列を変更したら、IMEは、WM_IME_COMPOSITIONメッセージを生成する
+必要がある。
+IMEがメッセージを生成する方法には、二通りある。
+一つは、ImeToAsciiEx関数で提供されるlpdwTransKeyバッファを使うこと、
+もう一つは、ImmGenerateMessage関数を呼ぶことだ。
+
+==メッセージ生成にlpdwTransKeyを使う方法
+
+IMEによって開始されたイベントは、入力コンテキストに関連付けられたウィンドウへの
+メッセージを生成するように実現される。
+基本的に、IMEはImeToAsciiExの引数として提供されたlpTransMsgListを使って、
+メッセージを生成する。ImeToAsciiExが呼ばれたとき、IMEはlpTransMsgListバッファへ、
+メッセージを置く。
+
+ImeToAsciiEx関数の引数lpTransMsgListで指定されたバッファは、
+システムによって提供される。
+この関数は、一度にバッファ内の全部のメッセージを置くことができる。
+メッセージの本当の個数は、バッファ先頭のダブルワード値で与えられる。
+しかしながら、もし、ImeToAsciiEx関数が、与えられた個数よりも多くの
+メッセージを生成したいなら、ImeToAsciiEx関数は、入力コンテキスト内の
+hMsgBufへ、すべてのメッセージを置くことができ、そのときメッセージの個数が
+返される。ImeToAsciiExの戻り値がlpTransMsgListで指定された値よりも大きいとき、
+システムは、lpTransMsgListからメッセージを取り出さない。
+代わりに、システムは入力コンテキスト内のhMsgBufを見る。
+このhMsgBufは、ImeToAsciiExの引数として渡される。
+
+(例は略)
+
+==メッセージ生成にメッセージバッファを使う方法
+
+もし、ImeToAsciiEx が呼ばれなかったとしても、IMEは、まだメッセージを、
+入力コンテキストに関連付けられたウィンドウに生成することができる。
+このメッセージバッファは、メモリーブロックのハンドルとして処理され、
+IMEは、メッセージをこのメモリーブロックへ置く。
+それからIMEは、ImmGenerateMessage関数を呼び、それが、
+適切なウィンドウへのメッセージバッファに格納されたメッセージを送信する。
+
+(例は略)
+
+==WM_IME_COMPOSITION
+
+IMEがWM_IME_COMPOSITION メッセージを生成したとき、
+IMEは、lParamをGCSビット群として指定する。
+そしてGCSビット群は、COMPOSITIONSTRING構造体の利用可能なメンバーを通知する。
+IMEが更新せず、メンバー利用可能でなかったとしても、
+IMEは、GCSビット群を設定できる。
+
+IMEがWM_IME_COMPOSITIONメッセージを生成したとき、
+IMEはなお、文字列属性と文節情報をすべて一度で変更できる。
+the IME can also change the string attribute and
+clause information all at once.
+
+=ImeSetCompositionString
+
+ImeSetCompositionString関数は、アプリがIME変換文字列を操作するために使われる。
+別のフラグを指定することで、アプリは、変換文字列、属性などを変更できる。
+第二引数dwIndexは、IMEにおいてどのように変換文字列を補正するかを指定する。
+それは、SCS_SETSTR、SCS_CHANGEATTR、SCS_CHANGECLAUSE、
+SCS_QUERYRECONVERTSTRINGなどの値を含む。
+それぞれの値が特定の機能を表現する。
+
+==ImeSetCompositionString Capability
+
+IMEがImeSetCompositionStringの能力を持たないとき、
+IMEINFO構造体のどんなSCS能力も指定できない。
+IMEがImeSetCompositionStringを取り扱うことができるとき、
+それはSCS_COMPSTRビットをセットする。
+もしIMEが変換文字列から読みの文字列を生成できるなら、
+それはSCS_CAP_MAKEREADビットをセットする。
+もしIMEがSCS_CAP_COMPSTR能力を持っていれば、
+ImeSetCompositionString関数が呼ばれるであろう。
+この呼び出しの反応では、IMEは、アプリによって
+生成された新しい変換文字列を使い、WM_IME_COMPOSITIONメッセージを
+生成するべきだろう。
+
+==SCS_SETSTR
+
+ImeSetCompositionStringのdwIndexがSCS_SETSTRであれば、
+IME はhIMCのCOMPOSITIONSTR構造体のすべてを消去できる。
+
+必要なら、IMEは候補情報を更新したり、候補メッセージWM_IME_NOTIFYに
+IMN_OPENCANDIDATE、CHANGECANDIDATE、またはIMN_CLOSECANDIDATEサブメッセージを
+つけて生成できる。
+
+IMEは、以下のように異なる入力引数に基づくアプリの要件に反応する必要がある。
+
+ * もし、ImeSetCompositonString のlpRead引数が利用可能であれば：
+   IMEは、変換文字列を、読みの文字列lpReadから作成できる。
+   IMEはそのとき、新しい変換文字列と読み文字列lpReadのために、
+   属性と文節を作成する。IMEは、WM_IME_COMPOSITION メッセージを
+   GCS_COMPかGCS_COMPREADのいずれかをつけて、生成する。
+   ときおり、IMEは、変換を自動的にファイナライズしうる。
+   IMEはそのとき、WM_IME_COMPOSITIONメッセージを、GCS_COMPxxxの代わりに
+   GCS_RESULTかGCS_RESULTREAD をつけて生成できる。
+
+ * もし、ImeSetCompositonStringの引数lpCompが利用可能であれば：
+   IMEは、変換属性と文節情報を変換文字列（lpCompに含まれる）から、
+   作成すべきだ。IMEはそのとき、WM_IME_COMPOSITIONメッセージを
+   GCS_COMPをつけて生成する。もしIMEがSCS_CAP_MAKEREADの能力が
+   あれば、IMEは、新しい読みの文字列も同時に作成すべきだ。
+   IMEはそのとき、WM_IME_COMPOSITION メッセージを
+   GCS_COMPかGCS_COMPREADのいずれかをつけて生成する。
+   ときおり、IMEは、変換をファイナライズしうる。
+   IMEはそのとき、WM_IME_COMPOSITIONメッセージを、
+   GCS_COMPxxxの代わりにGCS_RESULT かGCS_RESULTREAD のいずれかをつけて
+  生成できる。
+ * lpRead とlpComp の両方利用可能であれば：
+   IMEは、変換文字列と対応する読みの文字列を作成すべきだ。
+   この場合、IME は、lpComp とlpRead に完全に従う必要はない。
+   もし、IMEが、アプリによって指定されたlpReadとlpCompの
+   関係がわからないときは、変換文字列を修正すべきだ。
+   IMEはそのとき、新しい変換文字列と読みの文字列lpReadの
+   両方に属性と文節情報を作成できる。
+   IMEはそのとき、WM_IME_COMPOSITION メッセージを
+   GCS_COMPかGCS_COMPREADのいずれかをつけて生成する。
+   ときおり、IMEは、変換をファイナライズしうる。
+   IMEはそのとき、WM_IME_COMPOSITION メッセージを、
+   GCS_COMPxxxの代わりに、GCS_RESULT かGCS_RESULTREAD のいずれかをつけて
+   生成できる。
+
+==SCS_CHANGEATTR
+
+SCS_CHANGEATTRは、属性情報にのみ影響する。
+IMEは、変換文字列、変換文字列の文節情報、変換文字列の読み、
+または、読み文字列の文節情報を更新すべきではない。
+IMEは最初に、新しい属性を受け入れ可能かどうかをチェックする必要がある。
+そしてそれは、hIMCのCOMPOSITIONSTRING 構造体の中の新しい属性をセットする。
+最後に、IME は、WM_IME_COMPOSITION メッセージを生成する。
+必要ならば、IMEは、候補情報を更新し、候補メッセージWM_IME_NOTIFYを
+サブメッセージIMN_OPENCANDIDATE、CHANGECANDIDATE、または
+IMN_CLOSECANDIDATE をつけて、生成できる。
+
