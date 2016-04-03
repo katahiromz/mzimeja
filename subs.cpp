@@ -120,7 +120,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
       break;
 
     case TO_CMODE_KATAKANA:
-      lpSrc = ((LPMZCOMPSTR)lpCompStr)->szCompStr;
+      lpSrc = lpCompStr->szCompStr;
       lpSrc0 = lpSrc;
       lpDst0 = lpDst;
       while (*lpSrc) {
@@ -133,7 +133,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
       break;
 
     case TO_CMODE_HIRAGANA:
-      lpSrc = ((LPMZCOMPSTR)lpCompStr)->szCompStr;
+      lpSrc = lpCompStr->szCompStr;
       lpSrc0 = lpSrc;
       lpDst0 = lpDst;
       while (*lpSrc) {
@@ -204,7 +204,7 @@ BOOL PASCAL IsConvertedCompStr(HIMC hIMC) {
 
   CompStr *lpCompStr = lpIMC->LockCompStr();
   if (lpCompStr->dwCompStrLen > 0)
-    fRet = (((LPMZCOMPSTR)lpCompStr)->bCompAttr[0] > 0);
+    fRet = (lpCompStr->bCompAttr[0] > 0);
 
   lpIMC->UnlockCompStr();
   ImmUnlockIMC(hIMC);
@@ -232,7 +232,7 @@ HKL PASCAL GetMyHKL() {
     }
   }
 
-  GlobalFree((HANDLE)lphkl);
+  GlobalFree(lphkl);
   return hKL;
 }
 

@@ -255,7 +255,7 @@ void PASCAL MoveCandWindow(HWND hUIWnd, InputContext *lpIMC,
       ShowWindow(lpUIExtra->uiCand.hWnd, SW_SHOWNOACTIVATE);
       lpUIExtra->uiCand.bShow = TRUE;
       InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
-      SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG((WORD)pt.x, (WORD)pt.y));
+      SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
     }
     return;
   }
@@ -293,7 +293,7 @@ void PASCAL MoveCandWindow(HWND hUIWnd, InputContext *lpIMC,
       lpUIExtra->uiCand.bShow = TRUE;
       InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
     }
-    SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG((WORD)pt.x, (WORD)pt.y));
+    SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
   } else if (lpIMC->cfCandForm[0].dwStyle == CFS_CANDIDATEPOS) {
     pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
     pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
@@ -307,7 +307,7 @@ void PASCAL MoveCandWindow(HWND hUIWnd, InputContext *lpIMC,
       lpUIExtra->uiCand.bShow = TRUE;
       InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
     }
-    SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG((WORD)pt.x, (WORD)pt.y));
+    SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
   }
 }
 

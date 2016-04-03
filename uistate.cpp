@@ -356,7 +356,7 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
               }
               else
                 DebugPrint(TEXT("ImmRequestMessage returned 0\r\n"));
-              GlobalFree((HANDLE)lpRS);
+              GlobalFree(lpRS);
             }
             break;
           }

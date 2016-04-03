@@ -467,16 +467,14 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
         lpUIExtra->bVertical = FALSE;
       }
 
-      //
       // if current font can't display Japanese characters,
       // try to find Japanese font
-      //
       if (lf.lfCharSet != NATIVE_CHARSET) {
         lf.lfCharSet = NATIVE_CHARSET;
         lf.lfFaceName[0] = 0;
       }
 
-      lpUIExtra->hFont = CreateFontIndirect((LPLOGFONT)&lf);
+      lpUIExtra->hFont = CreateFontIndirect(&lf);
       SetFontCompWindow(lpUIExtra);
       MoveCompWindow(lpUIExtra, lpIMC);
 

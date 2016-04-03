@@ -150,11 +150,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     POINT ptSrc = lpIMC->cfCompForm.ptCurrentPos;
     RECT rcSrc;
     LPTSTR lpt;
-    int dx;
-    int dy;
     int num;
-    int curx;
-    int cury;
 
     // Lock the COMPOSITIONSTRING structure.
     if (!(lpCompStr = lpIMC->LockCompStr()))
@@ -171,7 +167,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     if (lpIMC->cfCompForm.dwStyle & CFS_RECT)
       rcSrc = lpIMC->cfCompForm.rcArea;
     else
-      GetClientRect(lpIMC->hWnd, (LPRECT)&rcSrc);
+      GetClientRect(lpIMC->hWnd, &rcSrc);
 
     ClientToScreen(lpIMC->hWnd, &ptSrc);
     ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.left);
@@ -193,9 +189,8 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     num = 1;
 
     if (!lpUIExtra->bVertical) {
-      dx = rcSrc.right - ptSrc.x;
-      curx = ptSrc.x;
-      cury = ptSrc.y;
+      int dx = rcSrc.right - ptSrc.x;
+      int curx = ptSrc.x, cury = ptSrc.y;
 
       // Set the composition string to each composition window.
       // The composition windows that are given the compostion string
@@ -251,11 +246,10 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
           ReleaseDC(lpUIExtra->uiComp[i].hWnd, hDC);
         }
       }
-    } else  // when it is vertical fonts.
-    {
-      dy = rcSrc.bottom - ptSrc.y;
-      curx = ptSrc.x;
-      cury = ptSrc.y;
+    } else {
+      // when it is vertical fonts.
+      int dy = rcSrc.bottom - ptSrc.y;
+      int curx = ptSrc.x, cury = ptSrc.y;
 
       for (i = 0; i < MAXCOMPWND; i++) {
         if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
@@ -485,7 +479,7 @@ void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra) {
 
   if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
     if (!lpUIExtra->dwCompStyle)
-      GetWindowRect(lpUIExtra->uiDefComp.hWnd, (LPRECT)&rc);
+      GetWindowRect(lpUIExtra->uiDefComp.hWnd, &rc);
 
     ShowWindow(lpUIExtra->uiDefComp.hWnd, SW_HIDE);
     lpUIExtra->uiDefComp.bShow = FALSE;

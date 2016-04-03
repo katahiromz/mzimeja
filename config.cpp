@@ -202,7 +202,7 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
           lpStyleBuf++;
         }
 
-        GlobalFree((HANDLE)lpStyleBuf);
+        GlobalFree(lpStyleBuf);
       }
       break;
 
