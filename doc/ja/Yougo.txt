@@ -33,7 +33,9 @@ clause	文節
 cls	clause
 code	コード	暗号
 comp	composition
-composition string	変換中の文字列
+composition	コンポジション
+composition string	コンポジション文字列
+composition window	コンポジションウィンドウ
 conversion	変換
 conversion mode	変換モード
 convert	変換する
