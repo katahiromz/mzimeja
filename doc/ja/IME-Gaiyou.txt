@@ -1257,4 +1257,140 @@ szDescription
 
 ==IMEMENUITEMINFO構造体
 
+IMEMENUITEMINFO構造体は、IMEメニュー項目に関する情報を含む。
 
+    typedef _tagIMEMENUITEMINFO {
+    UINT cbSize;
+    UINT fType;
+    UINT fState;
+    UINT wID;
+    HBITMAP hbmpChecked;
+    HBITMAP hbmpUnchecked;
+    DWORD dwItemData;
+    TCHAR szString[48];
+    HBITMAP hbmpItem;
+    } IMEMENUITEMINFO;
+
+===メンバー
+
+cbSize
+    構造体のサイズ。
+
+fType
+    メニュー項目の種類。次の1個以上の値を指定できる。
+
+    IMFT_RADIOCHECK
+        hbmpCheckedがNULLであれば、
+        チェックマークではなくラジオボタンマークを使って
+        メニュー項目をチェックする。
+
+    IMFT_SEPARATOR
+        メニュー項目が区分線であることを指定する。
+        区分線は、横線として表示される。
+        hbmpItemとszStringは無視される。
+
+    IMFT_SUBMENU
+        メニュー項目がサブメニューであることを指定する。
+
+fState
+    メニュー項目の状態。次の1個以上の値を指定できる。
+    
+    IMFS_CHECKED
+        メニュー項目にチェックをつける。
+        hbmpCheckedを参照。
+
+    IMFS_DEFAULT
+        既定のメニュー項目であることを指定する。
+        既定のメニュー項目は太字で表示される。
+    
+    IMFS_DISABLED
+        メニュー項目を無効にする。
+        ただし、灰色にはならない。
+        灰色にしたいときはIMFS_GRAYEDを指定しなければならない。
+
+    IMFS_ENABLED
+        メニュー項目を有効にする。これが既定の状態。
+
+    IMFS_GRAYED
+        メニュー項目を無効にし、灰色にする。
+    
+    IMFS_HILITE
+        メニュー項目をハイライトにする。
+
+    IMFS_UNCHECKED
+        メニュー項目のチェックを解除する。
+        hbmpUncheckedを参照。
+
+    IMFS_UNHILITE
+        メニュー項目のハイライトを解除する。
+        これが既定の状態。
+
+wID
+    メニュー項目を識別するために、アプリ定義の16ビットの値。
+
+hbmpChecked
+    項目がチェックされたときに隣に表示するビットマップのハンドル。
+    NULLならば、既定のビットマップが使われる。
+    種類がIMFT_RADIOCHECKなら、既定のビットマップは弾丸になる。
+    それ以外なら、既定のビットマップはチェックマークになる。
+
+hbmpUnchecked
+    項目がチェックされていないときに隣に表示するビットマップのハンドル。
+    NULLならビットマップを使わない。
+
+dwItemData
+    メニュー項目に関連付けられたアプリ定義の値。
+
+szString
+    メニュー項目の中身。これはナル終端の文字列。
+
+hbmpItem
+    表示するビットマップハンドル。
+
+===注記
+
+IMEMENUITEMINFO 構造体はWindows 98 とWindows 2000で登場した
+新しい構造体である。Unicode版はszStringにWCHARを使う。
+
+==TRANSMSG構造体
+
+TRANSMSG 構造体は、IME生成のメッセージを受け取るためにImeToAsciiExで使われる、
+転送メッセージを含む。
+
+    typedef _tagTRANSMSG {
+    UINT message;
+    WPARAM wParam;
+    LPARAM lParam;
+    } TRANSMSG;
+
+===注記
+
+この構造体は、未来の64ビットWindowsのために追加された。
+この構造体は、以前に用いられたLPDWORD lpdwTransBufを置き換えるために、
+ImeToAsciiExによって、TRANSMSGLIST構造体と一緒に用いられるだろう。
+この構造体を使うことで、同じオフセットでメモリーのデータを保持し、
+下位互換性を保つ。
+
+==TRANSMSGLIST構造体
+
+TRANSMSGLIST 構造体は、
+ImeToAsciiExから返却された転送メッセージリストを含む。
+
+    typedef _tagTRANSMSGLIST {
+    UINT uMsgCount;
+    TRANSMSG TransMsg[1];
+    } TRANSMSGLIST;
+
+uMsgCount
+    TransMsg配列のメッセージの個数。
+
+TransMsg
+    メッセージを表すTRANSMSG構造体の配列。
+
+===注記
+
+この構造体は、未来の64ビットWindowsのために追加された。
+この構造体は、以前に用いられたLPDWORD lpdwTransBufを置き換えるために、
+ImeToAsciiExによって、TRANSMSGLIST構造体と一緒に用いられるだろう。
+この構造体を使うことで、同じオフセットでメモリーのデータを保持し、
+下位互換性を保つ。
