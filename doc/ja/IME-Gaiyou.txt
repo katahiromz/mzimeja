@@ -929,7 +929,7 @@ dwIndex
     例えば、子音が連結できないときである。
     GL_ID_INPUTREADINGは、IMEがユーザに読みの文字入力状態にあることを伝える。
     GL_ID_INPUTRADICALは、IMEがユーザに
-    ラジカルな文字入力状態にあることを伝える。
+    部首文字入力状態にあることを伝える。
     GL_ID_INPUTCODEは、ユーザに文字コード入力状態にあることを伝える。
     GL_ID_CHOOSECANIDATEはユーザに、候補文字列を選択する状態であることを伝える。
     GL_ID_REVERSECONVERSIONは、逆変換の情報をユーザーに伝える。
@@ -976,5 +976,285 @@ fdwProperty
     システムによって使われる。
     IME_PROP_END_UNLOADは、IMEが誰にも使われていないときに
     アンロードすることを示す。
-    IME_PROP_KBD_CHAR_FIRSTは、
+    IME_PROP_KBD_CHAR_FIRSTをつけると、
+    DBCS文字列を変換する前に、システムがキーボードによる文字を
+    変換する。この文字は情報の助けとしてIMEに渡される。
+    IME_PROP_NEED_ALTKEYをつけると、
+    IMEは、ImeProcessKeyに渡すのにALTキーを必要とする。
+    IME_PROP_IGNORE_UPKEYSを指定すると、上向きキーを必要としない。
+    Windows 2000でサポートされる
+    IME_PROP_ACCEPT_WIDE_VKEYをつけると、
+    IMEは、VK_PACKETを使ってSendInput関数から来た
+    インジェクトされたUnicodeを処理する。
+    UnicodeとインジェクトされたUnicodeはアプリに直接送信される。
+
+fdwConversionCaps
+    変換モードと同じ定義。IME_CMODE_KATAKANA、
+    IME_CMODE_NATIVE、IME_CMODE_FULLSHAPE、IME_CMODE_ROMAN、
+    IME_CMODE_CHARCODE、IME_CMODE_HANJACONVERT、
+    IME_CMODE_SOFTKBD、IME_CMODE_NOCONVERSION、
+    IME_CMODE_EUDC、IME_CMODE_SYMBOL、
+    IME_CMODE_CHARCODE、IME_CMODE_FIXED。
+
+fdwSentenceCaps
+    文モードと同じ定義。
+    IME_SMODE_PLAURALCLAUSEは複数の文節の文をサポートする文モード。
+    IME_SMODE_SINGLECONVERTは、単一文字の文モード。
+    IME_SMODE_AUTOMATICは自動文モード。
+    IME_SMODE_PHRASEPREDICTは、予測文モード。
+    IME_SMODE_CONVERSATIONは、対話式モード。
+
+fdwUICaps
+    これはUIの能力を指定するビット列。
+    UI_CAP_2700では、LogFontエスケープがゼロか2700のときのUIをサポートする。
+    UI_CAP_ROT90では、LogFontエスケープは、ゼロか、900、1800または2700を
+    サポートする。
+    UI_CAP_ROTANYでは、すべてのエスケープをサポートする。
+    UI_CAP_SOFKBDでは、システムから提供されるソフトキーボードを使う。
+
+fdwSCSCaps
+    IMEが持つImmSetCompositionStringの能力を指定する。
+    SCS_CAP_COMPSTRでは、IMEがSCS_SETSTRによる変換文字列を生成できる。
+    SCS_CAP_MAKEREADではSCS_SETSTRをつけてImmSetCompositionStringを
+    呼び出したとき、IMEはlpReadを使うことなく変換文字列の読みを生成できる。
+    IMEがこの能力SCS_CAP_MAKEREADを持つとき、SCS_SETSTRに対して
+    アプリは、lpReadをセットする必要はない。
+
+fdwSelectCaps
+    アプリ用の能力を指定する。ユーザがIMEを変換したとき、
+    アプリはこの能力をチェックすることで、
+    変換モードを継承するか、しないかを決定できる。
+    SELECT_CAP_CONVMODEビットは、ImeSelectにおいて、
+    IMEは、変換モードを継承する能力を持っている。
+    SELECT_CAP_SENTENCEビットはImeSelectにおいて、
+    IMEは、文モードを継承する能力を持っている。
+
+==IME通信で使われる構造体
+
+CANDIDATELIST構造体は、候補リストに関する情報を持つ。
+
+===メンバー
+
+dwSize
+    この構造体、オフセット配列、そしてすべての候補文字列を
+    合わせたバイトサイズ。
+
+dwStyle
+    候補スタイル値。次の1個以上の値を指定できる。
+    
+    IME_CAND_UNKNOWN
+        未知の候補スタイル。
+    
+    IME_CAND_READ
+        候補は同じ読みを持つ。
+
+    IME_CAND_CODE
+        候補は一つのコード範囲にある。
+
+    IME_CAND_MEANING
+        候補は同じ意味を持つ。
+
+    IME_CAND_RADICAL
+        候補は同じ部首から構成される。
+        
+    IME_CAND_STROKES
+        候補は同じ画数から構成される。
+
+    IME_CAND_CODEスタイルについては、候補リストは、
+    dwCountメンバーに依存する特殊な構造体を持つ。
+    もしdwCountが1なら、dwOffsetは、
+    オフセットでなく単一の文字を持ち、候補文字列は提供されない。
+    dwCountが1より大きければ、dwOffsetは、有効なオフセットを
+    持ち、候補文字列は個別の文字列のテキストである。
+
+dwCount
+    候補文字列の個数。
+
+dwSelection
+    選択された候補文字列のインデックス。
+
+dwPageStart
+    候補ウィンドウで最初の候補文字列のインデックス。
+    これはPageUpとPageDownキーで変化する。
+
+dwPageSize
+    候補ウィンドウの1ページに表示される候補文字列の個数。
+    もしこの数がゼロなら、アプリは適当な値を定義できる。
+
+dwOffset
+    この構造体の開始位置から、候補文字列の開始位置への
+    オフセットの配列。
+
+===コメント
+
+CANDIDATELIST構造体は、ImmGetCandidateListの結果を返すのに使われる。
+候補文字列は、dwOffset配列の最後のオフセットの後に続く。
+
+==COMPOSITIONFORM構造体
+
+COMPOSITIONFORM 構造体は、
+IMC_SETCOMPOSITIONWINDOW とIMC_SETCANDIDATEPOS メッセージに使われる。
+
+    typedef tagCOMPOSITIONFORM {
+    DWORD dwStyle;
+    POINT ptCurrentPos;
+    RECT rcArea;
+    }COMPOSITIONFORM;
+
+===メンバー
+
+dwStyle
+    位置スタイル。
+
+    CFS_DEFAULT
+        変換ウィンドウは、既定の位置に移動する。
+        IMEウィンドウは、クライエント領域の外側で
+        浮動ウィンドウとして変換ウィンドウを表示できる。
+
+    CFS_FORCE_POSITION
+        ptCurrentPosで指定された位置に正確に
+        変換ウィンドウの左上端を表示する。
+        座標は、変換ウィンドウを含んでいるウィンドウの
+        左上端から相対的であり、
+        この位置はIMEから調整されない。
+
+    CFS_POINT
+        ptCurrentPosで指定された位置に
+        変換ウィンドウの左上端を表示する。
+        座標は、変換ウィンドウを含むウィンドウの
+        左上端から相対的であり、
+        位置はIMEにより補正を受ける。
+
+    CFS_RECT
+        rcAreaで指定された位置に変換ウィンドウを
+        表示する。座標は、変換ウィンドウを含むウィンドウの
+        左上から相対的である。
+
+ptCurrentPos
+    変換ウィンドウの左上端の座標。
+
+rcArea
+    変換ウィンドウの左上端と右下端の座標。
+
+===コメント
+
+もし、COMPOSITIONFORM構造体のスタイルが、CFS_POINTかCFS_FORCE_POINTであれば、
+IMEは、アプリによって与えられたptCurrentPosで指定した位置から変換文字列を
+描画するだろう。
+もし、スタイルがCFS_RECTであれば、変換文字列は、rcAreaで指定された長方形の
+内側になるだろう。そうでなければ、rcはアプリウィンドウのクライアント長方形
+になる。
+
+アプリが変換フォントを指定したときは、
+変換ウィンドウは、変換文字列のエスケープメント（escapement）に従って回転される。
+変換文字列の方向は、変換ウィンドウのフォントのエスケープメントに従う。
+IMEはそのとき、変換ウィンドウを描画する。
+次は、変換フォントのエスケープメントに対して
+様々な値を使ったこのプロセスの例である。
+
+ * 変換文字列のエスケープメントがゼロ。
+
+    たいていは、変換ウィンドウのエスケープメントがゼロである。
+    この場合、変換フォーム構造体のptCurrentPosは、文字列の左上端を指す。
+    すべてのIMEはこのタイプをサポートする。
+
+ * 変換文字列のエスケープメントが2700。
+
+    これは縦書きの典型例。アプリが縦書きを提供するとき、
+    アプリは、ImmSetCompositionFontに2700のエスケープメントを
+    指定する。変換文字列は下向きになる。
+    UI_CAP_2700、UI_CAP_ROT90、またはUI_CAP_ROTANYの能力を持つ
+    IMEは、このタイプをサポートするだろう。
+
+ * 変換文字列のエスケープメントが900か1800。
+
+    UI_CAP_ROT90 やUI_CAP_ROTANYの能力を持つIMEはこれをサポートするだろう。
+
+ * 変換文字列のエスケープメントが任意の値。
+
+    UI_CAP_ROTANYの能力を持つIMEはこれをサポートするだろう。
+
+補注：UI_CAP_ROT90 とUI_CAPS_ANYは、IMEの拡張としてオプションである。
+UI_CAP_2700が推奨される。
+
+==CANDIDATEFORM構造体
+
+CANDIDATEFORM 構造体は、
+IMC_GETCANDIDATEPOS とIMC_SETCANDIDATEPOSメッセージに使われる。
+
+    typedef tagCANDIDATEFORM {
+    DWORD dwIndex;
+    DWORD dwStyle;
+    POINT ptCurrentPos;
+    REC rcArea;
+    } CANDIDATEFORM;
+
+===メンバー
+
+dwIndex
+    候補リストのIDを指定する。ゼロは最初の候補リスト、
+    1は二番目、そして3まで続く。
+
+dwStyle
+    CFS_CANDIDATEPOSかCFS_EXCLUDEを指定する。
+    キャレット近傍IMEについては、CFS_DEFAULTも指定できる。
+    dwStyleがCFS_DEFAULTならば、キャレット近傍IMEは、
+    他のUIコンポーネントに基づく候補位置
+    を修正するだろう。
+
+ptCurrentPos
+    dwStyleに依存する。dwStyleがCFS_CANDIDATEPOSのとき、
+    ptCurrentPosは、候補リストウィンドウが表示すべき場所の
+    推奨される位置を指定する。dwStyleがCFS_EXCLUDEのとき、
+    ptCurrentPosは、キャレット位置などの関心のある現在位置を指定する。
+
+rcArea
+    CFS_EXCLUDEの場合、候補ウィンドウに認められない長方形を
+    指定する。
+
+==STYLEBUF構造体
+
+STYLEBUF構造体は、識別子とスタイルの名前を含む。
+
+    typedef struct tagSTYLEBUF {
+    DWORD dwStyle;
+    TCHAR szDescription[32]
+    } STYLEBUF;
+
+===メンバー
+
+dwStyle
+    登録単語のスタイルを指定する。
+
+szDescription
+    このスタイルの説明文字列。
+
+(略)
+
+==SOFTKBDDATA構造体
+
+(略)
+
+    typedef struct tagSOFTKBDDATA {
+    UINT uCount;
+    WORD wCode[][256]
+    } SOFTKBDDATA;
+
+==RECONVERTSTRING構造体
+
+(略)
+
+    typedef struct _tagRECONVERTSTRING {
+    DWOPD dwSize;
+    DWORD dwVersion;
+    DWORD dwStrLen;
+    DWORD dwStrOffset;
+    DWORD dwCompStrLen;
+    DWORD dwCompStrOffset;
+    DWORD dwTargetStrLen;
+    DWORD dwTargetStrOffset;
+    } RECONVERTSTRING;
+
+==IMEMENUITEMINFO構造体
+
 
