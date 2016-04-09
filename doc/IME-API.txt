@@ -1289,4 +1289,103 @@ lParam
 UIウィンドウは、状態ウィンドウが変換モードを指定したら、
 状態ウィンドウを再描画する。
 
+==IMN_SETSENTENCEMODEサブメッセージ
+
+IMN_SETSENTENCEMODEサブメッセージは
+入力コンテキストのセンテンスモードが更新されたときに送信される。
+アプリまたはUIウィンドウがこのメッセージを受け取ったとき、
+どちらかは、状態ウィンドウに関する情報を取得するために、
+ImmGetConversionStatusを呼び出すことができる。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_SETSENTENCEMODE;
+	lParam= 0;
+
+===引数
+
+lParam
+	使われない。
+
+===戻り値
+
+なし
+
+===コメント
+
+UIウィンドウは、状態ウィンドウがセンテンスモードを指定したとき、状態ウィンドウを再描画する。
+
+==IMN_SETOPENSTATUSサブメッセージ
+
+IMN_SETOPENSTATUSサブメッセージは、入力コンテキストのオープン状態が更新されたときに送信される。
+アプリまたはUIウィンドウがこのメッセージを受け取ったとき、
+どちらかは、情報を取得するためにImmGetOpenStatus を呼び出すことができる。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_SETOPENSTATUS;
+	lParam= 0;
+
+===引数
+
+lParam
+	使われない。
+
+===戻り値
+
+なし。
+
+===コメント
+
+UIウィンドウは、状態ウィンドウが開いたり閉じたりした状態を指定したら、
+状態ウィンドウを再描画する。
+
+==IMN_SETCANDIDATEPOSサブメッセージ
+
+IMN_SETCANDIDATEPOSサブメッセージは、IMEが候補ウィンドウを動かそうとしているときに送信される。
+アプリは、候補処理の終了に関する情報を取得するためにこのメッセージを処理する。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_SETCANDIDATEPOS;
+	lCandidateList= lParam;
+
+===引数
+
+lCandidateList
+	更新すべき候補リストがどれかを表す。例えば、ビット0が1なら、
+	最初の候補リストが更新されるべきだ。もし、ビット31が1なら、
+	32番目の候補リストが更新されるべきだ。
+
+===戻り値
+
+なし。
+
+===コメント
+
+UIウィンドウは、このメッセージを受け取ったときに、候補ウィンドウを移動する。
+
+==IMN_SETCOMPOSITIONFONT
+
+IMN_SETCOMPOSITIONFONTメッセージは、入力コンテキストのフォントが更新されたときに送信される。
+アプリまたはUIウィンドウがこのメッセージを受け取ったとき、
+どちらかは、コンポジションフォントに関する情報を受け取るために、
+ImmGetCompositionFont を呼び出すことができる。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_SETCOMPOSITIONFONT;
+	lParam= 0;
+
+===引数
+
+lParam
+	使われない。
+
+===戻り値
+
+なし
+
+===コメント
+
+UIウィンドウのコンポジションコンポーネントは、
+コンポジション文字列のテキストを描画するために
+ImmGetCompositionFontを呼び出すことで、フォント情報を使うことができる。
+
 ==
