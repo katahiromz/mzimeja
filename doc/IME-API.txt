@@ -217,7 +217,7 @@ IMEコンポーネントを破棄するためにIMEによって使われる。
 ===引数
 
 hIMCC
-	IMCコンポネントのハンドル。
+	IMCコンポーネントのハンドル。
 
 ===戻り値
 
@@ -225,5 +225,155 @@ hIMCC
 
 ==ImmLockIMCC関数
 
+ImmLockIMCC 関数は、IMCのメンバーとして作成されたIMCコンポーネントへの
+ポインタを取得するためにIMEによって使われる。
+ImmLockIMCは、IMCCに対するロックカウントを１だけ増加させる。
 
+	LPVOID WINAPI
+	ImmLockIMCC(
+	HIMCC hIMCC
+	)
 
+===引数
+
+hIMCC
+	IMCコンポーネントのハンドル。
+
+===戻り値
+
+関数が成功すれば、戻り値は、IMCコンポーネントへのポインタ。
+さもなければ戻り値はNULLである。
+
+==ImmUnlockIMCC関数
+
+ImmUnlockIMC関数は、IMCCに対するロックカウントを１だけ減少させる。
+
+	BOOL WINAPI
+	ImmUnlockIMCC(
+	HIMCC hIMCC
+	)
+
+===引数
+
+hIMCC
+	IMCコンポーネントのハンドル。
+
+===戻り値
+
+もしロックカウントがゼロになれば、戻り値はFALSEである。
+さもなければ戻り値はTRUEである。
+
+==ImmReSizeIMCC関数
+
+ImmReSizeIMCC関数は、コンポーネントのサイズを変更する。
+
+	HIMCC WINAPI
+	ImmReSizeIMCC(
+	HIMCC hIMCC,
+	DWORD dwSize
+	)
+
+===引数
+
+hIMCC
+	IMCコンポーネントのハンドル。
+
+dwSize
+	IMCコンポーネントの新しいサイズ。
+
+===戻り値
+
+関数が成功すれば、戻り値はHIMCCの新しい値である。
+さもなければ戻り値はNULLである。
+
+==ImmGetIMCCSize関数
+
+ImmGetIMCCSize関数は、IMCCのサイズを取得するのに使われる。
+
+	DWORD WINAPI
+	ImmGetIMCCSize(
+	HIMCC hIMCC
+	)
+
+===引数
+
+hIMCC
+	IMCコンポーネントのハンドル。
+
+===戻り値
+
+IMCCのサイズ。
+
+==ImmGetIMCCLockCount関数
+
+ImmGetIMCCLockCount関数は、IMCCのロックカウントを取得するのに使われる。
+
+	DWORD WINAPI
+	ImmGetIMCCLockCount(
+	HIMCC hIMCC
+	)
+
+===引数
+
+hIMCC
+	IMCコンポーネントのハンドル。
+
+===戻り値
+
+関数が成功すれば、戻り値はIMCCのロックカウントである。
+さもなければ、戻り値はゼロである。
+
+=IMEホットキーとホットキー関数群
+
+IMEホットキーは、IMEの入力モードを変更したり、
+IMEを切り替えたりするのに使われる。
+IMEを直接切り替えるのに使われたIMEホットキーは、
+直接切り替えホットキー（direct switching hot key）と呼ばれる。
+
+直接切り替えホットキーは、
+IME_HOTKEY_DSWITCH_FIRSTからIME_HOTKEY_DSWITCH_LASTまでの範囲になる。
+それはIMEや末端ユーザーがそのようなホットキーがほしいときに、
+IMEやコントロールパネルによって登録される。
+IMEホットキーは、どのIMEがアクティブかに関わらず、
+すべてのIMEにおいて効率がいい。
+
+IMMにおいて、いくつかの定義済みホットキー機能が存在する。
+IMMはそれ自体がそれらのホットキー関数の機能（異なる取り扱いルーチン）を提供する。
+すべてのホットキー機能は、IMMにおいて異なるホットキーIDを持ち、
+それぞれのIDは、それぞれの国の特定の必要性に応じた機能を所有する。
+アプリが別の定義済みホットキーIDをシステムに追加できないことに注意しておく。
+
+以下は定義済みホットキー識別子である。
+
+(表略)
+
+この他の種類のホットキーは、IMEのプライベートなホットキーであるが、
+この種類のホットキーに対する機能は存在しない。
+それはホットキーの値に対する単なるプレースホルダーである。
+IMEはImmGetHotKeyを呼び出すことにより、その値を取得できる。
+もしIMEが１つのホットキーIDに対するこの機能をサポートしたら、
+このキー入力が検出されるたびに機能を行うだろう。
+
+以下は、現在定義されているプライベートなIMEホットキーIDである。
+
+(表略)
+
+==ImmGetHotKey関数
+
+ImmGetHotKey関数は、IMEホットキーの値を取得する。
+
+	BOOL WINAPI
+	ImmGetHotKey(
+	DWORD dwHotKeyID,
+	LPUINT lpuModifiers,
+	LPUINT lpuVKey,
+	LPHKL lphKL
+	)
+
+===引数
+
+dwHotKeyID
+	ホットキー識別子。
+
+lpuModifiers
+	
