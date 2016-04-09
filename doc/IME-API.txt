@@ -1063,3 +1063,32 @@ lParam
 このメッセージをアプリケーションIME UIウィンドウやDefWindowProcへ渡すべきではない。
 DefWindowProc は、既定のIMEウィンドウにそれを渡すために、このメッセージを処理する。
 
+=WM_IME_SELECTメッセージ
+
+WM_IME_SELECTメッセージは、システムが現在のIMEを変更しようとしているときに、
+UIウィンドウに送信される。
+
+	WM_IME_SELECT
+	fSelect= (BOOL)wParam;
+	hKL= lParam;
+
+==引数
+
+fSelect
+	IMEが新しく選択されたらTRUE。IMEが選択を解除されたらFALSE。
+hKL
+	IMEの入力言語ハンドル。
+
+==戻り値
+
+なし。
+
+==コメント
+
+システムIMEクラスは、新しいUIウィンドウを作成、並びに
+アプリやシステムに対する古いUIウィンドウを破棄するために
+このメッセージを使う。
+DefWindowProc は、既定のIMEウィンドウへ情報を渡すために、
+このメッセージを処理する。
+そのとき既定のIMEウィンドウは、UIウィンドウへこのメッセージを送信する。
+
