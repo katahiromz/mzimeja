@@ -1132,3 +1132,161 @@ WM_IME_NOTIFYメッセージは、
 
 ==IMN_CLOSESTATUSWINDOWサブメッセージ
 
+IMN_CLOSESTATUSWINDOWサブメッセージは、
+IMEが状態ウィンドウが閉じようとしているときに、送信される。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_CLOSESTATUSWINDOW;
+	lParam= 0;
+
+===引数
+
+lParam
+	使われない。
+
+===戻り値
+
+なし。
+
+===コメント
+
+UIウィンドウは、このメッセージを受け取ったときに、
+状態ウィンドウを閉じる。
+
+==IMN_OPENSTATUSWINDOWサブメッセージ
+
+IMN_OPENSTATUSWINDOWサブメッセージは、
+IMEが状態ウィンドウを作成しようとしているときに送信される。
+そのときアプリはこのメッセージを処理し、IME自身のシステムウィンドウを表示する。
+アプリは、ImmGetConversionStatus関数を呼ぶことでシステムウィンドウに関する情報を取得できる。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_OPENSTATUSWINDOW;
+	lParam= 0;
+
+===引数
+
+lParam
+	使われない。
+
+===戻り値
+
+なし。
+
+===コメント
+
+UIウィンドウは、このメッセージを受け取ったときに状態ウィンドウを作成する。
+
+===参照
+
+ImmGetConversionStatus
+
+==IMN_OPENCANDIDATEサブメッセージ
+
+IMN_OPENCANDIDATEサブメッセージは、IMEが候補ウィンドウを開こうとしているときに送信される。
+そしてアプリは、このメッセージを処理し、候補ウィンドウ自身を表示するために、
+ImmGetCandidateCountとImmGetCandidateListを呼び出す。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_OPENCANDIDATE;
+	lCandidateList= lParam;
+
+===引数
+
+lCandidateList
+	更新すべき候補リストがどれかを表す。例えば、ビット0が1なら、
+	最初の候補リストが更新されるべきだ。もし、ビット31が1なら、
+	32番目の候補リストが更新されるべきだ。
+
+===戻り値
+
+なし。
+
+===コメント
+
+UIウィンドウはこのメッセージを受け取ったときに候補ウィンドウを作成する。
+
+===参照
+
+ImmGetCandidateListCount、ImmGetCandidateList、WM_IME_CHANGECANDIDATE
+
+==IMN_CHANGECANDIDATEサブメッセージ
+
+IMN_CHANGECANDIDATEサブメッセージは、
+IMEが候補ウィンドウの内容を変更しようとしているときに送信される。
+そしてアプリは、候補ウィンドウ自体を表示するために、このメッセージを処理する。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_CHANGECANDIDATE;
+	lCandidateList= lParam;
+
+===引数
+
+lCandidateList
+	更新すべき候補リストがどれかを表す。例えば、ビット0が1なら、
+	最初の候補リストが更新されるべきだ。もし、ビット31が1なら、
+	32番目の候補リストが更新されるべきだ。
+
+===戻り値
+
+なし。
+
+===コメント
+
+UIウィンドウは、このメッセージを受け取ったとき、候補ウィンドウを再描画する。
+
+===参照
+
+ImmGetCandidateCount、ImmGetCandidateList
+
+==IMN_CLOSECANDIDATEサブメッセージ
+
+IMN_CLOSECANDIDATEサブメッセージは、
+IMEが候補ウィンドウを閉じようとしているときに送信される。
+アプリは、候補処理の終わりに関する情報を取得するために、このメッセージを処理する。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_CLOSECANDIDATE;
+	lCandidateList= lParam;
+
+===引数
+
+lCandidateList
+	更新すべき候補リストがどれかを表す。例えば、ビット0が1なら、
+	最初の候補リストが更新されるべきだ。もし、ビット31が1なら、
+	32番目の候補リストが更新されるべきだ。
+
+===戻り値
+
+なし。
+
+===コメント
+
+UIウィンドウは、このメッセージを受け取ったときに、候補ウィンドウを破棄する。
+
+==IMN_SETCONVERSIONMODEサブメッセージ
+
+IMN_SETCONVERSIONMODEサブメッセージは、入力コンテキストの変換モードが更新されたときに
+送信される。アプリまたはUIウィンドウがこのメッセージを受け取ったとき、
+どちらかは、状態ウィンドウに関する情報を取得するために、
+ImmGetConversionStatus を呼び出すことができる。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_SETCONVERSIONMODE;
+	lParam= 0;
+
+===引数
+
+lParam
+	使われない。
+
+===戻り値
+
+なし。
+
+===コメント
+
+UIウィンドウは、状態ウィンドウが変換モードを指定したら、
+状態ウィンドウを再描画する。
+
+==
