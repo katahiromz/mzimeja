@@ -752,3 +752,104 @@ POINTS構造体は次の形式を持つ。
 	SHORT y;
 	} POINTS;
 
+UIウィンドウはこのメッセージを受け取る。
+
+==IMC_SETCANDIDATEPOSサブメッセージ
+
+IMC_SETCANDIDATEPOSサブメッセージは、候補ウィンドウの表示位置を指定するために、
+アプリによってIMEウィンドウへ送信される。
+特に、これは、コンポジット文字列を表示するが
+候補を表示するためにIME UIを使うアプリに適用される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_SETCANDIDATEPOS;
+	lpCANDIDATEFORM= (LPCANDIDATEFORM) lParam;
+
+===引数
+
+lpCANDIDATEFORM
+	候補ウィンドウの位置情報を含むバッファ。
+
+===戻り値
+
+メッセージが成功すれば、戻り値はゼロ。さもなければ戻り値は非ゼロ。
+
+===コメント
+
+UIウィンドウはこのメッセージを受け取らない。
+
+==IMC_SETCOMPOSITONFONTサブメッセージ
+
+IMC_SETCOMPOSITONFONTサブメッセージは、
+コンポジットウィンドウで未決定文字列の表示に使うフォントを指定するために、
+アプリによってIMEウィンドウへ送信される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_SETCOMPOSITIONFONT;
+	lpLogFont= (LPLOGFONT) lParam;
+
+===引数
+
+lpLogFont
+	セットするLOGFONTデータを含むバッファ。
+
+===戻り値
+
+メッセージが成功すれば、戻り値はゼロ。さもなければ戻り値は非ゼロ。
+
+===コメント
+
+UIウィンドウはこのメッセージを受け取らない。
+
+==IMC_SETCOMPOSITONWINDOWサブメッセージ
+
+IMC_SETCOMPOSITONWINDOWサブメッセージは、
+現在アクティブな入力コンテキストのコンポジションウィンドウのスタイルをセットするために、
+アプリによってIMEウィンドウへ送信される。
+一度スタイルをセットすれば、IME UIは入力コンテキストで指定されたスタイルに従う。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_SETCOMPOSITIONWINDOW;
+	lpCOMPOSITIONFORM= (LPCOMPOSITIONFORM) lParam;
+
+===引数
+
+lpCOMPOSITIONFORM
+	コンポジションウィンドウに対する新しいスタイルを含むCOMPOSITIONFORM構造体。
+
+===戻り値
+
+メッセージが成功されば、戻り値はゼロ。さもなければ戻り値は非ゼロ。
+
+===コメント
+
+IME UIは、コンポジションウィンドウに対する既定のスタイルを使う。それはCFS_POINTスタイルに等しい。
+もしアプリがその入力コンテキストにおいて、コンポジションスタイルが指定しなければ、
+IME UIは、アプリがコンポジションウィンドウを開くときに、
+クライアント座標系で、現在のキャレット位置とウィンドウクライアント領域を受け取る。
+UIウィンドウはこのメッセージを受け取らない。
+
+==IMC_SETSOFTKBDDATAサブメッセージ
+
+IMC_SETSOFTKBDDATAサブメッセージは、
+ソフトキーボードウィンドウにおける表示文字列に使う文字コードを指定するために、
+IMEによってソフトキーボードウィンドウへ送信される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_SETSOFTKBDDATA;
+	lpSoftKbdData= (LPSOFTKBDDATA) lParam;
+
+===引数
+
+lpSoftKbdData
+	表示文字列に使われる文字コードを指定するためのバッファを指し示す。
+
+===戻り値
+
+メッセージが成功されば、戻り値はゼロ。さもなければ戻り値は非ゼロ。
+
+===コメント
+
+UIウィンドウはこのメッセージを受け取らない。
+
+
