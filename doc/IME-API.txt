@@ -518,3 +518,189 @@ nCmdShow
 
 ==WM_IME_SETCONTEXTメッセージ
 
+WM_IME_SETCONTEXT メッセージは、アプリのウィンドウがアクティブになったとき、
+アプリに送信される。アプリがアプリケーションIMEウィンドウを持たなければ、
+アプリはこのメッセージをDefWindowProcに渡し、DefWindowProcの戻り値を返さねばならない。
+もしアプリがアプリケーションIMEウィンドウを所有していれば、
+アプリはImmIsUIMessageを呼ぶべきである。
+
+	WM_IME_SETCONTEXT
+	fSet = (BOOL) wParam;
+	lISCBits = lParam;
+
+===引数
+
+fSet
+	入力コンテキストがアプリに対してアクティブになったときfSetはTRUEである。 
+	もしFALSEなら、入力コンテキストはアプリに対して非アクティブになる。
+
+lISCBits
+	lISCBitsは以下のビット組み合わせからなる。
+	(略)
+
+===戻り値
+
+戻り値は、DefWindowProcかImmIsUIMessageの戻り値である。
+
+===コメント
+
+アプリがWM_IME_SETCONTEXTをつけてDefWindowProcかImmIsUIMessage を呼んだ後で
+UIウィンドウはWM_IME_SETCONTEXTを受け取る。
+もしビットがONならば、UIウィンドウはコンポジション、ガイド、候補ウィンドウを
+lParamのビット状態として表示する。
+もしアプリ自体がコンポジションウィンドウを描画するなら、
+UIウィンドウは、コンポジションウィンドウを表示する必要はない。
+そのときアプリは、lParamのISC_SHOWUICOMPOSITIONWINDOW ビットをクリアして
+DefWindowProc かImmIsUIMessage を呼ぶ必要がある。
+
+==WM_IME_CONTROLメッセージ
+
+
+WM_IME_CONTROLメッセージは、IME UIを制御するために使われるサブメッセージのグループである。
+アプリは、アプリによって作成されたIMEウィンドウと対話するためにこのメッセージを使うことができる。
+
+	WM_IME_CONTROL
+	wSubMessage= wParam;
+	lpData = (LPVOID) lParam;
+
+===引数
+
+wSubMessage
+	サブメッセージの値。
+
+LpData
+	wSubMessageに依存する。
+
+次のトピックは、wSubMessageの値によって分類されるサブメッセージである。
+
+IMC_GETSOFTKBDSUBTYPE、IMC_SETSOFTKBDSUBTYPE、IMC_SETSOFTKBDDATA、
+IMC_GETSOFTKBDFONT、IMC_SETSOFTKBDFONT、IMC_GETSOFTKBDPOS、およびIMC_SETSOFTKBDPOSを除いて、
+アプリは、IMEウィンドウと通信するために、IMCメッセージの代わりにIMM APIを使うことが推奨される。
+
+==IMC_GETCANDIDATEPOSサブメッセージ
+
+IMC_GETCANDIDATEPOS サブメッセージは、候補ウィンドウの位置を取得するために、
+アプリによってIMEウィンドウへ送信される。
+IMEは、スクリーンの教会に応じて候補ウィンドウの位置を補正できる。
+さらにアプリは、候補ウィンドウを他の位置に動かすかどうか決定するために
+候補ウィンドウの本当の位置を取得することができる。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_GETCANDIDATEPOS;
+	lpCANDIDATENFORM = (LPCANDIDATEFORM) lParam;
+
+===引数
+
+lpCANDIDATENFORM
+	候補ウィンドウの位置を得るためのバッファ。
+
+===戻り値
+
+メッセージが成功すれば、戻り値はゼロ。さもなければ戻り値は非ゼロ。
+
+===コメント
+
+戻るときに、IMEはアプリのフォーカスウィンドウのクライアント座標を伴った
+lpCANDIDATENFORMによって指し示すCANDIDATEFORM構造体を埋めるだろう。
+UIウィンドウは、このメッセージを受け取る。
+アプリは別の候補ウィンドウの位置をlpCANIDATEFORM->dwIndexにゼロから3までの値を指定しなければならない
+（例えば、インデックス0は、トップレベルの候補ウィンドウである）。
+
+==IMC_GETCOMPOSITONFONTサブメッセージ
+
+IMC_GETCOMPOSITONFONTサブメッセージは、
+候補ウィンドウの未決定文字列の表示において、使われるフォントを
+取得するために、アプリによってIMEウィンドウへ送信される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_GETCOMPOSITIONFONT;
+	lpLogFont= (LPLOGFONT) lParam;
+
+===引数
+
+lpLogFont
+	LOGFONTを受け取るバッファ。
+
+===戻り値
+
+メッセージが成功すれば、戻り値はゼロ。さもなければ戻り値は非ゼロ。
+
+===コメント
+
+UIウィンドウはこのメッセージを受け取らない。
+
+==IMC_GETCOMPOSITONWINDOWサブメッセージ
+
+IMC_GETCOMPOSITONWINDOWメッセージは
+コンポジションウィンドウの位置を取得するために、
+アプリによってIMEウィンドウへ送信される。
+IMEは、コンポジションウィンドウの位置を補正でき、またアプリは
+他の位置に動かすかどうかを決定するために、
+コンポジションウィンドウの本当の位置を取得できる。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_GETCOMPOSITIONWINDOW;
+	lpCOMPOSITIONFORM = (LPCOMPOSITIONFORM) lParam;
+
+===引数
+
+lpCOMPOSITIONFORM
+	コンポジションウィンドウの位置を取得するためのバッファ。
+
+===戻り値
+
+メッセージが成功すれば、戻り値はゼロ。さもなければ、戻り値は非ゼロ。
+
+===コメント
+
+戻るときに、IMEはアプリのフォーカスウィンドウのクライアント座標を伴った
+lpCANDIDATENFORMによって指し示すCANDIDATEFORM構造体を埋めるだろう。
+UIウィンドウはこのメッセージを受け取る。
+
+==IMC_GETSOFTKBDFONTサブメッセージ
+
+IMC_GETSOFTKBDFONTサブメッセージは、
+ソフトキーボードウィンドウで表示する文字に使うフォントを取得するために、
+IMEによってソフトキーボードへ送信される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_GETSOFTKBDFONT;
+	lpLogFont= (LPLOGFONT) lParam;
+
+===引数
+
+lpLogFont
+	LOGFONTを受け取るバッファ。
+
+===戻り値
+
+メッセージが成功すれば、戻り値はゼロ。さもなければ戻り値は非ゼロ。
+
+==IMC_GETSOFTKBDPOSサブメッセージ
+
+IMC_GETSOFTKBDPOSサブメッセージは、ソフトキーボードウィンドウの
+位置を取得するために、IMEによってソフトキーボードウィンドウへ送信される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_GETSOFTKBDPOS;
+	lParam = 0;
+
+===引数
+
+lParam
+	使用されない。
+
+===戻り値
+
+戻り値は、スクリーン座標系でソフトキーボードの位置のxおよびy座標を含む
+POINTS構造体を指定する。
+
+===コメント
+
+POINTS構造体は次の形式である。
+
+	typedef struct tagPOINTS { /* pts */
+	SHORT x;
+	SHORT y;
+	} POINTS;
+
