@@ -1489,3 +1489,39 @@ lKeyData
 このメッセージを処理する。
 このメッセージは、メッセージ順を管理するために、たいていIMEによって生成される。
 
+==WM_IME_CHAR
+
+WM_IME_CHARメッセージは、IMEが変換結果の文字を取得するときに、アプリに送信される。
+送られる値は、オリジナルのWindowsのWM_CHARに似ている（英語版）。
+違うのは、wParamが文字の2バイトを含むことができることだ。
+
+	WM_IME_CHAR
+	wCharCode = wParam;
+	lKeyData = lParam;
+
+===引数
+
+wCharCode
+	極東文字に対する2バイトを含む。
+	NT Unicodeアプリについては、1文字のUnicode文字を含む。
+
+lKeyData
+	オリジナルのWindowsのWM_CHARのものと同じ（英語版）。以下が利用可能なビットとその説明である。
+	(略)
+
+===戻り値
+
+なし。
+
+===コメント
+
+アプリがこのメッセージを取り扱わなければ、DefWindowProc関数が、
+WM_CHARメッセージを生成するためにこのメッセージを処理する。
+もしアプリがUnicodeではなく、wCharCodeが2バイトのDBCS文字を含むなら、
+DefWindowProc関数は、2個のWM_CHARメッセージを生成し、
+各メッセージは、DBCS文字の1バイトを所有する。
+もしメッセージがただSBCS文字を含むなら、DefWindowProcは、
+1個のWM_CHARメッセージのみを生成する。
+
+=VK_PROCESSKEY
+
