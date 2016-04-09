@@ -438,4 +438,83 @@ uModifiers は両側（MOD_LEFT|MODE_RIGHT）を指定すべきだ。
 
 =IMMソフトキーボード関数群
 
+以下のトピックは、ソフトキーボードを操作するためにIMEによって使われるIMM関数群である。
+
+==ImmCreateSoftKeyboard関数
+
+ImmCreateSoftKeyboard関数は、ソフトキーボードウィンドウの一種を作成する。
+
+	HWND WINAPI
+	ImmCreateSoftKeyboard(
+	UINT uType,
+	UINT hOwner,
+	int x,
+	int y
+	)
+
+===引数
+
+uType
+	ソフトキーボードの種類を指定する。
+	(略）
+
+hOwner
+	ソフトキーボードの所有者を指定する。これはUIウィンドウでなければならない。
+
+x
+	ソフトキーボードの初期水平位置を指定する。
+
+y
+	ソフトキーボードの初期垂直位置を指定する。
+
+===戻り値
+
+この関数は、ソフトキーボードのウィンドウハンドルを返す。
+
+==ImmDestroySoftKeyboard関数
+
+ImmDestroySoftKeyboard関数は、ソフトキーボードウィンドウを破棄する。
+
+	BOOL WINAPI
+	ImmDestroySoftKeyboard(
+	HWND hSoftKbdWnd
+	)
+
+===引数
+
+hSoftKbdWnd
+	破棄するソフトキーボードのウィンドウハンドル。
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ戻り値はFALSE。
+
+==ImmShowSoftKeyboard関数
+
+ImmShowSoftKeyboard 関数は、与えられたソフトキーボードを表示するか、または隠す。
+
+	BOOL WINAPI
+	ImmShowSoftKeyboard(
+	HWND hSoftKbdWnd,
+	int nCmdShow
+	)
+
+===引数
+
+hSoftKbdWnd
+	ソフトキーボードのウィンドウハンドル。
+
+nCmdShow
+	ウィンドウの状態を表す。
+	(略)
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ戻り値はFALSE。
+
+=メッセージ
+
+以下のトピックはUIウィンドウが受け取るメッセージである。
+
+==WM_IME_SETCONTEXTメッセージ
 
