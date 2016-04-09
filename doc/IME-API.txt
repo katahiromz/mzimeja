@@ -962,4 +962,104 @@ POINTS構造体は次の形式を持つ。
 
 =WM_IME_COMPOSITIONメッセージ
 
+WM_IME_COMPOSITIONメッセージは、
+IMEコンポジション状態がユーザーによって変更されるときに、
+アプリへ送信される。
+メッセージはコンポジション文字の2バイトから構成される。
+IME UIウィンドウは、それがこのメッセージを処理するときに、見た目を変える。
+アプリは、新しいコンポジション状態を取得するために、
+ImmGetCompositionString を呼び出すことができる。
+
+	WM_IME_COMPOSITION
+	wChar= wParam;
+	lAttribute= lParam;
+
+===引数
+
+wChar
+	コンポジション文字の最新の変更点の2バイト。
+
+lAttribute
+	以下のフラグ組み合わせからなる。基本的に、フラグは
+	どのようにコンポジション文字列または文字が変更されたかを示す。
+	アプリは必要な情報を取得するためにこれをチェックする。
+	(略)
+
+===戻り値
+
+なし。
+
+===コメント
+
+アプリ自体がコンポジション文字列を表示したいとき、
+このメッセージをアプリケーションIME UIウィンドウや、DefWindowProcへ渡すべきではない。
+DefWindowProc関数は、このメッセージを既定のIMEウィンドウに渡すために処理する。
+IMEは、IMEが現在のコンポジションをキャンセルするだけであっても、
+このメッセージをアプリへ送信すべきだ。
+このメッセージは、現在のコンポジション文字列を消すために、
+アプリやIME UIに通知するために使われるべきだ。
+
+===参照
+
+ImmGetCompositionString
+
+=WM_IME_COMPOSITIONFULLメッセージ
+
+WM_IME_COMPOSITIONFULLメッセージは、
+IME UIウィンドウがコンポジションウィンドウのサイズを増やせないときに、
+アプリに送信される。
+アプリは、このメッセージを受け取ったときに、
+どのようにIME UIウィンドウを表示するか指定すべきである。
+
+	WM_IME_COMPOSITIONFULL
+	wParam = 0
+	lParam= 0
+
+==引数
+
+wParam
+	使われない。
+
+lParam
+	使われない。
+
+==戻り値
+
+なし。
+
+==コメント
+
+このメッセージは、IME UIウィンドウによってアプリに送信される通知である。
+IME自身によるものではない。
+IMEは、この通知を送信するためにSendMessageを使う。
+
+==参照
+
+IMC_SETCOMPOSITONWINDOW
+
+=WM_IME_ENDCOMPOSITIONメッセージ
+
+WM_IME_ENDCOMPOSITIONメッセージは、
+IMEがコンポジションを終了したときに、アプリに送信される。
+
+	WM_IME_ENDCOMPOSITION
+	wParam = 0
+	lParam= 0
+
+==引数
+
+wParam
+	使われない。
+lParam
+	使われない。
+
+==戻り値
+
+なし。
+
+==コメント
+
+アプリ自体がコンポジション文字列を表示したいとき、
+このメッセージをアプリケーションIME UIウィンドウやDefWindowProcへ渡すべきではない。
+DefWindowProc は、既定のIMEウィンドウにそれを渡すために、このメッセージを処理する。
 
