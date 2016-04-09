@@ -1,0 +1,229 @@
+--------
+Win32 Multilingual IME Application Programming Interface
+Version 1.41
+Win32多言語IME API
+翻訳者：片山博文MZ
+--------
+この文書は、IMEのAPI開発のリファレンスである。
+以下の関数はIMEが使うものと意図されている。
+
+=IMM UI関数
+
+以下は、UIウィンドウからアクセス可能な入力方式管理（IMM）関数群である。
+これらは、IME状態を変化させるためにアプリからも使うことができる。
+
+ImmGetCompositionWindow
+ImmSetCompositionWindow
+ImmGetCandidateWindow
+ImmSetCandidateWindow
+ImmGetCompositionString
+ImmSetCompositionString
+ImmGetCompositionFont
+ImmSetCompositionFont
+ImmGetNumCandidateList
+ImmGetCandidateList
+ImmGetGuideLine
+ImmGetConversionStatus
+ImmGetConversionList
+ImmGetOpenStatus
+ImmSetConversionStatus
+ImmSetOpenStatus
+ImmNotifyIME
+ImmCreateSoftKeyboard
+ImmDestroySoftkeyboard
+ImmShowSoftKeyboard
+
+これらの関数に関しては、Platform SDKにあるIME関数群を参照されたい。
+
+=IMMサポート関数群
+
+以下のトピックは、IMEによってサポートされて使われる、IMM関数群である。
+
+==ImmGenerateMessage関数
+
+IMEはhIMCのhWndにメッセージを送るためにImmGenerateMessage 関数を使う。
+送られたメッセージはhIMCのhMsgBufに格納される。
+
+	BOOL WINAPI
+	ImmGenerateMessage(
+	HIMC hIMC
+	)
+
+===引数
+
+hIMC
+	hMsgBufを所有する入力コンテキストのハンドル。
+
+===戻り値
+
+関数が成功すれば戻り値はTRUEである。さもなければFALSEになる。
+
+===コメント
+
+これは汎用の関数だ。
+典型的に、IMMのImmNotifyIMEを通じてコンテキストの更新について通知されるときに
+IMEはこの関数を使う。この場合、IMEがアプリにメッセージを提供する必要があるときでも、
+アプリのメッセージキューにキーストロークはない。
+IME UIは、UIの見た目だけを更新したいときにこの関数を使うべきではない。
+IMEが更新された入力コンテキストについてIMEに伝えられたときは、
+IME UIが更新されているべきではない。
+キーストロークがなく、変更をアプリに通知する必要があるときで、
+IMEが入力コンテキストを変更したときでのみ、
+この関数を使うことが推奨される。
+
+==ImmRequestMessage関数
+
+ImmRequestMessage 関数は、アプリにWM_IME_REQUEST メッセージを送るのに使われる。
+
+	LRESULT WINAPI
+	ImmRequestMessage(
+	HIMC hIMC,
+	WPARAM wParam,
+	LPARAM lParam)
+
+===引数
+
+hIMC
+	ターゲットの入力コンテキストのハンドル。
+wParam
+	WM_IME_REQUESTメッセージのwParam。
+lParam
+	WM_IME_REQUESTメッセージのlParam。
+
+===戻り値
+
+戻り値は、WM_IME_REQUEST メッセージの戻り値。
+
+===コメント
+
+この関数は、Windows 98 およびWindow 2000で新しく導入されたもので、
+IMEによってWM_IME_REQUESTをアプリへ送るのに使われる。
+IMEは、候補ウィンドウやコンポジションウィンドウの位置を定義するときに、
+アプリからガイドラインを取得したいかもしれない。
+しかし、IMEを完全に意識したアプリ（インライン）では、アプリはたいてい
+コンポジションウィンドウの位置をセットしない。
+IMEがアプリにリクエストをするとき、
+アプリはWM_IME_REQUESTを受け取る。
+IMEはImmRequestMessage 関数の呼び出しにより、リクエストをアプリに送るべきであり、
+SendMessageを呼ぶべきではない。
+次は、ImmRequestMessage関数を通じてIMEがアプリに送ることができるサブメッセージのリストである：
+
+	IMR_COMPOSITIONWINOW
+	IMR_CANDIDATEWINDOW
+	IMR_COMPOSITIONFONT
+	IMR_RECONVERTSTRING
+	IMR_CONFIRMRECONVERTSTRING
+	IMR_QUERYCHARPOSITION
+	IMR_DOCUMENTFEED
+
+それらのメッセージの情報については、Platform SDKの入力方式エディタ関数を参照されたい。
+
+=HIMCおよびHIMCC の管理関数群
+
+以下のトピックは、HIMCとHIMCC の管理関数群である。
+
+==ImmLockIMC関数
+
+ImmLockIMC関数は、IMCに対するロックカウントを１だけ増やす。
+IMEがINPUTCONTEXTを参照する必要があるとき、IMEは
+INPUTCONTEXT構造体のポインタを取得するためにこの関数を呼び出す。
+
+	LPINPUTCONTEXT WINAPI
+	ImmLockIMC(
+	HIMC hIMC
+	)
+
+===引数
+
+hIMC
+	入力コンテキストのハンドル。
+
+===戻り値
+
+関数が成功すれば、INPUTCONTEXT構造体へのポインタを返す。
+さもなければNULLを返す。
+
+==ImmUnlockIMC関数
+
+ImmUnlockIMCk関数は、IMCに対するロックカウントを１だけ減らす。
+
+	BOOL WINAPI
+	ImmUnlockIMC(
+	HIMC hIMC
+	)
+
+===引数
+
+hIMC
+	入力コンテキストのハンドル。
+
+===戻り値
+
+ロックカウントがゼロになったら、戻り値はFALSEである。
+さもなければ戻り値はTRUEである。
+
+==ImmGetIMCLockCount関数
+
+ImmGetIMCLockCount関数は、IMCのロックカウントを取得するのに使われる。
+
+	HIMCC WINAPI
+	ImmGetIMCLockCount(
+	HIMC hIMC
+	)
+
+===引数
+
+hIMC
+	入力コンテキストのハンドル。
+
+===戻り値
+
+関数が成功すれば、戻り値はIMCのロックカウントである。
+さもなければNULLである。
+
+==ImmCreateIMCC関数
+
+ImmCreateIMCC関数は、IMCのメンバーとしての新しいコンポーネントを作成する。
+
+	HIMCC WINAPI
+	ImmCreateIMCC(
+	DWORD dwSize
+	)
+
+===引数
+
+dwSize
+	新しいIMCコンポーネントのサイズ。
+
+===戻り値
+
+関数が成功すれば、戻り値はIMCコンポーネントのハンドル（HIMCC）である。
+さもなければ、NULLである。
+
+===コメント
+
+この関数で作成されたIMCコンポーネントは、ゼロで初期化される。
+
+==ImmDestroyIMCC関数
+
+ImmDestroyIMCC関数は、IMCのメンバーとして作成された
+IMEコンポーネントを破棄するためにIMEによって使われる。
+
+	HIMCC WINAPI
+	ImmDestroyIMCC(
+	HIMCC hIMCC
+	)
+
+===引数
+
+hIMCC
+	IMCコンポネントのハンドル。
+
+===戻り値
+
+関数が成功すれば戻り値はNULL。さもなければ戻り値は、hIMCCに等しい。
+
+==ImmLockIMCC関数
+
+
+
