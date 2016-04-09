@@ -1388,4 +1388,76 @@ UIウィンドウのコンポジションコンポーネントは、
 コンポジション文字列のテキストを描画するために
 ImmGetCompositionFontを呼び出すことで、フォント情報を使うことができる。
 
-==
+==ImmGetCompositionFont 
+
+ImmGetCompositionFontメッセージは、
+入力コンテキストのコンポジションフォームを更新されたときに送信される。
+UIウィンドウがこのメッセージを受け取ったら、
+入力コンテキストのcfCompFormは、新しい変換モードを取得するために
+参照されることができる。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_SETCOMPOSITIONWINDOW;
+	lParam= 0;
+
+===引数
+
+lParam
+	使われない。
+
+===戻り値
+
+なし。
+
+===コメント
+
+UIウィンドウのコンポジションコンポーネントは、
+コンポジションウィンドウを表示するためにcfCompForm を使う。
+
+==IMN_GUIDELINE
+
+IMN_GUIDELINEメッセージは、IMEがエラーや情報を表示しようとしているときに送信される。
+アプリまたはUIウィンドウがこのメッセージを受け取ったとき、
+どちらかはガイドラインに関する情報を取得するために、ImmGetGuideLineを呼び出すことができる。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_GUIDELINE;
+	lParam= 0;
+
+===引数
+
+lParam
+	使われない。ゼロでなければならない。
+
+===戻り値
+
+なし。
+
+===コメント
+
+UIウィンドウは、このメッセージを受け取ったときに情報ウィンドウを作成し、情報文字列を表示する。
+
+===参照
+
+ImmGetGuideLine、GUIDELINE構造体
+
+==IMN_SOFTKBDDESTROYED
+
+IMN_SOFTKBDDESTROYEDメッセージは、ソフトキーボードが破棄されたときに、
+UIウィンドウに送信される。
+
+	WM_IME_NOTIFY
+	wSubMessage = IMN_SOFTKBDDESTROYED;
+	lParam= 0;
+
+===引数
+
+lParam
+	使われない。ゼロでなければならない。
+
+===戻り値
+
+なし。
+
+==WM_IME_KEYDOWNとWM_IME_KEYUP
+
