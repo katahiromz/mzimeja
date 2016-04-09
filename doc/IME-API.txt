@@ -697,7 +697,55 @@ POINTS構造体を指定する。
 
 ===コメント
 
-POINTS構造体は次の形式である。
+POINTS構造体は次の形式を持つ。
+
+	typedef struct tagPOINTS { /* pts */
+	SHORT x;
+	SHORT y;
+	} POINTS;
+
+==IMC_GETSOFTKBDSUBTYPEサブメッセージ
+
+IMC_GETSOFTKBDSUBTYPEサブメッセージは、
+IMC_SETSOFTKBDSUBTYPEによってセットされたソフトキーボードウィンドウのサブタイプを取得するために、
+IMEによってソフトキーボードウィンドウへ送信される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_GETSOFTKBDSUBTYPE;
+	lParam = 0;
+
+===引数
+
+lParam
+	使用されない。
+
+===戻り値
+
+戻り値は、IMC_SETSOFTKBDSUBTYPEによってセットされた、ソフトキーボードのサブタイプである。
+-1の戻り値は、失敗を意味する。
+
+==IMC_GETSTATUSWINDOWPOSサブメッセージ
+
+IMC_GETSTATUSWINDOWPOSサブメッセージは、
+状態ウィンドウの位置を取得するために、
+アプリによってIMEウィンドウへ送信される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_GETSTATUSWINDOWPOS;
+	lParam = 0;
+
+===引数
+
+lParam
+	使用されない。
+
+===戻り値
+
+戻り値は、スクリーン座標系で、状態ウィンドウの位置のxおよびy座標を含むPOINTS構造体を指定する。
+
+===コメント
+
+POINTS構造体は次の形式を持つ。
 
 	typedef struct tagPOINTS { /* pts */
 	SHORT x;
