@@ -852,4 +852,114 @@ lpSoftKbdData
 
 UIウィンドウはこのメッセージを受け取らない。
 
+==IMC_SETSOFTKBDSUBTYPEサブメッセージ
+
+IMC_SETSOFTKBDSUBTYPEサブメッセージは、IMEによって、
+ソフトキーボードウィンドウにおける表示文字列に使うサブタイプを指定するために、
+ソフトキーボードウィンドウへ送信される。
+これはIME特有の目的でも使える。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_SETSOFTKBDSUBTYPE;
+	lSubType= lParam;
+
+===引数
+
+lSubType
+	セットするサブタイプ。
+
+===戻り値
+
+戻り値は、サブタイプ。-1の戻り値は、失敗を意味する。
+
+===コメント
+
+UIウィンドウはこのメッセージを受け取らず、SOFTKEYBOARD_TYPE_T1はこの情報を使わない。
+IMEは、ソフトキーボードが表示読み文字列を変更しようとしないように、
+このメッセージを送信する。
+IMEは、このメッセージの意味を定義するために、
+SOFTKEYBOARD_TYPE_T1ソフトキーボードを使い、
+IMC_GETSOFTKBDSUBTYPEを使ってこのデータを取得できる。
+
+==IMC_SETSOFTKBDFONTサブメッセージ
+
+IMC_SETSOFTKBDFONTサブメッセージは、
+ソフトキーボードウィンドウにおける表示文字列で使うフォントを指定するために、
+IMEによってソフトキーボードウィンドウへ送信される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_SETSOFTKBDFONT;
+	lpLogFont= (LPLOGFONT)lParam;
+
+===引数
+
+lpLogFont
+	セットするLOGFONTを指し示す。
+
+===戻り値
+
+メッセージが成功すれば、戻り値はゼロ。さもなければ戻り値は非ゼロ。
+
+===コメント
+
+UIウィンドウは、このメッセージを受け取らない。
+
+==IMC_SETSOFTKBDPOSサブメッセージ
+
+IMC_SETSOFTKBDPOSサブメッセージは、
+ソフトキーボードウィンドウの位置をセットするために、
+UIウィンドウによってソフトキーボードウィンドウへ送信される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_SETSOFTKBDPOS;
+	ptsPt= (POINTS)lParam;
+
+===引数
+
+ptsPt
+	スクリーン座標系でソフトキーボードウィンドウの位置のxおよびy座標を含むPOINTS構造体を指定する。
+
+===戻り値
+
+メッセージが成功すれば、戻り値はゼロ。さもなければ戻り値は非ゼロ。
+
+===コメント
+
+POINTS構造体は次の形式を持つ。
+
+	typedef struct tagPOINTS { /* pts */
+	SHORT x;
+	SHORT y;
+	} POINTS;
+
+==IMC_SETSTATUSWINDOWPOSサブメッセージ
+
+IMC_SETSTATUSWINDOWPOSサブメッセージは、
+除隊ウィンドウの位置をセットするために、
+アプリによってIMEウィンドウへ送信される。
+
+	WM_IME_CONTROL
+	wSubMessage= IMC_SETSTATUSWINDOWPOS;
+	ptsPt= (POINTS)lParam;
+
+===引数
+
+ptsPt
+	スクリーン座標系で状態ウィンドウの位置のxおよびy座標を含むPOINTS構造体を指定する。
+
+===戻り値
+
+メッセージが成功すれば、戻り値はゼロ。さもなければ戻り値は非ゼロ。
+
+===コメント
+
+POINTS構造体は次の形式を持つ。
+
+	typedef struct tagPOINTS { /* pts */
+	SHORT x;
+	SHORT y;
+	} POINTS;
+
+=WM_IME_COMPOSITIONメッセージ
+
 
