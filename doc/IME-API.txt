@@ -376,4 +376,66 @@ dwHotKeyID
 	ホットキー識別子。
 
 lpuModifiers
-	
+	ホットキーの組み合わせキー。
+	ALT (MOD_ALT)、CTRL (MOD_CONTROL)、SHIFT (MOD_SHIFT)、左側 (MOD_LEFT)、右側 (MOD_RIGHT)を含む。
+	キーアップフラグ (MOD_ON_KEYUP) はホットキーがキーの上がっているとき有効であることを示す。
+	モディファイアー無視フラグ (MOD_IGNORE_ALL_MODIFIER) は、モディファイアーの組み合わせが
+	ホットキーマッチングにおいて無視されることを示す。
+
+lpuVKey
+	このホットキーの仮想キーコード。
+
+lphKL
+	IMEのHKL。もしこの引数の戻り値がNULLでなければ、ホットキーは、このHKLのIMEに切り替えることができる。
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ戻り値はFALSEである。
+
+===コメント
+
+この関数はコントロールパネルから呼ばれる。
+
+==ImmSetHotKey関数
+
+ImmSetHotKey関数は、IMEホットキーの値をセットする。
+
+	BOOL WINAPI
+	ImmSetHotKey(
+	DWORD dwHotKeyID,
+	UINT uModifiers,
+	UINT uVKey,
+	hKL hKL
+	)
+
+=引数
+
+dwHotKeyID
+	ホットキーの識別子。
+
+uModifiers
+	ホットキーの組み合わせキー。
+	ALT (MOD_ALT)、CTRL (MOD_CONTROL)、SHIFT (MOD_SHIFT)、左側 (MOD_LEFT)、右側 (MOD_RIGHT)を含む。
+	キーアップフラグ (MOD_ON_KEYUP) はホットキーがキーの上がっているとき有効であることを示す。
+	モディファイアー無視フラグ (MOD_IGNORE_ALL_MODIFIER) は、モディファイアーの組み合わせが
+	ホットキーマッチングにおいて無視されることを示す。
+
+uVKey
+	このホットキーの仮想キーコード。
+
+hKL
+	IMEのHKL。この引数が指定されると、ホットキーはこのHKLのIMEに切り替えることができる。
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ戻り値はFALSEである。
+
+===コメント
+
+この関数は、コントロールパネルから呼ばれる。
+特定のキーボードの側を指定しないキーについては、
+uModifiers は両側（MOD_LEFT|MODE_RIGHT）を指定すべきだ。
+
+=IMMソフトキーボード関数群
+
+
