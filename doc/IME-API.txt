@@ -1092,3 +1092,43 @@ DefWindowProc は、既定のIMEウィンドウへ情報を渡すために、
 このメッセージを処理する。
 そのとき既定のIMEウィンドウは、UIウィンドウへこのメッセージを送信する。
 
+=WM_IME_STARTCOMPOSITIONメッセージ
+
+WM_IME_STARTCOMPOSITIONメッセージは、ユーザーのキーストロークの結果として、
+IMEがコンポジション文字列を生成する直前に送信される。
+UIウィンドウは、このメッセージを受け取るときに、コンポジションウィンドウを開く。
+
+	WM_IME_STARTCOMPOSITION
+	wParam = 0
+	lParam= 0
+
+==引数
+
+wParam
+	使われない。
+lParam
+	使われない。
+
+==戻り値
+
+なし。
+
+==コメント
+
+アプリ自体がコンポジション文字列を表示したいとき、
+このメッセージをアプリケーションIMEウィンドウやDefWindowProcへ渡すべきではない。
+DefWindowProc関数は、既定のIMEウィンドウへこのメッセージを渡すためにこのメッセージを処理する。
+
+=WM_IME_NOTIFYメッセージ
+
+WM_IME_NOTIFYメッセージは、
+アプリやIME状態のUIウィンドウへ通知するサブメッセージのグループである。
+
+	WM_IME_NOTIFY
+	wSubMessage= wParam; //submessage ID
+	lParam= lParam; // depends on the submessage
+
+以下のトピックは、wSubMessageの値によって分類されるサブメッセージ群である。
+
+==IMN_CLOSESTATUSWINDOWサブメッセージ
+
