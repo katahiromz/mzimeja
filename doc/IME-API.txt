@@ -1461,3 +1461,31 @@ lParam
 
 ==WM_IME_KEYDOWNとWM_IME_KEYUP
 
+WM_IME_KEYDOWNとWM_IME_KEYUPメッセージは、
+IMEがWM_KEYDOWNかWM_KEYUPメッセージを生成する必要があるときに、アプリに送信される。
+送られる値は、オリジナルなWindowsのWM_KEYDOWNとWM_KEYUPの値と同じである（英語版）。
+
+	WM_IME_KEYDOWN / WM_IME_KEYUP
+	nVirtKey = (int) wParam; // virtual-key code
+	lKeyData = lParam; // key data
+
+===引数
+
+nVirtKey
+	wParamの値。システムキーではない仮想キーコードを指定する。
+lKeyData
+	lParamの値。リピートカウント、スキャンコード、拡張キーフラグ、コンテキストコード、
+	直前のキー状態フラグ、そしてトランジション状態フラグを指定する。
+	それは、オリジナルのWindowsのWM_KEYDOWNとWM_KEYUPメッセージに対するものと同じである。
+
+===戻り値
+
+なし
+
+===コメント
+
+アプリは、WM_KEYDOWNとWM_KEYUPメッセージと同じ方法でこのメッセージを取り扱うことができる。
+さもなければ、DefWindowProcが、同じwParamとlParam引数をつけてWM_KEYDOWNかWM_KEYUPメッセージを生成するために、
+このメッセージを処理する。
+このメッセージは、メッセージ順を管理するために、たいていIMEによって生成される。
+
