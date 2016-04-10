@@ -1907,3 +1907,56 @@ ANSI IMEが閉じられていれば、インジェクトされたUnicodeメッセージは、
 
 ==NotifyIME
 
+NotifyIME関数は、与えられた引数に従ってIMEの状態を変更する。
+
+	BOOL
+	NotifyIME(
+	HIMC hIMC,
+	DWORD dwAction,
+	DWORD dwIndex,
+	DWORD dwValue
+	)
+
+===引数
+
+hIMC
+	入力コンテキストのハンドル。
+dwAction
+	以下は、アプリが引数dwActionに指定できるコンテキスト項目である。
+	(略)
+dwIndex
+	uActionに依存する。
+dwValue
+	uActionに依存する。
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ戻り値はFALSE。
+
+===参照
+
+ImmNotifyIME
+
+==ImeSelect
+
+ImeSelect関数は、IMEのプライベートなコンテキストを初期化・逆初期化する。
+
+	BOOL
+	ImeSelect(
+	HIMC hIMC,
+	BOOL fSelect
+	)
+
+===引数
+
+hIMC
+	入力コンテキストのハンドル。
+fSelect
+	2つのフラグが提供される。TRUEは、初期化を表し、FALSEは逆初期化を表す (リソースの解放)。
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ戻り値はFALSE。
+
+==ImeSetCompositionString
+
