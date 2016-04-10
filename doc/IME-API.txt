@@ -1782,9 +1782,8 @@ uReserved
 
 ==ImeEscape
 
-ImeEscape関数
- function allows an application to access capabilities of a particular IME not directly available
-though other IMM functions. This is necessary mainly for country-specific functions or private functions in the IME.
+ImeEscape関数は、他のIMM関数を通じて直接利用可能ではない特定のIMEの能力へアプリがアクセスすることを許可する。
+これは主に、国特有の機能やIME内部の機能に対して必要である。
 
 	LRESULT
 	ImeEscape(
@@ -1793,3 +1792,99 @@ though other IMM functions. This is necessary mainly for country-specific functi
 	LPVOID lpData
 	)
 
+===引数
+
+hIMC
+	入力コンテキストのハンドル。
+uEscape
+	実行したいエスケープ機能を指定する。
+lpData
+	エスケープに必要なデータを指し示す。
+
+ImeEscape 関数は以下のエスケープ機能をサポートする。
+(略)
+
+===戻り値
+
+関数が失敗したら、戻り値はゼロ。さもなければ戻り値は、各エスケープ機能に依存する。
+
+===コメント
+
+パラメータの正当性の実証は、強靭性（robustness）のために、各エスケープ機能の内部で行われるべきだ。
+uEscape がIME_ESC_QUERY_SUPPORTであるとき、
+lpDataは、IMEのエスケープの値を含む変数へのポインタである。
+次は、現在のIMEがIME_ESC_GETHELPFILENAMEをサポートするかどうかを決定するために使うことができる。
+
+	IME_ESC_GETHELPFILENAME.
+	DWORD dwEsc = IME_ESC_GETHELPFILENAME;
+	LRESULT lRet = ImmEscape(hKL, hIMC, IME_ESC_QUERYSUPPORT, (LPVOID)&dwEsc);
+
+===参照
+
+ImmEscape
+
+==ImeSetActiveContext
+
+ImeSetActiveContext関数は、現在のIMEのアクティブな入力コンテキストを通知する。
+
+	BOOL
+	ImeSetActiveContext(
+	HIMC hIMC,
+	BOOL fFlag
+	)
+
+===引数
+
+hIMC
+	入力コンテキストのハンドル。
+fFlag
+	2つのフラグが提供される。TRUEはアクティブにされたことを示し、FALESは非アクティブにされたことを示す。
+
+===戻り値
+
+関数が成功したら、戻り値はTRUE。さもなければ戻り値はFALSE。
+
+===コメント
+
+IMEは、新しく選択された入力コンテキストについてこの関数によって通知される。
+IMEは初期化を実行できるが、それは必ずしも必要ではない。
+
+===参照
+
+ImeSetActiveContext
+
+==ImeProcessKey
+
+ImeProcessKey関数は、IMMを通じて与えられたすべてのキーストロークを前処理し、
+与えられた入力コンテキストについてキーがIMEに必要であればTRUEを返す。
+
+	BOOL
+	ImeProcessKey(
+	HIMC hIMC,
+	UINT uVirKey,
+	DWORD lParam,
+	CONST LPBYTE lpbKeyState
+	)
+
+===引数
+
+hIMC
+	入力コンテキストのハンドル。
+uVirKey
+	処理すべき仮想キー。
+lParam
+	キーメッセージのlParam。
+lpbKeyState
+	現在のキーボードの状態を含む256バイトの配列を指し示す。
+	IMEはこのキー状態の内容を変更すべきではない。
+
+===戻り値
+
+関数が成功したら、戻り値はTRUE。さもなければ戻り値はFALSE。
+
+===コメント
+
+The system decides whether the key is handled by IME or not by calling this function. If the function returns TRUE
+before the application gets the key message, the IME will handle the key. The system will then call the
+ImeToAsciiEx function. If this function returns FALSE, the system recognizes that the key will not be handled by
+the IME and the key message will be sent to the application.
