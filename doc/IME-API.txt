@@ -338,7 +338,7 @@ IMEホットキーは、どのIMEがアクティブかに関わらず、
 すべてのIMEにおいて効率がいい。
 
 IMMにおいて、いくつかの定義済みホットキー機能が存在する。
-IMMはそれ自体がそれらのホットキー関数の機能（異なる取り扱いルーチン）を提供する。
+IMMはそれ自体がそれらのホットキー関数の機能（異なる扱いルーチン）を提供する。
 すべてのホットキー機能は、IMMにおいて異なるホットキーIDを持ち、
 それぞれのIDは、それぞれの国の特定の必要性に応じた機能を所有する。
 アプリが別の定義済みホットキーIDをシステムに追加できないことに注意しておく。
@@ -1484,7 +1484,7 @@ lKeyData
 
 ===コメント
 
-アプリは、WM_KEYDOWNとWM_KEYUPメッセージと同じ方法でこのメッセージを取り扱うことができる。
+アプリは、WM_KEYDOWNとWM_KEYUPメッセージと同じ方法でこのメッセージを扱うことができる。
 さもなければ、DefWindowProcが、同じwParamとlParam引数をつけてWM_KEYDOWNかWM_KEYUPメッセージを生成するために、
 このメッセージを処理する。
 このメッセージは、メッセージ順を管理するために、たいていIMEによって生成される。
@@ -1515,7 +1515,7 @@ lKeyData
 
 ===コメント
 
-アプリがこのメッセージを取り扱わなければ、DefWindowProc関数が、
+アプリがこのメッセージを扱わなければ、DefWindowProc関数が、
 WM_CHARメッセージを生成するためにこのメッセージを処理する。
 もしアプリがUnicodeではなく、wCharCodeが2バイトのDBCS文字を含むなら、
 DefWindowProc関数は、2個のWM_CHARメッセージを生成し、
@@ -1619,7 +1619,7 @@ hKLは、送信元のIMEである。
 =IMEインターフェイス関数
 
 IMEは動的リンクライブラリ（DLL）として提供される。
-入力方式管理（IMM）は、すべてのインストールされたIMEを取り扱わなければならない。
+入力方式管理（IMM）は、すべてのインストールされたIMEを扱わなければならない。
 IMEは再起動することなく実行時に変更可能であるので、
 IMMは、それぞれのIMEのすべてのエントリポイントを管理するための構造体を持つだろう。
 
@@ -1630,7 +1630,7 @@ IMMは、それぞれのIMEのすべてのエントリポイントを管理するための構造体を持つだろう
 
 Windows 95、Windows 98、そしてWindows NT 3.51について
 
-ImeInquire関数は、IMEの初期化を取り扱う。また、IMEINFO構造体やIMEのUIクラス名も返す。
+ImeInquire関数は、IMEの初期化を扱う。また、IMEINFO構造体やIMEのUIクラス名も返す。
 
 	BOOL
 	ImeInquire(
@@ -1884,11 +1884,11 @@ lpbKeyState
 
 ===コメント
 
-システムはこの関数を呼び出すことで、キーがIMEによって取り扱うか、そうでないかを決定する。
+システムはこの関数を呼び出すことで、キーがIMEによって扱うか、そうでないかを決定する。
 もし、アプリがキーメッセージを取得する前にこの関数がTRUEを返せば、
-IMEはそのキーを取り扱うだろう。そのときシステムは、ImeToAsciiExを呼びだすだろう。
+IMEはそのキーを扱うだろう。そのときシステムは、ImeToAsciiExを呼びだすだろう。
 もしこの関数がFALSEを返せば、
-システムは、そのキーがIMEによって取り扱わないことを認識し、
+システムは、そのキーがIMEによって扱わないことを認識し、
 キーメッセージはアプリに送信されるだろう。
 
 Windows 2000において、IME_PROP_ACCEPT_WIDE_VKEYをサポートするIMEに関しては、
@@ -1959,4 +1959,51 @@ fSelect
 関数が成功すれば、戻り値はTRUE。さもなければ戻り値はFALSE。
 
 ==ImeSetCompositionString
+
+ImeSetCompositionString関数は、
+lpCompまたはlpRead引数に含まれるデータとともに、
+IMEのコンポジション文字列構造体をセットするために、
+アプリによって使われる。
+そのときIMEはWM_IME_COMPOSITIONメッセージを生成する。
+
+	BOOL WINAPI
+	ImeSetCompositionString(
+	HIMC hIMC,
+	DWORD dwIndex,
+	LPCVOID lpComp,
+	DWORD dwCompLen,
+	LPCVOID lpRead,
+	DWORD dwReadLen
+	);
+
+===引数
+
+hIMC
+	入力コンテキストのハンドル。
+dwIndex
+	以下の値がdwIndexに提供される。
+	(略)
+lpComp
+	更新されたコンポジション文字列を含むバッファへのポインタ。
+	文字列の種類は、dwIndexの値によって決定される。
+dwCompLen
+	バッファの長さ（バイト単位）。
+lpRead
+	更新された読み文字列を含むバッファへのポインタ。
+	文字列の種類は、dwIndexの値によって決定される。
+	もしdwIndexの値が、SCS_SETRRECONVERTSTRING かSCS_QUERYRECONVERTSTRINGであれば、
+	lpRead は、更新された読み文字列を含むRECONVERTSTRING 構造体へのポインタになるだろう。
+	もし選択中のIMEがSCS_CAP_MAKEREADの値を持っていれば、これはNULLでもよい。
+dwReadLen
+	バッファの長さ（バイト単位）。
+
+===コメント
+
+Unicodeにおいては、dwCompLenとdwReadLenは、
+たとえSCS_SETSTR が指定され、バッファがUnicode文字列を含んでいても、バイト数でバッファの長さを指定する。
+
+SCS_SETRECONVERTSTRINGかSCS_QUERYRECONVERTSTRINGは、SCS_CAP_SETRECONVERTSTRINGプロパティを
+持つIMEに対してのみ使うことができる。このプロパティは、ImmGetProperty関数を使うことで取得できる。
+
+==ImeToAsciiEx
 
