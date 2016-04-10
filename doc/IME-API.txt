@@ -2211,6 +2211,31 @@ ImeGetImeMenuItems関数は、IMEメニューに問う臆されたメニュー項目を取得する。
 ===引数
 
 hIMC
-	The lpMenuItem contains menu items that are related to this input context.
+	入力コンテキストのハンドル。
 dwFlags
-Consists of the following bit combinations.
+	以下のビット組み合わせからなる。
+	(略)
+dwType
+	以下のビット組み合わせからなる。
+	(略)
+
+lpImeParentMenu
+	fTypeにMFT_SUBMENUがあるとき、IMEMENUINFO構造体へのポインタ。
+	ImeGetImeMenuItems は、このメニュー項目のサブメニュー項目を返す。
+	もしこれがNULLならば、lpImeMenuはトップレベルのメニュー項目を含む。
+lpImeMenu
+	メニュー項目の内容を受け取るバッファへのポインタ。
+	このバッファは、IMEMENUITEMINFO構造体の配列である。
+	もしこれがNULLならば、ImeGetImeMenuItems は、登録済みメニュー項目の数を返す。
+dwSize
+	IMEMENUITEMINFO 構造体を受け取るバッファのサイズ。
+
+===戻り値
+
+戻り値は、lpImeMenuの中へセットされたメニュー項目の個数である。
+もしlpImeMenuがNULLであれば、ImeGetImeMenuItemsは
+指定されたhKLに登録済みのメニュー項目の個数を返す。
+
+===コメント
+
+ImeGetImeMenuItemsは Windows 98 とWindows 2000で登場した新しい関数である。
