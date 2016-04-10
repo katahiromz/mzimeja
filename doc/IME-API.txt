@@ -1626,3 +1626,170 @@ IMMは、それぞれのIMEのすべてのエントリポイントを管理するための構造体を持つだろう
 以下のトピックは、すべての共通IME関数群である。
 これらの関数は、アプリによって直接呼び出すべきではない。
 
+==ImeInquire
+
+Windows 95、Windows 98、そしてWindows NT 3.51について
+
+ImeInquire関数は、IMEの初期化を取り扱う。また、IMEINFO構造体やIMEのUIクラス名も返す。
+
+	BOOL
+	ImeInquire(
+	LPIMEINFO lpIMEInfo,
+	LPTSTR lpszWndClass,
+	LPCTSTR lpszData
+	)
+
+===引数
+
+lpIMEInfo
+	IME情報構造体へのポインタ。
+lpszWndClass
+	IMEによって埋められるべき、ウィンドウクラス名。
+	この名前はIMEのUIクラスである。
+lpszData
+	IMEのオプションブロック。このバージョンではNULL。
+
+Windows NT 4.0およびWindows 2000について
+
+	BOOL
+	ImeInquire(
+	LPIMEINFO lpIMEInfo,
+	LPTSTR lpszWndClass,
+	DWORD dwSystemInfoFlags
+	)
+
+===引数
+
+lpIMEInfo
+	IME情報構造体へのポインタ。
+lpszWndClass
+	IMEによって埋められるべき、ウィンドウクラス名。
+	この名前はIMEのUIクラスである。
+dwSystemInfoFlags
+	システムによって提供されるさまざまなシステム情報。以下のフラグが提供される。
+	(略)
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ戻り値はFALSE。
+
+==ImeConversionList
+
+ImeConversionList関数は、別の文字や文字列から変換後の結果リストを取得する。
+
+	DWORD
+	IMEConversionList(
+	HIMC hIMC,
+	LPCTSTR lpSrc,
+	LPCANDIDATELIST lpDst,
+	DWORD dwBufLen,
+	UINT uFlag
+	)
+
+===引数
+
+hIMC
+	入力コンテキスト
+lpSrc
+	変換元の文字列
+lpDst
+	変換先バッファへのポインタ。
+dwBufLen
+	変換先バッファの長さ。
+uFlag
+	現在、以下の3つのフラグのうち1つを選択できる。
+	(略)
+
+===戻り値
+
+戻り値は、結果文字列リストのバイト数である。
+
+===コメント
+
+この関数は、アプリ、あるいはIME関連のメッセージを生成していないIMEによって
+呼び出されることを想定している。
+したがって、この関数において、IMEはIME関連のメッセージを生成すべきではない。
+
+==ImeConfigure
+
+ImeConfigure関数は、IMEのオプショナルな情報を要求するために使うダイアログを提供する。
+
+	BOOL
+	ImeConfigure(
+	HKL hKL,
+	HWND hWnd,
+	DWORD dwMode,
+	LPVOID lpData
+	)
+
+===引数
+
+hKL
+	IMEの入力言語ハンドル。
+hWnd
+	親ウィンドウのハンドル。
+dwMode
+	ダイアログのモード。以下のフラグが提供される。
+	(略)
+lpData
+	VOIDへのポインタで、それは(dwMode == IME_CONFIG_REGISTERWORD)のときのみ、
+	REGISTERWORD構造体へのポインタになるだろう。
+	さもなければlpDataは単に無視されるべきだ。
+	また、もし初期文字列情報が与えられなければ、IME_CONFIG_REGISTERモードでNULLを指定できる。
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ戻り値はFALSE。
+
+===コメント
+
+IMEは次のような疑似コードでlpDataをチェックする。
+
+	if (dwmode != IME_CONFIG_REGISTERWORD)
+	{
+		// オリジナルの実行をする。
+	}
+	else if (IsBadReadPtr(lpdata, sizeof(REGISTERWORD)) == FALSE)
+	{
+		if (IsBadStringPtr(PREGISTERWORD(lpdata)->lpReading, (UINT)-1) == FALSE)
+		{
+			// 読み文字列を単語登録ダイアログにセットする。
+		}
+		if (IsBadStringPtr(PREGISTERWORD(lpdata)->lpWord, (UINT)-1) == FALSE)
+		{
+			// 単語文字列を単語登録ダイアログにセットする。
+		}
+	}
+
+==ImeDestroy
+
+ImeDestroy関数はIME自身を終了する。
+
+	BOOL
+	ImeDestroy(
+	UINT uReserved
+	)
+
+===引数
+
+uReserved
+	予約済み。現在はゼロであるべき。
+	このバージョンでは、それがゼロでなければIMEはFALSEを返すべき。
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ戻り値はFALSE。
+
+==ImeEscape
+
+ImeEscape関数
+ function allows an application to access capabilities of a particular IME not directly available
+though other IMM functions. This is necessary mainly for country-specific functions or private functions in the IME.
+
+	LRESULT
+	ImeEscape(
+	HIMC hIMC,
+	UINT uEscape,
+	LPVOID lpData
+	)
+
