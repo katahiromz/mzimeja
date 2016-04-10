@@ -1884,7 +1884,26 @@ lpbKeyState
 
 ===コメント
 
-The system decides whether the key is handled by IME or not by calling this function. If the function returns TRUE
-before the application gets the key message, the IME will handle the key. The system will then call the
-ImeToAsciiEx function. If this function returns FALSE, the system recognizes that the key will not be handled by
-the IME and the key message will be sent to the application.
+システムはこの関数を呼び出すことで、キーがIMEによって取り扱うか、そうでないかを決定する。
+もし、アプリがキーメッセージを取得する前にこの関数がTRUEを返せば、
+IMEはそのキーを取り扱うだろう。そのときシステムは、ImeToAsciiExを呼びだすだろう。
+もしこの関数がFALSEを返せば、
+システムは、そのキーがIMEによって取り扱わないことを認識し、
+キーメッセージはアプリに送信されるだろう。
+
+Windows 2000において、IME_PROP_ACCEPT_WIDE_VKEYをサポートするIMEに関しては、
+ImeProcessKey は、VK_PACKETを通じてSendInput APIを使ってインジェクト (inject) された
+uVirKeyの全部の32ビット値を受け取るだろう。
+uVirKey は、IMEがANSI版であっても16ビットUnicodeを上位ワードに含むだろう。
+
+IME_PROP_ACCEPT_WIDE_VKEYをサポートしないIMEに関しては、
+Unicode IMEのImeProcessKey は、上位ワードがゼロのVK_PACKETを受け取るだろう。
+それでもUnicode IMEは、TRUEを返すことができ、ImeToAsciiExは
+インジェクトされたUnicodeと共に呼び出される。
+ANSI IMEのImeProcessKeyは何も受け取らないだろう。
+インジェクトされたUnicodeは、ANSI IMEが開かれていれば、破棄される。
+ANSI IMEが閉じられていれば、インジェクトされたUnicodeメッセージは、
+アプリのキューにすぐに投稿される。
+
+==NotifyIME
+
