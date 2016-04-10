@@ -2085,9 +2085,9 @@ ImeRegisterWord 関数は、このIMEの辞書へ文字列を登録する。
 ===引数
 
 lpszReading
-	登録された文字列の読み文字列。
+	登録される文字列の読み文字列。
 dwStyle
-	登録された文字列のスタイル。以下の値が与えられる。
+	登録される文字列のスタイル。以下の値が与えられる。
 	(略)
 lpszString
 	登録される文字列。
@@ -2110,9 +2110,9 @@ ImeUnregisterWord関数は、このIMEの辞書から登録済みの文字列を除去する。
 ===引数
 
 lpszReading
-	登録された文字列の読み文字列。
+	登録済みの文字列の読み文字列。
 dwStyle
-	登録された文字列のスタイル。
+	登録済みの文字列のスタイル。
 	dwStyleの説明についてはImeRegisterWord関数を参照されたい。
 lpszString
 	登録を解除する文字列。
@@ -2148,7 +2148,7 @@ lpStyleBuf
 ==ImeEnumRegisterWord
 
 ImeEnumRegisterWord関数は、指定された読み文字列、スタイル、および登録済み文字列データと
-共に登録された文字列の情報を列挙する。
+共に登録済み文字列の情報を列挙する。
 
 	UINT WINAPI
 	ImeEnumRegisterWord(
@@ -2178,7 +2178,7 @@ lpszString
 	列挙対象の登録済み文字列を指定する。
 	もしlpszStringがNULLであれば、ImeEnumRegisterWordは、
 	指定されたlpszReadingとdwStyle引数にマッチする、
-	すべての登録された文字列を列挙する。
+	すべての登録済み文字列を列挙する。
 lpData
 	アプリが供給するデータのアドレス。
 
@@ -2196,7 +2196,7 @@ ImeEnumRegisterWordは、第三の引数にマッチするすべての登録済み文字列を列挙する。
 
 ==ImeGetImeMenuItems
 
-ImeGetImeMenuItems関数は、IMEメニューに問う臆されたメニュー項目を取得する。
+ImeGetImeMenuItems関数は、IMEメニューに登録済みのメニュー項目を取得する。
 
 	DWORD WINAPI
 	ImeGetImeMenuItems(
