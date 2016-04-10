@@ -1525,3 +1525,45 @@ DefWindowProc関数は、2個のWM_CHARメッセージを生成し、
 
 =VK_PROCESSKEY
 
+VK_PROCESSKEYメッセージは、WM_KEYDOWNかWM_KEYUPのwParamとしてアプリへ送信される。
+この仮想キーが生成されるとき、本当の仮想キーは入力コンテキストに保存されるか、
+あるいはIMEによって生成されたメッセージが入力コンテキストに格納される。
+システムは、本当の仮想キーを復元するか、
+入力コンテキストのメッセージバッファに格納されるメッセージを投稿するかのいずれかである。
+
+	WM_KEYDOWN /WM_KEYUP
+	wParam = VK_PROCESSKEY;
+	lParam= 1;
+
+==引数
+
+lParam
+	1でなければならない。
+
+=INDICM_SETIMEICON
+
+このメッセージは、IMEがシステムペンアイコンに対するアイコンを変更したいときに、
+インディケータウィンドウに送信される。
+このメッセージは、フォーカスウィンドウの選択されているhKLが送信元のIMEと
+同じであるときに、受け入れられる。
+
+	INDICM_SETIMEICON
+	nIconIndex = wParam;
+	hKL = lParam;
+
+==引数
+
+nIconIdex
+	IMEファイルのアイコンリソースのインデックス。
+	もしこの値が(-1)であれば、インディケータはシステムによって提供されたオリジナルのアイコンを復元する。
+lKeyhKL は、送信元のIMEである。
+
+==戻り値
+
+非ゼロの値は失敗を表す。さもなければゼロが返される。
+
+==コメント
+
+タスクバー管理の内部設計の要件のため、IMEは、INDICM_xxxメッセージに対してPostMessageを使わなければならない。
+
+=INDICM_SETIMETOOLTIPS
