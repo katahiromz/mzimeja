@@ -2007,3 +2007,210 @@ SCS_SETRECONVERTSTRINGかSCS_QUERYRECONVERTSTRINGは、SCS_CAP_SETRECONVERTSTRINGプ
 
 ==ImeToAsciiEx
 
+ImeToAsciiEx関数は、引数hIMCに基づき、IME変換エンジンを通じて変換結果を生成する。
+
+	UINT
+	ImeToAsciiEx(
+	UINT uVirKey,
+	UINT uScanCode,
+	CONST LPBYTE lpbKeyState,
+	LPTRANSMSGLIST lpTransMsgList,
+	UINT fuState,
+	HIMC hIMC
+	)
+
+===引数
+
+uVirKey
+	翻訳する仮想キーコードを指定する。
+	プロパティビットIME_PROP_KBD_CHAR_FIRSTがONであるとき、
+	仮想キーの上位バイトは、エイド（aid）文字列コードである。
+	Unicodeにおいては、IME_PROP_KBD_CHAR_FIRSTビットがONであるとき、
+	uVirKeyの上位ワードは、Unicode文字コードを含む。
+
+uScanCode
+	翻訳するキーのハードウェアスキャンコード
+
+lpbKeyState
+	現在のキーボード状態を含む256バイトの配列を指し示す。
+	IMEはキー状態の内容を変更すべきではない。
+lpTransMsgList
+	翻訳されたメッセージ結果を受け取るためのTRANSMSGLISTバッファを指し示す。
+	これはWindows 95/98およびWindows NT 4.0 IMEの文書ではダブルワードバッファとして
+	定義されていて、ダブルワードバッファバッファの形式は、
+	[翻訳されたメッセージバッファの長さ] [メッセージ1] [wParam1] [lParam1] {[メッセージ2] [wParam2] [lParam2] {...{...{...}}}}
+	である。
+fuState
+	アクティブなメニューフラグ。
+hIMC
+	入力コンテキストのハンドル。
+
+===戻り値
+
+戻り値はメッセージの個数を表す。
+その個数が翻訳されたメッセージバッファより大きければ、
+翻訳されたメッセージバッファは充分ではない。
+システムは、翻訳メッセージを取得するために、hMsgBufをチェックする。
+
+===コメント
+
+Windows 2000においては、
+wParamの下位バイトにVK_PACKETを使い、
+上位ワードにはUnicodeを使った、
+新しい32ビットの幅の仮想キーコードがSendInputを使って
+インジェクトされうる。
+
+IME_PROP_ACCEPT_WIDE_VKEYをサポートするANSI IMEについては、
+ImeToAsciiExは、1文字に対して16ビットまでのANSIコードを受け取るかもしれない。
+それは次のようにパックされる。文字は、VK_PACKETを通じてSendInput APIから
+インジェクトされる。
+
+(略)
+
+===参照
+
+ImmToAsciiEx
+
+==ImeRegisterWord
+
+ImeRegisterWord 関数は、このIMEの辞書へ文字列を登録する。
+
+	BOOL WINAPI
+	ImeRegisterWord(
+	LPCTSTR lpszReading,
+	DWORD dwStyle,
+	LPCTSTR lpszString
+	)
+
+===引数
+
+lpszReading
+	登録された文字列の読み文字列。
+dwStyle
+	登録された文字列のスタイル。以下の値が与えられる。
+	(略)
+lpszString
+	登録される文字列。
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ、戻り値はFALSE。
+
+==ImeUnregisterWord
+
+ImeUnregisterWord関数は、このIMEの辞書から登録済みの文字列を除去する。
+
+	BOOL WINAPI
+	ImeUnregisterWord(
+	LPCTSTR lpszReading,
+	DWORD dwStyle,
+	LPCTSTR lpszString
+	)
+
+===引数
+
+lpszReading
+	登録された文字列の読み文字列。
+dwStyle
+	登録された文字列のスタイル。
+	dwStyleの説明についてはImeRegisterWord関数を参照されたい。
+lpszString
+	登録を解除する文字列。
+
+===戻り値
+
+関数が成功すれば、戻り値はTRUE。さもなければ、戻り値はFALSE。
+
+==ImeGetRegisterWordStyle
+
+ImeGetRegisterWordStyle関数は、このIMEにおいて利用可能なスタイルを取得する。
+
+	UINT WINAPI
+	ImeGetRegisterWordStyle(
+	UINT nItem,
+	LPSTYLEBUF lpStyleBuf
+	)
+
+===引数
+
+nItem
+	バッファが所有するスタイルの最大個数。
+lpStyleBuf
+	埋められるバッファ。
+
+===戻り値
+
+戻り値は、バッファへコピーされたスタイルの個数である。
+もしnItems がゼロであれば、戻り値は、
+このIMEにおいて、利用可能なすべてのスタイルを受け取るのに必要な
+バッファサイズ（配列要素数）である。
+
+==ImeEnumRegisterWord
+
+ImeEnumRegisterWord関数は、指定された読み文字列、スタイル、および登録済み文字列データと
+共に登録された文字列の情報を列挙する。
+
+	UINT WINAPI
+	ImeEnumRegisterWord(
+	hKL,
+	REGISTERWORDENUMPROC lpfnEnumProc,
+	LPCTSTR lpszReading,
+	DWORD dwStyle,
+	LPCTSTR lpszString,
+	LPVOID lpData
+	)
+
+===引数
+
+hKL
+	入力言語ハンドル。
+lpfnEnumProc
+	コールバック関数のアドレス。
+lpszReading
+	列挙される読み文字列を指定する。
+	もしlpszReadingがNULLであれば、
+	ImeEnumRegisterWordは、指定されたdwStyleとlpszString引数にマッチする、すべての利用可能な読み文字列を列挙する。
+dwStyle
+	列挙対象のスタイルを指定する。もしdwStyleがNULLならば、ImeEnumRegisterWordは、
+	指定されたlpszReadingとlpszStringにマッチする、
+	すべての利用可能なスタイルを列挙する。
+lpszString
+	列挙対象の登録済み文字列を指定する。
+	もしlpszStringがNULLであれば、ImeEnumRegisterWordは、
+	指定されたlpszReadingとdwStyle引数にマッチする、
+	すべての登録された文字列を列挙する。
+lpData
+	アプリが供給するデータのアドレス。
+
+===戻り値
+
+関数が成功したら、戻り値は、コールバック関数が返した最後の値である。
+その意味は、アプリによって定義される。
+
+===コメント
+
+もしlpszReading、dwStyle、そしてlpszString のすべてがNULLであれば、
+ImeEnumRegisterWordは、IME辞書のすべての登録済み文字列を列挙する。
+もし入力引数のうち２つがNULLであれば、
+ImeEnumRegisterWordは、第三の引数にマッチするすべての登録済み文字列を列挙する。
+
+==ImeGetImeMenuItems
+
+ImeGetImeMenuItems関数は、IMEメニューに問う臆されたメニュー項目を取得する。
+
+	DWORD WINAPI
+	ImeGetImeMenuItems(
+	HIMC hIMC,
+	DWORD dwFlags,
+	DWORD dwType,
+	LPIMEMENUITEMINFO lpImeParentMenu,
+	LPIMEMENUITEMINFO lpImeMenu,
+	DWORD dwSize
+	)
+
+===引数
+
+hIMC
+	The lpMenuItem contains menu items that are related to this input context.
+dwFlags
+Consists of the following bit combinations.
