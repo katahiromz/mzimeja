@@ -19,11 +19,11 @@ struct InputContext : public INPUTCONTEXT {
   CompStr *LockCompStr();
   void UnlockCompStr();
 
-  LPTRANSMSG LockTransMsg();
-  void UnlockTransMsg();
+  LPTRANSMSG LockMsgBuf();
+  void UnlockMsgBuf();
 
-        DWORD& NumTransMsg();
-  const DWORD& NumTransMsg() const;
+        DWORD& NumMsgBuf();
+  const DWORD& NumMsgBuf() const;
 
   LPGUIDELINE LockGuideLine();
   void UnlockGuideLine();

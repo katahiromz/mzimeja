@@ -21,7 +21,7 @@ struct MZCOMPSTR : public COMPOSITIONSTRING {
   TCHAR   szCompStr[MAXCOMPSIZE];
   BYTE    bCompAttr[MAXCOMPSIZE];
   DWORD   dwCompClause[MAXCLAUSESIZE];
-  char    szTypeInfo[MAXCOMPSIZE];
+  BYTE    szTypeInfo[MAXCOMPSIZE];
   TCHAR   szResultReadStr[MAXCOMPSIZE];
   DWORD   dwResultReadClause[MAXCOMPSIZE];
   TCHAR   szResultStr[MAXCOMPSIZE];

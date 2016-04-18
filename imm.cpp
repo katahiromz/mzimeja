@@ -917,7 +917,6 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       else
         return NUM_SUB_MENU_L;
     }
-
     return 0;
   }
 

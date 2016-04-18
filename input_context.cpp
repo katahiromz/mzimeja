@@ -60,19 +60,19 @@ void InputContext::UnlockCompStr() {
   ImmUnlockIMCC(hCompStr);
 }
 
-LPTRANSMSG InputContext::LockTransMsg() {
+LPTRANSMSG InputContext::LockMsgBuf() {
   return (LPTRANSMSG)ImmLockIMCC(hMsgBuf);
 }
 
-void InputContext::UnlockTransMsg() {
+void InputContext::UnlockMsgBuf() {
     ImmUnlockIMCC(hMsgBuf);
 }
 
-DWORD& InputContext::NumTransMsg() {
+DWORD& InputContext::NumMsgBuf() {
   return dwNumMsgBuf;
 }
 
-const DWORD& InputContext::NumTransMsg() const {
+const DWORD& InputContext::NumMsgBuf() const {
   return dwNumMsgBuf;
 }
 
