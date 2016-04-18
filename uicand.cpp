@@ -34,7 +34,7 @@ LRESULT CALLBACK CandWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     default:
-      if (!MyIsIMEMessage(message))
+      if (!IsImeMessage(message))
         return DefWindowProc(hWnd, message, wParam, lParam);
       break;
   }
@@ -98,7 +98,7 @@ void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
     lpUIExtra->uiCand.hWnd =
         CreateWindowEx(WS_EX_WINDOWEDGE, szCandClassName, NULL,
                        WS_COMPDEFAULT | WS_DLGFRAME, lpUIExtra->uiCand.pt.x,
-                       lpUIExtra->uiCand.pt.y, 1, 1, hUIWnd, NULL, hInst, NULL);
+                       lpUIExtra->uiCand.pt.y, 1, 1, hUIWnd, NULL, TheApp.m_hInst, NULL);
   }
 
   SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWL_SVRWND, (LONG_PTR)hUIWnd);

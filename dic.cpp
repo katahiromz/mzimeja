@@ -26,7 +26,7 @@ void PASCAL FlushText(HIMC hIMC) {
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CLOSECANDIDATE;
     GnMsg.lParam = 1;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
   }
 
   CompStr *lpCompStr = lpIMC->LockCompStr();
@@ -38,12 +38,12 @@ void PASCAL FlushText(HIMC hIMC) {
     GnMsg.message = WM_IME_COMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = 0;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
     GnMsg.message = WM_IME_ENDCOMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = 0;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
   }
   ImmUnlockIMC(hIMC);
 }
@@ -68,7 +68,7 @@ void PASCAL RevertText(HIMC hIMC) {
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CLOSECANDIDATE;
     GnMsg.lParam = 1;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
   }
 
   lpCompStr = lpIMC->LockCompStr();
@@ -100,7 +100,7 @@ void PASCAL RevertText(HIMC hIMC) {
     GnMsg.message = WM_IME_COMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
     lpIMC->UnlockCompStr();
   }
@@ -111,8 +111,8 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   TRANSMSG GnMsg;
   BOOL bRc = FALSE;
 
-  if ((GetFileAttributes(szDicFileName) == 0xFFFFFFFF) ||
-      (GetFileAttributes(szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
+  if ((GetFileAttributes(TheApp.m_szDicFileName) == 0xFFFFFFFF) ||
+      (GetFileAttributes(TheApp.m_szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
     MakeGuideLine(hIMC, MYGL_NODICTIONARY);
   }
 
@@ -144,7 +144,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   szBuf[256] = 0;  // Double NULL-terminate
   szBuf[257] = 0;  // Double NULL-terminate
   int nBufLen =
-    GetCandidateStringsFromDictionary(lpT2, szBuf, 256, szDicFileName);
+    GetCandidateStringsFromDictionary(lpT2, szBuf, 256, TheApp.m_szDicFileName);
 
   // Check the result of dic. Because my candidate list has only MAXCANDSTRNUM
   // candidate strings.
@@ -175,7 +175,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
       GnMsg.wParam = 0;
       GnMsg.lParam =
         GCS_COMPSTR | GCS_CURSORPOS | GCS_COMPATTR | GCS_COMPREADATTR;
-      GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+      GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
     }
 
     lpIMC->UnlockCandInfo();
@@ -217,7 +217,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
         GnMsg.message = WM_IME_COMPOSITION;
         GnMsg.wParam = 0;
         GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-        GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+        GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
         bRc = TRUE;
         lpIMC->UnlockCandInfo();
@@ -234,7 +234,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
       GnMsg.message = WM_IME_NOTIFY;
       GnMsg.wParam = IMN_OPENCANDIDATE;
       GnMsg.lParam = 1L;
-      GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+      GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
     }
 
     // Make candidate structures.
@@ -272,7 +272,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CHANGECANDIDATE;
     GnMsg.lParam = 1L;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
     // If the selected candidate string is changed, the composition string
     // should be updated.
@@ -353,7 +353,7 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
       GnMsg.message = WM_IME_COMPOSITION;
       GnMsg.wParam = 0;
       GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-      GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+      GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
     } else {
       if (lpIMC->IsCandidate()) {
         CandInfo *lpCandInfo = lpIMC->LockCandInfo();
@@ -361,7 +361,7 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
         GnMsg.message = WM_IME_NOTIFY;
         GnMsg.wParam = IMN_CLOSECANDIDATE;
         GnMsg.lParam = 1;
-        GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+        GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
         lpIMC->UnlockCandInfo();
       }
 
@@ -370,12 +370,12 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
       GnMsg.message = WM_IME_COMPOSITION;
       GnMsg.wParam = 0;
       GnMsg.lParam = 0;
-      GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+      GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
       GnMsg.message = WM_IME_ENDCOMPOSITION;
       GnMsg.wParam = 0;
       GnMsg.lParam = 0;
-      GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+      GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
     }
   }
 
@@ -416,7 +416,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
     GnMsg.message = WM_IME_STARTCOMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = 0;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
   } else if (IsConvertedCompStr(hIMC)) {
     MakeResultString(hIMC, FALSE);
@@ -597,7 +597,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   GnMsg.message = WM_IME_COMPOSITION;
   GnMsg.wParam = 0;
   GnMsg.lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART | dwGCR;
-  GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+  GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
 ac_exit:
   lpIMC->UnlockCompStr();
@@ -621,7 +621,7 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_CLOSECANDIDATE;
     GnMsg.lParam = 1L;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
   }
 
   lstrcpy(lpCompStr->GetResultStr(), lpCompStr->GetCompStr());
@@ -648,12 +648,12 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
     GnMsg.message = WM_IME_COMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = GCS_RESULTALL;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
     GnMsg.message = WM_IME_ENDCOMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = 0;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
   }
 
   ImmUnlockIMC(hIMC);
@@ -677,14 +677,14 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   lpGuideLine->dwIndex = glTable[dwID].dwIndex;
   lpGuideLine->dwStrOffset = sizeof(GUIDELINE);
   lpStr = (LPTSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwStrOffset);
-  LoadString(hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
+  LoadString(TheApp.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
   lpGuideLine->dwStrLen = lstrlen(lpStr);
 
   if (glTable[dwID].dwPrivateID) {
     lpGuideLine->dwPrivateOffset =
         sizeof(GUIDELINE) + (MAXGLCHAR + 1) * sizeof(TCHAR);
     lpStr = (LPTSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwPrivateOffset);
-    LoadString(hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
+    LoadString(TheApp.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
     lpGuideLine->dwPrivateSize = lstrlen(lpStr) * sizeof(TCHAR);
   } else {
     lpGuideLine->dwPrivateOffset = 0L;
@@ -694,7 +694,7 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   GnMsg.message = WM_IME_NOTIFY;
   GnMsg.wParam = IMN_GUIDELINE;
   GnMsg.lParam = 0;
-  GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+  GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
   lpIMC->UnlockGuideLine();
   ImmUnlockIMC(hIMC);

@@ -40,7 +40,7 @@ extern "C" {
 //    ê¨å˜ÇµÇΩÇ»ÇÁÇŒÅATRUE ÇÅBÇ≥Ç‡Ç»Ç≠ÇŒ FALSE Çï‘Ç∑ÅB
 BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
   if ((dw == FAKEWORD_NOUN) || (dw == FAKEWORD_VERB))
-    return WritePrivateProfileString(lpRead, lpStr, lpStr, szDicFileName);
+    return WritePrivateProfileString(lpRead, lpStr, lpStr, TheApp.m_szDicFileName);
 
   return FALSE;
 }
@@ -67,7 +67,7 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
   if ((dw == FAKEWORD_NOUN) || (dw == FAKEWORD_VERB))
 
-    return WritePrivateProfileString(lpRead, lpStr, NULL, szDicFileName);
+    return WritePrivateProfileString(lpRead, lpStr, NULL, TheApp.m_szDicFileName);
 
   return FALSE;
 }
@@ -163,8 +163,8 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
   if (!dw || (dw == FAKEWORD_NOUN)) {
     if (lpRead) {
       nBufLen = GetPrivateProfileString(
-          lpRead, NULL, TEXT(""), szBuf,
-          sizeof(szBuf) / sizeof(szBuf[0]), szDicFileName);
+          lpRead, NULL, TEXT(""), szBuf, _countof(szBuf),
+          TheApp.m_szDicFileName);
 
       if (nBufLen) {
         while (*lpBuf) {

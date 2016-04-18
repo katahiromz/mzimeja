@@ -84,7 +84,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
   lstrcpy(lpszClassName, szUIClassName);
 
   if (dwSystemInfoFlags & IME_SYSINFO_WINLOGON) {
-    bWinLogOn = TRUE;
+    TheApp.m_bWinLogOn = TRUE;
   }
 
   return TRUE;
@@ -528,13 +528,13 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
         if (lpCandInfo) {
           // Get the candidate strings from dic file.
           GetCandidateStringsFromDictionary(
-              lpCompStr->GetCompReadStr(), szBuf, 256, szDicFileName);
+              lpCompStr->GetCompReadStr(), szBuf, 256, TheApp.m_szDicFileName);
 
           // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
           GnMsg.message = WM_IME_NOTIFY;
           GnMsg.wParam = IMN_OPENCANDIDATE;
           GnMsg.lParam = 1L;
-          GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+          GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
           // Make candidate structures.
           lpCandInfo->dwSize = sizeof(MZCAND);
@@ -570,7 +570,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           GnMsg.message = WM_IME_NOTIFY;
           GnMsg.wParam = IMN_CHANGECANDIDATE;
           GnMsg.lParam = 1L;
-          GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+          GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
 
           lpIMC->UnlockCandInfo();
           ImmUnlockIMC(hIMC);
@@ -587,7 +587,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
         GnMsg.message = WM_IME_NOTIFY;
         GnMsg.wParam = IMN_CLOSECANDIDATE;
         GnMsg.lParam = 1L;
-        GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+        GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
         bRet = TRUE;
       }
       ImmUnlockIMC(hIMC);
@@ -609,7 +609,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             GnMsg.message = WM_IME_NOTIFY;
             GnMsg.wParam = IMN_CHANGECANDIDATE;
             GnMsg.lParam = 1L;
-            GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+            GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
           }
           lpIMC->UnlockCandInfo();
         }
@@ -643,7 +643,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             GnMsg.message = WM_IME_NOTIFY;
             GnMsg.wParam = IMN_CHANGECANDIDATE;
             GnMsg.lParam = 1L;
-            GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+            GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
           }
           lpIMC->UnlockCandInfo();
         }
@@ -670,7 +670,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             GnMsg.message = WM_IME_NOTIFY;
             GnMsg.wParam = IMN_CHANGECANDIDATE;
             GnMsg.lParam = 1L;
-            GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+            GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
           }
           lpIMC->UnlockCandInfo();
         }
@@ -980,7 +980,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->hbmpChecked = 0;
       lpImeMenu->hbmpUnchecked = 0;
       lstrcpy(lpImeMenu->szString, TEXT("RootLeftMenu3"));
-      lpImeMenu->hbmpItem = LoadBitmap(hInst, TEXT("FACEBMP"));
+      lpImeMenu->hbmpItem = TheApp.LoadBMP(TEXT("FACEBMP"));
 
       return NUM_ROOT_MENU_L;
     }
@@ -1021,8 +1021,8 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       lpImeMenu->fType = 0;
       lpImeMenu->fState = IMFS_CHECKED;
       lpImeMenu->wID = IDIM_SUB_ML_2;
-      lpImeMenu->hbmpChecked = LoadBitmap(hInst, TEXT("CHECKBMP"));
-      lpImeMenu->hbmpUnchecked = LoadBitmap(hInst, TEXT("UNCHECKBMP"));
+      lpImeMenu->hbmpChecked = TheApp.LoadBMP(TEXT("CHECKBMP"));
+      lpImeMenu->hbmpUnchecked = TheApp.LoadBMP(TEXT("UNCHECKBMP"));
       lstrcpy(lpImeMenu->szString, TEXT("SubLeftMenu2"));
       lpImeMenu->hbmpItem = 0;
 

@@ -67,7 +67,7 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
     GnMsg.message = WM_IME_NOTIFY;
     GnMsg.wParam = IMN_SETCONVERSIONMODE;
     GnMsg.lParam = 0L;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
   }
 
   ImmUnlockIMC(hIMC);
@@ -142,7 +142,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
     GnMsg.message = WM_IME_COMPOSITION;
     GnMsg.wParam = 0;
     GnMsg.lParam = GCS_COMPSTR;
-    GenerateMessage(hIMC, lpIMC, lpCurTransKey, &GnMsg);
+    GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
   }
 
   GlobalUnlock(hDst);
@@ -210,7 +210,7 @@ HKL PASCAL GetMyHKL() {
   TCHAR szFile[32];
   for (DWORD dwi = 0; dwi < dwSize; dwi++) {
     HKL hKLTemp = *(lphkl + dwi);
-    ImmGetIMEFileName(hKLTemp, szFile, sizeof(szFile) / sizeof(szFile[0]));
+    ImmGetIMEFileName(hKLTemp, szFile, _countof(szFile));
 
     if (!lstrcmp(szFile, MZIME_FILENAME)) {
       hKL = hKLTemp;
@@ -223,9 +223,9 @@ HKL PASCAL GetMyHKL() {
 }
 
 void PASCAL UpdateIndicIcon(HIMC hIMC) {
-  if (!hMyKL) {
-    hMyKL = GetMyHKL();
-    if (!hMyKL) return;
+  if (!TheApp.m_hMyKL) {
+    TheApp.m_hMyKL = GetMyHKL();
+    if (!TheApp.m_hMyKL) return;
   }
 
   HWND hwndIndicate = FindWindow(INDICATOR_CLASS, NULL);
@@ -244,12 +244,12 @@ void PASCAL UpdateIndicIcon(HIMC hIMC) {
 
     atomTip = GlobalAddAtom(TEXT("MZ-IME Open"));
     PostMessage(hwndIndicate, INDICM_SETIMEICON, fOpen ? 1 : (-1),
-                (LPARAM)hMyKL);
+                (LPARAM)TheApp.m_hMyKL);
     PostMessage(hwndIndicate, INDICM_SETIMETOOLTIPS, fOpen ? atomTip : (-1),
-                (LPARAM)hMyKL);
+                (LPARAM)TheApp.m_hMyKL);
     PostMessage(hwndIndicate, INDICM_REMOVEDEFAULTMENUITEMS,
-                // fOpen ? (RDMI_LEFT | RDMI_RIGHT) : 0, (LPARAM)hMyKL);
-                fOpen ? (RDMI_LEFT) : 0, (LPARAM)hMyKL);
+                // fOpen ? (RDMI_LEFT | RDMI_RIGHT) : 0, (LPARAM)TheApp.m_hMyKL);
+                fOpen ? (RDMI_LEFT) : 0, (LPARAM)TheApp.m_hMyKL);
   }
 }
 

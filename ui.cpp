@@ -75,7 +75,7 @@ BOOL IMERegisterClasses(HINSTANCE hInstance) {
   wcx.style = CS_MZIME;
   wcx.lpfnWndProc = MZIMEWndProc;
   wcx.cbClsExtra = 0;
-  wcx.cbWndExtra = 8;
+  wcx.cbWndExtra = 2 * sizeof(LONG_PTR);
   wcx.hInstance = hInstance;
   wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
   wcx.hIcon = NULL;
@@ -441,7 +441,7 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
             BTX + GetSystemMetrics(SM_CYSMCAPTION) +
                 2 * GetSystemMetrics(SM_CYBORDER) +
                 2 * GetSystemMetrics(SM_CYEDGE),
-            hWnd, NULL, hInst, NULL);
+            hWnd, NULL, TheApp.m_hInst, NULL);
       }
 
       ShowWindow(lpUIExtra->uiStatus.hWnd, SW_SHOWNOACTIVATE);
@@ -524,7 +524,7 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
               dy + GetSystemMetrics(SM_CYSMCAPTION) +
                   2 * GetSystemMetrics(SM_CYBORDER) +
                   2 * GetSystemMetrics(SM_CYEDGE),
-              hWnd, NULL, hInst, NULL);
+              hWnd, NULL, TheApp.m_hInst, NULL);
         }
         ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
         lpUIExtra->uiGuide.bShow = TRUE;
@@ -681,7 +681,7 @@ void PASCAL DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 }
 
 // Any UI window should not pass the IME messages to DefWindowProc
-BOOL PASCAL MyIsIMEMessage(UINT message) {
+BOOL PASCAL IsImeMessage(UINT message) {
   switch (message) {
     case WM_IME_STARTCOMPOSITION:
     case WM_IME_ENDCOMPOSITION:
@@ -694,7 +694,6 @@ BOOL PASCAL MyIsIMEMessage(UINT message) {
     case WM_IME_CHAR:
       return TRUE;
   }
-
   return FALSE;
 }
 

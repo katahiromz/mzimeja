@@ -51,7 +51,7 @@ LRESULT CALLBACK GuideWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_CREATE:
-      hbmpGuide = LoadBitmap(hInst, TEXT("CLOSEBMP"));
+      hbmpGuide = TheApp.LoadBMP(TEXT("CLOSEBMP"));
       SetWindowLongPtr(hWnd, FIGWL_CLOSEBMP, (LONG_PTR)hbmpGuide);
       GetClientRect(hWnd, &rc);
       break;
@@ -62,7 +62,7 @@ LRESULT CALLBACK GuideWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     default:
-      if (!MyIsIMEMessage(message))
+      if (!IsImeMessage(message))
         return DefWindowProc(hWnd, message, wParam, lParam);
       break;
   }

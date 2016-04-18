@@ -47,9 +47,9 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_CREATE:
-      hbmpStatus = LoadBitmap(hInst, TEXT("STATUSBMP"));
+      hbmpStatus = TheApp.LoadBMP(TEXT("STATUSBMP"));
       SetWindowLongPtr(hWnd, FIGWL_STATUSBMP, (LONG_PTR)hbmpStatus);
-      hbmpStatus = LoadBitmap(hInst, TEXT("CLOSEBMP"));
+      hbmpStatus = TheApp.LoadBMP(TEXT("CLOSEBMP"));
       SetWindowLongPtr(hWnd, FIGWL_CLOSEBMP, (LONG_PTR)hbmpStatus);
       break;
 
@@ -61,7 +61,7 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     default:
-      if (!MyIsIMEMessage(message))
+      if (!IsImeMessage(message))
         return DefWindowProc(hWnd, message, wParam, lParam);
       break;
   }
@@ -313,7 +313,7 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
 
       hSvrWnd = (HWND)GetWindowLongPtr(hStatusWnd, FIGWL_SVRWND);
 
-      hMenu = LoadMenu(hInst, TEXT("RIGHTCLKMENU"));
+      hMenu = LoadMenu(TheApp.m_hInst, TEXT("RIGHTCLKMENU"));
       if (hMenu && (hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC))) {
         int cmd;
         HMENU hSubMenu = GetSubMenu(hMenu, 0);

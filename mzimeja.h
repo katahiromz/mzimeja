@@ -23,6 +23,10 @@
 #include "comp_str.h"
 #include "cand_info.h"
 
+#ifndef _countof
+  #define _countof(array) (sizeof(array) / sizeof(array[0]))
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 
 #define MZIME_FILENAME  TEXT("mzimeja.ime")
@@ -198,19 +202,6 @@ typedef struct _tagMZGUIDELINE {
 //////////////////////////////////////////////////////////////////////////////
 // externs
 
-extern HINSTANCE hInst;
-extern HKL hMyKL;
-extern BOOL bWinLogOn;
-extern LPTRANSMSGLIST lpCurTransKey;
-extern UINT uNumTransKey;
-extern BOOL fOverTransKey;
-extern TCHAR szUIClassName[];
-extern TCHAR szCompStrClassName[];
-extern TCHAR szCandClassName[];
-extern TCHAR szStatusClassName[];
-extern TCHAR szGuideClassName[];
-extern MZGUIDELINE glTable[];
-extern TCHAR szDicFileName[];
 extern BYTE bComp[];
 extern BYTE bCompCtl[];
 extern BYTE bCompSht[];
@@ -219,6 +210,15 @@ extern BYTE bNoComp[];
 extern BYTE bNoCompCtl[];
 extern BYTE bNoCompSht[];
 extern BYTE bNoCompAlt[];
+
+//////////////////////////////////////////////////////////////////////////////
+
+extern const TCHAR szUIClassName[];
+extern const TCHAR szCompStrClassName[];
+extern const TCHAR szCandClassName[];
+extern const TCHAR szStatusClassName[];
+extern const TCHAR szGuideClassName[];
+extern const MZGUIDELINE glTable[];
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -263,7 +263,7 @@ LRESULT CALLBACK StatusWndProc(HWND, UINT, WPARAM, LPARAM);
 void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
                         DWORD dwPushedStatus);
 void PASCAL ButtonStatus(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL PASCAL MyIsIMEMessage(UINT message);
+BOOL PASCAL IsImeMessage(UINT message);
 void PASCAL UpdateStatusWindow(LPUIEXTRA lpUIExtra);
 
 // uicand.c
@@ -351,6 +351,47 @@ void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
 //////////////////////////////////////////////////////////////////////////////
 
 }  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////
+// C++ interface
+
+struct MZIMEJA {
+  HINSTANCE       m_hInst;
+  HANDLE          m_hMutex;
+  HKL             m_hMyKL;
+  BOOL            m_bWinLogOn;
+  LPTRANSMSGLIST  m_lpCurTransKey;
+  UINT            m_uNumTransKey;
+  BOOL            m_fOverTransKey;
+
+  // dictionary file name
+  TCHAR           m_szDicFileName[256];
+
+  MZIMEJA() {
+    m_hInst = NULL;
+    m_hMutex = NULL;
+    m_hMyKL = 0;
+    m_bWinLogOn = FALSE;
+
+    m_lpCurTransKey = NULL;
+    m_uNumTransKey = 0;
+    m_fOverTransKey = FALSE;
+
+    m_szDicFileName[0] = 0;
+  }
+
+  BOOL Init(HINSTANCE hInstance);
+  VOID Destroy(VOID);
+  HBITMAP LoadBMP(LPCTSTR pszName);
+  HBITMAP LoadBMP(INT nID) {
+    return LoadBMP(MAKEINTRESOURCE(nID));
+  }
+  LPTSTR LoadSTR(INT nID);
+};
+
+extern MZIMEJA TheApp;
+
+//////////////////////////////////////////////////////////////////////////////
 
 #endif  // ndef MZIMEJA_H_
 

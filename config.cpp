@@ -17,7 +17,7 @@ void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
 
     psp.dwSize = sizeof(psp);
     psp.dwFlags = PSP_DEFAULT;
-    psp.hInstance = hInst;
+    psp.hInstance = TheApp.m_hInst;
     psp.pszTemplate = MAKEINTRESOURCE(id);
     psp.pfnDlgProc = pfn;
     psp.lParam = 0;
@@ -76,7 +76,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
   psh.dwSize = sizeof(psh);
   psh.dwFlags = PSH_PROPTITLE;
   psh.hwndParent = hWnd;
-  psh.hInstance = hInst;
+  psh.hInstance = TheApp.m_hInst;
   psh.pszCaption = MAKEINTRESOURCE(IDS_CONFIGNAME);
   psh.nPages = 0;
   psh.nStartPage = 0;
@@ -123,7 +123,6 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
   LRESULT dwIndex;
   TCHAR szRead[128];
   TCHAR szString[128];
-  TCHAR szBuf[128];
   LRESULT dwStyle;
 
   switch (message) {
@@ -138,19 +137,15 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 
         case PSN_APPLY:
 
-          if (!GetDlgItemText(hDlg, ID_WR_READING, szRead,
-                              sizeof(szRead) / sizeof(szRead[0]))) {
-            LoadString(hInst, IDS_NOREADING, szBuf,
-                       sizeof(szBuf) / sizeof(szBuf[0]));
-            MessageBox(hDlg, szBuf, NULL, MB_OK);
+          if (!GetDlgItemText(hDlg, ID_WR_READING, szRead, _countof(szRead))) {
+            LPTSTR psz = TheApp.LoadSTR(IDS_NOREADING);
+            MessageBox(hDlg, psz, NULL, MB_OK);
             return FALSE;
           }
 
-          if (!GetDlgItemText(hDlg, ID_WR_STRING, szString,
-                              sizeof(szString) / sizeof(szString[0]))) {
-            LoadString(hInst, IDS_NOSTRING, szBuf,
-                       sizeof(szBuf) / sizeof(szBuf[0]));
-            MessageBox(hDlg, szBuf, NULL, MB_OK);
+          if (!GetDlgItemText(hDlg, ID_WR_STRING, szString, _countof(szString))) {
+            LPTSTR psz = TheApp.LoadSTR(IDS_NOSTRING);
+            MessageBox(hDlg, psz, NULL, MB_OK);
             return FALSE;
           }
 
@@ -159,9 +154,8 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
               SendDlgItemMessage(hDlg, ID_WR_STYLE, CB_GETITEMDATA, dwIndex, 0);
 
           if (!ImeRegisterWord(szRead, (DWORD)dwStyle, szString)) {
-            LoadString(hInst, IDS_REGWORDRET, szBuf,
-                       sizeof(szBuf) / sizeof(szBuf[0]));
-            MessageBox(hDlg, szBuf, NULL, MB_OK);
+            LPTSTR psz = TheApp.LoadSTR(IDS_REGWORDRET);
+            MessageBox(hDlg, psz, NULL, MB_OK);
           }
           break;
 
@@ -186,9 +180,8 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
             (LPSTYLEBUF)GlobalAlloc(GPTR, nItem * sizeof(STYLEBUF));
 
         if (!lpStyleBuf) {
-          LoadString(hInst, IDS_NOMEMORY, szBuf,
-                     sizeof(szBuf) / sizeof(szBuf[0]));
-          MessageBox(hDlg, szBuf, NULL, MB_OK);
+          LPTSTR psz = TheApp.LoadSTR(IDS_NOMEMORY);
+          MessageBox(hDlg, psz, NULL, MB_OK);
           return TRUE;
         }
 

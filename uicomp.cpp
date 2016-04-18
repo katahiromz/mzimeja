@@ -35,7 +35,7 @@ LRESULT CALLBACK CompStrWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     default:
-      if (!MyIsIMEMessage(message))
+      if (!IsImeMessage(message))
         return DefWindowProc(hWnd, message, wParam, lParam);
       break;
   }
@@ -52,7 +52,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
     if (!IsWindow(lpUIExtra->uiComp[i].hWnd)) {
       lpUIExtra->uiComp[i].hWnd =
           CreateWindowEx(0, szCompStrClassName, NULL, WS_COMPNODEFAULT,
-                         0, 0, 1, 1, hUIWnd, NULL, hInst, NULL);
+                         0, 0, 1, 1, hUIWnd, NULL, TheApp.m_hInst, NULL);
     }
     lpUIExtra->uiComp[i].rc.left = 0;
     lpUIExtra->uiComp[i].rc.top = 0;
@@ -75,7 +75,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
     lpUIExtra->uiDefComp.hWnd = CreateWindowEx(
         WS_EX_WINDOWEDGE, szCompStrClassName, NULL,
         WS_COMPDEFAULT | WS_DLGFRAME, lpUIExtra->uiDefComp.pt.x,
-        lpUIExtra->uiDefComp.pt.y, 1, 1, hUIWnd, NULL, hInst, NULL);
+        lpUIExtra->uiDefComp.pt.y, 1, 1, hUIWnd, NULL, TheApp.m_hInst, NULL);
   }
 
   // SetWindowLong(lpUIExtra->uiDefComp.hWnd,FIGWL_FONT,(DWORD)lpUIExtra->hFont);

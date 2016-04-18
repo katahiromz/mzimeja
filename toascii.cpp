@@ -49,11 +49,11 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
                          LPTRANSMSGLIST lpTransBuf, UINT fuState, HIMC hIMC) {
   DebugPrint(TEXT("ImeToAsciiEx"));
 
-  lpCurTransKey = lpTransBuf;
+  TheApp.m_lpCurTransKey = lpTransBuf;
   LPARAM lParam = ((DWORD)uScanCode << 16) + 1L;
 
-  // Init uNumTransKey here.
-  uNumTransKey = 0;
+  // Init TheApp.m_uNumTransKey here.
+  TheApp.m_uNumTransKey = 0;
 
   // if hIMC is NULL, this means DISABLE IME.
   if (!hIMC) return 0;
@@ -70,20 +70,20 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
       IMEKeydownHandler(hIMC, uVKey, lParam, lpbKeyState);
 
     // Clear static value, no more generated message!
-    lpCurTransKey = NULL;
+    TheApp.m_lpCurTransKey = NULL;
   }
 
   // If trans key buffer that is allocated by USER.EXE full up,
   // the return value is the negative number.
-  if (fOverTransKey) {
+  if (TheApp.m_fOverTransKey) {
     DebugPrint(TEXT("***************************************"));
     DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *"));
     DebugPrint(TEXT("*                by MZIMEJA.DLL       *"));
     DebugPrint(TEXT("***************************************"));
-    return (int)uNumTransKey;
+    return (int)TheApp.m_uNumTransKey;
   }
 
-  return (int)uNumTransKey;
+  return (int)TheApp.m_uNumTransKey;
 }
 
 // Update the transrate key buffer
@@ -91,13 +91,13 @@ BOOL PASCAL GenerateMessageToTransKey(LPTRANSMSGLIST lpTransBuf,
                                       LPTRANSMSG lpGeneMsg) {
   LPTRANSMSG lpgmT0;
 
-  ++uNumTransKey;
-  if (uNumTransKey >= lpTransBuf->uMsgCount) {
-    fOverTransKey = TRUE;
+  ++TheApp.m_uNumTransKey;
+  if (TheApp.m_uNumTransKey >= lpTransBuf->uMsgCount) {
+    TheApp.m_fOverTransKey = TRUE;
     return FALSE;
   }
 
-  lpgmT0 = lpTransBuf->TransMsg + (uNumTransKey - 1);
+  lpgmT0 = lpTransBuf->TransMsg + (TheApp.m_uNumTransKey - 1);
   *lpgmT0 = *lpGeneMsg;
 
   return TRUE;
