@@ -227,8 +227,6 @@ extern "C" {
 // subs.c
 void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode);
 void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode);
-BOOL PASCAL IsCompStr(HIMC hIMC);
-BOOL PASCAL IsConvertedCompStr(HIMC hIMC);
 HFONT CheckNativeCharset(HDC hDC);
 
 // toascii.c

@@ -13,6 +13,7 @@ struct InputContext : public INPUTCONTEXT {
   void Initialize();
   BOOL HasCandInfo();
   BOOL HasCompStr();
+  BOOL HasConvertedCompStr();
 
   CandInfo *LockCandInfo();
   void UnlockCandInfo();

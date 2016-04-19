@@ -148,50 +148,6 @@ ccs_exit40:
   return;
 }
 
-BOOL PASCAL IsCompStr(HIMC hIMC) {
-  BOOL fRet = FALSE;
-
-  InputContext *lpIMC;
-  lpIMC = TheApp.LockIMC(hIMC);
-  if (!lpIMC) return FALSE;
-
-  if (ImmGetIMCCSize(lpIMC->hCompStr) < sizeof(COMPOSITIONSTRING)) {
-    TheApp.UnlockIMC();
-    return FALSE;
-  }
-
-  CompStr *lpCompStr = lpIMC->LockCompStr();
-  if (lpCompStr) {
-    fRet = (lpCompStr->dwCompStrLen > 0);
-    lpIMC->UnlockCompStr();
-  }
-
-  TheApp.UnlockIMC();
-
-  return fRet;
-}
-
-BOOL PASCAL IsConvertedCompStr(HIMC hIMC) {
-  BOOL fRet = FALSE;
-
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
-  if (!lpIMC) return FALSE;
-
-  if (ImmGetIMCCSize(lpIMC->hCompStr) < sizeof(COMPOSITIONSTRING)) {
-    TheApp.UnlockIMC();
-    return FALSE;
-  }
-
-  CompStr *lpCompStr = lpIMC->LockCompStr();
-  if (lpCompStr->dwCompStrLen > 0)
-    fRet = (lpCompStr->GetCompAttr()[0] > 0);
-
-  lpIMC->UnlockCompStr();
-  TheApp.UnlockIMC();
-
-  return fRet;
-}
-
 HFONT CheckNativeCharset(HDC hDC) {
   HFONT hOldFont = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
 

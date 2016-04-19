@@ -468,7 +468,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
         case IMC_SETOPENSTATUS:
           lpIMC = TheApp.LockIMC(hIMC);
           if (lpIMC) {
-            if (!lpIMC->fOpen && IsCompStr(hIMC)) FlushText(hIMC);
+            if (!lpIMC->fOpen && lpIMC->HasCompStr()) FlushText(hIMC);
             TheApp.UnlockIMC();
           }
           TheApp.UpdateIndicIcon(hIMC);
@@ -516,61 +516,63 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
     case NI_OPENCANDIDATE:
       DebugPrint(TEXT("NI_OPENCANDIDATE"));
-      if (IsConvertedCompStr(hIMC)) {
-        lpIMC = TheApp.LockIMC(hIMC);
-        if (!lpIMC) return FALSE;
-        if (!(lpCompStr = lpIMC->LockCompStr())) {
-          TheApp.UnlockIMC();
-          return FALSE;
+      lpIMC = TheApp.LockIMC(hIMC);
+      if (!lpIMC) return FALSE;
+      if (!(lpCompStr = lpIMC->LockCompStr())) {
+        TheApp.UnlockIMC();
+        return FALSE;
+      }
+      if (!lpIMC->HasConvertedCompStr()) {
+        TheApp.UnlockIMC();
+        return FALSE;
+      }
+
+      lpCandInfo = lpIMC->LockCandInfo();
+      if (lpCandInfo) {
+        // Get the candidate strings from dic file.
+        GetCandidateStringsFromDictionary(
+            lpCompStr->GetCompReadStr(), szBuf, 256, TheApp.m_szDicFileName);
+
+        // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
+        TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+
+        // Make candidate structures.
+        lpCandInfo->dwSize = sizeof(MZCAND);
+        lpCandInfo->dwCount = 1;
+        lpCandInfo->dwOffset[0] = sizeof(CANDIDATEINFO);
+        lpCandList = lpCandInfo->GetList();
+
+        lpstr = &szBuf[0];
+        while (*lpstr && (i < MAXCANDSTRNUM)) {
+          lpCandList->dwOffset[i] = lpCandInfo->GetCandOffset(i, lpCandList);
+          lstrcpy(lpCandList->GetCandString(i), lpstr);
+          lpstr += (lstrlen(lpstr) + 1);
+          i++;
         }
 
-        lpCandInfo = lpIMC->LockCandInfo();
-        if (lpCandInfo) {
-          // Get the candidate strings from dic file.
-          GetCandidateStringsFromDictionary(
-              lpCompStr->GetCompReadStr(), szBuf, 256, TheApp.m_szDicFileName);
+        lpCandList->dwSize = sizeof(CANDIDATELIST);
+        lpCandList->dwSize +=
+          (MAXCANDSTRNUM * (sizeof(DWORD) + MAXCANDSTRSIZE));
+        lpCandList->dwStyle = IME_CAND_READ;
+        lpCandList->dwCount = i;
+        lpCandList->dwPageStart = 0;
+        if (i < MAXCANDPAGESIZE)
+          lpCandList->dwPageSize = i;
+        else
+          lpCandList->dwPageSize = MAXCANDPAGESIZE;
 
-          // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
-          TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+        lpCandList->dwSelection++;
+        if (lpCandList->dwSelection == i) lpCandList->dwSelection = 0;
 
-          // Make candidate structures.
-          lpCandInfo->dwSize = sizeof(MZCAND);
-          lpCandInfo->dwCount = 1;
-          lpCandInfo->dwOffset[0] = sizeof(CANDIDATEINFO);
-          lpCandList = lpCandInfo->GetList();
+        //
+        // Generate messages.
+        //
+        TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
-          lpstr = &szBuf[0];
-          while (*lpstr && (i < MAXCANDSTRNUM)) {
-            lpCandList->dwOffset[i] = lpCandInfo->GetCandOffset(i, lpCandList);
-            lstrcpy(lpCandList->GetCandString(i), lpstr);
-            lpstr += (lstrlen(lpstr) + 1);
-            i++;
-          }
+        lpIMC->UnlockCandInfo();
+        TheApp.UnlockIMC();
 
-          lpCandList->dwSize = sizeof(CANDIDATELIST);
-          lpCandList->dwSize +=
-            (MAXCANDSTRNUM * (sizeof(DWORD) + MAXCANDSTRSIZE));
-          lpCandList->dwStyle = IME_CAND_READ;
-          lpCandList->dwCount = i;
-          lpCandList->dwPageStart = 0;
-          if (i < MAXCANDPAGESIZE)
-            lpCandList->dwPageSize = i;
-          else
-            lpCandList->dwPageSize = MAXCANDPAGESIZE;
-
-          lpCandList->dwSelection++;
-          if (lpCandList->dwSelection == i) lpCandList->dwSelection = 0;
-
-          //
-          // Generate messages.
-          //
-          TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
-
-          lpIMC->UnlockCandInfo();
-          TheApp.UnlockIMC();
-
-          bRet = TRUE;
-        }
+        bRet = TRUE;
       }
       break;
 

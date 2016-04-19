@@ -10,8 +10,6 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 void PASCAL FlushText(HIMC hIMC) {
-  if (!IsCompStr(hIMC)) return;
-
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (NULL == lpIMC) return;
 
@@ -25,14 +23,15 @@ void PASCAL FlushText(HIMC hIMC) {
     TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
-  CompStr *lpCompStr = lpIMC->LockCompStr();
-  if (lpCompStr) {
-    // Flush composition strings.
-    lpCompStr->Clear(CLR_RESULT_AND_UNDET);
-    lpIMC->UnlockCompStr();
+  if (lpIMC->HasCompStr()) {
+    CompStr *lpCompStr = lpIMC->LockCompStr();
+    if (lpCompStr) {
+      lpCompStr->Clear(CLR_RESULT_AND_UNDET);
+      lpIMC->UnlockCompStr();
 
-    TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL|GCS_RESULTALL);
-    TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
+      TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
+      TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
+    }
   }
   TheApp.UnlockIMC();
 }
@@ -40,8 +39,6 @@ void PASCAL FlushText(HIMC hIMC) {
 void PASCAL RevertText(HIMC hIMC) {
   CompStr *lpCompStr;
   LPTSTR lpread, lpstr;
-
-  if (!IsCompStr(hIMC)) return;
 
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (!lpIMC) return;
@@ -56,36 +53,38 @@ void PASCAL RevertText(HIMC hIMC) {
     TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
-  lpCompStr = lpIMC->LockCompStr();
-  if (lpCompStr) {
-    lpstr = lpCompStr->GetCompStr();
-    lpread = lpCompStr->GetCompReadStr();
-    lHanToZen(lpstr, lpread, lpIMC->fdwConversion);
+  if (lpIMC->HasCompStr()) {
+    lpCompStr = lpIMC->LockCompStr();
+    if (lpCompStr) {
+      lpstr = lpCompStr->GetCompStr();
+      lpread = lpCompStr->GetCompReadStr();
+      lHanToZen(lpstr, lpread, lpIMC->fdwConversion);
 
-    // make attribute
-    lpCompStr->dwCursorPos = lstrlen(lpstr);
-    // DeltaStart is 0 at RevertText time.
-    lpCompStr->dwDeltaStart = 0;
+      // make attribute
+      lpCompStr->dwCursorPos = lstrlen(lpstr);
+      // DeltaStart is 0 at RevertText time.
+      lpCompStr->dwDeltaStart = 0;
 
-    memset(lpCompStr->GetCompAttr(), 0, lstrlen(lpstr));
-    memset(lpCompStr->GetCompReadAttr(), 0, lstrlen(lpread));
+      memset(lpCompStr->GetCompAttr(), 0, lstrlen(lpstr));
+      memset(lpCompStr->GetCompReadAttr(), 0, lstrlen(lpread));
 
-    SetClause(lpCompStr->GetCompClause(), lstrlen(lpstr));
-    SetClause(lpCompStr->GetCompReadClause(), lstrlen(lpread));
-    lpCompStr->dwCompClauseLen = 8;
-    lpCompStr->dwCompReadClauseLen = 8;
+      SetClause(lpCompStr->GetCompClause(), lstrlen(lpstr));
+      SetClause(lpCompStr->GetCompReadClause(), lstrlen(lpread));
+      lpCompStr->dwCompClauseLen = 8;
+      lpCompStr->dwCompReadClauseLen = 8;
 
-    // make length
-    lpCompStr->dwCompStrLen = lstrlen(lpstr);
-    lpCompStr->dwCompReadStrLen = lstrlen(lpread);
-    lpCompStr->dwCompAttrLen = lstrlen(lpstr);
-    lpCompStr->dwCompReadAttrLen = lstrlen(lpread);
+      // make length
+      lpCompStr->dwCompStrLen = lstrlen(lpstr);
+      lpCompStr->dwCompReadStrLen = lstrlen(lpread);
+      lpCompStr->dwCompAttrLen = lstrlen(lpstr);
+      lpCompStr->dwCompReadAttrLen = lstrlen(lpread);
 
-    // Generate messages.
-    LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-    TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+      // Generate messages.
+      LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
+      TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 
-    lpIMC->UnlockCompStr();
+      lpIMC->UnlockCompStr();
+    }
   }
   TheApp.UnlockIMC();
 }
@@ -98,13 +97,11 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     MakeGuideLine(hIMC, MYGL_NODICTIONARY);
   }
 
-  if (!IsCompStr(hIMC)) return FALSE;
-
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (NULL == lpIMC) return FALSE;
 
   CompStr *lpCompStr = lpIMC->LockCompStr();
-  if (NULL ==lpCompStr) {
+  if (NULL == lpCompStr) {
     TheApp.UnlockIMC();
     return bRc;
   }
@@ -264,8 +261,6 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
   BOOL fDone = FALSE;
   DWORD dwCurPos;
 
-  if (!IsCompStr(hIMC)) return;
-
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (NULL == lpIMC) return;
   CompStr *lpCompStr = lpIMC->LockCompStr();
@@ -355,8 +350,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   LPARAM lParam;
 
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
-
-  if (ImmGetIMCCSize(lpIMC->hCompStr) < sizeof(COMPOSITIONSTRING)) {
+  if (!lpIMC->HasCompStr()) {
     // Init time.
     lpIMC->hCompStr = CompStr::ReAlloc(lpIMC->hCompStr, NULL);
     lpCompStr = lpIMC->LockCompStr();
@@ -369,7 +363,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   if (!dwStrLen) {
     lpCompStr->Init(CLR_RESULT_AND_UNDET);
     TheApp.GenerateMessage(WM_IME_STARTCOMPOSITION);
-  } else if (IsConvertedCompStr(hIMC)) {
+  } else if (lpIMC->HasConvertedCompStr()) {
     MakeResultString(hIMC, FALSE);
     lpCompStr->Init(CLR_UNDET);
     dwGCR = GCS_RESULTALL;
@@ -554,8 +548,6 @@ ac_exit:
 }
 
 BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
-  if (!IsCompStr(hIMC)) return FALSE;
-
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   CompStr *lpCompStr = lpIMC->LockCompStr();
 

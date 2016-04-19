@@ -43,6 +43,17 @@ BOOL InputContext::HasCompStr() {
   return ret;
 }
 
+BOOL InputContext::HasConvertedCompStr() {
+  if (ImmGetIMCCSize(hCompStr) <= sizeof(COMPOSITIONSTRING)) return FALSE;
+
+  CompStr *pCompStr = LockCompStr();
+  BOOL ret = (pCompStr->dwCompStrLen > 0) &&
+             (lpCompStr->GetCompAttr()[0] != ATTR_INPUT);
+  UnlockCompStr();
+
+  return ret;
+}
+
 CandInfo *InputContext::LockCandInfo() {
   return (CandInfo *)ImmLockIMCC(hCandInfo);
 }
