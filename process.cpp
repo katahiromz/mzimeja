@@ -132,14 +132,13 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   BOOL ret = FALSE;
   DebugPrint(TEXT("ImeProcessKey"));
 
+  // if key is up, don't process the key
   if (lKeyData & 0x80000000) return FALSE;
 
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (lpIMC == NULL) return FALSE;
 
   BOOL fOpen = lpIMC->IsOpen();
-  BOOL fCompStr = FALSE;
-  BOOL fCandInfo = FALSE;
   BOOL fAlt = (lpbKeyState[VK_MENU] & 0x80);
   BOOL fCtrl = (lpbKeyState[VK_CONTROL] & 0x80);
   BOOL fShift = (lpbKeyState[VK_SHIFT] & 0x80);
@@ -149,14 +148,15 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   case VK_OEM_AUTO:
   case VK_OEM_ENLW:
     if (!fShift && !fCtrl) {
+      // switch zenkaku/hankaku input mode
       ret = TRUE;
     }
     break;
   }
 
   if (fOpen) {
-    fCompStr = lpIMC->HasCompStr();
-    fCandInfo = lpIMC->HasCandInfo();
+    BOOL fCompStr = lpIMC->HasCompStr();
+    BOOL fCandInfo = lpIMC->HasCandInfo();
     if (fAlt) {
       // Alt key is down
     } else if (fCtrl) {
@@ -165,6 +165,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
         switch (vKey) {
         case VK_UP: case VK_DOWN:
         case VK_LEFT: case VK_RIGHT:
+          // widely move
           ret = TRUE;
           break;
         }
@@ -173,6 +174,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
       // Shift key is down
       switch (vKey) {
       case VK_LEFT: case VK_RIGHT:
+        // fix clauses
         ret = TRUE;
         break;
       }
@@ -181,43 +183,58 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
       ret = FALSE;
       if (fCompStr) {
         switch (vKey) {
-        case VK_F6: case VK_F7: case VK_F8: case VK_F9: case VK_F10:
-        case VK_HOME: case VK_END: case VK_ESCAPE:
+        case VK_F6:     // make composition zenkaku Hiragana
+        case VK_F7:     // make composition zenkaku Katakana
+        case VK_F8:     // make composition hankaku Katakana
+        case VK_F9:     // make composition zenkaku alphanumeric
+        case VK_F10:    // make composition hankaku alphanumeric
+        case VK_ESCAPE: // close composition
           ret = TRUE;
           break;
-        case VK_OEM_PLUS: case VK_OEM_MINUS: case VK_OEM_PERIOD:
-        case VK_OEM_COMMA:
-        case VK_OEM_1: case VK_OEM_2: case VK_OEM_3: case VK_OEM_4:
-        case VK_OEM_5: case VK_OEM_6: case VK_OEM_7: case VK_OEM_8:
-        case VK_OEM_102: case VK_OEM_COPY:
+        }
+      }
+      switch (vKey) {
+      case VK_OEM_PLUS: case VK_OEM_MINUS: case VK_OEM_PERIOD:
+      case VK_OEM_COMMA:
+      case VK_OEM_1: case VK_OEM_2: case VK_OEM_3: case VK_OEM_4:
+      case VK_OEM_5: case VK_OEM_6: case VK_OEM_7: case VK_OEM_8:
+      case VK_OEM_9: case VK_OEM_102: case VK_OEM_COPY:
+        // OEM keys
+        ret = TRUE;
+        break;
+      case VK_ADD: case VK_SUBTRACT:
+      case VK_MULTIPLY: case VK_DIVIDE:
+      case VK_SEPARATOR: case VK_DECIMAL:
+        // numpad keys
+        ret = TRUE;
+        break;
+      case VK_HOME: case VK_END:
+      case VK_UP: case VK_DOWN: case VK_LEFT: case VK_RIGHT:
+        // arrow and moving key
+        ret = TRUE;
+        break;
+      case VK_SPACE: case VK_BACK: case VK_DELETE: case VK_RETURN:
+      case VK_CAPITAL: case VK_CONVERT: case VK_NONCONVERT:
+        // special keys
+        ret = TRUE;
+        break;
+      default:
+        if ('0' <= vKey && vKey <= '9') {
+          // numbers
           ret = TRUE;
-          break;
-        case VK_ADD: case VK_SUBTRACT:
-        case VK_MULTIPLY: case VK_DIVIDE:
-        case VK_SEPARATOR: case VK_DECIMAL:
+        } else if ('A' <= vKey && vKey <= 'Z') {
+          // alphabets
           ret = TRUE;
-          break;
-        case VK_UP: case VK_DOWN: case VK_LEFT: case VK_RIGHT:
+        } else if (VK_NUMPAD0 <= vKey && vKey <= VK_NUMPAD9) {
+          // numpad numbers
           ret = TRUE;
-          break;
-        case VK_SPACE: case VK_BACK: case VK_DELETE: case VK_RETURN:
-        case VK_CAPITAL: case VK_CONVERT: case VK_NONCONVERT:
-          ret = TRUE;
-          break;
-        default:
-          if ('0' <= vKey && vKey <= '9') {
-            ret = TRUE;
-          } else if ('A' <= vKey && vKey <= 'Z') {
-            ret = TRUE;
-          } else if (VK_NUMPAD0 <= vKey && vKey <= VK_NUMPAD9) {
-            ret = TRUE;
-          } else {
-            if (fCandInfo) {
-              switch (vKey) {
-              case VK_PRIOR: case VK_NEXT:
-                ret = TRUE;
-                break;
-              }
+        } else {
+          if (fCandInfo) {
+            switch (vKey) {
+            case VK_PRIOR: case VK_NEXT:
+              // next or previous page of candidates
+              ret = TRUE;
+              break;
             }
           }
         }
