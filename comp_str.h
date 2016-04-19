@@ -15,6 +15,7 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
+// logical composition string
 
 struct LogCompStr {
   DWORD               dwCursorPos;
@@ -50,7 +51,7 @@ struct CompStr : public COMPOSITIONSTRING {
   BOOL CheckAttr();
   void MakeAttrClause();
 
-  void GetLog(LogCompStr& log);
+  void GetLogCompStr(LogCompStr& log);
 
   LPBYTE GetBytes() { return (LPBYTE)this; }
 

@@ -627,31 +627,6 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   return TRUE;
 }
 
-void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow) {
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
-  if (lpIMC) {
-    CompStr *lpCompStr = lpIMC->LockCompStr();
-    if (lpCompStr) {
-      if (!lpCompStr->CheckAttr()) {
-        LPTSTR lpstart = lpCompStr->GetCompStr();
-        LPTSTR lpstr = lpstart + lpCompStr->dwCursorPos;
-        LPTSTR lpend = lpstart + lstrlen(lpstart);
-
-        if (fArrow == ARR_RIGHT) {
-          if (lpstr < lpend) lpstr = CharNext(lpstr);
-        } else {
-          if (lpstr > lpstart) lpstr = CharPrev(lpstart, lpstr);
-        }
-
-        lpCompStr->dwCursorPos = (DWORD)(lpstr - lpstart);
-        lpCompStr->MakeAttrClause();
-      }
-      lpIMC->UnlockCompStr();
-    }
-    TheApp.UnlockIMC();
-  }
-}
-
 int CopyCandidateStringsFromDictionary(LPTSTR lpDic, LPTSTR lpRead,
                                        LPTSTR lpBuf, DWORD dwBufLen) {
   DWORD dwWritten = 0;

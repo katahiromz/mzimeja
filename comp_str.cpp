@@ -5,22 +5,22 @@
 
 DWORD LogCompStr::GetTotalSize() const {
   size_t total = sizeof(COMPOSITIONSTRING);
-  total += comp_read_attr.size();
-  total += comp_read_clause.size();
+  total += comp_read_attr.size() * sizeof(BYTE);
+  total += comp_read_clause.size() * sizeof(DWORD);
   total += comp_read_str.size() * sizeof(WCHAR);
-  total += comp_attr.size();
-  total += comp_clause.size();
+  total += comp_attr.size() * sizeof(BYTE);
+  total += comp_clause.size() * sizeof(DWORD);
   total += comp_str.size() * sizeof(WCHAR);
-  total += result_read_clause.size();
+  total += result_read_clause.size() * sizeof(DWORD);
   total += result_read_str.size() * sizeof(WCHAR);
-  total += result_clause.size();
+  total += result_clause.size() * sizeof(DWORD);
   total += result_str.size() * sizeof(WCHAR);
   return total;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void CompStr::GetLog(LogCompStr& log) {
+void CompStr::GetLogCompStr(LogCompStr& log) {
   log.dwCursorPos = dwCursorPos;
   log.dwDeltaStart = dwDeltaStart;
   log.comp_read_attr.assign(GetCompReadAttr(), GetCompReadAttr() + dwCompReadAttrLen);
@@ -117,7 +117,7 @@ BOOL CompStr::CheckAttr() {
   LPBYTE lpb = GetCompAttr();
   int len = dwCompAttrLen;
   for (int i = 0; i < len; i++)
-    if (*lpb++ & 0x01) return TRUE;
+    if (*lpb++ & ATTR_TARGET_CONVERTED) return TRUE;
   return FALSE;
 }
 
@@ -132,7 +132,7 @@ void CompStr::MakeAttrClause() {
     if (i < pos)
       *lpb++ = 0x10;
     else
-      *lpb++ = 0x00;
+      *lpb++ = ATTR_INPUT;
   }
 
   lpb = GetCompReadAttr();
@@ -140,7 +140,7 @@ void CompStr::MakeAttrClause() {
     if (i < pos)
       *lpb++ = 0x10;
     else
-      *lpb++ = 0x00;
+      *lpb++ = ATTR_INPUT;
   }
 
   LPDWORD lpdw = GetCompClause();

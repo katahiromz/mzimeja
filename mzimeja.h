@@ -122,10 +122,6 @@
 #define STCLBT_DX 12
 #define STCLBT_DY 12
 
-// define Shift Arrow right-left
-#define ARR_RIGHT 1
-#define ARR_LEFT 2
-
 // Clear Structure Flag
 #define CLR_RESULT 1
 #define CLR_UNDET 2
@@ -285,7 +281,6 @@ void PASCAL AddChar(HIMC, WORD);
 BOOL PASCAL ConvKanji(HIMC);
 BOOL WINAPI MakeResultString(HIMC, BOOL);
 BOOL PASCAL MakeGuideLine(HIMC, DWORD);
-void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow);
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
                                       DWORD dwBufLen, LPTSTR szDicFileName);
 
