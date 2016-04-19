@@ -110,14 +110,23 @@ ImeToAsciiEx関数においてメッセージを生成する場合は、引数lp
     VK_DELETE   現在位置のコンポジション文字を削除する。
     VK_BACK     一つ前のコンポジション文字を削除する。
     VK_SPACE    変換する。
-    VK_F6       ひらがなへ変換する。
-    VK_F7       カタカナへ変換する。
-    VK_F8       半角カナへ変換する。
-    VK_F9       全角英数へ変換する。
-    VK_F10      半角英数へ変換する。
+    VK_TAB      候補リストを表示する。
+    VK_F6       コンポジション文字列をひらがなへ変換する。
+    VK_F7       コンポジション文字列をカタカナへ変換する。
+    VK_F8       コンポジション文字列を半角カナへ変換する。
+    VK_F9       コンポジション文字列を全角英数へ変換する。
+    VK_F10      コンポジション文字列を半角英数へ変換する。
     VK_RETURN   確定する。
     VK_KANA     全角モードへ切り替える。
     VK_KANJI    全角／半角を切り替える。
+    VK_LEFT     左へ。
+    VK_RIGHT    右へ。
+    VK_UP       上へ。
+    VK_DOWN     下へ。
+    VK_HOME     先頭へ。
+    VK_END      終端へ。
+    VK_PRIOR    前の候補リストへ。
+    VK_NEXT     前の候補リストへ。
     その他      文字をコンポジション文字列に追加する。
 
 =ImeProcessKey関数の動作仕様
@@ -130,12 +139,42 @@ ImeProcessKey関数は、IMEによって扱うキーを振り分ける。
 戻り値がTRUEであれば、vKeyは、IMEによって扱うキーである。
 
 キーの振り分けは、「オープン状態」、コンポジション文字列の有無、
-Altキー、Ctrlキー、Shiftキーが押されているかによって異なる。
+候補リストの有無、Altキー、Ctrlキー、Shiftキーが押されているかによって異なる。
 Altキーが押されているかどうかは、(lpbKeyState[VK_MENU] & 0x80)によって確認できる。
 Ctrlキーが押されているかどうかは、(lpbKeyState[VK_CONTROL] & 0x80)によって確認できる。
 Shiftキーが押されているかどうかは、(lpbKeyState[VK_SHIFT] & 0x80)によって確認できる。
 
-Altが押されているときは、VK_KANJIを扱う。
+オープン状態がFALSEであれば、VK_KANJIとAtl+VK_KANJIのみを扱う。
+オープン状態がTRUEであれば、
+    * Altが押されている場合は、VK_KANJIを扱う。
+    * Altが押されていない場合は、
+        * ShiftもCtrlも押されていない場合は、
+            VK_KANJI、
+            VK_OEM_PLUS、VK_OEM_MINUS、VK_OEM_PERIOD、VK_OEM_COMMA、
+            VK_OEM_1～VK_OEM_8、VK_OEM_102、
+            '0'～'9'、'A'～'Z'、
+            VK_NUMPAD0 ～ VK_NUMPAD9、
+            VK_ADD、VK_SUBTRACT、VK_MULTIPLY、VK_DIVIDE、VK_SEPARATOR、VK_DECIMAL、
+            VK_LEFT、VK_UP、VK_RIGHT、VK_DOWN、
+            VK_SPACE、VK_BACK、VK_DELETE、VK_RETURN、
+            VK_CAPITAL、VK_CONVERT、VK_NONCONVERT、
+            VK_OEM_COPY（カタカナ・ひらがな・ローマ字）、
+            VK_OEM_AUTO（半角／全角・漢字）、
+            VK_OEM_ENLW（半角／全角・漢字）
+            を扱う。
+       * Ctrlが押されている場合は、
+         * 候補リストがある場合は、
+            '1'～'8'を扱う。
+         * コンポジション文字列も候補リストもない場合は、
+            何も扱わない。
+       * Ctrlが押されていない場合は、
+         * Shiftが押されている場合は、
+               VK_BACK、VK_TAB、VK_RETURN、
+               VK_SPACE、VK_END、VK_HOME
+           * VK_PRIOR、VK_NEXT、
+
+ただし、コンポジション文字列がある場合は、
+VK_F6～VK_F10、VK_HOME、VK_END、VK_ESCAPEも扱う。
 
 =状態ウィンドウの動作仕様
 
