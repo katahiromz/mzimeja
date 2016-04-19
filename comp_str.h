@@ -43,12 +43,13 @@ inline void SetClause(LPDWORD lpdw, DWORD num) {
 //////////////////////////////////////////////////////////////////////////////
 
 struct CompStr : public COMPOSITIONSTRING {
+  static HIMCC ReAlloc(HIMCC hCompStr, const LogCompStr *log);
+
   void Clear(DWORD dwClrFlag);
   BOOL CheckAttr();
   void MakeAttrClause();
 
   void GetLog(LogCompStr& log);
-  static HIMCC ReAlloc(HIMCC hCompStr, const LogCompStr *log);
 
   char *GetBytes() { return (char *)this; }
 
