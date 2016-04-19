@@ -91,12 +91,6 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   return TRUE;
 }
 
-// A function which handles WM_IME_KEYUP
-BOOL PASCAL IMEKeyupHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
-                            LPBYTE lpbKeyState) {
-  return FALSE;
-}
-
 //  ImeProcessKey ()
 //  ImeProcessKey 関数は IMM を通して与えられた全てのキーストロークを前処
 //  理して、もしそのキーが与えられた Input Context で IME に必要なもので
@@ -303,9 +297,7 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
   TheApp.UnlockIMC();
 
   if (fOpen) {
-    if (uScanCode & 0x8000)
-      IMEKeyupHandler(hIMC, uVKey, lParam, lpbKeyState);
-    else
+    if ((uScanCode & 0x8000) == 0)
       IMEKeydownHandler(hIMC, uVKey, lParam, lpbKeyState);
 
     // Clear static value, no more generated message!
