@@ -213,9 +213,6 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode);
 void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode);
 HFONT CheckNativeCharset(HDC hDC);
 
-// toascii.c
-BOOL PASCAL GenerateOverFlowMessage(LPTRANSMSGLIST lpTransKey);
-
 // notify.c
 BOOL PASCAL NotifyUCSetOpen(HIMC hIMC);
 BOOL PASCAL NotifyUCConversionMode(HIMC hIMC);

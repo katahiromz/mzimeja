@@ -26,7 +26,6 @@ SOURCES= \
         process.cpp \
         regword.cpp \
         subs.cpp \
-        toascii.cpp \
         ui.cpp \
         uicand.cpp \
         uicomp.cpp \

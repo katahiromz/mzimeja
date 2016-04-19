@@ -225,10 +225,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\toascii.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ui.cpp"
 				>
 			</File>
