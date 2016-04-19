@@ -30,7 +30,6 @@ OBJS = \
 	mzimeja$(DOTOBJ) \
 	imm$(DOTOBJ) \
 	immsec$(DOTOBJ) \
-	input$(DOTOBJ) \
 	process$(DOTOBJ) \
 	regword$(DOTOBJ) \
 	subs$(DOTOBJ) \
@@ -84,8 +83,6 @@ imm$(DOTOBJ): imm.cpp
 	$(CXX) -c $(CXXFLAGS) -o imm$(DOTOBJ) imm.cpp
 immsec$(DOTOBJ): immsec.cpp
 	$(CXX) -c $(CXXFLAGS) -o immsec$(DOTOBJ) immsec.cpp
-input$(DOTOBJ): input.cpp
-	$(CXX) -c $(CXXFLAGS) -o input$(DOTOBJ) input.cpp
 process$(DOTOBJ): process.cpp
 	$(CXX) -c $(CXXFLAGS) -o process$(DOTOBJ) process.cpp
 regword$(DOTOBJ): regword.cpp

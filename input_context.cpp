@@ -8,12 +8,12 @@
 void InputContext::Initialize() {
   if (!HasLogFont()) {
     lfFont.W.lfCharSet = SHIFTJIS_CHARSET;
-    SetsLogFont();
+    fdwInit |= INIT_LOGFONT;
   }
 
   if (!HasConversion()) {
     fdwConversion = IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_NATIVE;
-    SetsConversion();
+    fdwInit |= INIT_CONVERSION;
   }
 
   hCompStr = CompStr::ReAlloc(hCompStr, NULL);

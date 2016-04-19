@@ -23,7 +23,6 @@ SOURCES= \
         mzimeja.cpp \
         imm.cpp \
         immsec.cpp \
-        input.cpp \
         process.cpp \
         regword.cpp \
         subs.cpp \

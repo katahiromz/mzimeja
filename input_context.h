@@ -11,13 +11,20 @@
 
 struct InputContext : public INPUTCONTEXT {
   void Initialize();
-  BOOL HasCandInfo();
-  BOOL HasCompStr();
-  BOOL HasConvertedCompStr();
 
+        BOOL& IsOpen()       { return fOpen; }
+  const BOOL& IsOpen() const { return fOpen; }
+        DWORD& Conversion()       { return fdwConversion; }
+  const DWORD& Conversion() const { return fdwConversion; }
+        DWORD& Sentence()       { return fdwSentence; }
+  const DWORD& Sentence() const { return fdwSentence; }
+
+  BOOL HasCandInfo();
   CandInfo *LockCandInfo();
   void UnlockCandInfo();
 
+  BOOL HasCompStr();
+  BOOL HasConvertedCompStr();
   CompStr *LockCompStr();
   void UnlockCompStr();
 
@@ -30,19 +37,12 @@ struct InputContext : public INPUTCONTEXT {
   LPGUIDELINE LockGuideLine();
   void UnlockGuideLine();
 
-  BOOL HasStatusWndPos() const { return (fdwInit & INIT_STATUSWNDPOS); }
-  BOOL HasConversion() const { return (fdwInit & INIT_CONVERSION); }
-  BOOL HasSentence() const { return (fdwInit & INIT_SENTENCE); }
-  BOOL HasLogFont() const { return (fdwInit & INIT_LOGFONT); }
-  BOOL HasCompForm() const { return (fdwInit & INIT_COMPFORM); }
-  BOOL HasSoftKbdPos() const { return (fdwInit & INIT_SOFTKBDPOS); }
-
-  void SetsStatusWndPos() { fdwInit |= INIT_STATUSWNDPOS; }
-  void SetsConversion() { fdwInit |= INIT_CONVERSION; }
-  void SetsSentence() { fdwInit |= INIT_SENTENCE; }
-  void SetsLogFont() { fdwInit |= INIT_LOGFONT; }
-  void SetsCompForm() { fdwInit |= INIT_COMPFORM; }
-  void SetsSoftKbdPos() { fdwInit |= INIT_SOFTKBDPOS; }
+  BOOL HasStatusWndPos() const  { return (fdwInit & INIT_STATUSWNDPOS); }
+  BOOL HasConversion() const    { return (fdwInit & INIT_CONVERSION); }
+  BOOL HasSentence() const      { return (fdwInit & INIT_SENTENCE); }
+  BOOL HasLogFont() const       { return (fdwInit & INIT_LOGFONT); }
+  BOOL HasCompForm() const      { return (fdwInit & INIT_COMPFORM); }
+  BOOL HasSoftKbdPos() const    { return (fdwInit & INIT_SOFTKBDPOS); }
 
 private:
   InputContext();

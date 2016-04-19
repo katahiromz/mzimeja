@@ -1,145 +1,336 @@
 // process.cpp
 //////////////////////////////////////////////////////////////////////////////
 
-/**********************************************************************/
-/* These tables are for ImeProcessKey(). And IMEProcessKey function   */
-/* refer this table and deside the VKey is needed for MZ-IME or not. */
-/*                                                                    */
-/**********************************************************************/
-#include <windows.h>
+// imm.cpp
+//////////////////////////////////////////////////////////////////////////////
 
-BYTE bNoComp[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 10-1F
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 20-2F
-                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,   // 30-3F
-                  0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,   // 40-4F
-                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,   // 50-5F
-                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,   // 60-6F
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 70-7F
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 80-8F
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 90-9F
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // A0-AF
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // B0-BF
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // C0-CF
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // D0-DF
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // E0-EF
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // F0-FF
+#include "mzimeja.h"
 
-BYTE bNoCompCtl[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 10-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 20-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 30-0F
-                     0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,   // 40-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 50-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 60-0F
-                     0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,   // 70-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 80-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 90-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // A0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // B0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // C0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // D0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // E0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // F0-0F
+extern "C" {
 
-BYTE bNoCompSht[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 10-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 20-0F
-                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,   // 30-0F
-                     0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,   // 40-0F
-                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,   // 50-0F
-                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,   // 60-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 70-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 80-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 90-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // A0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // B0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // C0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // D0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // E0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // F0-0F
+BOOL PASCAL DicKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
+                              LPBYTE lpbKeyState) {
+  InputContext *lpIMC;
 
-BYTE bNoCompAlt[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 10-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 20-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 30-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 40-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 50-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 60-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 70-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 80-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 90-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // A0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // B0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // C0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // D0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // E0-0F
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // F0-0F
+  switch (wParam) {
+    case VK_ESCAPE:
+      FlushText(hIMC);
+      break;
 
-BYTE bComp[] = {0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0,   // 00-0F
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,   // 10-0F
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,   // 20-0F
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,   // 30-0F
-                0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,   // 40-0F
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,   // 50-0F
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,   // 60-0F
-                0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,   // 70-0F
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 80-0F
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 90-0F
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // A0-0F
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // B0-0F
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // C0-0F
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // D0-0F
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // E0-0F
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // F0-0F
+    case VK_DELETE:
+    case VK_BACK:
+      DeleteChar(hIMC, wParam);
+      break;
 
-BYTE bCompCtl[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 10-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 20-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 30-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 40-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 50-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 60-0F
-                   0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,   // 70-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 80-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 90-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // A0-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // B0-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // C0-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // D0-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // E0-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // F0-0F
+    case VK_SPACE:
+      ConvKanji(hIMC);
+      break;
 
-BYTE bCompSht[] = {0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,   // 10-0F
-                   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,   // 20-0F
-                   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,   // 30-0F
-                   0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,   // 40-0F
-                   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,   // 50-0F
-                   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,   // 60-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 70-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 80-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 90-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // A0-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // B0-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // C0-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // D0-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // E0-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // F0-0F
+    case VK_F3:
+      if (IsCTLPushed(lpbKeyState)) ChangeMode(hIMC, TO_CMODE_ROMAN);
+      break;
 
-BYTE bCompAlt[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 00-0F
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // 00-0F
+    case VK_F6:
+      if (IsCTLPushed(lpbKeyState))
+        ChangeMode(hIMC, TO_CMODE_HIRAGANA);
+      else
+        ChangeCompStr(hIMC, TO_CMODE_HIRAGANA);
+      break;
+
+    case VK_F7:
+      if (IsCTLPushed(lpbKeyState))
+        ChangeMode(hIMC, TO_CMODE_KATAKANA);
+      else
+        ChangeCompStr(hIMC, TO_CMODE_KATAKANA);
+      break;
+
+    case VK_F8:
+      if (IsCTLPushed(lpbKeyState))
+        ChangeMode(hIMC, TO_CMODE_FULLSHAPE);
+      else
+        ChangeCompStr(hIMC, TO_CMODE_FULLSHAPE);
+      break;
+
+    case VK_F9:
+      if (IsCTLPushed(lpbKeyState))
+        ChangeMode(hIMC, TO_CMODE_ALPHANUMERIC);
+      else
+        ChangeCompStr(hIMC, TO_CMODE_ALPHANUMERIC);
+      break;
+
+    case VK_RETURN:
+      lpIMC = TheApp.LockIMC(hIMC);
+      if (lpIMC) {
+        if (!(lpIMC->Conversion() & IME_CMODE_CHARCODE))
+          MakeResultString(hIMC, TRUE);
+        else
+          FlushText(hIMC);
+
+        TheApp.UnlockIMC();
+      }
+      break;
+
+    case VK_G:
+      //if (IsCTLPushed(lpbKeyState)) {
+      //  MakeGuideLine(hIMC, MYGL_TESTGUIDELINE);
+      //  return (TRUE);
+      //}
+      break;
+
+    default:
+      break;
+  }
+
+  if ((VK_0 <= wParam && VK_9 >= wParam) ||
+      (VK_A <= wParam && VK_Z >= wParam) ||
+      (VK_NUMPAD0 <= wParam && VK_NUMPAD9 >= wParam) ||
+      (VK_OEM_1 <= wParam && VK_OEM_9 >= wParam) ||
+      (VK_MULTIPLY <= wParam && VK_DIVIDE >= wParam)) {
+    return FALSE;
+  } else {
+    return TRUE;
+  }
+}
+
+// A function which handles WM_IME_KEYDOWN
+BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
+                              LPBYTE lpbKeyState) {
+  WORD wVKey = (wParam & 0x00FF);
+  switch (wVKey) {
+    case VK_SHIFT:
+    case VK_CONTROL:
+      break;
+
+    default:
+      if (!DicKeydownHandler(hIMC, wVKey, lParam, lpbKeyState)) {
+        // This WM_IME_KEYDOWN has actual character code in itself.
+        AddChar(hIMC, HIWORD(wParam));
+        // CharHandler( hIMC,  (WORD)((BYTE)HIBYTE(wParam)), lParam );
+      }
+      break;
+  }
+  return TRUE;
+}
+
+// A function which handles WM_IME_KEYUP
+BOOL PASCAL IMEKeyupHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
+                            LPBYTE lpbKeyState) {
+  return FALSE;
+}
+
+//  ImeProcessKey ()
+//  ImeProcessKey 関数は IMM を通して与えられた全てのキーストロークを前処
+//  理して、もしそのキーが与えられた Input Context で IME に必要なもので
+//  あれば TRUE を返す。
+//  BOOL
+//    ImeProcessKey(
+//    HIMC hIMC,
+//    UINT uVirKey,
+//    DWORD lParam,
+//    CONST LPBYTE lpbKeyState
+//  )
+//  Parameters
+//    hIMC
+//      Input context handle
+//    uVirKey
+//      処理されるべき仮想キー。
+//    lParam
+//      キーメッセージの lParam。(WM_KEYDOWN,WM_KEYUP の LPARAM)
+//    lpbKeyState
+//      現在のキーボードの状態を含んだ256バイトの配列を指すポインタ。
+//      IME はこの内容を変更すべきではない。
+//  Return Values
+//    成功なら TRUE。そうでなければ FALSE。
+//  Comments
+//    システムはキーが IME によって取り扱われるべきか否かをこの関数を
+//    呼び出すことによって決定している。アプリケーションがキーメッセー
+//    ジを受け取る前にこの関数が TRUE を返せば、IME はそのキーを処理す
+//    る。システムは ImeToAsciiEx 関数を呼び出す。
+//    FALSE を返したならば、システムはそのキーが IME によって処理され
+//    ないことが分かるのでキーメッセージはアプリケーションに送られる。
+BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
+                          CONST LPBYTE lpbKeyState) {
+  BOOL ret = FALSE;
+  DebugPrint(TEXT("ImeProcessKey"));
+
+  if (lKeyData & 0x80000000) return FALSE;
+
+  InputContext *lpIMC = TheApp.LockIMC(hIMC);
+  if (lpIMC == NULL) return FALSE;
+
+  BOOL fOpen = lpIMC->IsOpen();
+  BOOL fCompStr = FALSE;
+  BOOL fCandInfo = FALSE;
+  BOOL fAlt = (lpbKeyState[VK_MENU] & 0x80);
+  BOOL fCtrl = (lpbKeyState[VK_CONTROL] & 0x80);
+  BOOL fShift = (lpbKeyState[VK_SHIFT] & 0x80)
+
+  switch (vKey) {
+  case VK_KANJI:
+  case VK_OEM_AUTO:
+  case VK_OEM_ENLW:
+    if (!fShift && !fCtrl) {
+      ret = TRUE;
+    }
+    break;
+  }
+
+  if (fOpen) {
+    fCompStr = lpIMC->HasCompStr();
+    fCandInfo = lpIMC->HasCandInfo();
+    if (fAlt) {
+      // Alt key is down
+    } else if (fCtrl) {
+      // Ctrl key is down
+      if (fCompStr) {
+        switch (vKey) {
+        case VK_UP: case VK_DOWN:
+        case VK_LEFT: case VK_RIGHT:
+          ret = TRUE;
+          break;
+        }
+      }
+    } else if (fShift) {
+      // Shift key is down
+      switch (vKey) {
+      case VK_LEFT: case VK_RIGHT:
+        ret = TRUE;
+        break;
+      }
+    } else {
+      // Neither Ctrl nor Shift key is down
+      ret = FALSE;
+      if (fCompStr) {
+        switch (vKey) {
+        case VK_F6: case VK_F7: case VK_F8: case VK_F9: case VK_F10:
+        case VK_HOME: case VK_END: case VK_ESCAPE:
+          ret = TRUE;
+          break;
+        case VK_OEM_PLUS: case VK_OEM_MINUS: case VK_OEM_PERIOD:
+        case VK_OEM_COMMA:
+        case VK_OEM_1: case VK_OEM_2: case VK_OEM_3: case VK_OEM_4:
+        case VK_OEM_5: case VK_OEM_6: case VK_OEM_7: case VK_OEM_8:
+        case VK_OEM_102: case VK_OEM_COPY
+          ret = TRUE;
+          break;
+        case VK_ADD: case VK_SUBTRACT:
+        case VK_MULTIPLY: case VK_DIVIDE:
+        case VK_SEPARATOR: case VK_DECIMAL:
+          ret = TRUE;
+          break;
+        case VK_UP: case VK_DOWN: case VK_LEFT: case VK_RIGHT:
+          ret = TRUE;
+          break;
+        case VK_SPACE: case VK_BACK: case VK_DELETE: case VK_RETURN:
+        case VK_CAPITAL: case VK_CONVERT: case VK_NONCONVERT:
+          ret = TRUE;
+          break;
+        default:
+          if ('0' <= vKey && vKey <= '9') {
+            ret = TRUE;
+          } else if ('A' <= vKey && vKey <= 'Z') {
+            ret = TRUE;
+          } else if (VK_NUMPAD0 <= vKey && vKey <= VK_NUMPAD9) {
+            ret = TRUE;
+          } else {
+            if (fCandInfo) {
+              switch (vKey) {
+              case VK_PRIOR: case VK_NEXT:
+                ret = TRUE;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  TheApp.UnlockIMC();
+  return ret;
+}
+
+//  ImeToAsciiEx 
+//  ImeToAsciiEx 関数は hIMC パラメータに従って IME 変換エンジンを通して変
+//  換結果を生成します。
+//  UINT
+//    ImeToAsciiEx(
+//    UINT uVirKey,
+//    UINT uScanCode,
+//    CONST LPBYTE lpbKeyState,
+//    LPDWORD lpdwTransBuf,
+//    UINT fuState,
+//    HIMC hIMC
+//  )
+//  (パラメータ)
+//  uVirKey
+//    変換される仮想キーコードを指定します。プロパティの 
+//    IME_PROP_KBD_CHAR_FIRST ビットがオンだったら、仮想キーの上位バイト
+//    は補助キャラクタコード(?)になります。
+//    Unicode については、IME_PROP_KBD_CHAR_FIRST ビットがオンだったら 
+//    uVirKey の上位ワードが Unicode 文字を含みます。
+//  uScanCode
+//    変換されるキーのハードウェアスキャンコードを指定します。
+//  lpbKeyState
+//    現在のキーボードの状態を含んだ256バイトの配列へのポインタです。
+//    IME はこの内容を変更してはいけません。
+//  lpdwTransBuf
+//    変換結果を受け取る DWORD のバッファを指すポインタです。その書式は、
+//    [メッセージバッファの長さ][メッセージ1][wParam1][lParam1]
+//    [メッセージ2][wParam2][lParam2][...[...[...]]] のようになります。
+//  fuState
+//    Active menu flag. ？
+//  hIMC
+//    Input context handle.
+//  (返り値)
+//    返り値はメッセージの数を表します。もしその数がバッファサイズより
+//    大きければメッセージバッファは十分ではないです…って当然では…(^^;;
+//    システムは hMsgBuf をチェックしてメッセージを得ます。
+//  (See Also)
+//    ImmToAsciiEx
+UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
+                         LPTRANSMSGLIST lpTransBuf, UINT fuState, HIMC hIMC) {
+  DebugPrint(TEXT("ImeToAsciiEx"));
+
+  TheApp.m_lpCurTransKey = lpTransBuf;
+  LPARAM lParam = ((DWORD)uScanCode << 16) + 1L;
+
+  // Init TheApp.m_uNumTransKey here.
+  TheApp.m_uNumTransKey = 0;
+
+  // if hIMC is NULL, this means DISABLE IME.
+  if (!hIMC) return 0;
+
+  InputContext *lpIMC = TheApp.LockIMC(hIMC);
+  if (NULL == lpIMC) return 0;
+  BOOL fOpen = lpIMC->IsOpen();
+  TheApp.UnlockIMC();
+
+  if (fOpen) {
+    if (uScanCode & 0x8000)
+      IMEKeyupHandler(hIMC, uVKey, lParam, lpbKeyState);
+    else
+      IMEKeydownHandler(hIMC, uVKey, lParam, lpbKeyState);
+
+    // Clear static value, no more generated message!
+    TheApp.m_lpCurTransKey = NULL;
+  }
+
+  // If trans key buffer that is allocated by USER.EXE full up,
+  // the return value is the negative number.
+  if (TheApp.m_fOverTransKey) {
+    DebugPrint(TEXT("***************************************"));
+    DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *"));
+    DebugPrint(TEXT("*                by MZIMEJA.DLL       *"));
+    DebugPrint(TEXT("***************************************"));
+    return (int)TheApp.m_uNumTransKey;
+  }
+
+  return (int)TheApp.m_uNumTransKey;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+}  // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////

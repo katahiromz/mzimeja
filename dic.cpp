@@ -58,7 +58,7 @@ void PASCAL RevertText(HIMC hIMC) {
     if (lpCompStr) {
       lpstr = lpCompStr->GetCompStr();
       lpread = lpCompStr->GetCompReadStr();
-      lHanToZen(lpstr, lpread, lpIMC->fdwConversion);
+      lHanToZen(lpstr, lpread, lpIMC->Conversion());
 
       // make attribute
       lpCompStr->dwCursorPos = lstrlen(lpstr);
@@ -370,7 +370,7 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   }
 
   // Get ConvMode from IMC.
-  fdwConversion = lpIMC->fdwConversion;
+  fdwConversion = lpIMC->Conversion();
 
   lpchText = lpCompStr->GetCompStr();
   lpstr = lpchText;

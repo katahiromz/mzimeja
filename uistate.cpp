@@ -158,7 +158,7 @@ void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
 
     // Paint HDR.
     x = BTEMPT;
-    if (lpIMC->fOpen) x = 0;
+    if (lpIMC->IsOpen()) x = 0;
 
     if (!(dwPushedStatus & PUSHED_STATUS_HDR))
       BitBlt(hDC, 0, nCyCap, BTX, BTY, hMemDC, x, 0, SRCCOPY);
@@ -166,7 +166,7 @@ void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
       BitBlt(hDC, 0, nCyCap, BTX, BTY, hMemDC, x, BTY, SRCCOPY);
 
     // Paint MODE.
-    x = BTXFromCmode(lpIMC->fdwConversion);
+    x = BTXFromCmode(lpIMC->Conversion());
 
     if (!(dwPushedStatus & PUSHED_STATUS_MODE))
       BitBlt(hDC, BTX, nCyCap, BTX, BTY, hMemDC, x, 0, SRCCOPY);
@@ -175,7 +175,7 @@ void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
 
     // Paint Roman MODE.
     x = BTEMPT;
-    if (lpIMC->fdwConversion & IME_CMODE_ROMAN) x = BTROMA;
+    if (lpIMC->Conversion() & IME_CMODE_ROMAN) x = BTROMA;
 
     if (!(dwPushedStatus & PUSHED_STATUS_ROMAN))
       BitBlt(hDC, BTX * 2, nCyCap, BTX, BTY, hMemDC, x, 0, SRCCOPY);

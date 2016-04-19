@@ -149,7 +149,9 @@ Shiftキーが押されているかどうかは、(lpbKeyState[VK_SHIFT] & 0x80)
     * Altが押されている場合は、VK_KANJIを扱う。
     * Altが押されていない場合は、
         * ShiftもCtrlも押されていない場合は、
-            VK_KANJI、
+            VK_KANJI（半角／全角・漢字）、
+            VK_OEM_AUTO（半角／全角・漢字）、
+            VK_OEM_ENLW（半角／全角・漢字）
             VK_OEM_PLUS、VK_OEM_MINUS、VK_OEM_PERIOD、VK_OEM_COMMA、
             VK_OEM_1～VK_OEM_8、VK_OEM_102、
             '0'～'9'、'A'～'Z'、
@@ -159,8 +161,6 @@ Shiftキーが押されているかどうかは、(lpbKeyState[VK_SHIFT] & 0x80)
             VK_SPACE、VK_BACK、VK_DELETE、VK_RETURN、
             VK_CAPITAL、VK_CONVERT、VK_NONCONVERT、
             VK_OEM_COPY（カタカナ・ひらがな・ローマ字）、
-            VK_OEM_AUTO（半角／全角・漢字）、
-            VK_OEM_ENLW（半角／全角・漢字）
             を扱う。
        * Ctrlが押されている場合は、
          * 候補リストがある場合は、

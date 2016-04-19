@@ -205,10 +205,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\input.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\input_context.cpp"
 				>
 			</File>

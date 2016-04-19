@@ -287,82 +287,6 @@ BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
   return TRUE;
 }
 
-//  ImeProcessKey ()
-//  ImeProcessKey 関数は IMM を通して与えられた全てのキーストロークを前処
-//  理して、もしそのキーが与えられた Input Context で IME に必要なもので
-//  あれば TRUE を返す。
-//  BOOL
-//    ImeProcessKey(
-//    HIMC hIMC,
-//    UINT uVirKey,
-//    DWORD lParam,
-//    CONST LPBYTE lpbKeyState
-//  )
-//  Parameters
-//    hIMC
-//      Input context handle
-//    uVirKey
-//      処理されるべき仮想キー。
-//    lParam
-//      キーメッセージの lParam。(WM_KEYDOWN,WM_KEYUP の LPARAM)
-//    lpbKeyState
-//      現在のキーボードの状態を含んだ256バイトの配列を指すポインタ。
-//      IME はこの内容を変更すべきではない。
-//  Return Values
-//    成功なら TRUE。そうでなければ FALSE。
-//  Comments
-//    システムはキーが IME によって取り扱われるべきか否かをこの関数を
-//    呼び出すことによって決定している。アプリケーションがキーメッセー
-//    ジを受け取る前にこの関数が TRUE を返せば、IME はそのキーを処理す
-//    る。システムは ImeToAsciiEx 関数を呼び出す。
-//    FALSE を返したならば、システムはそのキーが IME によって処理され
-//    ないことが分かるのでキーメッセージはアプリケーションに送られる。
-BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
-                          CONST LPBYTE lpbKeyState) {
-  BOOL fRet = FALSE;
-  DebugPrint(TEXT("ImeProcessKey"));
-
-  if (lKeyData & 0x80000000) return FALSE;
-
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
-  if (lpIMC == NULL) return FALSE;
-
-  BOOL fOpen = lpIMC->fOpen;
-  BOOL fCompStr = FALSE;
-  if (fOpen) {
-    CompStr *lpCompStr = lpIMC->LockCompStr();
-    if (lpCompStr) {
-      if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
-          (lpCompStr->dwCompStrLen))
-        fCompStr = TRUE;
-    }
-
-    if (lpbKeyState[VK_MENU] & 0x80) {
-      fRet = FALSE;
-    } else if (lpbKeyState[VK_CONTROL] & 0x80) {
-      if (fCompStr)
-        fRet = (BOOL)bCompCtl[vKey];
-      else
-        fRet = (BOOL)bNoCompCtl[vKey];
-    } else if (lpbKeyState[VK_SHIFT] & 0x80) {
-      if (fCompStr)
-        fRet = (BOOL)bCompSht[vKey];
-      else
-        fRet = (BOOL)bNoCompSht[vKey];
-    } else {
-      if (fCompStr)
-        fRet = (BOOL)bComp[vKey];
-      else
-        fRet = (BOOL)bNoComp[vKey];
-    }
-
-    if (lpCompStr) lpIMC->UnlockCompStr();
-  }
-
-  TheApp.UnlockIMC();
-  return fRet;
-}
-
 //  NotifyIME
 //  NotifyIME 関数は与えられたパラメータに従って IME の状態を変更する。
 //  BOOL
@@ -468,7 +392,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
         case IMC_SETOPENSTATUS:
           lpIMC = TheApp.LockIMC(hIMC);
           if (lpIMC) {
-            if (!lpIMC->fOpen && lpIMC->HasCompStr()) FlushText(hIMC);
+            if (!lpIMC->IsOpen() && lpIMC->HasCompStr()) FlushText(hIMC);
             TheApp.UnlockIMC();
           }
           TheApp.UpdateIndicIcon(hIMC);

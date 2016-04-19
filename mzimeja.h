@@ -202,17 +202,6 @@ typedef struct _tagMZGUIDELINE {
 //////////////////////////////////////////////////////////////////////////////
 // externs
 
-extern BYTE bComp[];
-extern BYTE bCompCtl[];
-extern BYTE bCompSht[];
-extern BYTE bCompAlt[];
-extern BYTE bNoComp[];
-extern BYTE bNoCompCtl[];
-extern BYTE bNoCompSht[];
-extern BYTE bNoCompAlt[];
-
-//////////////////////////////////////////////////////////////////////////////
-
 extern const TCHAR szUIClassName[];
 extern const TCHAR szCompStrClassName[];
 extern const TCHAR szCandClassName[];

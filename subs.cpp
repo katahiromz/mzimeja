@@ -14,7 +14,7 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (!lpIMC) return;
 
-  fdwConversion = lpIMC->fdwConversion;
+  fdwConversion = lpIMC->Conversion();
 
   switch (dwToMode) {
     case TO_CMODE_ALPHANUMERIC:
@@ -61,8 +61,8 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
       break;
   }
 
-  if (lpIMC->fdwConversion != fdwConversion) {
-    lpIMC->fdwConversion = fdwConversion;
+  if (lpIMC->Conversion() != fdwConversion) {
+    lpIMC->Conversion() = fdwConversion;
     TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_SETCONVERSIONMODE);
   }
 
@@ -89,7 +89,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
   if (!(lpCompStr = lpIMC->LockCompStr()))
     goto ccs_exit40;
 
-  //fdwConversion = lpIMC->fdwConversion;
+  //fdwConversion = lpIMC->Conversion();
 
   dwSize = (lpCompStr->dwCompStrLen + 1) * sizeof(WCHAR);
   if (!(hDst = GlobalAlloc(GHND, dwSize)))

@@ -220,7 +220,7 @@ void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
   if (hIMC) {
     InputContext *lpIMC = TheApp.LockIMC(hIMC);
     if (lpIMC) {
-      fOpen = lpIMC->fOpen;
+      fOpen = lpIMC->IsOpen();
       TheApp.UnlockIMC();
     }
   }
