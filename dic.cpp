@@ -15,7 +15,7 @@ void PASCAL FlushText(HIMC hIMC) {
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (NULL == lpIMC) return;
 
-  if (lpIMC->HasCandidate()) {
+  if (lpIMC->HasCandInfo()) {
     // Flush candidate lists.
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
@@ -46,7 +46,7 @@ void PASCAL RevertText(HIMC hIMC) {
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (!lpIMC) return;
 
-  if (lpIMC->HasCandidate()) {
+  if (lpIMC->HasCandInfo()) {
     // Flush candidate lists.
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
@@ -208,7 +208,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   } else {
     // String is converted, so that open candidate.
     // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
-    if (!lpIMC->HasCandidate()) {
+    if (!lpIMC->HasCandInfo()) {
       TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
     }
 
@@ -324,7 +324,7 @@ void PASCAL DeleteChar(HIMC hIMC, UINT uVKey) {
       LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
       TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
     } else {
-      if (lpIMC->HasCandidate()) {
+      if (lpIMC->HasCandInfo()) {
         CandInfo *lpCandInfo = lpIMC->LockCandInfo();
         lpCandInfo->Clear();
         TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
@@ -559,7 +559,7 @@ BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   CompStr *lpCompStr = lpIMC->LockCompStr();
 
-  if (lpIMC->HasCandidate()) {
+  if (lpIMC->HasCandInfo()) {
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
       lpCandInfo->Clear();

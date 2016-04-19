@@ -20,7 +20,7 @@ void InputContext::Initialize() {
   hCandInfo = CandInfo::ReAlloc(hCandInfo);
 }
 
-BOOL InputContext::HasCandidate() {
+BOOL InputContext::HasCandInfo() {
   BOOL fRet = FALSE;
 
   if (ImmGetIMCCSize(hCandInfo) < sizeof(CANDIDATEINFO)) return FALSE;
@@ -31,6 +31,16 @@ BOOL InputContext::HasCandidate() {
     UnlockCandInfo();
   }
   return fRet;
+}
+
+BOOL InputContext::HasCompStr() {
+  if (ImmGetIMCCSize(hCompStr) <= sizeof(COMPOSITIONSTRING)) return FALSE;
+
+  CompStr *pCompStr = LockCompStr();
+  BOOL ret = (pCompStr->dwCompStrLen > 0);
+  UnlockCompStr();
+
+  return ret;
 }
 
 CandInfo *InputContext::LockCandInfo() {

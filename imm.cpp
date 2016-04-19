@@ -578,7 +578,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("NI_CLOSECANDIDATE"));
       lpIMC = TheApp.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
-      if (lpIMC->HasCandidate()) {
+      if (lpIMC->HasCandInfo()) {
         TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
         bRet = TRUE;
       }
@@ -590,7 +590,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       lpIMC = TheApp.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
 
-      if (dwIndex == 1 && lpIMC->HasCandidate()) {
+      if (dwIndex == 1 && lpIMC->HasCandInfo()) {
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
           lpCandList = lpCandInfo->GetList();
@@ -611,7 +611,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("NI_CHANGECANDIDATELIST"));
       lpIMC = TheApp.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
-      if (dwIndex == 1 && lpIMC->HasCandidate()) bRet = TRUE;
+      if (dwIndex == 1 && lpIMC->HasCandInfo()) bRet = TRUE;
       TheApp.UnlockIMC();
       break;
 
@@ -619,7 +619,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("NI_SETCANDIDATE_PAGESIZE"));
       lpIMC = TheApp.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
-      if (dwIndex == 1 && lpIMC->HasCandidate()) {
+      if (dwIndex == 1 && lpIMC->HasCandInfo()) {
         if (dwValue > MAXCANDPAGESIZE) return FALSE;
 
         lpCandInfo = lpIMC->LockCandInfo();
@@ -643,7 +643,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("NI_SETCANDIDATE_PAGESTART"));
       lpIMC = TheApp.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
-      if (dwIndex == 1 && lpIMC->HasCandidate()) {
+      if (dwIndex == 1 && lpIMC->HasCandInfo()) {
         if (dwValue > MAXCANDPAGESIZE) return FALSE;
 
         lpCandInfo = lpIMC->LockCandInfo();

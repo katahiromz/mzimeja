@@ -237,7 +237,7 @@ void PASCAL MoveCandWindow(HWND hUIWnd, InputContext *lpIMC,
     return;
   }
 
-  if (!lpIMC->HasCandidate()) return;
+  if (!lpIMC->HasCandInfo()) return;
 
   if (lpIMC->cfCandForm[0].dwStyle == CFS_EXCLUDE) {
     RECT rcWork;
