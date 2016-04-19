@@ -361,11 +361,11 @@ void PASCAL AddChar(HIMC hIMC, WORD code) {
   dwStrLen = lpCompStr->dwCompStrLen;
 
   if (!dwStrLen) {
-    lpCompStr->Init(CLR_RESULT_AND_UNDET);
+    lpCompStr->Clear(CLR_RESULT_AND_UNDET);
     TheApp.GenerateMessage(WM_IME_STARTCOMPOSITION);
   } else if (lpIMC->HasConvertedCompStr()) {
     MakeResultString(hIMC, FALSE);
-    lpCompStr->Init(CLR_UNDET);
+    lpCompStr->Clear(CLR_UNDET);
     dwGCR = GCS_RESULTALL;
   }
 

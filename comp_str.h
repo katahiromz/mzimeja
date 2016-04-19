@@ -43,7 +43,6 @@ inline void SetClause(LPDWORD lpdw, DWORD num) {
 //////////////////////////////////////////////////////////////////////////////
 
 struct CompStr : public COMPOSITIONSTRING {
-  void Init(DWORD dwClrFlag);
   void Clear(DWORD dwClrFlag);
   BOOL CheckAttr();
   void MakeAttrClause();

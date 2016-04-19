@@ -75,67 +75,36 @@ void CompStr::GetLog(LogCompStr& log) {
   return hCompStr;
 }
 
-void CompStr::Init(DWORD dwClrFlag) {
-  dwSize = sizeof(COMPOSITIONSTRING);
-
-  if (dwClrFlag & CLR_UNDET) {
-    dwCompReadAttrOffset = sizeof(COMPOSITIONSTRING);
-    dwCompReadClauseOffset = sizeof(COMPOSITIONSTRING);
-    dwCompReadStrOffset = sizeof(COMPOSITIONSTRING);
-    dwCompAttrOffset = sizeof(COMPOSITIONSTRING);
-    dwCompClauseOffset = sizeof(COMPOSITIONSTRING);
-    dwCompStrOffset = sizeof(COMPOSITIONSTRING);
-
-    dwCompStrLen = 0;
-    dwCompReadStrLen = 0;
-    dwCompAttrLen = 0;
-    dwCompReadAttrLen = 0;
-    dwCompClauseLen = 0;
-    dwCompReadClauseLen = 0;
-
-    dwCursorPos = 0;
-  }
-
-  if (dwClrFlag & CLR_RESULT) {
-    dwResultStrOffset = sizeof(COMPOSITIONSTRING);
-    dwResultStrLen = 0;
-    dwResultClauseOffset = sizeof(COMPOSITIONSTRING);
-    dwResultClauseLen = 0;
-    dwResultReadStrOffset = sizeof(COMPOSITIONSTRING);
-    dwResultReadStrLen = 0;
-    dwResultReadClauseOffset = sizeof(COMPOSITIONSTRING);
-    dwResultReadClauseLen = 0;
-  }
-}
-
 void CompStr::Clear(DWORD dwClrFlag) {
   dwSize = sizeof(COMPOSITIONSTRING);
 
   if (dwClrFlag & CLR_UNDET) {
-    dwCompStrLen = 0;
-    dwCompStrOffset = sizeof(COMPOSITIONSTRING);
-    dwCompClauseLen = 0;
-    dwCompClauseOffset = sizeof(COMPOSITIONSTRING);
-    dwCompAttrLen = 0;
-    dwCompAttrOffset = sizeof(COMPOSITIONSTRING);
-    dwCompReadStrLen = 0;
-    dwCompReadStrOffset = sizeof(COMPOSITIONSTRING);
-    dwCompReadClauseLen = 0;
-    dwCompReadClauseOffset = sizeof(COMPOSITIONSTRING);
-    dwCompReadAttrLen = 0;
     dwCompReadAttrOffset = sizeof(COMPOSITIONSTRING);
+    dwCompReadClauseOffset = sizeof(COMPOSITIONSTRING);
+    dwCompReadStrOffset = sizeof(COMPOSITIONSTRING);
+    dwCompAttrOffset = sizeof(COMPOSITIONSTRING);
+    dwCompClauseOffset = sizeof(COMPOSITIONSTRING);
+    dwCompStrOffset = sizeof(COMPOSITIONSTRING);
+
+    dwCompStrLen = 0;
+    dwCompReadStrLen = 0;
+    dwCompAttrLen = 0;
+    dwCompReadAttrLen = 0;
+    dwCompClauseLen = 0;
+    dwCompReadClauseLen = 0;
+
     dwCursorPos = 0;
-    dwDeltaStart = 0;
   }
 
   if (dwClrFlag & CLR_RESULT) {
     dwResultStrOffset = sizeof(COMPOSITIONSTRING);
-    dwResultStrLen = 0;
     dwResultClauseOffset = sizeof(COMPOSITIONSTRING);
-    dwResultClauseLen = 0;
     dwResultReadStrOffset = sizeof(COMPOSITIONSTRING);
-    dwResultReadStrLen = 0;
     dwResultReadClauseOffset = sizeof(COMPOSITIONSTRING);
+
+    dwResultStrLen = 0;
+    dwResultClauseLen = 0;
+    dwResultReadStrLen = 0;
     dwResultReadClauseLen = 0;
   }
 }

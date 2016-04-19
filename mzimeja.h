@@ -126,7 +126,7 @@
 #define ARR_RIGHT 1
 #define ARR_LEFT 2
 
-// Init or Clear Structure Flag
+// Clear Structure Flag
 #define CLR_RESULT 1
 #define CLR_UNDET 2
 #define CLR_RESULT_AND_UNDET 3
