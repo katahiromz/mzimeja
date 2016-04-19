@@ -11,7 +11,7 @@
 
 struct InputContext : public INPUTCONTEXT {
   void Initialize();
-  BOOL IsCandidate();
+  BOOL HasCandidate();
 
   CandInfo *LockCandInfo();
   void UnlockCandInfo();

@@ -343,7 +343,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 }
 
 void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
-                            LPBYTE lpattr, int num, BOOL fVert) {
+                            char *lpattr, int num, BOOL fVert) {
   //LPTSTR lpStart = lpstr;
   LPTSTR lpEnd = lpstr + num - 1;
   int x, y;
@@ -426,13 +426,13 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
 
   hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
-    InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+    InputContext *lpIMC = TheApp.LockIMC(hIMC);
     CompStr *lpCompStr = lpIMC->LockCompStr();
     if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen > 0)) {
         LPTSTR lpstr;
-        LPBYTE lpattr;
+        char *lpattr;
         LONG lstart;
         LONG num;
         BOOL fVert = FALSE;
@@ -467,7 +467,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
     end_pcw:
       lpIMC->UnlockCompStr();
     }
-    ImmUnlockIMC(hIMC);
+    TheApp.UnlockIMC();
   }
   if (hFont && hOldFont) SelectObject(hDC, hOldFont);
   EndPaint(hCompWnd, &ps);

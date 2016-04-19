@@ -46,6 +46,18 @@ struct CandInfo : public MZCAND {
     return DWORD(LPBYTE(szCand[i]) - LPBYTE(lpCandList));
   }
 
+  static HIMCC ReAlloc(HIMCC hCandInfo) {
+    HIMCC hNewCandInfo = ::ImmReSizeIMCC(hCandInfo, sizeof(MZCAND));
+    CandInfo *info = (CandInfo *)::ImmLockIMCC(hNewCandInfo);
+    if (info) {
+      info->Clear();
+      info->dwSize = sizeof(MZCAND);
+      ImmUnlockIMCC(hNewCandInfo);
+      return hNewCandInfo;
+    }
+    return NULL;
+  }
+
   void Clear() {
     dwSize = 0L;
     dwCount = 0L;

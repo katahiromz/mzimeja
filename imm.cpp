@@ -282,7 +282,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
 BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
   DebugPrint(TEXT("ImeSetActiveContext"));
 
-  UpdateIndicIcon(hIMC);
+  TheApp.UpdateIndicIcon(hIMC);
 
   return TRUE;
 }
@@ -324,7 +324,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 
   if (lKeyData & 0x80000000) return FALSE;
 
-  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+  InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (lpIMC == NULL) return FALSE;
 
   BOOL fOpen = lpIMC->fOpen;
@@ -359,7 +359,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
     if (lpCompStr) lpIMC->UnlockCompStr();
   }
 
-  ImmUnlockIMC(hIMC);
+  TheApp.UnlockIMC();
   return fRet;
 }
 
@@ -456,7 +456,6 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   CandList *lpCandList;
   TCHAR szBuf[256];
   LPTSTR lpstr;
-  TRANSMSG GnMsg;
   DWORD i = 0;
   //LPDWORD lpdw;
 
@@ -467,12 +466,12 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("NI_CONTEXTUPDATED"));
       switch (dwValue) {
         case IMC_SETOPENSTATUS:
-          lpIMC = (InputContext *)ImmLockIMC(hIMC);
+          lpIMC = TheApp.LockIMC(hIMC);
           if (lpIMC) {
             if (!lpIMC->fOpen && IsCompStr(hIMC)) FlushText(hIMC);
-            ImmUnlockIMC(hIMC);
+            TheApp.UnlockIMC();
           }
-          UpdateIndicIcon(hIMC);
+          TheApp.UpdateIndicIcon(hIMC);
           bRet = TRUE;
           break;
 
@@ -518,9 +517,10 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     case NI_OPENCANDIDATE:
       DebugPrint(TEXT("NI_OPENCANDIDATE"));
       if (IsConvertedCompStr(hIMC)) {
-        if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
+        lpIMC = TheApp.LockIMC(hIMC);
+        if (!lpIMC) return FALSE;
         if (!(lpCompStr = lpIMC->LockCompStr())) {
-          ImmUnlockIMC(hIMC);
+          TheApp.UnlockIMC();
           return FALSE;
         }
 
@@ -531,10 +531,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
               lpCompStr->GetCompReadStr(), szBuf, 256, TheApp.m_szDicFileName);
 
           // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
-          GnMsg.message = WM_IME_NOTIFY;
-          GnMsg.wParam = IMN_OPENCANDIDATE;
-          GnMsg.lParam = 1L;
-          GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
+          TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
 
           // Make candidate structures.
           lpCandInfo->dwSize = sizeof(MZCAND);
@@ -567,13 +564,10 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           //
           // Generate messages.
           //
-          GnMsg.message = WM_IME_NOTIFY;
-          GnMsg.wParam = IMN_CHANGECANDIDATE;
-          GnMsg.lParam = 1L;
-          GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
+          TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
           lpIMC->UnlockCandInfo();
-          ImmUnlockIMC(hIMC);
+          TheApp.UnlockIMC();
 
           bRet = TRUE;
         }
@@ -582,22 +576,21 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
     case NI_CLOSECANDIDATE:
       DebugPrint(TEXT("NI_CLOSECANDIDATE"));
-      if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
-      if (lpIMC->IsCandidate()) {
-        GnMsg.message = WM_IME_NOTIFY;
-        GnMsg.wParam = IMN_CLOSECANDIDATE;
-        GnMsg.lParam = 1L;
-        GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
+      lpIMC = TheApp.LockIMC(hIMC);
+      if (!lpIMC) return FALSE;
+      if (lpIMC->HasCandidate()) {
+        TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
         bRet = TRUE;
       }
-      ImmUnlockIMC(hIMC);
+      TheApp.UnlockIMC();
       break;
 
     case NI_SELECTCANDIDATESTR:
       DebugPrint(TEXT("NI_SELECTCANDIDATESTR"));
-      if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
+      lpIMC = TheApp.LockIMC(hIMC);
+      if (!lpIMC) return FALSE;
 
-      if (dwIndex == 1 && lpIMC->IsCandidate()) {
+      if (dwIndex == 1 && lpIMC->HasCandidate()) {
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
           lpCandList = lpCandInfo->GetList();
@@ -606,28 +599,27 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             bRet = TRUE;
 
             // Generate messages.
-            GnMsg.message = WM_IME_NOTIFY;
-            GnMsg.wParam = IMN_CHANGECANDIDATE;
-            GnMsg.lParam = 1L;
-            GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
+            TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
           }
           lpIMC->UnlockCandInfo();
         }
       }
-      ImmUnlockIMC(hIMC);
+      TheApp.UnlockIMC();
       break;
 
     case NI_CHANGECANDIDATELIST:
       DebugPrint(TEXT("NI_CHANGECANDIDATELIST"));
-      if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
-      if (dwIndex == 1 && lpIMC->IsCandidate()) bRet = TRUE;
-      ImmUnlockIMC(hIMC);
+      lpIMC = TheApp.LockIMC(hIMC);
+      if (!lpIMC) return FALSE;
+      if (dwIndex == 1 && lpIMC->HasCandidate()) bRet = TRUE;
+      TheApp.UnlockIMC();
       break;
 
     case NI_SETCANDIDATE_PAGESIZE:
       DebugPrint(TEXT("NI_SETCANDIDATE_PAGESIZE"));
-      if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
-      if (dwIndex == 1 && lpIMC->IsCandidate()) {
+      lpIMC = TheApp.LockIMC(hIMC);
+      if (!lpIMC) return FALSE;
+      if (dwIndex == 1 && lpIMC->HasCandidate()) {
         if (dwValue > MAXCANDPAGESIZE) return FALSE;
 
         lpCandInfo = lpIMC->LockCandInfo();
@@ -639,22 +631,19 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
             //
             // Generate messages.
-            //
-            GnMsg.message = WM_IME_NOTIFY;
-            GnMsg.wParam = IMN_CHANGECANDIDATE;
-            GnMsg.lParam = 1L;
-            GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
+            TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
           }
           lpIMC->UnlockCandInfo();
         }
       }
-      ImmUnlockIMC(hIMC);
+      TheApp.UnlockIMC();
       break;
 
     case NI_SETCANDIDATE_PAGESTART:
       DebugPrint(TEXT("NI_SETCANDIDATE_PAGESTART"));
-      if (!(lpIMC = (InputContext *)ImmLockIMC(hIMC))) return FALSE;
-      if (dwIndex == 1 && lpIMC->IsCandidate()) {
+      lpIMC = TheApp.LockIMC(hIMC);
+      if (!lpIMC) return FALSE;
+      if (dwIndex == 1 && lpIMC->HasCandidate()) {
         if (dwValue > MAXCANDPAGESIZE) return FALSE;
 
         lpCandInfo = lpIMC->LockCandInfo();
@@ -666,16 +655,12 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
             //
             // Generate messages.
-            //
-            GnMsg.message = WM_IME_NOTIFY;
-            GnMsg.wParam = IMN_CHANGECANDIDATE;
-            GnMsg.lParam = 1L;
-            GenerateMessage(hIMC, lpIMC, TheApp.m_lpCurTransKey, &GnMsg);
+            TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
           }
           lpIMC->UnlockCandInfo();
         }
       }
-      ImmUnlockIMC(hIMC);
+      TheApp.UnlockIMC();
       break;
 
     case NI_IMEMENUSELECTED:
@@ -711,15 +696,15 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
   DebugPrint(TEXT("ImeSelect"));
 
-  if (fSelect) UpdateIndicIcon(hIMC);
+  if (fSelect) TheApp.UpdateIndicIcon(hIMC);
 
   if (NULL == hIMC) return TRUE;
-  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+  InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (lpIMC) {
     if (fSelect) {
       lpIMC->Initialize();
     }
-    ImmUnlockIMC(hIMC);
+    TheApp.UnlockIMC();
   }
   return TRUE;
 }

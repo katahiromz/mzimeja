@@ -129,7 +129,7 @@ void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
     int nCyCap = GetSystemMetrics(SM_CYSMCAPTION);
     RECT rc;
 
-    InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+    InputContext *lpIMC = TheApp.LockIMC(hIMC);
     hMemDC = CreateCompatibleDC(hDC);
 
     // Paint Caption.
@@ -184,7 +184,7 @@ void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
 
     SelectObject(hMemDC, hbmpOld);
     DeleteDC(hMemDC);
-    ImmUnlockIMC(hIMC);
+    TheApp.UnlockIMC();
   }
 }
 

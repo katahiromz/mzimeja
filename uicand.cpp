@@ -120,7 +120,7 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
   HBRUSH hbrHightLight = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
   HIMC hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
-    InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+    InputContext *lpIMC = TheApp.LockIMC(hIMC);
     HFONT hOldFont = CheckNativeCharset(hDC);
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
@@ -153,7 +153,7 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
     if (hOldFont) {
       DeleteObject(SelectObject(hDC, hOldFont));
     }
-    ImmUnlockIMC(hIMC);
+    TheApp.UnlockIMC();
   }
   EndPaint(hCandWnd, &ps);
 
@@ -237,7 +237,7 @@ void PASCAL MoveCandWindow(HWND hUIWnd, InputContext *lpIMC,
     return;
   }
 
-  if (!lpIMC->IsCandidate()) return;
+  if (!lpIMC->HasCandidate()) return;
 
   if (lpIMC->cfCandForm[0].dwStyle == CFS_EXCLUDE) {
     RECT rcWork;

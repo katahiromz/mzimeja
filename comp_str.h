@@ -9,25 +9,31 @@
 #endif
 #include "immdev.h"
 
+#ifdef __cplusplus
+  #include <string>
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 
-#define MAXCOMPSIZE 128
-#define MAXCLAUSESIZE 16
-
-struct MZCOMPSTR : public COMPOSITIONSTRING {
-  TCHAR   szCompReadStr[MAXCOMPSIZE];
-  BYTE    bCompReadAttr[MAXCOMPSIZE];
-  DWORD   dwCompReadClause[MAXCLAUSESIZE];
-  TCHAR   szCompStr[MAXCOMPSIZE];
-  BYTE    bCompAttr[MAXCOMPSIZE];
-  DWORD   dwCompClause[MAXCLAUSESIZE];
-  BYTE    szTypeInfo[MAXCOMPSIZE];
-  TCHAR   szResultReadStr[MAXCOMPSIZE];
-  DWORD   dwResultReadClause[MAXCOMPSIZE];
-  TCHAR   szResultStr[MAXCOMPSIZE];
-  DWORD   dwResultClause[MAXCOMPSIZE];
+struct LogCompStr {
+  DWORD         dwCursorPos;
+  DWORD         dwDeltaStart;
+  std::string   comp_read_attr;
+  std::string   comp_read_clause;
+  std::wstring  comp_read_str;
+  std::string   comp_attr;
+  std::string   comp_clause;
+  std::wstring  comp_str;
+  std::string   result_read_clause;
+  std::wstring  result_read_str;
+  std::string   result_clause;
+  std::wstring  result_str;
+  LogCompStr() {
+    dwCursorPos = 0;
+    dwDeltaStart = 0;
+  }
+  DWORD GetTotalSize() const;
 };
-typedef MZCOMPSTR *LPMZCOMPSTR;
 
 inline void SetClause(LPDWORD lpdw, DWORD num) {
   *lpdw = 0;
@@ -36,15 +42,18 @@ inline void SetClause(LPDWORD lpdw, DWORD num) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct CompStr : public MZCOMPSTR {
+struct CompStr : public COMPOSITIONSTRING {
   void Init(DWORD dwClrFlag);
   void Clear(DWORD dwClrFlag);
   BOOL CheckAttr();
   void MakeAttrClause();
 
-  LPBYTE GetBytes() { return (LPBYTE)this; }
+  void GetLog(LogCompStr& log);
+  static HIMCC ReAlloc(HIMCC hCompStr, const LogCompStr *log);
 
-  LPBYTE GetCompReadAttr() {
+  char *GetBytes() { return (char *)this; }
+
+  char *GetCompReadAttr() {
     return GetBytes() + dwCompReadAttrOffset;
   }
   LPDWORD GetCompReadClause() {
@@ -53,8 +62,8 @@ struct CompStr : public MZCOMPSTR {
   LPTSTR GetCompReadStr() {
     return (LPTSTR)(GetBytes() + dwCompReadStrOffset);
   }
-  LPBYTE GetCompAttr() {
-    return (LPBYTE)(GetBytes() + dwCompAttrOffset);
+  char *GetCompAttr() {
+    return (char *)(GetBytes() + dwCompAttrOffset);
   }
   LPDWORD GetCompClause() {
     return (LPDWORD)(GetBytes() + dwCompClauseOffset);

@@ -229,12 +229,9 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode);
 void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode);
 BOOL PASCAL IsCompStr(HIMC hIMC);
 BOOL PASCAL IsConvertedCompStr(HIMC hIMC);
-void PASCAL UpdateIndicIcon(HIMC hIMC);
 HFONT CheckNativeCharset(HDC hDC);
 
 // toascii.c
-BOOL PASCAL GenerateMessageToTransKey(LPTRANSMSGLIST lpTrabsKey,
-                                      LPTRANSMSG lpGeneMsg);
 BOOL PASCAL GenerateOverFlowMessage(LPTRANSMSGLIST lpTransKey);
 
 // notify.c
@@ -248,11 +245,10 @@ BOOL PASCAL IMEKeydownHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 BOOL PASCAL IMEKeyupHandler(HIMC, WPARAM, LPARAM, LPBYTE);
 
 // ui.c
-BOOL IMERegisterClasses(HINSTANCE hInstance);
 LRESULT CALLBACK MZIMEWndProc(HWND, UINT, WPARAM, LPARAM);
-LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
+LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
                           WPARAM wParam, LPARAM lParam);
-LONG PASCAL ControlCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
+LONG PASCAL ControlCommand(HIMC hIMC, HWND hWnd, UINT message,
                            WPARAM wParam, LPARAM lParam);
 void PASCAL DrawUIBorder(LPRECT lprc);
 void PASCAL DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -315,7 +311,6 @@ void PASCAL AddChar(HIMC, WORD);
 BOOL PASCAL ConvKanji(HIMC);
 BOOL WINAPI MakeResultString(HIMC, BOOL);
 BOOL PASCAL MakeGuideLine(HIMC, DWORD);
-BOOL PASCAL GenerateMessage(HIMC, InputContext *, LPTRANSMSGLIST, LPTRANSMSG);
 void PASCAL HandleShiftArrow(HIMC hIMC, BOOL fArrow);
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
                                       DWORD dwBufLen, LPTSTR szDicFileName);
@@ -363,6 +358,8 @@ struct MZIMEJA {
   LPTRANSMSGLIST  m_lpCurTransKey;
   UINT            m_uNumTransKey;
   BOOL            m_fOverTransKey;
+  HIMC            m_hIMC;
+  InputContext *  m_lpIMC;
 
   // dictionary file name
   TCHAR           m_szDicFileName[256];
@@ -376,6 +373,8 @@ struct MZIMEJA {
     m_lpCurTransKey = NULL;
     m_uNumTransKey = 0;
     m_fOverTransKey = FALSE;
+    m_hIMC = NULL;
+    m_lpIMC = NULL;
 
     m_szDicFileName[0] = 0;
   }
@@ -387,6 +386,16 @@ struct MZIMEJA {
     return LoadBMP(MAKEINTRESOURCE(nID));
   }
   LPTSTR LoadSTR(INT nID);
+  BOOL RegisterClasses(HINSTANCE hInstance);
+  void UpdateIndicIcon(HIMC hIMC);
+  HKL GetHKL(VOID);
+
+  InputContext *LockIMC(HIMC hIMC);
+  VOID UnlockIMC();
+  BOOL GenerateMessage(HIMC hIMC, InputContext *lpIMC, LPTRANSMSG lpGeneMsg);
+  BOOL GenerateMessage(TRANSMSG& msg);
+  BOOL GenerateMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
+  BOOL GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg);
 };
 
 extern MZIMEJA TheApp;

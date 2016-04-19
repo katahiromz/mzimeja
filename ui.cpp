@@ -64,92 +64,6 @@ void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra) {
 }
 #endif  // def _DEBUG
 
-#define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
-
-// This function is called by IMMInquire, register the classes
-BOOL IMERegisterClasses(HINSTANCE hInstance) {
-  WNDCLASSEX wcx;
-
-  // register class of UI window.
-  wcx.cbSize = sizeof(WNDCLASSEX);
-  wcx.style = CS_MZIME;
-  wcx.lpfnWndProc = MZIMEWndProc;
-  wcx.cbClsExtra = 0;
-  wcx.cbWndExtra = 2 * sizeof(LONG_PTR);
-  wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wcx.hIcon = NULL;
-  wcx.lpszMenuName = NULL;
-  wcx.lpszClassName = szUIClassName;
-  wcx.hbrBackground = NULL;
-  wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
-
-  // register class of composition window.
-  wcx.cbSize = sizeof(WNDCLASSEX);
-  wcx.style = CS_MZIME;
-  wcx.lpfnWndProc = CompStrWndProc;
-  wcx.cbClsExtra = 0;
-  wcx.cbWndExtra = UIEXTRASIZE;
-  wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wcx.hIcon = NULL;
-  wcx.lpszMenuName = NULL;
-  wcx.lpszClassName = szCompStrClassName;
-  wcx.hbrBackground = NULL;
-  wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
-
-  // register class of candidate window.
-  wcx.cbSize = sizeof(WNDCLASSEX);
-  wcx.style = CS_MZIME;
-  wcx.lpfnWndProc = CandWndProc;
-  wcx.cbClsExtra = 0;
-  wcx.cbWndExtra = UIEXTRASIZE;
-  wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wcx.hIcon = NULL;
-  wcx.lpszMenuName = NULL;
-  wcx.lpszClassName = szCandClassName;
-  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
-  wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
-
-  // register class of status window.
-  wcx.cbSize = sizeof(WNDCLASSEX);
-  wcx.style = CS_MZIME;
-  wcx.lpfnWndProc = StatusWndProc;
-  wcx.cbClsExtra = 0;
-  wcx.cbWndExtra = UIEXTRASIZE;
-  wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wcx.hIcon = NULL;
-  wcx.lpszMenuName = NULL;
-  wcx.lpszClassName = szStatusClassName;
-  wcx.hbrBackground = NULL;
-  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
-  wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
-
-  // register class of guideline window.
-  wcx.cbSize = sizeof(WNDCLASSEX);
-  wcx.style = CS_MZIME;
-  wcx.lpfnWndProc = GuideWndProc;
-  wcx.cbClsExtra = 0;
-  wcx.cbWndExtra = UIEXTRASIZE;
-  wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wcx.hIcon = NULL;
-  wcx.lpszMenuName = NULL;
-  wcx.lpszClassName = szGuideClassName;
-  wcx.hbrBackground = NULL;
-  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
-  wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
-
-  return TRUE;
-}
-
 // IME UI window procedure
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
@@ -159,11 +73,11 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   LONG lRet = 0L;
   int i;
 
-  HIMC hUICurIMC = (HIMC)GetWindowLongPtr(hWnd, IMMGWLP_IMC);
+  HIMC hIMC = (HIMC)GetWindowLongPtr(hWnd, IMMGWLP_IMC);
 
   // Even if there is no current UI. these messages should not be pass to
   // DefWindowProc().
-  if (!hUICurIMC) {
+  if (!hIMC) {
     switch (message) {
       case WM_IME_STARTCOMPOSITION:
       case WM_IME_ENDCOMPOSITION:
@@ -173,7 +87,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       case WM_IME_COMPOSITIONFULL:
       case WM_IME_SELECT:
       case WM_IME_CHAR:
-        DebugPrint(TEXT("Why hUICurIMC is NULL????"));
+        DebugPrint(TEXT("Why hIMC is NULL????"));
         DebugPrint(TEXT("\thWnd is %x"), hWnd);
         DebugPrint(TEXT("\tmessage is %x"), message);
         DebugPrint(TEXT("\twParam is %x"), wParam);
@@ -209,15 +123,15 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       if (wParam) {
         hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
         lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
-        lpUIExtra->hIMC = hUICurIMC;
+        lpUIExtra->hIMC = hIMC;
 
-        if (hUICurIMC) {
+        if (hIMC) {
           //LPINPUTCONTEXT lpIMCT = NULL;
           //
           // input context was chenged.
           // if there are the child windows, the diplay have to be
           // updated.
-          lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
+          lpIMC = TheApp.LockIMC(hIMC);
           if (lpIMC) {
             CompStr *lpCompStr = lpIMC->LockCompStr();
             CandInfo *lpCandInfo = lpIMC->LockCandInfo();
@@ -245,7 +159,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             HideCompWindow(lpUIExtra);
           }
           UpdateStatusWindow(lpUIExtra);
-          ImmUnlockIMC(hUICurIMC);
+          TheApp.UnlockIMC();
         } else  // it is NULL input context.
         {
           HideCandWindow(lpUIExtra);
@@ -261,21 +175,21 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       // Start composition! Ready to display the composition string.
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
-      lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
+      lpIMC = TheApp.LockIMC(hIMC);
       CreateCompWindow(hWnd, lpUIExtra, lpIMC);
-      ImmUnlockIMC(hUICurIMC);
+      TheApp.UnlockIMC();
       GlobalUnlock(hUIExtra);
       break;
 
     case WM_IME_COMPOSITION:
       // Update to display the composition string.
-      lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
+      lpIMC = TheApp.LockIMC(hIMC);
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       MoveCompWindow(lpUIExtra, lpIMC);
       MoveCandWindow(hWnd, lpIMC, lpUIExtra, TRUE);
       GlobalUnlock(hUIExtra);
-      ImmUnlockIMC(hUICurIMC);
+      TheApp.UnlockIMC();
       break;
 
     case WM_IME_ENDCOMPOSITION:
@@ -293,17 +207,17 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       if (wParam) {
         hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
         lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
-        lpUIExtra->hIMC = hUICurIMC;
+        lpUIExtra->hIMC = hIMC;
         GlobalUnlock(hUIExtra);
       }
       break;
 
     case WM_IME_CONTROL:
-      lRet = ControlCommand(hUICurIMC, hWnd, message, wParam, lParam);
+      lRet = ControlCommand(hIMC, hWnd, message, wParam, lParam);
       break;
 
     case WM_IME_NOTIFY:
-      lRet = NotifyCommand(hUICurIMC, hWnd, message, wParam, lParam);
+      lRet = NotifyCommand(hIMC, hWnd, message, wParam, lParam);
       break;
 
     case WM_DESTROY:
@@ -400,7 +314,7 @@ int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra) {
 }
 
 // Handle WM_IME_NOTIFY messages
-LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
+LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
                           WPARAM wParam, LPARAM lParam) {
   LONG lRet = 0L;
   HGLOBAL hUIExtra;
@@ -408,7 +322,7 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
   RECT rc;
   LOGFONT lf;
 
-  InputContext *lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
+  InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (NULL == lpIMC) return 0L;
 
   hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
@@ -498,7 +412,7 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
       break;
 
     case IMN_GUIDELINE:
-      if (ImmGetGuideLine(hUICurIMC, GGL_LEVEL, NULL, 0)) {
+      if (ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0)) {
         if (!IsWindow(lpUIExtra->uiGuide.hWnd)) {
           HDC hdcIC;
           TEXTMETRIC tm;
@@ -554,7 +468,7 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
   }
 
   GlobalUnlock(hUIExtra);
-  ImmUnlockIMC(hUICurIMC);
+  TheApp.UnlockIMC();
 
   return lRet;
 }
@@ -562,14 +476,14 @@ LONG PASCAL NotifyCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
 //#define lpcfCandForm ((LPCANDIDATEFORM)lParam)
 
 // Handle WM_IME_CONTROL messages
-LONG PASCAL ControlCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
+LONG PASCAL ControlCommand(HIMC hIMC, HWND hWnd, UINT message,
                            WPARAM wParam, LPARAM lParam) {
   LONG lRet = 1L;
   InputContext *lpIMC;
   HGLOBAL hUIExtra;
   LPUIEXTRA lpUIExtra;
 
-  lpIMC = (InputContext *)ImmLockIMC(hUICurIMC);
+  lpIMC = TheApp.LockIMC(hIMC);
   if (NULL == lpIMC) return 1L;
 
   hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
@@ -598,7 +512,7 @@ LONG PASCAL ControlCommand(HIMC hUICurIMC, HWND hWnd, UINT message,
   }
 
   GlobalUnlock(hUIExtra);
-  ImmUnlockIMC(hUICurIMC);
+  TheApp.UnlockIMC();
 
   return lRet;
 }

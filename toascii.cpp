@@ -58,10 +58,10 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
   // if hIMC is NULL, this means DISABLE IME.
   if (!hIMC) return 0;
 
-  InputContext *lpIMC = (InputContext *)ImmLockIMC(hIMC);
+  InputContext *lpIMC = TheApp.LockIMC(hIMC);
   if (NULL == lpIMC) return 0;
   BOOL fOpen = lpIMC->fOpen;
-  ImmUnlockIMC(hIMC);
+  TheApp.UnlockIMC();
 
   if (fOpen) {
     if (uScanCode & 0x8000)
@@ -84,23 +84,6 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
   }
 
   return (int)TheApp.m_uNumTransKey;
-}
-
-// Update the transrate key buffer
-BOOL PASCAL GenerateMessageToTransKey(LPTRANSMSGLIST lpTransBuf,
-                                      LPTRANSMSG lpGeneMsg) {
-  LPTRANSMSG lpgmT0;
-
-  ++TheApp.m_uNumTransKey;
-  if (TheApp.m_uNumTransKey >= lpTransBuf->uMsgCount) {
-    TheApp.m_fOverTransKey = TRUE;
-    return FALSE;
-  }
-
-  lpgmT0 = lpTransBuf->TransMsg + (TheApp.m_uNumTransKey - 1);
-  *lpgmT0 = *lpGeneMsg;
-
-  return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////////

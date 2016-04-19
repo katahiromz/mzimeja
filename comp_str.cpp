@@ -3,21 +3,88 @@
 
 #include "mzimeja.h"
 
+DWORD LogCompStr::GetTotalSize() const {
+  size_t total = sizeof(COMPOSITIONSTRING);
+  total += comp_read_attr.size();
+  total += comp_read_clause.size();
+  total += comp_read_str.size() * sizeof(WCHAR);
+  total += comp_attr.size();
+  total += comp_clause.size();
+  total += comp_str.size() * sizeof(WCHAR);
+  total += result_read_clause.size();
+  total += result_read_str.size() * sizeof(WCHAR);
+  total += result_clause.size();
+  total += result_str.size() * sizeof(WCHAR);
+  return total;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
-#define member_offset(struct_name,member) \
-  ((LONG)(LONG_PTR)&((reinterpret_cast<struct_name*>(NULL))->member))
+void CompStr::GetLog(LogCompStr& log) {
+  log.dwCursorPos = dwCursorPos;
+  log.dwDeltaStart = dwDeltaStart;
+  log.comp_read_attr.assign(GetCompReadAttr(), dwCompReadAttrLen);
+  log.comp_read_clause.assign((char *)GetCompReadClause(), dwCompReadClauseLen);
+  log.comp_read_str.assign(GetCompReadStr(), dwCompReadStrLen);
+  log.comp_attr.assign(GetCompAttr(), dwCompAttrLen);
+  log.comp_clause.assign((char *)GetCompClause(), dwCompClauseLen);
+  log.comp_str.assign(GetCompStr(), dwCompStrLen);
+  log.result_read_clause.assign((char *)GetResultReadClause(), dwResultReadClauseLen);
+  log.result_read_str.assign(GetResultReadStr(), dwResultReadStrLen);
+  log.result_clause.assign((char *)GetResultClause(), dwResultClauseLen);
+  log.result_str.assign(GetResultStr(), dwResultStrLen);
+}
+
+/*static*/ HIMCC CompStr::ReAlloc(HIMCC hCompStr, const LogCompStr *log) {
+  DWORD total = (log ? log->GetTotalSize() : sizeof(COMPOSITIONSTRING));
+  HIMCC hNewCompStr = ImmReSizeIMCC(hCompStr, total);
+  if (hNewCompStr) {
+    CompStr *lpCompStr = (CompStr *)ImmLockIMCC(hNewCompStr);
+    if (lpCompStr) {
+      lpCompStr->dwSize = total;
+      lpCompStr->dwCursorPos = (log ? log->dwCursorPos : 0);
+      lpCompStr->dwDeltaStart = (log ? log->dwDeltaStart : 0);
+
+      char *pb = lpCompStr->GetBytes();
+      pb += sizeof(COMPOSITIONSTRING);
+
+#define ADD_BYTES(member) \
+  memcpy(pb, &log->member[0], log->member.size()); \
+  pb += log->member.size()
+
+#define ADD_STRING(member) \
+  memcpy(pb, &log->member[0], log->member.size() * sizeof(WCHAR)); \
+  pb += log->member.size() * sizeof(WCHAR)
+
+      ADD_BYTES(comp_read_attr);
+      ADD_BYTES(comp_read_clause);
+      ADD_STRING(comp_read_str);
+      ADD_BYTES(comp_attr);
+      ADD_BYTES(comp_clause);
+      ADD_STRING(comp_str);
+      ADD_BYTES(result_read_clause);
+      ADD_STRING(result_read_str);
+      ADD_BYTES(result_clause);
+      ADD_STRING(result_str);
+
+      assert((DWORD)(pb - lpCompStr->GetBytes()) == total);
+      ImmUnlockIMCC(hNewCompStr);
+      hCompStr = hNewCompStr;
+    }
+  }
+  return hCompStr;
+}
 
 void CompStr::Init(DWORD dwClrFlag) {
-  dwSize = sizeof(MZCOMPSTR);
+  dwSize = sizeof(COMPOSITIONSTRING);
 
   if (dwClrFlag & CLR_UNDET) {
-    dwCompReadAttrOffset = member_offset(MZCOMPSTR, bCompReadAttr);
-    dwCompReadClauseOffset = member_offset(MZCOMPSTR, dwCompReadClause);
-    dwCompReadStrOffset = member_offset(MZCOMPSTR, szCompReadStr);
-    dwCompAttrOffset = member_offset(MZCOMPSTR, bCompAttr);
-    dwCompClauseOffset = member_offset(MZCOMPSTR, dwCompClause);
-    dwCompStrOffset = member_offset(MZCOMPSTR, szCompStr);
+    dwCompReadAttrOffset = sizeof(COMPOSITIONSTRING);
+    dwCompReadClauseOffset = sizeof(COMPOSITIONSTRING);
+    dwCompReadStrOffset = sizeof(COMPOSITIONSTRING);
+    dwCompAttrOffset = sizeof(COMPOSITIONSTRING);
+    dwCompClauseOffset = sizeof(COMPOSITIONSTRING);
+    dwCompStrOffset = sizeof(COMPOSITIONSTRING);
 
     dwCompStrLen = 0;
     dwCompReadStrLen = 0;
@@ -26,65 +93,55 @@ void CompStr::Init(DWORD dwClrFlag) {
     dwCompClauseLen = 0;
     dwCompReadClauseLen = 0;
 
-    *GetCompStr() = 0;
-    *GetCompReadStr() = 0;
-
     dwCursorPos = 0;
   }
 
   if (dwClrFlag & CLR_RESULT) {
-    dwResultStrOffset = member_offset(MZCOMPSTR, szResultStr);
-    dwResultClauseOffset = member_offset(MZCOMPSTR, dwResultClause);
-    dwResultReadStrOffset = member_offset(MZCOMPSTR, szResultReadStr);
-    dwResultReadClauseOffset = member_offset(MZCOMPSTR, dwResultReadClause);
-
+    dwResultStrOffset = sizeof(COMPOSITIONSTRING);
     dwResultStrLen = 0;
+    dwResultClauseOffset = sizeof(COMPOSITIONSTRING);
     dwResultClauseLen = 0;
+    dwResultReadStrOffset = sizeof(COMPOSITIONSTRING);
     dwResultReadStrLen = 0;
+    dwResultReadClauseOffset = sizeof(COMPOSITIONSTRING);
     dwResultReadClauseLen = 0;
-
-    *GetResultStr() = 0;
-    *GetResultReadStr() = 0;
   }
 }
 
 void CompStr::Clear(DWORD dwClrFlag) {
-  dwSize = sizeof(MZCOMPSTR);
+  dwSize = sizeof(COMPOSITIONSTRING);
 
   if (dwClrFlag & CLR_UNDET) {
-    dwCompStrOffset = 0;
-    dwCompClauseOffset = 0;
-    dwCompAttrOffset = 0;
-    dwCompReadStrOffset = 0;
-    dwCompReadClauseOffset = 0;
-    dwCompReadAttrOffset = 0;
     dwCompStrLen = 0;
+    dwCompStrOffset = sizeof(COMPOSITIONSTRING);
     dwCompClauseLen = 0;
+    dwCompClauseOffset = sizeof(COMPOSITIONSTRING);
     dwCompAttrLen = 0;
+    dwCompAttrOffset = sizeof(COMPOSITIONSTRING);
     dwCompReadStrLen = 0;
+    dwCompReadStrOffset = sizeof(COMPOSITIONSTRING);
     dwCompReadClauseLen = 0;
+    dwCompReadClauseOffset = sizeof(COMPOSITIONSTRING);
     dwCompReadAttrLen = 0;
-    szCompStr[0] = 0;
-    szCompReadStr[0] = 0;
+    dwCompReadAttrOffset = sizeof(COMPOSITIONSTRING);
     dwCursorPos = 0;
+    dwDeltaStart = 0;
   }
 
   if (dwClrFlag & CLR_RESULT) {
-    dwResultStrOffset = 0;
-    dwResultClauseOffset = 0;
-    dwResultReadStrOffset = 0;
-    dwResultReadClauseOffset = 0;
+    dwResultStrOffset = sizeof(COMPOSITIONSTRING);
     dwResultStrLen = 0;
+    dwResultClauseOffset = sizeof(COMPOSITIONSTRING);
     dwResultClauseLen = 0;
+    dwResultReadStrOffset = sizeof(COMPOSITIONSTRING);
     dwResultReadStrLen = 0;
+    dwResultReadClauseOffset = sizeof(COMPOSITIONSTRING);
     dwResultReadClauseLen = 0;
-    szResultStr[0] = 0;
-    szResultReadStr[0] = 0;
   }
 }
 
 BOOL CompStr::CheckAttr() {
-  LPBYTE lpb = GetCompAttr();
+  char *lpb = GetCompAttr();
   int len = dwCompAttrLen;
   for (int i = 0; i < len; i++)
     if (*lpb++ & 0x01) return TRUE;
@@ -97,7 +154,7 @@ void CompStr::MakeAttrClause() {
   if (len != readlen) return;
 
   DWORD pos = dwCursorPos;
-  LPBYTE lpb = GetCompAttr();
+  char *lpb = GetCompAttr();
   for (DWORD i = 0; i < len; i++) {
     if (i < pos)
       *lpb++ = 0x10;

@@ -36,20 +36,207 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   if (psa != NULL) {
     m_hMutex = CreateMutex(psa, FALSE, TEXT("mzimeja_mutex"));
     FreeSecurityAttributes(psa);
-    assert(TheApp.m_hMutex);
+    assert(m_hMutex);
   } else {
     // Failed, not NT system
     assert(0);
     return FALSE;
   }
 
-  IMERegisterClasses(TheApp.m_hInst);
+  RegisterClasses(m_hInst);
 
-  LPTSTR lpDicFileName = TheApp.m_szDicFileName;
-  lpDicFileName += GetWindowsDirectory(lpDicFileName, 256);
+  LPTSTR lpDicFileName = m_szDicFileName;
+  lpDicFileName += ::GetWindowsDirectory(lpDicFileName, _countof(m_szDicFileName));
   if (*(lpDicFileName - 1) != TEXT('\\')) *lpDicFileName++ = TEXT('\\');
-  LoadString(hInstance, IDS_DICFILENAME, lpDicFileName, 128);
+  ::LoadString(hInstance, IDS_DICFILENAME, lpDicFileName, 128);
   return TRUE;
+}
+
+#define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
+
+BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
+  WNDCLASSEX wcx;
+
+  // register class of UI window.
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = MZIMEWndProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = 2 * sizeof(LONG_PTR);
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szUIClassName;
+  wcx.hbrBackground = NULL;
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
+
+  // register class of composition window.
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = CompStrWndProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = UIEXTRASIZE;
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szCompStrClassName;
+  wcx.hbrBackground = NULL;
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
+
+  // register class of candidate window.
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = CandWndProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = UIEXTRASIZE;
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szCandClassName;
+  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
+
+  // register class of status window.
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = StatusWndProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = UIEXTRASIZE;
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szStatusClassName;
+  wcx.hbrBackground = NULL;
+  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
+
+  // register class of guideline window.
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = GuideWndProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = UIEXTRASIZE;
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szGuideClassName;
+  wcx.hbrBackground = NULL;
+  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
+
+  return TRUE;
+}
+
+HKL MZIMEJA::GetHKL(VOID) {
+  HKL hKL = 0, *lphkl;
+
+  DWORD dwSize = GetKeyboardLayoutList(0, NULL);
+  lphkl = (HKL *)GlobalAlloc(GPTR, dwSize * sizeof(DWORD));
+  if (!lphkl) return NULL;
+
+  GetKeyboardLayoutList(dwSize, lphkl);
+
+  TCHAR szFile[32];
+  for (DWORD dwi = 0; dwi < dwSize; dwi++) {
+    HKL hKLTemp = *(lphkl + dwi);
+    ImmGetIMEFileName(hKLTemp, szFile, _countof(szFile));
+
+    if (!lstrcmp(szFile, MZIME_FILENAME)) {
+      hKL = hKLTemp;
+      break;
+    }
+  }
+
+  GlobalFree(lphkl);
+  return hKL;
+}
+
+// Update the transrate key buffer
+BOOL MZIMEJA::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
+  LPTRANSMSG lpgmT0;
+
+  ++m_uNumTransKey;
+  if (m_uNumTransKey >= m_lpCurTransKey->uMsgCount) {
+    m_fOverTransKey = TRUE;
+    return FALSE;
+  }
+
+  lpgmT0 = m_lpCurTransKey->TransMsg + (m_uNumTransKey - 1);
+  *lpgmT0 = *lpGeneMsg;
+
+  return TRUE;
+}
+
+BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
+  TRANSMSG genmsg;
+  genmsg.message = message;
+  genmsg.wParam = wParam;
+  genmsg.lParam = lParam;
+  return GenerateMessage(genmsg);
+}
+
+// Update the transrate key buffer
+BOOL MZIMEJA::GenerateMessage(
+  HIMC hIMC, InputContext *lpIMC, LPTRANSMSG lpGeneMsg)
+{
+  if (m_lpCurTransKey)
+    return GenerateMessageToTransKey(lpGeneMsg);
+
+  if (::IsWindow(lpIMC->hWnd)) {
+    DWORD dwNewSize = sizeof(TRANSMSG) * (lpIMC->NumMsgBuf() + 1);
+    if (!(lpIMC->hMsgBuf = ImmReSizeIMCC(lpIMC->hMsgBuf, dwNewSize)))
+      return FALSE;
+
+    LPTRANSMSG lpTransMsg = lpIMC->LockMsgBuf();
+    if (NULL == lpTransMsg) return FALSE;
+    lpTransMsg[lpIMC->NumMsgBuf()] = *lpGeneMsg;
+    lpIMC->NumMsgBuf()++;
+    lpIMC->UnlockMsgBuf();
+
+    ImmGenerateMessage(hIMC);
+  }
+  return TRUE;
+}
+
+void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
+  if (!m_hMyKL) {
+    m_hMyKL = GetHKL();
+    if (!m_hMyKL) return;
+  }
+
+  HWND hwndIndicate = FindWindow(INDICATOR_CLASS, NULL);
+
+  BOOL fOpen = FALSE;
+  if (hIMC) {
+    InputContext *lpIMC = TheApp.LockIMC(hIMC);
+    if (lpIMC) {
+      fOpen = lpIMC->fOpen;
+      TheApp.UnlockIMC();
+    }
+  }
+
+  if (IsWindow(hwndIndicate)) {
+    ATOM atomTip;
+
+    atomTip = GlobalAddAtom(TEXT("MZ-IME Open"));
+    PostMessage(hwndIndicate, INDICM_SETIMEICON, fOpen ? 1 : (-1),
+                (LPARAM)m_hMyKL);
+    PostMessage(hwndIndicate, INDICM_SETIMETOOLTIPS, fOpen ? atomTip : (-1),
+                (LPARAM)m_hMyKL);
+    PostMessage(hwndIndicate, INDICM_REMOVEDEFAULTMENUITEMS,
+                // fOpen ? (RDMI_LEFT | RDMI_RIGHT) : 0, (LPARAM)m_hMyKL);
+                fOpen ? (RDMI_LEFT) : 0, (LPARAM)m_hMyKL);
+  }
 }
 
 VOID MZIMEJA::Destroy(VOID) {
@@ -69,6 +256,31 @@ LPTSTR MZIMEJA::LoadSTR(INT nID) {
   sz[0] = 0;
   ::LoadString(m_hInst, nID, sz, 512);
   return sz;
+}
+
+InputContext *MZIMEJA::LockIMC(HIMC hIMC) {
+  InputContext *context;
+  context = (InputContext *)::ImmLockIMC(hIMC);
+  if (context) {
+    m_hIMC = hIMC;
+    m_lpIMC = context;
+  }
+  return context;
+}
+
+VOID MZIMEJA::UnlockIMC() {
+  if (m_hIMC) {
+    ::ImmUnlockIMC(m_hIMC);
+    m_hIMC = NULL;
+    m_lpIMC = NULL;
+  }
+}
+
+BOOL MZIMEJA::GenerateMessage(TRANSMSG& msg) {
+  if (m_lpIMC) {
+    return GenerateMessage(m_hIMC, m_lpIMC, &msg);
+  }
+  return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////////

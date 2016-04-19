@@ -16,22 +16,11 @@ void InputContext::Initialize() {
     SetsConversion();
   }
 
-  hCompStr = ImmReSizeIMCC(hCompStr, sizeof(MZCOMPSTR));
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    lpCompStr->dwSize = sizeof(MZCOMPSTR);
-    UnlockCompStr();
-  }
-
-  hCandInfo = ImmReSizeIMCC(hCandInfo, sizeof(MZCAND));
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->dwSize = sizeof(MZCAND);
-    UnlockCandInfo();
-  }
+  hCompStr = CompStr::ReAlloc(hCompStr, NULL);
+  hCandInfo = CandInfo::ReAlloc(hCandInfo);
 }
 
-BOOL InputContext::IsCandidate() {
+BOOL InputContext::HasCandidate() {
   BOOL fRet = FALSE;
 
   if (ImmGetIMCCSize(hCandInfo) < sizeof(CANDIDATEINFO)) return FALSE;

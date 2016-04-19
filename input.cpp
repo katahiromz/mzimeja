@@ -59,14 +59,14 @@ BOOL PASCAL DicKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
       break;
 
     case VK_RETURN:
-      lpIMC = (InputContext *)ImmLockIMC(hIMC);
+      lpIMC = TheApp.LockIMC(hIMC);
       if (lpIMC) {
         if (!(lpIMC->fdwConversion & IME_CMODE_CHARCODE))
           MakeResultString(hIMC, TRUE);
         else
           FlushText(hIMC);
 
-        ImmUnlockIMC(hIMC);
+        TheApp.UnlockIMC();
       }
       break;
 
