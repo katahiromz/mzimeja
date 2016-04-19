@@ -23,15 +23,15 @@ DWORD LogCompStr::GetTotalSize() const {
 void CompStr::GetLog(LogCompStr& log) {
   log.dwCursorPos = dwCursorPos;
   log.dwDeltaStart = dwDeltaStart;
-  log.comp_read_attr.assign(GetCompReadAttr(), dwCompReadAttrLen);
-  log.comp_read_clause.assign((char *)GetCompReadClause(), dwCompReadClauseLen);
+  log.comp_read_attr.assign(GetCompReadAttr(), GetCompReadAttr() + dwCompReadAttrLen);
+  log.comp_read_clause.assign(GetCompReadClause(), GetCompReadClause() + dwCompReadClauseLen / sizeof(DWORD));
   log.comp_read_str.assign(GetCompReadStr(), dwCompReadStrLen);
-  log.comp_attr.assign(GetCompAttr(), dwCompAttrLen);
-  log.comp_clause.assign((char *)GetCompClause(), dwCompClauseLen);
+  log.comp_attr.assign(GetCompAttr(), GetCompAttr() + dwCompAttrLen);
+  log.comp_clause.assign(GetCompClause(), GetCompClause() + dwCompClauseLen / sizeof(DWORD));
   log.comp_str.assign(GetCompStr(), dwCompStrLen);
-  log.result_read_clause.assign((char *)GetResultReadClause(), dwResultReadClauseLen);
+  log.result_read_clause.assign(GetResultReadClause(), GetResultReadClause() + dwResultReadClauseLen / sizeof(DWORD));
   log.result_read_str.assign(GetResultReadStr(), dwResultReadStrLen);
-  log.result_clause.assign((char *)GetResultClause(), dwResultClauseLen);
+  log.result_clause.assign(GetResultClause(), GetResultClause() + dwResultClauseLen / sizeof(DWORD));
   log.result_str.assign(GetResultStr(), dwResultStrLen);
 }
 
@@ -52,19 +52,23 @@ void CompStr::GetLog(LogCompStr& log) {
   memcpy(pb, &log->member[0], log->member.size()); \
   pb += log->member.size()
 
+#define ADD_DWORDS(member) \
+  memcpy(pb, &log->member[0], log->member.size() * sizeof(DWORD)); \
+  pb += log->member.size() * sizeof(DWORD)
+
 #define ADD_STRING(member) \
   memcpy(pb, &log->member[0], log->member.size() * sizeof(WCHAR)); \
   pb += log->member.size() * sizeof(WCHAR)
 
       ADD_BYTES(comp_read_attr);
-      ADD_BYTES(comp_read_clause);
+      ADD_DWORDS(comp_read_clause);
       ADD_STRING(comp_read_str);
       ADD_BYTES(comp_attr);
-      ADD_BYTES(comp_clause);
+      ADD_DWORDS(comp_clause);
       ADD_STRING(comp_str);
-      ADD_BYTES(result_read_clause);
+      ADD_DWORDS(result_read_clause);
       ADD_STRING(result_read_str);
-      ADD_BYTES(result_clause);
+      ADD_DWORDS(result_clause);
       ADD_STRING(result_str);
 
       assert((DWORD)(pb - lpCompStr->GetBytes()) == total);

@@ -11,23 +11,24 @@
 
 #ifdef __cplusplus
   #include <string>
+  #include <vector>
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
 
 struct LogCompStr {
-  DWORD         dwCursorPos;
-  DWORD         dwDeltaStart;
-  std::string   comp_read_attr;
-  std::string   comp_read_clause;
-  std::wstring  comp_read_str;
-  std::string   comp_attr;
-  std::string   comp_clause;
-  std::wstring  comp_str;
-  std::string   result_read_clause;
-  std::wstring  result_read_str;
-  std::string   result_clause;
-  std::wstring  result_str;
+  DWORD               dwCursorPos;
+  DWORD               dwDeltaStart;
+  std::vector<BYTE>   comp_read_attr;
+  std::vector<DWORD>  comp_read_clause;
+  std::wstring        comp_read_str;
+  std::vector<BYTE>   comp_attr;
+  std::vector<DWORD>  comp_clause;
+  std::wstring        comp_str;
+  std::vector<DWORD>  result_read_clause;
+  std::wstring        result_read_str;
+  std::vector<DWORD>  result_clause;
+  std::wstring        result_str;
   LogCompStr() {
     dwCursorPos = 0;
     dwDeltaStart = 0;
