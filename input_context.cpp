@@ -48,7 +48,7 @@ BOOL InputContext::HasConvertedCompStr() {
 
   CompStr *pCompStr = LockCompStr();
   BOOL ret = (pCompStr->dwCompStrLen > 0) &&
-             (lpCompStr->GetCompAttr()[0] != ATTR_INPUT);
+             (pCompStr->GetCompAttr()[0] != ATTR_INPUT);
   UnlockCompStr();
 
   return ret;
