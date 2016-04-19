@@ -343,7 +343,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 }
 
 void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
-                            char *lpattr, int num, BOOL fVert) {
+                            LPBYTE lpattr, int num, BOOL fVert) {
   //LPTSTR lpStart = lpstr;
   LPTSTR lpEnd = lpstr + num - 1;
   int x, y;
@@ -432,7 +432,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen > 0)) {
         LPTSTR lpstr;
-        char *lpattr;
+        LPBYTE lpattr;
         LONG lstart;
         LONG num;
         BOOL fVert = FALSE;

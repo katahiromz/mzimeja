@@ -142,7 +142,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     }
   }
 
-  char *lpb = lpCompStr->GetCompAttr();
+  LPBYTE lpb = lpCompStr->GetCompAttr();
   if (nBufLen < 1) {
     if (!*lpb) {
       // make attribute

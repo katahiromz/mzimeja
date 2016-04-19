@@ -45,7 +45,7 @@ void CompStr::GetLog(LogCompStr& log) {
       lpCompStr->dwCursorPos = (log ? log->dwCursorPos : 0);
       lpCompStr->dwDeltaStart = (log ? log->dwDeltaStart : 0);
 
-      char *pb = lpCompStr->GetBytes();
+      LPBYTE pb = lpCompStr->GetBytes();
       pb += sizeof(COMPOSITIONSTRING);
 
 #define ADD_BYTES(member) \
@@ -114,7 +114,7 @@ void CompStr::Clear(DWORD dwClrFlag) {
 }
 
 BOOL CompStr::CheckAttr() {
-  char *lpb = GetCompAttr();
+  LPBYTE lpb = GetCompAttr();
   int len = dwCompAttrLen;
   for (int i = 0; i < len; i++)
     if (*lpb++ & 0x01) return TRUE;
@@ -127,7 +127,7 @@ void CompStr::MakeAttrClause() {
   if (len != readlen) return;
 
   DWORD pos = dwCursorPos;
-  char *lpb = GetCompAttr();
+  LPBYTE lpb = GetCompAttr();
   for (DWORD i = 0; i < len; i++) {
     if (i < pos)
       *lpb++ = 0x10;

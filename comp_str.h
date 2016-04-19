@@ -52,9 +52,9 @@ struct CompStr : public COMPOSITIONSTRING {
 
   void GetLog(LogCompStr& log);
 
-  char *GetBytes() { return (char *)this; }
+  LPBYTE GetBytes() { return (LPBYTE)this; }
 
-  char *GetCompReadAttr() {
+  LPBYTE GetCompReadAttr() {
     return GetBytes() + dwCompReadAttrOffset;
   }
   LPDWORD GetCompReadClause() {
@@ -63,8 +63,8 @@ struct CompStr : public COMPOSITIONSTRING {
   LPTSTR GetCompReadStr() {
     return (LPTSTR)(GetBytes() + dwCompReadStrOffset);
   }
-  char *GetCompAttr() {
-    return (char *)(GetBytes() + dwCompAttrOffset);
+  LPBYTE GetCompAttr() {
+    return GetBytes() + dwCompAttrOffset;
   }
   LPDWORD GetCompClause() {
     return (LPDWORD)(GetBytes() + dwCompClauseOffset);
