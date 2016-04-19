@@ -54,11 +54,6 @@
 #define WS_COMPDEFAULT (WS_DISABLED | WS_POPUP)
 #define WS_COMPNODEFAULT (WS_DISABLED | WS_POPUP)
 
-// macro for me!
-#define IsCTLPushed(x) ((x)[VK_CONTROL] & 0x80)
-#define IsSHFTPushed(x) ((x)[VK_SHIFT] & 0x80)
-#define IsALTPushed(x) ((x)[VK_ALT] & 0x80)
-
 // update context
 #define UPDATE_MODE 0x01
 #define UPDATE_SYSTEM 0x02

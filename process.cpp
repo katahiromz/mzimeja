@@ -4,6 +4,10 @@
 #include "mzimeja.h"
 #include "vksub.h"
 
+#define IsCtrlPressed(x)  ((x)[VK_CONTROL] & 0x80)
+#define IsShiftPressed(x) ((x)[VK_SHIFT] & 0x80)
+#define IsAltPressed(x)   ((x)[VK_ALT] & 0x80)
+
 extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -32,32 +36,32 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     break;
 
   case VK_F3:
-    if (IsCTLPushed(lpbKeyState)) ChangeMode(hIMC, TO_CMODE_ROMAN);
+    if (IsCtrlPressed(lpbKeyState)) ChangeMode(hIMC, TO_CMODE_ROMAN);
     break;
 
   case VK_F6:
-    if (IsCTLPushed(lpbKeyState))
+    if (IsCtrlPressed(lpbKeyState))
       ChangeMode(hIMC, TO_CMODE_HIRAGANA);
     else
       ChangeCompStr(hIMC, TO_CMODE_HIRAGANA);
     break;
 
   case VK_F7:
-    if (IsCTLPushed(lpbKeyState))
+    if (IsCtrlPressed(lpbKeyState))
       ChangeMode(hIMC, TO_CMODE_KATAKANA);
     else
       ChangeCompStr(hIMC, TO_CMODE_KATAKANA);
     break;
 
   case VK_F8:
-    if (IsCTLPushed(lpbKeyState))
+    if (IsCtrlPressed(lpbKeyState))
       ChangeMode(hIMC, TO_CMODE_FULLSHAPE);
     else
       ChangeCompStr(hIMC, TO_CMODE_FULLSHAPE);
     break;
 
   case VK_F9:
-    if (IsCTLPushed(lpbKeyState))
+    if (IsCtrlPressed(lpbKeyState))
       ChangeMode(hIMC, TO_CMODE_ALPHANUMERIC);
     else
       ChangeCompStr(hIMC, TO_CMODE_ALPHANUMERIC);
