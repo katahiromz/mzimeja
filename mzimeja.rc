@@ -27,6 +27,13 @@
 // remains consistent on all systems.
 MZIMEICON               ICON    DISCARDABLE     "res\\mzimeja.ico"
 INDICOPENICON           ICON    DISCARDABLE     "res\\penindic.ico"
+MODE0ICON               ICON    DISCARDABLE     "res\\mode0.ico"
+MODE1ICON               ICON    DISCARDABLE     "res\\mode1.ico"
+MODE2ICON               ICON    DISCARDABLE     "res\\mode2.ico"
+MODE3ICON               ICON    DISCARDABLE     "res\\mode3.ico"
+MODE4ICON               ICON    DISCARDABLE     "res\\mode4.ico"
+MODE5ICON               ICON    DISCARDABLE     "res\\mode5.ico"
+MODE6ICON               ICON    DISCARDABLE     "res\\mode6.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -38,7 +45,7 @@ CLOSEBMP                BITMAP  DISCARDABLE     "res\\close.bmp"
 CHECKBMP                BITMAP  DISCARDABLE     "res\\check.bmp"
 UNCHECKBMP              BITMAP  DISCARDABLE     "res\\uncheck.bmp"
 FACEBMP                 BITMAP  DISCARDABLE     "res\\face.bmp"
-MODESBMP                BITMAP  DISCARDABLE     "res\\modes.bmp"
+MODESBMP                BITMAP  DISCARDABLE     "res\\modes-large.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
