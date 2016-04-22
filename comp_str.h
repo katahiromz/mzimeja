@@ -33,6 +33,10 @@ struct LogCompStr {
   LogCompStr() {
     dwCursorPos = 0;
     dwDeltaStart = 0;
+    comp_read_clause.resize(2, 0);
+    comp_clause.resize(2, 0);
+    result_read_clause.resize(2, 0);
+    result_clause.resize(2, 0);
   }
   DWORD GetTotalSize() const;
 };

@@ -157,6 +157,32 @@ void StatusWnd_OnButton(HWND hWnd, POINT pt, INT nPushed) {
   DebugPrint(TEXT("status button: %d"), nPushed);
 } // StatusWnd_OnButton
 
+void RepositionWindow(HWND hWnd) {
+  RECT rc, rcWorkArea;
+  ::GetWindowRect(hWnd, &rc);
+  ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, FALSE);
+  SIZE siz;
+  siz.cx = rc.right - rc.left;
+  siz.cy = rc.bottom - rc.top;
+  if (rc.right > rcWorkArea.right) {
+    rc.right = rcWorkArea.right;
+    rc.left = rcWorkArea.right - siz.cx;
+  }
+  if (rc.left < rcWorkArea.left) {
+    rc.left = rcWorkArea.left;
+    rc.right = rc.left + siz.cx;
+  }
+  if (rc.bottom > rcWorkArea.bottom) {
+    rc.bottom = rcWorkArea.bottom;
+    rc.top = rcWorkArea.bottom - siz.cy;
+  }
+  if (rc.top < rcWorkArea.top) {
+    rc.top = rcWorkArea.top;
+    rc.bottom = rc.top + siz.cy;
+  }
+  ::MoveWindow(hWnd, rc.left, rc.top, siz.cx, siz.cy, TRUE);
+}
+
 void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
   static POINT prev = {-1, -1};
   STATUS_WND_HITTEST hittest = StatusWnd_HitTest(hWnd, pt);
@@ -193,6 +219,7 @@ void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
     prev.x = -1;
     prev.y = -1;
     ::ReleaseCapture();
+    RepositionWindow(hWnd);
   }
 } // StatusWnd_OnLButton
 
