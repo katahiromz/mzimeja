@@ -36,43 +36,52 @@ void CompStr::GetLogCompStr(LogCompStr& log) {
 }
 
 /*static*/ HIMCC CompStr::ReAlloc(HIMCC hCompStr, const LogCompStr *log) {
-  DWORD total = (log ? log->GetTotalSize() : sizeof(COMPOSITIONSTRING));
+  LogCompStr log_comp_str;
+  if (log == NULL) {
+    log = &log_comp_str;
+  }
+  DWORD total = log->GetTotalSize();
   HIMCC hNewCompStr = ImmReSizeIMCC(hCompStr, total);
   if (hNewCompStr) {
     CompStr *lpCompStr = (CompStr *)ImmLockIMCC(hNewCompStr);
     if (lpCompStr) {
       lpCompStr->dwSize = total;
-      lpCompStr->dwCursorPos = (log ? log->dwCursorPos : 0);
-      lpCompStr->dwDeltaStart = (log ? log->dwDeltaStart : 0);
+      lpCompStr->dwCursorPos = log->dwCursorPos;
+      lpCompStr->dwDeltaStart = log->dwDeltaStart;
 
       LPBYTE pb = lpCompStr->GetBytes();
       pb += sizeof(COMPOSITIONSTRING);
 
 #define ADD_BYTES(member) \
-  memcpy(pb, &log->member[0], log->member.size()); \
-  pb += log->member.size()
+  if (log->member.size()) { \
+    memcpy(pb, &log->member[0], log->member.size() * sizeof(BYTE)); \
+    pb += log->member.size() * sizeof(BYTE); \
+  }
 
 #define ADD_DWORDS(member) \
-  memcpy(pb, &log->member[0], log->member.size() * sizeof(DWORD)); \
-  pb += log->member.size() * sizeof(DWORD)
+  if (log->member.size()) { \
+    memcpy(pb, &log->member[0], log->member.size() * sizeof(DWORD)); \
+    pb += log->member.size() * sizeof(DWORD); \
+  }
 
 #define ADD_STRING(member) \
-  memcpy(pb, &log->member[0], log->member.size() * sizeof(WCHAR)); \
-  pb += log->member.size() * sizeof(WCHAR)
+  if (log->member.size()) { \
+    memcpy(pb, &log->member[0], log->member.size() * sizeof(WCHAR)); \
+    pb += log->member.size() * sizeof(WCHAR); \
+  }
 
-      if (log) {
-        ADD_BYTES(comp_read_attr);
-        ADD_DWORDS(comp_read_clause);
-        ADD_STRING(comp_read_str);
-        ADD_BYTES(comp_attr);
-        ADD_DWORDS(comp_clause);
-        ADD_STRING(comp_str);
-        ADD_DWORDS(result_read_clause);
-        ADD_STRING(result_read_str);
-        ADD_DWORDS(result_clause);
-        ADD_STRING(result_str);
-        assert((DWORD)(pb - lpCompStr->GetBytes()) == total);
-      }
+      ADD_BYTES(comp_read_attr);
+      ADD_DWORDS(comp_read_clause);
+      ADD_STRING(comp_read_str);
+      ADD_BYTES(comp_attr);
+      ADD_DWORDS(comp_clause);
+      ADD_STRING(comp_str);
+      ADD_DWORDS(result_read_clause);
+      ADD_STRING(result_read_str);
+      ADD_DWORDS(result_clause);
+      ADD_STRING(result_str);
+      assert((DWORD)(pb - lpCompStr->GetBytes()) == total);
+
       ImmUnlockIMCC(hNewCompStr);
       hCompStr = hNewCompStr;
     }
