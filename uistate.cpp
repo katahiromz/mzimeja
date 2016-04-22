@@ -242,16 +242,19 @@ LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     }
 
   case WM_LBUTTONDOWN:
+    // This message comes from the captured window.
     ::GetCursorPos(&pt);
     StatusWnd_OnLButton(hWnd, pt, TRUE);
     break;
 
   case WM_LBUTTONUP:
+    // This message comes from the captured window.
     ::GetCursorPos(&pt);
     StatusWnd_OnLButton(hWnd, pt, FALSE);
     break;
 
   case WM_MOUSEMOVE:
+    // This message comes from the captured window.
     ::GetCursorPos(&pt);
     if (wParam & MK_LBUTTON) {
       StatusWnd_OnLButton(hWnd, pt, TRUE);
@@ -261,6 +264,7 @@ LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     break;
 
   case WM_SETCURSOR:
+    // This message comes even from the disabled window.
     DebugPrint(TEXT("status message: WM_SETCURSOR"));
     ::GetCursorPos(&pt);
     switch (HIWORD(lParam)) {
