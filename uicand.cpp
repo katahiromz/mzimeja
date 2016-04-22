@@ -29,7 +29,7 @@ LRESULT CALLBACK CandWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_MOVE:
-      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SVRWND);
+      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
       if (IsWindow(hUIWnd)) SendMessage(hUIWnd, WM_UI_CANDMOVE, wParam, lParam);
       break;
 
@@ -101,7 +101,7 @@ void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
                        lpUIExtra->uiCand.pt.y, 1, 1, hUIWnd, NULL, TheApp.m_hInst, NULL);
   }
 
-  SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SVRWND, (LONG_PTR)hUIWnd);
+  SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
   ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
   lpUIExtra->uiCand.bShow = FALSE;
 
@@ -115,7 +115,7 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
   PAINTSTRUCT ps;
   HDC hDC = BeginPaint(hCandWnd, &ps);
   SetBkMode(hDC, TRANSPARENT);
-  HWND hSvrWnd = (HWND)GetWindowLongPtr(hCandWnd, FIGWLP_SVRWND);
+  HWND hSvrWnd = (HWND)GetWindowLongPtr(hCandWnd, FIGWLP_SERVERWND);
 
   HBRUSH hbrHightLight = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
   HIMC hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);

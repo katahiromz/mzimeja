@@ -85,8 +85,8 @@
 
 // WndExtra of child UI windows
 #define FIGWL_MOUSE 0
-#define FIGWLP_SVRWND       (FIGWL_MOUSE + sizeof(LONG))
-#define FIGWLP_FONT         (FIGWLP_SVRWND + sizeof(LONG_PTR))
+#define FIGWLP_SERVERWND    (FIGWL_MOUSE + sizeof(LONG))
+#define FIGWLP_FONT         (FIGWLP_SERVERWND + sizeof(LONG_PTR))
 #define FIGWL_COMPSTARTSTR  (FIGWLP_FONT + sizeof(LONG_PTR))
 #define FIGWL_COMPSTARTNUM  (FIGWL_COMPSTARTSTR + sizeof(LONG))
 #define FIGWLP_STATUSBMP    (FIGWL_COMPSTARTNUM + sizeof(LONG))
@@ -104,17 +104,6 @@
 #define PUSHED_STATUS_MODE 0x02
 #define PUSHED_STATUS_ROMAN 0x04
 #define PUSHED_STATUS_CLOSE 0x08
-
-// Status Button Pos
-#define BTX 20
-#define BTY 20
-#define BTFHIRA 20
-#define BTFKATA 40
-#define BTFALPH 60
-#define BTHKATA 80
-#define BTHALPH 100
-#define BTROMA 120
-#define BTEMPT 140
 
 // Statue Close Button
 #define STCLBT_X (BTX * 2 + 3)
@@ -226,8 +215,9 @@ int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra);
 BOOL PASCAL IsImeMessage(UINT message);
 
 // uistate.c
+HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra);
 LRESULT CALLBACK StatusWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
-void PASCAL StatusWnd_Update(LPUIEXTRA lpUIExtra);
+void StatusWnd_Update(LPUIEXTRA lpUIExtra);
 
 // uicand.c
 LRESULT CALLBACK CandWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -297,16 +287,16 @@ WORD PASCAL KataToHira(WORD);
 void PASCAL lZenToHan(LPTSTR, LPTSTR);
 void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
 
-#ifdef _DEBUG
+#ifdef NDEBUG
+  #define DebugPrint (void)
+  #define ERROROUT(x)
+  #define WARNOUT(x)
+#else
   int DebugPrint(LPCTSTR lpszFormat, ...);
   VOID WarnOut(LPCTSTR pStr);
   VOID ErrorOut(LPCTSTR pStr);
   #define ERROROUT(x) ErrorOut(x)
   #define WARNOUT(x) WarnOut(x)
-#else
-  #define DebugPrint (void)
-  #define ERROROUT(x)
-  #define WARNOUT(x)
 #endif
 
 //////////////////////////////////////////////////////////////////////////////

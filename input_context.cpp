@@ -8,6 +8,7 @@
 void InputContext::Initialize() {
   if (!HasLogFont()) {
     lfFont.W.lfCharSet = SHIFTJIS_CHARSET;
+    lfFont.W.lfFaceName[0] = L'\0';
     fdwInit |= INIT_LOGFONT;
   }
 

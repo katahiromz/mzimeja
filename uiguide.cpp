@@ -45,7 +45,7 @@ LRESULT CALLBACK GuideWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_MOVE:
-      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SVRWND);
+      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
       if (IsWindow(hUIWnd))
         SendMessage(hUIWnd, WM_UI_GUIDEMOVE, wParam, lParam);
       break;
@@ -99,7 +99,7 @@ void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
   DWORD dwLevel;
   DWORD dwSize;
 
-  hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SVRWND);
+  hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND);
 
   hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
@@ -249,7 +249,7 @@ void PASCAL ButtonGuide(HWND hGuideWnd, UINT message, WPARAM wParam,
                      rc.bottom, TRUE);
         }
       }
-      hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SVRWND);
+      hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND);
 
       hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
       if (hIMC) {

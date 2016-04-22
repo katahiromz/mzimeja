@@ -331,7 +331,7 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
   switch (wParam) {
     case IMN_CLOSESTATUSWINDOW:
       if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
-        GetWindowRect(lpUIExtra->uiStatus.hWnd, (LPRECT)&rc);
+        GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
         lpUIExtra->uiStatus.pt.x = rc.left;
         lpUIExtra->uiStatus.pt.y = rc.top;
         ShowWindow(lpUIExtra->uiStatus.hWnd, SW_HIDE);
@@ -345,22 +345,7 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
         lpUIExtra->uiStatus.pt.x = rc.right + 1;
         lpUIExtra->uiStatus.pt.y = rc.top;
       }
-      if (!IsWindow(lpUIExtra->uiStatus.hWnd)) {
-        lpUIExtra->uiStatus.hWnd = CreateWindowEx(
-            WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME, szStatusClassName,
-            NULL, WS_DISABLED | WS_POPUP | WS_BORDER, lpUIExtra->uiStatus.pt.x,
-            lpUIExtra->uiStatus.pt.y,
-            BTX * 3 + 2 * GetSystemMetrics(SM_CXBORDER) +
-                2 * GetSystemMetrics(SM_CXEDGE),
-            BTX + GetSystemMetrics(SM_CYSMCAPTION) +
-                2 * GetSystemMetrics(SM_CYBORDER) +
-                2 * GetSystemMetrics(SM_CYEDGE),
-            hWnd, NULL, TheApp.m_hInst, NULL);
-      }
-
-      ShowWindow(lpUIExtra->uiStatus.hWnd, SW_SHOWNOACTIVATE);
-      lpUIExtra->uiStatus.bShow = TRUE;
-      SetWindowLongPtr(lpUIExtra->uiStatus.hWnd, FIGWLP_SVRWND, (LONG_PTR)hWnd);
+      lpUIExtra->uiStatus.hWnd = StatusWnd_Create(hWnd, lpUIExtra);
       break;
 
     case IMN_SETCONVERSIONMODE:
@@ -442,7 +427,7 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
         }
         ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
         lpUIExtra->uiGuide.bShow = TRUE;
-        SetWindowLongPtr(lpUIExtra->uiGuide.hWnd, FIGWLP_SVRWND, (LONG_PTR)hWnd);
+        SetWindowLongPtr(lpUIExtra->uiGuide.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
         UpdateGuideWindow(lpUIExtra);
       }
       break;

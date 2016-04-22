@@ -290,7 +290,7 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 // for debugging
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 int DebugPrint(LPCTSTR lpszFormat, ...) {
   int nCount;
   TCHAR szMsg[1024];
@@ -315,15 +315,11 @@ int DebugPrint(LPCTSTR lpszFormat, ...) {
   }
   return nCount;
 }
-#endif  // def _DEBUG
 
-#ifdef _DEBUG
 VOID WarnOut(LPCTSTR pStr) {
   DebugPrint(TEXT("%s"), pStr);
 }
-#endif  // def _DEBUG
 
-#ifdef _DEBUG
 VOID ErrorOut(LPCTSTR pStr) {
   DWORD dwError;
   DWORD dwResult;
@@ -340,23 +336,23 @@ VOID ErrorOut(LPCTSTR pStr) {
     DebugPrint(TEXT("%s:(0x%x)"), pStr, dwError);
   }
 }
-#endif  // def _DEBUG
+#endif  // ndef NDEBUG
 
 //////////////////////////////////////////////////////////////////////////////
 // DLL entry point
 
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
-  DebugPrint(TEXT("DLLEntry:dwFunc=%d\n"), dwFunction);
+  DebugPrint(TEXT("DLLEntry:dwFunc=%d"), dwFunction);
 
   switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
-      TheApp.Init(hInstDLL);
       DebugPrint(TEXT("DLLEntry Process Attach hInst is %lx"), TheApp.m_hInst);
+      TheApp.Init(hInstDLL);
       break;
 
     case DLL_PROCESS_DETACH:
-      TheApp.Destroy();
       DebugPrint(TEXT("DLLEntry Process Detach hInst is %lx"), TheApp.m_hInst);
+      TheApp.Destroy();
       break;
 
     case DLL_THREAD_ATTACH:

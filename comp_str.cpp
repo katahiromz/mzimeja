@@ -60,18 +60,19 @@ void CompStr::GetLogCompStr(LogCompStr& log) {
   memcpy(pb, &log->member[0], log->member.size() * sizeof(WCHAR)); \
   pb += log->member.size() * sizeof(WCHAR)
 
-      ADD_BYTES(comp_read_attr);
-      ADD_DWORDS(comp_read_clause);
-      ADD_STRING(comp_read_str);
-      ADD_BYTES(comp_attr);
-      ADD_DWORDS(comp_clause);
-      ADD_STRING(comp_str);
-      ADD_DWORDS(result_read_clause);
-      ADD_STRING(result_read_str);
-      ADD_DWORDS(result_clause);
-      ADD_STRING(result_str);
-
-      assert((DWORD)(pb - lpCompStr->GetBytes()) == total);
+      if (log) {
+        ADD_BYTES(comp_read_attr);
+        ADD_DWORDS(comp_read_clause);
+        ADD_STRING(comp_read_str);
+        ADD_BYTES(comp_attr);
+        ADD_DWORDS(comp_clause);
+        ADD_STRING(comp_str);
+        ADD_DWORDS(result_read_clause);
+        ADD_STRING(result_read_str);
+        ADD_DWORDS(result_clause);
+        ADD_STRING(result_str);
+        assert((DWORD)(pb - lpCompStr->GetBytes()) == total);
+      }
       ImmUnlockIMCC(hNewCompStr);
       hCompStr = hNewCompStr;
     }

@@ -4,415 +4,295 @@
 #include "mzimeja.h"
 #include "resource.h"
 
+#define CX_BUTTON 24
+#define CY_BUTTON 24
+
+enum STATUS_WND_HITTEST {
+  SWHT_CAPTION,
+  SWHT_BUTTON_1,
+  SWHT_BUTTON_2
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
 extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-DWORD PASCAL CheckPushedStatus(HWND hStatusWnd, LPPOINT lppt) {
-  POINT pt;
+// create status window
+HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
+  const DWORD style = WS_DISABLED | WS_POPUP;
+  const DWORD exstyle = WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
+  HWND hwndStatus = lpUIExtra->uiStatus.hWnd;
+  if (!::IsWindow(hwndStatus)) {
+    INT cx, cy;
+    cx = 10 + CX_BUTTON * 2;
+    cx += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
+    cy = CY_BUTTON;
+    cy += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
+    hwndStatus = ::CreateWindowEx(
+      exstyle, szStatusClassName, NULL, style,
+      lpUIExtra->uiStatus.pt.x, lpUIExtra->uiStatus.pt.y,
+      cx, cy,
+      hWnd, NULL, TheApp.m_hInst, NULL);
+    lpUIExtra->uiStatus.hWnd = hwndStatus;
+  }
+  ::ShowWindow(hwndStatus, SW_SHOWNOACTIVATE);
+  lpUIExtra->uiStatus.bShow = TRUE;
+  SetWindowLongPtr(hwndStatus, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
+  return hwndStatus;
+} // StatusWnd_Create
+
+// draw status window
+void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
   RECT rc;
-
-  if (lppt) {
-    pt = *lppt;
-    ScreenToClient(hStatusWnd, &pt);
-    GetClientRect(hStatusWnd, &rc);
-    if (!PtInRect(&rc, pt)) return 0;
-
-    if (pt.y > GetSystemMetrics(SM_CYSMCAPTION)) {
-      if (pt.x < BTX)
-        return PUSHED_STATUS_HDR;
-      else if (pt.x < (BTX * 2))
-        return PUSHED_STATUS_MODE;
-      else if (pt.x < (BTX * 3))
-        return PUSHED_STATUS_ROMAN;
-    } else {
-      rc.left = STCLBT_X;
-      rc.top = STCLBT_Y;
-      rc.right = STCLBT_X + STCLBT_DX;
-      rc.bottom = STCLBT_Y + STCLBT_DY;
-      if (PtInRect(&rc, pt)) return PUSHED_STATUS_CLOSE;
-    }
-  }
-  return 0;
-}
-
-int PASCAL BTXFromCmode(DWORD dwCmode) {
-  if (dwCmode & IME_CMODE_FULLSHAPE) {
-    if (!(dwCmode & IME_CMODE_LANGUAGE))
-      return BTFALPH;
-    else if ((dwCmode & IME_CMODE_LANGUAGE) == IME_CMODE_NATIVE)
-      return BTFHIRA;
-    else
-      return BTFKATA;
-  } else {
-    if ((dwCmode & IME_CMODE_LANGUAGE) == IME_CMODE_ALPHANUMERIC)
-      return BTHALPH;
-    else
-      return BTHKATA;
-  }
-}
-
-void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
-                        DWORD dwPushedStatus) {
-  HIMC hIMC;
-  HDC hMemDC;
-  HBITMAP hbmpOld;
-  int x;
-  HWND hSvrWnd;
-
-  hSvrWnd = (HWND)GetWindowLongPtr(hStatusWnd, FIGWLP_SVRWND);
-
-  hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+  HBITMAP hbmStatus;
+  HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
+  HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
   if (hIMC) {
-    HBITMAP hbmpStatus;
-    HBRUSH hOldBrush, hBrush;
-    int nCyCap = GetSystemMetrics(SM_CYSMCAPTION);
-    RECT rc;
-
     InputContext *lpIMC = TheApp.LockIMC(hIMC);
-    hMemDC = CreateCompatibleDC(hDC);
+    if (lpIMC) {
+      // draw face
+      HBRUSH hbr3DFace = ::CreateSolidBrush(GetSysColor(COLOR_3DFACE));
+      ::GetClientRect(hWnd, &rc);
+      ::FillRect(hDC, &rc, hbr3DFace);
+      DeleteObject(hbr3DFace);
 
-    // Paint Caption.
-    hBrush = CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION));
-    hOldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-    rc.top = rc.left = 0;
-    rc.right = BTX * 3;
-    rc.bottom = nCyCap;
-    FillRect(hDC, &rc, hBrush);
-    SelectObject(hDC, hOldBrush);
-    DeleteObject(hBrush);
+      // draw caption
+      HBRUSH hbrCaption = ::CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION));
+      rc.right = rc.left + 10;
+      ::InflateRect(&rc, -2, -2);
+      ::FillRect(hDC, &rc, hbrCaption);
+      ::DeleteObject(hbrCaption);
 
-    // Paint CloseButton.
-    hbmpStatus = (HBITMAP)GetWindowLongPtr(hStatusWnd, FIGWLP_CLOSEBMP);
-    hbmpOld = (HBITMAP)SelectObject(hMemDC, hbmpStatus);
+      // lpIMC->IsOpen()
 
-    if (!(dwPushedStatus & PUSHED_STATUS_CLOSE))
-      BitBlt(hDC, STCLBT_X, STCLBT_Y, STCLBT_DX, STCLBT_DY, hMemDC, 0, 0,
-             SRCCOPY);
-    else
-      BitBlt(hDC, STCLBT_X, STCLBT_Y, STCLBT_DX, STCLBT_DY, hMemDC, STCLBT_DX,
-             0, SRCCOPY);
+      ::GetClientRect(hWnd, &rc);
+      hbmStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
+      HDC hMemDC = ::CreateCompatibleDC(hDC);
+      if (hMemDC) {
+        HGDIOBJ hbmOld = ::SelectObject(hMemDC, hbmStatus);
 
-    hbmpStatus = (HBITMAP)GetWindowLongPtr(hStatusWnd, FIGWLP_STATUSBMP);
-    SelectObject(hMemDC, hbmpStatus);
-
-    // Paint HDR.
-    x = BTEMPT;
-    if (lpIMC->IsOpen()) x = 0;
-
-    if (!(dwPushedStatus & PUSHED_STATUS_HDR))
-      BitBlt(hDC, 0, nCyCap, BTX, BTY, hMemDC, x, 0, SRCCOPY);
-    else
-      BitBlt(hDC, 0, nCyCap, BTX, BTY, hMemDC, x, BTY, SRCCOPY);
-
-    // Paint MODE.
-    x = BTXFromCmode(lpIMC->Conversion());
-
-    if (!(dwPushedStatus & PUSHED_STATUS_MODE))
-      BitBlt(hDC, BTX, nCyCap, BTX, BTY, hMemDC, x, 0, SRCCOPY);
-    else
-      BitBlt(hDC, BTX, nCyCap, BTX, BTY, hMemDC, x, BTY, SRCCOPY);
-
-    // Paint Roman MODE.
-    x = BTEMPT;
-    if (lpIMC->Conversion() & IME_CMODE_ROMAN) x = BTROMA;
-
-    if (!(dwPushedStatus & PUSHED_STATUS_ROMAN))
-      BitBlt(hDC, BTX * 2, nCyCap, BTX, BTY, hMemDC, x, 0, SRCCOPY);
-    else
-      BitBlt(hDC, BTX * 2, nCyCap, BTX, BTY, hMemDC, x, BTY, SRCCOPY);
-
-    SelectObject(hMemDC, hbmpOld);
-    DeleteDC(hMemDC);
-    TheApp.UnlockIMC();
-  }
-}
-
-DWORD PASCAL GetUINextMode(DWORD fdwConversion, DWORD dwPushed) {
-  DWORD dwTemp;
-  BOOL fFullShape = ((fdwConversion & IME_CMODE_FULLSHAPE) != 0);
-
-  //
-  // When the mode button is pushed, the convmode will be chage as follow
-  // rotation.
-  //
-  //     FULLSHAPE,HIRAGANA     ->
-  //     FULLSHAPE,KATAKANA     ->
-  //     FULLSHAPE,ALPHANUMERIC ->
-  //     HALFSHAPE,KATAKANA     ->
-  //     HALFSHAPE,ALPHANUMERIC ->
-  //     FULLSHAPE,HIRAGANA
-  //
-  if (dwPushed == PUSHED_STATUS_MODE) {
-    dwTemp = fdwConversion & IME_CMODE_LANGUAGE;
-
-    if ((fFullShape) && (dwTemp == IME_CMODE_NATIVE))
-      return (fdwConversion & ~IME_CMODE_LANGUAGE) | IME_CMODE_KATAKANA |
-             IME_CMODE_NATIVE;
-
-    if ((fFullShape) && (dwTemp == (IME_CMODE_KATAKANA | IME_CMODE_NATIVE)))
-      return (fdwConversion & ~IME_CMODE_LANGUAGE);
-
-    if ((fFullShape) && (dwTemp == 0)) {
-      fdwConversion &= ~IME_CMODE_FULLSHAPE;
-      return (fdwConversion & ~IME_CMODE_LANGUAGE) | IME_CMODE_KATAKANA |
-             IME_CMODE_NATIVE;
-    }
-
-    if ((!fFullShape) && (dwTemp == (IME_CMODE_KATAKANA | IME_CMODE_NATIVE)))
-      return (fdwConversion & ~IME_CMODE_LANGUAGE);
-
-    if ((!fFullShape) && (!dwTemp)) {
-      fdwConversion |= IME_CMODE_FULLSHAPE;
-      return (fdwConversion & ~IME_CMODE_LANGUAGE) | IME_CMODE_NATIVE;
-    }
-  }
-  if (dwPushed == PUSHED_STATUS_ROMAN) {
-    if (fdwConversion & IME_CMODE_ROMAN)
-      return fdwConversion & ~IME_CMODE_ROMAN;
-    else
-      return fdwConversion | IME_CMODE_ROMAN;
-  }
-  return fdwConversion;
-}
-
-void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
-                         LPARAM lParam) {
-  POINT pt;
-  HDC hDC;
-  DWORD dwMouse;
-  DWORD dwPushedStatus;
-  DWORD dwTemp;
-  DWORD fdwConversion;
-  HIMC hIMC;
-  HWND hSvrWnd;
-  BOOL fOpen;
-  HMENU hMenu;
-  static POINT ptdif;
-  static RECT drc;
-  static RECT rc;
-  static DWORD dwCurrentPushedStatus;
-
-  hDC = GetDC(hStatusWnd);
-  switch (message) {
-    case WM_SETCURSOR:
-      if (HIWORD(lParam) == WM_LBUTTONDOWN ||
-          HIWORD(lParam) == WM_RBUTTONDOWN) {
-        GetCursorPos(&pt);
-        SetCapture(hStatusWnd);
-        GetWindowRect(hStatusWnd, &drc);
-        ptdif.x = pt.x - drc.left;
-        ptdif.y = pt.y - drc.top;
-        rc = drc;
-        rc.right -= rc.left;
-        rc.bottom -= rc.top;
-        SetWindowLong(hStatusWnd, FIGWL_MOUSE, FIM_CAPUTURED);
-        SetWindowLong(hStatusWnd, FIGWL_PUSHSTATUS,
-                      dwPushedStatus = CheckPushedStatus(hStatusWnd, &pt));
-        PaintStatus(hStatusWnd, hDC, &pt, dwPushedStatus);
-        dwCurrentPushedStatus = dwPushedStatus;
-      }
-      break;
-
-    case WM_MOUSEMOVE:
-      dwMouse = GetWindowLong(hStatusWnd, FIGWL_MOUSE);
-      if (!(dwPushedStatus = GetWindowLong(hStatusWnd, FIGWL_PUSHSTATUS))) {
-        if (dwMouse & FIM_MOVED) {
-          DrawUIBorder(&drc);
-          GetCursorPos(&pt);
-          drc.left = pt.x - ptdif.x;
-          drc.top = pt.y - ptdif.y;
-          drc.right = drc.left + rc.right;
-          drc.bottom = drc.top + rc.bottom;
-          DrawUIBorder(&drc);
-        } else if (dwMouse & FIM_CAPUTURED) {
-          DrawUIBorder(&drc);
-          SetWindowLong(hStatusWnd, FIGWL_MOUSE, dwMouse | FIM_MOVED);
-        }
-      } else {
-        GetCursorPos(&pt);
-        dwTemp = CheckPushedStatus(hStatusWnd, &pt);
-        if ((dwTemp ^ dwCurrentPushedStatus) & dwPushedStatus)
-          PaintStatus(hStatusWnd, hDC, &pt, dwPushedStatus & dwTemp);
-        dwCurrentPushedStatus = dwTemp;
-      }
-      break;
-
-    case WM_RBUTTONUP:
-      dwMouse = GetWindowLong(hStatusWnd, FIGWL_MOUSE);
-      if (dwMouse & FIM_CAPUTURED) {
-        ReleaseCapture();
-        if (dwMouse & FIM_MOVED) {
-          DrawUIBorder(&drc);
-          GetCursorPos(&pt);
-          MoveWindow(hStatusWnd, pt.x - ptdif.x, pt.y - ptdif.y, rc.right,
-                     rc.bottom, TRUE);
-        }
-      }
-      PaintStatus(hStatusWnd, hDC, NULL, 0);
-
-      hSvrWnd = (HWND)GetWindowLongPtr(hStatusWnd, FIGWLP_SVRWND);
-
-      hMenu = LoadMenu(TheApp.m_hInst, TEXT("RIGHTCLKMENU"));
-      if (hMenu && (hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC))) {
-        int cmd;
-        HMENU hSubMenu = GetSubMenu(hMenu, 0);
-
-        pt.x = (int)LOWORD(lParam), pt.y = (int)HIWORD(lParam),
-
-        ClientToScreen(hStatusWnd, &pt);
-
-        cmd = TrackPopupMenu(hSubMenu, TPM_RETURNCMD, pt.x, pt.y, 0, hStatusWnd,
-                             NULL);
-        switch (cmd) {
-          case IDM_RECONVERT: {
-            DWORD dwSize =
-                (DWORD)ImmRequestMessage(hIMC, IMR_RECONVERTSTRING, 0);
-            if (dwSize) {
-              LPRECONVERTSTRING lpRS;
-
-              lpRS = (LPRECONVERTSTRING)GlobalAlloc(GPTR, dwSize);
-              lpRS->dwSize = dwSize;
-
-              dwSize = (DWORD)ImmRequestMessage(hIMC, IMR_RECONVERTSTRING,
-                                                (LPARAM)lpRS);
-              if (dwSize) {
-                LPTSTR lpDump = (LPTSTR)((LPBYTE)lpRS + lpRS->dwStrOffset);
-                *(LPTSTR)(lpDump + lpRS->dwStrLen) = 0;
-
-                DebugPrint(TEXT("IMR_RECONVERTSTRING\r\n"));
-                DebugPrint(TEXT("dwSize            %x"), lpRS->dwSize);
-                DebugPrint(TEXT("dwVersion         %x"), lpRS->dwVersion);
-                DebugPrint(TEXT("dwStrLen          %x"), lpRS->dwStrLen);
-                DebugPrint(TEXT("dwStrOffset       %x"), lpRS->dwStrOffset);
-                DebugPrint(TEXT("dwCompStrLen      %x"), lpRS->dwCompStrLen);
-                DebugPrint(TEXT("dwCompStrOffset   %x"), lpRS->dwCompStrOffset);
-                DebugPrint(TEXT("dwTargetStrLen    %x"), lpRS->dwTargetStrLen);
-                DebugPrint(TEXT("dwTargetStrOffset %x"), lpRS->dwTargetStrOffset);
-                DebugPrint(TEXT("%s"), lpDump);
-
-                ImmRequestMessage(hIMC, IMR_CONFIRMRECONVERTSTRING,
-                                  (LPARAM)lpRS);
+        // draw input mode
+        rc.left += 10;
+        if (lpIMC->IsOpen()) {
+          if (lpIMC->Conversion() & IME_CMODE_FULLSHAPE) {
+            if (lpIMC->Conversion() & IME_CMODE_NATIVE) {
+              if (lpIMC->Conversion() & IME_CMODE_KATAKANA) {
+                // zenkaku katakana
+                ::BitBlt(hDC, rc.left, rc.top, CX_BUTTON, CY_BUTTON,
+                         hMemDC, 0, 1 * CY_BUTTON, SRCCOPY);
+              } else {
+                // zenkaku hiragana
+                ::BitBlt(hDC, rc.left, rc.top, CX_BUTTON, CY_BUTTON,
+                         hMemDC, 0, 0 * CY_BUTTON, SRCCOPY);
               }
-              else
-                DebugPrint(TEXT("ImmRequestMessage returned 0\r\n"));
-              GlobalFree(lpRS);
+            } else {
+              // zenkaku alphanumeric
+              ::BitBlt(hDC, rc.left, rc.top, CX_BUTTON, CY_BUTTON,
+                       hMemDC, 0, 2 * CY_BUTTON, SRCCOPY);
             }
-            break;
+          } else {
+            if (lpIMC->Conversion() & IME_CMODE_NATIVE) {
+              // hankaku kana
+              ::BitBlt(hDC, rc.left, rc.top, CX_BUTTON, CY_BUTTON,
+                       hMemDC, 0, 3 * CY_BUTTON, SRCCOPY);
+            } else {
+              // hankaku alphanumeric
+              ::BitBlt(hDC, rc.left, rc.top, CX_BUTTON, CY_BUTTON,
+                       hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
+            }
           }
-
-          case IDM_ABOUT:
-            ImmConfigureIME(GetKeyboardLayout(0), NULL, IME_CONFIG_GENERAL, 0);
-            break;
-
-          default:
-            break;
-        }
-      }
-      if (hMenu) DestroyMenu(hMenu);
-
-      break;
-
-    case WM_LBUTTONUP:
-      dwMouse = GetWindowLong(hStatusWnd, FIGWL_MOUSE);
-      if (dwMouse & FIM_CAPUTURED) {
-        ReleaseCapture();
-        if (dwMouse & FIM_MOVED) {
-          DrawUIBorder(&drc);
-          GetCursorPos(&pt);
-          MoveWindow(hStatusWnd, pt.x - ptdif.x, pt.y - ptdif.y, rc.right,
-                     rc.bottom, TRUE);
-        }
-      }
-      hSvrWnd = (HWND)GetWindowLongPtr(hStatusWnd, FIGWLP_SVRWND);
-
-      hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
-      if (hIMC) {
-        GetCursorPos(&pt);
-        dwPushedStatus = GetWindowLong(hStatusWnd, FIGWL_PUSHSTATUS);
-        dwPushedStatus &= CheckPushedStatus(hStatusWnd, &pt);
-        if (!dwPushedStatus) {
-        } else if (dwPushedStatus == PUSHED_STATUS_CLOSE) {
-        } else if (dwPushedStatus == PUSHED_STATUS_HDR) {
-          fOpen = ImmGetOpenStatus(hIMC);
-          fOpen = !fOpen;
-          ImmSetOpenStatus(hIMC, fOpen);
         } else {
-          ImmGetConversionStatus(hIMC, &fdwConversion, &dwTemp);
-          fdwConversion = GetUINextMode(fdwConversion, dwPushedStatus);
-          ImmSetConversionStatus(hIMC, fdwConversion, dwTemp);
+          // hankaku alphanumeric
+          ::BitBlt(hDC, rc.left, rc.top, CX_BUTTON, CY_BUTTON,
+                   hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
         }
-      }
-      PaintStatus(hStatusWnd, hDC, NULL, 0);
-      break;
-  }
-  ReleaseDC(hStatusWnd, hDC);
-}
 
-void PASCAL StatusWnd_Update(LPUIEXTRA lpUIExtra) {
+        // draw roman mode
+        rc.left += CX_BUTTON;
+        if (lpIMC->Conversion() & IME_CMODE_ROMAN) {
+          ::BitBlt(hDC, rc.left, rc.top, CX_BUTTON, CY_BUTTON,
+                   hMemDC, 0, 5 * CY_BUTTON, SRCCOPY);
+        } else {
+          ::BitBlt(hDC, rc.left, rc.top, CX_BUTTON, CY_BUTTON,
+                   hMemDC, 0, 6 * CY_BUTTON, SRCCOPY);
+        }
+
+        ::SelectObject(hMemDC, hbmOld);
+        ::DeleteDC(hMemDC);
+      }
+      TheApp.UnlockIMC();
+    }
+  }
+} // StatusWnd_Paint
+
+STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
+  ::ScreenToClient(hWnd, &pt);
+  RECT rc;
+  ::GetClientRect(hWnd, &rc);
+  rc.left += 10;
+  rc.right = rc.left + CX_BUTTON;
+  if (::PtInRect(&rc, pt)) {
+    DebugPrint(TEXT("status hit: %d"), SWHT_BUTTON_1);
+    return SWHT_BUTTON_1;
+  }
+  ::GetClientRect(hWnd, &rc);
+  rc.left += 10 + CX_BUTTON;
+  rc.right = rc.left + CX_BUTTON;
+  if (::PtInRect(&rc, pt)) {
+    DebugPrint(TEXT("status hit: %d"), SWHT_BUTTON_2);
+    return SWHT_BUTTON_2;
+  }
+  DebugPrint(TEXT("status hit: %d"), SWHT_CAPTION);
+  return SWHT_CAPTION;
+} // StatusWnd_HitTest
+
+void StatusWnd_Update(LPUIEXTRA lpUIExtra) {
   if (IsWindow(lpUIExtra->uiStatus.hWnd))
     SendMessage(lpUIExtra->uiStatus.hWnd, WM_UI_UPDATE, 0, 0L);
-}
+} // StatusWnd_Update
 
-  LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
+void StatusWnd_OnButton(HWND hWnd, POINT pt, INT nPushed) {
+  DebugPrint(TEXT("status button: %d"), nPushed);
+} // StatusWnd_OnButton
+
+void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
+  static POINT prev = {-1, -1};
+  STATUS_WND_HITTEST hittest = StatusWnd_HitTest(hWnd, pt);
+  switch (hittest) {
+  case SWHT_CAPTION:
+    if (prev.x != -1 && prev.y != -1) {
+      RECT rc;
+      ::GetWindowRect(hWnd, &rc);
+      MoveWindow(hWnd,
+        rc.left + (pt.x - prev.x),
+        rc.top + (pt.y - prev.y),
+        rc.right - rc.left,
+        rc.bottom - rc.top,
+        TRUE);
+    } else {
+      if (bDown) {
+        ::SetCapture(hWnd);
+      }
+    }
+    prev = pt;
+    break;
+  case SWHT_BUTTON_1:
+    StatusWnd_OnButton(hWnd, pt, 1);
+    break;
+  case SWHT_BUTTON_2:
+    StatusWnd_OnButton(hWnd, pt, 2);
+    break;
+  }
+  HDC hDC = ::GetDC(hWnd);
+  StatusWnd_Paint(hWnd, hDC, 0);
+  ::ReleaseDC(hWnd, hDC);
+  ::SetWindowLong(hWnd, FIGWL_MOUSE, bDown);
+  if (!bDown) {
+    prev.x = -1;
+    prev.y = -1;
+    ::ReleaseCapture();
+  }
+} // StatusWnd_OnLButton
+
+LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                       LPARAM lParam) {
   PAINTSTRUCT ps;
-  HWND hUIWnd;
+  HWND hwndServer;
   HDC hDC;
   HBITMAP hbm;
+  POINT pt;
+  STATUS_WND_HITTEST hittest;
 
   switch (message) {
   case WM_CREATE:
-    hbm = TheApp.LoadBMP(TEXT("STATUSBMP"));
+    DebugPrint(TEXT("status message: WM_CREATE"));
+    hbm = TheApp.LoadBMP(TEXT("MODESBMP"));
     SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbm);
-    hbm = TheApp.LoadBMP(TEXT("CLOSEBMP"));
-    SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbm);
-    break;
-
-  case WM_DESTROY:
-    hbm = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
-    DeleteObject(hbm);
-    hbm = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP);
-    DeleteObject(hbm);
-    break;
-
-  case WM_UI_UPDATE:
-    InvalidateRect(hWnd, NULL, FALSE);
     break;
 
   case WM_PAINT:
-    hDC = BeginPaint(hWnd, &ps);
-    PaintStatus(hWnd, hDC, NULL, 0);
-    EndPaint(hWnd, &ps);
+    hDC = ::BeginPaint(hWnd, &ps);
+    StatusWnd_Paint(hWnd, hDC, 0);
+    ::EndPaint(hWnd, &ps);
+    break;
+
+  case WM_DESTROY:
+    DebugPrint(TEXT("status message: WM_DESTROY"));
+    hbm = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
+    ::DeleteObject(hbm);
+    break;
+
+  case WM_UI_UPDATE:
+    DebugPrint(TEXT("status message: WM_UI_UPDATE"));
+    ::InvalidateRect(hWnd, NULL, FALSE);
+    break;
+
+  case WM_NCHITTEST:
+    DebugPrint(TEXT("status message: WM_NCHITTEST"));
+    pt.x = (SHORT)LOWORD(lParam);
+    pt.y = (SHORT)HIWORD(lParam);
+    hittest = StatusWnd_HitTest(hWnd, pt);
+    switch (hittest) {
+    case SWHT_CAPTION:
+      return HTCAPTION;
+    default:
+      return HTCLIENT;
+    }
+
+  case WM_LBUTTONDOWN:
+    ::GetCursorPos(&pt);
+    StatusWnd_OnLButton(hWnd, pt, TRUE);
+    break;
+
+  case WM_LBUTTONUP:
+    ::GetCursorPos(&pt);
+    StatusWnd_OnLButton(hWnd, pt, FALSE);
     break;
 
   case WM_MOUSEMOVE:
-  case WM_SETCURSOR:
-  case WM_LBUTTONUP:
-  case WM_RBUTTONUP:
-    ButtonStatus(hWnd, message, wParam, lParam);
-    if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
-        (HIWORD(lParam) != WM_RBUTTONDOWN))
-      return DefWindowProc(hWnd, message, wParam, lParam);
-    if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
-      SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
-      SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0L);
+    ::GetCursorPos(&pt);
+    if (wParam & MK_LBUTTON) {
+      StatusWnd_OnLButton(hWnd, pt, TRUE);
+    } else {
+      StatusWnd_OnLButton(hWnd, pt, FALSE);
     }
     break;
 
+  case WM_SETCURSOR:
+    DebugPrint(TEXT("status message: WM_SETCURSOR"));
+    ::GetCursorPos(&pt);
+    switch (HIWORD(lParam)) {
+    case WM_MOUSEMOVE:
+      if (::GetWindowLong(hWnd, FIGWL_MOUSE)) {
+        StatusWnd_OnLButton(hWnd, pt, TRUE);
+      }
+      break;
+    case WM_LBUTTONDOWN:
+      StatusWnd_OnLButton(hWnd, pt, TRUE);
+      break;
+    case WM_LBUTTONUP:
+      StatusWnd_OnLButton(hWnd, pt, FALSE);
+      break;
+    }
+    ::SetCursor(::LoadCursor(NULL, IDC_ARROW));
+    break;
+
   case WM_MOVE:
-    hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SVRWND);
-    if (IsWindow(hUIWnd))
-      SendMessage(hUIWnd, WM_UI_STATEMOVE, wParam, lParam);
+    DebugPrint(TEXT("status message: WM_MOVE"));
+    hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
+    if (::IsWindow(hwndServer))
+      SendMessage(hwndServer, WM_UI_STATEMOVE, wParam, lParam);
     break;
 
   default:
     if (!IsImeMessage(message))
-      return DefWindowProc(hWnd, message, wParam, lParam);
+      return ::DefWindowProc(hWnd, message, wParam, lParam);
     break;
   }
   return 0;
-}
+} // StatusWnd_WindowProc
 
 //////////////////////////////////////////////////////////////////////////////
 

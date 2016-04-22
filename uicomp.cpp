@@ -29,7 +29,7 @@ LRESULT CALLBACK CompStrWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_MOVE:
-      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SVRWND);
+      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
       if (IsWindow(hUIWnd))
         SendMessage(hUIWnd, WM_UI_DEFCOMPMOVE, wParam, lParam);
       break;
@@ -60,7 +60,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
     lpUIExtra->uiComp[i].rc.bottom = 1;
     SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_FONT,
                      (LONG_PTR)lpUIExtra->hFont);
-    SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_SVRWND, (LONG_PTR)hUIWnd);
+    SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
     ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_HIDE);
     lpUIExtra->uiComp[i].bShow = FALSE;
   }
@@ -79,7 +79,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
   }
 
   // SetWindowLong(lpUIExtra->uiDefComp.hWnd,FIGWLP_FONT,(DWORD)lpUIExtra->hFont);
-  SetWindowLongPtr(lpUIExtra->uiDefComp.hWnd, FIGWLP_SVRWND, (LONG_PTR)hUIWnd);
+  SetWindowLongPtr(lpUIExtra->uiDefComp.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
   ShowWindow(lpUIExtra->uiDefComp.hWnd, SW_HIDE);
   lpUIExtra->uiDefComp.bShow = FALSE;
 
@@ -422,7 +422,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
   if (hFont)
     hOldFont = (HFONT)SelectObject(hDC, hFont);
 
-  HWND hSvrWnd = (HWND)GetWindowLongPtr(hCompWnd, FIGWLP_SVRWND);
+  HWND hSvrWnd = (HWND)GetWindowLongPtr(hCompWnd, FIGWLP_SERVERWND);
 
   hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
