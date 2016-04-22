@@ -8,66 +8,6 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam,
-                               LPARAM lParam) {
-  PAINTSTRUCT ps;
-  HWND hUIWnd;
-  HDC hDC;
-  HBITMAP hbmpStatus;
-
-  switch (message) {
-    case WM_UI_UPDATE:
-      InvalidateRect(hWnd, NULL, FALSE);
-      break;
-
-    case WM_PAINT:
-      hDC = BeginPaint(hWnd, &ps);
-      PaintStatus(hWnd, hDC, NULL, 0);
-      EndPaint(hWnd, &ps);
-      break;
-
-    case WM_MOUSEMOVE:
-    case WM_SETCURSOR:
-    case WM_LBUTTONUP:
-    case WM_RBUTTONUP:
-      ButtonStatus(hWnd, message, wParam, lParam);
-      if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
-          (HIWORD(lParam) != WM_RBUTTONDOWN))
-        return DefWindowProc(hWnd, message, wParam, lParam);
-      if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
-        SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
-        SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0L);
-      }
-      break;
-
-    case WM_MOVE:
-      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWL_SVRWND);
-      if (IsWindow(hUIWnd))
-        SendMessage(hUIWnd, WM_UI_STATEMOVE, wParam, lParam);
-      break;
-
-    case WM_CREATE:
-      hbmpStatus = TheApp.LoadBMP(TEXT("STATUSBMP"));
-      SetWindowLongPtr(hWnd, FIGWL_STATUSBMP, (LONG_PTR)hbmpStatus);
-      hbmpStatus = TheApp.LoadBMP(TEXT("CLOSEBMP"));
-      SetWindowLongPtr(hWnd, FIGWL_CLOSEBMP, (LONG_PTR)hbmpStatus);
-      break;
-
-    case WM_DESTROY:
-      hbmpStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWL_STATUSBMP);
-      DeleteObject(hbmpStatus);
-      hbmpStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWL_CLOSEBMP);
-      DeleteObject(hbmpStatus);
-      break;
-
-    default:
-      if (!IsImeMessage(message))
-        return DefWindowProc(hWnd, message, wParam, lParam);
-      break;
-  }
-  return 0;
-}
-
 DWORD PASCAL CheckPushedStatus(HWND hStatusWnd, LPPOINT lppt) {
   POINT pt;
   RECT rc;
@@ -120,7 +60,7 @@ void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
   int x;
   HWND hSvrWnd;
 
-  hSvrWnd = (HWND)GetWindowLongPtr(hStatusWnd, FIGWL_SVRWND);
+  hSvrWnd = (HWND)GetWindowLongPtr(hStatusWnd, FIGWLP_SVRWND);
 
   hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
@@ -143,7 +83,7 @@ void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
     DeleteObject(hBrush);
 
     // Paint CloseButton.
-    hbmpStatus = (HBITMAP)GetWindowLongPtr(hStatusWnd, FIGWL_CLOSEBMP);
+    hbmpStatus = (HBITMAP)GetWindowLongPtr(hStatusWnd, FIGWLP_CLOSEBMP);
     hbmpOld = (HBITMAP)SelectObject(hMemDC, hbmpStatus);
 
     if (!(dwPushedStatus & PUSHED_STATUS_CLOSE))
@@ -153,7 +93,7 @@ void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
       BitBlt(hDC, STCLBT_X, STCLBT_Y, STCLBT_DX, STCLBT_DY, hMemDC, STCLBT_DX,
              0, SRCCOPY);
 
-    hbmpStatus = (HBITMAP)GetWindowLongPtr(hStatusWnd, FIGWL_STATUSBMP);
+    hbmpStatus = (HBITMAP)GetWindowLongPtr(hStatusWnd, FIGWLP_STATUSBMP);
     SelectObject(hMemDC, hbmpStatus);
 
     // Paint HDR.
@@ -311,7 +251,7 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
       }
       PaintStatus(hStatusWnd, hDC, NULL, 0);
 
-      hSvrWnd = (HWND)GetWindowLongPtr(hStatusWnd, FIGWL_SVRWND);
+      hSvrWnd = (HWND)GetWindowLongPtr(hStatusWnd, FIGWLP_SVRWND);
 
       hMenu = LoadMenu(TheApp.m_hInst, TEXT("RIGHTCLKMENU"));
       if (hMenu && (hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC))) {
@@ -384,7 +324,7 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
                      rc.bottom, TRUE);
         }
       }
-      hSvrWnd = (HWND)GetWindowLongPtr(hStatusWnd, FIGWL_SVRWND);
+      hSvrWnd = (HWND)GetWindowLongPtr(hStatusWnd, FIGWLP_SVRWND);
 
       hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
       if (hIMC) {
@@ -409,9 +349,69 @@ void PASCAL ButtonStatus(HWND hStatusWnd, UINT message, WPARAM wParam,
   ReleaseDC(hStatusWnd, hDC);
 }
 
-void PASCAL UpdateStatusWindow(LPUIEXTRA lpUIExtra) {
+void PASCAL StatusWnd_Update(LPUIEXTRA lpUIExtra) {
   if (IsWindow(lpUIExtra->uiStatus.hWnd))
     SendMessage(lpUIExtra->uiStatus.hWnd, WM_UI_UPDATE, 0, 0L);
+}
+
+  LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
+                                      LPARAM lParam) {
+  PAINTSTRUCT ps;
+  HWND hUIWnd;
+  HDC hDC;
+  HBITMAP hbmpStatus;
+
+  switch (message) {
+    case WM_UI_UPDATE:
+      InvalidateRect(hWnd, NULL, FALSE);
+      break;
+
+    case WM_PAINT:
+      hDC = BeginPaint(hWnd, &ps);
+      PaintStatus(hWnd, hDC, NULL, 0);
+      EndPaint(hWnd, &ps);
+      break;
+
+    case WM_MOUSEMOVE:
+    case WM_SETCURSOR:
+    case WM_LBUTTONUP:
+    case WM_RBUTTONUP:
+      ButtonStatus(hWnd, message, wParam, lParam);
+      if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
+          (HIWORD(lParam) != WM_RBUTTONDOWN))
+        return DefWindowProc(hWnd, message, wParam, lParam);
+      if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
+        SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
+        SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0L);
+      }
+      break;
+
+    case WM_MOVE:
+      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SVRWND);
+      if (IsWindow(hUIWnd))
+        SendMessage(hUIWnd, WM_UI_STATEMOVE, wParam, lParam);
+      break;
+
+    case WM_CREATE:
+      hbmpStatus = TheApp.LoadBMP(TEXT("STATUSBMP"));
+      SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbmpStatus);
+      hbmpStatus = TheApp.LoadBMP(TEXT("CLOSEBMP"));
+      SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbmpStatus);
+      break;
+
+    case WM_DESTROY:
+      hbmpStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
+      DeleteObject(hbmpStatus);
+      hbmpStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP);
+      DeleteObject(hbmpStatus);
+      break;
+
+    default:
+      if (!IsImeMessage(message))
+        return DefWindowProc(hWnd, message, wParam, lParam);
+      break;
+  }
+  return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////

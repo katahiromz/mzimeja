@@ -158,7 +158,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             HideCandWindow(lpUIExtra);
             HideCompWindow(lpUIExtra);
           }
-          UpdateStatusWindow(lpUIExtra);
+          StatusWnd_Update(lpUIExtra);
           TheApp.UnlockIMC();
         } else  // it is NULL input context.
         {
@@ -360,11 +360,11 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
 
       ShowWindow(lpUIExtra->uiStatus.hWnd, SW_SHOWNOACTIVATE);
       lpUIExtra->uiStatus.bShow = TRUE;
-      SetWindowLongPtr(lpUIExtra->uiStatus.hWnd, FIGWL_SVRWND, (LONG_PTR)hWnd);
+      SetWindowLongPtr(lpUIExtra->uiStatus.hWnd, FIGWLP_SVRWND, (LONG_PTR)hWnd);
       break;
 
     case IMN_SETCONVERSIONMODE:
-      UpdateStatusWindow(lpUIExtra);
+      StatusWnd_Update(lpUIExtra);
       break;
 
     case IMN_SETSENTENCEMODE:
@@ -395,7 +395,7 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
       break;
 
     case IMN_SETOPENSTATUS:
-      UpdateStatusWindow(lpUIExtra);
+      StatusWnd_Update(lpUIExtra);
       break;
 
     case IMN_OPENCANDIDATE:
@@ -442,7 +442,7 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
         }
         ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
         lpUIExtra->uiGuide.bShow = TRUE;
-        SetWindowLongPtr(lpUIExtra->uiGuide.hWnd, FIGWL_SVRWND, (LONG_PTR)hWnd);
+        SetWindowLongPtr(lpUIExtra->uiGuide.hWnd, FIGWLP_SVRWND, (LONG_PTR)hWnd);
         UpdateGuideWindow(lpUIExtra);
       }
       break;

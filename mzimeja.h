@@ -85,15 +85,15 @@
 
 // WndExtra of child UI windows
 #define FIGWL_MOUSE 0
-#define FIGWL_SVRWND (FIGWL_MOUSE + sizeof(LONG))
-#define FIGWL_FONT (FIGWL_SVRWND + sizeof(LONG_PTR))
-#define FIGWL_COMPSTARTSTR (FIGWL_FONT + sizeof(LONG_PTR))
+#define FIGWLP_SVRWND (FIGWL_MOUSE + sizeof(LONG))
+#define FIGWLP_FONT (FIGWLP_SVRWND + sizeof(LONG_PTR))
+#define FIGWL_COMPSTARTSTR (FIGWLP_FONT + sizeof(LONG_PTR))
 #define FIGWL_COMPSTARTNUM (FIGWL_COMPSTARTSTR + sizeof(LONG))
-#define FIGWL_STATUSBMP (FIGWL_COMPSTARTNUM + sizeof(LONG))
-#define FIGWL_CLOSEBMP (FIGWL_STATUSBMP + sizeof(LONG_PTR))
-#define FIGWL_PUSHSTATUS (FIGWL_CLOSEBMP + sizeof(LONG_PTR))
-#define FIGWL_CHILDWND (FIGWL_PUSHSTATUS + sizeof(LONG))
-#define UIEXTRASIZE (FIGWL_CHILDWND + sizeof(LONG_PTR))
+#define FIGWLP_STATUSBMP (FIGWL_COMPSTARTNUM + sizeof(LONG))
+#define FIGWLP_CLOSEBMP (FIGWLP_STATUSBMP + sizeof(LONG_PTR))
+#define FIGWL_PUSHSTATUS (FIGWLP_CLOSEBMP + sizeof(LONG_PTR))
+#define FIGWLP_CHILDWND (FIGWL_PUSHSTATUS + sizeof(LONG))
+#define UIEXTRASIZE (FIGWLP_CHILDWND + sizeof(LONG_PTR))
 
 // The flags of FIGWL_MOUSE
 #define FIM_CAPUTURED 0x01
@@ -223,14 +223,11 @@ LONG PASCAL ControlCommand(HIMC hIMC, HWND hWnd, UINT message,
 void PASCAL DrawUIBorder(LPRECT lprc);
 void PASCAL DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra);
+BOOL PASCAL IsImeMessage(UINT message);
 
 // uistate.c
-LRESULT CALLBACK StatusWndProc(HWND, UINT, WPARAM, LPARAM);
-void PASCAL PaintStatus(HWND hStatusWnd, HDC hDC, LPPOINT lppt,
-                        DWORD dwPushedStatus);
-void PASCAL ButtonStatus(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL PASCAL IsImeMessage(UINT message);
-void PASCAL UpdateStatusWindow(LPUIEXTRA lpUIExtra);
+LRESULT CALLBACK StatusWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
+void PASCAL StatusWnd_Update(LPUIEXTRA lpUIExtra);
 
 // uicand.c
 LRESULT CALLBACK CandWndProc(HWND, UINT, WPARAM, LPARAM);

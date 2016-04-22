@@ -105,7 +105,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   // register class of status window.
   wcx.cbSize = sizeof(WNDCLASSEX);
   wcx.style = CS_MZIME;
-  wcx.lpfnWndProc = StatusWndProc;
+  wcx.lpfnWndProc = StatusWnd_WindowProc;
   wcx.cbClsExtra = 0;
   wcx.cbWndExtra = UIEXTRASIZE;
   wcx.hInstance = hInstance;

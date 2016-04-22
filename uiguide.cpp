@@ -45,19 +45,19 @@ LRESULT CALLBACK GuideWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_MOVE:
-      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWL_SVRWND);
+      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SVRWND);
       if (IsWindow(hUIWnd))
         SendMessage(hUIWnd, WM_UI_GUIDEMOVE, wParam, lParam);
       break;
 
     case WM_CREATE:
       hbmpGuide = TheApp.LoadBMP(TEXT("CLOSEBMP"));
-      SetWindowLongPtr(hWnd, FIGWL_CLOSEBMP, (LONG_PTR)hbmpGuide);
+      SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbmpGuide);
       GetClientRect(hWnd, &rc);
       break;
 
     case WM_DESTROY:
-      hbmpGuide = (HBITMAP)GetWindowLongPtr(hWnd, FIGWL_CLOSEBMP);
+      hbmpGuide = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP);
       DeleteObject(hbmpGuide);
       break;
 
@@ -99,7 +99,7 @@ void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
   DWORD dwLevel;
   DWORD dwSize;
 
-  hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWL_SVRWND);
+  hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SVRWND);
 
   hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
@@ -122,7 +122,7 @@ void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
     DeleteObject(hBrush);
 
     // Paint CloseButton.
-    hbmpGuide = (HBITMAP)GetWindowLongPtr(hGuideWnd, FIGWL_CLOSEBMP);
+    hbmpGuide = (HBITMAP)GetWindowLongPtr(hGuideWnd, FIGWLP_CLOSEBMP);
     hbmpOld = (HBITMAP)SelectObject(hMemDC, hbmpGuide);
 
     if (!(dwPushedGuide & PUSHED_STATUS_CLOSE))
@@ -249,7 +249,7 @@ void PASCAL ButtonGuide(HWND hGuideWnd, UINT message, WPARAM wParam,
                      rc.bottom, TRUE);
         }
       }
-      hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWL_SVRWND);
+      hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SVRWND);
 
       hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
       if (hIMC) {
