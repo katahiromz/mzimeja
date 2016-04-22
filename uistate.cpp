@@ -359,57 +359,57 @@ void PASCAL StatusWnd_Update(LPUIEXTRA lpUIExtra) {
   PAINTSTRUCT ps;
   HWND hUIWnd;
   HDC hDC;
-  HBITMAP hbmpStatus;
+  HBITMAP hbm;
 
   switch (message) {
-    case WM_UI_UPDATE:
-      InvalidateRect(hWnd, NULL, FALSE);
-      break;
+  case WM_CREATE:
+    hbm = TheApp.LoadBMP(TEXT("STATUSBMP"));
+    SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbm);
+    hbm = TheApp.LoadBMP(TEXT("CLOSEBMP"));
+    SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbm);
+    break;
 
-    case WM_PAINT:
-      hDC = BeginPaint(hWnd, &ps);
-      PaintStatus(hWnd, hDC, NULL, 0);
-      EndPaint(hWnd, &ps);
-      break;
+  case WM_DESTROY:
+    hbm = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
+    DeleteObject(hbm);
+    hbm = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP);
+    DeleteObject(hbm);
+    break;
 
-    case WM_MOUSEMOVE:
-    case WM_SETCURSOR:
-    case WM_LBUTTONUP:
-    case WM_RBUTTONUP:
-      ButtonStatus(hWnd, message, wParam, lParam);
-      if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
-          (HIWORD(lParam) != WM_RBUTTONDOWN))
-        return DefWindowProc(hWnd, message, wParam, lParam);
-      if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
-        SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
-        SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0L);
-      }
-      break;
+  case WM_UI_UPDATE:
+    InvalidateRect(hWnd, NULL, FALSE);
+    break;
 
-    case WM_MOVE:
-      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SVRWND);
-      if (IsWindow(hUIWnd))
-        SendMessage(hUIWnd, WM_UI_STATEMOVE, wParam, lParam);
-      break;
+  case WM_PAINT:
+    hDC = BeginPaint(hWnd, &ps);
+    PaintStatus(hWnd, hDC, NULL, 0);
+    EndPaint(hWnd, &ps);
+    break;
 
-    case WM_CREATE:
-      hbmpStatus = TheApp.LoadBMP(TEXT("STATUSBMP"));
-      SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbmpStatus);
-      hbmpStatus = TheApp.LoadBMP(TEXT("CLOSEBMP"));
-      SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbmpStatus);
-      break;
+  case WM_MOUSEMOVE:
+  case WM_SETCURSOR:
+  case WM_LBUTTONUP:
+  case WM_RBUTTONUP:
+    ButtonStatus(hWnd, message, wParam, lParam);
+    if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
+        (HIWORD(lParam) != WM_RBUTTONDOWN))
+      return DefWindowProc(hWnd, message, wParam, lParam);
+    if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
+      SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
+      SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0L);
+    }
+    break;
 
-    case WM_DESTROY:
-      hbmpStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
-      DeleteObject(hbmpStatus);
-      hbmpStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP);
-      DeleteObject(hbmpStatus);
-      break;
+  case WM_MOVE:
+    hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SVRWND);
+    if (IsWindow(hUIWnd))
+      SendMessage(hUIWnd, WM_UI_STATEMOVE, wParam, lParam);
+    break;
 
-    default:
-      if (!IsImeMessage(message))
-        return DefWindowProc(hWnd, message, wParam, lParam);
-      break;
+  default:
+    if (!IsImeMessage(message))
+      return DefWindowProc(hWnd, message, wParam, lParam);
+    break;
   }
   return 0;
 }
