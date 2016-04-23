@@ -288,6 +288,47 @@ BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
   return TRUE;
 }
 
+static BOOL OnImeMenuSelected(HIMC hIMC, DWORD dwCommand) {
+  switch (dwCommand) {
+  case IDM_RECONVERT:
+    break;
+  case IDM_ABOUT:
+    break;
+  case IDM_HIRAGANA:
+    SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+    break;
+  case IDM_ZEN_KATAKANA:
+    SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+    break;
+  case IDM_ZEN_ALNUM:
+    SetInputMode(hIMC, IMODE_ZEN_EISUU);
+    break;
+  case IDM_HAN_KATAKANA:
+    SetInputMode(hIMC, IMODE_HAN_KANA);
+    break;
+  case IDM_ALNUM:
+    SetInputMode(hIMC, IMODE_HAN_EISUU);
+    break;
+  case IDM_CANCEL:
+    break;
+  case IDM_ROMAJI_INPUT:
+    SetRomajiMode(hIMC, TRUE);
+    break;
+  case IDM_KANA_INPUT:
+    SetRomajiMode(hIMC, FALSE);
+    break;
+  case IDM_HIDE:
+    break;
+  case IDM_PROPERTY:
+    break;
+  case IDM_ADD_WORD:
+    break;
+  default:
+    return FALSE;
+  }
+  return TRUE;
+} // OnImeMenuSelected
+
 //  NotifyIME
 //  NotifyIME 関数は与えられたパラメータに従って IME の状態を変更する。
 //  BOOL
@@ -595,6 +636,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("\thIMC is 0x%x"), hIMC);
       DebugPrint(TEXT("\tdwIndex is 0x%x"), dwIndex);
       DebugPrint(TEXT("\tdwValue is 0x%x"), dwValue);
+      OnImeMenuSelected(hIMC, dwIndex);
       break;
 
     default:

@@ -143,6 +143,7 @@ InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
 InputMode NextInputMode(InputMode imode);
 void SetInputMode(HIMC hIMC, InputMode imode);
 void RepositionWindow(HWND hWnd);
+void SetRomajiMode(HIMC hIMC, BOOL bRomaji);
 
 //////////////////////////////////////////////////////////////////////////////
 // Structures

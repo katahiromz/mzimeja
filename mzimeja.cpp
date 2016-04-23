@@ -107,6 +107,17 @@ void SetInputMode(HIMC hIMC, InputMode imode) {
   ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
 }
 
+void SetRomajiMode(HIMC hIMC, BOOL bRomaji) {
+  DWORD dwConversion, dwSentence;
+  ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
+  if (bRomaji) {
+    dwConversion |= IME_CMODE_ROMAN;
+  } else {
+    dwConversion &= ~IME_CMODE_ROMAN;
+  }
+  ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
+}
+
 void RepositionWindow(HWND hWnd) {
   RECT rc, rcWorkArea;
   ::GetWindowRect(hWnd, &rc);
