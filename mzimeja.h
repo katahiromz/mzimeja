@@ -126,24 +126,23 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-// ImeMenu Define
-#define NUM_ROOT_MENU_L 3
-#define NUM_ROOT_MENU_R 3
-#define NUM_SUB_MENU_L 2
-#define NUM_SUB_MENU_R 2
-
-#define IDIM_ROOT_ML_1 0x10
-#define IDIM_ROOT_ML_2 0x11
-#define IDIM_ROOT_ML_3 0x12
-#define IDIM_SUB_ML_1 0x20
-#define IDIM_SUB_ML_2 0x21
-#define IDIM_ROOT_MR_1 0x30
-#define IDIM_ROOT_MR_2 0x31
-#define IDIM_ROOT_MR_3 0x32
-#define IDIM_SUB_MR_1 0x40
-#define IDIM_SUB_MR_2 0x41
-
 #define NATIVE_CHARSET SHIFTJIS_CHARSET
+
+//////////////////////////////////////////////////////////////////////////////
+
+enum InputMode {
+  IMODE_ZEN_HIRAGANA,
+  IMODE_ZEN_KATAKANA,
+  IMODE_ZEN_EISUU,
+  IMODE_HAN_KANA,
+  IMODE_HAN_EISUU
+};
+
+BOOL IsInputModeOpen(InputMode imode);
+InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
+InputMode NextInputMode(InputMode imode);
+void SetInputMode(HIMC hIMC, InputMode imode);
+void RepositionWindow(HWND hWnd);
 
 //////////////////////////////////////////////////////////////////////////////
 // Structures

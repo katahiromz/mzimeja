@@ -2,6 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
+#include "resource.h"
 
 extern "C" {
 
@@ -747,63 +748,27 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
   return FALSE;
 }
 
-//  ImeGetImeMenuItems
-//  ImeGetImeMenuItems 関数は IME menu に登録されている menu item を得る。
-//  DWORD WINAPI
-//    ImeGetImeMenuItems(
-//    HIMC hIMC,
-//    DWORD dwFlags,
-//    DWORD dwType,
-//    LPIMEMENUITEMINFO lpImeParentMenu,
-//    LPIMEMENUITEMINFO lpImeMenu,
-//    DWORD dwSize
-//  )
-//  Parameters
-//    hIMC
-//      lpMenuItem はこの input context に関連付けられている menu
-//      item を含む。
-//    dwFlags
-//      続くビットの組み合わせからなる。
-//      ------------------------------------------------------------
-//      IGIMIF_RIGHTMENU  
-//        もし 1 なら、この関数は右クリック Context menu に対する
-//        menu item を返す。
-//      ------------------------------------------------------------
-//    dwType
-//      続くビットの組み合わせからなる。
-//      ------------------------------------------------------------
-//      IGIMII_CMODE
-//        conversion mode に関連付けられている menu item を返す。
-//      IGIMII_SMODE
-//        sentence mode に関連付けられている menu item を返す。
-//      IGIMII_CONFIGURE
-//        IME の設定に関連付けられている menu item を返す。
-//      IGIMII_TOOLS
-//        IME ツールに関連付けられている menu item を返す。
-//      IGIMII_HELP
-//        IME ヘルプに関連付けられている menu item を返す。
-//      IGIMII_OTHER
-//        その他の menu item を返す。
-//      IGIMII_INPUTTOOLS
-//        拡張された文字の入力方法を提供する IME 入力ツールに関連
-//        付けられた menu item を返す。
-//      ------------------------------------------------------------
-//    lpImeParentMenu
-//      fType に MFT_SUBMENU を持った IMEMENUINFO 構造体を指すポイン
-//      タ。ImeGetMenuItems はこの menu item の submenu item を返す。
-//      もし NULL なら lpImeMenu は top-level の IME menu item を含
-//      んでいる。
-//    lpImeMenu
-//      menu item の内容を受け取るバッファを指したポインタ。このバッ
-//      ファは IMEMENUINFO 構造体の配列である。もし NULL なら
-//      ImeGetImeMenuItems は登録される menu item の数を返す。
-//    dwSize
-//      IMEMENUITEMINFO 構造体を受けるバッファのサイズ。
-//  Return Values
-//    lpIM に設定された menu item の数が帰る。もし lpImeMenu が NULL 
-//    ならば ImeMenuItems は指定された hKL に登録されている menu item 
-//    の数を返す。
-//  ImeGetImeMenuItems は Windows'98 や Windows 2000 用の新しい関数である。
+struct MYMENUITEM {
+  INT nCommandID;
+  INT nStringID;
+};
+static const MYMENUITEM top_menu_items[] = {
+  {IDM_HIRAGANA, IDM_HIRAGANA},
+  {IDM_ZEN_KATAKANA, IDM_ZEN_KATAKANA},
+  {IDM_ZEN_ALNUM, IDM_ZEN_ALNUM},
+  {IDM_HAN_KATAKANA, IDM_HAN_KATAKANA},
+  {IDM_ALNUM, IDM_ALNUM},
+  {-1, -1},
+  {IDM_ROMAJI_INPUT, IDM_ROMAJI_INPUT},
+  {IDM_KANA_INPUT, IDM_KANA_INPUT},
+  {-1, -1},
+  {IDM_ADD_WORD, IDM_ADD_WORD},
+  {IDM_RECONVERT, IDM_RECONVERT},
+  {-1, -1},
+  {IDM_PROPERTY, IDM_PROPERTY},
+  {IDM_ABOUT, IDM_ABOUT},
+};
+
 DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
                                 LPIMEMENUITEMINFO lpImeParentMenu,
                                 LPIMEMENUITEMINFO lpImeMenu, DWORD dwSize) {
@@ -816,133 +781,100 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
   // このコードを有効にするかどうかは微妙だ。
   DebugPrint(TEXT("ImeGetImeMenuItems"));
 
-  if (!lpImeMenu) {
-    if (!lpImeParentMenu) {
+  if (lpImeMenu == NULL) {
+    if (lpImeParentMenu == NULL) {
       if (dwFlags & IGIMIF_RIGHTMENU)
-        return NUM_ROOT_MENU_R;
+        return _countof(top_menu_items);
       else
-        return NUM_ROOT_MENU_L;
+        return 0;
     } else {
-      if (dwFlags & IGIMIF_RIGHTMENU)
-        return NUM_SUB_MENU_R;
-      else
-        return NUM_SUB_MENU_L;
+        return 0;
     }
     return 0;
   }
 
-  if (!lpImeParentMenu) {
+  if (lpImeParentMenu == NULL) {
     if (dwFlags & IGIMIF_RIGHTMENU) {
-      lpImeMenu->cbSize = sizeof(IMEMENUITEMINFO);
-      lpImeMenu->fType = 0;
-      lpImeMenu->fState = 0;
-      lpImeMenu->wID = IDIM_ROOT_MR_1;
-      lpImeMenu->hbmpChecked = 0;
-      lpImeMenu->hbmpUnchecked = 0;
-      lstrcpy(lpImeMenu->szString, TEXT("RootRightMenu1"));
-      lpImeMenu->hbmpItem = 0;
+      BOOL bOpen;
+      bOpen = ImmGetOpenStatus(hIMC);
+      DWORD dwConversion, dwSentence;
+      ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
+      InputMode imode;
+      imode = InputModeFromConversionMode(bOpen, dwConversion);
 
-      lpImeMenu++;
-      lpImeMenu->cbSize = sizeof(IMEMENUITEMINFO);
-      lpImeMenu->fType = IMFT_SUBMENU;
-      lpImeMenu->fState = 0;
-      lpImeMenu->wID = IDIM_ROOT_MR_2;
-      lpImeMenu->hbmpChecked = 0;
-      lpImeMenu->hbmpUnchecked = 0;
-      lstrcpy(lpImeMenu->szString, TEXT("RootRightMenu2"));
-      lpImeMenu->hbmpItem = 0;
-
-      lpImeMenu++;
-      lpImeMenu->cbSize = sizeof(IMEMENUITEMINFO);
-      lpImeMenu->fType = 0;
-      lpImeMenu->fState = 0;
-      lpImeMenu->wID = IDIM_ROOT_MR_3;
-      lpImeMenu->hbmpChecked = 0;
-      lpImeMenu->hbmpUnchecked = 0;
-      lstrcpy(lpImeMenu->szString, TEXT("RootRightMenu3"));
-      lpImeMenu->hbmpItem = 0;
-
-      return NUM_ROOT_MENU_R;
+      for (size_t i = 0; i < _countof(top_menu_items); ++i) {
+        const MYMENUITEM& item = top_menu_items[i];
+        lpImeMenu[i].cbSize = sizeof(IMEMENUITEMINFO);
+        lpImeMenu[i].fState = 0;
+        switch (item.nCommandID) {
+        case -1:
+          lpImeMenu[i].fType = IMFT_SEPARATOR;
+          break;
+        case IDM_HIRAGANA:
+          lpImeMenu[i].fType = IMFT_RADIOCHECK;
+          if (imode == IMODE_ZEN_HIRAGANA) {
+            lpImeMenu[i].fState = IMFS_CHECKED;
+          }
+          break;
+        case IDM_ZEN_KATAKANA:
+          lpImeMenu[i].fType = IMFT_RADIOCHECK;
+          if (imode == IMODE_ZEN_KATAKANA) {
+            lpImeMenu[i].fState = IMFS_CHECKED;
+          }
+          break;
+        case IDM_ZEN_ALNUM:
+          lpImeMenu[i].fType = IMFT_RADIOCHECK;
+          if (imode == IMODE_ZEN_EISUU) {
+            lpImeMenu[i].fState = IMFS_CHECKED;
+          }
+          break;
+        case IDM_HAN_KATAKANA:
+          lpImeMenu[i].fType = IMFT_RADIOCHECK;
+          if (imode == IMODE_HAN_KANA) {
+            lpImeMenu[i].fState = IMFS_CHECKED;
+          }
+          break;
+        case IDM_ALNUM:
+          lpImeMenu[i].fType = IMFT_RADIOCHECK;
+          if (imode == IMODE_HAN_EISUU) {
+            lpImeMenu[i].fState = IMFS_CHECKED;
+          }
+          break;
+        case IDM_ROMAJI_INPUT:
+        case IDM_KANA_INPUT:
+          lpImeMenu[i].fType = IMFT_RADIOCHECK;
+          if (dwConversion & IME_CMODE_ROMAN) {
+            if (item.nCommandID == IDM_ROMAJI_INPUT) {
+              lpImeMenu[i].fState = IMFS_CHECKED;
+            }
+          } else {
+            if (item.nCommandID == IDM_KANA_INPUT) {
+              lpImeMenu[i].fState = IMFS_CHECKED;
+            }
+          }
+          break;
+        default:
+          lpImeMenu[i].fType = 0;
+          break;
+        }
+        lpImeMenu[i].wID = item.nCommandID;
+        lpImeMenu[i].hbmpChecked = 0;
+        lpImeMenu[i].hbmpUnchecked = 0;
+        if (item.nStringID != -1) {
+          lstrcpy(lpImeMenu[i].szString, TheApp.LoadSTR(item.nStringID));
+        } else {
+          lpImeMenu[i].szString[0] = TEXT('\0');
+        }
+        lpImeMenu[i].hbmpItem = 0;
+      }
+      return _countof(top_menu_items);
     } else {
-      lpImeMenu->cbSize = sizeof(IMEMENUITEMINFO);
-      lpImeMenu->fType = 0;
-      lpImeMenu->fState = 0;
-      lpImeMenu->wID = IDIM_ROOT_ML_1;
-      lpImeMenu->hbmpChecked = 0;
-      lpImeMenu->hbmpUnchecked = 0;
-      lstrcpy(lpImeMenu->szString, TEXT("RootLeftMenu1"));
-      lpImeMenu->hbmpItem = 0;
-
-      lpImeMenu++;
-      lpImeMenu->cbSize = sizeof(IMEMENUITEMINFO);
-      lpImeMenu->fType = IMFT_SUBMENU;
-      lpImeMenu->fState = 0;
-      lpImeMenu->wID = IDIM_ROOT_ML_2;
-      lpImeMenu->hbmpChecked = 0;
-      lpImeMenu->hbmpUnchecked = 0;
-      lstrcpy(lpImeMenu->szString, TEXT("RootLeftMenu2"));
-      lpImeMenu->hbmpItem = 0;
-
-      lpImeMenu++;
-      lpImeMenu->cbSize = sizeof(IMEMENUITEMINFO);
-      lpImeMenu->fType = 0;
-      lpImeMenu->fState = 0;
-      lpImeMenu->wID = IDIM_ROOT_ML_3;
-      lpImeMenu->hbmpChecked = 0;
-      lpImeMenu->hbmpUnchecked = 0;
-      lstrcpy(lpImeMenu->szString, TEXT("RootLeftMenu3"));
-      lpImeMenu->hbmpItem = TheApp.LoadBMP(TEXT("FACEBMP"));
-
-      return NUM_ROOT_MENU_L;
+      return 0;
     }
   } else {
-    if (dwFlags & IGIMIF_RIGHTMENU) {
-      lpImeMenu->cbSize = sizeof(IMEMENUITEMINFO);
-      lpImeMenu->fType = 0;
-      lpImeMenu->fState = 0;
-      lpImeMenu->wID = IDIM_SUB_MR_1;
-      lpImeMenu->hbmpChecked = 0;
-      lpImeMenu->hbmpUnchecked = 0;
-      lstrcpy(lpImeMenu->szString, TEXT("SubRightMenu1"));
-      lpImeMenu->hbmpItem = 0;
-
-      lpImeMenu++;
-      lpImeMenu->cbSize = sizeof(IMEMENUITEMINFO);
-      lpImeMenu->fType = 0;
-      lpImeMenu->fState = 0;
-      lpImeMenu->wID = IDIM_SUB_MR_2;
-      lpImeMenu->hbmpChecked = 0;
-      lpImeMenu->hbmpUnchecked = 0;
-      lstrcpy(lpImeMenu->szString, TEXT("SubRightMenu2"));
-      lpImeMenu->hbmpItem = 0;
-
-      return NUM_SUB_MENU_R;
-    } else {
-      lpImeMenu->cbSize = sizeof(IMEMENUITEMINFO);
-      lpImeMenu->fType = 0;
-      lpImeMenu->fState = IMFS_CHECKED;
-      lpImeMenu->wID = IDIM_SUB_ML_1;
-      lpImeMenu->hbmpChecked = 0;
-      lpImeMenu->hbmpUnchecked = 0;
-      lstrcpy(lpImeMenu->szString, TEXT("SubLeftMenu1"));
-      lpImeMenu->hbmpItem = 0;
-
-      lpImeMenu++;
-      lpImeMenu->cbSize = sizeof(IMEMENUITEMINFO);
-      lpImeMenu->fType = 0;
-      lpImeMenu->fState = IMFS_CHECKED;
-      lpImeMenu->wID = IDIM_SUB_ML_2;
-      lpImeMenu->hbmpChecked = TheApp.LoadBMP(TEXT("CHECKBMP"));
-      lpImeMenu->hbmpUnchecked = TheApp.LoadBMP(TEXT("UNCHECKBMP"));
-      lstrcpy(lpImeMenu->szString, TEXT("SubLeftMenu2"));
-      lpImeMenu->hbmpItem = 0;
-
-      return NUM_SUB_MENU_L;
-    }
+    return 0;
   }
-
-  return 0;
-}
+} // ImeGetImeMenuItems
 
 //////////////////////////////////////////////////////////////////////////////
 

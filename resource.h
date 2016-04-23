@@ -51,7 +51,6 @@
 #define IDM_KANA_INPUT 40011
 #define IDM_HIDE 40012
 #define IDM_PROPERTY 40013
-#define IDM_HELP 40014
 #define IDM_ADD_WORD 40015
 
 // Next default values for new objects
