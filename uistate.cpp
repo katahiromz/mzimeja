@@ -15,6 +15,7 @@ enum STATUS_WND_HITTEST {
   SWHT_CAPTION,
   SWHT_BUTTON_1,
   SWHT_BUTTON_2,
+  SWHT_BUTTON_3
 };
 
 enum InputMode {
@@ -109,6 +110,32 @@ void SetInputMode(HIMC hIMC, InputMode imode) {
   ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
 }
 
+void RepositionWindow(HWND hWnd) {
+  RECT rc, rcWorkArea;
+  ::GetWindowRect(hWnd, &rc);
+  ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, FALSE);
+  SIZE siz;
+  siz.cx = rc.right - rc.left;
+  siz.cy = rc.bottom - rc.top;
+  if (rc.right > rcWorkArea.right) {
+    rc.right = rcWorkArea.right;
+    rc.left = rcWorkArea.right - siz.cx;
+  }
+  if (rc.left < rcWorkArea.left) {
+    rc.left = rcWorkArea.left;
+    rc.right = rc.left + siz.cx;
+  }
+  if (rc.bottom > rcWorkArea.bottom) {
+    rc.bottom = rcWorkArea.bottom;
+    rc.top = rcWorkArea.bottom - siz.cy;
+  }
+  if (rc.top < rcWorkArea.top) {
+    rc.top = rcWorkArea.top;
+    rc.bottom = rc.top + siz.cy;
+  }
+  ::MoveWindow(hWnd, rc.left, rc.top, siz.cx, siz.cy, TRUE);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 extern "C" {
@@ -122,9 +149,9 @@ HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
   HWND hwndStatus = lpUIExtra->uiStatus.hWnd;
   if (!::IsWindow(hwndStatus)) {
     INT cx, cy;
-    cx = CX_MINICAPTION + CX_BUTTON * 2;
+    cx = CX_MINICAPTION + CX_BUTTON * 3;
     cx += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
-    cx += 2 * CX_BTNEDGE * 2;
+    cx += 3 * CX_BTNEDGE * 2;
     cy = CY_BUTTON;
     cy += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
     cy += 2 * CY_BTNEDGE;
@@ -135,6 +162,7 @@ HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
       hWnd, NULL, TheApp.m_hInst, NULL);
     lpUIExtra->uiStatus.hWnd = hwndStatus;
   }
+  RepositionWindow(hwndStatus);
   ::ShowWindow(hwndStatus, SW_SHOWNOACTIVATE);
   lpUIExtra->uiStatus.bShow = TRUE;
   SetWindowLongPtr(hwndStatus, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
@@ -166,11 +194,10 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
       hbmStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
       HDC hMemDC = ::CreateCompatibleDC(hDC);
       if (hMemDC) {
+        RECT rcButton;
         HGDIOBJ hbmOld = ::SelectObject(hMemDC, hbmStatus);
 
-        // draw input mode
         rc.left += CX_MINICAPTION;
-        RECT rcButton;
         rcButton.left = rc.left;
         rcButton.top = rc.top;
         rcButton.right = rc.left + CX_BUTTON + 4;
@@ -181,6 +208,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
         } else {
           ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON, DFCS_BUTTONPUSH);
         }
+
         rcButton.left += CX_BUTTON + 2 * CX_BTNEDGE;
         rcButton.right += CX_BUTTON + 2 * CY_BTNEDGE;
         if (nPushed == 2) {
@@ -190,6 +218,30 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
           ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
             DFCS_BUTTONPUSH);
         }
+
+        rcButton.left += CX_BUTTON + 2 * CX_BTNEDGE;
+        rcButton.right += CX_BUTTON + 2 * CY_BTNEDGE;
+        if (nPushed == 3) {
+          ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+            DFCS_BUTTONPUSH | DFCS_PUSHED);
+        } else {
+          ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+            DFCS_BUTTONPUSH);
+        }
+
+        // draw ime on/off
+        if (lpIMC->IsOpen()) {
+          ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                   CX_BUTTON, CY_BUTTON,
+                   hMemDC, 0, 7 * CY_BUTTON, SRCCOPY);
+        } else {
+          ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                   CX_BUTTON, CY_BUTTON,
+                   hMemDC, 0, 8 * CY_BUTTON, SRCCOPY);
+        }
+
+        // draw input mode
+        rc.left += CX_BUTTON + CX_BTNEDGE * 2;
         if (lpIMC->IsOpen()) {
           if (lpIMC->Conversion() & IME_CMODE_FULLSHAPE) {
             if (lpIMC->Conversion() & IME_CMODE_NATIVE) {
@@ -267,6 +319,13 @@ STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
     DebugPrint(TEXT("status hit: %d"), SWHT_BUTTON_2);
     return SWHT_BUTTON_2;
   }
+  ::GetClientRect(hWnd, &rc);
+  rc.left += CX_MINICAPTION + 2 * (CX_BUTTON + 2 * CX_BTNEDGE);
+  rc.right = rc.left + CX_BUTTON + 2 * CX_BTNEDGE;
+  if (::PtInRect(&rc, pt)) {
+    DebugPrint(TEXT("status hit: %d"), SWHT_BUTTON_3);
+    return SWHT_BUTTON_3;
+  }
   ::GetWindowRect(hWnd, &rc);
   ::ClientToScreen(hWnd, &pt);
   if (::PtInRect(&rc, pt)) {
@@ -280,32 +339,6 @@ void StatusWnd_Update(LPUIEXTRA lpUIExtra) {
     SendMessage(lpUIExtra->uiStatus.hWnd, WM_UI_UPDATE, 0, 0L);
 } // StatusWnd_Update
 
-void RepositionWindow(HWND hWnd) {
-  RECT rc, rcWorkArea;
-  ::GetWindowRect(hWnd, &rc);
-  ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, FALSE);
-  SIZE siz;
-  siz.cx = rc.right - rc.left;
-  siz.cy = rc.bottom - rc.top;
-  if (rc.right > rcWorkArea.right) {
-    rc.right = rcWorkArea.right;
-    rc.left = rcWorkArea.right - siz.cx;
-  }
-  if (rc.left < rcWorkArea.left) {
-    rc.left = rcWorkArea.left;
-    rc.right = rc.left + siz.cx;
-  }
-  if (rc.bottom > rcWorkArea.bottom) {
-    rc.bottom = rcWorkArea.bottom;
-    rc.top = rcWorkArea.bottom - siz.cy;
-  }
-  if (rc.top < rcWorkArea.top) {
-    rc.top = rcWorkArea.top;
-    rc.bottom = rc.top + siz.cy;
-  }
-  ::MoveWindow(hWnd, rc.left, rc.top, siz.cx, siz.cy, TRUE);
-}
-
 void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
   HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
   HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
@@ -315,6 +348,13 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
     InputMode imode;
     switch (hittest) {
     case SWHT_BUTTON_1:
+      if (bOpen) {
+        SetInputMode(hIMC, IMODE_HAN_EISUU);
+      } else {
+        SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+      }
+      break;
+    case SWHT_BUTTON_2:
       DebugPrint(TEXT("dwConversion: %08X"), dwConversion);
       imode = InputModeFromConversionMode(bOpen, dwConversion);
       DebugPrint(TEXT("imode1: %d"), imode);
@@ -322,7 +362,7 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
       DebugPrint(TEXT("imode2: %d"), imode);
       SetInputMode(hIMC, imode);
       break;
-    case SWHT_BUTTON_2:
+    case SWHT_BUTTON_3:
       if (dwConversion & IME_CMODE_ROMAN) {
         dwConversion &= ~IME_CMODE_ROMAN;
       } else {
@@ -374,6 +414,13 @@ void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
     if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_2) {
       HDC hDC = ::GetDC(hWnd);
       StatusWnd_Paint(hWnd, hDC, (bDown ? 2 : 0));
+      ::ReleaseDC(hWnd, hDC);
+    }
+    break;
+  case SWHT_BUTTON_3:
+    if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_3) {
+      HDC hDC = ::GetDC(hWnd);
+      StatusWnd_Paint(hWnd, hDC, (bDown ? 3 : 0));
       ::ReleaseDC(hWnd, hDC);
     }
     break;
