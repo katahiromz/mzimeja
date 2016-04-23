@@ -103,7 +103,13 @@ wWinMain(
   WCHAR szPath[MAX_PATH];
   GetSystemDirectory(szPath, MAX_PATH);
   wcscat(szPath, L"\\mzimeja.ime");
-  ImmInstallIME(szPath, DoLoadString(hInstance, 4));
+  if (!ImmInstallIME(szPath, DoLoadString(hInstance, 4))) {
+    TCHAR szMsg[128];
+    DWORD dwError = GetLastError();
+    wsprintf(szMsg, DoLoadString(hInstance, 5), dwError);
+    MessageBox(NULL, szMsg, NULL, MB_ICONERROR);
+    return 3;
+  }
 
   return 0;
 }
