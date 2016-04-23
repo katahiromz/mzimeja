@@ -60,6 +60,30 @@ InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
   }
 }
 
+UINT CommandFromInputMode(InputMode imode) {
+  switch (imode) {
+  case IMODE_ZEN_HIRAGANA:
+    return IDM_HIRAGANA;
+  case IMODE_ZEN_KATAKANA:
+    return IDM_ZEN_KATAKANA;
+  case IMODE_ZEN_EISUU:
+    return IDM_ZEN_ALNUM;
+  case IMODE_HAN_KANA:
+    return IDM_HAN_KATAKANA;
+  case IMODE_HAN_EISUU:
+    return IDM_ALNUM;
+  default:
+    return IDM_ALNUM;
+  }
+}
+
+InputMode GetInputMode(HIMC hIMC) {
+  DWORD dwConversion, dwSentence;
+  ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
+  BOOL bOpen = ::ImmGetOpenStatus(hIMC);
+  return InputModeFromConversionMode(bOpen, dwConversion);
+}
+
 InputMode NextInputMode(InputMode imode) {
   switch (imode) {
   case IMODE_ZEN_HIRAGANA:
@@ -105,6 +129,12 @@ void SetInputMode(HIMC hIMC, InputMode imode) {
     break;
   }
   ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
+}
+
+BOOL IsRomajiMode(HIMC hIMC) {
+  DWORD dwConversion, dwSentence;
+  ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
+  return (dwConversion & IME_CMODE_ROMAN);
 }
 
 void SetRomajiMode(HIMC hIMC, BOOL bRomaji) {
@@ -330,6 +360,47 @@ BOOL MZIMEJA::GenerateMessage(
   }
   return TRUE;
 }
+
+BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
+  switch (dwCommand) {
+  case IDM_RECONVERT:
+    break;
+  case IDM_ABOUT:
+    break;
+  case IDM_HIRAGANA:
+    SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+    break;
+  case IDM_ZEN_KATAKANA:
+    SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+    break;
+  case IDM_ZEN_ALNUM:
+    SetInputMode(hIMC, IMODE_ZEN_EISUU);
+    break;
+  case IDM_HAN_KATAKANA:
+    SetInputMode(hIMC, IMODE_HAN_KANA);
+    break;
+  case IDM_ALNUM:
+    SetInputMode(hIMC, IMODE_HAN_EISUU);
+    break;
+  case IDM_CANCEL:
+    break;
+  case IDM_ROMAJI_INPUT:
+    SetRomajiMode(hIMC, TRUE);
+    break;
+  case IDM_KANA_INPUT:
+    SetRomajiMode(hIMC, FALSE);
+    break;
+  case IDM_HIDE:
+    break;
+  case IDM_PROPERTY:
+    break;
+  case IDM_ADD_WORD:
+    break;
+  default:
+    return FALSE;
+  }
+  return TRUE;
+} // MZIMEJA::DoCommand
 
 void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
   if (!m_hMyKL) {

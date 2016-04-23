@@ -38,7 +38,6 @@ MODE4ICON               ICON    DISCARDABLE     "res\\mode4.ico"
 // Bitmap
 //
 
-STATUSBMP               BITMAP  DISCARDABLE     "res\\status.bmp"
 CLOSEBMP                BITMAP  DISCARDABLE     "res\\close.bmp"
 CHECKBMP                BITMAP  DISCARDABLE     "res\\check.bmp"
 UNCHECKBMP              BITMAP  DISCARDABLE     "res\\uncheck.bmp"
@@ -182,7 +181,7 @@ END
 // Menu
 //
 
-MODESMENU MENU DISCARDABLE
+STATUSRMENU MENU DISCARDABLE
 BEGIN
     POPUP ""
     BEGIN
@@ -192,10 +191,6 @@ BEGIN
         MENUITEM "半角カタカナ",                IDM_HAN_KATAKANA
         MENUITEM "半角英数",                    IDM_ALNUM
         MENUITEM SEPARATOR
-        MENUITEM "キャンセル",                  IDM_CANCEL
-    END
-    POPUP ""
-    BEGIN
         MENUITEM "ローマ字入力",                IDM_ROMAJI_INPUT
         MENUITEM "かな入力",                    IDM_KANA_INPUT
         MENUITEM SEPARATOR

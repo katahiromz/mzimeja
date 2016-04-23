@@ -334,6 +334,43 @@ void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
   }
 } // StatusWnd_OnLButton
 
+static BOOL StatusWnd_DoCommand(HIMC hIMC, DWORD dwCommand) {
+} // StatusWnd_DoCommand
+
+static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
+  HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
+  HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
+
+  HMENU hMenu = ::LoadMenu(TheApp.m_hInst, TEXT("STATUSRMENU"));
+  if (hMenu) {
+    HMENU hSubMenu = ::GetSubMenu(hMenu, 0);
+    TPMPARAMS params;
+    params.cbSize = sizeof(params);
+    ::GetWindowRect(hWnd, &params.rcExclude);
+    HWND hwndFore = ::GetForegroundWindow();
+    ::SetForegroundWindow(hWnd);
+
+    UINT uCheck = CommandFromInputMode(GetInputMode(hIMC));
+    ::CheckMenuRadioItem(hSubMenu, IDM_HIRAGANA, IDM_ALNUM, uCheck, MF_BYCOMMAND);
+
+    if (IsRomajiMode(hIMC)) {
+      ::CheckMenuRadioItem(hSubMenu, IDM_ROMAJI_INPUT, IDM_KANA_INPUT,
+                           IDM_ROMAJI_INPUT, MF_BYCOMMAND);
+    } else {
+      ::CheckMenuRadioItem(hSubMenu, IDM_ROMAJI_INPUT, IDM_KANA_INPUT,
+                           IDM_KANA_INPUT, MF_BYCOMMAND);
+    }
+
+    UINT nCommand = ::TrackPopupMenuEx(hSubMenu, TPM_RETURNCMD | TPM_NONOTIFY,
+      pt.x, pt.y, hWnd, &params);
+    TheApp.DoCommand(hIMC, nCommand);
+    ::PostMessage(hWnd, WM_NULL, 0, 0);
+    ::DestroyMenu(hMenu);
+    ::SetForegroundWindow(hwndFore);
+  }
+  return TRUE;
+} // StatusWnd_OnRClick
+
 LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                       LPARAM lParam) {
   PAINTSTRUCT ps;
@@ -424,6 +461,7 @@ LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
     case WM_RBUTTONUP:
       DebugPrint(TEXT("status: WM_SETCURSOR WM_RBUTTONUP"));
+      StatusWnd_OnRClick(hWnd, pt);
       break;
     }
     ::SetCursor(::LoadCursor(NULL, IDC_ARROW));

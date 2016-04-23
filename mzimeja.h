@@ -141,9 +141,12 @@ enum InputMode {
 BOOL IsInputModeOpen(InputMode imode);
 InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
 InputMode NextInputMode(InputMode imode);
+InputMode GetInputMode(HIMC hIMC);
 void SetInputMode(HIMC hIMC, InputMode imode);
 void RepositionWindow(HWND hWnd);
+BOOL IsRomajiMode(HIMC hIMC);
 void SetRomajiMode(HIMC hIMC, BOOL bRomaji);
+UINT CommandFromInputMode(InputMode imode);
 
 //////////////////////////////////////////////////////////////////////////////
 // Structures
@@ -352,6 +355,8 @@ struct MZIMEJA {
   BOOL GenerateMessage(TRANSMSG& msg);
   BOOL GenerateMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
   BOOL GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg);
+
+  BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
 };
 
 extern MZIMEJA TheApp;
