@@ -155,6 +155,12 @@ HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
     cy = CY_BUTTON;
     cy += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
     cy += 2 * CY_BTNEDGE;
+    if (lpUIExtra->uiStatus.pt.x == -1) {
+      RECT rcWorkArea;
+      ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, FALSE);
+      lpUIExtra->uiStatus.pt.x = rcWorkArea.right - cx;
+      lpUIExtra->uiStatus.pt.y = rcWorkArea.bottom - cy;
+    }
     hwndStatus = ::CreateWindowEx(
       exstyle, szStatusClassName, NULL, style,
       lpUIExtra->uiStatus.pt.x, lpUIExtra->uiStatus.pt.y,

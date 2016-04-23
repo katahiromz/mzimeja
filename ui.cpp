@@ -252,8 +252,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       // This message is sent by the status window.
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
-      lpUIExtra->uiStatus.pt.x = (long)LOWORD(lParam);
-      lpUIExtra->uiStatus.pt.y = (long)HIWORD(lParam);
+      lpUIExtra->uiStatus.pt.x = (short)LOWORD(lParam);
+      lpUIExtra->uiStatus.pt.y = (short)HIWORD(lParam);
       GlobalUnlock(hUIExtra);
       break;
 
@@ -263,8 +263,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       if (!lpUIExtra->dwCompStyle) {
-        lpUIExtra->uiDefComp.pt.x = (long)LOWORD(lParam);
-        lpUIExtra->uiDefComp.pt.y = (long)HIWORD(lParam);
+        lpUIExtra->uiDefComp.pt.x = (short)LOWORD(lParam);
+        lpUIExtra->uiDefComp.pt.y = (short)HIWORD(lParam);
       }
       GlobalUnlock(hUIExtra);
       break;
@@ -274,8 +274,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       // This message is sent by the candidate window.
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
-      lpUIExtra->uiCand.pt.x = (long)LOWORD(lParam);
-      lpUIExtra->uiCand.pt.y = (long)HIWORD(lParam);
+      lpUIExtra->uiCand.pt.x = (short)LOWORD(lParam);
+      lpUIExtra->uiCand.pt.y = (short)HIWORD(lParam);
       GlobalUnlock(hUIExtra);
       break;
 
@@ -331,21 +331,16 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
   switch (wParam) {
     case IMN_CLOSESTATUSWINDOW:
       if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
-        GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
+        ::GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
         lpUIExtra->uiStatus.pt.x = rc.left;
         lpUIExtra->uiStatus.pt.y = rc.top;
-        ShowWindow(lpUIExtra->uiStatus.hWnd, SW_HIDE);
+        ::ShowWindow(lpUIExtra->uiStatus.hWnd, SW_HIDE);
         lpUIExtra->uiStatus.bShow = FALSE;
       }
       break;
 
     case IMN_OPENSTATUSWINDOW:
-      if (lpUIExtra->uiStatus.pt.x == -1) {
-        GetWindowRect(lpIMC->hWnd, &rc);
-        lpUIExtra->uiStatus.pt.x = rc.right + 1;
-        lpUIExtra->uiStatus.pt.y = rc.top;
-      }
-      lpUIExtra->uiStatus.hWnd = StatusWnd_Create(hWnd, lpUIExtra);
+      StatusWnd_Create(hWnd, lpUIExtra);
       break;
 
     case IMN_SETCONVERSIONMODE:
@@ -475,25 +470,25 @@ LONG PASCAL ControlCommand(HIMC hIMC, HWND hWnd, UINT message,
   lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
 
   switch (wParam) {
-    case IMC_GETCANDIDATEPOS:
-      if (IsWindow(lpUIExtra->uiCand.hWnd)) {
-        // MZ-IME has only one candidate list.
-        *(LPCANDIDATEFORM)lParam = lpIMC->cfCandForm[0];
-        lRet = 0;
-      }
-      break;
-
-    case IMC_GETCOMPOSITIONWINDOW:
-      *(LPCOMPOSITIONFORM)lParam = lpIMC->cfCompForm;
+  case IMC_GETCANDIDATEPOS:
+    if (IsWindow(lpUIExtra->uiCand.hWnd)) {
+      // MZ-IME has only one candidate list.
+      *(LPCANDIDATEFORM)lParam = lpIMC->cfCandForm[0];
       lRet = 0;
-      break;
+    }
+    break;
 
-    case IMC_GETSTATUSWINDOWPOS:
-      lRet = (lpUIExtra->uiStatus.pt.x << 16) & lpUIExtra->uiStatus.pt.x;
-      break;
+  case IMC_GETCOMPOSITIONWINDOW:
+    *(LPCOMPOSITIONFORM)lParam = lpIMC->cfCompForm;
+    lRet = 0;
+    break;
 
-    default:
-      break;
+  case IMC_GETSTATUSWINDOWPOS:
+    lRet = MAKELONG(lpUIExtra->uiStatus.pt.x, lpUIExtra->uiStatus.pt.y);
+    break;
+
+  default:
+    break;
   }
 
   GlobalUnlock(hUIExtra);
