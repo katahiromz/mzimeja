@@ -52,7 +52,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
     if (!IsWindow(lpUIExtra->uiComp[i].hWnd)) {
       lpUIExtra->uiComp[i].hWnd =
           CreateWindowEx(0, szCompStrClassName, NULL, WS_COMPNODEFAULT,
-                         0, 0, 1, 1, hUIWnd, NULL, TheApp.m_hInst, NULL);
+                         0, 0, 1, 1, hUIWnd, NULL, TheIME.m_hInst, NULL);
     }
     lpUIExtra->uiComp[i].rc.left = 0;
     lpUIExtra->uiComp[i].rc.top = 0;
@@ -75,7 +75,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
     lpUIExtra->uiDefComp.hWnd = CreateWindowEx(
         WS_EX_WINDOWEDGE, szCompStrClassName, NULL,
         WS_COMPDEFAULT | WS_DLGFRAME, lpUIExtra->uiDefComp.pt.x,
-        lpUIExtra->uiDefComp.pt.y, 1, 1, hUIWnd, NULL, TheApp.m_hInst, NULL);
+        lpUIExtra->uiDefComp.pt.y, 1, 1, hUIWnd, NULL, TheIME.m_hInst, NULL);
   }
 
   // SetWindowLong(lpUIExtra->uiDefComp.hWnd,FIGWLP_FONT,(DWORD)lpUIExtra->hFont);
@@ -426,7 +426,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
 
   hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
-    InputContext *lpIMC = TheApp.LockIMC(hIMC);
+    InputContext *lpIMC = TheIME.LockIMC(hIMC);
     CompStr *lpCompStr = lpIMC->LockCompStr();
     if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
@@ -467,7 +467,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
     end_pcw:
       lpIMC->UnlockCompStr();
     }
-    TheApp.UnlockIMC();
+    TheIME.UnlockIMC();
   }
   if (hFont && hOldFont) SelectObject(hDC, hOldFont);
   EndPaint(hCompWnd, &ps);

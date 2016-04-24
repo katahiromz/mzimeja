@@ -108,7 +108,7 @@ void InputContext::AddChar(WCHAR ch) {
 
   if (log.comp_str.empty()) {
     // start composition
-    TheApp.GenerateMessage(WM_IME_STARTCOMPOSITION);
+    TheIME.GenerateMessage(WM_IME_STARTCOMPOSITION);
   }
 
   //DWORD dwConversion = lpIMC->Conversion();
@@ -120,11 +120,10 @@ void InputContext::AddChar(WCHAR ch) {
   log.dwDeltaStart = log.dwCursorPos;
   ++log.dwCursorPos;
 
+  // update info
   log.comp_read_str = log.comp_str;
-
   log.comp_read_attr.resize(log.comp_str.size(), 0);
   log.comp_attr.resize(log.comp_str.size(), 0);
-
   log.comp_read_clause.resize(2);
   log.comp_read_clause[0] = 0;
   log.comp_read_clause[1] = (DWORD)log.comp_read_str.size();
@@ -139,7 +138,7 @@ void InputContext::AddChar(WCHAR ch) {
   DumpCompStr();
 
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-  TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 } // InputContext::AddChar
 
 void InputContext::MakeResult() {
@@ -152,7 +151,7 @@ void InputContext::MakeResult() {
       lpCandInfo->Clear();
       UnlockCandInfo();
     }
-    TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
   // get logical data
@@ -185,8 +184,8 @@ void InputContext::MakeResult() {
   DumpCompStr();
 
   // generate messages to end composition
-  TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_RESULTALL);
-  TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_RESULTALL);
+  TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::MakeResult
 
 void InputContext::CancelText() {
@@ -199,7 +198,7 @@ void InputContext::CancelText() {
       lpCandInfo->Clear();
       UnlockCandInfo();
     }
-    TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
   DumpCompStr();
@@ -207,8 +206,8 @@ void InputContext::CancelText() {
   DumpCompStr();
 
   // generate messages to end composition
-  TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL);
-  TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL);
+  TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::CancelText
 
 void InputContext::DeleteChar(BOOL bBackSpace) {
@@ -227,18 +226,32 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     if (log.dwCursorPos == 0) {
       return;
     } else if (log.dwCursorPos < log.comp_str.size()) {
+      log.dwDeltaStart = log.dwCursorPos;
       --log.dwCursorPos;
       log.comp_str.erase(log.dwCursorPos);
     } else {
       log.dwCursorPos = (DWORD)log.comp_str.size();
+      log.dwDeltaStart = log.dwCursorPos;
     }
   } else {
     if (log.dwCursorPos >= log.comp_str.size()) {
       return;
     } else {
       log.comp_str.erase(log.dwCursorPos);
+      log.dwCursorPos = dwDeltaStart;
     }
   }
+
+  // update info
+  log.comp_read_str = log.comp_str;
+  log.comp_read_attr.resize(log.comp_str.size(), 0);
+  log.comp_attr.resize(log.comp_str.size(), 0);
+  log.comp_read_clause.resize(2);
+  log.comp_read_clause[0] = 0;
+  log.comp_read_clause[1] = (DWORD)log.comp_read_str.size();
+  log.comp_clause.resize(2);
+  log.comp_clause[0] = 0;
+  log.comp_clause[1] = (DWORD)log.comp_str.size();
 
   // realloc
   DumpCompStr();
@@ -251,18 +264,18 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
       CandInfo *lpCandInfo = LockCandInfo();
       if (lpCandInfo) {
         lpCandInfo->Clear();
-        TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
         UnlockCandInfo();
       }
     }
 
     // generate messages to end composition
-    TheApp.GenerateMessage(WM_IME_COMPOSITION);
-    TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
+    TheIME.GenerateMessage(WM_IME_COMPOSITION);
+    TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
   } else {
     // update composition
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-    TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
   }
 } // InputContext::DeleteChar
 

@@ -23,19 +23,19 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     break;
 
   case VK_ESCAPE:
-    lpIMC = TheApp.LockIMC(hIMC);
+    lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       lpIMC->CancelText();
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
     }
     break;
 
   case VK_DELETE:
   case VK_BACK:
-    lpIMC = TheApp.LockIMC(hIMC);
+    lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       lpIMC->DeleteChar(wParam == VK_BACK);
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
     }
     break;
 
@@ -76,13 +76,13 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     break;
 
   case VK_RETURN:
-    lpIMC = TheApp.LockIMC(hIMC);
+    lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       if (lpIMC->Conversion() & IME_CMODE_CHARCODE)
         lpIMC->CancelText();
       else
         lpIMC->MakeResult();
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
     }
     break;
 
@@ -94,10 +94,10 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
         (VK_MULTIPLY <= wVKey && wVKey <= VK_DIVIDE))
     {
       // This WM_IME_KEYDOWN has actual character code in itself.
-      lpIMC = TheApp.LockIMC(hIMC);
+      lpIMC = TheIME.LockIMC(hIMC);
       if (lpIMC) {
         lpIMC->AddChar(HIWORD(wParam));
-        TheApp.UnlockIMC();
+        TheIME.UnlockIMC();
       }
     }
     break;
@@ -145,7 +145,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
     return FALSE;
   }
 
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
+  InputContext *lpIMC = TheIME.LockIMC(hIMC);
   if (lpIMC == NULL) {
     DebugPrint(TEXT("end ImeProcessKey (no context)\n"));
     return FALSE;
@@ -255,7 +255,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
     }
   }
 
-  TheApp.UnlockIMC();
+  TheIME.UnlockIMC();
   DebugPrint(TEXT("end ImeProcessKey\n"));
   return ret;
 }
@@ -303,15 +303,15 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
   UINT ret = 0;
   DebugPrint(TEXT("ImeToAsciiEx\n"));
 
-  TheApp.m_lpCurTransKey = lpTransBuf;
-  TheApp.m_uNumTransKey = 0;
+  TheIME.m_lpCurTransKey = lpTransBuf;
+  TheIME.m_uNumTransKey = 0;
 
   // if hIMC is NULL, this means DISABLE IME.
   if (hIMC) {
-    InputContext *lpIMC = TheApp.LockIMC(hIMC);
+    InputContext *lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       BOOL fOpen = lpIMC->IsOpen();
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
 
       if (fOpen) {
         if ((uScanCode & 0x8000) == 0) {
@@ -320,18 +320,18 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
         }
 
         // Clear static value, no more generated message!
-        TheApp.m_lpCurTransKey = NULL;
+        TheIME.m_lpCurTransKey = NULL;
       }
 
       // If trans key buffer that is allocated by USER.EXE full up,
       // the return value is the negative number.
-      if (TheApp.m_fOverTransKey) {
+      if (TheIME.m_fOverTransKey) {
         DebugPrint(TEXT("***************************************\n"));
         DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *\n"));
         DebugPrint(TEXT("*                by MZIMEJA.IME       *\n"));
         DebugPrint(TEXT("***************************************\n"));
       }
-      ret = TheApp.m_uNumTransKey;
+      ret = TheIME.m_uNumTransKey;
     }
   }
   DebugPrint(TEXT("end ImeToAsciiEx\n"));

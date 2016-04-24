@@ -11,7 +11,7 @@ extern "C" {
 void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
   DWORD fdwConversion;
 
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
+  InputContext *lpIMC = TheIME.LockIMC(hIMC);
   if (!lpIMC) return;
 
   fdwConversion = lpIMC->Conversion();
@@ -63,10 +63,10 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
 
   if (lpIMC->Conversion() != fdwConversion) {
     lpIMC->Conversion() = fdwConversion;
-    TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_SETCONVERSIONMODE);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_SETCONVERSIONMODE);
   }
 
-  TheApp.UnlockIMC();
+  TheIME.UnlockIMC();
   return;
 }
 
@@ -83,7 +83,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
   BOOL fChange = FALSE;
   DWORD dwSize;
 
-  lpIMC = TheApp.LockIMC(hIMC);
+  lpIMC = TheIME.LockIMC(hIMC);
   if (!lpIMC) return;
 
   if (!(lpCompStr = lpIMC->LockCompStr()))
@@ -135,7 +135,7 @@ void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode) {
   }
 
   if (fChange) {
-    TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPSTR);
+    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPSTR);
   }
 
   GlobalUnlock(hDst);
@@ -144,7 +144,7 @@ ccs_exit20:
 ccs_exit30:
   lpIMC->UnlockCompStr();
 ccs_exit40:
-  TheApp.UnlockIMC();
+  TheIME.UnlockIMC();
   return;
 }
 

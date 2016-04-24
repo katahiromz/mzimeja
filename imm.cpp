@@ -85,7 +85,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
   lstrcpy(lpszClassName, szUIClassName);
 
   if (dwSystemInfoFlags & IME_SYSINFO_WINLOGON) {
-    TheApp.m_bWinLogOn = TRUE;
+    TheIME.m_bWinLogOn = TRUE;
   }
 
   DebugPrint(TEXT("end ImeInquire\n"));
@@ -283,7 +283,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
 BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
   DebugPrint(TEXT("ImeSetActiveContext\n"));
 
-  TheApp.UpdateIndicIcon(hIMC);
+  TheIME.UpdateIndicIcon(hIMC);
 
   DebugPrint(TEXT("end ImeSetActiveContext\n"));
   return TRUE;
@@ -393,13 +393,13 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       switch (dwValue) {
         case IMC_SETOPENSTATUS:
           if (!dwIndex) {
-            lpIMC = TheApp.LockIMC(hIMC);
+            lpIMC = TheIME.LockIMC(hIMC);
             if (lpIMC) {
               lpIMC->CancelText();
-              TheApp.UnlockIMC();
+              TheIME.UnlockIMC();
             }
           }
-          TheApp.UpdateIndicIcon(hIMC);
+          TheIME.UpdateIndicIcon(hIMC);
           bRet = TRUE;
           break;
 
@@ -418,10 +418,10 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("NI_COMPOSITIONSTR\n"));
       switch (dwIndex) {
         case CPS_COMPLETE:
-          lpIMC = TheApp.LockIMC(hIMC);
+          lpIMC = TheIME.LockIMC(hIMC);
           if (lpIMC) {
             lpIMC->MakeResult();
-            TheApp.UnlockIMC();
+            TheIME.UnlockIMC();
           }
           bRet = TRUE;
           break;
@@ -437,10 +437,10 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           break;
 
         case CPS_CANCEL:
-          lpIMC = TheApp.LockIMC(hIMC);
+          lpIMC = TheIME.LockIMC(hIMC);
           if (lpIMC) {
             lpIMC->CancelText();
-            TheApp.UnlockIMC();
+            TheIME.UnlockIMC();
           }
           bRet = TRUE;
           break;
@@ -452,14 +452,14 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
     case NI_OPENCANDIDATE:
       DebugPrint(TEXT("NI_OPENCANDIDATE\n"));
-      lpIMC = TheApp.LockIMC(hIMC);
+      lpIMC = TheIME.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
       if (!(lpCompStr = lpIMC->LockCompStr())) {
-        TheApp.UnlockIMC();
+        TheIME.UnlockIMC();
         return FALSE;
       }
       if (!lpIMC->HasConvertedCompStr()) {
-        TheApp.UnlockIMC();
+        TheIME.UnlockIMC();
         return FALSE;
       }
 
@@ -467,10 +467,10 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       if (lpCandInfo) {
         // Get the candidate strings from dic file.
         GetCandidateStringsFromDictionary(
-            lpCompStr->GetCompReadStr(), szBuf, 256, TheApp.m_szDicFileName);
+            lpCompStr->GetCompReadStr(), szBuf, 256, TheIME.m_szDicFileName);
 
         // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
-        TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
 
         // Make candidate structures.
         lpCandInfo->dwSize = sizeof(MZCAND);
@@ -503,10 +503,10 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
         //
         // Generate messages.
         //
-        TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
         lpIMC->UnlockCandInfo();
-        TheApp.UnlockIMC();
+        TheIME.UnlockIMC();
 
         bRet = TRUE;
       }
@@ -514,18 +514,18 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
     case NI_CLOSECANDIDATE:
       DebugPrint(TEXT("NI_CLOSECANDIDATE\n"));
-      lpIMC = TheApp.LockIMC(hIMC);
+      lpIMC = TheIME.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
       if (lpIMC->HasCandInfo()) {
-        TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
         bRet = TRUE;
       }
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
       break;
 
     case NI_SELECTCANDIDATESTR:
       DebugPrint(TEXT("NI_SELECTCANDIDATESTR\n"));
-      lpIMC = TheApp.LockIMC(hIMC);
+      lpIMC = TheIME.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
 
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
@@ -537,25 +537,25 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             bRet = TRUE;
 
             // Generate messages.
-            TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+            TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
           }
           lpIMC->UnlockCandInfo();
         }
       }
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
       break;
 
     case NI_CHANGECANDIDATELIST:
       DebugPrint(TEXT("NI_CHANGECANDIDATELIST\n"));
-      lpIMC = TheApp.LockIMC(hIMC);
+      lpIMC = TheIME.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
       if (dwIndex == 1 && lpIMC->HasCandInfo()) bRet = TRUE;
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
       break;
 
     case NI_SETCANDIDATE_PAGESIZE:
       DebugPrint(TEXT("NI_SETCANDIDATE_PAGESIZE\n"));
-      lpIMC = TheApp.LockIMC(hIMC);
+      lpIMC = TheIME.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
         if (dwValue > MAXCANDPAGESIZE) return FALSE;
@@ -569,17 +569,17 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
             //
             // Generate messages.
-            TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+            TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
           }
           lpIMC->UnlockCandInfo();
         }
       }
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
       break;
 
     case NI_SETCANDIDATE_PAGESTART:
       DebugPrint(TEXT("NI_SETCANDIDATE_PAGESTART\n"));
-      lpIMC = TheApp.LockIMC(hIMC);
+      lpIMC = TheIME.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
         if (dwValue > MAXCANDPAGESIZE) return FALSE;
@@ -593,12 +593,12 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
             //
             // Generate messages.
-            TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+            TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
           }
           lpIMC->UnlockCandInfo();
         }
       }
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
       break;
 
     case NI_IMEMENUSELECTED:
@@ -606,7 +606,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("\thIMC is 0x%x\n"), hIMC);
       DebugPrint(TEXT("\tdwIndex is 0x%x\n"), dwIndex);
       DebugPrint(TEXT("\tdwValue is 0x%x\n"), dwValue);
-      TheApp.DoCommand(hIMC, dwIndex);
+      TheIME.DoCommand(hIMC, dwIndex);
       break;
 
     default:
@@ -637,14 +637,14 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
   DebugPrint(TEXT("ImeSelect\n"));
 
-  if (fSelect) TheApp.UpdateIndicIcon(hIMC);
+  if (fSelect) TheIME.UpdateIndicIcon(hIMC);
   if (NULL != hIMC) {
-    InputContext *lpIMC = TheApp.LockIMC(hIMC);
+    InputContext *lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       if (fSelect) {
         lpIMC->Initialize();
       }
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
     }
   }
   DebugPrint(TEXT("end ImeSelect\n"));
@@ -875,7 +875,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
         lpImeMenu[i].hbmpChecked = 0;
         lpImeMenu[i].hbmpUnchecked = 0;
         if (item.nStringID != -1) {
-          lstrcpy(lpImeMenu[i].szString, TheApp.LoadSTR(item.nStringID));
+          lstrcpy(lpImeMenu[i].szString, TheIME.LoadSTR(item.nStringID));
         } else {
           lpImeMenu[i].szString[0] = TEXT('\0');
         }

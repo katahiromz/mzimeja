@@ -98,7 +98,7 @@ void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
     lpUIExtra->uiCand.hWnd =
         CreateWindowEx(WS_EX_WINDOWEDGE, szCandClassName, NULL,
                        WS_COMPDEFAULT | WS_DLGFRAME, lpUIExtra->uiCand.pt.x,
-                       lpUIExtra->uiCand.pt.y, 1, 1, hUIWnd, NULL, TheApp.m_hInst, NULL);
+                       lpUIExtra->uiCand.pt.y, 1, 1, hUIWnd, NULL, TheIME.m_hInst, NULL);
   }
 
   SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
@@ -120,7 +120,7 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
   HBRUSH hbrHightLight = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
   HIMC hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
-    InputContext *lpIMC = TheApp.LockIMC(hIMC);
+    InputContext *lpIMC = TheIME.LockIMC(hIMC);
     HFONT hOldFont = CheckNativeCharset(hDC);
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
@@ -153,7 +153,7 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
     if (hOldFont) {
       DeleteObject(SelectObject(hDC, hOldFont));
     }
-    TheApp.UnlockIMC();
+    TheIME.UnlockIMC();
   }
   EndPaint(hCandWnd, &ps);
 

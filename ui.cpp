@@ -132,7 +132,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
           // input context was chenged.
           // if there are the child windows, the diplay have to be
           // updated.
-          lpIMC = TheApp.LockIMC(hIMC);
+          lpIMC = TheIME.LockIMC(hIMC);
           if (lpIMC) {
             CompStr *lpCompStr = lpIMC->LockCompStr();
             CandInfo *lpCandInfo = lpIMC->LockCandInfo();
@@ -160,7 +160,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             HideCompWindow(lpUIExtra);
           }
           StatusWnd_Update(lpUIExtra);
-          TheApp.UnlockIMC();
+          TheIME.UnlockIMC();
         } else  // it is NULL input context.
         {
           HideCandWindow(lpUIExtra);
@@ -176,21 +176,21 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       // Start composition! Ready to display the composition string.
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
-      lpIMC = TheApp.LockIMC(hIMC);
+      lpIMC = TheIME.LockIMC(hIMC);
       CreateCompWindow(hWnd, lpUIExtra, lpIMC);
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
       GlobalUnlock(hUIExtra);
       break;
 
     case WM_IME_COMPOSITION:
       // Update to display the composition string.
-      lpIMC = TheApp.LockIMC(hIMC);
+      lpIMC = TheIME.LockIMC(hIMC);
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       MoveCompWindow(lpUIExtra, lpIMC);
       MoveCandWindow(hWnd, lpIMC, lpUIExtra, TRUE);
       GlobalUnlock(hUIExtra);
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
       break;
 
     case WM_IME_ENDCOMPOSITION:
@@ -323,7 +323,7 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
   RECT rc;
   LOGFONT lf;
 
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
+  InputContext *lpIMC = TheIME.LockIMC(hIMC);
   if (NULL == lpIMC) return 0L;
 
   hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
@@ -419,7 +419,7 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
               dy + GetSystemMetrics(SM_CYSMCAPTION) +
                   2 * GetSystemMetrics(SM_CYBORDER) +
                   2 * GetSystemMetrics(SM_CYEDGE),
-              hWnd, NULL, TheApp.m_hInst, NULL);
+              hWnd, NULL, TheIME.m_hInst, NULL);
         }
         ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
         lpUIExtra->uiGuide.bShow = TRUE;
@@ -449,7 +449,7 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
   }
 
   GlobalUnlock(hUIExtra);
-  TheApp.UnlockIMC();
+  TheIME.UnlockIMC();
 
   return lRet;
 }
@@ -464,7 +464,7 @@ LONG PASCAL ControlCommand(HIMC hIMC, HWND hWnd, UINT message,
   HGLOBAL hUIExtra;
   LPUIEXTRA lpUIExtra;
 
-  lpIMC = TheApp.LockIMC(hIMC);
+  lpIMC = TheIME.LockIMC(hIMC);
   if (NULL == lpIMC) return 1L;
 
   hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
@@ -493,7 +493,7 @@ LONG PASCAL ControlCommand(HIMC hIMC, HWND hWnd, UINT message,
   }
 
   GlobalUnlock(hUIExtra);
-  TheApp.UnlockIMC();
+  TheIME.UnlockIMC();
 
   return lRet;
 }

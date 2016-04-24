@@ -176,7 +176,7 @@ void RepositionWindow(HWND hWnd) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-MZIMEJA TheApp;
+MZIMEJA TheIME;
 
 BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   m_hInst = hInstance;
@@ -422,10 +422,10 @@ void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
 
   BOOL fOpen = FALSE;
   if (hIMC) {
-    InputContext *lpIMC = TheApp.LockIMC(hIMC);
+    InputContext *lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       fOpen = lpIMC->IsOpen();
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
     }
   }
 
@@ -541,21 +541,21 @@ VOID ErrorOut(LPCTSTR pStr) {
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
-      DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %lx\n"), TheApp.m_hInst);
-      TheApp.Init(hInstDLL);
+      DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %lx\n"), TheIME.m_hInst);
+      TheIME.Init(hInstDLL);
       break;
 
     case DLL_PROCESS_DETACH:
-      DebugPrint(TEXT("DLL_PROCESS_DETACH: hInst is %lx\n"), TheApp.m_hInst);
-      TheApp.Destroy();
+      DebugPrint(TEXT("DLL_PROCESS_DETACH: hInst is %lx\n"), TheIME.m_hInst);
+      TheIME.Destroy();
       break;
 
     case DLL_THREAD_ATTACH:
-      DebugPrint(TEXT("DLL_THREAD_ATTACH: hInst is %lx\n"), TheApp.m_hInst);
+      DebugPrint(TEXT("DLL_THREAD_ATTACH: hInst is %lx\n"), TheIME.m_hInst);
       break;
 
     case DLL_THREAD_DETACH:
-      DebugPrint(TEXT("DLL_THREAD_DETACH: hInst is %lx\n"), TheApp.m_hInst);
+      DebugPrint(TEXT("DLL_THREAD_DETACH: hInst is %lx\n"), TheIME.m_hInst);
       break;
   }
   return TRUE;

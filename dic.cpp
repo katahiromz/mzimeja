@@ -13,7 +13,7 @@ void PASCAL RevertText(HIMC hIMC) {
   CompStr *lpCompStr;
   LPTSTR lpread, lpstr;
 
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
+  InputContext *lpIMC = TheIME.LockIMC(hIMC);
   if (!lpIMC) return;
 
   if (lpIMC->HasCandInfo()) {
@@ -23,7 +23,7 @@ void PASCAL RevertText(HIMC hIMC) {
       lpCandInfo->Clear();
       lpIMC->UnlockCandInfo();
     }
-    TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
   if (lpIMC->HasCompStr()) {
@@ -54,35 +54,35 @@ void PASCAL RevertText(HIMC hIMC) {
 
       // Generate messages.
       LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-      TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+      TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 
       lpIMC->UnlockCompStr();
     }
   }
-  TheApp.UnlockIMC();
+  TheIME.UnlockIMC();
 }
 
 BOOL PASCAL ConvKanji(HIMC hIMC) {
   BOOL bRc = FALSE;
 
-  if ((GetFileAttributes(TheApp.m_szDicFileName) == 0xFFFFFFFF) ||
-      (GetFileAttributes(TheApp.m_szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
+  if ((GetFileAttributes(TheIME.m_szDicFileName) == 0xFFFFFFFF) ||
+      (GetFileAttributes(TheIME.m_szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
     MakeGuideLine(hIMC, MYGL_NODICTIONARY);
   }
 
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
+  InputContext *lpIMC = TheIME.LockIMC(hIMC);
   if (NULL == lpIMC) return FALSE;
 
   CompStr *lpCompStr = lpIMC->LockCompStr();
   if (NULL == lpCompStr) {
-    TheApp.UnlockIMC();
+    TheIME.UnlockIMC();
     return bRc;
   }
 
   CandInfo *lpCandInfo = lpIMC->LockCandInfo();
   if (NULL == lpCandInfo) {
     lpIMC->UnlockCompStr();
-    TheApp.UnlockIMC();
+    TheIME.UnlockIMC();
     return bRc;
   }
 
@@ -96,7 +96,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   szBuf[256] = 0;  // Double NULL-terminate
   szBuf[257] = 0;  // Double NULL-terminate
   int nBufLen =
-    GetCandidateStringsFromDictionary(lpT2, szBuf, 256, TheApp.m_szDicFileName);
+    GetCandidateStringsFromDictionary(lpT2, szBuf, 256, TheIME.m_szDicFileName);
 
   // Check the result of dic. Because my candidate list has only MAXCANDSTRNUM
   // candidate strings.
@@ -110,7 +110,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
       // The dic is too big....
       lpIMC->UnlockCandInfo();
       lpIMC->UnlockCompStr();
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
       return bRc;
     }
   }
@@ -125,12 +125,12 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
 
       LPARAM lParam =
         GCS_COMPSTR | GCS_CURSORPOS | GCS_COMPATTR | GCS_COMPREADATTR;
-      TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+      TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
     }
 
     lpIMC->UnlockCandInfo();
     lpIMC->UnlockCompStr();
-    TheApp.UnlockIMC();
+    TheIME.UnlockIMC();
     return bRc;
   }
 
@@ -165,12 +165,12 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
 
         // Generate messages.
         LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-        TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+        TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 
         bRc = TRUE;
         lpIMC->UnlockCandInfo();
         lpIMC->UnlockCompStr();
-        TheApp.UnlockIMC();
+        TheIME.UnlockIMC();
         return bRc;
       }
       lpstr += (lstrlen(lpstr) + 1);
@@ -179,7 +179,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     // String is converted, so that open candidate.
     // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
     if (!lpIMC->HasCandInfo()) {
-      TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+      TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
     }
 
     // Make candidate structures.
@@ -214,7 +214,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
     }
 
     // Generate messages.
-    TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
     // If the selected candidate string is changed, the composition string
     // should be updated.
@@ -224,7 +224,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
 
   lpIMC->UnlockCandInfo();
   lpIMC->UnlockCompStr();
-  TheApp.UnlockIMC();
+  TheIME.UnlockIMC();
   return bRc;
 }
 
@@ -234,7 +234,7 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
       sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(TCHAR)) * 2 * sizeof(TCHAR);
   LPTSTR lpStr;
 
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
+  InputContext *lpIMC = TheIME.LockIMC(hIMC);
   lpIMC->hGuideLine = ImmReSizeIMCC(lpIMC->hGuideLine, dwSize);
   LPGUIDELINE lpGuideLine = lpIMC->LockGuideLine();
 
@@ -243,24 +243,24 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   lpGuideLine->dwIndex = glTable[dwID].dwIndex;
   lpGuideLine->dwStrOffset = sizeof(GUIDELINE);
   lpStr = (LPTSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwStrOffset);
-  LoadString(TheApp.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
+  LoadString(TheIME.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
   lpGuideLine->dwStrLen = lstrlen(lpStr);
 
   if (glTable[dwID].dwPrivateID) {
     lpGuideLine->dwPrivateOffset =
         sizeof(GUIDELINE) + (MAXGLCHAR + 1) * sizeof(TCHAR);
     lpStr = (LPTSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwPrivateOffset);
-    LoadString(TheApp.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
+    LoadString(TheIME.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
     lpGuideLine->dwPrivateSize = lstrlen(lpStr) * sizeof(TCHAR);
   } else {
     lpGuideLine->dwPrivateOffset = 0L;
     lpGuideLine->dwPrivateSize = 0L;
   }
 
-  TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_GUIDELINE, 0);
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_GUIDELINE, 0);
 
   lpIMC->UnlockGuideLine();
-  TheApp.UnlockIMC();
+  TheIME.UnlockIMC();
 
   return TRUE;
 }

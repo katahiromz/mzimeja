@@ -355,7 +355,7 @@ struct MZIMEJA {
   BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
 };
 
-extern MZIMEJA TheApp;
+extern MZIMEJA TheIME;
 
 //////////////////////////////////////////////////////////////////////////////
 

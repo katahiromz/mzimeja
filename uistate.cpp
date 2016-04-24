@@ -47,7 +47,7 @@ HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
       exstyle, szStatusClassName, NULL, style,
       lpUIExtra->uiStatus.pt.x, lpUIExtra->uiStatus.pt.y,
       cx, cy,
-      hWnd, NULL, TheApp.m_hInst, NULL);
+      hWnd, NULL, TheIME.m_hInst, NULL);
     lpUIExtra->uiStatus.hWnd = hwndStatus;
   }
   RepositionWindow(hwndStatus);
@@ -64,7 +64,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
   HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
   HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
   if (hIMC) {
-    InputContext *lpIMC = TheApp.LockIMC(hIMC);
+    InputContext *lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       // draw face
       HBRUSH hbr3DFace = ::CreateSolidBrush(GetSysColor(COLOR_3DFACE));
@@ -185,7 +185,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
         ::SelectObject(hMemDC, hbmOld);
         ::DeleteDC(hMemDC);
       }
-      TheApp.UnlockIMC();
+      TheIME.UnlockIMC();
     }
   }
 } // StatusWnd_Paint
@@ -332,7 +332,7 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
   HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
   HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
 
-  HMENU hMenu = ::LoadMenu(TheApp.m_hInst, TEXT("STATUSRMENU"));
+  HMENU hMenu = ::LoadMenu(TheIME.m_hInst, TEXT("STATUSRMENU"));
   if (hMenu) {
     HMENU hSubMenu = ::GetSubMenu(hMenu, 0);
     TPMPARAMS params;
@@ -354,7 +354,7 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
 
     UINT nCommand = ::TrackPopupMenuEx(hSubMenu, TPM_RETURNCMD | TPM_NONOTIFY,
       pt.x, pt.y, hWnd, &params);
-    TheApp.DoCommand(hIMC, nCommand);
+    TheIME.DoCommand(hIMC, nCommand);
     ::PostMessage(hWnd, WM_NULL, 0, 0);
     ::DestroyMenu(hMenu);
     ::SetForegroundWindow(hwndFore);
@@ -372,7 +372,7 @@ LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 
   switch (message) {
   case WM_CREATE:
-    hbm = TheApp.LoadBMP(TEXT("MODESBMP"));
+    hbm = TheIME.LoadBMP(TEXT("MODESBMP"));
     SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbm);
     break;
 

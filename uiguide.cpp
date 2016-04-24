@@ -51,7 +51,7 @@ LRESULT CALLBACK GuideWndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_CREATE:
-      hbmpGuide = TheApp.LoadBMP(TEXT("CLOSEBMP"));
+      hbmpGuide = TheIME.LoadBMP(TEXT("CLOSEBMP"));
       SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbmpGuide);
       GetClientRect(hWnd, &rc);
       break;
