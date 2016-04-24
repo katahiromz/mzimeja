@@ -25,7 +25,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   case VK_ESCAPE:
     lpIMC = TheApp.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->FlushText();
+      lpIMC->CancelText();
       TheApp.UnlockIMC();
     }
     break;
@@ -81,7 +81,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
       if (!(lpIMC->Conversion() & IME_CMODE_CHARCODE))
         MakeResultString(hIMC, TRUE);
       else
-        lpIMC->FlushText();
+        lpIMC->CancelText();
 
       TheApp.UnlockIMC();
     }

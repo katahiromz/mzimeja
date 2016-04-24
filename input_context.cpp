@@ -95,7 +95,7 @@ void InputContext::UnlockGuideLine() {
   ImmUnlockIMCC(hGuideLine);
 }
 
-void InputContext::FlushText() {
+void InputContext::CancelText() {
   // close candidate
   if (HasCandInfo()) {
     CandInfo *lpCandInfo = LockCandInfo();
@@ -116,7 +116,7 @@ void InputContext::FlushText() {
     TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
     TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
   }
-} // InputContext::FlushText
+} // InputContext::CancelText
 
 void InputContext::DeleteChar(BOOL bBackSpace) {
   // get logical data
