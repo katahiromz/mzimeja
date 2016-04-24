@@ -7,7 +7,6 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include <windows.h>
-#include "mzimeja.h"
 #include "resource.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -163,7 +162,6 @@ END
 2 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "#include "<windows.h>"\r\n"
-    "#include ""mzimeja.h""\r\n"
     "#include ""resource.h""\r\n"
     "\0"
 END
