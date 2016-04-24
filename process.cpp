@@ -34,7 +34,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   case VK_BACK:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->DeleteChar(wParam == VK_BACK);
+      lpIMC->DeleteChar(wVKey == VK_BACK);
       TheIME.UnlockIMC(hIMC);
     }
     break;

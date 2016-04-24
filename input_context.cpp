@@ -231,7 +231,7 @@ void InputContext::CancelText() {
 } // InputContext::CancelText
 
 void InputContext::DeleteChar(BOOL bBackSpace) {
-  DebugPrint(TEXT("InputContext::DeleteChar\n"));
+  DebugPrint(TEXT("InputContext::DeleteChar(%d)\n"), bBackSpace);
 
   // get logical data
   LogCompStr log;
@@ -244,17 +244,19 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   // delete char
   if (bBackSpace) {
     if (log.dwCursorPos == 0) {
+      DebugPrint(TEXT("log.dwCursorPos == 0\n"));
       return;
-    } else if (log.dwCursorPos < log.comp_str.size()) {
-      log.dwDeltaStart = log.dwCursorPos;
+    } else if (log.dwCursorPos <= log.comp_str.size()) {
       --log.dwCursorPos;
       log.comp_str.erase(log.dwCursorPos);
+      log.dwDeltaStart = log.dwCursorPos;
     } else {
       log.dwCursorPos = (DWORD)log.comp_str.size();
       log.dwDeltaStart = log.dwCursorPos;
     }
   } else {
     if (log.dwCursorPos >= log.comp_str.size()) {
+      DebugPrint(TEXT("log.dwCursorPos >= log.comp_str.size()\n"));
       return;
     } else {
       log.comp_str.erase(log.dwCursorPos);

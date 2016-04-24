@@ -40,7 +40,7 @@ void CompStr::GetLogCompStr(LogCompStr& log) {
   if (log == NULL) {
     log = &log_comp_str;
   }
-  DWORD total = log->GetTotalSize();
+  const DWORD total = log->GetTotalSize();
   HIMCC hNewCompStr = ImmReSizeIMCC(hCompStr, total);
   if (hNewCompStr) {
     CompStr *lpCompStr = (CompStr *)ImmLockIMCC(hNewCompStr);
@@ -107,7 +107,11 @@ void CompStr::GetLogCompStr(LogCompStr& log) {
 
       ImmUnlockIMCC(hNewCompStr);
       hCompStr = hNewCompStr;
+    } else {
+      DebugPrint(TEXT("CompStr::ReAlloc: failed #2"));
     }
+  } else {
+    DebugPrint(TEXT("CompStr::ReAlloc: failed"));
   }
   return hCompStr;
 }
@@ -189,7 +193,7 @@ void CompStr::Dump() {
     DebugPrint(TEXT("%s"), str);
   }
   DebugPrint(TEXT("\n"));
-#endif
+#endif  // ndef NDEBUG
 } // CompStr::Dump
 
 //////////////////////////////////////////////////////////////////////////////
