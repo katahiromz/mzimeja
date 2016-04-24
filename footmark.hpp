@@ -92,7 +92,7 @@
 #ifndef NDEBUG
   #define FOOTMARK() \
     FootmarkLocation \
-      object_for_debugging_##__LINE__(__FILE__, __LINE__, __func__);
+      object_for_debugging_##__LINE__(__FILE__, __LINE__, __FUNCTION__);
   #define FOOTMARK_PRINT_CALL_STACK() FootmarkPrintCallStack()
 #else   // def NDEBUG
   #define FOOTMARK()                  /*empty*/

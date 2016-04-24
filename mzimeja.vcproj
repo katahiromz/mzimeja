@@ -259,6 +259,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\footmark.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\include\immdev.h"
 				>
 			</File>
