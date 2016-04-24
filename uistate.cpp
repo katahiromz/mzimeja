@@ -197,21 +197,18 @@ STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
   rc.left += CX_MINICAPTION;
   rc.right = rc.left + CX_BUTTON + 2 * CX_BTNEDGE;
   if (::PtInRect(&rc, pt)) {
-    DebugPrint(TEXT("status hit: %d"), SWHT_BUTTON_1);
     return SWHT_BUTTON_1;
   }
   ::GetClientRect(hWnd, &rc);
   rc.left += CX_MINICAPTION + CX_BUTTON + 2 * CX_BTNEDGE;
   rc.right = rc.left + CX_BUTTON + 2 * CX_BTNEDGE;
   if (::PtInRect(&rc, pt)) {
-    DebugPrint(TEXT("status hit: %d"), SWHT_BUTTON_2);
     return SWHT_BUTTON_2;
   }
   ::GetClientRect(hWnd, &rc);
   rc.left += CX_MINICAPTION + 2 * (CX_BUTTON + 2 * CX_BTNEDGE);
   rc.right = rc.left + CX_BUTTON + 2 * CX_BTNEDGE;
   if (::PtInRect(&rc, pt)) {
-    DebugPrint(TEXT("status hit: %d"), SWHT_BUTTON_3);
     return SWHT_BUTTON_3;
   }
   ::GetWindowRect(hWnd, &rc);
@@ -243,11 +240,8 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
       }
       break;
     case SWHT_BUTTON_2:
-      DebugPrint(TEXT("dwConversion: %08X"), dwConversion);
       imode = InputModeFromConversionMode(bOpen, dwConversion);
-      DebugPrint(TEXT("imode1: %d"), imode);
       imode = NextInputMode(imode);
-      DebugPrint(TEXT("imode2: %d"), imode);
       SetInputMode(hIMC, imode);
       break;
     case SWHT_BUTTON_3:
@@ -334,9 +328,6 @@ void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
   }
 } // StatusWnd_OnLButton
 
-static BOOL StatusWnd_DoCommand(HIMC hIMC, DWORD dwCommand) {
-} // StatusWnd_DoCommand
-
 static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
   HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
   HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
@@ -381,7 +372,6 @@ LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 
   switch (message) {
   case WM_CREATE:
-    DebugPrint(TEXT("status message: WM_CREATE"));
     hbm = TheApp.LoadBMP(TEXT("MODESBMP"));
     SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbm);
     break;
@@ -393,34 +383,29 @@ LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     break;
 
   case WM_DESTROY:
-    DebugPrint(TEXT("status message: WM_DESTROY"));
     hbm = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
     ::DeleteObject(hbm);
     break;
 
   case WM_UI_UPDATE:
-    DebugPrint(TEXT("status message: WM_UI_UPDATE"));
     ::InvalidateRect(hWnd, NULL, FALSE);
     break;
 
   case WM_LBUTTONUP:
     // This message comes from the captured window.
     ::GetCursorPos(&pt);
-    DebugPrint(TEXT("status: WM_LBUTTONUP"));
     StatusWnd_OnLButton(hWnd, pt, FALSE);
     break;
 
   case WM_LBUTTONDOWN:
     // This message comes from the captured window.
     ::GetCursorPos(&pt);
-    DebugPrint(TEXT("status: WM_LBUTTONDOWN"));
     StatusWnd_OnLButton(hWnd, pt, TRUE);
     break;
 
   case WM_MOUSEMOVE:
     // This message comes from the captured window.
     ::GetCursorPos(&pt);
-    DebugPrint(TEXT("status: WM_MOUSEMOVE"));
     if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
       StatusWnd_OnMouseMove(hWnd, pt, ::GetAsyncKeyState(VK_LBUTTON) < 0);
     }
@@ -429,13 +414,11 @@ LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
   case WM_RBUTTONUP:
     // This message comes from the captured window.
     ::GetCursorPos(&pt);
-    DebugPrint(TEXT("status: WM_RBUTTONUP"));
     break;
 
   case WM_RBUTTONDOWN:
     // This message comes from the captured window.
     ::GetCursorPos(&pt);
-    DebugPrint(TEXT("status: WM_RBUTTONDOWN"));
     break;
 
   case WM_SETCURSOR:
@@ -443,24 +426,19 @@ LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     ::GetCursorPos(&pt);
     switch (HIWORD(lParam)) {
     case WM_MOUSEMOVE:
-      DebugPrint(TEXT("status: WM_SETCURSOR WM_MOUSEMOVE"));
       if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
         StatusWnd_OnMouseMove(hWnd, pt, ::GetAsyncKeyState(VK_LBUTTON) < 0);
       }
       break;
     case WM_LBUTTONDOWN:
-      DebugPrint(TEXT("status: WM_SETCURSOR WM_LBUTTONDOWN"));
       StatusWnd_OnLButton(hWnd, pt, TRUE);
       break;
     case WM_LBUTTONUP:
-      DebugPrint(TEXT("status: WM_SETCURSOR WM_LBUTTONUP"));
       StatusWnd_OnLButton(hWnd, pt, FALSE);
       break;
     case WM_RBUTTONDOWN:
-      DebugPrint(TEXT("status: WM_SETCURSOR WM_RBUTTONDOWN"));
       break;
     case WM_RBUTTONUP:
-      DebugPrint(TEXT("status: WM_SETCURSOR WM_RBUTTONUP"));
       StatusWnd_OnRClick(hWnd, pt);
       break;
     }
@@ -468,7 +446,6 @@ LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     break;
 
   case WM_MOVE:
-    DebugPrint(TEXT("status message: WM_MOVE"));
     hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
     if (::IsWindow(hwndServer))
       SendMessage(hwndServer, WM_UI_STATEMOVE, wParam, lParam);

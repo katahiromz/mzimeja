@@ -96,7 +96,7 @@ void InputContext::UnlockGuideLine() {
 }
 
 void InputContext::AddChar(WCHAR ch) {
-  DebugPrint(TEXT("InputContext::AddChar"));
+  DebugPrint(TEXT("InputContext::AddChar\n"));
 
   // get logical data
   LogCompStr log;
@@ -143,7 +143,7 @@ void InputContext::AddChar(WCHAR ch) {
 } // InputContext::AddChar
 
 void InputContext::CancelText() {
-  DebugPrint(TEXT("InputContext::CancelText"));
+  DebugPrint(TEXT("InputContext::CancelText\n"));
 
   // close candidate
   if (HasCandInfo()) {
@@ -165,7 +165,7 @@ void InputContext::CancelText() {
 } // InputContext::CancelText
 
 void InputContext::DeleteChar(BOOL bBackSpace) {
-  DebugPrint(TEXT("InputContext::DeleteChar"));
+  DebugPrint(TEXT("InputContext::DeleteChar\n"));
 
   // get logical data
   LogCompStr log;

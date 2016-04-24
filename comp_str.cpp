@@ -186,9 +186,9 @@ void CompStr::MakeAttrClause() {
 
 void CompStr::Dump() {
 #ifndef NDEBUG
-  DebugPrint(TEXT("dwSize: %08X"), dwSize);
-  DebugPrint(TEXT("dwCursorPos: %08X"), dwCursorPos);
-  DebugPrint(TEXT("dwDeltaStart: %08X"), dwDeltaStart);
+  DebugPrint(TEXT("dwSize: %08X\n"), dwSize);
+  DebugPrint(TEXT("dwCursorPos: %08X\n"), dwCursorPos);
+  DebugPrint(TEXT("dwDeltaStart: %08X\n"), dwDeltaStart);
   DebugPrint(TEXT("CompReadAttr: "));
   if (dwCompReadAttrLen) {
     LPBYTE attrs = GetCompReadAttr();
@@ -196,6 +196,7 @@ void CompStr::Dump() {
       DebugPrint(TEXT("%02X"), attrs[i]);
     }
   }
+  DebugPrint(TEXT("\n"));
   DebugPrint(TEXT("CompReadClause: "));
   if (dwCompReadClauseLen) {
     LPDWORD clauses = GetCompReadClause();
@@ -203,6 +204,7 @@ void CompStr::Dump() {
       DebugPrint(TEXT("%08X"), clauses[i]);
     }
   }
+  DebugPrint(TEXT("\n"));
   DebugPrint(TEXT("CompReadStr: "));
   if (dwCompReadStrLen) {
     LPTSTR str = GetCompReadStr();
@@ -210,6 +212,7 @@ void CompStr::Dump() {
       DebugPrint(TEXT("%*s"), dwCompReadStrLen, str);
     }
   }
+  DebugPrint(TEXT("\n"));
   DebugPrint(TEXT("CompAttr: "));
   if (dwCompAttrLen) {
     LPBYTE attrs = GetCompAttr();
@@ -217,6 +220,7 @@ void CompStr::Dump() {
       DebugPrint(TEXT("%02X"), attrs[i]);
     }
   }
+  DebugPrint(TEXT("\n"));
   DebugPrint(TEXT("CompClause: "));
   if (dwCompClauseLen) {
     LPDWORD clauses = GetCompClause();
@@ -224,6 +228,7 @@ void CompStr::Dump() {
       DebugPrint(TEXT("%08X"), clauses[i]);
     }
   }
+  DebugPrint(TEXT("\n"));
   DebugPrint(TEXT("CompStr: "));
   if (dwCompStrLen) {
     LPTSTR str = GetCompStr();
@@ -231,6 +236,7 @@ void CompStr::Dump() {
       DebugPrint(TEXT("%*s"), dwCompStrLen, str);
     }
   }
+  DebugPrint(TEXT("\n"));
   DebugPrint(TEXT("ResultReadClause: "));
   if (dwResultReadClauseLen) {
     LPDWORD clauses = GetResultReadClause();
@@ -238,6 +244,7 @@ void CompStr::Dump() {
       DebugPrint(TEXT("%08X"), clauses[i]);
     }
   }
+  DebugPrint(TEXT("\n"));
   DebugPrint(TEXT("ResultReadStr: "));
   if (dwResultReadStrLen) {
     LPTSTR str = GetResultReadStr();
@@ -245,6 +252,7 @@ void CompStr::Dump() {
       DebugPrint(TEXT("%*s"), dwResultReadStrLen, str);
     }
   }
+  DebugPrint(TEXT("\n"));
   DebugPrint(TEXT("ResultClause: "));
   if (dwResultClauseLen) {
     LPDWORD clauses = GetResultClause();
@@ -252,6 +260,7 @@ void CompStr::Dump() {
       DebugPrint(TEXT("%08X"), clauses[i]);
     }
   }
+  DebugPrint(TEXT("\n"));
   DebugPrint(TEXT("ResultStr: "));
   if (dwResultStrLen) {
     LPTSTR str = GetResultStr();
@@ -259,6 +268,7 @@ void CompStr::Dump() {
       DebugPrint(TEXT("%*s"), dwResultStrLen, str);
     }
   }
+  DebugPrint(TEXT("\n"));
 #endif
 } // CompStr::Dump
 

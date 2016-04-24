@@ -318,7 +318,7 @@ HKL MZIMEJA::GetHKL(VOID) {
 BOOL MZIMEJA::GenerateMessage(
   HIMC hIMC, InputContext *lpIMC, LPTRANSMSG lpGeneMsg)
 {
-  DebugPrint(TEXT("GenerateMessage(%u,%d,%d)"),
+  DebugPrint(TEXT("GenerateMessage(%u,%d,%d)\n"),
     lpGeneMsg->message, lpGeneMsg->wParam, lpGeneMsg->lParam);
 
   if (m_lpCurTransKey)
@@ -498,23 +498,16 @@ int DebugPrint(LPCTSTR lpszFormat, ...) {
   va_end(marker);
 
   //OutputDebugString(szMsg);
-  FILE *fp = fopen("C:\\mzimeja.log", "ab");
+  FILE *fp = fopen("C:\\mzimeja.log", "a");
   if (fp) {
-#ifdef UNICODE
-    CHAR szAnsi[1024];
-    szAnsi[0] = 0;
-    WideCharToMultiByte(CP_ACP, 0, szMsg, -1, szAnsi, 1024, NULL, NULL);
-    fprintf(fp, "%s\r\n", szAnsi);
-#else
-    fprintf(fp, "%s\r\n", szMsg);
-#endif
+    fwprintf(fp, L"%s", szMsg);
     fclose(fp);
   }
   return nCount;
 }
 
 VOID WarnOut(LPCTSTR pStr) {
-  DebugPrint(TEXT("%s"), pStr);
+  DebugPrint(TEXT("%s\n"), pStr);
 }
 
 VOID ErrorOut(LPCTSTR pStr) {
@@ -528,9 +521,9 @@ VOID ErrorOut(LPCTSTR pStr) {
                     MAKELANGID(LANG_ENGLISH, LANG_NEUTRAL), buf1, 512, NULL);
 
   if (dwResult > 0) {
-    DebugPrint(TEXT("%s:%s(0x%x)"), pStr, buf1, dwError);
+    DebugPrint(TEXT("%s:%s(0x%x)\n"), pStr, buf1, dwError);
   } else {
-    DebugPrint(TEXT("%s:(0x%x)"), pStr, dwError);
+    DebugPrint(TEXT("%s:(0x%x)\n"), pStr, dwError);
   }
 }
 #endif  // ndef NDEBUG
@@ -539,25 +532,23 @@ VOID ErrorOut(LPCTSTR pStr) {
 // DLL entry point
 
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
-  DebugPrint(TEXT("DLLEntry:dwFunc=%d"), dwFunction);
-
   switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
-      DebugPrint(TEXT("DLLEntry Process Attach hInst is %lx"), TheApp.m_hInst);
+      DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %lx\n"), TheApp.m_hInst);
       TheApp.Init(hInstDLL);
       break;
 
     case DLL_PROCESS_DETACH:
-      DebugPrint(TEXT("DLLEntry Process Detach hInst is %lx"), TheApp.m_hInst);
+      DebugPrint(TEXT("DLL_PROCESS_DETACH: hInst is %lx\n"), TheApp.m_hInst);
       TheApp.Destroy();
       break;
 
     case DLL_THREAD_ATTACH:
-      DebugPrint(TEXT("DLLEntry Thread Attach hInst is %lx"), TheApp.m_hInst);
+      DebugPrint(TEXT("DLL_THREAD_ATTACH: hInst is %lx\n"), TheApp.m_hInst);
       break;
 
     case DLL_THREAD_DETACH:
-      DebugPrint(TEXT("DLLEntry Thread Detach hInst is %lx"), TheApp.m_hInst);
+      DebugPrint(TEXT("DLL_THREAD_DETACH: hInst is %lx\n"), TheApp.m_hInst);
       break;
   }
   return TRUE;

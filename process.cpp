@@ -139,7 +139,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
 BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
                           CONST LPBYTE lpbKeyState) {
   BOOL ret = FALSE;
-  DebugPrint(TEXT("ImeProcessKey"));
+  DebugPrint(TEXT("ImeProcessKey\n"));
 
   // if key is up, don't process the key
   if (lKeyData & 0x80000000) return FALSE;
@@ -295,7 +295,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 //    ImmToAsciiEx
 UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
                          LPTRANSMSGLIST lpTransBuf, UINT fuState, HIMC hIMC) {
-  DebugPrint(TEXT("ImeToAsciiEx"));
+  DebugPrint(TEXT("ImeToAsciiEx\n"));
 
   TheApp.m_lpCurTransKey = lpTransBuf;
   LPARAM lParam = ((DWORD)uScanCode << 16) + 1L;
@@ -322,10 +322,10 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
   // If trans key buffer that is allocated by USER.EXE full up,
   // the return value is the negative number.
   if (TheApp.m_fOverTransKey) {
-    DebugPrint(TEXT("***************************************"));
-    DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *"));
-    DebugPrint(TEXT("*                by MZIMEJA.DLL       *"));
-    DebugPrint(TEXT("***************************************"));
+    DebugPrint(TEXT("***************************************\n"));
+    DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *\n"));
+    DebugPrint(TEXT("*                by MZIMEJA.DLL       *\n"));
+    DebugPrint(TEXT("***************************************\n"));
     return (int)TheApp.m_uNumTransKey;
   }
 

@@ -71,7 +71,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
   HPROPSHEETPAGE rPages[MAX_PAGES];
   PROPSHEETHEADER psh;
 
-  DebugPrint(TEXT("ImeConfigure"));
+  DebugPrint(TEXT("ImeConfigure\n"));
 
   psh.dwSize = sizeof(psh);
   psh.dwFlags = PSH_PROPTITLE;
