@@ -78,11 +78,10 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   case VK_RETURN:
     lpIMC = TheApp.LockIMC(hIMC);
     if (lpIMC) {
-      if (!(lpIMC->Conversion() & IME_CMODE_CHARCODE))
-        MakeResultString(hIMC, TRUE);
-      else
+      if (lpIMC->Conversion() & IME_CMODE_CHARCODE)
         lpIMC->CancelText();
-
+      else
+        lpIMC->MakeResult();
       TheApp.UnlockIMC();
     }
     break;

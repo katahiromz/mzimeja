@@ -47,6 +47,8 @@ struct InputContext : public INPUTCONTEXT {
   void AddChar(WCHAR ch);
   void CancelText();
   void DeleteChar(BOOL bBackSpace = FALSE);
+  void MakeResult();
+
   void DumpCompStr();
 
 private:

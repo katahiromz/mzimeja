@@ -498,9 +498,16 @@ int DebugPrint(LPCTSTR lpszFormat, ...) {
   va_end(marker);
 
   //OutputDebugString(szMsg);
-  FILE *fp = fopen("C:\\mzimeja.log", "a");
+  FILE *fp = fopen("C:\\mzimeja.log", "ab");
   if (fp) {
-    fwrite(szMsg, lstrlen(szMsg) * sizeof(TCHAR), 1, fp);
+    size_t len = lstrlen(szMsg);
+    if (len > 0 && szMsg[len - 1] == TEXT('\n')) {
+      szMsg[len - 1] = TEXT('\r');
+      szMsg[len] = TEXT('\n');
+      ++len;
+      szMsg[len] = TEXT('\0');
+    }
+    fwrite(szMsg, len * sizeof(TCHAR), 1, fp);
     fclose(fp);
   }
   return nCount;

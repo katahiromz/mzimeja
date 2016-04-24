@@ -142,6 +142,53 @@ void InputContext::AddChar(WCHAR ch) {
   TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 } // InputContext::AddChar
 
+void InputContext::MakeResult() {
+  DebugPrint(TEXT("InputContext::MakeResult\n"));
+
+  // close candidate
+  if (HasCandInfo()) {
+    CandInfo *lpCandInfo = LockCandInfo();
+    if (lpCandInfo) {
+      lpCandInfo->Clear();
+      UnlockCandInfo();
+    }
+    TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+  }
+
+  // get logical data
+  LogCompStr log;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  // set result
+  log.result_read_clause = log.comp_read_clause;
+  log.result_read_str = log.comp_read_str;
+  log.result_clause = log.comp_clause;
+  log.result_str = log.comp_str;
+
+  // clear compostion
+  log.dwCursorPos = 0;
+  log.dwDeltaStart = 0;
+  log.comp_read_attr.clear();
+  log.comp_read_clause.clear();
+  log.comp_read_str.clear();
+  log.comp_attr.clear();
+  log.comp_clause.clear();
+  log.comp_str.clear();
+
+  // realloc
+  DumpCompStr();
+  hCompStr = CompStr::ReAlloc(hCompStr, &log);
+  DumpCompStr();
+
+  // generate messages to end composition
+  TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_RESULTALL);
+  TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
+} // InputContext::MakeResult
+
 void InputContext::CancelText() {
   DebugPrint(TEXT("InputContext::CancelText\n"));
 

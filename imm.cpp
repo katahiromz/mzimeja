@@ -418,7 +418,11 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("NI_COMPOSITIONSTR\n"));
       switch (dwIndex) {
         case CPS_COMPLETE:
-          MakeResultString(hIMC, TRUE);
+          lpIMC = TheApp.LockIMC(hIMC);
+          if (lpIMC) {
+            lpIMC->MakeResult();
+            TheApp.UnlockIMC();
+          }
           bRet = TRUE;
           break;
 

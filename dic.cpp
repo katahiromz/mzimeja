@@ -228,49 +228,6 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   return bRc;
 }
 
-BOOL MakeResultString(HIMC hIMC, BOOL fFlag) {
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
-  CompStr *lpCompStr = lpIMC->LockCompStr();
-
-  if (lpIMC->HasCandInfo()) {
-    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
-    if (lpCandInfo) {
-      lpCandInfo->Clear();
-      lpIMC->UnlockCandInfo();
-    }
-    TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
-
-  lstrcpy(lpCompStr->GetResultStr(), lpCompStr->GetCompStr());
-  lstrcpy(lpCompStr->GetResultReadStr(), lpCompStr->GetCompReadStr());
-
-  lpCompStr->dwResultStrLen = lpCompStr->dwCompStrLen;
-  lpCompStr->dwResultReadStrLen = lpCompStr->dwCompReadStrLen;
-
-  lpCompStr->dwCompStrLen = 0;
-  lpCompStr->dwCompReadStrLen = 0;
-
-  //
-  // make clause info
-  //
-  SetClause(lpCompStr->GetResultClause(), lstrlen(lpCompStr->GetResultStr()));
-  SetClause(lpCompStr->GetResultReadClause(),
-            lstrlen(lpCompStr->GetResultReadStr()));
-  lpCompStr->dwResultClauseLen = 8;
-  lpCompStr->dwResultReadClauseLen = 8;
-
-  lpIMC->UnlockCompStr();
-
-  if (fFlag) {
-    TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_RESULTALL);
-    TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
-  }
-
-  TheApp.UnlockIMC();
-
-  return TRUE;
-}
-
 // Update the transrate key buffer
 BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   DWORD dwSize =
