@@ -70,8 +70,7 @@ void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
 BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
   HPROPSHEETPAGE rPages[MAX_PAGES];
   PROPSHEETHEADER psh;
-
-  DebugPrint(TEXT("ImeConfigure\n"));
+  FOOTMARK();
 
   psh.dwSize = sizeof(psh);
   psh.dwFlags = PSH_PROPTITLE;
@@ -110,7 +109,6 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
       break;
   }
 
-  DebugPrint(TEXT("end ImeConfigure\n"));
   return TRUE;
 }
 

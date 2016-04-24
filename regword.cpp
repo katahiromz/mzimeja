@@ -40,8 +40,7 @@ extern "C" {
 //    成功したならば、TRUE を。さもなくば FALSE を返す。
 BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
   BOOL ret = FALSE;
-  DebugPrint(TEXT("ImeRegisterWord\n"));
-  DebugPrint(TEXT("end ImeRegisterWord\n"));
+  FOOTMARK();
   return ret;
 }
 
@@ -66,8 +65,7 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 //    成功したならば、TRUE を。さもなくば FALSE を返す。
 BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
   BOOL ret = FALSE;
-  DebugPrint(TEXT("ImeUnregisterWord\n"));
-  DebugPrint(TEXT("end ImeUnregisterWord\n"));
+  FOOTMARK();
   return ret;
 }
 
@@ -89,8 +87,7 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 //    要素数になります。
 UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
   UINT ret = 0;
-  DebugPrint(TEXT("ImeGetRegisterWordStyle\n"));
-  DebugPrint(TEXT("end ImeGetRegisterWordStyle\n"));
+  FOOTMARK();
   return ret;
 }
 
@@ -140,8 +137,7 @@ UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
 UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
                                 DWORD dw, LPCTSTR lpStr, LPVOID lpData) {
   UINT ret = 0;
-  DebugPrint(TEXT("ImeEnumRegisterWord\n"));
-  DebugPrint(TEXT("end ImeEnumRegisterWord\n"));
+  FOOTMARK();
   return ret;
 }
 

@@ -293,6 +293,8 @@ void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
 #else
   int DebugPrintA(LPCSTR lpszFormat, ...);
   int DebugPrintW(LPCWSTR lpszFormat, ...);
+  #define DebugPrintA DebugPrintA
+  #define DebugPrintW DebugPrintW
   #ifdef UNICODE
     #define DebugPrint DebugPrintW
   #else
@@ -362,7 +364,9 @@ extern MZIMEJA TheIME;
 
 //////////////////////////////////////////////////////////////////////////////
 
-#include "footmark.hpp"
+#ifndef RC_INVOKED
+  #include "footmark.hpp"
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 

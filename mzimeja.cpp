@@ -491,14 +491,13 @@ extern "C" {
 
     WCHAR szMsgW[1024];
     szMsgW[0] = 0;
-    ::MultiByteToWideChar(CP_ACP, 0
-      szMsgA, -1, szMsgW, 1024);
+    ::MultiByteToWideChar(CP_ACP, 0, szMsgA, -1, szMsgW, 1024);
 
     //OutputDebugString(szMsg);
     FILE *fp = fopen("C:\\mzimeja.log", "ab");
     if (fp) {
       int len = lstrlenW(szMsgW);
-      if (len > 0 && szMsg[len - 1] == L'\n') {
+      if (len > 0 && szMsgW[len - 1] == L'\n') {
         szMsgW[len - 1] = L'\r';
         szMsgW[len] = L'\n';
         ++len;
@@ -539,6 +538,7 @@ extern "C" {
 // DLL entry point
 
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
+  FOOTMARK();
   switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
       DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %lx\n"), TheIME.m_hInst);

@@ -54,7 +54,7 @@ extern "C" {
 //    成功すれば、TRUE。そうでなければ、FALSE。
 BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
                        DWORD dwSystemInfoFlags) {
-  DebugPrint(TEXT("ImeInquire\n"));
+  FOOTMARK();
 
   lpIMEInfo->dwPrivateDataSize = sizeof(UIEXTRA);
   lpIMEInfo->fdwProperty = IME_PROP_KBD_CHAR_FIRST |
@@ -88,7 +88,6 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
     TheIME.m_bWinLogOn = TRUE;
   }
 
-  DebugPrint(TEXT("end ImeInquire\n"));
   return TRUE;
 }
 
@@ -135,8 +134,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
 DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
                                LPCANDIDATELIST lpCandList, DWORD dwBufLen,
                                UINT uFlags) {
-  DebugPrint(TEXT("ImeConversionList\n"));
-  DebugPrint(TEXT("end ImeConversionList\n"));
+  FOOTMARK();
 
   return 0;
 }
@@ -154,8 +152,7 @@ DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
 //  Return Values
 //    関数が成功したら、TRUE。そうじゃなかったら、FALSE。
 BOOL WINAPI ImeDestroy(UINT uForce) {
-  DebugPrint(TEXT("ImeDestroy\n"));
-  DebugPrint(TEXT("end ImeDestroy\n"));
+  FOOTMARK();
 
   return TRUE;
 }
@@ -227,8 +224,7 @@ BOOL WINAPI ImeDestroy(UINT uForce) {
 //    ImmEscape
 LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
   LRESULT lRet = FALSE;
-
-  DebugPrint(TEXT("ImeEscape\n"));
+  FOOTMARK();
 
   switch (uSubFunc) {
     case IME_ESC_QUERY_SUPPORT:
@@ -253,8 +249,6 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
       lRet = FALSE;
       break;
   }
-
-  DebugPrint(TEXT("end ImeEscape\n"));
 
   return lRet;
 }
@@ -281,11 +275,10 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
 //  See Also
 //    ImeSetActiveContext
 BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
-  DebugPrint(TEXT("ImeSetActiveContext\n"));
+  FOOTMARK();
 
   TheIME.UpdateIndicIcon(hIMC);
 
-  DebugPrint(TEXT("end ImeSetActiveContext\n"));
   return TRUE;
 }
 
@@ -385,7 +378,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   DWORD i = 0;
   //LPDWORD lpdw;
 
-  DebugPrint(TEXT("NotifyIME\n"));
+  FOOTMARK();
 
   switch (dwAction) {
     case NI_CONTEXTUPDATED:
@@ -614,7 +607,6 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       break;
   }
 
-  DebugPrint(TEXT("end NotifyIME\n"));
   return bRet;
 }
 
@@ -635,7 +627,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 //  Return Values
 //    成功すれば TRUE。さもなくば FALSE。
 BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
-  DebugPrint(TEXT("ImeSelect\n"));
+  FOOTMARK();
 
   if (fSelect) TheIME.UpdateIndicIcon(hIMC);
   if (NULL != hIMC) {
@@ -647,7 +639,6 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
       TheIME.UnlockIMC(hIMC);
     }
   }
-  DebugPrint(TEXT("end ImeSelect\n"));
   return TRUE;
 }
 
@@ -731,7 +722,7 @@ void DumpRS(LPRECONVERTSTRING lpRS) {
 //    このプロパティは ImmGetProperty 関数を使うことで得ることができる。
 BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
                                     DWORD dwComp, LPVOID lpRead, DWORD dwRead) {
-  DebugPrint(TEXT("ImeSetCompositionString\n"));
+  FOOTMARK();
 
   // サイズがおまかせの場合には、取り敢えずは dwStrLen に
   // あわせる。kakasi とこの位置で連携した方がいいのかもし
@@ -760,7 +751,6 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
       break;
   }
 
-  DebugPrint(TEXT("end ImeSetCompositionString\n"));
   return FALSE;
 }
 
@@ -789,6 +779,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
                                 LPIMEMENUITEMINFO lpImeParentMenu,
                                 LPIMEMENUITEMINFO lpImeMenu, DWORD dwSize) {
   INT ret = 0;
+  FOOTMARK();
   // dwType を MSIME はチェックしていないようだ。それに合わせる。
   // ただ、TSF が生きていると、この method は常に動作してないように思えるが。
   //
@@ -797,13 +788,11 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
   //
   // このコードを有効にするかどうかは微妙だ。
 
-  DebugPrint(TEXT("ImeGetImeMenuItems\n"));
   if (lpImeMenu == NULL) {
     if (lpImeParentMenu == NULL) {
       if (dwFlags & IGIMIF_RIGHTMENU)
         ret = _countof(top_menu_items);
     }
-    DebugPrint(TEXT("end ImeGetImeMenuItems\n"));
     return ret;
   }
 
@@ -885,7 +874,6 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
     }
   }
 
-  DebugPrint(TEXT("end ImeGetImeMenuItems\n"));
   return ret;
 } // ImeGetImeMenuItems
 

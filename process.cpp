@@ -138,16 +138,14 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
 BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
                           CONST LPBYTE lpbKeyState) {
   BOOL ret = FALSE;
-  DebugPrint(TEXT("ImeProcessKey\n"));
+  FOOTMARK();
 
   if (lKeyData & 0x80000000) {
-    DebugPrint(TEXT("end ImeProcessKey (key up)\n"));
     return FALSE;
   }
 
   InputContext *lpIMC = TheIME.LockIMC(hIMC);
   if (lpIMC == NULL) {
-    DebugPrint(TEXT("end ImeProcessKey (no context)\n"));
     return FALSE;
   }
 
@@ -256,7 +254,6 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   }
 
   TheIME.UnlockIMC(hIMC);
-  DebugPrint(TEXT("end ImeProcessKey\n"));
   return ret;
 }
 
@@ -301,7 +298,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
                          LPTRANSMSGLIST lpTransBuf, UINT fuState, HIMC hIMC) {
   UINT ret = 0;
-  DebugPrint(TEXT("ImeToAsciiEx\n"));
+  FOOTMARK();
 
   TheIME.m_lpCurTransKey = lpTransBuf;
   TheIME.m_uNumTransKey = 0;
@@ -334,7 +331,6 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
       ret = TheIME.m_uNumTransKey;
     }
   }
-  DebugPrint(TEXT("end ImeToAsciiEx\n"));
   return ret;
 }
 
