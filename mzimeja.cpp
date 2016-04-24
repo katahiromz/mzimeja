@@ -500,7 +500,7 @@ int DebugPrint(LPCTSTR lpszFormat, ...) {
   //OutputDebugString(szMsg);
   FILE *fp = fopen("C:\\mzimeja.log", "a");
   if (fp) {
-    fwprintf(fp, L"%s", szMsg);
+    fwrite(szMsg, lstrlen(szMsg) * sizeof(TCHAR), 1, fp);
     fclose(fp);
   }
   return nCount;

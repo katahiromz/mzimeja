@@ -112,47 +112,6 @@ void CompStr::GetLogCompStr(LogCompStr& log) {
   return hCompStr;
 }
 
-BOOL CompStr::CheckAttr() {
-  LPBYTE lpb = GetCompAttr();
-  int len = dwCompAttrLen;
-  for (int i = 0; i < len; i++)
-    if (*lpb++ & ATTR_TARGET_CONVERTED) return TRUE;
-  return FALSE;
-}
-
-void CompStr::MakeAttrClause() {
-  DWORD len = dwCompAttrLen;
-  DWORD readlen = dwCompReadAttrLen;
-  if (len != readlen) return;
-
-  DWORD pos = dwCursorPos;
-  LPBYTE lpb = GetCompAttr();
-  for (DWORD i = 0; i < len; i++) {
-    if (i < pos)
-      *lpb++ = 0x10;
-    else
-      *lpb++ = ATTR_INPUT;
-  }
-
-  lpb = GetCompReadAttr();
-  for (DWORD i = 0; i < readlen; i++) {
-    if (i < pos)
-      *lpb++ = 0x10;
-    else
-      *lpb++ = ATTR_INPUT;
-  }
-
-  LPDWORD lpdw = GetCompClause();
-  *lpdw++ = 0;
-  *lpdw++ = (BYTE)pos;
-  *lpdw++ = len;
-
-  lpdw = GetCompReadClause();
-  *lpdw++ = 0;
-  *lpdw++ = (BYTE)pos;
-  *lpdw = len;
-}
-
 void CompStr::Dump() {
 #ifndef NDEBUG
   DebugPrint(TEXT("dwSize: %08X\n"), dwSize);

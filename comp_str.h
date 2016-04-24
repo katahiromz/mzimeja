@@ -51,9 +51,6 @@ inline void SetClause(LPDWORD lpdw, DWORD num) {
 struct CompStr : public COMPOSITIONSTRING {
   static HIMCC ReAlloc(HIMCC hCompStr, const LogCompStr *log);
 
-  BOOL CheckAttr();
-  void MakeAttrClause();
-
   void GetLogCompStr(LogCompStr& log);
 
   LPBYTE GetBytes() { return (LPBYTE)this; }
