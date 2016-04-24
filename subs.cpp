@@ -66,7 +66,7 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_SETCONVERSIONMODE);
   }
 
-  TheIME.UnlockIMC();
+  TheIME.UnlockIMC(hIMC);
   return;
 }
 
@@ -144,7 +144,7 @@ ccs_exit20:
 ccs_exit30:
   lpIMC->UnlockCompStr();
 ccs_exit40:
-  TheIME.UnlockIMC();
+  TheIME.UnlockIMC(hIMC);
   return;
 }
 

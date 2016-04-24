@@ -26,7 +26,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       lpIMC->CancelText();
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
     }
     break;
 
@@ -35,7 +35,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       lpIMC->DeleteChar(wParam == VK_BACK);
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
     }
     break;
 
@@ -82,7 +82,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
         lpIMC->CancelText();
       else
         lpIMC->MakeResult();
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
     }
     break;
 
@@ -97,7 +97,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
       lpIMC = TheIME.LockIMC(hIMC);
       if (lpIMC) {
         lpIMC->AddChar(HIWORD(wParam));
-        TheIME.UnlockIMC();
+        TheIME.UnlockIMC(hIMC);
       }
     }
     break;
@@ -255,7 +255,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
     }
   }
 
-  TheIME.UnlockIMC();
+  TheIME.UnlockIMC(hIMC);
   DebugPrint(TEXT("end ImeProcessKey\n"));
   return ret;
 }
@@ -311,7 +311,7 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
     InputContext *lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       BOOL fOpen = lpIMC->IsOpen();
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
 
       if (fOpen) {
         if ((uScanCode & 0x8000) == 0) {

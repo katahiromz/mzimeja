@@ -59,7 +59,7 @@ void PASCAL RevertText(HIMC hIMC) {
       lpIMC->UnlockCompStr();
     }
   }
-  TheIME.UnlockIMC();
+  TheIME.UnlockIMC(hIMC);
 }
 
 BOOL PASCAL ConvKanji(HIMC hIMC) {
@@ -75,14 +75,14 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
 
   CompStr *lpCompStr = lpIMC->LockCompStr();
   if (NULL == lpCompStr) {
-    TheIME.UnlockIMC();
+    TheIME.UnlockIMC(hIMC);
     return bRc;
   }
 
   CandInfo *lpCandInfo = lpIMC->LockCandInfo();
   if (NULL == lpCandInfo) {
     lpIMC->UnlockCompStr();
-    TheIME.UnlockIMC();
+    TheIME.UnlockIMC(hIMC);
     return bRc;
   }
 
@@ -110,7 +110,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
       // The dic is too big....
       lpIMC->UnlockCandInfo();
       lpIMC->UnlockCompStr();
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
       return bRc;
     }
   }
@@ -130,7 +130,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
 
     lpIMC->UnlockCandInfo();
     lpIMC->UnlockCompStr();
-    TheIME.UnlockIMC();
+    TheIME.UnlockIMC(hIMC);
     return bRc;
   }
 
@@ -170,7 +170,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
         bRc = TRUE;
         lpIMC->UnlockCandInfo();
         lpIMC->UnlockCompStr();
-        TheIME.UnlockIMC();
+        TheIME.UnlockIMC(hIMC);
         return bRc;
       }
       lpstr += (lstrlen(lpstr) + 1);
@@ -224,7 +224,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
 
   lpIMC->UnlockCandInfo();
   lpIMC->UnlockCompStr();
-  TheIME.UnlockIMC();
+  TheIME.UnlockIMC(hIMC);
   return bRc;
 }
 
@@ -260,7 +260,7 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
   TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_GUIDELINE, 0);
 
   lpIMC->UnlockGuideLine();
-  TheIME.UnlockIMC();
+  TheIME.UnlockIMC(hIMC);
 
   return TRUE;
 }

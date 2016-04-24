@@ -396,7 +396,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             lpIMC = TheIME.LockIMC(hIMC);
             if (lpIMC) {
               lpIMC->CancelText();
-              TheIME.UnlockIMC();
+              TheIME.UnlockIMC(hIMC);
             }
           }
           TheIME.UpdateIndicIcon(hIMC);
@@ -421,7 +421,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           lpIMC = TheIME.LockIMC(hIMC);
           if (lpIMC) {
             lpIMC->MakeResult();
-            TheIME.UnlockIMC();
+            TheIME.UnlockIMC(hIMC);
           }
           bRet = TRUE;
           break;
@@ -440,7 +440,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           lpIMC = TheIME.LockIMC(hIMC);
           if (lpIMC) {
             lpIMC->CancelText();
-            TheIME.UnlockIMC();
+            TheIME.UnlockIMC(hIMC);
           }
           bRet = TRUE;
           break;
@@ -455,11 +455,11 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       lpIMC = TheIME.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
       if (!(lpCompStr = lpIMC->LockCompStr())) {
-        TheIME.UnlockIMC();
+        TheIME.UnlockIMC(hIMC);
         return FALSE;
       }
       if (!lpIMC->HasConvertedCompStr()) {
-        TheIME.UnlockIMC();
+        TheIME.UnlockIMC(hIMC);
         return FALSE;
       }
 
@@ -506,7 +506,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
         lpIMC->UnlockCandInfo();
-        TheIME.UnlockIMC();
+        TheIME.UnlockIMC(hIMC);
 
         bRet = TRUE;
       }
@@ -520,7 +520,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
         bRet = TRUE;
       }
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
       break;
 
     case NI_SELECTCANDIDATESTR:
@@ -542,7 +542,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           lpIMC->UnlockCandInfo();
         }
       }
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
       break;
 
     case NI_CHANGECANDIDATELIST:
@@ -550,7 +550,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       lpIMC = TheIME.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
       if (dwIndex == 1 && lpIMC->HasCandInfo()) bRet = TRUE;
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
       break;
 
     case NI_SETCANDIDATE_PAGESIZE:
@@ -574,7 +574,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           lpIMC->UnlockCandInfo();
         }
       }
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
       break;
 
     case NI_SETCANDIDATE_PAGESTART:
@@ -598,7 +598,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           lpIMC->UnlockCandInfo();
         }
       }
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
       break;
 
     case NI_IMEMENUSELECTED:
@@ -644,7 +644,7 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
       if (fSelect) {
         lpIMC->Initialize();
       }
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
     }
   }
   DebugPrint(TEXT("end ImeSelect\n"));

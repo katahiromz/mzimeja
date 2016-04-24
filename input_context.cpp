@@ -56,27 +56,42 @@ BOOL InputContext::HasConvertedCompStr() {
 }
 
 CandInfo *InputContext::LockCandInfo() {
-  return (CandInfo *)ImmLockIMCC(hCandInfo);
+  DebugPrint(TEXT("InputContext::LockCandInfo: locking %p\n"), hCandInfo);
+  CandInfo *info = (CandInfo *)ImmLockIMCC(hCandInfo);
+  DebugPrint(TEXT("InputContext::LockCandInfo: locked %p\n"), hCandInfo);
+  return info;
 }
 
 void InputContext::UnlockCandInfo() {
+  DebugPrint(TEXT("InputContext::UnlockCandInfo: unlocking %p\n"), hCandInfo);
   ImmUnlockIMCC(hCandInfo);
+  DebugPrint(TEXT("InputContext::UnlockCandInfo: unlocked %p\n"), hCandInfo);
 }
 
 CompStr *InputContext::LockCompStr() {
-  return (CompStr *)ImmLockIMCC(hCompStr);
+  DebugPrint(TEXT("InputContext::LockCompStr: locking %p\n"), hCompStr);
+  CompStr *comp_str = (CompStr *)ImmLockIMCC(hCompStr);
+  DebugPrint(TEXT("InputContext::LockCompStr: locked %p\n"), hCompStr);
+  return comp_str;
 }
 
 void InputContext::UnlockCompStr() {
+  DebugPrint(TEXT("InputContext::UnlockCompStr: unlocking %p\n"), hCompStr);
   ImmUnlockIMCC(hCompStr);
+  DebugPrint(TEXT("InputContext::UnlockCompStr: unlocked %p\n"), hCompStr);
 }
 
 LPTRANSMSG InputContext::LockMsgBuf() {
-  return (LPTRANSMSG)ImmLockIMCC(hMsgBuf);
+  DebugPrint(TEXT("InputContext::LockMsgBuf: locking %p\n"), hMsgBuf);
+  LPTRANSMSG lpTransMsg = (LPTRANSMSG)ImmLockIMCC(hMsgBuf);
+  DebugPrint(TEXT("InputContext::LockMsgBuf: locked %p\n"), hMsgBuf);
+  return lpTransMsg;
 }
 
 void InputContext::UnlockMsgBuf() {
-    ImmUnlockIMCC(hMsgBuf);
+  DebugPrint(TEXT("InputContext::UnlockMsgBuf: unlocking %p\n"), hMsgBuf);
+  ImmUnlockIMCC(hMsgBuf);
+  DebugPrint(TEXT("InputContext::UnlockMsgBuf: unlocked %p\n"), hMsgBuf);
 }
 
 DWORD& InputContext::NumMsgBuf() {
@@ -88,11 +103,16 @@ const DWORD& InputContext::NumMsgBuf() const {
 }
 
 LPGUIDELINE InputContext::LockGuideLine() {
-  return (LPGUIDELINE)ImmLockIMCC(hGuideLine);
+  DebugPrint(TEXT("InputContext::LockGuideLine: locking %p\n"), hGuideLine);
+  LPGUIDELINE guideline = (LPGUIDELINE)ImmLockIMCC(hGuideLine);
+  DebugPrint(TEXT("InputContext::LockGuideLine: locked %p\n"), hGuideLine);
+  return guideline;
 }
 
 void InputContext::UnlockGuideLine() {
+  DebugPrint(TEXT("InputContext::UnlockGuideLine: unlocking %p\n"), hGuideLine);
   ImmUnlockIMCC(hGuideLine);
+  DebugPrint(TEXT("InputContext::UnlockGuideLine: unlocked %p\n"), hGuideLine);
 }
 
 void InputContext::AddChar(WCHAR ch) {
@@ -238,7 +258,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
       return;
     } else {
       log.comp_str.erase(log.dwCursorPos);
-      log.dwCursorPos = dwDeltaStart;
+      log.dwCursorPos = log.dwDeltaStart;
     }
   }
 
@@ -284,8 +304,10 @@ void InputContext::DumpCompStr() {
   CompStr *pCompStr = LockCompStr();
   if (pCompStr) {
     pCompStr->Dump();
+    UnlockCompStr();
+  } else {
+    DebugPrint(TEXT("(no comp str)\n"));
   }
-  UnlockCompStr();
 #endif
 } // InputContext::DumpCompStr
 

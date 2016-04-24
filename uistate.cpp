@@ -185,7 +185,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
         ::SelectObject(hMemDC, hbmOld);
         ::DeleteDC(hMemDC);
       }
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
     }
   }
 } // StatusWnd_Paint

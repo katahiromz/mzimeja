@@ -160,7 +160,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             HideCompWindow(lpUIExtra);
           }
           StatusWnd_Update(lpUIExtra);
-          TheIME.UnlockIMC();
+          TheIME.UnlockIMC(hIMC);
         } else  // it is NULL input context.
         {
           HideCandWindow(lpUIExtra);
@@ -178,7 +178,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       lpIMC = TheIME.LockIMC(hIMC);
       CreateCompWindow(hWnd, lpUIExtra, lpIMC);
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
       GlobalUnlock(hUIExtra);
       break;
 
@@ -190,7 +190,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       MoveCompWindow(lpUIExtra, lpIMC);
       MoveCandWindow(hWnd, lpIMC, lpUIExtra, TRUE);
       GlobalUnlock(hUIExtra);
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
       break;
 
     case WM_IME_ENDCOMPOSITION:
@@ -449,7 +449,7 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
   }
 
   GlobalUnlock(hUIExtra);
-  TheIME.UnlockIMC();
+  TheIME.UnlockIMC(hIMC);
 
   return lRet;
 }
@@ -493,7 +493,7 @@ LONG PASCAL ControlCommand(HIMC hIMC, HWND hWnd, UINT message,
   }
 
   GlobalUnlock(hUIExtra);
-  TheIME.UnlockIMC();
+  TheIME.UnlockIMC(hIMC);
 
   return lRet;
 }

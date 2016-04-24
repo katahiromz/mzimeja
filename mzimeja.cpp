@@ -315,36 +315,27 @@ HKL MZIMEJA::GetHKL(VOID) {
 }
 
 // Update the transrate key buffer
-BOOL MZIMEJA::GenerateMessage(
-  HIMC hIMC, InputContext *lpIMC, LPTRANSMSG lpGeneMsg)
-{
+BOOL MZIMEJA::GenerateMessage(LPTRANSMSG lpGeneMsg) {
+  BOOL ret = FALSE;
   DebugPrint(TEXT("GenerateMessage(%u,%d,%d)\n"),
     lpGeneMsg->message, lpGeneMsg->wParam, lpGeneMsg->lParam);
 
   if (m_lpCurTransKey)
     return GenerateMessageToTransKey(lpGeneMsg);
 
-  if (::IsWindow(lpIMC->hWnd)) {
-    DWORD dwNewSize = sizeof(TRANSMSG) * (lpIMC->NumMsgBuf() + 1);
-    if (!(lpIMC->hMsgBuf = ImmReSizeIMCC(lpIMC->hMsgBuf, dwNewSize)))
-      return FALSE;
-
-    LPTRANSMSG lpTransMsg = lpIMC->LockMsgBuf();
-    if (NULL == lpTransMsg) return FALSE;
-    lpTransMsg[lpIMC->NumMsgBuf()] = *lpGeneMsg;
-    lpIMC->NumMsgBuf()++;
-    lpIMC->UnlockMsgBuf();
-
-    ImmGenerateMessage(hIMC);
+  if (m_lpIMC && ::IsWindow(m_lpIMC->hWnd)) {
+    DWORD dwNewSize = sizeof(TRANSMSG) * (m_lpIMC->NumMsgBuf() + 1);
+    m_lpIMC->hMsgBuf = ImmReSizeIMCC(m_lpIMC->hMsgBuf, dwNewSize);
+    if (m_lpIMC->hMsgBuf) {
+      LPTRANSMSG lpTransMsg = m_lpIMC->LockMsgBuf();
+      if (lpTransMsg) {
+        lpTransMsg[m_lpIMC->NumMsgBuf()++] = *lpGeneMsg;
+        m_lpIMC->UnlockMsgBuf();
+        ret = ImmGenerateMessage(m_hIMC);
+      }
+    }
   }
-  return TRUE;
-}
-
-BOOL MZIMEJA::GenerateMessage(TRANSMSG& msg) {
-  if (m_lpIMC) {
-    return GenerateMessage(m_hIMC, m_lpIMC, &msg);
-  }
-  return FALSE;
+  return ret;
 }
 
 BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
@@ -352,20 +343,18 @@ BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
   genmsg.message = message;
   genmsg.wParam = wParam;
   genmsg.lParam = lParam;
-  return GenerateMessage(genmsg);
+  return GenerateMessage(&genmsg);
 }
 
 // Update the transrate key buffer
 BOOL MZIMEJA::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
-  LPTRANSMSG lpgmT0;
-
   ++m_uNumTransKey;
   if (m_uNumTransKey >= m_lpCurTransKey->uMsgCount) {
     m_fOverTransKey = TRUE;
     return FALSE;
   }
 
-  lpgmT0 = m_lpCurTransKey->TransMsg + (m_uNumTransKey - 1);
+  LPTRANSMSG lpgmT0 = m_lpCurTransKey->TransMsg + (m_uNumTransKey - 1);
   *lpgmT0 = *lpGeneMsg;
 
   return TRUE;
@@ -425,7 +414,7 @@ void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
     InputContext *lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       fOpen = lpIMC->IsOpen();
-      TheIME.UnlockIMC();
+      TheIME.UnlockIMC(hIMC);
     }
   }
 
@@ -463,21 +452,24 @@ LPTSTR MZIMEJA::LoadSTR(INT nID) {
 }
 
 InputContext *MZIMEJA::LockIMC(HIMC hIMC) {
-  InputContext *context;
-  context = (InputContext *)::ImmLockIMC(hIMC);
+  DebugPrint(TEXT("MZIMEJA::LockIMC: locking: %p\n"), hIMC);
+  InputContext *context = (InputContext *)::ImmLockIMC(hIMC);
   if (context) {
     m_hIMC = hIMC;
     m_lpIMC = context;
+    DebugPrint(TEXT("MZIMEJA::LockIMC: locked: %p\n"), hIMC);
+  } else {
+    DebugPrint(TEXT("MZIMEJA::LockIMC: cannot lock: %p\n"), hIMC);
   }
   return context;
 }
 
-VOID MZIMEJA::UnlockIMC() {
-  if (m_hIMC) {
-    ::ImmUnlockIMC(m_hIMC);
-    m_hIMC = NULL;
-    m_lpIMC = NULL;
-  }
+VOID MZIMEJA::UnlockIMC(HIMC hIMC) {
+  DebugPrint(TEXT("MZIMEJA::UnlockIMC: unlocking: %p\n"), hIMC);
+  ::ImmUnlockIMC(hIMC);
+  DebugPrint(TEXT("MZIMEJA::UnlockIMC: unlocked: %p\n"), hIMC);
+  m_hIMC = NULL;
+  m_lpIMC = NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////

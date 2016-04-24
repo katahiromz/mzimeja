@@ -467,7 +467,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
     end_pcw:
       lpIMC->UnlockCompStr();
     }
-    TheIME.UnlockIMC();
+    TheIME.UnlockIMC(hIMC);
   }
   if (hFont && hOldFont) SelectObject(hDC, hOldFont);
   EndPaint(hCompWnd, &ps);

@@ -153,7 +153,7 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
     if (hOldFont) {
       DeleteObject(SelectObject(hDC, hOldFont));
     }
-    TheIME.UnlockIMC();
+    TheIME.UnlockIMC(hIMC);
   }
   EndPaint(hCandWnd, &ps);
 

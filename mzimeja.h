@@ -327,7 +327,9 @@ struct MZIMEJA {
 
     m_lpCurTransKey = NULL;
     m_uNumTransKey = 0;
+
     m_fOverTransKey = FALSE;
+
     m_hIMC = NULL;
     m_lpIMC = NULL;
 
@@ -346,9 +348,8 @@ struct MZIMEJA {
   HKL GetHKL(VOID);
 
   InputContext *LockIMC(HIMC hIMC);
-  VOID UnlockIMC();
-  BOOL GenerateMessage(HIMC hIMC, InputContext *lpIMC, LPTRANSMSG lpGeneMsg);
-  BOOL GenerateMessage(TRANSMSG& msg);
+  VOID UnlockIMC(HIMC hIMC);
+  BOOL GenerateMessage(LPTRANSMSG lpGeneMsg);
   BOOL GenerateMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
   BOOL GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg);
 
