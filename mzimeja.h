@@ -287,15 +287,17 @@ void PASCAL lZenToHan(LPTSTR, LPTSTR);
 void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
 
 #ifdef NDEBUG
+  #define DebugPrintA (void)
+  #define DebugPrintW (void)
   #define DebugPrint (void)
-  #define ERROROUT(x)
-  #define WARNOUT(x)
 #else
-  int DebugPrint(LPCTSTR lpszFormat, ...);
-  VOID WarnOut(LPCTSTR pStr);
-  VOID ErrorOut(LPCTSTR pStr);
-  #define ERROROUT(x) ErrorOut(x)
-  #define WARNOUT(x) WarnOut(x)
+  int DebugPrintA(LPCSTR lpszFormat, ...);
+  int DebugPrintW(LPCWSTR lpszFormat, ...);
+  #ifdef UNICODE
+    #define DebugPrint DebugPrintW
+  #else
+    #define DebugPrint DebugPrintA
+  #endif
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -357,6 +359,10 @@ struct MZIMEJA {
 };
 
 extern MZIMEJA TheIME;
+
+//////////////////////////////////////////////////////////////////////////////
+
+#include "footmark.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 

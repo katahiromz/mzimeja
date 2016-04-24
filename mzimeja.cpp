@@ -480,51 +480,59 @@ extern "C" {
 // for debugging
 
 #ifndef NDEBUG
-int DebugPrint(LPCTSTR lpszFormat, ...) {
-  int nCount;
-  TCHAR szMsg[1024];
+  int DebugPrintA(LPCSTR lpszFormat, ...) {
+    int nCount;
+    char szMsgA[1024];
 
-  va_list marker;
-  va_start(marker, lpszFormat);
-  nCount = wvsprintf(szMsg, lpszFormat, marker);
-  va_end(marker);
+    va_list marker;
+    va_start(marker, lpszFormat);
+    nCount = wvsprintfA(szMsgA, lpszFormat, marker);
+    va_end(marker);
 
-  //OutputDebugString(szMsg);
-  FILE *fp = fopen("C:\\mzimeja.log", "ab");
-  if (fp) {
-    size_t len = lstrlen(szMsg);
-    if (len > 0 && szMsg[len - 1] == TEXT('\n')) {
-      szMsg[len - 1] = TEXT('\r');
-      szMsg[len] = TEXT('\n');
-      ++len;
-      szMsg[len] = TEXT('\0');
+    WCHAR szMsgW[1024];
+    szMsgW[0] = 0;
+    ::MultiByteToWideChar(CP_ACP, 0
+      szMsgA, -1, szMsgW, 1024);
+
+    //OutputDebugString(szMsg);
+    FILE *fp = fopen("C:\\mzimeja.log", "ab");
+    if (fp) {
+      int len = lstrlenW(szMsgW);
+      if (len > 0 && szMsg[len - 1] == L'\n') {
+        szMsgW[len - 1] = L'\r';
+        szMsgW[len] = L'\n';
+        ++len;
+        szMsgW[len] = L'\0';
+      }
+      fwrite(szMsgW, len * sizeof(WCHAR), 1, fp);
+      fclose(fp);
     }
-    fwrite(szMsg, len * sizeof(TCHAR), 1, fp);
-    fclose(fp);
+    return nCount;
   }
-  return nCount;
-}
+  int DebugPrintW(LPCWSTR lpszFormat, ...) {
+    int nCount;
+    WCHAR szMsg[1024];
 
-VOID WarnOut(LPCTSTR pStr) {
-  DebugPrint(TEXT("%s\n"), pStr);
-}
+    va_list marker;
+    va_start(marker, lpszFormat);
+    nCount = wvsprintfW(szMsg, lpszFormat, marker);
+    va_end(marker);
 
-VOID ErrorOut(LPCTSTR pStr) {
-  DWORD dwError;
-  DWORD dwResult;
-  TCHAR buf1[512];
-
-  dwError = GetLastError();
-  dwResult =
-      FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwError,
-                    MAKELANGID(LANG_ENGLISH, LANG_NEUTRAL), buf1, 512, NULL);
-
-  if (dwResult > 0) {
-    DebugPrint(TEXT("%s:%s(0x%x)\n"), pStr, buf1, dwError);
-  } else {
-    DebugPrint(TEXT("%s:(0x%x)\n"), pStr, dwError);
+    //OutputDebugString(szMsg);
+    FILE *fp = fopen("C:\\mzimeja.log", "ab");
+    if (fp) {
+      int len = lstrlenW(szMsg);
+      if (len > 0 && szMsg[len - 1] == L'\n') {
+        szMsg[len - 1] = L'\r';
+        szMsg[len] = L'\n';
+        ++len;
+        szMsg[len] = L'\0';
+      }
+      fwrite(szMsg, len * sizeof(WCHAR), 1, fp);
+      fclose(fp);
+    }
+    return nCount;
   }
-}
 #endif  // ndef NDEBUG
 
 //////////////////////////////////////////////////////////////////////////////

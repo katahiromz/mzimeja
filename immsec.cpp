@@ -22,12 +22,12 @@ PSID MyCreateSid(VOID) {
   fResult = AllocateAndInitializeSid(&SidAuthority, 1, SECURITY_WORLD_RID, 0, 0,
                                      0, 0, 0, 0, 0, &psid);
   if (!fResult) {
-    ERROROUT(TEXT("MyCreateSid:AllocateAndInitializeSid failed"));
+    DebugPrint(TEXT("MyCreateSid:AllocateAndInitializeSid failed"));
     return NULL;
   }
 
   if (!IsValidSid(psid)) {
-    WARNOUT(TEXT("MyCreateSid:AllocateAndInitializeSid returns bogus sid"));
+    DebugPrint(TEXT("MyCreateSid:AllocateAndInitializeSid returns bogus sid"));
     FreeSid(psid);
     return NULL;
   }
@@ -83,14 +83,14 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
   PACL pacl;
   pacl = (PACL)MEMALLOC(cbacl);
   if (pacl == NULL) {
-    ERROROUT(TEXT("CreateSecurityAttributes:LocalAlloc for ACL failed"));
+    DebugPrint(TEXT("CreateSecurityAttributes:LocalAlloc for ACL failed"));
     FreeSid(psid);
     return NULL;
   }
 
   BOOL fResult = InitializeAcl(pacl, cbacl, ACL_REVISION);
   if (!fResult) {
-    ERROROUT(TEXT("CreateSecurityAttributes:InitializeAcl failed"));
+    DebugPrint(TEXT("CreateSecurityAttributes:InitializeAcl failed"));
     FreeSid(psid);
     MEMFREE(pacl);
     return NULL;
@@ -101,7 +101,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
   //
   fResult = AddAccessAllowedAce(pacl, ACL_REVISION, GENERIC_ALL, psid);
   if (!fResult) {
-    ERROROUT(TEXT("CreateSecurityAttributes:AddAccessAllowedAce failed"));
+    DebugPrint(TEXT("CreateSecurityAttributes:AddAccessAllowedAce failed"));
     MEMFREE(pacl);
     FreeSid(psid);
     return NULL;
@@ -112,7 +112,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
 
   // Let's make sure that our ACL is valid.
   if (!IsValidAcl(pacl)) {
-    WARNOUT(TEXT("CreateSecurityAttributes:IsValidAcl returns FALSE!"));
+    DebugPrint(TEXT("CreateSecurityAttributes:IsValidAcl returns FALSE!"));
     MEMFREE(pacl);
     return NULL;
   }
@@ -121,7 +121,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
   PSECURITY_ATTRIBUTES psa;
   psa = (PSECURITY_ATTRIBUTES)MEMALLOC(sizeof(SECURITY_ATTRIBUTES));
   if (psa == NULL) {
-    ERROROUT(TEXT("CreateSecurityAttributes:LocalAlloc for psa failed"));
+    DebugPrint(TEXT("CreateSecurityAttributes:LocalAlloc for psa failed"));
     MEMFREE(pacl);
     return NULL;
   }
@@ -130,14 +130,14 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
   PSECURITY_DESCRIPTOR psd;
   psd = MEMALLOC(SECURITY_DESCRIPTOR_MIN_LENGTH);
   if (psd == NULL) {
-    ERROROUT(TEXT("CreateSecurityAttributes:LocalAlloc for psd failed"));
+    DebugPrint(TEXT("CreateSecurityAttributes:LocalAlloc for psd failed"));
     MEMFREE(pacl);
     MEMFREE(psa);
     return NULL;
   }
 
   if (!InitializeSecurityDescriptor(psd, SECURITY_DESCRIPTOR_REVISION)) {
-    ERROROUT(
+    DebugPrint(
         TEXT("CreateSecurityAttributes:InitializeSecurityDescriptor failed"));
     MEMFREE(pacl);
     MEMFREE(psa);
@@ -150,7 +150,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
   // after the SetSecurityDescriptorDacl call.
   fResult = SetSecurityDescriptorDacl(psd, TRUE, pacl, FALSE);
   if (!fResult) {
-    ERROROUT(TEXT("CreateSecurityAttributes:SetSecurityDescriptorDacl failed"));
+    DebugPrint(TEXT("CreateSecurityAttributes:SetSecurityDescriptorDacl failed"));
     MEMFREE(pacl);
     MEMFREE(psa);
     MEMFREE(psd);
@@ -158,7 +158,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
   }
 
   if (!IsValidSecurityDescriptor(psd)) {
-    WARNOUT(TEXT("CreateSecurityAttributes:IsValidSecurityDescriptor failed!"));
+    DebugPrint(TEXT("CreateSecurityAttributes:IsValidSecurityDescriptor failed!"));
     MEMFREE(pacl);
     MEMFREE(psa);
     MEMFREE(psd);
@@ -190,7 +190,7 @@ VOID FreeSecurityAttributes(PSECURITY_ATTRIBUTES psa) {
   if (fResult) {
     if (pacl != NULL) MEMFREE(pacl);
   } else {
-    ERROROUT(TEXT("FreeSecurityAttributes:GetSecurityDescriptorDacl failed"));
+    DebugPrint(TEXT("FreeSecurityAttributes:GetSecurityDescriptorDacl failed"));
   }
 
   MEMFREE(psa->lpSecurityDescriptor);
