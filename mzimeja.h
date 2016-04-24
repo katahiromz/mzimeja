@@ -264,7 +264,6 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam);
 
 // dic.c
-void PASCAL DeleteChar(HIMC hIMC, UINT uVKey);
 void PASCAL RevertText(HIMC hIMC);
 void PASCAL AddChar(HIMC, WORD);
 BOOL PASCAL ConvKanji(HIMC);

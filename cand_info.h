@@ -28,7 +28,7 @@ struct CandList : public CANDIDATELIST {
   LPBYTE GetBytes() { return (LPBYTE)this; }
   LPTSTR GetCandString(DWORD i) { return LPTSTR(GetBytes() + dwOffset[i]); }
   LPTSTR GetCurString() { return GetCandString(dwSelection); }
-  DWORD GetPageEnd() const { return dwPageStart + dwPageSize; }
+  DWORD  GetPageEnd() const { return dwPageStart + dwPageSize; }
 
 private:
   CandList();

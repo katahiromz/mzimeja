@@ -45,6 +45,7 @@ struct InputContext : public INPUTCONTEXT {
   BOOL HasSoftKbdPos() const    { return (fdwInit & INIT_SOFTKBDPOS); }
 
   void FlushText();
+  void DeleteChar(BOOL bBackSpace = FALSE);
 
 private:
   InputContext();

@@ -32,7 +32,11 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
 
   case VK_DELETE:
   case VK_BACK:
-    DeleteChar(hIMC, wParam);
+    lpIMC = TheApp.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->DeleteChar(wParam == VK_BACK);
+      TheApp.UnlockIMC();
+    }
     break;
 
   case VK_SPACE:
