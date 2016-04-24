@@ -393,7 +393,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
         case IMC_SETOPENSTATUS:
           lpIMC = TheApp.LockIMC(hIMC);
           if (lpIMC) {
-            if (!lpIMC->IsOpen() && lpIMC->HasCompStr()) FlushText(hIMC);
+            lpIMC->FlushText();
             TheApp.UnlockIMC();
           }
           TheApp.UpdateIndicIcon(hIMC);
@@ -430,7 +430,11 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           break;
 
         case CPS_CANCEL:
-          FlushText(hIMC);
+          lpIMC = TheApp.LockIMC(hIMC);
+          if (lpIMC) {
+            lpIMC->FlushText();
+            TheApp.UnlockIMC();
+          }
           bRet = TRUE;
           break;
 

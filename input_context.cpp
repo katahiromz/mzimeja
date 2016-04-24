@@ -95,4 +95,24 @@ void InputContext::UnlockGuideLine() {
   ImmUnlockIMCC(hGuideLine);
 }
 
+void InputContext::FlushText() {
+  if (HasCandInfo()) {
+    CandInfo *lpCandInfo = LockCandInfo();
+    if (lpCandInfo) {
+      lpCandInfo->Clear();
+      UnlockCandInfo();
+    }
+    TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+  }
+
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->Clear(CLR_RESULT_AND_UNDET);
+    UnlockCompStr();
+
+    TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
+    TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////

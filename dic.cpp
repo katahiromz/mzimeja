@@ -9,33 +9,6 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-void PASCAL FlushText(HIMC hIMC) {
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
-  if (NULL == lpIMC) return;
-
-  if (lpIMC->HasCandInfo()) {
-    // Flush candidate lists.
-    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
-    if (lpCandInfo) {
-      lpCandInfo->Clear();
-      lpIMC->UnlockCandInfo();
-    }
-    TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
-
-  if (lpIMC->HasCompStr()) {
-    CompStr *lpCompStr = lpIMC->LockCompStr();
-    if (lpCompStr) {
-      lpCompStr->Clear(CLR_RESULT_AND_UNDET);
-      lpIMC->UnlockCompStr();
-
-      TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
-      TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
-    }
-  }
-  TheApp.UnlockIMC();
-}
-
 void PASCAL RevertText(HIMC hIMC) {
   CompStr *lpCompStr;
   LPTSTR lpread, lpstr;
