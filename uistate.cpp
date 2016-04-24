@@ -26,6 +26,7 @@ extern "C" {
 
 // create status window
 HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
+  FOOTMARK();
   const DWORD style = WS_DISABLED | WS_POPUP;
   const DWORD exstyle = WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
   HWND hwndStatus = lpUIExtra->uiStatus.hWnd;
@@ -59,6 +60,7 @@ HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
 
 // draw status window
 void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
+  FOOTMARK();
   RECT rc;
   HBITMAP hbmStatus;
   HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
@@ -191,6 +193,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
 } // StatusWnd_Paint
 
 STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
+  FOOTMARK();
   ::ScreenToClient(hWnd, &pt);
   RECT rc;
   ::GetClientRect(hWnd, &rc);
@@ -220,11 +223,13 @@ STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
 } // StatusWnd_HitTest
 
 void StatusWnd_Update(LPUIEXTRA lpUIExtra) {
+  FOOTMARK();
   if (IsWindow(lpUIExtra->uiStatus.hWnd))
     SendMessage(lpUIExtra->uiStatus.hWnd, WM_UI_UPDATE, 0, 0L);
 } // StatusWnd_Update
 
 void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
+  FOOTMARK();
   HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
   HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
   DWORD dwConversion, dwSentence;
@@ -259,6 +264,7 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
 }
 
 void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
+  FOOTMARK();
   static POINT prev = {-1, -1};
   if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
     if (bDown && ::GetCapture() == hWnd) {
@@ -281,6 +287,7 @@ void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
 }
 
 void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
+  FOOTMARK();
   STATUS_WND_HITTEST hittest = StatusWnd_HitTest(hWnd, pt);
   switch (hittest) {
   case SWHT_CAPTION:
@@ -329,6 +336,7 @@ void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
 } // StatusWnd_OnLButton
 
 static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
+  FOOTMARK();
   HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
   HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
 
@@ -369,6 +377,7 @@ LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
   HDC hDC;
   HBITMAP hbm;
   POINT pt;
+  FOOTMARK();
 
   switch (message) {
   case WM_CREATE:

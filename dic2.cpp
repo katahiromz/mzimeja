@@ -7,61 +7,6 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// Roman character Kana converting function
-WORD PASCAL ConvChar(HIMC hIMC, WORD ch1, WORD ch2) {
-  int num1, num2;
-  static WCHAR table[15][5] = {
-      {0x30A2, 0x30A4, 0x30A6, 0x30A8, 0x30AA},  //  A
-      {0x30AB, 0x30AD, 0x30AF, 0x30B1, 0x30B3},  //  K
-      {0x30B5, 0x30B7, 0x30B9, 0x30BB, 0x30BD},  //  S
-      {0x30BF, 0x30C1, 0x30C4, 0x30C6, 0x30C8},  //  T
-      {0x30CA, 0x30CB, 0x30CC, 0x30CD, 0x30CE},  //  N
-      {0x30CF, 0x30D2, 0x30D5, 0x30D8, 0x30DB},  //  H
-      {0x30DE, 0x30DF, 0x30E0, 0x30E1, 0x30E2},  //  M
-      {0x30E4, 0x0000, 0x30E6, 0x0000, 0x30E8},  //  Y
-      {0x30E9, 0x30EA, 0x30EB, 0x30EC, 0x30ED},  //  R
-      {0x30EF, 0x0000, 0x0000, 0x0000, 0x30F2},  //  W
-      {0x30AC, 0x30AE, 0x30B0, 0x30B2, 0x30B4},  //  G
-      {0x30B6, 0x30B8, 0x30BA, 0x30BC, 0x30BE},  //  Z
-      {0x30C0, 0x30C2, 0x30C5, 0x30C7, 0x30C9},  //  D
-      {0x30D0, 0x30D3, 0x30D6, 0x30D9, 0x30DC},  //  B
-      {0x30d1, 0x30d4, 0x30d7, 0x30da, 0x30dd}   //  p
-  };
-
-  num1 = IsFirst(ch1);
-  num2 = IsSecond(ch2);
-
-  return ((WORD)table[num1][num2 - 1]);
-}
-
-// A function which judges the vowels
-int PASCAL IsFirst(WORD ch) {
-  register int i;
-  static WCHAR table0[] = TEXT("KSTNHMYRWGZDBP");
-  static WCHAR table1[] = TEXT("kstnhmyrwgzdbp");
-
-  for (i = 0; table0[i]; i++) {
-    if (table0[i] == (WCHAR)ch) return (i + 1);
-
-    if (table1[i] == (WCHAR)ch) return (i + 1);
-  }
-  return 0;
-}
-
-// A function which judges the consonants
-int PASCAL IsSecond(WORD ch) {
-  register int i;
-  static WCHAR table0[] = TEXT("AIUEO");
-  static WCHAR table1[] = TEXT("aiueo");
-
-  for (i = 0; table0[i]; i++) {
-    if (table0[i] == (WCHAR)ch) return (i + 1);
-
-    if (table1[i] == (WCHAR)ch) return (i + 1);
-  }
-  return 0;
-}
-
 static WORD table1[] = {0x3000, 0xFF01, 0x201D, 0xFF03, 0xFF04, 0xFF05,
                         0xFF06, 0x2019, 0xFF08, 0xFF09, 0xFF0A, 0xFF0B,
                         0xFF0C, 0xFF0D, 0xFF0E, 0x00F7};
@@ -234,58 +179,6 @@ WORD PASCAL KataToHira(WORD code) {
       if (IsMaru(table6[i])) return table5[i] + 2;
   }
   return code;
-}
-
-BOOL OneCharZenToHan(WCHAR code, WCHAR* pKatakanaLetter, WCHAR* pSound) {
-  WCHAR NewCode;
-
-  *pKatakanaLetter = 0;
-  *pSound = 0;
-
-  NewCode = (TCHAR)ZenToHan(code);
-  if (!NewCode) {
-    if (IsTenten((WORD)(code - 1))) {
-      *pKatakanaLetter = (TCHAR)ZenToHan((WORD)(code - 1));
-      *pSound = (TCHAR)0xFF9E;
-      return TRUE;
-    } else if (IsMaru((WORD)(code - 2))) {
-      *pKatakanaLetter = (TCHAR)ZenToHan((WORD)(code - 2));
-      *pSound = (TCHAR)0xFF9F;
-      return TRUE;
-    } else {
-      return FALSE;
-    }
-  } else {
-    *pKatakanaLetter = NewCode;
-    return TRUE;
-  }
-}
-
-void PASCAL lZenToHan(LPTSTR lpDst, LPTSTR lpSrc) {
-  WORD code;
-
-  while (*lpSrc) {
-    code = *lpSrc;
-    *lpDst = (TCHAR)ZenToHan(code);
-    if (!*lpDst) {
-      if (IsTenten((WORD)(code - 1))) {
-        *lpDst++ = (TCHAR)ZenToHan((WORD)(code - 1));
-        *lpDst++ = (TCHAR)0xFF9E;
-      } else if (IsMaru((WORD)(code - 2))) {
-        *lpDst++ = (TCHAR)ZenToHan((WORD)(code - 2));
-        *lpDst++ = (TCHAR)0xFF9F;
-      } else {
-        //
-        // this case means it is not Japanese char
-        //
-        *lpDst++ = *lpSrc;
-      }
-    } else
-      lpDst++;
-
-    lpSrc++;
-  }
-  *lpDst = 0;
 }
 
 void PASCAL lHanToZen(LPTSTR lpDst, LPTSTR lpSrc, DWORD fdwConversion) {

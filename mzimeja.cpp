@@ -24,6 +24,7 @@ const MZGUIDELINE glTable[] = {
 //////////////////////////////////////////////////////////////////////////////
 
 BOOL IsInputModeOpen(InputMode imode) {
+  FOOTMARK();
   switch (imode) {
   case IMODE_ZEN_HIRAGANA:
   case IMODE_ZEN_KATAKANA:
@@ -37,6 +38,7 @@ BOOL IsInputModeOpen(InputMode imode) {
 }
 
 InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
+  FOOTMARK();
   if (bOpen) {
     if (dwConversion & IME_CMODE_FULLSHAPE) {
       if (dwConversion & IME_CMODE_JAPANESE) {
@@ -61,6 +63,7 @@ InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
 }
 
 UINT CommandFromInputMode(InputMode imode) {
+  FOOTMARK();
   switch (imode) {
   case IMODE_ZEN_HIRAGANA:
     return IDM_HIRAGANA;
@@ -78,6 +81,7 @@ UINT CommandFromInputMode(InputMode imode) {
 }
 
 InputMode GetInputMode(HIMC hIMC) {
+  FOOTMARK();
   DWORD dwConversion, dwSentence;
   ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
   BOOL bOpen = ::ImmGetOpenStatus(hIMC);
@@ -85,6 +89,7 @@ InputMode GetInputMode(HIMC hIMC) {
 }
 
 InputMode NextInputMode(InputMode imode) {
+  FOOTMARK();
   switch (imode) {
   case IMODE_ZEN_HIRAGANA:
     return IMODE_ZEN_KATAKANA;
@@ -101,6 +106,7 @@ InputMode NextInputMode(InputMode imode) {
 }
 
 void SetInputMode(HIMC hIMC, InputMode imode) {
+  FOOTMARK();
   DWORD dwConversion, dwSentence;
   ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
   switch (imode) {
@@ -132,12 +138,14 @@ void SetInputMode(HIMC hIMC, InputMode imode) {
 }
 
 BOOL IsRomajiMode(HIMC hIMC) {
+  FOOTMARK();
   DWORD dwConversion, dwSentence;
   ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
   return (dwConversion & IME_CMODE_ROMAN);
 }
 
 void SetRomajiMode(HIMC hIMC, BOOL bRomaji) {
+  FOOTMARK();
   DWORD dwConversion, dwSentence;
   ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
   if (bRomaji) {
@@ -149,6 +157,7 @@ void SetRomajiMode(HIMC hIMC, BOOL bRomaji) {
 }
 
 void RepositionWindow(HWND hWnd) {
+  FOOTMARK();
   RECT rc, rcWorkArea;
   ::GetWindowRect(hWnd, &rc);
   ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, FALSE);
@@ -179,6 +188,7 @@ void RepositionWindow(HWND hWnd) {
 MZIMEJA TheIME;
 
 BOOL MZIMEJA::Init(HINSTANCE hInstance) {
+  FOOTMARK();
   m_hInst = hInstance;
 
   // Create/open a system global named mutex.
@@ -209,6 +219,7 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
 
 BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   WNDCLASSEX wcx;
+  FOOTMARK();
 
   // register class of UI window.
   wcx.cbSize = sizeof(WNDCLASSEX);
@@ -292,6 +303,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
 
 HKL MZIMEJA::GetHKL(VOID) {
   HKL hKL = 0, *lphkl;
+  FOOTMARK();
 
   DWORD dwSize = GetKeyboardLayoutList(0, NULL);
   lphkl = (HKL *)GlobalAlloc(GPTR, dwSize * sizeof(DWORD));
@@ -317,7 +329,8 @@ HKL MZIMEJA::GetHKL(VOID) {
 // Update the transrate key buffer
 BOOL MZIMEJA::GenerateMessage(LPTRANSMSG lpGeneMsg) {
   BOOL ret = FALSE;
-  DebugPrint(TEXT("GenerateMessage(%u,%d,%d)\n"),
+  FOOTMARK();
+  DebugPrint(TEXT("(%u,%d,%d)\n"),
     lpGeneMsg->message, lpGeneMsg->wParam, lpGeneMsg->lParam);
 
   if (m_lpCurTransKey)
@@ -344,6 +357,7 @@ BOOL MZIMEJA::GenerateMessage(LPTRANSMSG lpGeneMsg) {
 
 BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
   TRANSMSG genmsg;
+  FOOTMARK();
   genmsg.message = message;
   genmsg.wParam = wParam;
   genmsg.lParam = lParam;
@@ -352,6 +366,7 @@ BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
 
 // Update the transrate key buffer
 BOOL MZIMEJA::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
+  FOOTMARK();
   ++m_uNumTransKey;
   if (m_uNumTransKey >= m_lpCurTransKey->uMsgCount) {
     m_fOverTransKey = TRUE;
@@ -365,6 +380,7 @@ BOOL MZIMEJA::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
 }
 
 BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
+  FOOTMARK();
   switch (dwCommand) {
   case IDM_RECONVERT:
     break;
@@ -406,6 +422,7 @@ BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
 } // MZIMEJA::DoCommand
 
 void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
+  FOOTMARK();
   if (!m_hMyKL) {
     m_hMyKL = GetHKL();
     if (!m_hMyKL) return;
@@ -437,6 +454,7 @@ void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
 }
 
 VOID MZIMEJA::Destroy(VOID) {
+  FOOTMARK();
   ::UnregisterClass(szUIClassName, m_hInst);
   ::UnregisterClass(szCompStrClassName, m_hInst);
   ::UnregisterClass(szCandClassName, m_hInst);
@@ -445,10 +463,12 @@ VOID MZIMEJA::Destroy(VOID) {
 }
 
 HBITMAP MZIMEJA::LoadBMP(LPCTSTR pszName) {
+  FOOTMARK();
   return ::LoadBitmap(m_hInst, pszName);
 }
 
 LPTSTR MZIMEJA::LoadSTR(INT nID) {
+  FOOTMARK();
   static TCHAR sz[512];
   sz[0] = 0;
   ::LoadString(m_hInst, nID, sz, 512);
@@ -456,6 +476,7 @@ LPTSTR MZIMEJA::LoadSTR(INT nID) {
 }
 
 InputContext *MZIMEJA::LockIMC(HIMC hIMC) {
+  FOOTMARK();
   DebugPrint(TEXT("MZIMEJA::LockIMC: locking: %p\n"), hIMC);
   InputContext *context = (InputContext *)::ImmLockIMC(hIMC);
   if (context) {
@@ -469,6 +490,7 @@ InputContext *MZIMEJA::LockIMC(HIMC hIMC) {
 }
 
 VOID MZIMEJA::UnlockIMC(HIMC hIMC) {
+  FOOTMARK();
   DebugPrint(TEXT("MZIMEJA::UnlockIMC: unlocking: %p\n"), hIMC);
   ::ImmUnlockIMC(hIMC);
   DebugPrint(TEXT("MZIMEJA::UnlockIMC: unlocked: %p\n"), hIMC);

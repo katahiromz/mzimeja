@@ -4,6 +4,7 @@
 #include "mzimeja.h"
 
 DWORD LogCompStr::GetTotalSize() const {
+  FOOTMARK();
   size_t total = sizeof(COMPOSITIONSTRING);
   total += comp_read_attr.size() * sizeof(BYTE);
   total += comp_read_clause.size() * sizeof(DWORD);
@@ -21,6 +22,7 @@ DWORD LogCompStr::GetTotalSize() const {
 //////////////////////////////////////////////////////////////////////////////
 
 void CompStr::GetLogCompStr(LogCompStr& log) {
+  FOOTMARK();
   log.dwCursorPos = dwCursorPos;
   log.dwDeltaStart = dwDeltaStart;
   log.comp_read_attr.assign(GetCompReadAttr(), GetCompReadAttr() + dwCompReadAttrLen);
@@ -36,6 +38,7 @@ void CompStr::GetLogCompStr(LogCompStr& log) {
 }
 
 /*static*/ HIMCC CompStr::ReAlloc(HIMCC hCompStr, const LogCompStr *log) {
+  FOOTMARK();
   LogCompStr log_comp_str;
   if (log == NULL) {
     log = &log_comp_str;
@@ -114,9 +117,10 @@ void CompStr::GetLogCompStr(LogCompStr& log) {
     DebugPrint(TEXT("CompStr::ReAlloc: failed"));
   }
   return hCompStr;
-}
+} // CompStr::ReAlloc
 
 void CompStr::Dump() {
+  FOOTMARK();
 #ifndef NDEBUG
   DebugPrint(TEXT("dwSize: %08X\n"), dwSize);
   DebugPrint(TEXT("dwCursorPos: %08X\n"), dwCursorPos);

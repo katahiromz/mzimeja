@@ -136,16 +136,6 @@ enum InputMode {
   IMODE_HAN_EISUU
 };
 
-BOOL IsInputModeOpen(InputMode imode);
-InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
-InputMode NextInputMode(InputMode imode);
-InputMode GetInputMode(HIMC hIMC);
-void SetInputMode(HIMC hIMC, InputMode imode);
-void RepositionWindow(HWND hWnd);
-BOOL IsRomajiMode(HIMC hIMC);
-void SetRomajiMode(HIMC hIMC, BOOL bRomaji);
-UINT CommandFromInputMode(InputMode imode);
-
 //////////////////////////////////////////////////////////////////////////////
 // Structures
 
@@ -269,19 +259,14 @@ int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
                                       DWORD dwBufLen, LPTSTR szDicFileName);
 
 // dic2.c
-BOOL OneCharZenToHan(WCHAR, WCHAR *, WCHAR *);
 WORD PASCAL HanToZen(WORD, WORD, DWORD);
 WORD PASCAL ZenToHan(WORD);
-int PASCAL IsFirst(WORD);
-int PASCAL IsSecond(WORD);
-WORD PASCAL ConvChar(HIMC, WORD, WORD);
 BOOL PASCAL IsTenten(WORD);
 WORD PASCAL ConvTenten(WORD);
 BOOL PASCAL IsMaru(WORD);
 WORD PASCAL ConvMaru(WORD);
 WORD PASCAL HiraToKata(WORD);
 WORD PASCAL KataToHira(WORD);
-void PASCAL lZenToHan(LPTSTR, LPTSTR);
 void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
 
 #ifdef NDEBUG
@@ -299,6 +284,17 @@ void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
     #define DebugPrint DebugPrintA
   #endif
 #endif
+
+// mzimeja.cpp
+BOOL IsInputModeOpen(InputMode imode);
+InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
+InputMode NextInputMode(InputMode imode);
+InputMode GetInputMode(HIMC hIMC);
+void SetInputMode(HIMC hIMC, InputMode imode);
+void RepositionWindow(HWND hWnd);
+BOOL IsRomajiMode(HIMC hIMC);
+void SetRomajiMode(HIMC hIMC, BOOL bRomaji);
+UINT CommandFromInputMode(InputMode imode);
 
 //////////////////////////////////////////////////////////////////////////////
 

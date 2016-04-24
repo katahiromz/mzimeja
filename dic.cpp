@@ -12,6 +12,7 @@ extern "C" {
 void PASCAL RevertText(HIMC hIMC) {
   CompStr *lpCompStr;
   LPTSTR lpread, lpstr;
+  FOOTMARK();
 
   InputContext *lpIMC = TheIME.LockIMC(hIMC);
   if (!lpIMC) return;
@@ -64,6 +65,7 @@ void PASCAL RevertText(HIMC hIMC) {
 
 BOOL PASCAL ConvKanji(HIMC hIMC) {
   BOOL bRc = FALSE;
+  FOOTMARK();
 
   if ((GetFileAttributes(TheIME.m_szDicFileName) == 0xFFFFFFFF) ||
       (GetFileAttributes(TheIME.m_szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
@@ -230,6 +232,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
 
 // Update the transrate key buffer
 BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
+  FOOTMARK();
   DWORD dwSize =
       sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(TCHAR)) * 2 * sizeof(TCHAR);
   LPTSTR lpStr;
@@ -267,6 +270,7 @@ BOOL PASCAL MakeGuideLine(HIMC hIMC, DWORD dwID) {
 
 int CopyCandidateStringsFromDictionary(LPTSTR lpDic, LPTSTR lpRead,
                                        LPTSTR lpBuf, DWORD dwBufLen) {
+  FOOTMARK();
   DWORD dwWritten = 0;
   LPTSTR lpSection, lpTemp;
   const LPTSTR szSep = TEXT(" \r\n\t");
@@ -312,6 +316,7 @@ int GetCandidateStringsFromDictionary(LPTSTR lpRead, LPTSTR lpBuf,
   DWORD dwFileSize, dwRead;
   LPTSTR lpDic;
 
+  FOOTMARK();
   psa = CreateSecurityAttributes();
 
   hTblFile = CreateFile(lpFilename, GENERIC_READ, FILE_SHARE_READ, NULL,

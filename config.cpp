@@ -12,6 +12,7 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
+  FOOTMARK();
   if (ppsh->nPages < MAX_PAGES) {
     PROPSHEETPAGE psp;
 
@@ -25,7 +26,7 @@ void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
     ppsh->phpage[ppsh->nPages] = CreatePropertySheetPage(&psp);
     if (ppsh->phpage[ppsh->nPages]) ppsh->nPages++;
   }
-}
+} // AddPage
 
 //  ImeConfigure
 //    ImeConfigure ä÷êîÇÕ IME Ç…ëŒÇµÇƒï‚ë´ìIÇ»èÓïÒÇóvãÅÇ∑ÇÈÇΩÇﬂÇ…égÇ§
@@ -110,10 +111,11 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
   }
 
   return TRUE;
-}
+} // ImeConfigure
 
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
+  FOOTMARK();
   NMHDR FAR *lpnm;
   //LPPROPSHEETPAGE lpPropSheet =
   //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
@@ -214,13 +216,14 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
       return FALSE;
   }
   return TRUE;
-}
+} // RegWordDlgProc
 
 INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                          LPARAM lParam) {
   NMHDR FAR *lpnm;
   //LPPROPSHEETPAGE lpPropSheet =
   //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+  FOOTMARK();
 
   switch (message) {
     case WM_NOTIFY:
@@ -267,13 +270,14 @@ INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
       return FALSE;
   }
   return TRUE;
-}
+} // SelectDictionaryDlgProc
 
 INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                               LPARAM lParam) {
   NMHDR FAR *lpnm;
   //LPPROPSHEETPAGE lpPropSheet =
   //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+  FOOTMARK();
 
   switch (message) {
     case WM_NOTIFY:
@@ -320,13 +324,14 @@ INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
       return FALSE;
   }
   return TRUE;
-}
+} // AboutDlgProc
 
 INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
   NMHDR FAR *lpnm;
   //LPPROPSHEETPAGE lpPropSheet =
   //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+  FOOTMARK();
 
   switch (message) {
     case WM_NOTIFY:
@@ -373,7 +378,7 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
       return FALSE;
   }
   return TRUE;
-}
+} // GeneralDlgProc
 
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
@@ -382,6 +387,7 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
   NMHDR FAR *lpnm;
   //LPPROPSHEETPAGE lpPropSheet =
   //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+  FOOTMARK();
 
   switch (message) {
     case WM_NOTIFY:
@@ -428,7 +434,7 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
       return FALSE;
   }
   return TRUE;
-}
+} // DebugOptionDlgProc
 
 //////////////////////////////////////////////////////////////////////////////
 
