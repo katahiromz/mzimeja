@@ -11,11 +11,9 @@
   #include <tchar.h>
 #endif
 
-#ifndef RC_INVOKED
-  #include <cstdio>
-  #include <cassert>
-  #include <cstring>
-#endif
+#include <cstdio>
+#include <cassert>
+#include <cstring>
 
 #include "indicml.h"
 #include "immdev.h"
@@ -364,9 +362,7 @@ extern MZIMEJA TheIME;
 
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef RC_INVOKED
-  #include "footmark.hpp"
-#endif
+#include "footmark.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 

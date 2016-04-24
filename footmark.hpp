@@ -90,9 +90,15 @@
 // FOOTMARK(), FOOTMARK_PRINT_CALL_STACK() macros
 
 #ifndef NDEBUG
-  #define FOOTMARK() \
-    FootmarkLocation \
-      object_for_debugging_##__LINE__(__FILE__, __LINE__, __FUNCTION__);
+  #if (__cplusplus >= 201103L) // C++11
+    #define FOOTMARK() \
+      FootmarkLocation \
+        object_for_debugging_##__LINE__(__FILE__, __LINE__, __func__);
+  #else // until C++11
+    #define FOOTMARK() \
+      FootmarkLocation \
+        object_for_debugging_##__LINE__(__FILE__, __LINE__, __FUNCTION__);
+  #endif
   #define FOOTMARK_PRINT_CALL_STACK() FootmarkPrintCallStack()
 #else   // def NDEBUG
   #define FOOTMARK()                  /*empty*/
