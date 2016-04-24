@@ -39,10 +39,10 @@ extern "C" {
 //  (返り値)
 //    成功したならば、TRUE を。さもなくば FALSE を返す。
 BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
-  if ((dw == FAKEWORD_NOUN) || (dw == FAKEWORD_VERB))
-    return WritePrivateProfileString(lpRead, lpStr, lpStr, TheApp.m_szDicFileName);
-
-  return FALSE;
+  BOOL ret = FALSE;
+  DebugPrint(TEXT("ImeRegisterWord\n"));
+  DebugPrint(TEXT("end ImeRegisterWord\n"));
+  return ret;
 }
 
 //  ImeUnregisterWord
@@ -65,11 +65,10 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 //  (返り値)
 //    成功したならば、TRUE を。さもなくば FALSE を返す。
 BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
-  if ((dw == FAKEWORD_NOUN) || (dw == FAKEWORD_VERB))
-
-    return WritePrivateProfileString(lpRead, lpStr, NULL, TheApp.m_szDicFileName);
-
-  return FALSE;
+  BOOL ret = FALSE;
+  DebugPrint(TEXT("ImeUnregisterWord\n"));
+  DebugPrint(TEXT("end ImeUnregisterWord\n"));
+  return ret;
 }
 
 //  ImeGetRegisterWordStyle
@@ -89,21 +88,10 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 //    ならば、このIMEですべての可能なスタイルを受け取るのに必要な配列の
 //    要素数になります。
 UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
-  UINT uRet = 0;
-
-  if (u > 0 && lp) {
-    lp->dwStyle = FAKEWORD_NOUN;
-    lstrcpy(lp->szDescription, TEXT("NOUN"));
-
-    if (u > 1) {
-      lp++;
-      lp->dwStyle = FAKEWORD_VERB;
-      lstrcpy(lp->szDescription, TEXT("VERB"));
-    }
-  } else
-    uRet = 2;
-
-  return uRet;
+  UINT ret = 0;
+  DebugPrint(TEXT("ImeGetRegisterWordStyle\n"));
+  DebugPrint(TEXT("end ImeGetRegisterWordStyle\n"));
+  return ret;
 }
 
 //  ImeEnumRegisterWord
@@ -151,36 +139,10 @@ UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
 //    SKK辞書との相性は最悪では？
 UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
                                 DWORD dw, LPCTSTR lpStr, LPVOID lpData) {
-  UINT uRet = 0;
-  TCHAR szBuf[256];
-  int nBufLen;
-  LPTSTR lpBuf;
-
-  if (!lpfn) return 0;
-
-  lpBuf = szBuf;
-
-  if (!dw || (dw == FAKEWORD_NOUN)) {
-    if (lpRead) {
-      nBufLen = GetPrivateProfileString(
-          lpRead, NULL, TEXT(""), szBuf, _countof(szBuf),
-          TheApp.m_szDicFileName);
-
-      if (nBufLen) {
-        while (*lpBuf) {
-          if (lpStr && lstrcmp(lpStr, lpBuf)) continue;
-
-          uRet = (*lpfn)(lpRead, dw, lpBuf, lpData);
-          lpBuf += (lstrlen(lpBuf) + 1);
-
-          if (!uRet) break;
-        }
-      }
-    } else {
-    }
-  }
-
-  return uRet;
+  UINT ret = 0;
+  DebugPrint(TEXT("ImeEnumRegisterWord\n"));
+  DebugPrint(TEXT("end ImeEnumRegisterWord\n"));
+  return ret;
 }
 
 //////////////////////////////////////////////////////////////////////////////

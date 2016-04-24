@@ -88,6 +88,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
     TheApp.m_bWinLogOn = TRUE;
   }
 
+  DebugPrint(TEXT("end ImeInquire\n"));
   return TRUE;
 }
 
@@ -135,6 +136,7 @@ DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
                                LPCANDIDATELIST lpCandList, DWORD dwBufLen,
                                UINT uFlags) {
   DebugPrint(TEXT("ImeConversionList\n"));
+  DebugPrint(TEXT("end ImeConversionList\n"));
 
   return 0;
 }
@@ -153,6 +155,7 @@ DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
 //    関数が成功したら、TRUE。そうじゃなかったら、FALSE。
 BOOL WINAPI ImeDestroy(UINT uForce) {
   DebugPrint(TEXT("ImeDestroy\n"));
+  DebugPrint(TEXT("end ImeDestroy\n"));
 
   return TRUE;
 }
@@ -231,7 +234,6 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
     case IME_ESC_QUERY_SUPPORT:
       switch (*(LPUINT)lpData) {
         case IME_ESC_QUERY_SUPPORT:
-        case IME_ESC_PRI_GETDWORDTEST:
         case IME_ESC_GETHELPFILENAME:
           lRet = TRUE;
           break;
@@ -240,10 +242,6 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
           lRet = FALSE;
           break;
       }
-      break;
-
-    case IME_ESC_PRI_GETDWORDTEST:
-      lRet = 0x12345678;
       break;
 
     case IME_ESC_GETHELPFILENAME:
@@ -255,6 +253,8 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
       lRet = FALSE;
       break;
   }
+
+  DebugPrint(TEXT("end ImeEscape\n"));
 
   return lRet;
 }
@@ -285,6 +285,7 @@ BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
 
   TheApp.UpdateIndicIcon(hIMC);
 
+  DebugPrint(TEXT("end ImeSetActiveContext\n"));
   return TRUE;
 }
 
@@ -608,6 +609,8 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("NI_(unknown)\n"));
       break;
   }
+
+  DebugPrint(TEXT("end NotifyIME\n"));
   return bRet;
 }
 
@@ -631,15 +634,16 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
   DebugPrint(TEXT("ImeSelect\n"));
 
   if (fSelect) TheApp.UpdateIndicIcon(hIMC);
-
-  if (NULL == hIMC) return TRUE;
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
-  if (lpIMC) {
-    if (fSelect) {
-      lpIMC->Initialize();
+  if (NULL != hIMC) {
+    InputContext *lpIMC = TheApp.LockIMC(hIMC);
+    if (lpIMC) {
+      if (fSelect) {
+        lpIMC->Initialize();
+      }
+      TheApp.UnlockIMC();
     }
-    TheApp.UnlockIMC();
   }
+  DebugPrint(TEXT("end ImeSelect\n"));
   return TRUE;
 }
 
@@ -752,6 +756,7 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
       break;
   }
 
+  DebugPrint(TEXT("end ImeSetCompositionString\n"));
   return FALSE;
 }
 
@@ -779,6 +784,7 @@ static const MYMENUITEM top_menu_items[] = {
 DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
                                 LPIMEMENUITEMINFO lpImeParentMenu,
                                 LPIMEMENUITEMINFO lpImeMenu, DWORD dwSize) {
+  INT ret = 0;
   // dwType を MSIME はチェックしていないようだ。それに合わせる。
   // ただ、TSF が生きていると、この method は常に動作してないように思えるが。
   //
@@ -786,18 +792,15 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
   //   return  0 ;
   //
   // このコードを有効にするかどうかは微妙だ。
-  DebugPrint(TEXT("ImeGetImeMenuItems\n"));
 
+  DebugPrint(TEXT("ImeGetImeMenuItems\n"));
   if (lpImeMenu == NULL) {
     if (lpImeParentMenu == NULL) {
       if (dwFlags & IGIMIF_RIGHTMENU)
-        return _countof(top_menu_items);
-      else
-        return 0;
-    } else {
-        return 0;
+        ret = _countof(top_menu_items);
     }
-    return 0;
+    DebugPrint(TEXT("end ImeGetImeMenuItems\n"));
+    return ret;
   }
 
   if (lpImeParentMenu == NULL) {
@@ -874,13 +877,12 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
         }
         lpImeMenu[i].hbmpItem = 0;
       }
-      return _countof(top_menu_items);
-    } else {
-      return 0;
+      ret = _countof(top_menu_items);
     }
-  } else {
-    return 0;
   }
+
+  DebugPrint(TEXT("end ImeGetImeMenuItems\n"));
+  return ret;
 } // ImeGetImeMenuItems
 
 //////////////////////////////////////////////////////////////////////////////

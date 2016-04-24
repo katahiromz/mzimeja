@@ -138,8 +138,8 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   RECT rc;
   RECT oldrc;
   SIZE sz;
-  int width;
-  int height;
+  int width = 0;
+  int height = 0;
   int i;
 
   // Save the composition form style into lpUIExtra.

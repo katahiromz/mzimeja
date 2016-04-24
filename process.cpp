@@ -141,11 +141,16 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   BOOL ret = FALSE;
   DebugPrint(TEXT("ImeProcessKey\n"));
 
-  // if key is up, don't process the key
-  if (lKeyData & 0x80000000) return FALSE;
+  if (lKeyData & 0x80000000) {
+    DebugPrint(TEXT("end ImeProcessKey (key up)\n"));
+    return FALSE;
+  }
 
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
-  if (lpIMC == NULL) return FALSE;
+  if (lpIMC == NULL) {
+    DebugPrint(TEXT("end ImeProcessKey (no context)\n"));
+    return FALSE;
+  }
 
   BOOL fOpen = lpIMC->IsOpen();
   BOOL fAlt = (lpbKeyState[VK_MENU] & 0x80);
@@ -252,6 +257,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   }
 
   TheApp.UnlockIMC();
+  DebugPrint(TEXT("end ImeProcessKey\n"));
   return ret;
 }
 
@@ -295,41 +301,42 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 //    ImmToAsciiEx
 UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
                          LPTRANSMSGLIST lpTransBuf, UINT fuState, HIMC hIMC) {
+  UINT ret = 0;
   DebugPrint(TEXT("ImeToAsciiEx\n"));
 
   TheApp.m_lpCurTransKey = lpTransBuf;
-  LPARAM lParam = ((DWORD)uScanCode << 16) + 1L;
-
-  // Init TheApp.m_uNumTransKey here.
   TheApp.m_uNumTransKey = 0;
 
   // if hIMC is NULL, this means DISABLE IME.
-  if (!hIMC) return 0;
+  if (hIMC) {
+    InputContext *lpIMC = TheApp.LockIMC(hIMC);
+    if (lpIMC) {
+      BOOL fOpen = lpIMC->IsOpen();
+      TheApp.UnlockIMC();
 
-  InputContext *lpIMC = TheApp.LockIMC(hIMC);
-  if (NULL == lpIMC) return 0;
-  BOOL fOpen = lpIMC->IsOpen();
-  TheApp.UnlockIMC();
+      if (fOpen) {
+        if ((uScanCode & 0x8000) == 0) {
+          LPARAM lParam = ((DWORD)uScanCode << 16) + 1L;
+          IMEKeydownHandler(hIMC, uVKey, lParam, lpbKeyState);
+        }
 
-  if (fOpen) {
-    if ((uScanCode & 0x8000) == 0)
-      IMEKeydownHandler(hIMC, uVKey, lParam, lpbKeyState);
+        // Clear static value, no more generated message!
+        TheApp.m_lpCurTransKey = NULL;
+      }
 
-    // Clear static value, no more generated message!
-    TheApp.m_lpCurTransKey = NULL;
+      // If trans key buffer that is allocated by USER.EXE full up,
+      // the return value is the negative number.
+      if (TheApp.m_fOverTransKey) {
+        DebugPrint(TEXT("***************************************\n"));
+        DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *\n"));
+        DebugPrint(TEXT("*                by MZIMEJA.IME       *\n"));
+        DebugPrint(TEXT("***************************************\n"));
+      }
+      ret = TheApp.m_uNumTransKey;
+    }
   }
-
-  // If trans key buffer that is allocated by USER.EXE full up,
-  // the return value is the negative number.
-  if (TheApp.m_fOverTransKey) {
-    DebugPrint(TEXT("***************************************\n"));
-    DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *\n"));
-    DebugPrint(TEXT("*                by MZIMEJA.DLL       *\n"));
-    DebugPrint(TEXT("***************************************\n"));
-    return (int)TheApp.m_uNumTransKey;
-  }
-
-  return (int)TheApp.m_uNumTransKey;
+  DebugPrint(TEXT("end ImeToAsciiEx\n"));
+  return ret;
 }
 
 //////////////////////////////////////////////////////////////////////////////

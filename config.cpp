@@ -110,6 +110,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
       break;
   }
 
+  DebugPrint(TEXT("end ImeConfigure\n"));
   return TRUE;
 }
 

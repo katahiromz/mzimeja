@@ -228,7 +228,7 @@ BOOL PASCAL ConvKanji(HIMC hIMC) {
   return bRc;
 }
 
-BOOL WINAPI MakeResultString(HIMC hIMC, BOOL fFlag) {
+BOOL MakeResultString(HIMC hIMC, BOOL fFlag) {
   InputContext *lpIMC = TheApp.LockIMC(hIMC);
   CompStr *lpCompStr = lpIMC->LockCompStr();
 
