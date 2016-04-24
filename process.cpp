@@ -88,15 +88,18 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     break;
 
   default:
-    if ((VK_0 <= wParam && VK_9 >= wParam) ||
-        (VK_A <= wParam && VK_Z >= wParam) ||
-        (VK_NUMPAD0 <= wParam && VK_NUMPAD9 >= wParam) ||
-        (VK_OEM_1 <= wParam && VK_OEM_9 >= wParam) ||
-        (VK_MULTIPLY <= wParam && VK_DIVIDE >= wParam))
+    if ((VK_0 <= wVKey && wVKey <= VK_9) ||
+        (VK_A <= wVKey && wVKey <= VK_Z) ||
+        (VK_NUMPAD0 <= wVKey && wVKey <= VK_NUMPAD9) ||
+        (VK_OEM_1 <= wVKey && wVKey <= VK_OEM_9) ||
+        (VK_MULTIPLY <= wVKey && wVKey <= VK_DIVIDE))
     {
       // This WM_IME_KEYDOWN has actual character code in itself.
-      AddChar(hIMC, HIWORD(wParam));
-      // CharHandler( hIMC,  (WORD)((BYTE)HIBYTE(wParam)), lParam );
+      lpIMC = TheApp.LockIMC(hIMC);
+      if (lpIMC) {
+        lpIMC->AddChar(HIWORD(wParam));
+        TheApp.UnlockIMC();
+      }
     }
     break;
   }

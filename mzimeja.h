@@ -265,7 +265,6 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 
 // dic.c
 void PASCAL RevertText(HIMC hIMC);
-void PASCAL AddChar(HIMC, WORD);
 BOOL PASCAL ConvKanji(HIMC);
 BOOL WINAPI MakeResultString(HIMC, BOOL);
 BOOL PASCAL MakeGuideLine(HIMC, DWORD);

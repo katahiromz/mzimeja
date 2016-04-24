@@ -95,7 +95,56 @@ void InputContext::UnlockGuideLine() {
   ImmUnlockIMCC(hGuideLine);
 }
 
+void InputContext::AddChar(WCHAR ch) {
+  DebugPrint(TEXT("InputContext::AddChar"));
+
+  // get logical data
+  LogCompStr log;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  if (log.comp_str.empty()) {
+    // start composition
+    TheApp.GenerateMessage(WM_IME_STARTCOMPOSITION);
+  }
+
+  //DWORD dwConversion = lpIMC->Conversion();
+
+  if (log.dwCursorPos > log.comp_str.size()) {
+    log.dwCursorPos = log.comp_str.size();
+  }
+  log.comp_str.insert(log.dwCursorPos, 1, ch);
+  log.dwDeltaStart = log.dwCursorPos;
+  ++log.dwCursorPos;
+
+  log.comp_read_str = log.comp_str;
+
+  log.comp_read_attr.resize(log.comp_str.size(), 0);
+  log.comp_attr.resize(log.comp_str.size(), 0);
+
+  log.comp_read_clause.resize(2);
+  log.comp_read_clause[0] = 0;
+  log.comp_read_clause[1] = (DWORD)log.comp_read_str.size();
+
+  log.comp_clause.resize(2);
+  log.comp_clause[0] = 0;
+  log.comp_clause[1] = (DWORD)log.comp_str.size();
+
+  // realloc
+  DumpCompStr();
+  hCompStr = CompStr::ReAlloc(hCompStr, &log);
+  DumpCompStr();
+
+  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
+  TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+} // InputContext::AddChar
+
 void InputContext::CancelText() {
+  DebugPrint(TEXT("InputContext::CancelText"));
+
   // close candidate
   if (HasCandInfo()) {
     CandInfo *lpCandInfo = LockCandInfo();
@@ -106,19 +155,18 @@ void InputContext::CancelText() {
     TheApp.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    // clear compositoin
-    lpCompStr->Clear(CLR_RESULT_AND_UNDET);
-    UnlockCompStr();
+  DumpCompStr();
+  hCompStr = CompStr::ReAlloc(hCompStr, NULL);
+  DumpCompStr();
 
-    // generate messages to end composition
-    TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
-    TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
-  }
+  // generate messages to end composition
+  TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL);
+  TheApp.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::CancelText
 
 void InputContext::DeleteChar(BOOL bBackSpace) {
+  DebugPrint(TEXT("InputContext::DeleteChar"));
+
   // get logical data
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
@@ -146,7 +194,9 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   }
 
   // realloc
+  DumpCompStr();
   hCompStr = CompStr::ReAlloc(hCompStr, &log);
+  DumpCompStr();
 
   if (log.comp_str.empty()) {
     // close candidate if any
@@ -168,5 +218,15 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     TheApp.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
   }
 } // InputContext::DeleteChar
+
+void InputContext::DumpCompStr() {
+#ifndef NDEBUG
+  CompStr *pCompStr = LockCompStr();
+  if (pCompStr) {
+    pCompStr->Dump();
+  }
+  UnlockCompStr();
+#endif
+} // InputContext::DumpCompStr
 
 //////////////////////////////////////////////////////////////////////////////

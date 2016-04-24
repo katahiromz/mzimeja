@@ -70,15 +70,35 @@ void CompStr::GetLogCompStr(LogCompStr& log) {
     pb += log->member.size() * sizeof(WCHAR); \
   }
 
+      lpCompStr->dwCompReadAttrLen = log->comp_read_attr.size() * sizeof(BYTE);
+      lpCompStr->dwCompReadAttrOffset = (DWORD)(pb - lpCompStr->GetBytes());
       ADD_BYTES(comp_read_attr);
+      lpCompStr->dwCompReadClauseLen = log->comp_read_clause.size() * sizeof(DWORD);
+      lpCompStr->dwCompReadClauseOffset = (DWORD)(pb - lpCompStr->GetBytes());
       ADD_DWORDS(comp_read_clause);
+      lpCompStr->dwCompReadStrLen = log->comp_read_str.size();
+      lpCompStr->dwCompReadStrOffset = (DWORD)(pb - lpCompStr->GetBytes());
       ADD_STRING(comp_read_str);
+      lpCompStr->dwCompAttrLen = log->comp_attr.size() * sizeof(BYTE);
+      lpCompStr->dwCompAttrOffset = (DWORD)(pb - lpCompStr->GetBytes());
       ADD_BYTES(comp_attr);
+      lpCompStr->dwCompClauseLen = log->comp_clause.size() * sizeof(DWORD);
+      lpCompStr->dwCompClauseOffset = (DWORD)(pb - lpCompStr->GetBytes());
       ADD_DWORDS(comp_clause);
+      lpCompStr->dwCompStrLen = log->comp_str.size();
+      lpCompStr->dwCompStrOffset = (DWORD)(pb - lpCompStr->GetBytes());
       ADD_STRING(comp_str);
+      lpCompStr->dwResultReadClauseLen = log->result_read_clause.size() * sizeof(DWORD);
+      lpCompStr->dwResultReadClauseOffset = (DWORD)(pb - lpCompStr->GetBytes());
       ADD_DWORDS(result_read_clause);
+      lpCompStr->dwResultReadStrLen = log->result_read_str.size();
+      lpCompStr->dwResultReadStrOffset = (DWORD)(pb - lpCompStr->GetBytes());
       ADD_STRING(result_read_str);
+      lpCompStr->dwResultClauseLen = log->result_clause.size() * sizeof(DWORD);
+      lpCompStr->dwResultClauseOffset = (DWORD)(pb - lpCompStr->GetBytes());
       ADD_DWORDS(result_clause);
+      lpCompStr->dwResultStrLen = log->result_str.size();
+      lpCompStr->dwResultStrOffset = (DWORD)(pb - lpCompStr->GetBytes());
       ADD_STRING(result_str);
       assert((DWORD)(pb - lpCompStr->GetBytes()) == total);
 
@@ -163,5 +183,83 @@ void CompStr::MakeAttrClause() {
   *lpdw++ = (BYTE)pos;
   *lpdw = len;
 }
+
+void CompStr::Dump() {
+#ifndef NDEBUG
+  DebugPrint(TEXT("dwSize: %08X"), dwSize);
+  DebugPrint(TEXT("dwCursorPos: %08X"), dwCursorPos);
+  DebugPrint(TEXT("dwDeltaStart: %08X"), dwDeltaStart);
+  DebugPrint(TEXT("CompReadAttr: "));
+  if (dwCompReadAttrLen) {
+    LPBYTE attrs = GetCompReadAttr();
+    for (DWORD i = 0; i < dwCompReadAttrLen; ++i) {
+      DebugPrint(TEXT("%02X"), attrs[i]);
+    }
+  }
+  DebugPrint(TEXT("CompReadClause: "));
+  if (dwCompReadClauseLen) {
+    LPDWORD clauses = GetCompReadClause();
+    for (DWORD i = 0; i < dwCompReadClauseLen / 4; ++i) {
+      DebugPrint(TEXT("%08X"), clauses[i]);
+    }
+  }
+  DebugPrint(TEXT("CompReadStr: "));
+  if (dwCompReadStrLen) {
+    LPTSTR str = GetCompReadStr();
+    for (DWORD i = 0; i < dwCompReadStrLen; ++i) {
+      DebugPrint(TEXT("%*s"), dwCompReadStrLen, str);
+    }
+  }
+  DebugPrint(TEXT("CompAttr: "));
+  if (dwCompAttrLen) {
+    LPBYTE attrs = GetCompAttr();
+    for (DWORD i = 0; i < dwCompAttrLen; ++i) {
+      DebugPrint(TEXT("%02X"), attrs[i]);
+    }
+  }
+  DebugPrint(TEXT("CompClause: "));
+  if (dwCompClauseLen) {
+    LPDWORD clauses = GetCompClause();
+    for (DWORD i = 0; i < dwCompClauseLen / 4; ++i) {
+      DebugPrint(TEXT("%08X"), clauses[i]);
+    }
+  }
+  DebugPrint(TEXT("CompStr: "));
+  if (dwCompStrLen) {
+    LPTSTR str = GetCompStr();
+    for (DWORD i = 0; i < dwCompStrLen; ++i) {
+      DebugPrint(TEXT("%*s"), dwCompStrLen, str);
+    }
+  }
+  DebugPrint(TEXT("ResultReadClause: "));
+  if (dwResultReadClauseLen) {
+    LPDWORD clauses = GetResultReadClause();
+    for (DWORD i = 0; i < dwResultReadClauseLen / 4; ++i) {
+      DebugPrint(TEXT("%08X"), clauses[i]);
+    }
+  }
+  DebugPrint(TEXT("ResultReadStr: "));
+  if (dwResultReadStrLen) {
+    LPTSTR str = GetResultReadStr();
+    for (DWORD i = 0; i < dwResultReadStrLen; ++i) {
+      DebugPrint(TEXT("%*s"), dwResultReadStrLen, str);
+    }
+  }
+  DebugPrint(TEXT("ResultClause: "));
+  if (dwResultClauseLen) {
+    LPDWORD clauses = GetResultClause();
+    for (DWORD i = 0; i < dwResultClauseLen / 4; ++i) {
+      DebugPrint(TEXT("%08X"), clauses[i]);
+    }
+  }
+  DebugPrint(TEXT("ResultStr: "));
+  if (dwResultStrLen) {
+    LPTSTR str = GetResultStr();
+    for (DWORD i = 0; i < dwResultStrLen; ++i) {
+      DebugPrint(TEXT("%*s"), dwResultStrLen, str);
+    }
+  }
+#endif
+} // CompStr::Dump
 
 //////////////////////////////////////////////////////////////////////////////

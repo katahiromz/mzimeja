@@ -90,6 +90,8 @@ struct CompStr : public COMPOSITIONSTRING {
     return (LPTSTR)(GetBytes() + dwResultStrOffset);
   }
 
+  void Dump();
+
 private:
   CompStr();
   CompStr(const CompStr&);

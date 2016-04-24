@@ -315,33 +315,12 @@ HKL MZIMEJA::GetHKL(VOID) {
 }
 
 // Update the transrate key buffer
-BOOL MZIMEJA::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
-  LPTRANSMSG lpgmT0;
-
-  ++m_uNumTransKey;
-  if (m_uNumTransKey >= m_lpCurTransKey->uMsgCount) {
-    m_fOverTransKey = TRUE;
-    return FALSE;
-  }
-
-  lpgmT0 = m_lpCurTransKey->TransMsg + (m_uNumTransKey - 1);
-  *lpgmT0 = *lpGeneMsg;
-
-  return TRUE;
-}
-
-BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
-  TRANSMSG genmsg;
-  genmsg.message = message;
-  genmsg.wParam = wParam;
-  genmsg.lParam = lParam;
-  return GenerateMessage(genmsg);
-}
-
-// Update the transrate key buffer
 BOOL MZIMEJA::GenerateMessage(
   HIMC hIMC, InputContext *lpIMC, LPTRANSMSG lpGeneMsg)
 {
+  DebugPrint(TEXT("GenerateMessage(%u,%d,%d)"),
+    lpGeneMsg->message, lpGeneMsg->wParam, lpGeneMsg->lParam);
+
   if (m_lpCurTransKey)
     return GenerateMessageToTransKey(lpGeneMsg);
 
@@ -358,6 +337,37 @@ BOOL MZIMEJA::GenerateMessage(
 
     ImmGenerateMessage(hIMC);
   }
+  return TRUE;
+}
+
+BOOL MZIMEJA::GenerateMessage(TRANSMSG& msg) {
+  if (m_lpIMC) {
+    return GenerateMessage(m_hIMC, m_lpIMC, &msg);
+  }
+  return FALSE;
+}
+
+BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
+  TRANSMSG genmsg;
+  genmsg.message = message;
+  genmsg.wParam = wParam;
+  genmsg.lParam = lParam;
+  return GenerateMessage(genmsg);
+}
+
+// Update the transrate key buffer
+BOOL MZIMEJA::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
+  LPTRANSMSG lpgmT0;
+
+  ++m_uNumTransKey;
+  if (m_uNumTransKey >= m_lpCurTransKey->uMsgCount) {
+    m_fOverTransKey = TRUE;
+    return FALSE;
+  }
+
+  lpgmT0 = m_lpCurTransKey->TransMsg + (m_uNumTransKey - 1);
+  *lpgmT0 = *lpGeneMsg;
+
   return TRUE;
 }
 
@@ -468,13 +478,6 @@ VOID MZIMEJA::UnlockIMC() {
     m_hIMC = NULL;
     m_lpIMC = NULL;
   }
-}
-
-BOOL MZIMEJA::GenerateMessage(TRANSMSG& msg) {
-  if (m_lpIMC) {
-    return GenerateMessage(m_hIMC, m_lpIMC, &msg);
-  }
-  return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////////
