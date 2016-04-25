@@ -187,6 +187,23 @@ void RepositionWindow(HWND hWnd) {
 
 MZIMEJA TheIME;
 
+MZIMEJA::MZIMEJA() {
+  m_hInst = NULL;
+  m_hMutex = NULL;
+  m_hMyKL = 0;
+  m_bWinLogOn = FALSE;
+
+  m_lpCurTransKey = NULL;
+  m_uNumTransKey = 0;
+
+  m_fOverTransKey = FALSE;
+
+  m_hIMC = NULL;
+  m_lpIMC = NULL;
+
+  m_szDicFileName[0] = 0;
+}
+
 BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   FOOTMARK();
   m_hInst = hInstance;

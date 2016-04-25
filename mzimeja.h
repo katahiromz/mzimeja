@@ -298,23 +298,7 @@ struct MZIMEJA {
   // dictionary file name
   TCHAR           m_szDicFileName[256];
 
-  MZIMEJA() {
-    m_hInst = NULL;
-    m_hMutex = NULL;
-    m_hMyKL = 0;
-    m_bWinLogOn = FALSE;
-
-    m_lpCurTransKey = NULL;
-    m_uNumTransKey = 0;
-
-    m_fOverTransKey = FALSE;
-
-    m_hIMC = NULL;
-    m_lpIMC = NULL;
-
-    m_szDicFileName[0] = 0;
-  }
-
+  MZIMEJA();
   BOOL Init(HINSTANCE hInstance);
   VOID Destroy(VOID);
   HBITMAP LoadBMP(LPCTSTR pszName);
