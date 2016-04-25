@@ -130,7 +130,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
           //LPINPUTCONTEXT lpIMCT = NULL;
           //
           // input context was chenged.
-          // if there are the child windows, the diplay have to be
+          // if there are the child windows, the display have to be
           // updated.
           lpIMC = TheIME.LockIMC(hIMC);
           if (lpIMC) {
