@@ -152,16 +152,16 @@ typedef struct _tagUICHILD2 {
 } UICHILD2, NEAR *PUICHILD2, FAR *LPUICHILD2;
 
 typedef struct _tagUIEXTRA {
-  HIMC hIMC;
-  UICHILD uiStatus;
-  UICHILD uiCand;
-  DWORD dwCompStyle;
-  HFONT hFont;
-  BOOL bVertical;
-  UICHILD uiDefComp;
-  UICHILD2 uiComp[MAXCOMPWND];
-  UICHILD uiGuide;
-} UIEXTRA, NEAR *PUIEXTRA, FAR *LPUIEXTRA;
+  HIMC      hIMC;
+  UICHILD   uiStatus;
+  UICHILD   uiCand;
+  DWORD     dwCompStyle;
+  HFONT     hFont;
+  BOOL      bVertical;
+  UICHILD   uiDefComp;
+  UICHILD2  uiComp[MAXCOMPWND];
+  UICHILD   uiGuide;
+} UIEXTRA,  NEAR *PUIEXTRA, FAR *LPUIEXTRA;
 
 typedef struct _tagMZGUIDELINE {
   DWORD dwLevel;

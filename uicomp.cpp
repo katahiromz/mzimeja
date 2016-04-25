@@ -153,7 +153,8 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     int num;
 
     // Lock the COMPOSITIONSTRING structure.
-    if (!(lpCompStr = lpIMC->LockCompStr()))
+    lpCompStr = lpIMC->LockCompStr();
+    if (lpCompStr == NULL)
       return;
 
     // If there is no composition string, don't display anything.
