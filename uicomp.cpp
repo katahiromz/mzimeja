@@ -44,11 +44,10 @@ LRESULT CALLBACK CompStrWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
 void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
                              InputContext *lpIMC) {
-  int i;
   RECT rc;
 
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
-  for (i = 0; i < MAXCOMPWND; i++) {
+  for (int i = 0; i < MAXCOMPWND; i++) {
     if (!IsWindow(lpUIExtra->uiComp[i].hWnd)) {
       lpUIExtra->uiComp[i].hWnd =
           CreateWindowEx(0, szCompStrClassName, NULL, WS_COMPNODEFAULT,
@@ -140,7 +139,6 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   SIZE sz;
   int width = 0;
   int height = 0;
-  int i;
 
   // Save the composition form style into lpUIExtra.
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
@@ -196,7 +194,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       // Set the composition string to each composition window.
       // The composition windows that are given the compostion string
       // will be moved and shown.
-      for (i = 0; i < MAXCOMPWND; i++) {
+      for (int i = 0; i < MAXCOMPWND; i++) {
         if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
           hDC = GetDC(lpUIExtra->uiComp[i].hWnd);
 
@@ -251,7 +249,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       int dy = rcSrc.bottom - ptSrc.y;
       int curx = ptSrc.x, cury = ptSrc.y;
 
-      for (i = 0; i < MAXCOMPWND; i++) {
+      for (int i = 0; i < MAXCOMPWND; i++) {
         if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
           hDC = GetDC(lpUIExtra->uiComp[i].hWnd);
 
@@ -305,7 +303,7 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   } else {
     // When the style is DEFAULT, show the default composition window.
     if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
-      for (i = 0; i < MAXCOMPWND; i++) {
+      for (int i = 0; i < MAXCOMPWND; i++) {
         if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
           ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_HIDE);
           lpUIExtra->uiComp[i].bShow = FALSE;
@@ -474,9 +472,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
 }
 
 void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra) {
-  int i;
   RECT rc;
-
   if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
     if (!lpUIExtra->dwCompStyle)
       GetWindowRect(lpUIExtra->uiDefComp.hWnd, &rc);
@@ -485,7 +481,7 @@ void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra) {
     lpUIExtra->uiDefComp.bShow = FALSE;
   }
 
-  for (i = 0; i < MAXCOMPWND; i++) {
+  for (int i = 0; i < MAXCOMPWND; i++) {
     if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
       ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_HIDE);
       lpUIExtra->uiComp[i].bShow = FALSE;
@@ -494,9 +490,7 @@ void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra) {
 }
 
 void PASCAL SetFontCompWindow(LPUIEXTRA lpUIExtra) {
-  int i;
-
-  for (i = 0; i < MAXCOMPWND; i++)
+  for (int i = 0; i < MAXCOMPWND; i++)
     if (IsWindow(lpUIExtra->uiComp[i].hWnd))
       SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_FONT,
                        (LONG_PTR)lpUIExtra->hFont);
