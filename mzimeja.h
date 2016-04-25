@@ -33,53 +33,50 @@
 #define MAXCOMPWND 10
 #define MAXGLCHAR 32
 
-// for GlobalAlloc
-#define GHIME   (GHND | GMEM_SHARE)
-
 // special messages
-#define WM_UI_UPDATE (WM_USER + 500)
-#define WM_UI_HIDE (WM_USER + 501)
+#define WM_UI_UPDATE      (WM_USER + 500)
+#define WM_UI_HIDE        (WM_USER + 501)
 
-#define WM_UI_STATEMOVE (WM_USER + 601)
+#define WM_UI_STATEMOVE   (WM_USER + 601)
 #define WM_UI_DEFCOMPMOVE (WM_USER + 602)
-#define WM_UI_CANDMOVE (WM_USER + 603)
-#define WM_UI_GUIDEMOVE (WM_USER + 604)
+#define WM_UI_CANDMOVE    (WM_USER + 603)
+#define WM_UI_GUIDEMOVE   (WM_USER + 604)
 
 // Escape Functions
 #define IME_ESC_PRI_GETDWORDTEST (IME_ESC_PRIVATE_FIRST + 0)
 
 // special style
-#define WS_COMPDEFAULT (WS_DISABLED | WS_POPUP)
-#define WS_COMPNODEFAULT (WS_DISABLED | WS_POPUP)
+#define WS_COMPDEFAULT    (WS_DISABLED | WS_POPUP)
+#define WS_COMPNODEFAULT  (WS_DISABLED | WS_POPUP)
 
 // update context
-#define UPDATE_MODE 0x01
+#define UPDATE_MODE   0x01
 #define UPDATE_SYSTEM 0x02
-#define UPDATE_TEXT 0x04
-#define UPDATE_FORCE 0x08
-#define UPDATE_ALL (UPDATE_MODE | UPDATE_SYSTEM | UPDATE_TEXT)
+#define UPDATE_TEXT   0x04
+#define UPDATE_FORCE  0x08
+#define UPDATE_ALL    (UPDATE_MODE | UPDATE_SYSTEM | UPDATE_TEXT)
 
 // advise context
-#define ADVISE_MODE 0x0001   // advise about Mode requested  
-#define ADVISE_ISOPEN 0x0002 // advise about IsOpen requested
+#define ADVISE_MODE   0x0001  // advise about Mode requested  
+#define ADVISE_ISOPEN 0x0002  // advise about IsOpen requested
 
 // key state context
-#define KS_SHIFT 0x01
-#define KS_CONTROL 0x02
+#define KS_SHIFT    0x01
+#define KS_CONTROL  0x02
 
 // ID of guideline table
-#define MYGL_NODICTIONARY 0
-#define MYGL_TYPINGERROR 1
-#define MYGL_TESTGUIDELINE 2
+#define MYGL_NODICTIONARY   0
+#define MYGL_TYPINGERROR    1
+#define MYGL_TESTGUIDELINE  2
 
 // Change Mode index
-#define TO_CMODE_ALPHANUMERIC 0x0001
-#define TO_CMODE_KATAKANA 0x0002
-#define TO_CMODE_HIRAGANA 0x0003
-#define TO_CMODE_FULLSHAPE 0x0008
-#define TO_CMODE_ROMAN 0x0010
-#define TO_CMODE_CHARCODE 0x0020
-#define TO_CMODE_TOOLBAR 0x0100
+#define TO_CMODE_ALPHANUMERIC   0x0001
+#define TO_CMODE_KATAKANA       0x0002
+#define TO_CMODE_HIRAGANA       0x0003
+#define TO_CMODE_FULLSHAPE      0x0008
+#define TO_CMODE_ROMAN          0x0010
+#define TO_CMODE_CHARCODE       0x0020
+#define TO_CMODE_TOOLBAR        0x0100
 
 // WndExtra of child UI windows
 #define FIGWL_MOUSE 0
@@ -109,20 +106,18 @@
 #define STCLBT_DX 12
 #define STCLBT_DY 12
 
-// Clear Structure Flag
-#define CLR_RESULT 1
-#define CLR_UNDET 2
-#define CLR_RESULT_AND_UNDET 3
-
 //////////////////////////////////////////////////////////////////////////////
+// additional GCS bits
 
 #define GCS_COMPALL                                                  \
   (GCS_COMPSTR | GCS_COMPATTR | GCS_COMPREADSTR | GCS_COMPREADATTR | \
    GCS_COMPCLAUSE | GCS_COMPREADCLAUSE)
+
 #define GCS_RESULTALL \
   (GCS_RESULTSTR | GCS_RESULTREADSTR | GCS_RESULTCLAUSE | GCS_RESULTREADCLAUSE)
 
 //////////////////////////////////////////////////////////////////////////////
+// input modes
 
 enum InputMode {
   IMODE_ZEN_HIRAGANA,
@@ -344,7 +339,7 @@ struct MZIMEJA {
   BOOL GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg);
 
   BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
-};
+}; // struct MZIMEJA
 
 extern MZIMEJA TheIME;
 
