@@ -7,6 +7,50 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// Count how may the char can be arranged in DX
+static int NumCharInDX(HDC hDC, LPTSTR lp, int dx) {
+  SIZE sz;
+  int width = 0;
+  int num = 0;
+  int numT = 0;
+
+  if (!*lp) return 0;
+
+  while ((width < dx) && *(lp + numT)) {
+    num = numT;
+
+    numT++;
+    GetTextExtentPointW(hDC, lp, numT, &sz);
+    width = sz.cx;
+  }
+
+  if (width < dx) num = numT;
+
+  return num;
+}
+
+// Count how may the char can be arranged in DY
+static int NumCharInDY(HDC hDC, LPTSTR lp, int dy) {
+  SIZE sz;
+  int width = 0;
+  int num;
+  int numT = 0;
+
+  if (!*lp) return 0;
+
+  while ((width < dy) && *(lp + numT)) {
+    num = numT;
+    numT++;
+
+    GetTextExtentPointW(hDC, lp, numT, &sz);
+    width = sz.cy;
+  }
+
+  return num;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
   HWND hUIWnd;
@@ -83,48 +127,6 @@ void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra,
   lpUIExtra->uiDefComp.bShow = FALSE;
 
   return;
-}
-
-// Count how may the char can be arranged in DX
-int NumCharInDX(HDC hDC, LPTSTR lp, int dx) {
-  SIZE sz;
-  int width = 0;
-  int num = 0;
-  int numT = 0;
-
-  if (!*lp) return 0;
-
-  while ((width < dx) && *(lp + numT)) {
-    num = numT;
-
-    numT++;
-    GetTextExtentPointW(hDC, lp, numT, &sz);
-    width = sz.cx;
-  }
-
-  if (width < dx) num = numT;
-
-  return num;
-}
-
-// Count how may the char can be arranged in DY
-int NumCharInDY(HDC hDC, LPTSTR lp, int dy) {
-  SIZE sz;
-  int width = 0;
-  int num;
-  int numT = 0;
-
-  if (!*lp) return 0;
-
-  while ((width < dy) && *(lp + numT)) {
-    num = numT;
-    numT++;
-
-    GetTextExtentPointW(hDC, lp, numT, &sz);
-    width = sz.cy;
-  }
-
-  return num;
 }
 
 // Calc the position of composition windows and move them
