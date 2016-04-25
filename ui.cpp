@@ -354,15 +354,14 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
 
       // if current font can't display Japanese characters,
       // try to find Japanese font
-      if (lf.lfCharSet != NATIVE_CHARSET) {
-        lf.lfCharSet = NATIVE_CHARSET;
+      if (lf.lfCharSet != SHIFTJIS_CHARSET) {
+        lf.lfCharSet = SHIFTJIS_CHARSET;
         lf.lfFaceName[0] = 0;
       }
 
       lpUIExtra->hFont = CreateFontIndirect(&lf);
       CompWnd_SetFont(lpUIExtra);
       CompWnd_Move(lpUIExtra, lpIMC);
-
       break;
 
     case IMN_SETOPENSTATUS:

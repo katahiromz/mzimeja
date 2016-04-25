@@ -154,9 +154,9 @@ HFONT CheckNativeCharset(HDC hDC) {
   LOGFONT lfFont;
   GetObject(hOldFont, sizeof(LOGFONT), &lfFont);
 
-  if (lfFont.lfCharSet != NATIVE_CHARSET) {
+  if (lfFont.lfCharSet != SHIFTJIS_CHARSET) {
     lfFont.lfWeight = FW_NORMAL;
-    lfFont.lfCharSet = NATIVE_CHARSET;
+    lfFont.lfCharSet = SHIFTJIS_CHARSET;
     lfFont.lfFaceName[0] = 0;
     SelectObject(hDC, CreateFontIndirect(&lfFont));
   } else {
