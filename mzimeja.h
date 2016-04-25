@@ -7,27 +7,51 @@
 #ifndef _INC_WINDOWS
   #include <windows.h>
 #endif
-#ifndef _INC_TCHAR
-  #include <tchar.h>
-#endif
+#include <tchar.h>
 
 #include <cstdio>
 #include <cassert>
 #include <cstring>
 
-#include "indicml.h"
-#include "immdev.h"
-#include "input_context.h"
-#include "comp_str.h"
-#include "cand_info.h"
+#include "indicml.h"        // for system indicator
+#include "immdev.h"         // for IME/IMM development
+#include "input_context.h"  // for InputContext
+#include "comp_str.h"       // for LogCompStr and CompStr
+#include "cand_info.h"      // for MZCAND, CandList, CandInfo
+
+//////////////////////////////////////////////////////////////////////////////
+// _countof macro --- get the number of elements in an array
 
 #ifndef _countof
-  #define _countof(array) (sizeof(array) / sizeof(array[0]))
+  #define _countof(array)   (sizeof(array) / sizeof(array[0]))
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
+// for debugging
 
-#define MZIME_FILENAME  TEXT("mzimeja.ime")
+#ifdef NDEBUG
+  #define DebugPrintA (void)
+  #define DebugPrintW (void)
+  #define DebugPrint  (void)
+#else
+  extern "C" {
+    int DebugPrintA(LPCSTR lpszFormat, ...);
+    int DebugPrintW(LPCWSTR lpszFormat, ...);
+  } // extern "C"
+  #define DebugPrintA DebugPrintA
+  #define DebugPrintW DebugPrintW
+  #ifdef UNICODE
+    #define DebugPrint DebugPrintW
+  #else
+    #define DebugPrint DebugPrintA
+  #endif
+#endif
+
+#include "footmark.hpp"
+
+//////////////////////////////////////////////////////////////////////////////
+
+#define MZIME_FILENAME    TEXT("mzimeja.ime")
 
 // for limit of MZ-IME
 #define MAXCOMPWND  10  // maximum number of composition windows
@@ -238,22 +262,6 @@ WORD PASCAL HiraToKata(WORD);
 WORD PASCAL KataToHira(WORD);
 void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
 
-#ifdef NDEBUG
-  #define DebugPrintA (void)
-  #define DebugPrintW (void)
-  #define DebugPrint (void)
-#else
-  int DebugPrintA(LPCSTR lpszFormat, ...);
-  int DebugPrintW(LPCWSTR lpszFormat, ...);
-  #define DebugPrintA DebugPrintA
-  #define DebugPrintW DebugPrintW
-  #ifdef UNICODE
-    #define DebugPrint DebugPrintW
-  #else
-    #define DebugPrint DebugPrintA
-  #endif
-#endif
-
 // mzimeja.cpp
 BOOL IsInputModeOpen(InputMode imode);
 InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
@@ -324,10 +332,6 @@ struct MZIMEJA {
 }; // struct MZIMEJA
 
 extern MZIMEJA TheIME;
-
-//////////////////////////////////////////////////////////////////////////////
-
-#include "footmark.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 
