@@ -8,45 +8,41 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // Count how may the char can be arranged in DX
-static int NumCharInDX(HDC hDC, LPTSTR lp, int dx) {
-  SIZE sz;
-  int width = 0;
-  int num = 0;
-  int numT = 0;
-
-  if (!*lp) return 0;
-
-  while ((width < dx) && *(lp + numT)) {
-    num = numT;
-
-    numT++;
-    GetTextExtentPointW(hDC, lp, numT, &sz);
-    width = sz.cx;
+static int NumCharInDX(HDC hDC, LPWSTR psz, int dx) {
+  int ret = 0;
+  if (*psz) {
+    SIZE siz;
+    int width = 0, ich = 0;
+    while (width < dx) {
+      ret = ich;
+      if (psz[ich] == L'\0') {
+        break;
+      }
+      ich++;
+      ::GetTextExtentPointW(hDC, psz, ich, &siz);
+      width = siz.cx;
+    }
   }
-
-  if (width < dx) num = numT;
-
-  return num;
+  return ret;
 }
 
 // Count how may the char can be arranged in DY
-static int NumCharInDY(HDC hDC, LPTSTR lp, int dy) {
-  SIZE sz;
-  int width = 0;
-  int num;
-  int numT = 0;
-
-  if (!*lp) return 0;
-
-  while ((width < dy) && *(lp + numT)) {
-    num = numT;
-    numT++;
-
-    GetTextExtentPointW(hDC, lp, numT, &sz);
-    width = sz.cy;
+static int NumCharInDY(HDC hDC, LPWSTR psz, int dy) {
+  int ret = 0;
+  if (*psz) {
+    SIZE siz;
+    int height = 0, ich = 0;
+    while (height < dy) {
+      ret = ich;
+      if (psz[ich] == L'\0') {
+        break;
+      }
+      ich++;
+      ::GetTextExtentPointW(hDC, psz, ich, &siz);
+      height = siz.cy;
+    }
   }
-
-  return num;
+  return ret;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -103,27 +99,24 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   LPTSTR lpstr;
   RECT rc;
   RECT oldrc;
-  SIZE sz;
+  SIZE siz;
   int width = 0;
   int height = 0;
 
   // Save the composition form style into lpUIExtra.
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
 
-  if (lpIMC->cfCompForm.dwStyle)  // Style is not CFS_DEFAULT.
-  {
-    LPTSTR lpt;
+  if (lpIMC->cfCompForm.dwStyle) {  // Style is not CFS_DEFAULT.
+    LPTSTR pch;
     int num;
+
+    if (!lpIMC->HasCompStr()) {
+      return;
+    }
 
     // Lock the COMPOSITIONSTRING structure.
     lpCompStr = lpIMC->LockCompStr();
-    if (lpCompStr == NULL)
-      return;
-
-    // If there is no composition string, don't display anything.
-    if ((lpCompStr->dwSize <= sizeof(COMPOSITIONSTRING)) ||
-        (lpCompStr->dwCompStrLen == 0)) {
-      lpIMC->UnlockCompStr();
+    if (lpCompStr == NULL) {
       return;
     }
 
@@ -151,7 +144,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       lpUIExtra->uiDefComp.bShow = FALSE;
     }
 
-    lpt = lpstr = lpCompStr->GetCompStr();
+    pch = lpstr = lpCompStr->GetCompStr();
     num = 1;
 
     if (!lpUIExtra->bVertical) {
@@ -170,26 +163,26 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
           if (hFont)
             hOldFont = (HFONT)SelectObject(hDC, hFont);
 
-          sz.cy = 0;
+          siz.cy = 0;
           oldrc = lpUIExtra->uiComp[i].rc;
 
-          num = NumCharInDX(hDC, lpt, dx);
+          num = NumCharInDX(hDC, pch, dx);
           if (num) {
-            GetTextExtentPoint(hDC, lpt, num, &sz);
+            GetTextExtentPoint(hDC, pch, num, &siz);
 
             lpUIExtra->uiComp[i].rc.left = curx;
             lpUIExtra->uiComp[i].rc.top = cury;
-            lpUIExtra->uiComp[i].rc.right = sz.cx;
-            lpUIExtra->uiComp[i].rc.bottom = sz.cy;
+            lpUIExtra->uiComp[i].rc.right = siz.cx;
+            lpUIExtra->uiComp[i].rc.bottom = siz.cy;
             SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR,
-                          (DWORD)(lpt - lpstr));
+                          (DWORD)(pch - lpstr));
             SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTNUM, num);
-            MoveWindow(lpUIExtra->uiComp[i].hWnd, curx, cury, sz.cx, sz.cy,
+            MoveWindow(lpUIExtra->uiComp[i].hWnd, curx, cury, siz.cx, siz.cy,
                        TRUE);
             ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_SHOWNOACTIVATE);
             lpUIExtra->uiComp[i].bShow = TRUE;
 
-            lpt += num;
+            pch += num;
           } else {
             lpUIExtra->uiComp[i].rc.left = 0;
             lpUIExtra->uiComp[i].rc.top = 0;
@@ -205,7 +198,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
           dx = rcSrc.right - rcSrc.left;
           curx = rcSrc.left;
-          cury += sz.cy;
+          cury += siz.cy;
 
           if (hOldFont) SelectObject(hDC, hOldFont);
           ReleaseDC(lpUIExtra->uiComp[i].hWnd, hDC);
@@ -225,24 +218,24 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
           if (hFont)
             hOldFont = (HFONT)SelectObject(hDC, hFont);
 
-          sz.cy = 0;
-          num = NumCharInDY(hDC, lpt, dy);
+          siz.cy = 0;
+          num = NumCharInDY(hDC, pch, dy);
           if (num) {
-            GetTextExtentPoint(hDC, lpt, num, &sz);
+            GetTextExtentPoint(hDC, pch, num, &siz);
 
-            lpUIExtra->uiComp[i].rc.left = curx - sz.cy;
+            lpUIExtra->uiComp[i].rc.left = curx - siz.cy;
             lpUIExtra->uiComp[i].rc.top = cury;
-            lpUIExtra->uiComp[i].rc.right = sz.cy;
-            lpUIExtra->uiComp[i].rc.bottom = sz.cx;
+            lpUIExtra->uiComp[i].rc.right = siz.cy;
+            lpUIExtra->uiComp[i].rc.bottom = siz.cx;
             SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR,
-                          (DWORD)(lpt - lpstr));
+                          (DWORD)(pch - lpstr));
             SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTNUM, num);
-            MoveWindow(lpUIExtra->uiComp[i].hWnd, curx, cury, sz.cy, sz.cx,
+            MoveWindow(lpUIExtra->uiComp[i].hWnd, curx, cury, siz.cy, siz.cx,
                        TRUE);
             ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_SHOWNOACTIVATE);
             lpUIExtra->uiComp[i].bShow = TRUE;
 
-            lpt += num;
+            pch += num;
           } else {
             lpUIExtra->uiComp[i].rc.left = 0;
             lpUIExtra->uiComp[i].rc.top = 0;
@@ -258,7 +251,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
           dy = rcSrc.bottom - rcSrc.top;
           cury = rcSrc.top;
-          curx -= sz.cy;
+          curx -= siz.cy;
 
           if (hOldFont) SelectObject(hDC, hOldFont);
           ReleaseDC(lpUIExtra->uiComp[i].hWnd, hDC);
@@ -284,9 +277,9 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
         if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
             (lpCompStr->dwCompStrLen > 0)) {
           lpstr = lpCompStr->GetCompStr();
-          GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
-          width = sz.cx;
-          height = sz.cy;
+          GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &siz);
+          width = siz.cx;
+          height = siz.cy;
         }
         lpIMC->UnlockCompStr();
       }
@@ -329,7 +322,7 @@ void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
   while (lpstr <= lpEnd) {
     int cnt = 0;
     BYTE bAttr = *lpattr;
-    SIZE sz;
+    SIZE siz;
 
     while ((bAttr == *lpattr) || (cnt <= num)) {
       lpattr++;
@@ -364,13 +357,13 @@ void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
     }
 
     TextOut(hDC, x, y, lpstr, cnt);
-    GetTextExtentPoint(hDC, lpstr, cnt, &sz);
+    GetTextExtentPoint(hDC, lpstr, cnt, &siz);
     lpstr += cnt;
 
     if (!fVert)
-      x += sz.cx;
+      x += siz.cx;
     else
-      y += sz.cx;
+      y += siz.cx;
   }
 }
 
