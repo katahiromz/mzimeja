@@ -30,8 +30,8 @@
 #define MZIME_FILENAME  TEXT("mzimeja.ime")
 
 // for limit of MZ-IME
-#define MAXCOMPWND 10
-#define MAXGLCHAR 32
+#define MAXCOMPWND  10  // maximum number of composition windows
+#define MAXGLCHAR   32  // maximum number of guideline characters
 
 // special messages
 #define WM_UI_UPDATE      (WM_USER + 500)
