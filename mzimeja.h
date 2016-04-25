@@ -49,21 +49,6 @@
 #define WS_COMPDEFAULT    (WS_DISABLED | WS_POPUP)
 #define WS_COMPNODEFAULT  (WS_DISABLED | WS_POPUP)
 
-// update context
-#define UPDATE_MODE   0x01
-#define UPDATE_SYSTEM 0x02
-#define UPDATE_TEXT   0x04
-#define UPDATE_FORCE  0x08
-#define UPDATE_ALL    (UPDATE_MODE | UPDATE_SYSTEM | UPDATE_TEXT)
-
-// advise context
-#define ADVISE_MODE   0x0001  // advise about Mode requested  
-#define ADVISE_ISOPEN 0x0002  // advise about IsOpen requested
-
-// key state context
-#define KS_SHIFT    0x01
-#define KS_CONTROL  0x02
-
 // ID of guideline table
 #define MYGL_NODICTIONARY   0
 #define MYGL_TYPINGERROR    1
@@ -94,15 +79,12 @@
 #define FIM_CAPUTURED 0x01
 #define FIM_MOVED 0x02
 
-// The flags of the button of Status Window
-#define PUSHED_STATUS_HDR 0x01
-#define PUSHED_STATUS_MODE 0x02
-#define PUSHED_STATUS_ROMAN 0x04
+// The flags of the close button
 #define PUSHED_STATUS_CLOSE 0x08
 
 // Statue Close Button
-#define STCLBT_X (BTX * 2 + 3)
-#define STCLBT_Y 1
+#define STCLBT_X  (BTX * 2 + 3)
+#define STCLBT_Y  1
 #define STCLBT_DX 12
 #define STCLBT_DY 12
 
