@@ -34,7 +34,7 @@
 #define MAXGLCHAR 32
 
 // for GlobalAlloc
-#define GHIME (GHND | GMEM_SHARE)
+#define GHIME   (GHND | GMEM_SHARE)
 
 // special messages
 #define WM_UI_UPDATE (WM_USER + 500)
