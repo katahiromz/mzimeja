@@ -221,10 +221,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\subs.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ui.cpp"
 				>
 			</File>

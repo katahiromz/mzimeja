@@ -32,7 +32,6 @@ OBJS = \
 	immsec$(DOTOBJ) \
 	process$(DOTOBJ) \
 	regword$(DOTOBJ) \
-	subs$(DOTOBJ) \
 	ui$(DOTOBJ) \
 	uicand$(DOTOBJ) \
 	uicomp$(DOTOBJ) \
@@ -86,8 +85,6 @@ process$(DOTOBJ): process.cpp
 	$(CXX) -c $(CXXFLAGS) -o process$(DOTOBJ) process.cpp
 regword$(DOTOBJ): regword.cpp
 	$(CXX) -c $(CXXFLAGS) -o regword$(DOTOBJ) regword.cpp
-subs$(DOTOBJ): subs.cpp
-	$(CXX) -c $(CXXFLAGS) -o subs$(DOTOBJ) subs.cpp
 ui$(DOTOBJ): ui.cpp
 	$(CXX) -c $(CXXFLAGS) -o ui$(DOTOBJ) ui.cpp
 uicand$(DOTOBJ): uicand.cpp

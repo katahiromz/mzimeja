@@ -40,39 +40,20 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     break;
 
   case VK_SPACE:
+  case VK_CONVERT:
     ConvKanji(hIMC);
     break;
 
-  case VK_F3:
-    if (IsCtrlPressed(lpbKeyState)) ChangeMode(hIMC, TO_CMODE_ROMAN);
-    break;
-
   case VK_F6:
-    if (IsCtrlPressed(lpbKeyState))
-      ChangeMode(hIMC, TO_CMODE_HIRAGANA);
-    else
-      ChangeCompStr(hIMC, TO_CMODE_HIRAGANA);
     break;
 
   case VK_F7:
-    if (IsCtrlPressed(lpbKeyState))
-      ChangeMode(hIMC, TO_CMODE_KATAKANA);
-    else
-      ChangeCompStr(hIMC, TO_CMODE_KATAKANA);
     break;
 
   case VK_F8:
-    if (IsCtrlPressed(lpbKeyState))
-      ChangeMode(hIMC, TO_CMODE_FULLSHAPE);
-    else
-      ChangeCompStr(hIMC, TO_CMODE_FULLSHAPE);
     break;
 
   case VK_F9:
-    if (IsCtrlPressed(lpbKeyState))
-      ChangeMode(hIMC, TO_CMODE_ALPHANUMERIC);
-    else
-      ChangeCompStr(hIMC, TO_CMODE_ALPHANUMERIC);
     break;
 
   case VK_RETURN:

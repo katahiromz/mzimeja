@@ -78,15 +78,6 @@
 #define MYGL_TYPINGERROR    1
 #define MYGL_TESTGUIDELINE  2
 
-// Change Mode index
-#define TO_CMODE_ALPHANUMERIC   0x0001
-#define TO_CMODE_KATAKANA       0x0002
-#define TO_CMODE_HIRAGANA       0x0003
-#define TO_CMODE_FULLSHAPE      0x0008
-#define TO_CMODE_ROMAN          0x0010
-#define TO_CMODE_CHARCODE       0x0020
-#define TO_CMODE_TOOLBAR        0x0100
-
 // WndExtra of child UI windows
 #define FIGWL_MOUSE 0
 #define FIGWLP_SERVERWND    (FIGWL_MOUSE + sizeof(LONG))
@@ -185,11 +176,6 @@ extern const MZGUIDELINE glTable[];
 
 extern "C" {
 
-// subs.c
-void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode);
-void PASCAL ChangeCompStr(HIMC hIMC, DWORD dwToMode);
-HFONT CheckNativeCharset(HDC hDC);
-
 // notify.c
 BOOL PASCAL NotifyUCSetOpen(HIMC hIMC);
 BOOL PASCAL NotifyUCConversionMode(HIMC hIMC);
@@ -276,6 +262,7 @@ void RepositionWindow(HWND hWnd);
 BOOL IsRomajiMode(HIMC hIMC);
 void SetRomajiMode(HIMC hIMC, BOOL bRomaji);
 UINT CommandFromInputMode(InputMode imode);
+HFONT CheckNativeCharset(HDC hDC);
 
 //////////////////////////////////////////////////////////////////////////////
 

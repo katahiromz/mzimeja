@@ -25,7 +25,6 @@ SOURCES= \
         immsec.cpp \
         process.cpp \
         regword.cpp \
-        subs.cpp \
         ui.cpp \
         uicand.cpp \
         uicomp.cpp \

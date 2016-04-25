@@ -23,6 +23,23 @@ const MZGUIDELINE glTable[] = {
 
 //////////////////////////////////////////////////////////////////////////////
 
+HFONT CheckNativeCharset(HDC hDC) {
+  HFONT hOldFont = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
+
+  LOGFONT lfFont;
+  GetObject(hOldFont, sizeof(LOGFONT), &lfFont);
+
+  if (lfFont.lfCharSet != SHIFTJIS_CHARSET) {
+    lfFont.lfWeight = FW_NORMAL;
+    lfFont.lfCharSet = SHIFTJIS_CHARSET;
+    lfFont.lfFaceName[0] = 0;
+    SelectObject(hDC, CreateFontIndirect(&lfFont));
+  } else {
+    hOldFont = NULL;
+  }
+  return hOldFont;
+} // CheckNativeCharset
+
 BOOL IsInputModeOpen(InputMode imode) {
   FOOTMARK();
   switch (imode) {
