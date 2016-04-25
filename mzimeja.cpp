@@ -319,7 +319,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   // register class of guideline window.
   wcx.cbSize = sizeof(WNDCLASSEX);
   wcx.style = CS_MZIME;
-  wcx.lpfnWndProc = GuideWndProc;
+  wcx.lpfnWndProc = GuideWnd_WindowProc;
   wcx.cbClsExtra = 0;
   wcx.cbWndExtra = UIEXTRASIZE;
   wcx.hInstance = hInstance;

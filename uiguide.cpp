@@ -7,8 +7,8 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-LRESULT CALLBACK GuideWndProc(HWND hWnd, UINT message, WPARAM wParam,
-                              LPARAM lParam) {
+LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
+                                     LPARAM lParam) {
   PAINTSTRUCT ps;
   HWND hUIWnd;
   HDC hDC;
@@ -26,7 +26,7 @@ LRESULT CALLBACK GuideWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
     case WM_PAINT:
       hDC = BeginPaint(hWnd, &ps);
-      PaintGuide(hWnd, hDC, NULL, 0);
+      GuideWnd_Paint(hWnd, hDC, NULL, 0);
       EndPaint(hWnd, &ps);
       break;
 
@@ -34,7 +34,7 @@ LRESULT CALLBACK GuideWndProc(HWND hWnd, UINT message, WPARAM wParam,
     case WM_SETCURSOR:
     case WM_LBUTTONUP:
     case WM_RBUTTONUP:
-      ButtonGuide(hWnd, message, wParam, lParam);
+      GuideWnd_Button(hWnd, message, wParam, lParam);
       if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
           (HIWORD(lParam) != WM_RBUTTONDOWN))
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -88,8 +88,8 @@ DWORD PASCAL CheckPushedGuide(HWND hGuideWnd, LPPOINT lppt) {
   return 0;
 }
 
-void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
-                       DWORD dwPushedGuide) {
+void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
+                    DWORD dwPushedGuide) {
   HIMC hIMC;
   HDC hMemDC;
   HBITMAP hbmpOld;
@@ -178,8 +178,8 @@ void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
   }
 }
 
-void PASCAL ButtonGuide(HWND hGuideWnd, UINT message, WPARAM wParam,
-                        LPARAM lParam) {
+void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
+                     LPARAM lParam) {
   POINT pt;
   HDC hDC;
   DWORD dwMouse;
@@ -208,7 +208,7 @@ void PASCAL ButtonGuide(HWND hGuideWnd, UINT message, WPARAM wParam,
         SetWindowLong(hGuideWnd, FIGWL_MOUSE, FIM_CAPUTURED);
         SetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS,
                       dwPushedGuide = CheckPushedGuide(hGuideWnd, &pt));
-        PaintGuide(hGuideWnd, hDC, &pt, dwPushedGuide);
+        GuideWnd_Paint(hGuideWnd, hDC, &pt, dwPushedGuide);
         dwCurrentPushedGuide = dwPushedGuide;
       }
       break;
@@ -232,7 +232,7 @@ void PASCAL ButtonGuide(HWND hGuideWnd, UINT message, WPARAM wParam,
         GetCursorPos(&pt);
         dwTemp = CheckPushedGuide(hGuideWnd, &pt);
         if ((dwTemp ^ dwCurrentPushedGuide) & dwPushedGuide)
-          PaintGuide(hGuideWnd, hDC, &pt, dwPushedGuide & dwTemp);
+          GuideWnd_Paint(hGuideWnd, hDC, &pt, dwPushedGuide & dwTemp);
         dwCurrentPushedGuide = dwTemp;
       }
       break;
@@ -261,13 +261,13 @@ void PASCAL ButtonGuide(HWND hGuideWnd, UINT message, WPARAM wParam,
           PostMessage(hGuideWnd, WM_UI_HIDE, 0, 0);
         }
       }
-      PaintGuide(hGuideWnd, hDC, NULL, 0);
+      GuideWnd_Paint(hGuideWnd, hDC, NULL, 0);
       break;
   }
   ReleaseDC(hGuideWnd, hDC);
 }
 
-void PASCAL UpdateGuideWindow(LPUIEXTRA lpUIExtra) {
+void GuideWnd_Update(LPUIEXTRA lpUIExtra) {
   if (IsWindow(lpUIExtra->uiGuide.hWnd))
     SendMessage(lpUIExtra->uiGuide.hWnd, WM_UI_UPDATE, 0, 0L);
 }

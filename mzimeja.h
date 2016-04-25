@@ -215,11 +215,10 @@ void CompWnd_Hide(LPUIEXTRA lpUIExtra);
 void CompWnd_SetFont(LPUIEXTRA lpUIExtra);
 
 // uiguide.c
-LRESULT CALLBACK GuideWndProc(HWND, UINT, WPARAM, LPARAM);
-void PASCAL PaintGuide(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
-                       DWORD dwPushedGuide);
-void PASCAL ButtonGuide(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-void PASCAL UpdateGuideWindow(LPUIEXTRA lpUIExtra);
+LRESULT CALLBACK GuideWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
+void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt, DWORD dwPushedGuide);
+void GuideWnd_Button(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+void GuideWnd_Update(LPUIEXTRA lpUIExtra);
 LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
 
 // config.c

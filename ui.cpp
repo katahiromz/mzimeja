@@ -407,7 +407,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
         ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
         lpUIExtra->uiGuide.bShow = TRUE;
         SetWindowLongPtr(lpUIExtra->uiGuide.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
-        UpdateGuideWindow(lpUIExtra);
+        GuideWnd_Update(lpUIExtra);
       }
       break;
 

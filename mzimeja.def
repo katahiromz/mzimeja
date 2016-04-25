@@ -23,7 +23,7 @@ EXPORTS
                 CompWnd_WindowProc
                 StatusWnd_WindowProc
                 CompWnd_WindowProc
-                GuideWndProc
+                GuideWnd_WindowProc
 
                 GeneralDlgProc
                 AboutDlgProc
