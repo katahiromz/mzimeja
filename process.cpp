@@ -13,8 +13,8 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // A function which handles WM_IME_KEYDOWN
-BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
-                              LPBYTE lpbKeyState) {
+BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
+                       LPBYTE lpbKeyState) {
   InputContext *lpIMC;
   WORD wVKey = (wParam & 0x00FF);
   switch (wVKey) {
@@ -103,7 +103,7 @@ BOOL PASCAL IMEKeydownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     break;
   }
   return TRUE;
-}
+} // IMEKeyDownHandler
 
 //  ImeProcessKey ()
 //  ImeProcessKey 関数は IMM を通して与えられた全てのキーストロークを前処
@@ -313,7 +313,7 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
       if (fOpen) {
         if ((uScanCode & 0x8000) == 0) {
           LPARAM lParam = ((DWORD)uScanCode << 16) + 1L;
-          IMEKeydownHandler(hIMC, uVKey, lParam, lpbKeyState);
+          IMEKeyDownHandler(hIMC, uVKey, lParam, lpbKeyState);
         }
 
         // Clear static value, no more generated message!
