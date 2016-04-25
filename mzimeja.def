@@ -20,7 +20,7 @@ EXPORTS
                 ImeGetImeMenuItems
 
                 MZIMEWndProc
-                CompStrWndProc
+                CompWnd_WindowProc
                 StatusWnd_WindowProc
                 CandWndProc
                 GuideWndProc

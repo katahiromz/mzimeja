@@ -7,13 +7,13 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-LRESULT CALLBACK CompStrWndProc(HWND hWnd, UINT message, WPARAM wParam,
-                                LPARAM lParam) {
+LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
+                                    LPARAM lParam) {
   HWND hUIWnd;
 
   switch (message) {
     case WM_PAINT:
-      PaintCompWindow(hWnd);
+      CompWnd_Paint(hWnd);
       break;
 
     case WM_SETCURSOR:
@@ -42,8 +42,8 @@ LRESULT CALLBACK CompStrWndProc(HWND hWnd, UINT message, WPARAM wParam,
   return 0;
 }
 
-void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
-                             InputContext *lpIMC) {
+void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra,
+                    InputContext *lpIMC) {
   RECT rc;
 
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
@@ -86,7 +86,7 @@ void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
 }
 
 // Count how may the char can be arranged in DX
-int PASCAL NumCharInDX(HDC hDC, LPTSTR lp, int dx) {
+int NumCharInDX(HDC hDC, LPTSTR lp, int dx) {
   SIZE sz;
   int width = 0;
   int num = 0;
@@ -108,7 +108,7 @@ int PASCAL NumCharInDX(HDC hDC, LPTSTR lp, int dx) {
 }
 
 // Count how may the char can be arranged in DY
-int PASCAL NumCharInDY(HDC hDC, LPTSTR lp, int dy) {
+int NumCharInDY(HDC hDC, LPTSTR lp, int dy) {
   SIZE sz;
   int width = 0;
   int num;
@@ -128,7 +128,7 @@ int PASCAL NumCharInDY(HDC hDC, LPTSTR lp, int dy) {
 }
 
 // Calc the position of composition windows and move them
-void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   HDC hDC;
   HFONT hFont = NULL;
   HFONT hOldFont = NULL;
@@ -407,7 +407,7 @@ void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
   }
 }
 
-void PASCAL PaintCompWindow(HWND hCompWnd) {
+void CompWnd_Paint(HWND hCompWnd) {
   HIMC hIMC;
   HDC hDC;
   RECT rc;
@@ -471,7 +471,7 @@ void PASCAL PaintCompWindow(HWND hCompWnd) {
   EndPaint(hCompWnd, &ps);
 }
 
-void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra) {
+void CompWnd_Hide(LPUIEXTRA lpUIExtra) {
   RECT rc;
   if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
     if (!lpUIExtra->dwCompStyle)
@@ -489,7 +489,7 @@ void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra) {
   }
 }
 
-void PASCAL SetFontCompWindow(LPUIEXTRA lpUIExtra) {
+void CompWnd_SetFont(LPUIEXTRA lpUIExtra) {
   for (int i = 0; i < MAXCOMPWND; i++)
     if (IsWindow(lpUIExtra->uiComp[i].hWnd))
       SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_FONT,

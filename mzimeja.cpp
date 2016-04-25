@@ -239,7 +239,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   // register class of composition window.
   wcx.cbSize = sizeof(WNDCLASSEX);
   wcx.style = CS_MZIME;
-  wcx.lpfnWndProc = CompStrWndProc;
+  wcx.lpfnWndProc = CompWnd_WindowProc;
   wcx.cbClsExtra = 0;
   wcx.cbWndExtra = UIEXTRASIZE;
   wcx.hInstance = hInstance;

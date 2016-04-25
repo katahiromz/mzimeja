@@ -223,13 +223,13 @@ void PASCAL MoveCandWindow(HWND hUIWnd, InputContext *lpIMC,
                            LPUIEXTRA lpUIExtra, BOOL fForceComp);
 
 // uicomp.c
-LRESULT CALLBACK CompStrWndProc(HWND, UINT, WPARAM, LPARAM);
-void PASCAL PaintCompWindow(HWND hCompWnd);
-void PASCAL CreateCompWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
-                             InputContext *lpIMC);
-void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
-void PASCAL HideCompWindow(LPUIEXTRA lpUIExtra);
-void PASCAL SetFontCompWindow(LPUIEXTRA lpUIExtra);
+LRESULT CALLBACK CompWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
+void CompWnd_Paint(HWND hCompWnd);
+void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra,
+                    InputContext *lpIMC);
+void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
+void CompWnd_Hide(LPUIEXTRA lpUIExtra);
+void CompWnd_SetFont(LPUIEXTRA lpUIExtra);
 
 // uiguide.c
 LRESULT CALLBACK GuideWndProc(HWND, UINT, WPARAM, LPARAM);
