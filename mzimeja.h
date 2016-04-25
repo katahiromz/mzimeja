@@ -47,7 +47,7 @@
   #endif
 #endif
 
-#include "footmark.hpp"
+#include "footmark.hpp"   // for FOOTMARK and FOOTMARK_PRINT_CALL_STACK
 
 //////////////////////////////////////////////////////////////////////////////
 
