@@ -22,7 +22,7 @@ EXPORTS
                 MZIMEWndProc
                 CompWnd_WindowProc
                 StatusWnd_WindowProc
-                CandWndProc
+                CompWnd_WindowProc
                 GuideWndProc
 
                 GeneralDlgProc

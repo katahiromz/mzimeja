@@ -7,13 +7,13 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-LRESULT CALLBACK CandWndProc(HWND hWnd, UINT message, WPARAM wParam,
-                             LPARAM lParam) {
+LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
+                                    LPARAM lParam) {
   HWND hUIWnd;
 
   switch (message) {
     case WM_PAINT:
-      PaintCandWindow(hWnd);
+      CandWnd_Paint(hWnd);
       break;
 
     case WM_SETCURSOR:
@@ -85,8 +85,7 @@ BOOL PASCAL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
   return FALSE;
 }
 
-void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
-                             InputContext *lpIMC) {
+void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   POINT pt;
 
   if (GetCandPosFromCompWnd(lpUIExtra, &pt)) {
@@ -108,7 +107,7 @@ void PASCAL CreateCandWindow(HWND hUIWnd, LPUIEXTRA lpUIExtra,
   return;
 }
 
-void PASCAL PaintCandWindow(HWND hCandWnd) {
+void CandWnd_Paint(HWND hCandWnd) {
   RECT rc;
   GetClientRect(hCandWnd, &rc);
 
@@ -160,7 +159,7 @@ void PASCAL PaintCandWindow(HWND hCandWnd) {
   DeleteObject(hbrHightLight);
 }
 
-void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   if (IsWindow(lpUIExtra->uiCand.hWnd)) {
     int width = 0, height = 0;
     HDC hDC = GetDC(lpUIExtra->uiCand.hWnd);
@@ -191,7 +190,7 @@ void PASCAL ResizeCandWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   }
 }
 
-void PASCAL HideCandWindow(LPUIEXTRA lpUIExtra) {
+void CandWnd_Hide(LPUIEXTRA lpUIExtra) {
   RECT rc;
 
   if (IsWindow(lpUIExtra->uiCand.hWnd)) {
@@ -204,8 +203,8 @@ void PASCAL HideCandWindow(LPUIEXTRA lpUIExtra) {
   }
 }
 
-void PASCAL MoveCandWindow(HWND hUIWnd, InputContext *lpIMC,
-                           LPUIEXTRA lpUIExtra, BOOL fForceComp) {
+void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
+                  BOOL fForceComp) {
   RECT rc;
   POINT pt;
   CANDIDATEFORM caf;

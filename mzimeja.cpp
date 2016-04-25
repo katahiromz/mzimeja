@@ -254,7 +254,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   // register class of candidate window.
   wcx.cbSize = sizeof(WNDCLASSEX);
   wcx.style = CS_MZIME;
-  wcx.lpfnWndProc = CandWndProc;
+  wcx.lpfnWndProc = CandWnd_WindowProc;
   wcx.cbClsExtra = 0;
   wcx.cbWndExtra = UIEXTRASIZE;
   wcx.hInstance = hInstance;

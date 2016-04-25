@@ -126,12 +126,12 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
           if (lpIMC) {
             CompStr *lpCompStr = lpIMC->LockCompStr();
             CandInfo *lpCandInfo = lpIMC->LockCandInfo();
-            if (IsWindow(lpUIExtra->uiCand.hWnd)) HideCandWindow(lpUIExtra);
+            if (IsWindow(lpUIExtra->uiCand.hWnd)) CandWnd_Hide(lpUIExtra);
             if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
               if (lpCandInfo->dwCount) {
-                CreateCandWindow(hWnd, lpUIExtra, lpIMC);
-                ResizeCandWindow(lpUIExtra, lpIMC);
-                MoveCandWindow(hWnd, lpIMC, lpUIExtra, FALSE);
+                CandWnd_Create(hWnd, lpUIExtra, lpIMC);
+                CandWnd_Resize(lpUIExtra, lpIMC);
+                CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
               }
             }
 
@@ -146,14 +146,14 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             lpIMC->UnlockCompStr();
             lpIMC->UnlockCandInfo();
           } else {
-            HideCandWindow(lpUIExtra);
+            CandWnd_Hide(lpUIExtra);
             CompWnd_Hide(lpUIExtra);
           }
           StatusWnd_Update(lpUIExtra);
           TheIME.UnlockIMC(hIMC);
         } else  // it is NULL input context.
         {
-          HideCandWindow(lpUIExtra);
+          CandWnd_Hide(lpUIExtra);
           CompWnd_Hide(lpUIExtra);
         }
         GlobalUnlock(hUIExtra);
@@ -178,7 +178,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE);
       lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
       CompWnd_Move(lpUIExtra, lpIMC);
-      MoveCandWindow(hWnd, lpIMC, lpUIExtra, TRUE);
+      CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
       GlobalUnlock(hUIExtra);
       TheIME.UnlockIMC(hIMC);
       break;
@@ -370,16 +370,16 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
       break;
 
     case IMN_OPENCANDIDATE:
-      CreateCandWindow(hWnd, lpUIExtra, lpIMC);
+      CandWnd_Create(hWnd, lpUIExtra, lpIMC);
       break;
 
     case IMN_CHANGECANDIDATE:
-      ResizeCandWindow(lpUIExtra, lpIMC);
-      MoveCandWindow(hWnd, lpIMC, lpUIExtra, FALSE);
+      CandWnd_Resize(lpUIExtra, lpIMC);
+      CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
       break;
 
     case IMN_CLOSECANDIDATE:
-      HideCandWindow(lpUIExtra);
+      CandWnd_Hide(lpUIExtra);
       break;
 
     case IMN_GUIDELINE:
@@ -422,12 +422,12 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
       // MZ-IME supports only one candidate list.
       if (lParam != 0x01) break;
 
-      MoveCandWindow(hWnd, lpIMC, lpUIExtra, FALSE);
+      CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
       break;
 
     case IMN_SETCOMPOSITIONWINDOW:
       CompWnd_Move(lpUIExtra, lpIMC);
-      MoveCandWindow(hWnd, lpIMC, lpUIExtra, TRUE);
+      CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
       break;
 
     case IMN_SETSTATUSWINDOWPOS:
