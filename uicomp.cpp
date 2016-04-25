@@ -147,8 +147,6 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
   if (lpIMC->cfCompForm.dwStyle)  // Style is not DEFAULT.
   {
-    POINT ptSrc = lpIMC->cfCompForm.ptCurrentPos;
-    RECT rcSrc;
     LPTSTR lpt;
     int num;
 
@@ -165,11 +163,13 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     }
 
     // Set the rectangle for the composition string.
+    RECT rcSrc;
     if (lpIMC->cfCompForm.dwStyle & CFS_RECT)
       rcSrc = lpIMC->cfCompForm.rcArea;
     else
       GetClientRect(lpIMC->hWnd, &rcSrc);
 
+    POINT ptSrc = lpIMC->cfCompForm.ptCurrentPos;
     ClientToScreen(lpIMC->hWnd, &ptSrc);
     ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.left);
     ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.right);
@@ -225,7 +225,6 @@ void PASCAL MoveCompWindow(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
             lpUIExtra->uiComp[i].bShow = TRUE;
 
             lpt += num;
-
           } else {
             lpUIExtra->uiComp[i].rc.left = 0;
             lpUIExtra->uiComp[i].rc.top = 0;
