@@ -51,41 +51,6 @@ static int NumCharInDY(HDC hDC, LPTSTR lp, int dy) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
-                                    LPARAM lParam) {
-  HWND hUIWnd;
-
-  switch (message) {
-    case WM_PAINT:
-      CompWnd_Paint(hWnd);
-      break;
-
-    case WM_SETCURSOR:
-    case WM_MOUSEMOVE:
-    case WM_LBUTTONUP:
-    case WM_RBUTTONUP:
-      DragUI(hWnd, message, wParam, lParam);
-      if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
-          (HIWORD(lParam) != WM_RBUTTONDOWN))
-        return DefWindowProc(hWnd, message, wParam, lParam);
-      if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP))
-        SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
-      break;
-
-    case WM_MOVE:
-      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
-      if (IsWindow(hUIWnd))
-        SendMessage(hUIWnd, WM_UI_DEFCOMPMOVE, wParam, lParam);
-      break;
-
-    default:
-      if (!IsImeMessage(message))
-        return DefWindowProc(hWnd, message, wParam, lParam);
-      break;
-  }
-  return 0;
-}
-
 void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra,
                     InputContext *lpIMC) {
   RECT rc;
@@ -496,6 +461,41 @@ void CompWnd_SetFont(LPUIEXTRA lpUIExtra) {
     if (IsWindow(lpUIExtra->uiComp[i].hWnd))
       SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_FONT,
                        (LONG_PTR)lpUIExtra->hFont);
+}
+
+LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
+                                    LPARAM lParam) {
+  HWND hUIWnd;
+
+  switch (message) {
+    case WM_PAINT:
+      CompWnd_Paint(hWnd);
+      break;
+
+    case WM_SETCURSOR:
+    case WM_MOUSEMOVE:
+    case WM_LBUTTONUP:
+    case WM_RBUTTONUP:
+      DragUI(hWnd, message, wParam, lParam);
+      if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
+          (HIWORD(lParam) != WM_RBUTTONDOWN))
+        return DefWindowProc(hWnd, message, wParam, lParam);
+      if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP))
+        SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
+      break;
+
+    case WM_MOVE:
+      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
+      if (IsWindow(hUIWnd))
+        SendMessage(hUIWnd, WM_UI_DEFCOMPMOVE, wParam, lParam);
+      break;
+
+    default:
+      if (!IsImeMessage(message))
+        return DefWindowProc(hWnd, message, wParam, lParam);
+      break;
+  }
+  return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
