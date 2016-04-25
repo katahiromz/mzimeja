@@ -22,12 +22,12 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
       break;
 
     case TO_CMODE_KATAKANA:
-      fdwConversion |= (IME_CMODE_NATIVE | IME_CMODE_KATAKANA);
+      fdwConversion |= (IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
       break;
 
     case TO_CMODE_HIRAGANA:
       fdwConversion =
-          ((fdwConversion & ~IME_CMODE_LANGUAGE) | IME_CMODE_NATIVE);
+          ((fdwConversion & ~IME_CMODE_LANGUAGE) | IME_CMODE_JAPANESE);
       fdwConversion |= IME_CMODE_FULLSHAPE;
       break;
 
@@ -37,8 +37,8 @@ void PASCAL ChangeMode(HIMC hIMC, DWORD dwToMode) {
         fdwConversion &= ~IME_CMODE_FULLSHAPE;
 
         // If hiragana mode, make it katakana mode.
-        if ((fdwConversion & IME_CMODE_LANGUAGE) == IME_CMODE_NATIVE)
-          fdwConversion |= (IME_CMODE_NATIVE | IME_CMODE_KATAKANA);
+        if ((fdwConversion & IME_CMODE_LANGUAGE) == IME_CMODE_JAPANESE)
+          fdwConversion |= (IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
 
       } else {
         // To DBCS mode.

@@ -134,7 +134,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
         rc.left += CX_BUTTON + CX_BTNEDGE * 2;
         if (lpIMC->IsOpen()) {
           if (lpIMC->Conversion() & IME_CMODE_FULLSHAPE) {
-            if (lpIMC->Conversion() & IME_CMODE_NATIVE) {
+            if (lpIMC->Conversion() & IME_CMODE_JAPANESE) {
               if (lpIMC->Conversion() & IME_CMODE_KATAKANA) {
                 // zenkaku katakana
                 ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
@@ -153,7 +153,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
                        hMemDC, 0, 2 * CY_BUTTON, SRCCOPY);
             }
           } else {
-            if (lpIMC->Conversion() & IME_CMODE_NATIVE) {
+            if (lpIMC->Conversion() & IME_CMODE_JAPANESE) {
               // hankaku kana
               ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                        CX_BUTTON, CY_BUTTON,

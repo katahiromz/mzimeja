@@ -13,7 +13,7 @@ void InputContext::Initialize() {
   }
 
   if (!HasConversion()) {
-    fdwConversion = IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_NATIVE;
+    fdwConversion = IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE;
     fdwInit |= INIT_CONVERSION;
   }
 
