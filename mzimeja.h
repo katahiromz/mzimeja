@@ -302,7 +302,7 @@ struct MZIMEJA {
   BOOL Init(HINSTANCE hInstance);
   VOID Destroy(VOID);
   HBITMAP LoadBMP(LPCTSTR pszName);
-  HBITMAP LoadBMP(INT nID) {
+  HBITMAP LoadBMP(UINT nID) {
     return LoadBMP(MAKEINTRESOURCE(nID));
   }
   LPTSTR LoadSTR(INT nID);
