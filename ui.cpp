@@ -78,24 +78,14 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
   // Even if there is no current UI. these messages should not be pass to
   // DefWindowProc().
-  if (!hIMC) {
-    switch (message) {
-      case WM_IME_STARTCOMPOSITION:
-      case WM_IME_ENDCOMPOSITION:
-      case WM_IME_COMPOSITION:
-      case WM_IME_NOTIFY:
-      case WM_IME_CONTROL:
-      case WM_IME_COMPOSITIONFULL:
-      case WM_IME_SELECT:
-      case WM_IME_CHAR:
-        DebugPrint(TEXT("Why hIMC is NULL????\n"));
-        DebugPrint(TEXT("\thWnd is %x\n"), hWnd);
-        DebugPrint(TEXT("\tmessage is %x\n"), message);
-        DebugPrint(TEXT("\twParam is %x\n"), wParam);
-        DebugPrint(TEXT("\tlParam is %x\n"), lParam);
-        return 0L;
-      default:
-        break;
+  if (hIMC == NULL) {
+    if (IsImeMessage(message)) {
+      DebugPrint(TEXT("Why hIMC is NULL????\n"));
+      DebugPrint(TEXT("\thWnd is %x\n"), hWnd);
+      DebugPrint(TEXT("\tmessage is %x\n"), message);
+      DebugPrint(TEXT("\twParam is %x\n"), wParam);
+      DebugPrint(TEXT("\tlParam is %x\n"), lParam);
+      return 0L;
     }
   }
 

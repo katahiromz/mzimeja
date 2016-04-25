@@ -66,7 +66,7 @@ BOOL PASCAL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                                    LPPOINT lppt) {
   if (lpUIExtra->dwCompStyle) {
     if (lpIMC && lpIMC->HasCompForm()) {
-      int height = GetCompFontHeight(lpUIExtra);;
+      int height = GetCompFontHeight(lpUIExtra);
       if (!lpUIExtra->bVertical) {
         lppt->x = lpIMC->cfCompForm.ptCurrentPos.x;
         lppt->y = lpIMC->cfCompForm.ptCurrentPos.y + height;
