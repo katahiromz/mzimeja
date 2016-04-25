@@ -110,7 +110,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   // Save the composition form style into lpUIExtra.
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
 
-  if (lpIMC->cfCompForm.dwStyle)  // Style is not DEFAULT.
+  if (lpIMC->cfCompForm.dwStyle)  // Style is not CFS_DEFAULT.
   {
     LPTSTR lpt;
     int num;
