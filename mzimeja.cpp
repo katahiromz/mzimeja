@@ -8,11 +8,11 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-const TCHAR szUIClassName[]       = TEXT("MZIMEUUI");
-const TCHAR szCompStrClassName[]  = TEXT("MZIMEUCompStr");
-const TCHAR szCandClassName[]     = TEXT("MZIMEUCand");
-const TCHAR szStatusClassName[]   = TEXT("MZIMEUStatus");
-const TCHAR szGuideClassName[]    = TEXT("MZIMEUGuide");
+const TCHAR szUIServerClassName[] = TEXT("MZIMEUI");
+const TCHAR szCompStrClassName[]  = TEXT("MZIMECompStr");
+const TCHAR szCandClassName[]     = TEXT("MZIMECand");
+const TCHAR szStatusClassName[]   = TEXT("MZIMEStatus");
+const TCHAR szGuideClassName[]    = TEXT("MZIMEGuide");
 
 const MZGUIDELINE glTable[] = {
   {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},
@@ -231,7 +231,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
   wcx.hIcon = NULL;
   wcx.lpszMenuName = NULL;
-  wcx.lpszClassName = szUIClassName;
+  wcx.lpszClassName = szUIServerClassName;
   wcx.hbrBackground = NULL;
   wcx.hIconSm = NULL;
   if (!RegisterClassEx(&wcx)) return FALSE;
@@ -455,7 +455,7 @@ void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
 
 VOID MZIMEJA::Destroy(VOID) {
   FOOTMARK();
-  ::UnregisterClass(szUIClassName, m_hInst);
+  ::UnregisterClass(szUIServerClassName, m_hInst);
   ::UnregisterClass(szCompStrClassName, m_hInst);
   ::UnregisterClass(szCandClassName, m_hInst);
   ::UnregisterClass(szStatusClassName, m_hInst);

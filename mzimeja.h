@@ -136,19 +136,22 @@ enum InputMode {
 //////////////////////////////////////////////////////////////////////////////
 // Structures
 
-typedef struct _tagUICHILD {
+// UICHILD
+typedef struct {
   HWND hWnd;
   BOOL bShow;
   POINT pt;
 } UICHILD, NEAR *PUICHILD, FAR *LPUICHILD;
 
-typedef struct _tagUICHILD2 {
+// UICHILD2
+typedef struct {
   HWND hWnd;
   BOOL bShow;
   RECT rc;
 } UICHILD2, NEAR *PUICHILD2, FAR *LPUICHILD2;
 
-typedef struct _tagUIEXTRA {
+// UIEXTRA
+typedef struct {
   HIMC      hIMC;
   UICHILD   uiStatus;
   UICHILD   uiCand;
@@ -160,7 +163,8 @@ typedef struct _tagUIEXTRA {
   UICHILD   uiGuide;
 } UIEXTRA,  NEAR *PUIEXTRA, FAR *LPUIEXTRA;
 
-typedef struct _tagMZGUIDELINE {
+// MZGUIDELINE
+typedef struct {
   DWORD dwLevel;
   DWORD dwIndex;
   DWORD dwStrID;
@@ -170,7 +174,7 @@ typedef struct _tagMZGUIDELINE {
 //////////////////////////////////////////////////////////////////////////////
 // externs
 
-extern const TCHAR szUIClassName[];
+extern const TCHAR szUIServerClassName[];
 extern const TCHAR szCompStrClassName[];
 extern const TCHAR szCandClassName[];
 extern const TCHAR szStatusClassName[];
@@ -193,14 +197,14 @@ BOOL PASCAL NotifyUCSetCompositionWindow(HIMC hIMC);
 
 // ui.c
 LRESULT CALLBACK MZIMEWndProc(HWND, UINT, WPARAM, LPARAM);
-LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
-                          WPARAM wParam, LPARAM lParam);
-LONG PASCAL ControlCommand(HIMC hIMC, HWND hWnd, UINT message,
-                           WPARAM wParam, LPARAM lParam);
-void PASCAL DrawUIBorder(LPRECT lprc);
-void PASCAL DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra);
-BOOL PASCAL IsImeMessage(UINT message);
+LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
+                   LPARAM lParam);
+LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
+                    LPARAM lParam);
+void DrawUIBorder(LPRECT lprc);
+void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+int GetCompFontHeight(LPUIEXTRA lpUIExtra);
+BOOL IsImeMessage(UINT message);
 
 // uistate.c
 HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra);

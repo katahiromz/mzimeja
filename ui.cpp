@@ -11,7 +11,7 @@ extern "C" {
 void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag) {
   HGLOBAL hUIExtra;
   LPUIEXTRA lpUIExtra;
-  int nsw = fFlag ? SW_SHOWNOACTIVATE : SW_HIDE;
+  int nsw = (fFlag ? SW_SHOWNOACTIVATE : SW_HIDE);
 
   if (!(hUIExtra = (HGLOBAL)GetWindowLongPtr(hWnd, IMMGWLP_PRIVATE))) return;
 
@@ -65,7 +65,7 @@ void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra) {
 }
 #endif  // def _DEBUG
 
-// IME UI window procedure
+// IME UI server window procedure
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
   InputContext *lpIMC;
@@ -85,7 +85,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       DebugPrint(TEXT("\tmessage is %x\n"), message);
       DebugPrint(TEXT("\twParam is %x\n"), wParam);
       DebugPrint(TEXT("\tlParam is %x\n"), lParam);
-      return 0L;
+      return 0;
     }
   }
 
@@ -287,26 +287,20 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   return lRet;
 }
 
-int PASCAL GetCompFontHeight(LPUIEXTRA lpUIExtra) {
-  HDC hIC;
-  HFONT hOldFont = 0;
-  SIZE sz;
-
-  hIC = CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL);
-
+int GetCompFontHeight(LPUIEXTRA lpUIExtra) {
+  HDC hIC = CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL);
+  HFONT hOldFont = NULL;
   if (lpUIExtra->hFont) hOldFont = (HFONT)SelectObject(hIC, lpUIExtra->hFont);
-  GetTextExtentPoint(hIC, TEXT("A"), 1, &sz);
-
+  SIZE siz;
+  GetTextExtentPoint(hIC, TEXT("A"), 1, &siz);
   if (hOldFont) SelectObject(hIC, hOldFont);
-
   DeleteDC(hIC);
-
-  return sz.cy;
+  return siz.cy;
 }
 
 // Handle WM_IME_NOTIFY messages
-LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
-                          WPARAM wParam, LPARAM lParam) {
+LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
+                   LPARAM lParam) {
   LONG lRet = 0L;
   HGLOBAL hUIExtra;
   LPUIEXTRA lpUIExtra;
@@ -446,8 +440,8 @@ LONG PASCAL NotifyCommand(HIMC hIMC, HWND hWnd, UINT message,
 //#define lpcfCandForm ((LPCANDIDATEFORM)lParam)
 
 // Handle WM_IME_CONTROL messages
-LONG PASCAL ControlCommand(HIMC hIMC, HWND hWnd, UINT message,
-                           WPARAM wParam, LPARAM lParam) {
+LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
+                    LPARAM lParam) {
   LONG lRet = 1L;
   InputContext *lpIMC;
   HGLOBAL hUIExtra;
@@ -488,7 +482,7 @@ LONG PASCAL ControlCommand(HIMC hIMC, HWND hWnd, UINT message,
 }
 
 // When draging the child window, this function draws the border
-void PASCAL DrawUIBorder(LPRECT lprc) {
+void DrawUIBorder(LPRECT lprc) {
   HDC hDC;
   int sbx, sby;
 
@@ -508,7 +502,7 @@ void PASCAL DrawUIBorder(LPRECT lprc) {
 }
 
 // Handling mouse messages for the child windows
-void PASCAL DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   POINT pt;
   static POINT ptdif;
   static RECT drc;
@@ -565,7 +559,7 @@ void PASCAL DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 }
 
 // Any UI window should not pass the IME messages to DefWindowProc
-BOOL PASCAL IsImeMessage(UINT message) {
+BOOL IsImeMessage(UINT message) {
   switch (message) {
     case WM_IME_STARTCOMPOSITION:
     case WM_IME_ENDCOMPOSITION:
