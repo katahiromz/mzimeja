@@ -584,21 +584,21 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   FOOTMARK();
   switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
-      DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %lx\n"), TheIME.m_hInst);
+      DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %p\n"), TheIME.m_hInst);
       TheIME.Init(hInstDLL);
       break;
 
     case DLL_PROCESS_DETACH:
-      DebugPrint(TEXT("DLL_PROCESS_DETACH: hInst is %lx\n"), TheIME.m_hInst);
+      DebugPrint(TEXT("DLL_PROCESS_DETACH: hInst is %p\n"), TheIME.m_hInst);
       TheIME.Destroy();
       break;
 
     case DLL_THREAD_ATTACH:
-      DebugPrint(TEXT("DLL_THREAD_ATTACH: hInst is %lx\n"), TheIME.m_hInst);
+      DebugPrint(TEXT("DLL_THREAD_ATTACH: hInst is %p\n"), TheIME.m_hInst);
       break;
 
     case DLL_THREAD_DETACH:
-      DebugPrint(TEXT("DLL_THREAD_DETACH: hInst is %lx\n"), TheIME.m_hInst);
+      DebugPrint(TEXT("DLL_THREAD_DETACH: hInst is %p\n"), TheIME.m_hInst);
       break;
   }
   return TRUE;
