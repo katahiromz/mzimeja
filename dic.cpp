@@ -9,60 +9,6 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-void PASCAL RevertText(HIMC hIMC) {
-  CompStr *lpCompStr;
-  LPTSTR lpread, lpstr;
-  FOOTMARK();
-
-  InputContext *lpIMC = TheIME.LockIMC(hIMC);
-  if (!lpIMC) return;
-
-  if (lpIMC->HasCandInfo()) {
-    // Flush candidate lists.
-    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
-    if (lpCandInfo) {
-      lpCandInfo->Clear();
-      lpIMC->UnlockCandInfo();
-    }
-    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
-
-  if (lpIMC->HasCompStr()) {
-    lpCompStr = lpIMC->LockCompStr();
-    if (lpCompStr) {
-      lpstr = lpCompStr->GetCompStr();
-      lpread = lpCompStr->GetCompReadStr();
-      lHanToZen(lpstr, lpread, lpIMC->Conversion());
-
-      // make attribute
-      lpCompStr->dwCursorPos = lstrlen(lpstr);
-      // DeltaStart is 0 at RevertText time.
-      lpCompStr->dwDeltaStart = 0;
-
-      memset(lpCompStr->GetCompAttr(), 0, lstrlen(lpstr));
-      memset(lpCompStr->GetCompReadAttr(), 0, lstrlen(lpread));
-
-      SetClause(lpCompStr->GetCompClause(), lstrlen(lpstr));
-      SetClause(lpCompStr->GetCompReadClause(), lstrlen(lpread));
-      lpCompStr->dwCompClauseLen = 8;
-      lpCompStr->dwCompReadClauseLen = 8;
-
-      // make length
-      lpCompStr->dwCompStrLen = lstrlen(lpstr);
-      lpCompStr->dwCompReadStrLen = lstrlen(lpread);
-      lpCompStr->dwCompAttrLen = lstrlen(lpstr);
-      lpCompStr->dwCompReadAttrLen = lstrlen(lpread);
-
-      // Generate messages.
-      LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-      TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
-
-      lpIMC->UnlockCompStr();
-    }
-  }
-  TheIME.UnlockIMC(hIMC);
-}
-
 BOOL PASCAL ConvKanji(HIMC hIMC) {
   BOOL bRc = FALSE;
   FOOTMARK();

@@ -234,7 +234,6 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam);
 
 // dic.c
-void PASCAL RevertText(HIMC hIMC);
 BOOL PASCAL ConvKanji(HIMC);
 BOOL PASCAL MakeGuideLine(HIMC, DWORD);
 int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,

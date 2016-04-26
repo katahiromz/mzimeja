@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 void InputContext::Initialize() {
+  FOOTMARK();
   if (!HasLogFont()) {
     lfFont.W.lfCharSet = SHIFTJIS_CHARSET;
     lfFont.W.lfFaceName[0] = L'\0';
@@ -22,6 +23,7 @@ void InputContext::Initialize() {
 }
 
 BOOL InputContext::HasCandInfo() {
+  FOOTMARK();
   BOOL fRet = FALSE;
 
   if (ImmGetIMCCSize(hCandInfo) < sizeof(CANDIDATEINFO)) return FALSE;
@@ -35,6 +37,7 @@ BOOL InputContext::HasCandInfo() {
 }
 
 BOOL InputContext::HasCompStr() {
+  FOOTMARK();
   if (ImmGetIMCCSize(hCompStr) <= sizeof(COMPOSITIONSTRING)) return FALSE;
 
   CompStr *pCompStr = LockCompStr();
@@ -105,7 +108,7 @@ void InputContext::UnlockGuideLine() {
 }
 
 void InputContext::AddChar(WCHAR ch) {
-  DebugPrint(TEXT("InputContext::AddChar\n"));
+  FOOTMARK();
 
   // get logical data
   LogCompStr log;
@@ -131,8 +134,8 @@ void InputContext::AddChar(WCHAR ch) {
 
   // update info
   log.comp_read_str = log.comp_str;
-  log.comp_read_attr.resize(log.comp_str.size(), 0);
-  log.comp_attr.resize(log.comp_str.size(), 0);
+  log.comp_read_attr.resize(log.comp_str.size(), ATTR_INPUT);
+  log.comp_attr.resize(log.comp_str.size(), ATTR_INPUT);
   log.comp_read_clause.resize(2);
   log.comp_read_clause[0] = 0;
   log.comp_read_clause[1] = (DWORD)log.comp_read_str.size();
@@ -151,7 +154,7 @@ void InputContext::AddChar(WCHAR ch) {
 } // InputContext::AddChar
 
 void InputContext::MakeResult() {
-  DebugPrint(TEXT("InputContext::MakeResult\n"));
+  FOOTMARK();
 
   // close candidate
   if (HasCandInfo()) {
@@ -198,7 +201,7 @@ void InputContext::MakeResult() {
 } // InputContext::MakeResult
 
 void InputContext::CancelText() {
-  DebugPrint(TEXT("InputContext::CancelText\n"));
+  FOOTMARK();
 
   // close candidate
   if (HasCandInfo()) {
@@ -219,8 +222,52 @@ void InputContext::CancelText() {
   TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::CancelText
 
+void InputContext::RevertText() {
+  FOOTMARK();
+
+  // close candidate
+  if (HasCandInfo()) {
+    CandInfo *lpCandInfo = LockCandInfo();
+    if (lpCandInfo) {
+      lpCandInfo->Clear();
+      UnlockCandInfo();
+    }
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+  }
+
+  // return if no composition string
+  if (!HasCompStr()) {
+    return;
+  }
+
+  // get logical data
+  LogCompStr log;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  // reset composition
+  log.comp_str = log.comp_read_str;
+  log.comp_clause.resize(2);
+  log.comp_clause[0] = 0;
+  log.comp_clause[1] = (DWORD)log.comp_str.size();
+  log.comp_attr.assign(log.comp_read_str.size(), ATTR_INPUT);
+  log.dwCursorPos = (DWORD)log.comp_str.size();
+  log.dwDeltaStart = 0;
+
+  // realloc
+  DumpCompStr();
+  hCompStr = CompStr::ReAlloc(hCompStr, &log);
+  DumpCompStr();
+
+  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+} // InputContext::RevertText
+
 void InputContext::DeleteChar(BOOL bBackSpace) {
-  DebugPrint(TEXT("InputContext::DeleteChar(%d)\n"), bBackSpace);
+  FOOTMARK();
 
   // get logical data
   LogCompStr log;
@@ -255,8 +302,8 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
 
   // update info
   log.comp_read_str = log.comp_str;
-  log.comp_read_attr.resize(log.comp_str.size(), 0);
-  log.comp_attr.resize(log.comp_str.size(), 0);
+  log.comp_read_attr.resize(log.comp_str.size(), ATTR_INPUT);
+  log.comp_attr.resize(log.comp_str.size(), ATTR_INPUT);
   log.comp_read_clause.resize(2);
   log.comp_read_clause[0] = 0;
   log.comp_read_clause[1] = (DWORD)log.comp_read_str.size();
@@ -291,6 +338,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
 } // InputContext::DeleteChar
 
 void InputContext::DumpCompStr() {
+  FOOTMARK();
 #ifndef NDEBUG
   CompStr *pCompStr = LockCompStr();
   if (pCompStr) {
