@@ -21,6 +21,11 @@ DWORD LogCompStr::GetTotalSize() const {
 
 //////////////////////////////////////////////////////////////////////////////
 
+BOOL CompStr::IsBeingConverted() const {
+  return (dwCompStrLen > 0 && dwCompAttrLen > 0 &&
+          GetCompAttr()[0] != ATTR_INPUT);
+}
+
 void CompStr::GetLogCompStr(LogCompStr& log) {
   FOOTMARK();
   log.dwCursorPos = dwCursorPos;

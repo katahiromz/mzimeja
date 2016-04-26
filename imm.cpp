@@ -447,11 +447,13 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       DebugPrint(TEXT("NI_OPENCANDIDATE\n"));
       lpIMC = TheIME.LockIMC(hIMC);
       if (!lpIMC) return FALSE;
-      if (!(lpCompStr = lpIMC->LockCompStr())) {
+      lpCompStr = lpIMC->LockCompStr();
+      if (lpCompStr == NULL) {
         TheIME.UnlockIMC(hIMC);
         return FALSE;
       }
-      if (!lpIMC->HasConvertedCompStr()) {
+      if (!lpCompStr->IsBeingConverted()) {
+        lpIMC->UnlockCompStr();
         TheIME.UnlockIMC(hIMC);
         return FALSE;
       }
@@ -499,6 +501,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
         lpIMC->UnlockCandInfo();
+        lpIMC->UnlockCompStr();
         TheIME.UnlockIMC(hIMC);
 
         bRet = TRUE;

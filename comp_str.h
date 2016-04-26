@@ -52,6 +52,7 @@ struct CompStr : public COMPOSITIONSTRING {
   static HIMCC ReAlloc(HIMCC hCompStr, const LogCompStr *log);
 
   void GetLogCompStr(LogCompStr& log);
+  BOOL IsBeingConverted() const;
 
   LPBYTE GetBytes() { return (LPBYTE)this; }
 

@@ -24,7 +24,6 @@ struct InputContext : public INPUTCONTEXT {
   void UnlockCandInfo();
 
   BOOL HasCompStr();
-  BOOL HasConvertedCompStr();
   CompStr *LockCompStr();
   void UnlockCompStr();
 
