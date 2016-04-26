@@ -58,7 +58,8 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
 
   lpIMEInfo->dwPrivateDataSize = sizeof(UIEXTRA);
   lpIMEInfo->fdwProperty = IME_PROP_KBD_CHAR_FIRST |
-                           IME_PROP_UNICODE | IME_PROP_AT_CARET;
+                           IME_PROP_UNICODE | IME_PROP_AT_CARET |
+                           IME_PROP_CANDLIST_START_FROM_1;
   lpIMEInfo->fdwConversionCaps = IME_CMODE_LANGUAGE | IME_CMODE_FULLSHAPE |
                                  IME_CMODE_ROMAN | IME_CMODE_CHARCODE;
   lpIMEInfo->fdwSentenceCaps = 0L;
@@ -369,252 +370,199 @@ BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
 //    ImmNotifyIME
 BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   InputContext *lpIMC;
-  BOOL bRet = FALSE;
+  BOOL ret = FALSE;
   CompStr *lpCompStr;
   CandInfo *lpCandInfo;
   CandList *lpCandList;
-  TCHAR szBuf[256];
-  LPTSTR lpstr;
-  DWORD i = 0;
   //LPDWORD lpdw;
 
   FOOTMARK();
 
   switch (dwAction) {
-    case NI_CONTEXTUPDATED:
-      DebugPrint(TEXT("NI_CONTEXTUPDATED\n"));
-      switch (dwValue) {
-        case IMC_SETOPENSTATUS:
-          if (!dwIndex) {
-            lpIMC = TheIME.LockIMC(hIMC);
-            if (lpIMC) {
-              lpIMC->CancelText();
-              TheIME.UnlockIMC(hIMC);
-            }
-          }
-          TheIME.UpdateIndicIcon(hIMC);
-          bRet = TRUE;
-          break;
-
-        case IMC_SETCONVERSIONMODE:
-          break;
-
-        case IMC_SETCOMPOSITIONWINDOW:
-          break;
-
-        default:
-          break;
-      }
-      break;
-
-    case NI_COMPOSITIONSTR:
-      DebugPrint(TEXT("NI_COMPOSITIONSTR\n"));
-      switch (dwIndex) {
-        case CPS_COMPLETE:
-          lpIMC = TheIME.LockIMC(hIMC);
-          if (lpIMC) {
-            lpIMC->MakeResult();
-            TheIME.UnlockIMC(hIMC);
-          }
-          bRet = TRUE;
-          break;
-
-        case CPS_CONVERT:
-          ConvKanji(hIMC);
-          bRet = TRUE;
-          break;
-
-        case CPS_REVERT:
-          lpIMC = TheIME.LockIMC(hIMC);
-          if (lpIMC) {
-            lpIMC->RevertText();
-            TheIME.UnlockIMC(hIMC);
-          }
-          bRet = TRUE;
-          break;
-
-        case CPS_CANCEL:
+  case NI_CONTEXTUPDATED:
+    DebugPrint(TEXT("NI_CONTEXTUPDATED\n"));
+    switch (dwValue) {
+      case IMC_SETOPENSTATUS:
+        if (!dwIndex) {
           lpIMC = TheIME.LockIMC(hIMC);
           if (lpIMC) {
             lpIMC->CancelText();
             TheIME.UnlockIMC(hIMC);
           }
-          bRet = TRUE;
-          break;
-
-        default:
-          break;
-      }
-      break;
-
-    case NI_OPENCANDIDATE:
-      DebugPrint(TEXT("NI_OPENCANDIDATE\n"));
-      lpIMC = TheIME.LockIMC(hIMC);
-      if (!lpIMC) return FALSE;
-      lpCompStr = lpIMC->LockCompStr();
-      if (lpCompStr == NULL) {
-        TheIME.UnlockIMC(hIMC);
-        return FALSE;
-      }
-      if (!lpCompStr->IsBeingConverted()) {
-        lpIMC->UnlockCompStr();
-        TheIME.UnlockIMC(hIMC);
-        return FALSE;
-      }
-
-      lpCandInfo = lpIMC->LockCandInfo();
-      if (lpCandInfo) {
-        // Get the candidate strings from dic file.
-        GetCandidateStringsFromDictionary(
-            lpCompStr->GetCompReadStr(), szBuf, 256, TheIME.m_szDicFileName);
-
-        // generate WM_IME_NOTFIY IMN_OPENCANDIDATE message.
-        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
-
-        // Make candidate structures.
-        lpCandInfo->dwSize = sizeof(MZCAND);
-        lpCandInfo->dwCount = 1;
-        lpCandInfo->dwOffset[0] = sizeof(CANDIDATEINFO);
-        lpCandList = lpCandInfo->GetList();
-
-        lpstr = &szBuf[0];
-        while (*lpstr && (i < MAXCANDSTRNUM)) {
-          lpCandList->dwOffset[i] = lpCandInfo->GetCandOffset(i, lpCandList);
-          lstrcpy(lpCandList->GetCandString(i), lpstr);
-          lpstr += (lstrlen(lpstr) + 1);
-          i++;
         }
+        TheIME.UpdateIndicIcon(hIMC);
+        ret = TRUE;
+        break;
 
-        lpCandList->dwSize = sizeof(CANDIDATELIST);
-        lpCandList->dwSize +=
-          (MAXCANDSTRNUM * (sizeof(DWORD) + MAXCANDSTRSIZE));
-        lpCandList->dwStyle = IME_CAND_READ;
-        lpCandList->dwCount = i;
-        lpCandList->dwPageStart = 0;
-        if (i < MAXCANDPAGESIZE)
-          lpCandList->dwPageSize = i;
-        else
-          lpCandList->dwPageSize = MAXCANDPAGESIZE;
+      case IMC_SETCONVERSIONMODE:
+        break;
 
-        lpCandList->dwSelection++;
-        if (lpCandList->dwSelection == i) lpCandList->dwSelection = 0;
+      case IMC_SETCOMPOSITIONWINDOW:
+        break;
 
-        //
-        // Generate messages.
-        //
-        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+      default:
+        break;
+    }
+    break;
 
-        lpIMC->UnlockCandInfo();
-        lpIMC->UnlockCompStr();
+  case NI_COMPOSITIONSTR:
+    DebugPrint(TEXT("NI_COMPOSITIONSTR\n"));
+    switch (dwIndex) {
+    case CPS_COMPLETE:
+      lpIMC = TheIME.LockIMC(hIMC);
+      if (lpIMC) {
+        lpIMC->MakeResult();
         TheIME.UnlockIMC(hIMC);
+      }
+      ret = TRUE;
+      break;
 
-        bRet = TRUE;
+    case CPS_CONVERT:
+      lpIMC = TheIME.LockIMC(hIMC);
+      if (lpIMC) {
+        lpIMC->DoConvert();
+        ret = TRUE;
+        TheIME.UnlockIMC(hIMC);
       }
       break;
 
-    case NI_CLOSECANDIDATE:
-      DebugPrint(TEXT("NI_CLOSECANDIDATE\n"));
+    case CPS_REVERT:
       lpIMC = TheIME.LockIMC(hIMC);
-      if (!lpIMC) return FALSE;
-      if (lpIMC->HasCandInfo()) {
-        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-        bRet = TRUE;
+      if (lpIMC) {
+        lpIMC->RevertText();
+        TheIME.UnlockIMC(hIMC);
+      }
+      ret = TRUE;
+      break;
+
+    case CPS_CANCEL:
+      lpIMC = TheIME.LockIMC(hIMC);
+      if (lpIMC) {
+        lpIMC->CancelText();
+        TheIME.UnlockIMC(hIMC);
+      }
+      ret = TRUE;
+      break;
+
+    default:
+      break;
+    }
+    break;
+
+  case NI_OPENCANDIDATE:
+    DebugPrint(TEXT("NI_OPENCANDIDATE\n"));
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpCompStr = lpIMC->LockCompStr();
+      if (lpCompStr) {
+        if (lpCompStr->IsBeingConverted()) {
+          // generate message to open candidate
+          TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+          // reset candidates
+          lpIMC->hCandInfo = CandInfo::ReCreate(lpIMC->hCandInfo, NULL);
+          // generate message to change candidate
+          TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+          ret = TRUE;
+        }
+        lpIMC->UnlockCompStr();
       }
       TheIME.UnlockIMC(hIMC);
-      break;
+    }
+    break;
 
-    case NI_SELECTCANDIDATESTR:
-      DebugPrint(TEXT("NI_SELECTCANDIDATESTR\n"));
-      lpIMC = TheIME.LockIMC(hIMC);
-      if (!lpIMC) return FALSE;
+  case NI_CLOSECANDIDATE:
+    DebugPrint(TEXT("NI_CLOSECANDIDATE\n"));
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      if (lpIMC->HasCandInfo()) {
+        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+        ret = TRUE;
+      }
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
 
+  case NI_SELECTCANDIDATESTR:
+    DebugPrint(TEXT("NI_SELECTCANDIDATESTR\n"));
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
           lpCandList = lpCandInfo->GetList();
           if (lpCandList->dwCount > dwValue) {
             lpCandList->dwSelection = dwValue;
-            bRet = TRUE;
-
-            // Generate messages.
             TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+            ret = TRUE;
           }
           lpIMC->UnlockCandInfo();
         }
       }
       TheIME.UnlockIMC(hIMC);
-      break;
+    }
+    break;
 
-    case NI_CHANGECANDIDATELIST:
-      DebugPrint(TEXT("NI_CHANGECANDIDATELIST\n"));
-      lpIMC = TheIME.LockIMC(hIMC);
-      if (!lpIMC) return FALSE;
-      if (dwIndex == 1 && lpIMC->HasCandInfo()) bRet = TRUE;
+  case NI_CHANGECANDIDATELIST:
+    DebugPrint(TEXT("NI_CHANGECANDIDATELIST\n"));
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      if (dwIndex == 1 && lpIMC->HasCandInfo()) ret = TRUE;
       TheIME.UnlockIMC(hIMC);
-      break;
+    }
+    break;
 
-    case NI_SETCANDIDATE_PAGESIZE:
-      DebugPrint(TEXT("NI_SETCANDIDATE_PAGESIZE\n"));
-      lpIMC = TheIME.LockIMC(hIMC);
-      if (!lpIMC) return FALSE;
+  case NI_SETCANDIDATE_PAGESIZE:
+    DebugPrint(TEXT("NI_SETCANDIDATE_PAGESIZE\n"));
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
-        if (dwValue > MAXCANDPAGESIZE) return FALSE;
-
         lpCandInfo = lpIMC->LockCandInfo();
-        if (lpCandInfo) {
-          lpCandList = lpCandInfo->GetList();
-          if (lpCandList->dwCount > dwValue) {
-            lpCandList->dwPageSize = dwValue;
-            bRet = TRUE;
-
-            //
-            // Generate messages.
-            TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
-          }
+        if (lpCandInfo && lpCandInfo->dwCount > 0) {
+          CandList *lpCandList = lpCandInfo->GetList();
+          lpCandList->dwPageSize = dwValue;
           lpIMC->UnlockCandInfo();
+          TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+          ret = TRUE;
         }
       }
       TheIME.UnlockIMC(hIMC);
-      break;
+    }
+    break;
 
-    case NI_SETCANDIDATE_PAGESTART:
-      DebugPrint(TEXT("NI_SETCANDIDATE_PAGESTART\n"));
-      lpIMC = TheIME.LockIMC(hIMC);
-      if (!lpIMC) return FALSE;
+  case NI_SETCANDIDATE_PAGESTART:
+    DebugPrint(TEXT("NI_SETCANDIDATE_PAGESTART\n"));
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
-        if (dwValue > MAXCANDPAGESIZE) return FALSE;
-
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
           lpCandList = lpCandInfo->GetList();
-          if (lpCandList->dwCount > dwValue) {
+          if (dwValue < lpCandList->dwCount) {
             lpCandList->dwPageStart = dwValue;
-            bRet = TRUE;
-
-            //
-            // Generate messages.
             TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+            ret = TRUE;
           }
           lpIMC->UnlockCandInfo();
         }
       }
       TheIME.UnlockIMC(hIMC);
-      break;
+    }
+    break;
 
-    case NI_IMEMENUSELECTED:
-      DebugPrint(TEXT("NI_IMEMENUSELECTED\n"));
-      DebugPrint(TEXT("\thIMC is 0x%x\n"), hIMC);
-      DebugPrint(TEXT("\tdwIndex is 0x%x\n"), dwIndex);
-      DebugPrint(TEXT("\tdwValue is 0x%x\n"), dwValue);
-      TheIME.DoCommand(hIMC, dwIndex);
-      break;
+  case NI_IMEMENUSELECTED:
+    DebugPrint(TEXT("NI_IMEMENUSELECTED\n"));
+    DebugPrint(TEXT("\thIMC is 0x%x\n"), hIMC);
+    DebugPrint(TEXT("\tdwIndex is 0x%x\n"), dwIndex);
+    DebugPrint(TEXT("\tdwValue is 0x%x\n"), dwValue);
+    TheIME.DoCommand(hIMC, dwIndex);
+    break;
 
-    default:
-      DebugPrint(TEXT("NI_(unknown)\n"));
-      break;
+  default:
+    DebugPrint(TEXT("NI_(unknown)\n"));
+    break;
   }
 
-  return bRet;
+  return ret;
 }
 
 //  ImeSelect

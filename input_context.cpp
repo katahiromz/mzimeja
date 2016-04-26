@@ -18,8 +18,8 @@ void InputContext::Initialize() {
     fdwInit |= INIT_CONVERSION;
   }
 
-  hCompStr = CompStr::ReAlloc(hCompStr, NULL);
-  hCandInfo = CandInfo::ReAlloc(hCandInfo);
+  hCompStr = CompStr::ReCreate(hCompStr, NULL);
+  hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
 }
 
 BOOL InputContext::HasCandInfo() {
@@ -94,6 +94,39 @@ const DWORD& InputContext::NumMsgBuf() const {
   return dwNumMsgBuf;
 }
 
+void InputContext::MakeGuideLine(DWORD dwID) {
+  FOOTMARK();
+  DWORD dwSize =
+      sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(TCHAR)) * 2 * sizeof(TCHAR);
+  LPTSTR lpStr;
+
+  hGuideLine = ImmReSizeIMCC(hGuideLine, dwSize);
+  LPGUIDELINE lpGuideLine = LockGuideLine();
+
+  lpGuideLine->dwSize = dwSize;
+  lpGuideLine->dwLevel = glTable[dwID].dwLevel;
+  lpGuideLine->dwIndex = glTable[dwID].dwIndex;
+  lpGuideLine->dwStrOffset = sizeof(GUIDELINE);
+  lpStr = (LPTSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwStrOffset);
+  LoadString(TheIME.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
+  lpGuideLine->dwStrLen = lstrlen(lpStr);
+
+  if (glTable[dwID].dwPrivateID) {
+    lpGuideLine->dwPrivateOffset =
+        sizeof(GUIDELINE) + (MAXGLCHAR + 1) * sizeof(TCHAR);
+    lpStr = (LPTSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwPrivateOffset);
+    LoadString(TheIME.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
+    lpGuideLine->dwPrivateSize = lstrlen(lpStr) * sizeof(TCHAR);
+  } else {
+    lpGuideLine->dwPrivateOffset = 0L;
+    lpGuideLine->dwPrivateSize = 0L;
+  }
+
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_GUIDELINE, 0);
+
+  UnlockGuideLine();
+}
+
 LPGUIDELINE InputContext::LockGuideLine() {
   DebugPrint(TEXT("InputContext::LockGuideLine: locking %p\n"), hGuideLine);
   LPGUIDELINE guideline = (LPGUIDELINE)ImmLockIMCC(hGuideLine);
@@ -146,23 +179,135 @@ void InputContext::AddChar(WCHAR ch) {
 
   // realloc
   DumpCompStr();
-  hCompStr = CompStr::ReAlloc(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
   DumpCompStr();
 
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 } // InputContext::AddChar
 
+void InputContext::GetCands(LogCandInfo& log_cand_info, std::wstring& str) {
+  DWORD dwCount = (DWORD)log_cand_info.cand_strs.size();
+  if (dwCount > 0) {
+    log_cand_info.dwSelection++;
+    if (log_cand_info.dwSelection >= dwCount) {
+      log_cand_info.dwSelection = 0;
+    }
+  } else {
+    log_cand_info.dwSelection = 0;
+    log_cand_info.cand_strs.push_back(L"これは");
+    log_cand_info.cand_strs.push_back(L"テスト");
+    log_cand_info.cand_strs.push_back(L"です。");
+  }
+  str = log_cand_info.cand_strs[log_cand_info.dwSelection];
+}
+
+BOOL InputContext::DoConvert() {
+  FOOTMARK();
+
+  if ((GetFileAttributes(TheIME.m_szDicFileName) == 0xFFFFFFFF) ||
+      (GetFileAttributes(TheIME.m_szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
+    MakeGuideLine(MYGL_NODICTIONARY);
+    return FALSE;
+  }
+
+  BOOL bHasCompStr = FALSE, bIsBeingConverted = FALSE;
+  LogCompStr log_comp_str;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log_comp_str);
+    bIsBeingConverted = lpCompStr->IsBeingConverted();
+    UnlockCompStr();
+    bHasCompStr = (log_comp_str.comp_str.size() > 0);
+  }
+
+  if (!bHasCompStr) {
+    return FALSE;
+  }
+
+  if (bIsBeingConverted) {
+    // the composition string is being converted.
+    if (HasCandInfo()) {  // there is candidates.
+      // get logical data
+      LogCandInfo log_cand_info;
+      CandInfo *lpCandInfo = LockCandInfo();
+      if (lpCandInfo) {
+        lpCandInfo->GetLogCandInfo(log_cand_info);
+        UnlockCandInfo();
+      }
+
+      log_cand_info.dwSelection++;
+      DWORD dwCount = (DWORD)log_cand_info.cand_strs.size();
+      if (log_cand_info.dwSelection == dwCount) {
+        log_cand_info.dwSelection = 0;
+      }
+
+      // recreate candidate
+      hCandInfo = CandInfo::ReCreate(hCandInfo, &log_cand_info);
+    } else {
+      // there is no candidate.
+      // open candidate
+      TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+
+      // get logical data
+      LogCandInfo log_cand_info;
+      CandInfo *lpCandInfo = LockCandInfo();
+      if (lpCandInfo) {
+        lpCandInfo->GetLogCandInfo(log_cand_info);
+        UnlockCandInfo();
+      }
+
+      // get candidates
+      std::wstring str = log_comp_str.comp_read_str;
+      GetCands(log_cand_info, str);
+
+      // set composition string
+      log_comp_str.comp_str = str;
+      log_comp_str.comp_attr.assign(str.size(), ATTR_INPUT);
+      log_comp_str.comp_clause.resize(2);
+      log_comp_str.comp_clause[0] = 0;
+      log_comp_str.comp_clause[1] = str.size();
+
+      // recreate candidate
+      hCandInfo = CandInfo::ReCreate(hCandInfo, &log_cand_info);
+    }
+  } else {  // not being converted yet
+    // get logical data
+    LogCandInfo log_cand_info;
+    CandInfo *lpCandInfo = LockCandInfo();
+    if (lpCandInfo) {
+      lpCandInfo->GetLogCandInfo(log_cand_info);
+      UnlockCandInfo();
+    }
+
+    // get candidates
+    std::wstring str = log_comp_str.comp_read_str;
+    GetCands(log_cand_info, str);
+
+    // set composition string
+    log_comp_str.comp_str = str;
+    log_comp_str.comp_attr.assign(str.size(), ATTR_INPUT);
+    log_comp_str.comp_clause.resize(2);
+    log_comp_str.comp_clause[0] = 0;
+    log_comp_str.comp_clause[1] = str.size();
+
+    // recreate composition
+    hCompStr = CompStr::ReCreate(hCompStr, &log_comp_str);
+
+    // generate message
+    LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
+    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+  }
+
+  return TRUE;
+}
+
 void InputContext::MakeResult() {
   FOOTMARK();
 
   // close candidate
   if (HasCandInfo()) {
-    CandInfo *lpCandInfo = LockCandInfo();
-    if (lpCandInfo) {
-      lpCandInfo->Clear();
-      UnlockCandInfo();
-    }
+    hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
@@ -192,7 +337,7 @@ void InputContext::MakeResult() {
 
   // realloc
   DumpCompStr();
-  hCompStr = CompStr::ReAlloc(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
   DumpCompStr();
 
   // generate messages to end composition
@@ -205,16 +350,12 @@ void InputContext::CancelText() {
 
   // close candidate
   if (HasCandInfo()) {
-    CandInfo *lpCandInfo = LockCandInfo();
-    if (lpCandInfo) {
-      lpCandInfo->Clear();
-      UnlockCandInfo();
-    }
+    hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
   DumpCompStr();
-  hCompStr = CompStr::ReAlloc(hCompStr, NULL);
+  hCompStr = CompStr::ReCreate(hCompStr, NULL);
   DumpCompStr();
 
   // generate messages to end composition
@@ -227,11 +368,7 @@ void InputContext::RevertText() {
 
   // close candidate
   if (HasCandInfo()) {
-    CandInfo *lpCandInfo = LockCandInfo();
-    if (lpCandInfo) {
-      lpCandInfo->Clear();
-      UnlockCandInfo();
-    }
+    hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
@@ -259,7 +396,7 @@ void InputContext::RevertText() {
 
   // realloc
   DumpCompStr();
-  hCompStr = CompStr::ReAlloc(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
   DumpCompStr();
 
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
@@ -313,18 +450,13 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
 
   // realloc
   DumpCompStr();
-  hCompStr = CompStr::ReAlloc(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
   DumpCompStr();
 
   if (log.comp_str.empty()) {
     // close candidate if any
     if (HasCandInfo()) {
-      CandInfo *lpCandInfo = LockCandInfo();
-      if (lpCandInfo) {
-        lpCandInfo->Clear();
-        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-        UnlockCandInfo();
-      }
+      hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
     }
 
     // generate messages to end composition

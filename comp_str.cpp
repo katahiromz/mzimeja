@@ -42,7 +42,7 @@ void CompStr::GetLogCompStr(LogCompStr& log) {
   log.result_str.assign(GetResultStr(), dwResultStrLen);
 }
 
-/*static*/ HIMCC CompStr::ReAlloc(HIMCC hCompStr, const LogCompStr *log) {
+/*static*/ HIMCC CompStr::ReCreate(HIMCC hCompStr, const LogCompStr *log) {
   FOOTMARK();
   LogCompStr log_comp_str;
   if (log == NULL) {
@@ -116,13 +116,13 @@ void CompStr::GetLogCompStr(LogCompStr& log) {
       ImmUnlockIMCC(hNewCompStr);
       hCompStr = hNewCompStr;
     } else {
-      DebugPrint(TEXT("CompStr::ReAlloc: failed #2"));
+      DebugPrint(TEXT("CompStr::ReCreate: failed #2"));
     }
   } else {
-    DebugPrint(TEXT("CompStr::ReAlloc: failed"));
+    DebugPrint(TEXT("CompStr::ReCreate: failed"));
   }
   return hCompStr;
-} // CompStr::ReAlloc
+} // CompStr::ReCreate
 
 void CompStr::Dump() {
   FOOTMARK();

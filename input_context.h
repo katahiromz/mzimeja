@@ -33,6 +33,7 @@ struct InputContext : public INPUTCONTEXT {
         DWORD& NumMsgBuf();
   const DWORD& NumMsgBuf() const;
 
+  void MakeGuideLine(DWORD dwID);
   LPGUIDELINE LockGuideLine();
   void UnlockGuideLine();
 
@@ -47,6 +48,8 @@ struct InputContext : public INPUTCONTEXT {
   void CancelText();
   void RevertText();
   void DeleteChar(BOOL bBackSpace = FALSE);
+  BOOL DoConvert();
+  void GetCands(LogCandInfo& log_cand_info, std::wstring& str);
   void MakeResult();
 
   void DumpCompStr();

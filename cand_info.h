@@ -8,19 +8,25 @@
   #include <windows.h>
 #endif
 #include "immdev.h"
-
-#define MAXCANDPAGESIZE 9
-#define MAXCANDSTRSIZE 16
-#define MAXCANDSTRNUM 32
+#include <vector>
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct MZCAND : public CANDIDATEINFO {
-  CANDIDATELIST cl;
-  DWORD offset[MAXCANDSTRNUM];
-  TCHAR szCand[MAXCANDSTRNUM][MAXCANDSTRSIZE];
+struct LogCandInfo {
+  DWORD   dwStyle;
+  DWORD   dwSelection;
+  DWORD   dwPageStart;
+  DWORD   dwPageSize;
+  std::vector<std::wstring> cand_strs;
+
+  LogCandInfo(DWORD dwCandStyle = IME_CAND_READ) {
+    dwStyle = dwCandStyle;
+    dwSelection = 0;
+    dwPageStart = 0;
+    dwPageSize = 0;
+  }
+  DWORD GetTotalSize() const;
 };
-typedef MZCAND *LPMZCAND;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -31,6 +37,7 @@ struct CandList : public CANDIDATELIST {
   DWORD  GetPageEnd() const { return dwPageStart + dwPageSize; }
 
 private:
+  // not implemented
   CandList();
   CandList(const CandList&);
   CandList& operator=(const CandList&);
@@ -38,37 +45,13 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct CandInfo : public MZCAND {
+struct CandInfo : public CANDIDATEINFO {
+  static HIMCC ReCreate(HIMCC hCandInfo, const LogCandInfo *log);
+  void GetLogCandInfo(LogCandInfo& log);
+
   LPBYTE GetBytes() { return (LPBYTE)this; }
-  CandList *GetList() { return (CandList *)(GetBytes() + cl.dwOffset[0]); }
-
-  DWORD GetCandOffset(DWORD i, LPCANDIDATELIST lpCandList) {
-    return DWORD(LPBYTE(szCand[i]) - LPBYTE(lpCandList));
-  }
-
-  static HIMCC ReAlloc(HIMCC hCandInfo) {
-    HIMCC hNewCandInfo = ::ImmReSizeIMCC(hCandInfo, sizeof(MZCAND));
-    CandInfo *info = (CandInfo *)::ImmLockIMCC(hNewCandInfo);
-    if (info) {
-      info->Clear();
-      info->dwSize = sizeof(MZCAND);
-      ImmUnlockIMCC(hNewCandInfo);
-      return hNewCandInfo;
-    }
-    return NULL;
-  }
-
-  void Clear() {
-    dwSize = 0L;
-    dwCount = 0L;
-    dwOffset[0] = 0L;
-    cl.dwSize = 0L;
-    cl.dwStyle = 0L;
-    cl.dwCount = 0L;
-    cl.dwSelection = 0L;
-    cl.dwPageStart = 0L;
-    cl.dwPageSize = 0L;
-    cl.dwOffset[0] = 0L;
+  CandList *GetList(DWORD i = 0) {
+    return (CandList *)(GetBytes() + dwOffset[i]);
   }
 
 private:

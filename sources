@@ -18,7 +18,6 @@ INCLUDES=include;
 
 SOURCES= \
         config.cpp \
-        dic.cpp \
         dic2.cpp \
         mzimeja.cpp \
         imm.cpp \
@@ -32,6 +31,7 @@ SOURCES= \
         uistate.cpp \
         input_context.cpp \
         comp_str.cpp \
+        cand_info.cpp \
         mzimeja.rc \
 
 TARGETLIBS= \

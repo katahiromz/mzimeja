@@ -25,7 +25,6 @@ RCFLAGS = -Iinclude -F pe-i386            # x86
 
 OBJS = \
 	config$(DOTOBJ) \
-	dic$(DOTOBJ) \
 	dic2$(DOTOBJ) \
 	mzimeja$(DOTOBJ) \
 	imm$(DOTOBJ) \
@@ -39,6 +38,7 @@ OBJS = \
 	uistate$(DOTOBJ) \
 	input_context$(DOTOBJ) \
 	comp_str$(DOTOBJ) \
+	cand_info$(DOTOBJ) \
 	mzimeja_res$(DOTOBJ) \
 
 LIBS = \
@@ -71,8 +71,6 @@ $(SETUP_FILE): $(SETUP_OBJS)
 
 config$(DOTOBJ): config.cpp
 	$(CXX) -c $(CXXFLAGS) -o config$(DOTOBJ) config.cpp
-dic$(DOTOBJ): dic.cpp
-	$(CXX) -c $(CXXFLAGS) -o dic$(DOTOBJ) dic.cpp
 dic2$(DOTOBJ): dic2.cpp
 	$(CXX) -c $(CXXFLAGS) -o dic2$(DOTOBJ) dic2.cpp
 mzimeja$(DOTOBJ): mzimeja.cpp
@@ -99,6 +97,8 @@ input_context$(DOTOBJ): input_context.cpp
 	$(CXX) -c $(CXXFLAGS) -o input_context$(DOTOBJ) input_context.cpp
 comp_str$(DOTOBJ): comp_str.cpp
 	$(CXX) -c $(CXXFLAGS) -o comp_str$(DOTOBJ) comp_str.cpp
+cand_info$(DOTOBJ): cand_info.cpp
+	$(CXX) -c $(CXXFLAGS) -o cand_info$(DOTOBJ) cand_info.cpp
 
 setup$(DOTOBJ): setup.cpp
 	$(CXX) -c $(CXXFLAGS) -o setup$(DOTOBJ) setup.cpp

@@ -41,7 +41,11 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
 
   case VK_SPACE:
   case VK_CONVERT:
-    ConvKanji(hIMC);
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->DoConvert();
+      TheIME.UnlockIMC(hIMC);
+    }
     break;
 
   case VK_F6:

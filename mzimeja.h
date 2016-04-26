@@ -233,12 +233,6 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam);
 
-// dic.c
-BOOL PASCAL ConvKanji(HIMC);
-BOOL PASCAL MakeGuideLine(HIMC, DWORD);
-int GetCandidateStringsFromDictionary(LPWSTR lpString, LPWSTR lpBuf,
-                                      DWORD dwBufLen, LPTSTR szDicFileName);
-
 // dic2.c
 WORD PASCAL HanToZen(WORD, WORD, DWORD);
 WORD PASCAL ZenToHan(WORD);

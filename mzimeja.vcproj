@@ -181,15 +181,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\cand_info.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\comp_str.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\config.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dic.cpp"
 				>
 			</File>
 			<File

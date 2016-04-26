@@ -131,7 +131,7 @@ void CandWnd_Paint(HWND hCandWnd) {
         HBRUSH hbr;
         LPTSTR lpstr = lpCandList->GetCandString(i);
         GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
-        if (lpCandInfo->cl.dwSelection == i) {
+        if (lpCandList->dwSelection == i) {
           hbr = (HBRUSH)SelectObject(hDC, hbrHightLight);
           PatBlt(hDC, 0, height, rc.right, sz.cy, PATCOPY);
           SelectObject(hDC, hbr);
