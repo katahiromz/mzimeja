@@ -58,8 +58,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
 
   lpIMEInfo->dwPrivateDataSize = sizeof(UIEXTRA);
   lpIMEInfo->fdwProperty = IME_PROP_KBD_CHAR_FIRST |
-                           IME_PROP_UNICODE | IME_PROP_AT_CARET |
-                           IME_PROP_CANDLIST_START_FROM_1;
+                           IME_PROP_UNICODE | IME_PROP_AT_CARET;
   lpIMEInfo->fdwConversionCaps = IME_CMODE_LANGUAGE | IME_CMODE_FULLSHAPE |
                                  IME_CMODE_ROMAN | IME_CMODE_CHARCODE;
   lpIMEInfo->fdwSentenceCaps = 0L;
