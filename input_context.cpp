@@ -227,80 +227,48 @@ BOOL InputContext::DoConvert() {
 
   if (bIsBeingConverted) {
     // the composition string is being converted.
-    if (HasCandInfo()) {  // there is candidates.
-      // get logical data
-      LogCandInfo log_cand_info;
-      CandInfo *lpCandInfo = LockCandInfo();
-      if (lpCandInfo) {
-        lpCandInfo->GetLogCandInfo(log_cand_info);
-        UnlockCandInfo();
-      }
-
-      log_cand_info.dwSelection++;
-      DWORD dwCount = (DWORD)log_cand_info.cand_strs.size();
-      if (log_cand_info.dwSelection == dwCount) {
-        log_cand_info.dwSelection = 0;
-      }
-
-      // recreate candidate
-      hCandInfo = CandInfo::ReCreate(hCandInfo, &log_cand_info);
-    } else {
+    if (!HasCandInfo()) {
       // there is no candidate.
       // open candidate
       TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
-
-      // get logical data
-      LogCandInfo log_cand_info;
-      CandInfo *lpCandInfo = LockCandInfo();
-      if (lpCandInfo) {
-        lpCandInfo->GetLogCandInfo(log_cand_info);
-        UnlockCandInfo();
-      }
-
-      // get candidates
-      std::wstring str = log_comp_str.comp_read_str;
-      GetCands(log_cand_info, str);
-
-      // set composition string
-      log_comp_str.comp_str = str;
-      log_comp_str.comp_attr.assign(str.size(), ATTR_INPUT);
-      log_comp_str.comp_clause.resize(2);
-      log_comp_str.comp_clause[0] = 0;
-      log_comp_str.comp_clause[1] = str.size();
-
-      // recreate candidate
-      hCandInfo = CandInfo::ReCreate(hCandInfo, &log_cand_info);
     }
-  } else {  // not being converted yet
-    // get logical data
-    LogCandInfo log_cand_info;
-    CandInfo *lpCandInfo = LockCandInfo();
-    if (lpCandInfo) {
-      lpCandInfo->GetLogCandInfo(log_cand_info);
-      UnlockCandInfo();
-    }
-
-    // get candidates
-    std::wstring str = log_comp_str.comp_read_str;
-    GetCands(log_cand_info, str);
-
-    // set composition string
-    log_comp_str.comp_str = str;
-    log_comp_str.comp_attr.assign(str.size(), ATTR_INPUT);
-    log_comp_str.comp_clause.resize(2);
-    log_comp_str.comp_clause[0] = 0;
-    log_comp_str.comp_clause[1] = str.size();
-
-    // recreate composition
-    hCompStr = CompStr::ReCreate(hCompStr, &log_comp_str);
-
-    // generate message
-    LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
-    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
   }
 
+  // get logical data of candidate info
+  LogCandInfo log_cand_info;
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLogCandInfo(log_cand_info);
+    UnlockCandInfo();
+  }
+
+  // get candidates
+  std::wstring str = log_comp_str.comp_str;
+  GetCands(log_cand_info, str);
+  log_comp_str.comp_str = str;
+
+  // recreate candidate
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &log_cand_info);
+  // generate message to change candidate
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+
+  // set composition string
+  log_comp_str.comp_str = str;
+  log_comp_str.comp_attr.assign(str.size(), ATTR_INPUT);
+  log_comp_str.comp_clause.resize(2);
+  log_comp_str.comp_clause[0] = 0;
+  log_comp_str.comp_clause[1] = str.size();
+  // recreate composition
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr, &log_comp_str);
+  DumpCompStr();
+
+  // generate message to change composition
+  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+
   return TRUE;
-}
+} // InputContext::DoConvert
 
 void InputContext::MakeResult() {
   FOOTMARK();
@@ -481,5 +449,18 @@ void InputContext::DumpCompStr() {
   }
 #endif
 } // InputContext::DumpCompStr
+
+void InputContext::DumpCandInfo() {
+  FOOTMARK();
+#ifndef NDEBUG
+  CandInfo *pCandInfo = LockCandInfo();
+  if (pCandInfo) {
+    pCandInfo->Dump();
+    UnlockCandInfo();
+  } else {
+    DebugPrint(TEXT("(no cand info)\n"));
+  }
+#endif
+} // InputContext::DumpCandInfo
 
 //////////////////////////////////////////////////////////////////////////////

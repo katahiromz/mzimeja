@@ -528,8 +528,10 @@ VOID MZIMEJA::UnlockIMC(HIMC hIMC) {
   DebugPrint(TEXT("MZIMEJA::UnlockIMC: unlocking: %p\n"), hIMC);
   ::ImmUnlockIMC(hIMC);
   DebugPrint(TEXT("MZIMEJA::UnlockIMC: unlocked: %p\n"), hIMC);
-  m_hIMC = NULL;
-  m_lpIMC = NULL;
+  if (::ImmGetIMCLockCount(hIMC) == 0) {
+    m_hIMC = NULL;
+    m_lpIMC = NULL;
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////

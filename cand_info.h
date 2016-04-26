@@ -54,7 +54,10 @@ struct CandInfo : public CANDIDATEINFO {
     return (CandList *)(GetBytes() + dwOffset[i]);
   }
 
+  void Dump();
+
 private:
+  // not implement
   CandInfo();
   CandInfo(const CandInfo&);
   CandInfo& operator=(const CandInfo&);

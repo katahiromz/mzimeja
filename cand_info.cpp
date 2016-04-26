@@ -107,4 +107,27 @@ void CandInfo::GetLogCandInfo(LogCandInfo& log) {
   return hCandInfo;
 } // CandInfo::ReCreate
 
+void CandInfo::Dump() {
+#ifndef NDEBUG
+  DebugPrint(TEXT("### CandInfo ###\n"));
+  DebugPrint(TEXT("+ dwSize: %u\n"), dwSize);
+  DebugPrint(TEXT("+ dwCount: %u\n"), dwCount);
+  for (DWORD i = 0; i < dwCount; ++i) {
+    DebugPrint(TEXT("+ List #%u"), i);
+    DebugPrint(TEXT("++ dwOffset: %08X\n"), dwOffset[i]);
+    CandList *list = GetList(i);
+    DebugPrint(TEXT("++ dwSize: %u\n"), list->dwSize);
+    DebugPrint(TEXT("++ dwStyle: %08X\n"), list->dwStyle);
+    DebugPrint(TEXT("++ dwCount: %08X\n"), list->dwCount);
+    DebugPrint(TEXT("++ dwSelection: %08X\n"), list->dwSelection);
+    DebugPrint(TEXT("++ dwPageStart: %u\n"), list->dwPageStart);
+    DebugPrint(TEXT("++ dwPageSize: %u\n"), list->dwPageSize);
+    DebugPrint(TEXT("++ dwOffset: %u\n"), list->dwOffset);
+    for (DWORD k = 0; k < list->dwCount; ++k) {
+      DebugPrint(TEXT("+++ %s"), list->GetCandString(k));
+    }
+  }
+#endif
+} // CandInfo::Dump
+
 //////////////////////////////////////////////////////////////////////////////

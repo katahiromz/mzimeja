@@ -382,7 +382,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     DebugPrint(TEXT("NI_CONTEXTUPDATED\n"));
     switch (dwValue) {
       case IMC_SETOPENSTATUS:
-        if (!dwIndex) {
+        if (dwIndex == 0) {
           lpIMC = TheIME.LockIMC(hIMC);
           if (lpIMC) {
             lpIMC->CancelText();
