@@ -25,7 +25,6 @@ RCFLAGS = -Iinclude -F pe-i386            # x86
 
 OBJS = \
 	config$(DOTOBJ) \
-	dic2$(DOTOBJ) \
 	mzimeja$(DOTOBJ) \
 	imm$(DOTOBJ) \
 	immsec$(DOTOBJ) \
@@ -71,8 +70,6 @@ $(SETUP_FILE): $(SETUP_OBJS)
 
 config$(DOTOBJ): config.cpp
 	$(CXX) -c $(CXXFLAGS) -o config$(DOTOBJ) config.cpp
-dic2$(DOTOBJ): dic2.cpp
-	$(CXX) -c $(CXXFLAGS) -o dic2$(DOTOBJ) dic2.cpp
 mzimeja$(DOTOBJ): mzimeja.cpp
 	$(CXX) -c $(CXXFLAGS) -o mzimeja$(DOTOBJ) mzimeja.cpp
 imm$(DOTOBJ): imm.cpp

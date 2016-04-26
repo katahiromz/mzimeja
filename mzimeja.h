@@ -233,17 +233,6 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam);
 
-// dic2.c
-WORD PASCAL HanToZen(WORD, WORD, DWORD);
-WORD PASCAL ZenToHan(WORD);
-BOOL PASCAL IsTenten(WORD);
-WORD PASCAL ConvTenten(WORD);
-BOOL PASCAL IsMaru(WORD);
-WORD PASCAL ConvMaru(WORD);
-WORD PASCAL HiraToKata(WORD);
-WORD PASCAL KataToHira(WORD);
-void PASCAL lHanToZen(LPTSTR, LPTSTR, DWORD);
-
 // mzimeja.cpp
 BOOL IsInputModeOpen(InputMode imode);
 InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);

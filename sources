@@ -18,7 +18,6 @@ INCLUDES=include;
 
 SOURCES= \
         config.cpp \
-        dic2.cpp \
         mzimeja.cpp \
         imm.cpp \
         immsec.cpp \

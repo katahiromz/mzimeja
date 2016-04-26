@@ -193,10 +193,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dic2.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\imm.cpp"
 				>
 			</File>
