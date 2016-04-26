@@ -49,7 +49,7 @@ inline void SetClause(LPDWORD lpdw, DWORD num) {
 //////////////////////////////////////////////////////////////////////////////
 
 struct CompStr : public COMPOSITIONSTRING {
-  static HIMCC ReCreate(HIMCC hCompStr, const LogCompStr *log);
+  static HIMCC ReCreate(HIMCC hCompStr, const LogCompStr *log = NULL);
 
   void GetLogCompStr(LogCompStr& log);
   BOOL IsBeingConverted();

@@ -46,7 +46,7 @@ private:
 //////////////////////////////////////////////////////////////////////////////
 
 struct CandInfo : public CANDIDATEINFO {
-  static HIMCC ReCreate(HIMCC hCandInfo, const LogCandInfo *log);
+  static HIMCC ReCreate(HIMCC hCandInfo, const LogCandInfo *log = NULL);
   void GetLogCandInfo(LogCandInfo& log);
 
   LPBYTE GetBytes() { return (LPBYTE)this; }

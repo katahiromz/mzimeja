@@ -459,7 +459,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
           // generate message to open candidate
           TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
           // reset candidates
-          lpIMC->hCandInfo = CandInfo::ReCreate(lpIMC->hCandInfo, NULL);
+          lpIMC->hCandInfo = CandInfo::ReCreate(lpIMC->hCandInfo);
           // generate message to change candidate
           TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
           ret = TRUE;

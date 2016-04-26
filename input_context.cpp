@@ -18,8 +18,8 @@ void InputContext::Initialize() {
     fdwInit |= INIT_CONVERSION;
   }
 
-  hCompStr = CompStr::ReCreate(hCompStr, NULL);
-  hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
+  hCompStr = CompStr::ReCreate(hCompStr);
+  hCandInfo = CandInfo::ReCreate(hCandInfo);
 }
 
 BOOL InputContext::HasCandInfo() {
@@ -307,7 +307,7 @@ void InputContext::MakeResult() {
 
   // close candidate
   if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
+    hCandInfo = CandInfo::ReCreate(hCandInfo);
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
@@ -350,12 +350,12 @@ void InputContext::CancelText() {
 
   // close candidate
   if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
+    hCandInfo = CandInfo::ReCreate(hCandInfo);
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
   DumpCompStr();
-  hCompStr = CompStr::ReCreate(hCompStr, NULL);
+  hCompStr = CompStr::ReCreate(hCompStr);
   DumpCompStr();
 
   // generate messages to end composition
@@ -368,7 +368,7 @@ void InputContext::RevertText() {
 
   // close candidate
   if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
+    hCandInfo = CandInfo::ReCreate(hCandInfo);
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
   }
 
@@ -456,7 +456,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   if (log.comp_str.empty()) {
     // close candidate if any
     if (HasCandInfo()) {
-      hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
+      hCandInfo = CandInfo::ReCreate(hCandInfo);
     }
 
     // generate messages to end composition
