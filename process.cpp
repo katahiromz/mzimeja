@@ -16,8 +16,8 @@ extern "C" {
 BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                        LPBYTE lpbKeyState) {
   InputContext *lpIMC;
-  WORD wVKey = (wParam & 0x00FF);
-  switch (wVKey) {
+  WORD vk = (wParam & 0x00FF);
+  switch (vk) {
   case VK_SHIFT:
   case VK_CONTROL:
     break;
@@ -34,7 +34,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   case VK_BACK:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->DeleteChar(wVKey == VK_BACK);
+      lpIMC->DeleteChar(vk == VK_BACK);
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -63,22 +63,24 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   case VK_RETURN:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      if (lpIMC->Conversion() & IME_CMODE_CHARCODE)
+      if (lpIMC->Conversion() & IME_CMODE_CHARCODE) {
+        // code input
         lpIMC->CancelText();
-      else
+      } else {
         lpIMC->MakeResult();
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
 
   default:
-    if ((VK_0 <= wVKey && wVKey <= VK_9) ||
-        (VK_A <= wVKey && wVKey <= VK_Z) ||
-        (VK_NUMPAD0 <= wVKey && wVKey <= VK_NUMPAD9) ||
-        (VK_OEM_1 <= wVKey && wVKey <= VK_OEM_9) ||
-        (VK_MULTIPLY <= wVKey && wVKey <= VK_DIVIDE))
+    if ((VK_0 <= vk && vk <= VK_9) ||
+        (VK_A <= vk && vk <= VK_Z) ||
+        (VK_NUMPAD0 <= vk && vk <= VK_NUMPAD9) ||
+        (VK_OEM_1 <= vk && vk <= VK_OEM_9) ||
+        (VK_MULTIPLY <= vk && vk <= VK_DIVIDE) ||
+        (vk == VK_PACKET))
     {
-      // This WM_IME_KEYDOWN has actual character code in itself.
       lpIMC = TheIME.LockIMC(hIMC);
       if (lpIMC) {
         lpIMC->AddChar(HIWORD(wParam));
@@ -240,7 +242,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 
   TheIME.UnlockIMC(hIMC);
   return ret;
-}
+} // ImeProcessKey
 
 //  ImeToAsciiEx 
 //  ImeToAsciiEx 関数は hIMC パラメータに従って IME 変換エンジンを通して変
@@ -317,7 +319,7 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
     }
   }
   return ret;
-}
+} // ImeToAsciiEx
 
 //////////////////////////////////////////////////////////////////////////////
 
