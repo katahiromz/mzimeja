@@ -52,6 +52,9 @@ struct InputContext : public INPUTCONTEXT {
   void GetCands(LogCandInfo& log_cand_info, std::wstring& str);
   void MakeResult();
 
+  void MoveLeft();
+  void MoveRight();
+
   void DumpCandInfo();
   void DumpCompStr();
 

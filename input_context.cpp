@@ -177,7 +177,7 @@ void InputContext::AddChar(WCHAR ch) {
   log.comp_clause[0] = 0;
   log.comp_clause[1] = (DWORD)log.comp_str.size();
 
-  // realloc
+  // recreate
   DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
   DumpCompStr();
@@ -254,7 +254,7 @@ BOOL InputContext::DoConvert() {
 
   // set composition string
   log_comp_str.comp_str = str;
-  log_comp_str.comp_attr.assign(str.size(), ATTR_INPUT);
+  log_comp_str.comp_attr.assign(str.size(), ATTR_TARGET_CONVERTED);
   log_comp_str.comp_clause.resize(2);
   log_comp_str.comp_clause[0] = 0;
   log_comp_str.comp_clause[1] = str.size();
@@ -303,13 +303,13 @@ void InputContext::MakeResult() {
   log.comp_clause.clear();
   log.comp_str.clear();
 
-  // realloc
+  // recreate
   DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
   DumpCompStr();
 
   // generate messages to end composition
-  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_RESULTALL);
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
   TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::MakeResult
 
@@ -362,7 +362,7 @@ void InputContext::RevertText() {
   log.dwCursorPos = (DWORD)log.comp_str.size();
   log.dwDeltaStart = 0;
 
-  // realloc
+  // recreate
   DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
   DumpCompStr();
@@ -416,7 +416,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   log.comp_clause[0] = 0;
   log.comp_clause[1] = (DWORD)log.comp_str.size();
 
-  // realloc
+  // recreate
   DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
   DumpCompStr();
@@ -436,6 +436,101 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
   }
 } // InputContext::DeleteChar
+
+void InputContext::MoveLeft() {
+  FOOTMARK();
+
+  // get logical data
+  LogCompStr log;
+  BOOL bIsBeingConverted = FALSE;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    bIsBeingConverted = lpCompStr->IsBeingConverted();
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  DWORD dwCursorPos = log.dwCursorPos;
+  if (bIsBeingConverted) {
+    size_t i, siz = log.comp_clause.size();
+    if (siz > 1) {
+      for (i = 0; i < siz; ++i) {
+        if (dwCursorPos <= log.comp_clause[i]) {
+          if (i == 0) {
+            i = siz - 2;
+          } else {
+            --i;
+          }
+          break;
+        }
+      }
+      dwCursorPos = log.comp_clause[i];
+    }
+  } else {
+    if (log.dwCursorPos > 0) {
+      --dwCursorPos;
+    } else {
+      return;
+    }
+  }
+  log.dwCursorPos = dwCursorPos;
+
+  // recreate
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  DumpCompStr();
+
+  // update composition
+  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+} // InputContext::MoveLeft
+
+void InputContext::MoveRight() {
+  FOOTMARK();
+
+  // get logical data
+  LogCompStr log;
+  BOOL bIsBeingConverted = FALSE;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    bIsBeingConverted = lpCompStr->IsBeingConverted();
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  DWORD dwCursorPos = log.dwCursorPos;
+  if (bIsBeingConverted) {
+    size_t i, k, siz = log.comp_clause.size();
+    if (siz > 1) {
+      for (i = k = 0; i < siz; ++i) {
+        if (log.comp_clause[i] <= dwCursorPos) {
+          if (siz <= i + 1) {
+            k = 0;
+          } else {
+            k = i + 1;
+          }
+        }
+      }
+      dwCursorPos = log.comp_clause[k];
+    }
+  } else {
+    if (log.dwCursorPos < (DWORD)log.comp_str.size()) {
+      ++dwCursorPos;
+    } else {
+      return;
+    }
+  }
+  log.dwCursorPos = dwCursorPos;
+
+  // recreate
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  DumpCompStr();
+
+  // update composition
+  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+} // InputContext::MoveRight
 
 void InputContext::DumpCompStr() {
   FOOTMARK();

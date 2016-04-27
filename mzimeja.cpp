@@ -599,10 +599,20 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 // DLL entry point
 
+#ifndef NDEBUG
+  LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo) {
+    DebugPrint(TEXT("### Abnormal Status ###\n"));
+    FOOTMARK_PRINT_CALL_STACK();
+  }
+#endif
+
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   FOOTMARK();
   switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
+      #ifndef NDEBUG
+        ::SetUnhandledExceptionFilter();
+      #endif
       DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %p\n"), TheIME.m_hInst);
       TheIME.Init(hInstDLL);
       break;

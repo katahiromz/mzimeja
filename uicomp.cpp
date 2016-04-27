@@ -50,6 +50,7 @@ static int NumCharInDY(HDC hDC, LPWSTR psz, int dy) {
 void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra,
                     InputContext *lpIMC) {
   RECT rc;
+  FOOTMARK();
 
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
   for (int i = 0; i < MAXCOMPWND; i++) {
@@ -92,6 +93,8 @@ void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra,
 
 // Calc the position of composition windows and move them
 void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+  FOOTMARK();
+
   HDC hDC;
   HFONT hFont = NULL;
   HFONT hOldFont = NULL;
@@ -173,7 +176,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
             lpUIExtra->uiComp[i].rc.left = curx;
             lpUIExtra->uiComp[i].rc.top = cury;
             lpUIExtra->uiComp[i].rc.right = siz.cx;
-            lpUIExtra->uiComp[i].rc.bottom = siz.cy;
+            lpUIExtra->uiComp[i].rc.bottom = siz.cy + 1;
             SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR,
                           (DWORD)(pch - lpstr));
             SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTNUM, num);
@@ -198,7 +201,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
           dx = rcSrc.right - rcSrc.left;
           curx = rcSrc.left;
-          cury += siz.cy;
+          cury += siz.cy + 1;
 
           if (hOldFont) SelectObject(hDC, hOldFont);
           ReleaseDC(lpUIExtra->uiComp[i].hWnd, hDC);
@@ -225,7 +228,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
             lpUIExtra->uiComp[i].rc.left = curx - siz.cy;
             lpUIExtra->uiComp[i].rc.top = cury;
-            lpUIExtra->uiComp[i].rc.right = siz.cy;
+            lpUIExtra->uiComp[i].rc.right = siz.cy + 1;
             lpUIExtra->uiComp[i].rc.bottom = siz.cx;
             SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR,
                           (DWORD)(pch - lpstr));
@@ -251,7 +254,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
           dy = rcSrc.bottom - rcSrc.top;
           cury = rcSrc.top;
-          curx -= siz.cy;
+          curx -= siz.cy + 1;
 
           if (hOldFont) SelectObject(hDC, hOldFont);
           ReleaseDC(lpUIExtra->uiComp[i].hWnd, hDC);
@@ -279,7 +282,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
           lpstr = lpCompStr->GetCompStr();
           GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &siz);
           width = siz.cx;
-          height = siz.cy;
+          height = siz.cy + 1;
         }
         lpIMC->UnlockCompStr();
       }
@@ -300,8 +303,9 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   }
 }
 
-void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
-                            LPBYTE lpattr, int num, BOOL fVert) {
+void DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
+                     LPBYTE lpattr, int num, BOOL fVert, DWORD dwCursor) {
+  FOOTMARK();
   //LPTSTR lpStart = lpstr;
   LPTSTR lpEnd = lpstr + num - 1;
   int x, y;
@@ -319,46 +323,63 @@ void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
     y = 0;
   }
 
+  DWORD ich = 0;
   while (lpstr <= lpEnd) {
-    int cnt = 0;
     BYTE bAttr = *lpattr;
     SIZE siz;
 
-    while ((bAttr == *lpattr) || (cnt <= num)) {
-      lpattr++;
-      cnt++;
-    }
+    BOOL bConverted = FALSE;
     switch (bAttr) {
-      case ATTR_INPUT:
-        break;
+    case ATTR_TARGET_CONVERTED:
+    case ATTR_CONVERTED:
+      bConverted = TRUE;
+      break;
 
-      case ATTR_TARGET_CONVERTED:
-        SetTextColor(hDC, RGB(127, 127, 127));
-        if (!fVert)
-          TextOut(hDC, x + 1, y + 1, lpstr, cnt);
-        else
-          TextOut(hDC, x - 1, y + 1, lpstr, cnt);
-        SetTextColor(hDC, RGB(0, 0, 0));
-        SetBkMode(hDC, TRANSPARENT);
-        break;
-
-      case ATTR_CONVERTED:
-        SetTextColor(hDC, RGB(127, 127, 127));
-        if (!fVert)
-          TextOut(hDC, x + 1, y + 1, lpstr, cnt);
-        else
-          TextOut(hDC, x - 1, y + 1, lpstr, cnt);
-        SetTextColor(hDC, RGB(0, 0, 255));
-        SetBkMode(hDC, TRANSPARENT);
-        break;
-
-      case ATTR_TARGET_NOTCONVERTED:
-        break;
+    default:
+      break;
     }
 
-    TextOut(hDC, x, y, lpstr, cnt);
-    GetTextExtentPoint(hDC, lpstr, cnt, &siz);
-    lpstr += cnt;
+    HPEN hPen;
+    if (bConverted) {
+      SetTextColor(hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
+      SetBkMode(hDC, OPAQUE);
+      SetBkColor(hDC, GetSysColor(COLOR_HIGHLIGHT));
+      hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
+    } else {
+      SetTextColor(hDC, RGB(0, 127, 0));
+      SetBkMode(hDC, OPAQUE);
+      SetBkColor(hDC, RGB(255, 255, 255));
+      hPen = CreatePen(PS_DOT, 1, RGB(0, 127, 0));
+    }
+
+    TextOut(hDC, x, y, lpstr, 1);
+    GetTextExtentPoint(hDC, lpstr, 1, &siz);
+
+    HGDIOBJ hPenOld = SelectObject(hDC, hPen);
+    if (fVert) {
+      MoveToEx(hDC, x, y, NULL);
+      LineTo(hDC, x, y + siz.cx - 1);
+    } else {
+      MoveToEx(hDC, x, y + siz.cy - 1, NULL);
+      LineTo(hDC, x + siz.cx, y + siz.cy - 1);
+    }
+    SelectObject(hDC, hPenOld);
+    DeleteObject(hPen);
+
+    SelectObject(hDC, GetStockObject(BLACK_PEN));
+    if (dwCursor == ich) {
+      if (fVert) {
+        MoveToEx(hDC, x, y, NULL);
+        LineTo(hDC, x + siz.cy, y);
+      } else {
+        MoveToEx(hDC, x, y, NULL);
+        LineTo(hDC, x, y + siz.cy);
+      }
+    }
+
+    ++lpstr;
+    ++ich;
+    ++lpattr;
 
     if (!fVert)
       x += siz.cx;
@@ -368,6 +389,8 @@ void PASCAL DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
 }
 
 void CompWnd_Paint(HWND hCompWnd) {
+  FOOTMARK();
+
   HIMC hIMC;
   HDC hDC;
   RECT rc;
@@ -394,18 +417,14 @@ void CompWnd_Paint(HWND hCompWnd) {
         LONG lstart;
         LONG num;
         BOOL fVert = FALSE;
+        DWORD dwCursor = lpCompStr->dwCursorPos;
 
         if (hFont) fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
 
         lpstr = lpCompStr->GetCompStr();
         lpattr = lpCompStr->GetCompAttr();
-        SetBkMode(hDC, TRANSPARENT);
         if (lpIMC->cfCompForm.dwStyle) {
-          HDC hPDC;
-
-          hPDC = GetDC(GetParent(hCompWnd));
           GetClientRect(hCompWnd, &rc);
-          SetBkColor(hDC, GetBkColor(hPDC));
           SetBkMode(hDC, OPAQUE);
 
           lstart = GetWindowLong(hCompWnd, FIGWL_COMPSTARTSTR);
@@ -415,11 +434,11 @@ void CompWnd_Paint(HWND hCompWnd) {
 
           lpstr += lstart;
           lpattr += lstart;
-          DrawTextOneLine(hCompWnd, hDC, lpstr, lpattr, num, fVert);
-          ReleaseDC(GetParent(hCompWnd), hPDC);
+          dwCursor -= lstart;
+          DrawTextOneLine(hCompWnd, hDC, lpstr, lpattr, num, fVert, dwCursor);
         } else {
           num = lstrlen(lpstr);
-          DrawTextOneLine(hCompWnd, hDC, lpstr, lpattr, num, fVert);
+          DrawTextOneLine(hCompWnd, hDC, lpstr, lpattr, num, fVert, dwCursor);
         }
       }
     end_pcw:
@@ -432,6 +451,8 @@ void CompWnd_Paint(HWND hCompWnd) {
 }
 
 void CompWnd_Hide(LPUIEXTRA lpUIExtra) {
+  FOOTMARK();
+
   RECT rc;
   if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
     if (!lpUIExtra->dwCompStyle)
@@ -450,6 +471,7 @@ void CompWnd_Hide(LPUIEXTRA lpUIExtra) {
 }
 
 void CompWnd_SetFont(LPUIEXTRA lpUIExtra) {
+  FOOTMARK();
   for (int i = 0; i < MAXCOMPWND; i++)
     if (IsWindow(lpUIExtra->uiComp[i].hWnd))
       SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_FONT,
@@ -458,6 +480,7 @@ void CompWnd_SetFont(LPUIEXTRA lpUIExtra) {
 
 LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
+  FOOTMARK();
   HWND hUIWnd;
 
   switch (message) {

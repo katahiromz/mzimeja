@@ -73,6 +73,22 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     }
     break;
 
+  case VK_LEFT:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MoveLeft();
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
+  case VK_RIGHT:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MoveRight();
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
   default:
     if ((VK_0 <= vk && vk <= VK_9) ||
         (VK_A <= vk && vk <= VK_Z) ||
