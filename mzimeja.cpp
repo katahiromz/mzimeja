@@ -603,35 +603,40 @@ extern "C" {
   LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo) {
     DebugPrint(TEXT("### Abnormal Status ###\n"));
     FOOTMARK_PRINT_CALL_STACK();
+    return EXCEPTION_EXECUTE_HANDLER;
   }
 #endif
 
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   FOOTMARK();
+  static LPTOP_LEVEL_EXCEPTION_FILTER s_old_handler;
   switch (dwFunction) {
-    case DLL_PROCESS_ATTACH:
-      #ifndef NDEBUG
-        ::SetUnhandledExceptionFilter();
-      #endif
-      DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %p\n"), TheIME.m_hInst);
-      TheIME.Init(hInstDLL);
-      break;
+  case DLL_PROCESS_ATTACH:
+    #ifndef NDEBUG
+      s_old_handler = ::SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
+    #endif
+    DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %p\n"), TheIME.m_hInst);
+    TheIME.Init(hInstDLL);
+    break;
 
-    case DLL_PROCESS_DETACH:
-      DebugPrint(TEXT("DLL_PROCESS_DETACH: hInst is %p\n"), TheIME.m_hInst);
-      TheIME.Destroy();
-      break;
+  case DLL_PROCESS_DETACH:
+    DebugPrint(TEXT("DLL_PROCESS_DETACH: hInst is %p\n"), TheIME.m_hInst);
+    TheIME.Destroy();
+    #ifndef NDEBUG
+      ::SetUnhandledExceptionFilter(s_old_handler);
+    #endif
+    break;
 
-    case DLL_THREAD_ATTACH:
-      DebugPrint(TEXT("DLL_THREAD_ATTACH: hInst is %p\n"), TheIME.m_hInst);
-      break;
+  case DLL_THREAD_ATTACH:
+    DebugPrint(TEXT("DLL_THREAD_ATTACH: hInst is %p\n"), TheIME.m_hInst);
+    break;
 
-    case DLL_THREAD_DETACH:
-      DebugPrint(TEXT("DLL_THREAD_DETACH: hInst is %p\n"), TheIME.m_hInst);
-      break;
+  case DLL_THREAD_DETACH:
+    DebugPrint(TEXT("DLL_THREAD_DETACH: hInst is %p\n"), TheIME.m_hInst);
+    break;
   }
   return TRUE;
-}
+} // DllMain
 
 //////////////////////////////////////////////////////////////////////////////
 
