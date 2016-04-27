@@ -50,10 +50,18 @@ struct InputContext : public INPUTCONTEXT {
   void DeleteChar(BOOL bBackSpace = FALSE);
   BOOL DoConvert();
   void GetCands(LogCandInfo& log_cand_info, std::wstring& str);
+
   void MakeResult();
+  void MakeHiragana();
+  void MakeKatakana();
+  void MakeHanKana();
+  void MakeZenEisuu();
+  void MakeHanEisuu();
 
   void MoveLeft();
   void MoveRight();
+  void MoveToBeginning();
+  void MoveToEnd();
 
   void DumpCandInfo();
   void DumpCompStr();

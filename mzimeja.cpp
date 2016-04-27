@@ -596,9 +596,6 @@ extern "C" {
   }
 #endif  // ndef NDEBUG
 
-//////////////////////////////////////////////////////////////////////////////
-// DLL entry point
-
 #ifndef NDEBUG
   LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo) {
     DebugPrint(TEXT("### Abnormal Status ###\n"));
@@ -606,6 +603,9 @@ extern "C" {
     return EXCEPTION_EXECUTE_HANDLER;
   }
 #endif
+
+//////////////////////////////////////////////////////////////////////////////
+// DLL entry point
 
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   FOOTMARK();

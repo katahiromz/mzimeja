@@ -12,14 +12,95 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
+WCHAR MapOemVirtualKey(BYTE vk, BOOL bShift) {
+  switch (vk) {
+  case VK_OEM_PLUS:     return (bShift ? L'+' : L';');
+  case VK_OEM_MINUS:    return (bShift ? L'=' : L'-');
+  case VK_OEM_PERIOD:   return (bShift ? L'>' : L'.');
+  case VK_OEM_COMMA:    return (bShift ? L'<' : L',');
+  case VK_OEM_1:        return (bShift ? L'*' : L':');
+  case VK_OEM_2:        return (bShift ? L'?' : L'/');
+  case VK_OEM_3:        return (bShift ? L'`' : L'@');
+  case VK_OEM_4:        return (bShift ? L'{' : L'[');
+  case VK_OEM_5:        return (bShift ? L'|' : L'\\');
+  case VK_OEM_6:        return (bShift ? L'}' : L']');
+  case VK_OEM_7:        return (bShift ? L'~' : L'^');
+  case VK_OEM_8:        return 0;
+  case VK_OEM_9:        return 0;
+  case VK_OEM_102:      return (bShift ? L'_' : L'\\');
+  default:              return 0;
+  }
+} // MapOemVirtualKey
+
+WCHAR MapNumPadVirtualKey(BYTE vk) {
+  switch (vk) {
+  case VK_ADD:        return L'+';
+  case VK_SUBTRACT:   return L'-';
+  case VK_MULTIPLY:   return L'*';
+  case VK_DIVIDE:     return L'/';
+  case VK_SEPARATOR:  return L',';
+  case VK_DECIMAL:    return L'.';
+  case VK_NUMPAD0:    return L'0';
+  case VK_NUMPAD1:    return L'1';
+  case VK_NUMPAD2:    return L'2';
+  case VK_NUMPAD3:    return L'3';
+  case VK_NUMPAD4:    return L'4';
+  case VK_NUMPAD5:    return L'5';
+  case VK_NUMPAD6:    return L'6';
+  case VK_NUMPAD7:    return L'7';
+  case VK_NUMPAD8:    return L'8';
+  case VK_NUMPAD9:    return L'9';
+  default:            return 0;
+  }
+} // MapNumPadVirtualKey
+
+
 // A function which handles WM_IME_KEYDOWN
 BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                        LPBYTE lpbKeyState) {
   InputContext *lpIMC;
   WORD vk = (wParam & 0x00FF);
+  BOOL bOpen;
+  WCHAR ch;
+
   switch (vk) {
   case VK_SHIFT:
   case VK_CONTROL:
+    break;
+
+  case VK_KANJI:
+  case VK_OEM_AUTO:
+  case VK_OEM_ENLW:
+    bOpen = FALSE;
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      bOpen = lpIMC->IsOpen();
+      TheIME.UnlockIMC(hIMC);
+    }
+    if (bOpen) {
+      ImmSetOpenStatus(hIMC, FALSE);
+    } else {
+      ImmSetOpenStatus(hIMC, TRUE);
+    }
+    break;
+
+  case VK_OEM_COPY:
+    bOpen = FALSE;
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      bOpen = lpIMC->IsOpen();
+      TheIME.UnlockIMC(hIMC);
+    }
+    if (!bOpen) {
+      ImmSetOpenStatus(hIMC, TRUE);
+    }
+    if (lpbKeyState[VK_MENU] & 0x80) {
+      SetRomajiMode(hIMC, !IsRomajiMode(hIMC));
+    } else if (lpbKeyState[VK_SHIFT] & 0x80) {
+      SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+    } else {
+      SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+    }
     break;
 
   case VK_ESCAPE:
@@ -49,15 +130,43 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     break;
 
   case VK_F6:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MakeHiragana();
+      TheIME.UnlockIMC(hIMC);
+    }
     break;
 
   case VK_F7:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MakeKatakana();
+      TheIME.UnlockIMC(hIMC);
+    }
     break;
 
   case VK_F8:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MakeHanKana();
+      TheIME.UnlockIMC(hIMC);
+    }
     break;
 
   case VK_F9:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MakeZenEisuu();
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
+  case VK_F10:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MakeHanEisuu();
+      TheIME.UnlockIMC(hIMC);
+    }
     break;
 
   case VK_RETURN:
@@ -89,12 +198,56 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     }
     break;
 
+  case VK_HOME: case VK_UP:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MoveToBeginning();
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
+  case VK_END: case VK_DOWN:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MoveToEnd();
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
+  case VK_OEM_PLUS: case VK_OEM_MINUS: case VK_OEM_PERIOD:
+  case VK_OEM_COMMA:
+  case VK_OEM_1: case VK_OEM_2: case VK_OEM_3: case VK_OEM_4:
+  case VK_OEM_5: case VK_OEM_6: case VK_OEM_7: case VK_OEM_8:
+  case VK_OEM_9: case VK_OEM_102:
+    // OEM keys
+    ch = MapOemVirtualKey((BYTE)vk, (lpbKeyState[VK_SHIFT] & 0x80));
+    if (ch != 0) {
+      lpIMC = TheIME.LockIMC(hIMC);
+      if (lpIMC) {
+        lpIMC->AddChar(ch);
+        TheIME.UnlockIMC(hIMC);
+      }
+    }
+    break;
+  case VK_ADD: case VK_SUBTRACT: case VK_MULTIPLY: case VK_DIVIDE:
+  case VK_SEPARATOR: case VK_DECIMAL:
+  case VK_NUMPAD0: case VK_NUMPAD1: case VK_NUMPAD2: case VK_NUMPAD3:
+  case VK_NUMPAD4: case VK_NUMPAD5: case VK_NUMPAD6: case VK_NUMPAD7:
+  case VK_NUMPAD8: case VK_NUMPAD9:
+    // num pad keys
+    // OEM keys
+    ch = MapNumPadVirtualKey((BYTE)vk);
+    if (ch != 0) {
+      lpIMC = TheIME.LockIMC(hIMC);
+      if (lpIMC) {
+        lpIMC->AddChar(ch);
+        TheIME.UnlockIMC(hIMC);
+      }
+    }
+    break;
+
   default:
-    if ((VK_0 <= vk && vk <= VK_9) ||
-        (VK_A <= vk && vk <= VK_Z) ||
-        (VK_NUMPAD0 <= vk && vk <= VK_NUMPAD9) ||
-        (VK_OEM_1 <= vk && vk <= VK_OEM_9) ||
-        (VK_MULTIPLY <= vk && vk <= VK_DIVIDE) ||
+    if ((VK_0 <= vk && vk <= VK_9) || (VK_A <= vk && vk <= VK_Z) ||
         (vk == VK_PACKET))
     {
       lpIMC = TheIME.LockIMC(hIMC);

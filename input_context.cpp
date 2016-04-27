@@ -313,6 +313,214 @@ void InputContext::MakeResult() {
   TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::MakeResult
 
+void InputContext::MakeHiragana() {
+  FOOTMARK();
+
+  // close candidate
+  if (HasCandInfo()) {
+    hCandInfo = CandInfo::ReCreate(hCandInfo);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+  }
+
+  // get logical data
+  LogCompStr log;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  WCHAR szBuf[1024];
+  LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+  ::LCMapString(MAKELCID(langid, SORT_DEFAULT),
+    LCMAP_FULLWIDTH | LCMAP_HIRAGANA,
+    log.comp_read_str.c_str(), -1, szBuf, 1024);
+
+  // update composition
+  log.comp_str = szBuf;
+  DWORD len = (DWORD)log.comp_str.size();
+  log.dwCursorPos = len;
+  log.dwDeltaStart = 0;
+  log.comp_attr.assign(len, ATTR_INPUT);
+  log.comp_clause.resize(2);
+  log.comp_clause[0] = 0;
+  log.comp_clause[1] = len;
+
+  // recreate
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  DumpCompStr();
+
+  // generate messages to update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
+}
+
+void InputContext::MakeKatakana() {
+  FOOTMARK();
+
+  // close candidate
+  if (HasCandInfo()) {
+    hCandInfo = CandInfo::ReCreate(hCandInfo);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+  }
+
+  // get logical data
+  LogCompStr log;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  WCHAR szBuf[1024];
+  LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+  ::LCMapString(MAKELCID(langid, SORT_DEFAULT),
+    LCMAP_FULLWIDTH | LCMAP_KATAKANA,
+    log.comp_read_str.c_str(), -1, szBuf, 1024);
+
+  // update composition
+  log.comp_str = szBuf;
+  DWORD len = (DWORD)log.comp_str.size();
+  log.dwCursorPos = len;
+  log.dwDeltaStart = 0;
+  log.comp_attr.assign(len, ATTR_INPUT);
+  log.comp_clause.resize(2);
+  log.comp_clause[0] = 0;
+  log.comp_clause[1] = len;
+
+  // recreate
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  DumpCompStr();
+
+  // generate messages to update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
+}
+
+void InputContext::MakeHanKana() {
+  FOOTMARK();
+
+  // close candidate
+  if (HasCandInfo()) {
+    hCandInfo = CandInfo::ReCreate(hCandInfo);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+  }
+
+  // get logical data
+  LogCompStr log;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  WCHAR szBuf[1024];
+  LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+  ::LCMapString(MAKELCID(langid, SORT_DEFAULT),
+    LCMAP_HALFWIDTH | LCMAP_KATAKANA,
+    log.comp_read_str.c_str(), -1, szBuf, 1024);
+
+  // update composition
+  log.comp_str = szBuf;
+  DWORD len = (DWORD)log.comp_str.size();
+  log.dwCursorPos = len;
+  log.dwDeltaStart = 0;
+  log.comp_attr.assign(len, ATTR_INPUT);
+  log.comp_clause.resize(2);
+  log.comp_clause[0] = 0;
+  log.comp_clause[1] = len;
+
+  // recreate
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  DumpCompStr();
+
+  // generate messages to update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
+}
+
+void InputContext::MakeZenEisuu() {
+  FOOTMARK();
+
+  // close candidate
+  if (HasCandInfo()) {
+    hCandInfo = CandInfo::ReCreate(hCandInfo);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+  }
+
+  // get logical data
+  LogCompStr log;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  WCHAR szBuf[1024];
+  LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+  ::LCMapString(MAKELCID(langid, SORT_DEFAULT),
+    LCMAP_FULLWIDTH, log.comp_read_str.c_str(), -1, szBuf, 1024);
+
+  // update composition
+  log.comp_str = szBuf;
+  DWORD len = (DWORD)log.comp_str.size();
+  log.dwCursorPos = len;
+  log.dwDeltaStart = 0;
+  log.comp_attr.assign(len, ATTR_INPUT);
+  log.comp_clause.resize(2);
+  log.comp_clause[0] = 0;
+  log.comp_clause[1] = len;
+
+  // recreate
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  DumpCompStr();
+
+  // generate messages to update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
+}
+
+void InputContext::MakeHanEisuu() {
+  FOOTMARK();
+
+  // close candidate
+  if (HasCandInfo()) {
+    hCandInfo = CandInfo::ReCreate(hCandInfo);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+  }
+
+  // get logical data
+  LogCompStr log;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  WCHAR szBuf[1024];
+  LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+  ::LCMapString(MAKELCID(langid, SORT_DEFAULT),
+    LCMAP_HALFWIDTH, log.comp_read_str.c_str(), -1, szBuf, 1024);
+
+  // update composition
+  log.comp_str = szBuf;
+  DWORD len = (DWORD)log.comp_str.size();
+  log.dwCursorPos = len;
+  log.dwDeltaStart = 0;
+  log.comp_attr.assign(len, ATTR_INPUT);
+  log.comp_clause.resize(2);
+  log.comp_clause[0] = 0;
+  log.comp_clause[1] = len;
+
+  // recreate
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  DumpCompStr();
+
+  // generate messages to update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
+}
+
 void InputContext::CancelText() {
   FOOTMARK();
 
@@ -481,8 +689,7 @@ void InputContext::MoveLeft() {
   DumpCompStr();
 
   // update composition
-  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
-  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
 } // InputContext::MoveLeft
 
 void InputContext::MoveRight() {
@@ -528,9 +735,52 @@ void InputContext::MoveRight() {
   DumpCompStr();
 
   // update composition
-  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
-  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
 } // InputContext::MoveRight
+
+void InputContext::MoveToBeginning() {
+  FOOTMARK();
+
+  // get logical data
+  LogCompStr log;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  log.dwCursorPos = 0;
+
+  // recreate
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  DumpCompStr();
+
+  // update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
+}
+
+void InputContext::MoveToEnd() {
+  FOOTMARK();
+
+  // get logical data
+  LogCompStr log;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLogCompStr(log);
+    UnlockCompStr();
+  }
+
+  log.dwCursorPos = (DWORD)log.comp_str.size();
+
+  // recreate
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  DumpCompStr();
+
+  // update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
+}
 
 void InputContext::DumpCompStr() {
   FOOTMARK();
