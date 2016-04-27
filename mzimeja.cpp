@@ -612,6 +612,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   static LPTOP_LEVEL_EXCEPTION_FILTER s_old_handler;
   switch (dwFunction) {
   case DLL_PROCESS_ATTACH:
+    ::DisableThreadLibraryCalls();
     #ifndef NDEBUG
       s_old_handler = ::SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
     #endif
