@@ -372,12 +372,12 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
 
 LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                       LPARAM lParam) {
+  FOOTMARK();
   PAINTSTRUCT ps;
   HWND hwndServer;
   HDC hDC;
   HBITMAP hbm;
   POINT pt;
-  FOOTMARK();
 
   switch (message) {
   case WM_CREATE:

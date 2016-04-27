@@ -9,6 +9,7 @@ extern "C" {
 
 LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
+  FOOTMARK();
   HWND hUIWnd;
 
   switch (message) {
@@ -42,6 +43,7 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 }
 
 BOOL PASCAL GetCandPosFromCompWnd(LPUIEXTRA lpUIExtra, LPPOINT lppt) {
+  FOOTMARK();
   RECT rc;
 
   if (lpUIExtra->dwCompStyle) {
@@ -64,6 +66,7 @@ BOOL PASCAL GetCandPosFromCompWnd(LPUIEXTRA lpUIExtra, LPPOINT lppt) {
 
 BOOL PASCAL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                                    LPPOINT lppt) {
+  FOOTMARK();
   if (lpUIExtra->dwCompStyle) {
     if (lpIMC && lpIMC->HasCompForm()) {
       int height = GetCompFontHeight(lpUIExtra);
@@ -86,6 +89,7 @@ BOOL PASCAL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
 }
 
 void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+  FOOTMARK();
   POINT pt;
 
   if (GetCandPosFromCompWnd(lpUIExtra, &pt)) {
@@ -108,6 +112,7 @@ void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 }
 
 void CandWnd_Paint(HWND hCandWnd) {
+  FOOTMARK();
   RECT rc;
   GetClientRect(hCandWnd, &rc);
 
@@ -160,6 +165,7 @@ void CandWnd_Paint(HWND hCandWnd) {
 }
 
 void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+  FOOTMARK();
   if (IsWindow(lpUIExtra->uiCand.hWnd)) {
     int width = 0, height = 0;
     HDC hDC = GetDC(lpUIExtra->uiCand.hWnd);
@@ -191,6 +197,7 @@ void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 }
 
 void CandWnd_Hide(LPUIEXTRA lpUIExtra) {
+  FOOTMARK();
   RECT rc;
 
   if (IsWindow(lpUIExtra->uiCand.hWnd)) {
@@ -205,6 +212,7 @@ void CandWnd_Hide(LPUIEXTRA lpUIExtra) {
 
 void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                   BOOL fForceComp) {
+  FOOTMARK();
   RECT rc;
   POINT pt;
   CANDIDATEFORM caf;
