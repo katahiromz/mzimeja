@@ -31,6 +31,7 @@ SOURCES= \
         input_context.cpp \
         comp_str.cpp \
         cand_info.cpp \
+        keychar.cpp \
         mzimeja.rc \
 
 TARGETLIBS= \

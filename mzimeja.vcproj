@@ -205,6 +205,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\keychar.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mzimeja.cpp"
 				>
 			</File>
@@ -276,6 +280,10 @@
 			</File>
 			<File
 				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\unboost.hpp"
 				>
 			</File>
 			<File

@@ -250,6 +250,16 @@ HFONT CheckNativeCharset(HDC hDC);
 }  // extern "C"
 
 //////////////////////////////////////////////////////////////////////////////
+// keychar.cpp
+
+std::wstring zenkaku_to_hankaku(const std::wstring& zenkaku);
+std::wstring hankaku_to_zenkaku(const std::wstring& hankaku);
+std::wstring zenkaku_hiragana_to_katakana(const std::wstring& hiragana);
+std::wstring zenkaku_katakana_to_hiragana(const std::wstring& katakana);
+std::wstring hiragana_to_romaji(const std::wstring& hiragana);
+std::wstring romaji_to_hiragana(const std::wstring& romaji);
+
+//////////////////////////////////////////////////////////////////////////////
 // C++ interface
 
 struct MZIMEJA {
