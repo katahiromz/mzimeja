@@ -1160,7 +1160,7 @@ std::wstring romaji_to_hiragana(const std::wstring& romaji) {
   return hiragana;
 } // romaji_to_hiragana
 
-WCHAR alpha_to_kana(BYTE vk) {
+WCHAR alpha_to_hiragana(BYTE vk) {
   static const WCHAR s_table[26] = {
     L'‚¿',
     L'‚±',
@@ -1193,7 +1193,7 @@ WCHAR alpha_to_kana(BYTE vk) {
     return s_table[vk - VK_A];
   }
   return 0;
-} // alpha_to_kana
+} // alpha_to_hiragana
 
 BOOL is_hiragana(WCHAR ch) {
   if (0x3040 <= ch && ch <= 0x309F) return TRUE;
