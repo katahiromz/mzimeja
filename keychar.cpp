@@ -1160,7 +1160,7 @@ std::wstring romaji_to_hiragana(const std::wstring& romaji) {
   return hiragana;
 } // romaji_to_hiragana
 
-void alpha_to_kana(BYTE vk) {
+WCHAR alpha_to_kana(BYTE vk) {
   static const WCHAR s_table[26] = {
     L'‚¿',
     L'‚±',
@@ -1194,5 +1194,50 @@ void alpha_to_kana(BYTE vk) {
   }
   return 0;
 } // alpha_to_kana
+
+BOOL is_hiragana(WCHAR ch) {
+  if (0x3040 <= ch && ch <= 0x309F) return TRUE;
+  switch (ch) {
+  case 0x3095: case 0x3096: case 0x3099: case 0x309A:
+  case 0x309B: case 0x309C: case 0x309D: case 0x309E:
+  case 0x30FC:
+    return TRUE;
+  default:
+    return FALSE;
+  }
+}
+
+BOOL is_zenkaku_katakana(WCHAR ch) {
+  if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
+  switch (ch) {
+  case 0x30FD: case 0x30FE: case 0x3099: case 0x309A:
+  case 0x309B: case 0x309C: case 0x30FC:
+    return TRUE;
+  default:
+    return FALSE;
+  }
+}
+
+BOOL is_hankaku_katakana(WCHAR ch) {
+  if (0xFF65 <= ch && ch <= 0xFF9F) return TRUE;
+  switch (ch) {
+  case 0xFF61: case 0xFF62: case 0xFF63: case 0xFF64:
+    return TRUE;
+  default:
+    return FALSE;
+  }
+}
+
+BOOL is_kanji(WCHAR ch) {
+  // CJK“‡Š¿Žš
+  if (0x4E00 <= ch && ch <= 0x9FFF) return TRUE;
+  // CJKŒÝŠ·Š¿Žš
+  if (0xF900 <= ch && ch <= 0xFAFF) return TRUE;
+  return FALSE;
+}
+
+BOOL is_fullwidth_ascii(WCHAR ch) {
+  return (0xFF00 <= ch && ch <= 0xFFEF);
+}
 
 //////////////////////////////////////////////////////////////////////////////
