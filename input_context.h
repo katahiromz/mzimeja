@@ -54,7 +54,7 @@ struct InputContext : public INPUTCONTEXT {
   void MakeResult();
   void MakeHiragana();
   void MakeKatakana();
-  void MakeHanKana();
+  void MakeHankaku();
   void MakeZenEisuu();
   void MakeHanEisuu();
 

@@ -330,14 +330,12 @@ void InputContext::MakeHiragana() {
     UnlockCompStr();
   }
 
-  WCHAR szBuf[1024];
-  LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  ::LCMapString(MAKELCID(langid, SORT_DEFAULT),
-    LCMAP_FULLWIDTH | LCMAP_HIRAGANA,
-    log.comp_read_str.c_str(), -1, szBuf, 1024);
+  std::wstring str;
+  str = romaji_to_hiragana(log.comp_read_str);
+  str = zenkaku_katakana_to_hiragana(str);
 
   // update composition
-  log.comp_str = szBuf;
+  log.comp_str = str;
   DWORD len = (DWORD)log.comp_str.size();
   log.dwCursorPos = len;
   log.dwDeltaStart = 0;
@@ -372,14 +370,12 @@ void InputContext::MakeKatakana() {
     UnlockCompStr();
   }
 
-  WCHAR szBuf[1024];
-  LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  ::LCMapString(MAKELCID(langid, SORT_DEFAULT),
-    LCMAP_FULLWIDTH | LCMAP_KATAKANA,
-    log.comp_read_str.c_str(), -1, szBuf, 1024);
+  std::wstring str;
+  str = romaji_to_hiragana(log.comp_read_str);
+  str = zenkaku_hiragana_to_katakana(str);
 
   // update composition
-  log.comp_str = szBuf;
+  log.comp_str = str;
   DWORD len = (DWORD)log.comp_str.size();
   log.dwCursorPos = len;
   log.dwDeltaStart = 0;
@@ -397,7 +393,7 @@ void InputContext::MakeKatakana() {
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
 }
 
-void InputContext::MakeHanKana() {
+void InputContext::MakeHankaku() {
   FOOTMARK();
 
   // close candidate
@@ -414,14 +410,12 @@ void InputContext::MakeHanKana() {
     UnlockCompStr();
   }
 
-  WCHAR szBuf[1024];
-  LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  ::LCMapString(MAKELCID(langid, SORT_DEFAULT),
-    LCMAP_HALFWIDTH | LCMAP_KATAKANA,
-    log.comp_read_str.c_str(), -1, szBuf, 1024);
+  std::wstring str;
+  str = romaji_to_hiragana(log.comp_read_str);
+  str = zenkaku_to_hankaku(str);
 
   // update composition
-  log.comp_str = szBuf;
+  log.comp_str = str;
   DWORD len = (DWORD)log.comp_str.size();
   log.dwCursorPos = len;
   log.dwDeltaStart = 0;
@@ -456,13 +450,12 @@ void InputContext::MakeZenEisuu() {
     UnlockCompStr();
   }
 
-  WCHAR szBuf[1024];
-  LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  ::LCMapString(MAKELCID(langid, SORT_DEFAULT),
-    LCMAP_FULLWIDTH, log.comp_read_str.c_str(), -1, szBuf, 1024);
+  std::wstring str;
+  str = hiragana_to_romaji(log.comp_read_str);
+  str = hankaku_to_zenkaku(str);
 
   // update composition
-  log.comp_str = szBuf;
+  log.comp_str = str;
   DWORD len = (DWORD)log.comp_str.size();
   log.dwCursorPos = len;
   log.dwDeltaStart = 0;
@@ -497,13 +490,12 @@ void InputContext::MakeHanEisuu() {
     UnlockCompStr();
   }
 
-  WCHAR szBuf[1024];
-  LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  ::LCMapString(MAKELCID(langid, SORT_DEFAULT),
-    LCMAP_HALFWIDTH, log.comp_read_str.c_str(), -1, szBuf, 1024);
+  std::wstring str;
+  str = hiragana_to_romaji(log.comp_read_str);
+  str = zenkaku_to_hankaku(str);
 
   // update composition
-  log.comp_str = szBuf;
+  log.comp_str = str;
   DWORD len = (DWORD)log.comp_str.size();
   log.dwCursorPos = len;
   log.dwDeltaStart = 0;

@@ -148,7 +148,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   case VK_F8:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MakeHanKana();
+      lpIMC->MakeHankaku();
       TheIME.UnlockIMC(hIMC);
     }
     break;
