@@ -258,6 +258,7 @@ std::wstring zenkaku_hiragana_to_katakana(const std::wstring& hiragana);
 std::wstring zenkaku_katakana_to_hiragana(const std::wstring& katakana);
 std::wstring hiragana_to_romaji(const std::wstring& hiragana);
 std::wstring romaji_to_hiragana(const std::wstring& romaji);
+void alpha_to_kana(BYTE vk);
 
 //////////////////////////////////////////////////////////////////////////////
 // C++ interface
