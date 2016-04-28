@@ -121,6 +121,18 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     break;
 
   case VK_SPACE:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      if (lpIMC->HasCompStr()) {
+        lpIMC->DoConvert();
+      } else {
+        // add ideographic space
+        TheIME.GenerateMessage(WM_IME_CHAR, L'Å@', 1);
+      }
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
   case VK_CONVERT:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
