@@ -27,7 +27,9 @@ void MainWnd_OnPaint(HWND hwnd)
     RECT rcClient;
 
     GetClientRect(hwnd, &rcClient);
-    tstring str = g_strRead + TEXT(" | ") + g_strComp;
+    WCHAR sz[1024];
+    wsprintfW(sz, L"reading: %s\r\ncomposition: %s",
+        g_strRead.c_str(), g_strComp.c_str());
 
     hdc = BeginPaint(hwnd, &ps);
     if (hdc)
@@ -35,8 +37,8 @@ void MainWnd_OnPaint(HWND hwnd)
         SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
         SetBkMode(hdc, TRANSPARENT);
         SetBkColor(hdc, RGB(255, 255, 255));
-        DrawText(hdc, str.c_str(), -1, &rcClient,
-                 DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOPREFIX);
+        DrawText(hdc, sz, -1, &rcClient,
+                 DT_LEFT | DT_VCENTER | DT_NOPREFIX);
         EndPaint(hwnd, &ps);
     }
 }
@@ -52,6 +54,12 @@ void MainWnd_OnDestroy(HWND hwnd)
     PostQuitMessage(0);
 }
 
+void separate(std::wstring& str, LPDWORD pdw, DWORD count) {
+    for (LONG i = count - 1; i >= 0; --i) {
+        str.insert(pdw[i], 1, L'|');
+    }
+}
+
 void MainWnd_OnImeComposition(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
     HIMC hIMC = ImmGetContext(hwnd);
@@ -64,8 +72,16 @@ void MainWnd_OnImeComposition(HWND hwnd, WPARAM wParam, LPARAM lParam)
         {
             LPTSTR pchRead = (LPTSTR)(LPBYTE(lpCompStr) + lpCompStr->dwCompReadStrOffset);
             g_strRead.assign(pchRead, lpCompStr->dwCompReadStrLen);
+            if (lpCompStr->dwCompReadClauseLen) {
+                LPDWORD pdw = (LPDWORD)(LPBYTE(lpCompStr) + lpCompStr->dwCompReadClauseOffset);
+                separate(g_strRead, pdw, lpCompStr->dwCompReadClauseLen / sizeof(DWORD));
+            }
             LPTSTR pchComp = (LPTSTR)(LPBYTE(lpCompStr) + lpCompStr->dwCompStrOffset);
             g_strComp.assign(pchComp, lpCompStr->dwCompStrLen);
+            if (lpCompStr->dwCompClauseLen) {
+                LPDWORD pdw = (LPDWORD)(LPBYTE(lpCompStr) + lpCompStr->dwCompClauseOffset);
+                separate(g_strComp, pdw, lpCompStr->dwCompClauseLen / sizeof(DWORD));
+            }
             ImmUnlockIMCC(hCompStr);
         }
         ImmUnlockIMC(hIMC);
