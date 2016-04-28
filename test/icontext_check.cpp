@@ -20,6 +20,8 @@ DWORD       g_dwCursorPos = 0;
 DWORD       g_dwDeltaStart = 0;
 tstring     g_strRead;
 tstring     g_strComp;
+tstring     g_strResultRead;
+tstring     g_strResult;
 std::vector<BYTE> g_vecReadAttr;
 std::vector<BYTE> g_vecCompAttr;
 
@@ -50,10 +52,13 @@ void MainWnd_OnPaint(HWND hwnd)
         L"reading: %s\r\n"
         L"reading attributes: %s\r\n"
         L"composition: %s\r\n"
-        L"composition attributes: %s",
+        L"composition attributes: %s\r\n"
+        L"result reading: %s\r\n"
+        L"result: %s",
         g_dwCursorPos, g_dwDeltaStart,
         g_strRead.c_str(), strReadAttr.c_str(),
-        g_strComp.c_str(), strCompAttr.c_str());
+        g_strComp.c_str(), strCompAttr.c_str(),
+        g_strResultRead.c_str(), g_strResult.c_str());
 
     hdc = BeginPaint(hwnd, &ps);
     if (hdc)
@@ -117,6 +122,22 @@ void MainWnd_OnImeComposition(HWND hwnd, WPARAM wParam, LPARAM lParam)
             LPBYTE pbCompAttr = LPBYTE(lpCompStr) + lpCompStr->dwCompAttrOffset;
             g_vecCompAttr.assign(pbCompAttr, pbCompAttr + lpCompStr->dwCompAttrLen);
 
+            // get result reading
+            LPTSTR pchResultRead = (LPTSTR)(LPBYTE(lpCompStr) + lpCompStr->dwResultReadStrOffset);
+            g_strResultRead.assign(pchResultRead, lpCompStr->dwResultReadStrLen);
+            if (lpCompStr->dwResultReadClauseLen) {
+                LPDWORD pdw = (LPDWORD)(LPBYTE(lpCompStr) + lpCompStr->dwResultReadClauseOffset);
+                separate(g_strResultRead, pdw, lpCompStr->dwResultReadClauseLen / sizeof(DWORD));
+            }
+
+            // get result
+            LPTSTR pchResult = (LPTSTR)(LPBYTE(lpCompStr) + lpCompStr->dwResultStrOffset);
+            g_strResult.assign(pchResult, lpCompStr->dwResultStrLen);
+            if (lpCompStr->dwResultClauseLen) {
+                LPDWORD pdw = (LPDWORD)(LPBYTE(lpCompStr) + lpCompStr->dwResultClauseOffset);
+                separate(g_strResult, pdw, lpCompStr->dwResultClauseLen / sizeof(DWORD));
+            }
+
             ImmUnlockIMCC(hCompStr);
         }
         ImmUnlockIMC(hIMC);
@@ -166,7 +187,7 @@ int WINAPI _tWinMain(
     }
 
     CreateWindow(s_szName, s_szName, WS_OVERLAPPEDWINDOW,
-                 CW_USEDEFAULT, 0, 450, 220,
+                 CW_USEDEFAULT, 0, 450, 350,
         NULL, NULL, hInstance, NULL);
     if (g_hMainWnd == NULL)
     {
