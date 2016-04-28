@@ -1161,35 +1161,38 @@ std::wstring romaji_to_hiragana(const std::wstring& romaji) {
 } // romaji_to_hiragana
 
 void alpha_to_kana(BYTE vk) {
-  switch (vk) {
-  case VK_A:  return L'‚¿';
-  case VK_B:  return L'‚±';
-  case VK_C:  return L'‚»';
-  case VK_D:  return L'‚µ';
-  case VK_E:  return L'‚¢';
-  case VK_F:  return L'‚Í';
-  case VK_G:  return L'‚«';
-  case VK_H:  return L'‚­';
-  case VK_I:  return L'‚É';
-  case VK_J:  return L'‚Ü';
-  case VK_K:  return L'‚Ì';
-  case VK_L:  return L'‚è';
-  case VK_M:  return L'‚à';
-  case VK_N:  return L'‚Ý';
-  case VK_O:  return L'‚ç';
-  case VK_P:  return L'‚¹';
-  case VK_Q:  return L'‚½';
-  case VK_R:  return L'‚·';
-  case VK_S:  return L'‚Æ';
-  case VK_T:  return L'‚©';
-  case VK_U:  return L'‚È';
-  case VK_V:  return L'‚Ð';
-  case VK_W:  return L'‚Ä';
-  case VK_X:  return L'‚³';
-  case VK_Y:  return L'‚ñ';
-  case VK_Z:  return L'‚Â';
-  default:    return 0;
+  static const WCHAR s_table[26] = {
+    L'‚¿',
+    L'‚±',
+    L'‚»',
+    L'‚µ',
+    L'‚¢',
+    L'‚Í',
+    L'‚«',
+    L'‚­',
+    L'‚É',
+    L'‚Ü',
+    L'‚Ì',
+    L'‚è',
+    L'‚à',
+    L'‚Ý',
+    L'‚ç',
+    L'‚¹',
+    L'‚½',
+    L'‚·',
+    L'‚Æ',
+    L'‚©',
+    L'‚È',
+    L'‚Ð',
+    L'‚Ä',
+    L'‚³',
+    L'‚ñ',
+    L'‚Â',
+  };
+  if (VK_A <= vk && vk <= VK_Z) {
+    return s_table[vk - VK_A];
   }
+  return 0;
 } // alpha_to_kana
 
 //////////////////////////////////////////////////////////////////////////////
