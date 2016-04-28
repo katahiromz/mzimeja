@@ -10,13 +10,18 @@
 #include <tchar.h>
 #include "../include/immdev.h"
 #include <string>
+#include <vector>
 
 typedef std::wstring tstring;
 
 HINSTANCE   g_hInstance;
 HWND        g_hMainWnd;
+DWORD       g_dwCursorPos = 0;
+DWORD       g_dwDeltaStart = 0;
 tstring     g_strRead;
 tstring     g_strComp;
+std::vector<BYTE> g_vecReadAttr;
+std::vector<BYTE> g_vecCompAttr;
 
 static const TCHAR s_szName[] = TEXT("katahiromz's input context checker");
 
@@ -27,9 +32,28 @@ void MainWnd_OnPaint(HWND hwnd)
     RECT rcClient;
 
     GetClientRect(hwnd, &rcClient);
-    WCHAR sz[1024];
-    wsprintfW(sz, L"reading: %s\r\ncomposition: %s",
-        g_strRead.c_str(), g_strComp.c_str());
+    std::wstring strReadAttr, strCompAttr;
+    WCHAR sz[256];
+    for (size_t i = 0; i < g_vecReadAttr.size(); ++i) {
+        wsprintfW(sz, TEXT("%02X "), g_vecReadAttr[i]);
+        strReadAttr += sz;
+    }
+    for (size_t i = 0; i < g_vecCompAttr.size(); ++i) {
+        wsprintfW(sz, TEXT("%02X "), g_vecCompAttr[i]);
+        strCompAttr += sz;
+    }
+
+    WCHAR szBuf[1024];
+    wsprintfW(szBuf,
+        L"dwCursorPos: %u\r\n"
+        L"dwDeltaStart: %u\r\n"
+        L"reading: %s\r\n"
+        L"reading attributes: %s\r\n"
+        L"composition: %s\r\n"
+        L"composition attributes: %s",
+        g_dwCursorPos, g_dwDeltaStart,
+        g_strRead.c_str(), strReadAttr.c_str(),
+        g_strComp.c_str(), strCompAttr.c_str());
 
     hdc = BeginPaint(hwnd, &ps);
     if (hdc)
@@ -37,7 +61,7 @@ void MainWnd_OnPaint(HWND hwnd)
         SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
         SetBkMode(hdc, TRANSPARENT);
         SetBkColor(hdc, RGB(255, 255, 255));
-        DrawText(hdc, sz, -1, &rcClient,
+        DrawText(hdc, szBuf, -1, &rcClient,
                  DT_LEFT | DT_VCENTER | DT_NOPREFIX);
         EndPaint(hwnd, &ps);
     }
@@ -70,18 +94,29 @@ void MainWnd_OnImeComposition(HWND hwnd, WPARAM wParam, LPARAM lParam)
         LPCOMPOSITIONSTRING lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(hCompStr);
         if (lpCompStr != NULL)
         {
+            g_dwCursorPos = lpCompStr->dwCursorPos;
+            g_dwDeltaStart = lpCompStr->dwDeltaStart;
+
+            // get read info
             LPTSTR pchRead = (LPTSTR)(LPBYTE(lpCompStr) + lpCompStr->dwCompReadStrOffset);
             g_strRead.assign(pchRead, lpCompStr->dwCompReadStrLen);
             if (lpCompStr->dwCompReadClauseLen) {
                 LPDWORD pdw = (LPDWORD)(LPBYTE(lpCompStr) + lpCompStr->dwCompReadClauseOffset);
                 separate(g_strRead, pdw, lpCompStr->dwCompReadClauseLen / sizeof(DWORD));
             }
+            LPBYTE pbReadAttr = LPBYTE(lpCompStr) + lpCompStr->dwCompReadAttrOffset;
+            g_vecReadAttr.assign(pbReadAttr, pbReadAttr + lpCompStr->dwCompReadAttrLen);
+
+            // get comp info
             LPTSTR pchComp = (LPTSTR)(LPBYTE(lpCompStr) + lpCompStr->dwCompStrOffset);
             g_strComp.assign(pchComp, lpCompStr->dwCompStrLen);
             if (lpCompStr->dwCompClauseLen) {
                 LPDWORD pdw = (LPDWORD)(LPBYTE(lpCompStr) + lpCompStr->dwCompClauseOffset);
                 separate(g_strComp, pdw, lpCompStr->dwCompClauseLen / sizeof(DWORD));
             }
+            LPBYTE pbCompAttr = LPBYTE(lpCompStr) + lpCompStr->dwCompAttrOffset;
+            g_vecCompAttr.assign(pbCompAttr, pbCompAttr + lpCompStr->dwCompAttrLen);
+
             ImmUnlockIMCC(hCompStr);
         }
         ImmUnlockIMC(hIMC);
@@ -131,7 +166,7 @@ int WINAPI _tWinMain(
     }
 
     CreateWindow(s_szName, s_szName, WS_OVERLAPPEDWINDOW,
-                 CW_USEDEFAULT, 0, 450, 100,
+                 CW_USEDEFAULT, 0, 450, 220,
         NULL, NULL, hInstance, NULL);
     if (g_hMainWnd == NULL)
     {
