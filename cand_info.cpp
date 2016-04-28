@@ -25,7 +25,7 @@ DWORD LogCandInfo::GetTotalSize() const {
 
 #define PAGE_SIZE 9
 
-void CandInfo::GetLogCandInfo(LogCandInfo& log) {
+void CandInfo::GetLog(LogCandInfo& log) {
   FOOTMARK();
   log.dwStyle = IME_CAND_READ;
   log.dwSelection = 0;

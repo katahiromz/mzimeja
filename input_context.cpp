@@ -147,7 +147,7 @@ void InputContext::AddChar(WCHAR ch) {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -227,7 +227,7 @@ BOOL InputContext::DoConvert() {
   LogCompStr log_comp_str;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log_comp_str);
+    lpCompStr->GetLog(log_comp_str);
     bIsBeingConverted = lpCompStr->IsBeingConverted();
     UnlockCompStr();
     bHasCompStr = (log_comp_str.comp_str.size() > 0);
@@ -250,7 +250,7 @@ BOOL InputContext::DoConvert() {
   LogCandInfo log_cand_info;
   CandInfo *lpCandInfo = LockCandInfo();
   if (lpCandInfo) {
-    lpCandInfo->GetLogCandInfo(log_cand_info);
+    lpCandInfo->GetLog(log_cand_info);
     UnlockCandInfo();
   }
 
@@ -295,7 +295,7 @@ void InputContext::MakeResult() {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -338,7 +338,7 @@ void InputContext::MakeHiragana() {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -378,7 +378,7 @@ void InputContext::MakeKatakana() {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -418,7 +418,7 @@ void InputContext::MakeHankaku() {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -458,7 +458,7 @@ void InputContext::MakeZenEisuu() {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -498,7 +498,7 @@ void InputContext::MakeHanEisuu() {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -561,7 +561,7 @@ void InputContext::RevertText() {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -590,7 +590,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -658,7 +658,7 @@ void InputContext::MoveLeft() {
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
     bIsBeingConverted = lpCompStr->IsBeingConverted();
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -705,7 +705,7 @@ void InputContext::MoveRight() {
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
     bIsBeingConverted = lpCompStr->IsBeingConverted();
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -749,7 +749,7 @@ void InputContext::MoveToBeginning() {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 
@@ -771,7 +771,7 @@ void InputContext::MoveToEnd() {
   LogCompStr log;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLogCompStr(log);
+    lpCompStr->GetLog(log);
     UnlockCompStr();
   }
 

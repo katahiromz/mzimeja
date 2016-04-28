@@ -47,7 +47,7 @@ private:
 
 struct CandInfo : public CANDIDATEINFO {
   static HIMCC ReCreate(HIMCC hCandInfo, const LogCandInfo *log = NULL);
-  void GetLogCandInfo(LogCandInfo& log);
+  void GetLog(LogCandInfo& log);
 
   LPBYTE GetBytes() { return (LPBYTE)this; }
   CandList *GetList(DWORD i = 0) {

@@ -15,6 +15,61 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
+
+struct LogCompStrPrivate {
+  DWORD               dwReadCursor;
+  std::wstring        spell;
+  std::vector<DWORD>  index_map_comp2read;
+  std::vector<DWORD>  index_map_read2spell;
+  LogCompStrPrivate() : dwReadCursor(0) {}
+  DWORD GetTotalSize() const;
+  void clear() {
+    dwReadCursor = 0;
+    spell.clear();
+    index_map_comp2read.clear();
+    index_map_read2spell.clear();
+  }
+}; // struct LogCompStrPrivate
+
+//////////////////////////////////////////////////////////////////////////////
+
+struct COMPSTRPRIVATE {
+  DWORD dwSignature;
+  DWORD dwReadCursor;
+  DWORD dwSpellStrLen;
+  DWORD dwSpellStrOffset;
+  DWORD dwComp2ReadMapLen;
+  DWORD dwComp2ReadMapOffset;
+  DWORD dwRead2SpellMapLen;
+  DWORD dwRead2SpellMapOffset;
+  LPBYTE GetBytes() { return (LPBYTE)this; }
+
+  LPWSTR GetSpellStr() {
+    if (dwSpellStrLen) {
+      return (LPWSTR)(GetBytes() + dwSpellStrOffset);
+    }
+    return NULL;
+  }
+  LPDWORD GetComp2Read(DWORD& dwCount) {
+    dwCount = dwComp2ReadMapLen / sizeof(DWORD);
+    if (dwCount) {
+      return (LPDWORD)(GetBytes() + dwComp2ReadMapOffset);
+    }
+    return NULL;
+  }
+  LPDWORD GetRead2Spell(DWORD& dwCount) {
+    dwCount = dwRead2SpellMapLen / sizeof(DWORD);
+    if (dwCount) {
+      return (LPDWORD)(GetBytes() + dwRead2SpellMapOffset);
+    }
+    return NULL;
+  }
+
+  void GetLog(LogCompStrPrivate& log);
+  DWORD Store(const LogCompStrPrivate *log);
+}; // struct COMPSTRPRIVATE
+
+//////////////////////////////////////////////////////////////////////////////
 // logical composition string
 
 struct LogCompStr {
@@ -30,6 +85,7 @@ struct LogCompStr {
   std::wstring        result_read_str;
   std::vector<DWORD>  result_clause;
   std::wstring        result_str;
+  LogCompStrPrivate   private_data;
   LogCompStr() {
     dwCursorPos = 0;
     dwDeltaStart = 0;
@@ -51,7 +107,7 @@ inline void SetClause(LPDWORD lpdw, DWORD num) {
 struct CompStr : public COMPOSITIONSTRING {
   static HIMCC ReCreate(HIMCC hCompStr, const LogCompStr *log = NULL);
 
-  void GetLogCompStr(LogCompStr& log);
+  void GetLog(LogCompStr& log);
   BOOL IsBeingConverted();
 
   LPBYTE GetBytes() { return (LPBYTE)this; }
@@ -85,6 +141,12 @@ struct CompStr : public COMPOSITIONSTRING {
   }
   LPTSTR GetResultStr() {
     return (LPTSTR)(GetBytes() + dwResultStrOffset);
+  }
+
+  // extension
+  COMPSTRPRIVATE *GetPrivateData() {
+    if (dwPrivateSize) return (COMPSTRPRIVATE *)(GetBytes() + dwPrivateOffset);
+    return NULL;
   }
 
   void Dump();
