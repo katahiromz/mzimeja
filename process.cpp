@@ -55,6 +55,29 @@ WCHAR MapNumPadVirtualKey(BYTE vk) {
 } // MapNumPadVirtualKey
 
 
+WCHAR MapDigitVirtualKey(BYTE vk, BOOL bShift) {
+  if (bShift) {
+    static const WCHAR s_table[] = {
+      0, L'!', L'"', L'#', L'$', L'%', L'&', L'\'', L'(', L')'
+    };
+    if (VK_0 <= vk && vk <= VK_9) {
+      return s_table[vk - VK_0];
+    }
+  } else {
+    return (WCHAR)vk;
+  }
+  return 0;
+}
+
+WCHAR MapAlphaVirtualKey(HIMC hIMC, BYTE vk, LPBYTE lpbKeyState) {
+  if (IsRomajiMode(hIMC)) {
+    if (lpbKeyState[VK_SHIFT] & 0x80) {
+      return L'A' + (vk - VK_A);
+    }
+  }
+  return L'a' + (vk - VK_A);
+}
+
 // A function which handles WM_IME_KEYDOWN
 BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                        LPBYTE lpbKeyState) {
@@ -62,6 +85,8 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   WORD vk = (wParam & 0x00FF);
   BOOL bOpen;
   WCHAR ch;
+
+  if (lpbKeyState[VK_CONTROL] & 0x80) return FALSE;
 
   switch (vk) {
   case VK_SHIFT:
@@ -71,16 +96,18 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   case VK_KANJI:
   case VK_OEM_AUTO:
   case VK_OEM_ENLW:
-    bOpen = FALSE;
-    lpIMC = TheIME.LockIMC(hIMC);
-    if (lpIMC) {
-      bOpen = lpIMC->IsOpen();
-      TheIME.UnlockIMC(hIMC);
-    }
-    if (bOpen) {
-      ImmSetOpenStatus(hIMC, FALSE);
-    } else {
-      ImmSetOpenStatus(hIMC, TRUE);
+    if (hIMC) {
+      bOpen = FALSE;
+      lpIMC = TheIME.LockIMC(hIMC);
+      if (lpIMC) {
+        bOpen = lpIMC->IsOpen();
+        TheIME.UnlockIMC(hIMC);
+      }
+      if (bOpen) {
+        ImmSetOpenStatus(hIMC, FALSE);
+      } else {
+        ImmSetOpenStatus(hIMC, TRUE);
+      }
     }
     break;
 
@@ -259,12 +286,19 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     break;
 
   default:
-    if ((VK_0 <= vk && vk <= VK_9) || (VK_A <= vk && vk <= VK_Z) ||
-        (vk == VK_PACKET))
-    {
+    if (VK_0 <= vk && vk <= VK_9) {
+      ch = MapDigitVirtualKey((BYTE)vk, (lpbKeyState[VK_SHIFT] & 0x80));
+    } else if (VK_A <= vk && vk <= VK_Z) {
+      ch = MapAlphaVirtualKey(hIMC, (BYTE)vk, lpbKeyState);
+    } else if (vk == VK_PACKET) {
+      ch = HIWORD(wParam);
+    } else {
+      return FALSE;
+    }
+    if (ch) {
       lpIMC = TheIME.LockIMC(hIMC);
       if (lpIMC) {
-        lpIMC->AddChar(HIWORD(wParam));
+        lpIMC->AddChar(ch);
         TheIME.UnlockIMC(hIMC);
       }
     }

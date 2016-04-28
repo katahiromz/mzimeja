@@ -1088,8 +1088,8 @@ std::wstring zenkaku_to_hankaku(const std::wstring& zenkaku) {
   const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
   szBuf[0] = 0;
   DWORD dwFlags = LCMAP_HALFWIDTH;
-  ::LCMapString(MAKELCID(langid, SORT_DEFAULT), dwFlags,
-                hankaku.c_str(), -1, szBuf, 1024);
+  ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
+                 hankaku.c_str(), -1, szBuf, 1024);
   return szBuf;
 } // zenkaku_to_hankaku
 
@@ -1110,8 +1110,8 @@ std::wstring hankaku_to_zenkaku(const std::wstring& hankaku) {
   const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
   szBuf[0] = 0;
   DWORD dwFlags = LCMAP_FULLWIDTH;
-  ::LCMapString(MAKELCID(langid, SORT_DEFAULT), dwFlags,
-                zenkaku.c_str(), -1, szBuf, 1024);
+  ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
+                 zenkaku.c_str(), -1, szBuf, 1024);
   return szBuf;
 } // hankaku_to_zenkaku
 
@@ -1120,8 +1120,8 @@ std::wstring zenkaku_hiragana_to_katakana(const std::wstring& hiragana) {
   const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
   szBuf[0] = 0;
   DWORD dwFlags = LCMAP_FULLWIDTH | LCMAP_KATAKANA;
-  ::LCMapString(MAKELCID(langid, SORT_DEFAULT), dwFlags,
-                hiragana.c_str(), -1, szBuf, 1024);
+  ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
+                 hiragana.c_str(), -1, szBuf, 1024);
   return szBuf;
 } // zenkaku_hiragana_to_katakana
 
@@ -1130,8 +1130,8 @@ std::wstring zenkaku_katakana_to_hiragana(const std::wstring& katakana) {
   const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
   szBuf[0] = 0;
   DWORD dwFlags = LCMAP_FULLWIDTH | LCMAP_HIRAGANA;
-  ::LCMapString(MAKELCID(langid, SORT_DEFAULT), dwFlags,
-                katakana.c_str(), -1, szBuf, 1024);
+  ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
+                 katakana.c_str(), -1, szBuf, 1024);
   return szBuf;
 } // zenkaku_katakana_to_hiragana
 
@@ -1238,6 +1238,66 @@ BOOL is_kanji(WCHAR ch) {
 
 BOOL is_fullwidth_ascii(WCHAR ch) {
   return (0xFF00 <= ch && ch <= 0xFFEF);
+}
+
+void add_romaji_char(std::wstring& strComp, WCHAR ch, DWORD& dwCursorPos) {
+  strComp.insert(dwCursorPos, 1, ch);
+  ++dwCursorPos;
+
+  for (size_t i = 0; i < _countof(sokuon_table); ++i) {
+    const std::wstring& key = sokuon_table[i].key;
+    if ((DWORD)key.size() <= dwCursorPos) {
+      DWORD i = dwCursorPos - (DWORD)key.size();
+      if (strComp.substr(i, key.size()) == key) {
+        strComp.replace(i, key.size(), sokuon_table[i].value);
+        return;
+      }
+    }
+  }
+
+  for (size_t i = 0; i < _countof(romaji_table); ++i) {
+    const std::wstring& key = romaji_table[i].key;
+    if ((DWORD)key.size() <= dwCursorPos) {
+      DWORD i = dwCursorPos - (DWORD)key.size();
+      if (strComp.substr(i, key.size()) == key) {
+        strComp.replace(i, key.size(), romaji_table[i].value);
+        return;
+      }
+    }
+  }
+} // add_romaji_char
+
+void add_hiragana_char(std::wstring& strComp, WCHAR ch, DWORD& dwCursorPos) {
+  if (is_zenkaku_katakana(ch)) {
+    WCHAR sz[2] = {ch, 0};
+    const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+    sz[0] = 0;
+    DWORD dwFlags = LCMAP_FULLWIDTH | LCMAP_HIRAGANA;
+    ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
+                   sz, 1, &ch, 1);
+  }
+
+  strComp.insert(dwCursorPos, 1, ch);
+  ++dwCursorPos;
+} // add_hiragana_char
+
+void add_katakana_char(std::wstring& strComp, WCHAR ch, DWORD& dwCursorPos) {
+  if (is_hiragana(ch)) {
+    WCHAR sz[2] = {ch, 0};
+    const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+    sz[0] = 0;
+    DWORD dwFlags = LCMAP_FULLWIDTH | LCMAP_KATAKANA;
+    ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
+                   sz, 1, &ch, 1);
+  }
+
+  strComp.insert(dwCursorPos, 1, ch);
+  ++dwCursorPos;
+} // add_katakana_char
+
+void add_ascii_char(std::wstring& strComp, WCHAR ch, DWORD& dwCursorPos) {
+  strComp.insert(dwCursorPos, 1, ch);
+  ++dwCursorPos;
 }
 
 //////////////////////////////////////////////////////////////////////////////

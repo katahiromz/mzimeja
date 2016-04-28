@@ -156,26 +156,38 @@ void InputContext::AddChar(WCHAR ch) {
     TheIME.GenerateMessage(WM_IME_STARTCOMPOSITION);
   }
 
-  //DWORD dwConversion = lpIMC->Conversion();
-
-  if (log.dwCursorPos > log.comp_str.size()) {
-    log.dwCursorPos = log.comp_str.size();
+  // fix cursor pos
+  std::wstring& comp_str = log.comp_str;
+  if ((DWORD)comp_str.size() < log.dwCursorPos) {
+    log.dwCursorPos = (DWORD)comp_str.size();
   }
-  log.comp_str.insert(log.dwCursorPos, 1, ch);
-  log.dwDeltaStart = log.dwCursorPos;
-  ++log.dwCursorPos;
+
+  // enter a char depending on the conversion mode
+  if (Conversion() & IME_CMODE_FULLSHAPE) {
+    if (Conversion() & IME_CMODE_ROMAN) {
+      add_romaji_char(comp_str, ch, log.dwCursorPos);
+    } else {
+      if (Conversion() & IME_CMODE_KATAKANA) {
+        add_katakana_char(comp_str, ch, log.dwCursorPos);
+      } else {
+        add_hiragana_char(comp_str, ch, log.dwCursorPos);
+      }
+    }
+  } else {
+    add_ascii_char(comp_str, ch, log.dwCursorPos);
+  }
 
   // update info
-  log.comp_read_str = log.comp_str;
-  log.comp_read_attr.resize(log.comp_str.size(), ATTR_INPUT);
-  log.comp_attr.resize(log.comp_str.size(), ATTR_INPUT);
+  log.comp_read_str = comp_str;
+  log.comp_read_attr.resize(comp_str.size(), ATTR_INPUT);
+  log.comp_attr.resize(comp_str.size(), ATTR_INPUT);
   log.comp_read_clause.resize(2);
   log.comp_read_clause[0] = 0;
   log.comp_read_clause[1] = (DWORD)log.comp_read_str.size();
 
   log.comp_clause.resize(2);
   log.comp_clause[0] = 0;
-  log.comp_clause[1] = (DWORD)log.comp_str.size();
+  log.comp_clause[1] = (DWORD)comp_str.size();
 
   // recreate
   DumpCompStr();
