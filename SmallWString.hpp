@@ -9,6 +9,9 @@ public:
     SmallWString(const wchar_t *str) {
         *this = str;
     }
+    SmallWString(const wchar_t *str, size_t len) {
+        assign(str, len);
+    }
     SmallWString(const SmallWString& str) {
         using namespace std;
         memcpy(m_buf, str.m_buf, c_capacity * sizeof(wchar_t));
@@ -41,6 +44,18 @@ public:
         }
         if (count < capacity) {
             m_buf[count] = 0;
+        }
+        return *this;
+    }
+    SmallWString& assign(const wchar_t *str, size_t len) {
+        if (len > capacity) {
+            len = capacity;
+        }
+        for (size_t i = 0; i < len; ++i) {
+            m_buf[i] = str[i];
+        }
+        if (len < capacity) {
+            m_buf[len] = 0;
         }
         return *this;
     }

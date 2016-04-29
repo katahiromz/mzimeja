@@ -10,7 +10,6 @@ public:
         using namespace std;
         m_len = wcslen(ptr);
     }
-    WStringRef(const wchar_t *ptr, size_t len) : m_ptr(ptr), m_len(len) {}
     WStringRef(const WStringRef& str) : m_ptr(str.m_ptr), m_len(str.m_len) {}
 
     bool empty() const { return size() == 0; }
