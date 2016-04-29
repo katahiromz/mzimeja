@@ -2,6 +2,7 @@
 #define SMALLWSTRING_HPP_
 
 #include <cstring>  // for memcpy, wcslen
+#include <cassert>  // for assert
 
 class SmallWString {
 public:
