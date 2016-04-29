@@ -65,131 +65,149 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
   HBITMAP hbmStatus;
   HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
   HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
-  if (hIMC) {
-    InputContext *lpIMC = TheIME.LockIMC(hIMC);
+  InputContext *lpIMC = TheIME.LockIMC(hIMC);
+
+  // draw face
+  HBRUSH hbr3DFace = ::CreateSolidBrush(GetSysColor(COLOR_3DFACE));
+  ::GetClientRect(hWnd, &rc);
+  ::FillRect(hDC, &rc, hbr3DFace);
+  DeleteObject(hbr3DFace);
+
+  // draw caption
+  HBRUSH hbrCaption = ::CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION));
+  rc.right = rc.left + CX_MINICAPTION;
+  ::FillRect(hDC, &rc, hbrCaption);
+  ::DeleteObject(hbrCaption);
+
+  ::GetClientRect(hWnd, &rc);
+  hbmStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
+  HDC hMemDC = ::CreateCompatibleDC(hDC);
+  if (hMemDC) {
+    RECT rcButton;
+    HGDIOBJ hbmOld = ::SelectObject(hMemDC, hbmStatus);
+
+    rc.left += CX_MINICAPTION;
+    rcButton.left = rc.left;
+    rcButton.top = rc.top;
+    rcButton.right = rc.left + CX_BUTTON + 4;
+    rcButton.bottom = rc.bottom;
+    if (nPushed == 1) {
+      ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+        DFCS_BUTTONPUSH | DFCS_PUSHED);
+    } else {
+      ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON, DFCS_BUTTONPUSH);
+    }
+
+    rcButton.left += CX_BUTTON + 2 * CX_BTNEDGE;
+    rcButton.right += CX_BUTTON + 2 * CY_BTNEDGE;
+    if (nPushed == 2) {
+      ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+        DFCS_BUTTONPUSH | DFCS_PUSHED);
+    } else {
+      ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+        DFCS_BUTTONPUSH);
+    }
+
+    rcButton.left += CX_BUTTON + 2 * CX_BTNEDGE;
+    rcButton.right += CX_BUTTON + 2 * CY_BTNEDGE;
+    if (nPushed == 3) {
+      ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+        DFCS_BUTTONPUSH | DFCS_PUSHED);
+    } else {
+      ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+        DFCS_BUTTONPUSH);
+    }
+
+    // draw ime on/off
     if (lpIMC) {
-      // draw face
-      HBRUSH hbr3DFace = ::CreateSolidBrush(GetSysColor(COLOR_3DFACE));
-      ::GetClientRect(hWnd, &rc);
-      ::FillRect(hDC, &rc, hbr3DFace);
-      DeleteObject(hbr3DFace);
+      if (lpIMC->IsOpen()) {
+        ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                 CX_BUTTON, CY_BUTTON,
+                 hMemDC, 0, 7 * CY_BUTTON, SRCCOPY);
+      } else {
+        ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                 CX_BUTTON, CY_BUTTON,
+                 hMemDC, 0, 8 * CY_BUTTON, SRCCOPY);
+      }
+    } else {
+      // disabled
+      ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+               CX_BUTTON, CY_BUTTON,
+               hMemDC, 0, 9 * CY_BUTTON, SRCCOPY);
+    }
 
-      // draw caption
-      HBRUSH hbrCaption = ::CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION));
-      rc.right = rc.left + CX_MINICAPTION;
-      ::FillRect(hDC, &rc, hbrCaption);
-      ::DeleteObject(hbrCaption);
-
-      ::GetClientRect(hWnd, &rc);
-      hbmStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
-      HDC hMemDC = ::CreateCompatibleDC(hDC);
-      if (hMemDC) {
-        RECT rcButton;
-        HGDIOBJ hbmOld = ::SelectObject(hMemDC, hbmStatus);
-
-        rc.left += CX_MINICAPTION;
-        rcButton.left = rc.left;
-        rcButton.top = rc.top;
-        rcButton.right = rc.left + CX_BUTTON + 4;
-        rcButton.bottom = rc.bottom;
-        if (nPushed == 1) {
-          ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
-            DFCS_BUTTONPUSH | DFCS_PUSHED);
-        } else {
-          ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON, DFCS_BUTTONPUSH);
-        }
-
-        rcButton.left += CX_BUTTON + 2 * CX_BTNEDGE;
-        rcButton.right += CX_BUTTON + 2 * CY_BTNEDGE;
-        if (nPushed == 2) {
-          ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
-            DFCS_BUTTONPUSH | DFCS_PUSHED);
-        } else {
-          ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
-            DFCS_BUTTONPUSH);
-        }
-
-        rcButton.left += CX_BUTTON + 2 * CX_BTNEDGE;
-        rcButton.right += CX_BUTTON + 2 * CY_BTNEDGE;
-        if (nPushed == 3) {
-          ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
-            DFCS_BUTTONPUSH | DFCS_PUSHED);
-        } else {
-          ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
-            DFCS_BUTTONPUSH);
-        }
-
-        // draw ime on/off
-        if (lpIMC->IsOpen()) {
-          ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
-                   CX_BUTTON, CY_BUTTON,
-                   hMemDC, 0, 7 * CY_BUTTON, SRCCOPY);
-        } else {
-          ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
-                   CX_BUTTON, CY_BUTTON,
-                   hMemDC, 0, 8 * CY_BUTTON, SRCCOPY);
-        }
-
-        // draw input mode
-        rc.left += CX_BUTTON + CX_BTNEDGE * 2;
-        if (lpIMC->IsOpen()) {
-          if (lpIMC->Conversion() & IME_CMODE_FULLSHAPE) {
-            if (lpIMC->Conversion() & IME_CMODE_JAPANESE) {
-              if (lpIMC->Conversion() & IME_CMODE_KATAKANA) {
-                // zenkaku katakana
-                ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
-                         CX_BUTTON, CY_BUTTON,
-                         hMemDC, 0, 1 * CY_BUTTON, SRCCOPY);
-              } else {
-                // zenkaku hiragana
-                ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
-                         CX_BUTTON, CY_BUTTON,
-                         hMemDC, 0, 0 * CY_BUTTON, SRCCOPY);
-              }
-            } else {
-              // zenkaku alphanumeric
+    // draw input mode
+    rc.left += CX_BUTTON + CX_BTNEDGE * 2;
+    if (lpIMC) {
+      if (lpIMC->IsOpen()) {
+        if (lpIMC->Conversion() & IME_CMODE_FULLSHAPE) {
+          if (lpIMC->Conversion() & IME_CMODE_JAPANESE) {
+            if (lpIMC->Conversion() & IME_CMODE_KATAKANA) {
+              // zenkaku katakana
               ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                        CX_BUTTON, CY_BUTTON,
-                       hMemDC, 0, 2 * CY_BUTTON, SRCCOPY);
+                       hMemDC, 0, 1 * CY_BUTTON, SRCCOPY);
+            } else {
+              // zenkaku hiragana
+              ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                       CX_BUTTON, CY_BUTTON,
+                       hMemDC, 0, 0 * CY_BUTTON, SRCCOPY);
             }
           } else {
-            if (lpIMC->Conversion() & IME_CMODE_JAPANESE) {
-              // hankaku kana
-              ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
-                       CX_BUTTON, CY_BUTTON,
-                       hMemDC, 0, 3 * CY_BUTTON, SRCCOPY);
-            } else {
-              // hankaku alphanumeric
-              ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
-                       CX_BUTTON, CY_BUTTON,
-                       hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
-            }
+            // zenkaku alphanumeric
+            ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                     CX_BUTTON, CY_BUTTON,
+                     hMemDC, 0, 2 * CY_BUTTON, SRCCOPY);
           }
         } else {
-          // hankaku alphanumeric
-          ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
-                   CX_BUTTON, CY_BUTTON,
-                   hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
+          if (lpIMC->Conversion() & IME_CMODE_JAPANESE) {
+            // hankaku kana
+            ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                     CX_BUTTON, CY_BUTTON,
+                     hMemDC, 0, 3 * CY_BUTTON, SRCCOPY);
+          } else {
+            // hankaku alphanumeric
+            ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                     CX_BUTTON, CY_BUTTON,
+                     hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
+          }
         }
-
-        // draw roman mode
-        rc.left += CX_BUTTON + CX_BTNEDGE * 2;
-        if (lpIMC->Conversion() & IME_CMODE_ROMAN) {
-          ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
-                   CX_BUTTON, CY_BUTTON,
-                   hMemDC, 0, 5 * CY_BUTTON, SRCCOPY);
-        } else {
-          ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
-                   CX_BUTTON, CY_BUTTON,
-                   hMemDC, 0, 6 * CY_BUTTON, SRCCOPY);
-        }
-
-        ::SelectObject(hMemDC, hbmOld);
-        ::DeleteDC(hMemDC);
+      } else {
+        // hankaku alphanumeric
+        ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                 CX_BUTTON, CY_BUTTON,
+                 hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
       }
-      TheIME.UnlockIMC(hIMC);
+    } else {
+      // disabled
+      ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+               CX_BUTTON, CY_BUTTON,
+               hMemDC, 0, 9 * CY_BUTTON, SRCCOPY);
     }
+
+    // draw roman mode
+    rc.left += CX_BUTTON + CX_BTNEDGE * 2;
+    if (lpIMC) {
+      if (lpIMC->Conversion() & IME_CMODE_ROMAN) {
+        ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                 CX_BUTTON, CY_BUTTON,
+                 hMemDC, 0, 5 * CY_BUTTON, SRCCOPY);
+      } else {
+        ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                 CX_BUTTON, CY_BUTTON,
+                 hMemDC, 0, 6 * CY_BUTTON, SRCCOPY);
+      }
+    } else {
+      // disabled
+      ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+               CX_BUTTON, CY_BUTTON,
+               hMemDC, 0, 9 * CY_BUTTON, SRCCOPY);
+    }
+
+    ::SelectObject(hMemDC, hbmOld);
+    ::DeleteDC(hMemDC);
   }
+  if (lpIMC) TheIME.UnlockIMC(hIMC);
 } // StatusWnd_Paint
 
 STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
@@ -232,6 +250,9 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
   FOOTMARK();
   HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
   HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
+  if (hIMC == NULL) {
+    return;
+  }
   DWORD dwConversion, dwSentence;
   BOOL bOpen = ImmGetOpenStatus(hIMC);
   if (::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence)) {
@@ -288,6 +309,7 @@ void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
 
 void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
   FOOTMARK();
+
   STATUS_WND_HITTEST hittest = StatusWnd_HitTest(hWnd, pt);
   switch (hittest) {
   case SWHT_CAPTION:
@@ -339,6 +361,7 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
   FOOTMARK();
   HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
   HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
+  if (hIMC == NULL) return FALSE;
 
   HMENU hMenu = ::LoadMenu(TheIME.m_hInst, TEXT("STATUSRMENU"));
   if (hMenu) {
