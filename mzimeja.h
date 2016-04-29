@@ -258,7 +258,7 @@ std::wstring zenkaku_hiragana_to_katakana(const std::wstring& hiragana);
 std::wstring zenkaku_katakana_to_hiragana(const std::wstring& katakana);
 std::wstring hiragana_to_romaji(const std::wstring& hiragana);
 std::wstring romaji_to_hiragana(const std::wstring& romaji);
-WCHAR alpha_to_hiragana(BYTE vk);
+WCHAR convert_key_to_kana(BYTE vk, BOOL bShift);
 BOOL is_hiragana(WCHAR ch);
 BOOL is_zenkaku_katakana(WCHAR ch);
 BOOL is_hankaku_katakana(WCHAR ch);

@@ -1160,40 +1160,58 @@ std::wstring romaji_to_hiragana(const std::wstring& romaji) {
   return hiragana;
 } // romaji_to_hiragana
 
-WCHAR alpha_to_hiragana(BYTE vk) {
-  static const WCHAR s_table[26] = {
-    L'ち',
-    L'こ',
-    L'そ',
-    L'し',
-    L'い',
-    L'は',
-    L'き',
-    L'く',
-    L'に',
-    L'ま',
-    L'の',
-    L'り',
-    L'も',
-    L'み',
-    L'ら',
-    L'せ',
-    L'た',
-    L'す',
-    L'と',
-    L'か',
-    L'な',
-    L'ひ',
-    L'て',
-    L'さ',
-    L'ん',
-    L'つ',
-  };
-  if (VK_A <= vk && vk <= VK_Z) {
-    return s_table[vk - VK_A];
+WCHAR convert_key_to_kana(BYTE vk, BOOL bShift) {
+  switch (vk) {
+  case VK_A:          return L'ち';
+  case VK_B:          return L'こ';
+  case VK_C:          return L'そ';
+  case VK_D:          return L'し';
+  case VK_E:          return (bShift ? L'ぃ' : L'い');
+  case VK_F:          return L'は';
+  case VK_G:          return L'き';
+  case VK_H:          return L'く';
+  case VK_I:          return L'に';
+  case VK_J:          return L'ま';
+  case VK_K:          return L'の';
+  case VK_L:          return L'り';
+  case VK_M:          return L'も';
+  case VK_N:          return L'み';
+  case VK_O:          return L'ら';
+  case VK_P:          return L'せ';
+  case VK_Q:          return L'た';
+  case VK_R:          return L'す';
+  case VK_S:          return L'と';
+  case VK_T:          return L'か';
+  case VK_U:          return L'な';
+  case VK_V:          return L'ひ';
+  case VK_W:          return L'て';
+  case VK_X:          return L'さ';
+  case VK_Y:          return L'ん';
+  case VK_Z:          return (bShift ? L'っ' : L'つ');
+  case VK_0:          return (bShift ? L'を' : L'わ');
+  case VK_1:          return L'ぬ';
+  case VK_2:          return L'ふ';
+  case VK_3:          return (bShift ? L'ぁ' : L'あ');
+  case VK_4:          return (bShift ? L'ぅ' : L'う');
+  case VK_5:          return (bShift ? L'ぇ' : L'え');
+  case VK_6:          return (bShift ? L'ぉ' : L'お');
+  case VK_7:          return (bShift ? L'ゃ' : L'や');
+  case VK_8:          return (bShift ? L'ゅ' : L'ゆ');
+  case VK_9:          return (bShift ? L'ょ' : L'よ');
+  case VK_OEM_PLUS:   return L'れ';
+  case VK_OEM_102:    return L'ろ';
+  case VK_OEM_1:      return L'け';
+  case VK_OEM_2:      return (bShift ? L'・' : L'め');
+  case VK_OEM_3:      return L'゛';
+  case VK_OEM_4:      return (bShift ? L'「' : L'゜');
+  case VK_OEM_5:      return L'ー';
+  case VK_OEM_6:      return (bShift ? L'」' : L'む');
+  case VK_OEM_7:      return L'へ';
+  case VK_OEM_COMMA:  return (bShift ? L'、' : L'ね');
+  case VK_OEM_PERIOD: return (bShift ? L'。' : L'る');
+  default:            return 0;
   }
-  return 0;
-} // alpha_to_hiragana
+} // convert_key_to_kana
 
 BOOL is_hiragana(WCHAR ch) {
   if (0x3040 <= ch && ch <= 0x309F) return TRUE;
