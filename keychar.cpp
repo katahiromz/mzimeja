@@ -1199,7 +1199,9 @@ WCHAR convert_key_to_kana(BYTE vk, BOOL bShift) {
   case VK_8:          return (bShift ? L'ゅ' : L'ゆ');
   case VK_9:          return (bShift ? L'ょ' : L'よ');
   case VK_OEM_PLUS:   return L'れ';
-  case VK_OEM_102:    return L'ろ';
+  case VK_OEM_MINUS:  return L'ほ';
+  case VK_OEM_COMMA:  return (bShift ? L'、' : L'ね');
+  case VK_OEM_PERIOD: return (bShift ? L'。' : L'る');
   case VK_OEM_1:      return L'け';
   case VK_OEM_2:      return (bShift ? L'・' : L'め');
   case VK_OEM_3:      return L'゛';
@@ -1207,11 +1209,61 @@ WCHAR convert_key_to_kana(BYTE vk, BOOL bShift) {
   case VK_OEM_5:      return L'ー';
   case VK_OEM_6:      return (bShift ? L'」' : L'む');
   case VK_OEM_7:      return L'へ';
-  case VK_OEM_COMMA:  return (bShift ? L'、' : L'ね');
-  case VK_OEM_PERIOD: return (bShift ? L'。' : L'る');
+  case VK_OEM_102:    return L'ろ';
   default:            return 0;
   }
 } // convert_key_to_kana
+
+WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock) {
+  if (VK_A <= vk && vk <= VK_Z) {
+    if (!bShift == !bCapsLock) {
+      return vk + (L'a' - VK_A);
+    } else {
+      return vk + (L'A' - VK_A);
+    }
+  }
+  switch (vk) {
+  case VK_0:          return L'0';
+  case VK_1:          return (bShift ? L'!' : L'1');
+  case VK_2:          return (bShift ? L'"' : L'2');
+  case VK_3:          return (bShift ? L'#' : L'3');
+  case VK_4:          return (bShift ? L'$' : L'4');
+  case VK_5:          return (bShift ? L'%' : L'5');
+  case VK_6:          return (bShift ? L'&' : L'6');
+  case VK_7:          return (bShift ? L'\'' : L'7');
+  case VK_8:          return (bShift ? L'(' : L'8');
+  case VK_9:          return (bShift ? L')' : L'9');
+  case VK_OEM_PLUS:   return (bShift ? L'+' : L';');
+  case VK_OEM_MINUS:  return (bShift ? L'=' : L'-');
+  case VK_OEM_COMMA:  return (bShift ? L'<' : L',');
+  case VK_OEM_PERIOD: return (bShift ? L'>' : L'.');
+  case VK_OEM_1:      return (bShift ? L'*' : L':');
+  case VK_OEM_2:      return (bShift ? L'?' : L'/');
+  case VK_OEM_3:      return (bShift ? L'@' : L'`');
+  case VK_OEM_4:      return (bShift ? L'{' : L'[');
+  case VK_OEM_5:      return (bShift ? L'|' : L'\\');
+  case VK_OEM_6:      return (bShift ? L'}' : L']');
+  case VK_OEM_7:      return (bShift ? L'~' : L'^');
+  case VK_OEM_102:    return (bShift ? L'_' : L'\\');
+  case VK_ADD:        return L'+';
+  case VK_SUBTRACT:   return L'-';
+  case VK_MULTIPLY:   return L'*';
+  case VK_DIVIDE:     return L'/';
+  case VK_SEPARATOR:  return L',';
+  case VK_DECIMAL:    return L'.';
+  case VK_NUMPAD0:    return L'0';
+  case VK_NUMPAD1:    return L'1';
+  case VK_NUMPAD2:    return L'2';
+  case VK_NUMPAD3:    return L'3';
+  case VK_NUMPAD4:    return L'4';
+  case VK_NUMPAD5:    return L'5';
+  case VK_NUMPAD6:    return L'6';
+  case VK_NUMPAD7:    return L'7';
+  case VK_NUMPAD8:    return L'8';
+  case VK_NUMPAD9:    return L'9';
+  default:            return 0;
+  }
+} // typing_key_to_char
 
 BOOL is_hiragana(WCHAR ch) {
   if (0x3040 <= ch && ch <= 0x309F) return TRUE;
@@ -1259,12 +1311,21 @@ BOOL is_fullwidth_ascii(WCHAR ch) {
 }
 
 void LogCompStr::AddRomanChar(WCHAR ch, BOOL bMakeKatakana/* = FALSE*/) {
+  extra.AssertValid();
+  if (is_hiragana(ch)) {
+    // romanize
+  } else if (L'A' <= ch && ch <= L'Z') {
+  } else if (L'a' <= ch && ch <= L'z') {
+    
+  }
 }
 
 void LogCompStr::AddKanaChar(WCHAR ch, BOOL bMakeKatakana/* = FALSE*/) {
+  extra.AssertValid();
 }
 
 void LogCompStr::AddEisuuChar(WCHAR ch, BOOL bMakeZenkaku/* = FALSE*/) {
+  extra.AssertValid();
 }
 
 void LogCompStr::Revert() {

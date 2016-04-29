@@ -29,6 +29,10 @@ struct LogCompStrExtra {
     typing_phonemes.clear();
     phoneme_clauses.clear();
   }
+  void AssertValid() {
+    assert(hiragana_phonemes.size() == typing_phonemes.size());
+    assert(dwPhonemeCursor <= (DWORD)hiragana_phonemes.size());
+  }
 }; // struct LogCompStrExtra
 
 //////////////////////////////////////////////////////////////////////////////

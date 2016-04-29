@@ -35,12 +35,14 @@ public:
 
     bool empty() const { return size() == 0; }
     size_t size() const {
-        for (size_t index = 0; index < c_capacity; ++index) {
-            if (m_buf[index] == 0) return index;
+        size_t index;
+        for (index = 0; index < c_capacity; ++index) {
+            if (m_buf[index] == 0) break;
         }
-        return c_capacity;
+        return index;
     }
     void clear() { m_buf[0] = 0; }
+    void resize(size_t count) { erase(count); }
 
     SmallWString& operator=(const wchar_t *str) { return assign(str); }
     SmallWString& assign(const wchar_t *str) {
@@ -75,19 +77,29 @@ public:
 
     SmallWString& erase() { clear(); return *this; }
     SmallWString& erase(size_t index) {
-        assert(index <= c_capacity);
-        m_buf[index] = 0;
+        if (index < c_capacity) m_buf[index] = 0;
         return *this;
     }
     SmallWString& erase(size_t index, size_t count) {
-        assert(index <= c_capacity);
-        assert(index + count <= c_capacity);
-        size_t k;
-        for (k = index; k < c_capacity - count; ++k) {
+        for (size_t k = index; k + count < c_capacity; ++k) {
             m_buf[k] = m_buf[k + count];
         }
-        if (k < c_capacity) m_buf[k] = 0;
+        if (index + count < c_capacity) m_buf[index + count] = 0;
         return *this;
+    }
+
+    SmallWString& operator+=(wchar_t ch) {
+        size_t len = size();
+        if (len < c_capacity) {
+            m_buf[len++] = ch;
+            if (len < c_capacity) {
+                m_buf[len] = 0;
+            }
+        }
+        return *this;
+    }
+    SmallWString& operator+=(const wchar_t *str) {
+        return insert(size(), str);
     }
 
     SmallWString& insert(size_t index, size_t count, wchar_t ch) {
@@ -97,7 +109,8 @@ public:
                 count = c_capacity - index;
             }
             const size_t span = c_capacity - (index + count);
-            memmove(&m_buf[index + count], &m_buf[index], span);
+            const size_t siz = span * sizeof(wchar_t);
+            memmove(&m_buf[index + count], &m_buf[index], siz);
             for (size_t k = index; k < index + count; ++k) {
                 m_buf[k] = ch;
             }
@@ -110,8 +123,25 @@ public:
         const size_t index = pos - m_buf;
         if (index < c_capacity) {
             const size_t span = c_capacity - (index + 1);
-            memmove(&m_buf[index + 1], &m_buf[index], span);
+            const size_t siz = span * sizeof(wchar_t);
+            memmove(&m_buf[index + 1], &m_buf[index], siz);
             m_buf[index] = ch;
+        }
+        return *this;
+    }
+    SmallWString& insert(size_t index, const wchar_t *str) {
+        using namespace std;
+        if (index < c_capacity) {
+            size_t count = wcslen(str);
+            if (index + count > c_capacity) {
+                count = c_capacity - index;
+            }
+            const size_t span = c_capacity - (index + count);
+            const size_t siz = span * sizeof(wchar_t);
+            memmove(&m_buf[index + count], &m_buf[index], siz);
+            for (size_t k = index; k < index + count; ++k) {
+                m_buf[k] = str[k - index];
+            }
         }
         return *this;
     }
