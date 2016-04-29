@@ -18,8 +18,8 @@ public:
 
     bool empty() const { return size() == 0; }
     size_t size() const {
-        for (size_t i = 0; i < c_capacity; ++i) {
-            if (m_buf[i] == 0) return i;
+        for (size_t index = 0; index < c_capacity; ++index) {
+            if (m_buf[index] == 0) return index;
         }
         return c_capacity;
     }
