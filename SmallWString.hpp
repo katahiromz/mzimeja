@@ -25,6 +25,9 @@ public:
 
 public:
     SmallWString() { m_buf[0] = 0; }
+    SmallWString(size_t count, wchar_t ch) {
+        assign(count, ch);
+    }
     SmallWString(const wchar_t *str) {
         assign(str);
     }
