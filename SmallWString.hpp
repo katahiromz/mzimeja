@@ -107,7 +107,7 @@ public:
 
     SmallWString& insert(size_t index, size_t count, wchar_t ch) {
         using namespace std;
-        if (index <= c_capacity) {
+        if (index < c_capacity) {
             if (index + count > c_capacity) {
                 count = c_capacity - index;
             }
