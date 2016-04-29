@@ -6,6 +6,15 @@
 
 class SmallWString {
 public:
+    typedef wchar_t         value_type;
+    typedef size_t          size_type;
+    typedef wchar_t&        reference;
+    typedef const wchar_t&  const_reference;
+    typedef wchar_t *       pointer;
+    typedef const wchar_t * const_pointer;
+    typedef pointer         iterator;
+    typedef const_pointer   const_iterator;
+public:
     SmallWString() { m_buf[0] = 0; }
     SmallWString(const wchar_t *str) {
         assign(str);
@@ -71,6 +80,10 @@ public:
     const wchar_t *c_str() const { return m_buf; }
     wchar_t *data() { return m_buf; }
 
+    iterator begin()    { return &m_buf[0]; }
+    iterator end()      { return &m_buf[size()]; }
+    const_iterator begin() const { return &m_buf[0]; }
+    const_iterator end()   const { return &m_buf[size()]; }
 protected:
     static const size_t c_capacity = 6;
     wchar_t m_buf[c_capacity];
