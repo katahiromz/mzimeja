@@ -12,97 +12,68 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-WCHAR MapOemVirtualKey(BYTE vk, BOOL bShift) {
-  switch (vk) {
-  case VK_OEM_PLUS:     return (bShift ? L'+' : L';');
-  case VK_OEM_MINUS:    return (bShift ? L'=' : L'-');
-  case VK_OEM_PERIOD:   return (bShift ? L'>' : L'.');
-  case VK_OEM_COMMA:    return (bShift ? L'<' : L',');
-  case VK_OEM_1:        return (bShift ? L'*' : L':');
-  case VK_OEM_2:        return (bShift ? L'?' : L'/');
-  case VK_OEM_3:        return (bShift ? L'`' : L'@');
-  case VK_OEM_4:        return (bShift ? L'{' : L'[');
-  case VK_OEM_5:        return (bShift ? L'|' : L'\\');
-  case VK_OEM_6:        return (bShift ? L'}' : L']');
-  case VK_OEM_7:        return (bShift ? L'~' : L'^');
-  case VK_OEM_8:        return 0;
-  case VK_OEM_9:        return 0;
-  case VK_OEM_102:      return (bShift ? L'_' : L'\\');
-  default:              return 0;
-  }
-} // MapOemVirtualKey
-
-WCHAR MapNumPadVirtualKey(BYTE vk) {
-  switch (vk) {
-  case VK_ADD:        return L'+';
-  case VK_SUBTRACT:   return L'-';
-  case VK_MULTIPLY:   return L'*';
-  case VK_DIVIDE:     return L'/';
-  case VK_SEPARATOR:  return L',';
-  case VK_DECIMAL:    return L'.';
-  case VK_NUMPAD0:    return L'0';
-  case VK_NUMPAD1:    return L'1';
-  case VK_NUMPAD2:    return L'2';
-  case VK_NUMPAD3:    return L'3';
-  case VK_NUMPAD4:    return L'4';
-  case VK_NUMPAD5:    return L'5';
-  case VK_NUMPAD6:    return L'6';
-  case VK_NUMPAD7:    return L'7';
-  case VK_NUMPAD8:    return L'8';
-  case VK_NUMPAD9:    return L'9';
-  default:            return 0;
-  }
-} // MapNumPadVirtualKey
-
-
-WCHAR MapDigitVirtualKey(BYTE vk, BOOL bShift) {
-  if (bShift) {
-    static const WCHAR s_table[] = {
-      0, L'!', L'"', L'#', L'$', L'%', L'&', L'\'', L'(', L')'
-    };
-    if (VK_0 <= vk && vk <= VK_9) {
-      return s_table[vk - VK_0];
-    }
-  } else {
-    return (WCHAR)vk;
-  }
-  return 0;
-}
-
-WCHAR MapAlphaVirtualKey(HIMC hIMC, BYTE vk, LPBYTE lpbKeyState) {
-  if (IsRomanMode(hIMC)) {
-    if (lpbKeyState[VK_SHIFT] & 0x80) {
-      return L'A' + (vk - VK_A);
-    }
-  }
-  return L'a' + (vk - VK_A);
-}
-
 // A function which handles WM_IME_KEYDOWN
 BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                        LPBYTE lpbKeyState) {
   InputContext *lpIMC;
   WORD vk = (wParam & 0x00FF);
-  BOOL bOpen;
-  WCHAR ch;
 
-  if (lpbKeyState[VK_CONTROL] & 0x80) return FALSE;
+  // check open
+  BOOL bOpen = FALSE;
+  if (hIMC) {
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      bOpen = lpIMC->IsOpen();
+      TheIME.UnlockIMC(hIMC);
+    }
+  }
+
+  // check modifiers
+  BOOL bShift = lpbKeyState[VK_SHIFT] & 0x80;
+  BOOL bCtrl = lpbKeyState[VK_CONTROL] & 0x80;
+  BOOL bCapsLock = lpbKeyState[VK_CAPITAL] & 0x80;
+  BOOL bRoman = IsRomanMode(hIMC);
+
+  // Is Ctrl down?
+  if (bCtrl) {
+    if (bOpen) {
+      if (vk == VK_SPACE) {
+        // add ideographic space
+        TheIME.GenerateMessage(WM_IME_CHAR, L' ', 1);
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  WCHAR chTyped;
+
+  // get typed character
+  if (vk == VK_PACKET) {
+    chTyped = HIWORD(wParam);
+  } else {
+    chTyped = typing_key_to_char(vk, bShift, bCapsLock);
+  }
+
+  // get translated char
+  WCHAR chTranslated = 0;
+  if (!bRoman) {
+    chTranslated = convert_key_to_kana(vk, bShift);
+  }
+  if (chTranslated || chTyped) {
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->AddChar(chTyped, chTranslated, bRoman);
+      TheIME.UnlockIMC(hIMC);
+    }
+    return TRUE;
+  }
 
   switch (vk) {
-  case VK_SHIFT:
-  case VK_CONTROL:
-    break;
-
   case VK_KANJI:
   case VK_OEM_AUTO:
   case VK_OEM_ENLW:
     if (hIMC) {
-      bOpen = FALSE;
-      lpIMC = TheIME.LockIMC(hIMC);
-      if (lpIMC) {
-        bOpen = lpIMC->IsOpen();
-        TheIME.UnlockIMC(hIMC);
-      }
       if (bOpen) {
         ImmSetOpenStatus(hIMC, FALSE);
       } else {
@@ -112,12 +83,6 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     break;
 
   case VK_OEM_COPY:
-    bOpen = FALSE;
-    lpIMC = TheIME.LockIMC(hIMC);
-    if (lpIMC) {
-      bOpen = lpIMC->IsOpen();
-      TheIME.UnlockIMC(hIMC);
-    }
     if (!bOpen) {
       ImmSetOpenStatus(hIMC, TRUE);
     }
@@ -253,56 +218,8 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     }
     break;
 
-  case VK_OEM_PLUS: case VK_OEM_MINUS: case VK_OEM_PERIOD:
-  case VK_OEM_COMMA:
-  case VK_OEM_1: case VK_OEM_2: case VK_OEM_3: case VK_OEM_4:
-  case VK_OEM_5: case VK_OEM_6: case VK_OEM_7: case VK_OEM_8:
-  case VK_OEM_9: case VK_OEM_102:
-    // OEM keys
-    ch = MapOemVirtualKey((BYTE)vk, (lpbKeyState[VK_SHIFT] & 0x80));
-    if (ch != 0) {
-      lpIMC = TheIME.LockIMC(hIMC);
-      if (lpIMC) {
-        lpIMC->AddChar(ch);
-        TheIME.UnlockIMC(hIMC);
-      }
-    }
-    break;
-  case VK_ADD: case VK_SUBTRACT: case VK_MULTIPLY: case VK_DIVIDE:
-  case VK_SEPARATOR: case VK_DECIMAL:
-  case VK_NUMPAD0: case VK_NUMPAD1: case VK_NUMPAD2: case VK_NUMPAD3:
-  case VK_NUMPAD4: case VK_NUMPAD5: case VK_NUMPAD6: case VK_NUMPAD7:
-  case VK_NUMPAD8: case VK_NUMPAD9:
-    // num pad keys
-    // OEM keys
-    ch = MapNumPadVirtualKey((BYTE)vk);
-    if (ch != 0) {
-      lpIMC = TheIME.LockIMC(hIMC);
-      if (lpIMC) {
-        lpIMC->AddChar(ch);
-        TheIME.UnlockIMC(hIMC);
-      }
-    }
-    break;
-
   default:
-    if (VK_0 <= vk && vk <= VK_9) {
-      ch = MapDigitVirtualKey((BYTE)vk, (lpbKeyState[VK_SHIFT] & 0x80));
-    } else if (VK_A <= vk && vk <= VK_Z) {
-      ch = MapAlphaVirtualKey(hIMC, (BYTE)vk, lpbKeyState);
-    } else if (vk == VK_PACKET) {
-      ch = HIWORD(wParam);
-    } else {
-      return FALSE;
-    }
-    if (ch) {
-      lpIMC = TheIME.LockIMC(hIMC);
-      if (lpIMC) {
-        lpIMC->AddChar(ch);
-        TheIME.UnlockIMC(hIMC);
-      }
-    }
-    break;
+    return FALSE;
   }
   return TRUE;
 } // IMEKeyDownHandler
@@ -513,7 +430,11 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
       TheIME.UnlockIMC(hIMC);
 
       if (fOpen) {
-        if ((uScanCode & 0x8000) == 0) {
+        if (uScanCode & 0x8000) {
+          // key up
+          ;
+        } else {
+          // key down
           LPARAM lParam = ((DWORD)uScanCode << 16) + 1L;
           IMEKeyDownHandler(hIMC, uVKey, lParam, lpbKeyState);
         }
