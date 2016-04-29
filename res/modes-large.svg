@@ -11,13 +11,13 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="24"
-   height="216"
+   height="240"
    viewBox="0 0 0 96.000003"
    id="svg4144"
    version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="modes-large.svg"
-   inkscape:export-filename="C:\WinDDK\3790.1830\src\ime\mzimeja\res\modes.png"
+   inkscape:export-filename="C:\WinDDK\3790.1830\src\ime\mzimeja\res\modes-large"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -108,9 +108,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.9600002"
-     inkscape:cx="61.352267"
-     inkscape:cy="28.021712"
+     inkscape:zoom="1.4000715"
+     inkscape:cx="-101.14755"
+     inkscape:cy="99.123866"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -138,7 +138,7 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      units="px"
-     inkscape:snap-global="false"
+     inkscape:snap-global="true"
      inkscape:snap-grids="false" />
   <metadata
      id="metadata4149">
@@ -148,7 +148,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -156,16 +156,16 @@
      inkscape:label="レイヤー 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(3.4842904e-6,-836.36217)">
+     transform="translate(3.4842904e-6,-812.36217)">
     <rect
        style="opacity:0.95999995;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.45631068"
        id="rect3440"
        width="24"
        height="215.99998"
-       x="-1.3209961e-005"
-       y="836.36218" />
+       x="-3.3428112e-006"
+       y="812.36218" />
     <g
-       transform="matrix(0.42333346,0,0,0.42333346,-1.760876e-5,414.86205)"
+       transform="matrix(0.42333346,0,0,0.42333346,-7.74161e-6,390.86204)"
        id="layer1-9"
        inkscape:label="レイヤー 1">
       <rect
@@ -188,7 +188,7 @@
            sodipodi:role="line">あ</tspan></text>
     </g>
     <g
-       transform="matrix(0.42333346,0,0,0.42333346,-1.2140409e-5,438.86205)"
+       transform="matrix(0.42333346,0,0,0.42333346,-2.273259e-6,414.86204)"
        id="layer1-8"
        inkscape:label="レイヤー 1">
       <rect
@@ -212,7 +212,7 @@
            sodipodi:role="line">ア</tspan></text>
     </g>
     <g
-       transform="matrix(0.42333346,0,0,0.42333346,-1.2140409e-5,462.86204)"
+       transform="matrix(0.42333346,0,0,0.42333346,-2.273259e-6,438.86203)"
        id="layer1-1"
        inkscape:label="レイヤー 1">
       <rect
@@ -236,7 +236,7 @@
            sodipodi:role="line">Ａ</tspan></text>
     </g>
     <g
-       transform="matrix(0.42333346,0,0,0.42333346,-1.0665392e-5,486.86204)"
+       transform="matrix(0.42333346,0,0,0.42333346,-7.9824197e-7,462.86203)"
        id="layer1-3"
        inkscape:label="レイヤー 1">
       <rect
@@ -280,7 +280,7 @@
       </g>
     </g>
     <g
-       transform="matrix(0.42333346,0,0,0.42333346,-2.1866081e-5,510.86204)"
+       transform="matrix(0.42333346,0,0,0.42333346,-1.1998931e-5,486.86203)"
        id="layer1-34"
        inkscape:label="レイヤー 1">
       <rect
@@ -325,7 +325,7 @@
     </g>
     <g
        id="g3521"
-       transform="translate(54.854942,-51.71603)">
+       transform="translate(54.854952,-75.716043)">
       <rect
          y="1008.0782"
          x="-54.854965"
@@ -360,7 +360,7 @@
     </g>
     <g
        id="g3528"
-       transform="translate(94.056749,11.424919)">
+       transform="translate(94.056759,-12.575094)">
       <rect
          y="968.93726"
          x="-94.056763"
@@ -394,7 +394,8 @@
            sodipodi:role="line">OFF</tspan></text>
     </g>
     <g
-       id="g3544">
+       id="g3544"
+       transform="translate(9.86715e-6,-24.000013)">
       <rect
          y="1004.3622"
          x="-8.2526622e-006"
@@ -428,7 +429,8 @@
            sodipodi:role="line">ON</tspan></text>
     </g>
     <g
-       id="g3537">
+       id="g3537"
+       transform="translate(1.4147913e-7,-24.000036)">
       <rect
          y="1028.3622"
          x="-3.4842903e-006"
@@ -460,6 +462,27 @@
            y="1015.854"
            x="2.6661396"
            sodipodi:role="line">IME</tspan></text>
+    </g>
+    <rect
+       style="opacity:0.95999995;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.45631068"
+       id="rect3378-1-0-1"
+       width="24"
+       height="24.000008"
+       x="-3.2483465e-006"
+       y="1028.3622" />
+    <g
+       id="g4317"
+       transform="matrix(0.83147971,0,0,0.83147971,2.398249,155.74261)">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4313"
+         d="m -1.3209961e-5,1052.3622 24.000000209961,24"
+         style="fill:none;fill-rule:evenodd;stroke:#ff0404;stroke-width:5.5999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4315"
+         d="m -1.3209961e-5,1076.3622 24.000000209961,-24 0,0"
+         style="fill:none;fill-rule:evenodd;stroke:#ff0404;stroke-width:5.5999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
   </g>
 </svg>
