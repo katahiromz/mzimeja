@@ -8,6 +8,8 @@
 #include <cstring>  // for wcslen
 #include <cassert>  // for assert
 
+#include <string>   // for std::wstring
+
 //////////////////////////////////////////////////////////////////////////////
 
 class WStringRef {
@@ -24,6 +26,9 @@ public:
         using namespace std;
         m_len = wcslen(ptr);
     }
+    WStringRef(const wchar_t *ptr, size_t len) : m_ptr(ptr), m_len(len) {}
+    WStringRef(const std::wstring& str) :
+        m_ptr(str.c_str()), m_len(str.size()) {}
     WStringRef(const WStringRef& str) : m_ptr(str.m_ptr), m_len(str.m_len) {}
 
     bool empty() const { return size() == 0; }
@@ -48,6 +53,8 @@ public:
 
     const wchar_t *begin() const { return &m_ptr[0]; }
     const wchar_t *end()   const { return &m_ptr[m_len]; }
+
+    std::wstring str() const { return std::wstring(m_ptr, m_len); }
 
 protected:
     const wchar_t *     m_ptr;

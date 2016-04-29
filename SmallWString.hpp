@@ -8,6 +8,8 @@
 #include <cstring>  // for memcpy
 #include <cassert>  // for assert
 
+#include <string>   // for std::string
+
 //////////////////////////////////////////////////////////////////////////////
 
 class SmallWString {
@@ -28,6 +30,9 @@ public:
     }
     SmallWString(const wchar_t *str, size_t len) {
         assign(str, len);
+    }
+    SmallWString(const std::wstring& str) {
+        assign(str.c_str(), str.size());
     }
     SmallWString(const SmallWString& str) {
         assign(str);
@@ -145,6 +150,8 @@ public:
     wchar_t *end()      { return &m_buf[size()]; }
     const wchar_t *begin() const { return &m_buf[0]; }
     const wchar_t *end()   const { return &m_buf[size()]; }
+
+    std::wstring str() const { return std::wstring(m_buf, size()); }
 
 protected:
     static const size_t c_capacity = 6;
