@@ -28,6 +28,10 @@ public:
 
     bool empty() const { return size() == 0; }
     size_t size() const { return m_len; }
+    void clear() {
+        m_ptr = NULL;
+        m_len = 0;
+    }
 
     WStringRef& operator=(const wchar_t *ptr) {
         using namespace std;
