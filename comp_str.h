@@ -20,12 +20,14 @@ struct LogCompStrExtra {
   DWORD                       dwPhonemeCursor;
   std::vector<SmallWString>   hiragana_phonemes;
   std::vector<SmallWString>   typing_phonemes;
+  std::vector<DWORD>          phoneme_clauses;  // for future use
   LogCompStrExtra() : dwPhonemeCursor(0) {}
   DWORD GetTotalSize() const;
   void clear() {
     dwPhonemeCursor = 0;
     hiragana_phonemes.clear();
     typing_phonemes.clear();
+    phoneme_clauses.clear();
   }
 }; // struct LogCompStrExtra
 

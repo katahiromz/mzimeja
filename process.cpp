@@ -70,7 +70,7 @@ WCHAR MapDigitVirtualKey(BYTE vk, BOOL bShift) {
 }
 
 WCHAR MapAlphaVirtualKey(HIMC hIMC, BYTE vk, LPBYTE lpbKeyState) {
-  if (IsRomajiMode(hIMC)) {
+  if (IsRomanMode(hIMC)) {
     if (lpbKeyState[VK_SHIFT] & 0x80) {
       return L'A' + (vk - VK_A);
     }
@@ -122,7 +122,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
       ImmSetOpenStatus(hIMC, TRUE);
     }
     if (lpbKeyState[VK_MENU] & 0x80) {
-      SetRomajiMode(hIMC, !IsRomajiMode(hIMC));
+      SetRomanMode(hIMC, !IsRomanMode(hIMC));
     } else if (lpbKeyState[VK_SHIFT] & 0x80) {
       SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
     } else {

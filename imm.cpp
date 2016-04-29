@@ -719,7 +719,7 @@ static const MYMENUITEM top_menu_items[] = {
   {IDM_HAN_KATAKANA, IDM_HAN_KATAKANA},
   {IDM_ALNUM, IDM_ALNUM},
   {-1, -1},
-  {IDM_ROMAJI_INPUT, IDM_ROMAJI_INPUT},
+  {IDM_ROMAN_INPUT, IDM_ROMAN_INPUT},
   {IDM_KANA_INPUT, IDM_KANA_INPUT},
   {-1, -1},
   {IDM_ADD_WORD, IDM_ADD_WORD},
@@ -797,11 +797,11 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
             lpImeMenu[i].fState = IMFS_CHECKED;
           }
           break;
-        case IDM_ROMAJI_INPUT:
+        case IDM_ROMAN_INPUT:
         case IDM_KANA_INPUT:
           lpImeMenu[i].fType = IMFT_RADIOCHECK;
           if (dwConversion & IME_CMODE_ROMAN) {
-            if (item.nCommandID == IDM_ROMAJI_INPUT) {
+            if (item.nCommandID == IDM_ROMAN_INPUT) {
               lpImeMenu[i].fState = IMFS_CHECKED;
             }
           } else {

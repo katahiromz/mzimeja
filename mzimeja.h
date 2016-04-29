@@ -240,8 +240,8 @@ InputMode NextInputMode(InputMode imode);
 InputMode GetInputMode(HIMC hIMC);
 void SetInputMode(HIMC hIMC, InputMode imode);
 void RepositionWindow(HWND hWnd);
-BOOL IsRomajiMode(HIMC hIMC);
-void SetRomajiMode(HIMC hIMC, BOOL bRomaji);
+BOOL IsRomanMode(HIMC hIMC);
+void SetRomanMode(HIMC hIMC, BOOL bRoman);
 UINT CommandFromInputMode(InputMode imode);
 HFONT CheckNativeCharset(HDC hDC);
 

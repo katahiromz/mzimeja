@@ -154,18 +154,18 @@ void SetInputMode(HIMC hIMC, InputMode imode) {
   ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
 }
 
-BOOL IsRomajiMode(HIMC hIMC) {
+BOOL IsRomanMode(HIMC hIMC) {
   FOOTMARK();
   DWORD dwConversion, dwSentence;
   ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
   return (dwConversion & IME_CMODE_ROMAN);
 }
 
-void SetRomajiMode(HIMC hIMC, BOOL bRomaji) {
+void SetRomanMode(HIMC hIMC, BOOL bRoman) {
   FOOTMARK();
   DWORD dwConversion, dwSentence;
   ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
-  if (bRomaji) {
+  if (bRoman) {
     dwConversion |= IME_CMODE_ROMAN;
   } else {
     dwConversion &= ~IME_CMODE_ROMAN;
@@ -437,11 +437,11 @@ BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
     break;
   case IDM_CANCEL:
     break;
-  case IDM_ROMAJI_INPUT:
-    SetRomajiMode(hIMC, TRUE);
+  case IDM_ROMAN_INPUT:
+    SetRomanMode(hIMC, TRUE);
     break;
   case IDM_KANA_INPUT:
-    SetRomajiMode(hIMC, FALSE);
+    SetRomanMode(hIMC, FALSE);
     break;
   case IDM_HIDE:
     break;

@@ -352,11 +352,11 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
     UINT uCheck = CommandFromInputMode(GetInputMode(hIMC));
     ::CheckMenuRadioItem(hSubMenu, IDM_HIRAGANA, IDM_ALNUM, uCheck, MF_BYCOMMAND);
 
-    if (IsRomajiMode(hIMC)) {
-      ::CheckMenuRadioItem(hSubMenu, IDM_ROMAJI_INPUT, IDM_KANA_INPUT,
-                           IDM_ROMAJI_INPUT, MF_BYCOMMAND);
+    if (IsRomanMode(hIMC)) {
+      ::CheckMenuRadioItem(hSubMenu, IDM_ROMAN_INPUT, IDM_KANA_INPUT,
+                           IDM_ROMAN_INPUT, MF_BYCOMMAND);
     } else {
-      ::CheckMenuRadioItem(hSubMenu, IDM_ROMAJI_INPUT, IDM_KANA_INPUT,
+      ::CheckMenuRadioItem(hSubMenu, IDM_ROMAN_INPUT, IDM_KANA_INPUT,
                            IDM_KANA_INPUT, MF_BYCOMMAND);
     }
 
