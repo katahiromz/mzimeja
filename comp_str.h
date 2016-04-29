@@ -87,7 +87,20 @@ struct LogCompStr {
     result_clause.resize(2, 0);
   }
   DWORD GetTotalSize() const;
-};
+
+  void AddRomanChar(WCHAR ch, BOOL bMakeKatakana = FALSE);
+  void AddKanaChar(WCHAR ch, BOOL bMakeKatakana = FALSE);
+  void AddEisuuChar(WCHAR ch, BOOL bMakeZenkaku = FALSE);
+  void Revert();
+  void DeleteChar(BOOL bBackSpace = FALSE);
+  void MakeResult();
+
+  void MakeHiragana();
+  void MakeKatakana();
+  void MakeHankaku();
+  void MakeZenEisuu();
+  void MakeHanEisuu();
+}; // struct LogCompStr
 
 inline void SetClause(LPDWORD lpdw, DWORD num) {
   *lpdw = 0;

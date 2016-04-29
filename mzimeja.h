@@ -264,10 +264,6 @@ BOOL is_zenkaku_katakana(WCHAR ch);
 BOOL is_hankaku_katakana(WCHAR ch);
 BOOL is_kanji(WCHAR ch);
 BOOL is_fullwidth_ascii(WCHAR ch);
-void add_romaji_char(std::wstring& strComp, WCHAR ch, DWORD& dwCursorPos);
-void add_hiragana_char(std::wstring& strComp, WCHAR ch, DWORD& dwCursorPos);
-void add_katakana_char(std::wstring& strComp, WCHAR ch, DWORD& dwCursorPos);
-void add_ascii_char(std::wstring& strComp, WCHAR ch, DWORD& dwCursorPos);
 
 //////////////////////////////////////////////////////////////////////////////
 // C++ interface

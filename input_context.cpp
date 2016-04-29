@@ -164,30 +164,18 @@ void InputContext::AddChar(WCHAR ch) {
 
   // enter a char depending on the conversion mode
   if (Conversion() & IME_CMODE_FULLSHAPE) {
-    if (Conversion() & IME_CMODE_ROMAN) {
-      add_romaji_char(comp_str, ch, log.dwCursorPos);
-    } else {
-      if (Conversion() & IME_CMODE_KATAKANA) {
-        add_katakana_char(comp_str, ch, log.dwCursorPos);
+    if (Conversion() & IME_CMODE_JAPANESE) {
+      if (Conversion() & IME_CMODE_ROMAN) {
+        log.AddRomanChar(ch, (Conversion() & IME_CMODE_KATAKANA));
       } else {
-        add_hiragana_char(comp_str, ch, log.dwCursorPos);
+        log.AddKanaChar(ch, (Conversion() & IME_CMODE_KATAKANA));
       }
+    } else {
+      log.AddEisuuChar(ch, TRUE);
     }
   } else {
-    add_ascii_char(comp_str, ch, log.dwCursorPos);
+    log.AddEisuuChar(ch, FALSE);
   }
-
-  // update info
-  log.comp_read_str = comp_str;
-  log.comp_read_attr.resize(comp_str.size(), ATTR_INPUT);
-  log.comp_attr.resize(comp_str.size(), ATTR_INPUT);
-  log.comp_read_clause.resize(2);
-  log.comp_read_clause[0] = 0;
-  log.comp_read_clause[1] = (DWORD)log.comp_read_str.size();
-
-  log.comp_clause.resize(2);
-  log.comp_clause[0] = 0;
-  log.comp_clause[1] = (DWORD)comp_str.size();
 
   // recreate
   DumpCompStr();
@@ -270,6 +258,7 @@ BOOL InputContext::DoConvert() {
   log_comp_str.comp_clause.resize(2);
   log_comp_str.comp_clause[0] = 0;
   log_comp_str.comp_clause[1] = str.size();
+
   // recreate composition
   DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log_comp_str);
@@ -342,19 +331,8 @@ void InputContext::MakeHiragana() {
     UnlockCompStr();
   }
 
-  std::wstring str;
-  str = romaji_to_hiragana(log.comp_read_str);
-  str = zenkaku_katakana_to_hiragana(str);
-
   // update composition
-  log.comp_str = str;
-  DWORD len = (DWORD)log.comp_str.size();
-  log.dwCursorPos = len;
-  log.dwDeltaStart = 0;
-  log.comp_attr.assign(len, ATTR_INPUT);
-  log.comp_clause.resize(2);
-  log.comp_clause[0] = 0;
-  log.comp_clause[1] = len;
+  log.MakeHiragana();
 
   // recreate
   DumpCompStr();
@@ -382,19 +360,8 @@ void InputContext::MakeKatakana() {
     UnlockCompStr();
   }
 
-  std::wstring str;
-  str = romaji_to_hiragana(log.comp_read_str);
-  str = zenkaku_hiragana_to_katakana(str);
-
   // update composition
-  log.comp_str = str;
-  DWORD len = (DWORD)log.comp_str.size();
-  log.dwCursorPos = len;
-  log.dwDeltaStart = 0;
-  log.comp_attr.assign(len, ATTR_INPUT);
-  log.comp_clause.resize(2);
-  log.comp_clause[0] = 0;
-  log.comp_clause[1] = len;
+  log.MakeKatakana();
 
   // recreate
   DumpCompStr();
@@ -422,19 +389,8 @@ void InputContext::MakeHankaku() {
     UnlockCompStr();
   }
 
-  std::wstring str;
-  str = romaji_to_hiragana(log.comp_read_str);
-  str = zenkaku_to_hankaku(str);
-
   // update composition
-  log.comp_str = str;
-  DWORD len = (DWORD)log.comp_str.size();
-  log.dwCursorPos = len;
-  log.dwDeltaStart = 0;
-  log.comp_attr.assign(len, ATTR_INPUT);
-  log.comp_clause.resize(2);
-  log.comp_clause[0] = 0;
-  log.comp_clause[1] = len;
+  log.MakeHankaku();
 
   // recreate
   DumpCompStr();
@@ -462,19 +418,8 @@ void InputContext::MakeZenEisuu() {
     UnlockCompStr();
   }
 
-  std::wstring str;
-  str = hiragana_to_romaji(log.comp_read_str);
-  str = hankaku_to_zenkaku(str);
-
   // update composition
-  log.comp_str = str;
-  DWORD len = (DWORD)log.comp_str.size();
-  log.dwCursorPos = len;
-  log.dwDeltaStart = 0;
-  log.comp_attr.assign(len, ATTR_INPUT);
-  log.comp_clause.resize(2);
-  log.comp_clause[0] = 0;
-  log.comp_clause[1] = len;
+  log.MakeZenEisuu();
 
   // recreate
   DumpCompStr();
@@ -502,19 +447,8 @@ void InputContext::MakeHanEisuu() {
     UnlockCompStr();
   }
 
-  std::wstring str;
-  str = hiragana_to_romaji(log.comp_read_str);
-  str = zenkaku_to_hankaku(str);
-
   // update composition
-  log.comp_str = str;
-  DWORD len = (DWORD)log.comp_str.size();
-  log.dwCursorPos = len;
-  log.dwDeltaStart = 0;
-  log.comp_attr.assign(len, ATTR_INPUT);
-  log.comp_clause.resize(2);
-  log.comp_clause[0] = 0;
-  log.comp_clause[1] = len;
+  log.MakeHanEisuu();
 
   // recreate
   DumpCompStr();
@@ -566,13 +500,7 @@ void InputContext::RevertText() {
   }
 
   // reset composition
-  log.comp_str = log.comp_read_str;
-  log.comp_clause.resize(2);
-  log.comp_clause[0] = 0;
-  log.comp_clause[1] = (DWORD)log.comp_str.size();
-  log.comp_attr.assign(log.comp_read_str.size(), ATTR_INPUT);
-  log.dwCursorPos = (DWORD)log.comp_str.size();
-  log.dwDeltaStart = 0;
+  log.Revert();
 
   // recreate
   DumpCompStr();
@@ -595,38 +523,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   }
 
   // delete char
-  if (bBackSpace) {
-    if (log.dwCursorPos == 0) {
-      DebugPrint(TEXT("log.dwCursorPos == 0\n"));
-      return;
-    } else if (log.dwCursorPos <= log.comp_str.size()) {
-      --log.dwCursorPos;
-      log.comp_str.erase(log.dwCursorPos);
-      log.dwDeltaStart = log.dwCursorPos;
-    } else {
-      log.dwCursorPos = (DWORD)log.comp_str.size();
-      log.dwDeltaStart = log.dwCursorPos;
-    }
-  } else {
-    if (log.dwCursorPos >= log.comp_str.size()) {
-      DebugPrint(TEXT("log.dwCursorPos >= log.comp_str.size()\n"));
-      return;
-    } else {
-      log.comp_str.erase(log.dwCursorPos);
-      log.dwCursorPos = log.dwDeltaStart;
-    }
-  }
-
-  // update info
-  log.comp_read_str = log.comp_str;
-  log.comp_read_attr.resize(log.comp_str.size(), ATTR_INPUT);
-  log.comp_attr.resize(log.comp_str.size(), ATTR_INPUT);
-  log.comp_read_clause.resize(2);
-  log.comp_read_clause[0] = 0;
-  log.comp_read_clause[1] = (DWORD)log.comp_read_str.size();
-  log.comp_clause.resize(2);
-  log.comp_clause[0] = 0;
-  log.comp_clause[1] = (DWORD)log.comp_str.size();
+  log.DeleteChar(bBackSpace);
 
   // recreate
   DumpCompStr();
