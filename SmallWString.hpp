@@ -85,6 +85,7 @@ public:
     wchar_t *end()      { return &m_buf[size()]; }
     const wchar_t *begin() const { return &m_buf[0]; }
     const wchar_t *end()   const { return &m_buf[size()]; }
+
 protected:
     static const size_t c_capacity = 6;
     wchar_t m_buf[c_capacity];
