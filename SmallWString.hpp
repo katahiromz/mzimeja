@@ -14,6 +14,8 @@
 
 class SmallWString {
 public:
+    static const size_t c_capacity = 6;
+
     typedef wchar_t         value_type;
     typedef size_t          size_type;
     typedef wchar_t&        reference;
@@ -24,22 +26,12 @@ public:
     typedef const_pointer   const_iterator;
 
 public:
-    SmallWString() { m_buf[0] = 0; }
-    SmallWString(size_t count, wchar_t ch) {
-        assign(count, ch);
-    }
-    SmallWString(const wchar_t *str) {
-        assign(str);
-    }
-    SmallWString(const wchar_t *str, size_t len) {
-        assign(str, len);
-    }
-    SmallWString(const std::wstring& str) {
-        assign(str.c_str(), str.size());
-    }
-    SmallWString(const SmallWString& str) {
-        assign(str);
-    }
+    SmallWString()                                  { m_buf[0] = 0; }
+    SmallWString(size_t count, wchar_t ch)          { assign(count, ch); }
+    SmallWString(const wchar_t *str)                { assign(str); }
+    SmallWString(const wchar_t *str, size_t len)    { assign(str, len); }
+    SmallWString(const std::wstring& str) { assign(str.c_str(), str.size()); }
+    SmallWString(const SmallWString& str) { assign(str); }
 
     bool empty() const { return size() == 0; }
     size_t size() const {
@@ -48,16 +40,11 @@ public:
         }
         return c_capacity;
     }
-    void clear() {
-        m_buf[0] = 0;
-    }
+    void clear() { m_buf[0] = 0; }
 
-    SmallWString& operator=(const wchar_t *str) {
-        return assign(str);
-    }
+    SmallWString& operator=(const wchar_t *str) { return assign(str); }
     SmallWString& assign(const wchar_t *str) {
-        wchar_t *pch = m_buf;
-        wchar_t *pchEnd = pch + c_capacity;
+        wchar_t *pch = m_buf, *pchEnd = pch + c_capacity;
         while (*str) {
             *pch++ = *str++;
             if (pch == pchEnd) return *this;
@@ -70,12 +57,8 @@ public:
         memcpy(m_buf, str.m_buf, c_capacity * sizeof(wchar_t));
     }
     SmallWString& assign(size_t count, wchar_t ch) {
-        if (count > c_capacity) {
-            count = c_capacity;
-        }
-        if (count < c_capacity) {
-            m_buf[count] = 0;
-        }
+        if (count > c_capacity) count = c_capacity;
+        if (count < c_capacity) m_buf[count] = 0;
         while (count) {
             m_buf[--count] = ch;
         }
@@ -83,20 +66,13 @@ public:
     }
     SmallWString& assign(const wchar_t *str, size_t len) {
         using namespace std;
-        if (len > c_capacity) {
-            len = c_capacity;
-        }
+        if (len > c_capacity) len = c_capacity;
         memcpy(m_buf, str, len * sizeof(wchar_t));
-        if (len < c_capacity) {
-            m_buf[len] = 0;
-        }
+        if (len < c_capacity) m_buf[len] = 0;
         return *this;
     }
 
-    SmallWString& erase() {
-        clear();
-        return *this;
-    }
+    SmallWString& erase() { clear(); return *this; }
     SmallWString& erase(size_t index) {
         assert(index <= c_capacity);
         m_buf[index] = 0;
@@ -146,8 +122,8 @@ public:
         assert(index < c_capacity);
         return m_buf[index];
     }
+          wchar_t *data()        { return m_buf; }
     const wchar_t *c_str() const { return m_buf; }
-    wchar_t *data() { return m_buf; }
 
     wchar_t *begin()    { return &m_buf[0]; }
     wchar_t *end()      { return &m_buf[size()]; }
@@ -157,7 +133,6 @@ public:
     std::wstring str() const { return std::wstring(m_buf, size()); }
 
 protected:
-    static const size_t c_capacity = 6;
     wchar_t m_buf[c_capacity];
 }; // class SmallWString
 
