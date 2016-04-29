@@ -5,8 +5,8 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-DWORD LogCompStrPrivate::GetTotalSize() const {
-  DWORD total = sizeof(COMPSTRPRIVATE);
+DWORD LogCompStrExtra::GetTotalSize() const {
+  DWORD total = sizeof(COMPSTREXTRA);
   for (size_t i = 0; i < hiragana_phonemes.size(); ++i) {
     total += (hiragana_phonemes[i].size() + 1) * sizeof(WCHAR);
   }
@@ -16,7 +16,7 @@ DWORD LogCompStrPrivate::GetTotalSize() const {
   return total;
 }
 
-void COMPSTRPRIVATE::GetLog(LogCompStrPrivate& log) {
+void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
   log.clear();
   log.dwPhonemeCursor = dwPhonemeCursor;
 
@@ -36,16 +36,16 @@ void COMPSTRPRIVATE::GetLog(LogCompStrPrivate& log) {
       pch += lstrlenW(pch) + 1;
     }
   }
-} // COMPSTRPRIVATE::GetLog
+} // COMPSTREXTRA::GetLog
 
-DWORD COMPSTRPRIVATE::Store(const LogCompStrPrivate *log) {
+DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
   assert(this);
   assert(log);
   dwSignature = 0xDEADFACE;
   dwPhonemeCursor = log->dwPhonemeCursor;
 
   LPBYTE pb = (LPBYTE)this;
-  pb += sizeof(COMPSTRPRIVATE);
+  pb += sizeof(COMPSTREXTRA);
 
   DWORD size, dwCount;
   LPWSTR pch;
@@ -86,7 +86,7 @@ DWORD COMPSTRPRIVATE::Store(const LogCompStrPrivate *log) {
 
   assert(log->GetTotalSize() == (DWORD)(pb - (LPBYTE)this));
   return (DWORD)(pb - (LPBYTE)this);
-} // COMPSTRPRIVATE::Store
+} // COMPSTREXTRA::Store
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -103,7 +103,7 @@ DWORD LogCompStr::GetTotalSize() const {
   total += (result_read_str.size() + 1) * sizeof(WCHAR);
   total += result_clause.size() * sizeof(DWORD);
   total += (result_str.size() + 1) * sizeof(WCHAR);
-  total += private_data.GetTotalSize();
+  total += extra.GetTotalSize();
   return total;
 }
 
@@ -128,9 +128,9 @@ void CompStr::GetLog(LogCompStr& log) {
   log.result_read_str.assign(GetResultReadStr(), dwResultReadStrLen);
   log.result_clause.assign(GetResultClause(), GetResultClause() + dwResultClauseLen / sizeof(DWORD));
   log.result_str.assign(GetResultStr(), dwResultStrLen);
-  COMPSTRPRIVATE *private_data = GetPrivateData();
-  if (private_data && private_data->dwSignature == 0xDEADFACE) {
-    private_data->GetLog(log.private_data);
+  COMPSTREXTRA *extra = GetExtra();
+  if (extra && extra->dwSignature == 0xDEADFACE) {
+    extra->GetLog(log.extra);
   }
 }
 
@@ -204,8 +204,8 @@ void CompStr::GetLog(LogCompStr& log) {
       lpCompStr->dwResultStrLen = log->result_str.size();
       ADD_STRING(result_str);
 
-      COMPSTRPRIVATE *private_data = (COMPSTRPRIVATE *)pb;
-      pb += private_data->Store(&log->private_data);
+      COMPSTREXTRA *extra = (COMPSTREXTRA *)pb;
+      pb += extra->Store(&log->extra);
 
       assert((DWORD)(pb - lpCompStr->GetBytes()) == total);
 

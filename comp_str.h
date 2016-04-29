@@ -16,22 +16,22 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct LogCompStrPrivate {
+struct LogCompStrExtra {
   DWORD                       dwPhonemeCursor;
   std::vector<SmallWString>   hiragana_phonemes;
   std::vector<SmallWString>   typing_phonemes;
-  LogCompStrPrivate() : dwPhonemeCursor(0) {}
+  LogCompStrExtra() : dwPhonemeCursor(0) {}
   DWORD GetTotalSize() const;
   void clear() {
     dwPhonemeCursor = 0;
     hiragana_phonemes.clear();
     typing_phonemes.clear();
   }
-}; // struct LogCompStrPrivate
+}; // struct LogCompStrExtra
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct COMPSTRPRIVATE {
+struct COMPSTREXTRA {
   DWORD dwSignature;
   DWORD dwPhonemeCursor;
   DWORD dwHiraganaPhonemeLen;
@@ -55,9 +55,9 @@ struct COMPSTRPRIVATE {
     return NULL;
   }
 
-  void GetLog(LogCompStrPrivate& log);
-  DWORD Store(const LogCompStrPrivate *log);
-}; // struct COMPSTRPRIVATE
+  void GetLog(LogCompStrExtra& log);
+  DWORD Store(const LogCompStrExtra *log);
+}; // struct COMPSTREXTRA
 
 //////////////////////////////////////////////////////////////////////////////
 // logical composition string
@@ -75,7 +75,7 @@ struct LogCompStr {
   std::wstring        result_read_str;
   std::vector<DWORD>  result_clause;
   std::wstring        result_str;
-  LogCompStrPrivate   private_data;
+  LogCompStrExtra     extra;
   LogCompStr() {
     dwCursorPos = 0;
     dwDeltaStart = 0;
@@ -134,8 +134,8 @@ struct CompStr : public COMPOSITIONSTRING {
   }
 
   // extension
-  COMPSTRPRIVATE *GetPrivateData() {
-    if (dwPrivateSize) return (COMPSTRPRIVATE *)(GetBytes() + dwPrivateOffset);
+  COMPSTREXTRA *GetExtra() {
+    if (dwPrivateSize) return (COMPSTREXTRA *)(GetBytes() + dwPrivateOffset);
     return NULL;
   }
 
