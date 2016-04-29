@@ -131,6 +131,8 @@ void CompStr::GetLog(LogCompStr& log) {
   COMPSTREXTRA *extra = GetExtra();
   if (extra && extra->dwSignature == 0xDEADFACE) {
     extra->GetLog(log.extra);
+  } else {
+    // TODO: do something
   }
 }
 
