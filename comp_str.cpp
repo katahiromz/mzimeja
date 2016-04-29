@@ -7,28 +7,34 @@
 
 DWORD LogCompStrPrivate::GetTotalSize() const {
   DWORD total = sizeof(COMPSTRPRIVATE);
-  total += (DWORD)((spell.size() + 1) * sizeof(WCHAR));
-  total += (DWORD)(index_map_comp2read.size() * sizeof(DWORD));
-  total += (DWORD)(index_map_read2spell.size() * sizeof(DWORD));
+  for (size_t i = 0; i < hiragana_phonemes.size(); ++i) {
+    total += (hiragana_phonemes[i].size() + 1) * sizeof(WCHAR);
+  }
+  for (size_t i = 0; i < typing_phonemes.size(); ++i) {
+    total += (typing_phonemes[i].size() + 1) * sizeof(WCHAR);
+  }
   return total;
 }
 
 void COMPSTRPRIVATE::GetLog(LogCompStrPrivate& log) {
   log.clear();
-  log.dwReadCursor = dwReadCursor;
-  LPWSTR spell = GetSpellStr();
-  if (spell) {
-    log.spell = spell;
-  }
+  log.dwPhonemeCursor = dwPhonemeCursor;
+
   DWORD dwCount;
-  LPDWORD pdw;
-  pdw = GetComp2Read(dwCount);
-  if (pdw) {
-    log.index_map_comp2read.assign(pdw, pdw + dwCount);
+  LPWSTR pch = GetHiraganaPhonemes(dwCount);
+  if (pch && dwCount) {
+    while (dwCount--) {
+      log.hiragana_phonemes.push_back(pch);
+      pch += lstrlenW(pch) + 1;
+    }
   }
-  pdw = GetRead2Spell(dwCount);
-  if (pdw) {
-    log.index_map_read2spell.assign(pdw, pdw + dwCount);
+
+  pch = GetTypingPhonemes(dwCount);
+  if (pch && dwCount) {
+    while (dwCount--) {
+      log.typing_phonemes.push_back(pch);
+      pch += lstrlenW(pch) + 1;
+    }
   }
 } // COMPSTRPRIVATE::GetLog
 
@@ -36,34 +42,46 @@ DWORD COMPSTRPRIVATE::Store(const LogCompStrPrivate *log) {
   assert(this);
   assert(log);
   dwSignature = 0xDEADFACE;
-  dwReadCursor = log->dwReadCursor;
-  dwSpellStrLen = (DWORD)log->spell.size();
-  dwComp2ReadMapLen = (DWORD)log->index_map_comp2read.size();
-  dwRead2SpellMapLen = (DWORD)log->index_map_read2spell.size();
+  dwPhonemeCursor = log->dwPhonemeCursor;
 
-  DWORD size;
-  LPBYTE pb = (LPBYTE)this + sizeof(COMPSTRPRIVATE);
+  LPBYTE pb = (LPBYTE)this;
+  pb += sizeof(COMPSTRPRIVATE);
 
-  // store spell
-  dwSpellStrOffset = (DWORD)(pb - (LPBYTE)this);
-  size = (log->spell.size() + 1) * sizeof(WCHAR);
-  memcpy(pb, log->spell.c_str(), size);
-  pb += size;
+  DWORD size, dwCount;
+  LPWSTR pch;
 
-  // store comp2read
-  dwComp2ReadMapOffset = (DWORD)(pb - (LPBYTE)this);
-  size = dwComp2ReadMapOffset * sizeof(DWORD);
-  if (size) {
-    memcpy(pb, &log->index_map_comp2read[0], size);
-    pb += size;
+  // calculate size and offset of hiragana phonemes
+  dwHiraganaPhonemeOffset = (DWORD)(pb - (LPBYTE)this);
+  size = 0;
+  for (size_t i = 0; i < log->hiragana_phonemes.size(); ++i) {
+    size += (log->hiragana_phonemes[i].size() + 1);
+  }
+  dwHiraganaPhonemeLen = size * sizeof(WCHAR);
+  pb += dwHiraganaPhonemeLen;
+
+  // calculate size and offset of typing phonemes
+  dwTypingPhonemeOffset = (DWORD)(pb - (LPBYTE)this);
+  size = 0;
+  for (size_t i = 0; i < log->typing_phonemes.size(); ++i) {
+    size += (log->typing_phonemes[i].size() + 1);
+  }
+  dwTypingPhonemeLen = size * sizeof(WCHAR);
+  pb += dwTypingPhonemeLen;
+
+  // store hiragana phonemes
+  pch = GetHiraganaPhonemes(dwCount);
+  for (size_t i = 0; i < log->hiragana_phonemes.size(); ++i) {
+    size_t size = (log->hiragana_phonemes[i].size() + 1);
+    memcpy(pch, &log->hiragana_phonemes[i][0], size * sizeof(WCHAR));
+    pch += size;
   }
 
-  // store read2spell
-  dwRead2SpellMapOffset = (DWORD)(pb - (LPBYTE)this);
-  if (size) {
-    size = dwRead2SpellMapLen * sizeof(DWORD);
-    memcpy(pb, &log->index_map_read2spell[0], size);
-    pb += size;
+  // store typing phonemes
+  pch = GetTypingPhonemes(dwCount);
+  for (size_t i = 0; i < log->typing_phonemes.size(); ++i) {
+    size_t size = (log->typing_phonemes[i].size() + 1);
+    memcpy(pch, &log->typing_phonemes[i][0], size * sizeof(WCHAR));
+    pch += size;
   }
 
   assert(log->GetTotalSize() == (DWORD)(pb - (LPBYTE)this));

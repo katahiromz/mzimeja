@@ -9,25 +9,23 @@
 #endif
 #include "immdev.h"
 
-#ifdef __cplusplus
-  #include <string>
-  #include <vector>
-#endif
+#include <string>
+#include <vector>
+
+#include "SmallWString.hpp"   // for SmallWString
 
 //////////////////////////////////////////////////////////////////////////////
 
 struct LogCompStrPrivate {
-  DWORD               dwReadCursor;
-  std::wstring        spell;
-  std::vector<DWORD>  index_map_comp2read;
-  std::vector<DWORD>  index_map_read2spell;
-  LogCompStrPrivate() : dwReadCursor(0) {}
+  DWORD                       dwPhonemeCursor;
+  std::vector<SmallWString>   hiragana_phonemes;
+  std::vector<SmallWString>   typing_phonemes;
+  LogCompStrPrivate() : dwPhonemeCursor(0) {}
   DWORD GetTotalSize() const;
   void clear() {
-    dwReadCursor = 0;
-    spell.clear();
-    index_map_comp2read.clear();
-    index_map_read2spell.clear();
+    dwPhonemeCursor = 0;
+    hiragana_phonemes.clear();
+    typing_phonemes.clear();
   }
 }; // struct LogCompStrPrivate
 
@@ -35,32 +33,24 @@ struct LogCompStrPrivate {
 
 struct COMPSTRPRIVATE {
   DWORD dwSignature;
-  DWORD dwReadCursor;
-  DWORD dwSpellStrLen;
-  DWORD dwSpellStrOffset;
-  DWORD dwComp2ReadMapLen;
-  DWORD dwComp2ReadMapOffset;
-  DWORD dwRead2SpellMapLen;
-  DWORD dwRead2SpellMapOffset;
+  DWORD dwPhonemeCursor;
+  DWORD dwHiraganaPhonemeLen;
+  DWORD dwHiraganaPhonemeOffset;
+  DWORD dwTypingPhonemeLen;
+  DWORD dwTypingPhonemeOffset;
   LPBYTE GetBytes() { return (LPBYTE)this; }
 
-  LPWSTR GetSpellStr() {
-    if (dwSpellStrLen) {
-      return (LPWSTR)(GetBytes() + dwSpellStrOffset);
+  LPWSTR GetHiraganaPhonemes(DWORD& dwCount) {
+    dwCount = dwHiraganaPhonemeLen / sizeof(WCHAR);
+    if (dwCount) {
+      return (LPWSTR)(GetBytes() + dwHiraganaPhonemeOffset);
     }
     return NULL;
   }
-  LPDWORD GetComp2Read(DWORD& dwCount) {
-    dwCount = dwComp2ReadMapLen / sizeof(DWORD);
+  LPWSTR GetTypingPhonemes(DWORD& dwCount) {
+    dwCount = dwTypingPhonemeLen / sizeof(WCHAR);
     if (dwCount) {
-      return (LPDWORD)(GetBytes() + dwComp2ReadMapOffset);
-    }
-    return NULL;
-  }
-  LPDWORD GetRead2Spell(DWORD& dwCount) {
-    dwCount = dwRead2SpellMapLen / sizeof(DWORD);
-    if (dwCount) {
-      return (LPDWORD)(GetBytes() + dwRead2SpellMapOffset);
+      return (LPWSTR)(GetBytes() + dwTypingPhonemeOffset);
     }
     return NULL;
   }

@@ -55,6 +55,7 @@ public:
     SmallWString& assign(const SmallWString& str) {
         using namespace std;
         memcpy(m_buf, str.m_buf, c_capacity * sizeof(wchar_t));
+        return *this;
     }
     SmallWString& assign(size_t count, wchar_t ch) {
         if (count > c_capacity) count = c_capacity;
@@ -101,6 +102,7 @@ public:
                 m_buf[k] = ch;
             }
         }
+        return *this;
     }
     SmallWString& insert(const wchar_t *pos, wchar_t ch) {
         using namespace std;
