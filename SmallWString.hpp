@@ -26,16 +26,8 @@ public:
     }
 
     SmallWString& operator=(const wchar_t *str) {
-        using namespace std;
-        size_t len = wcslen(str);
-        if (len > c_capacity) len = c_capacity;
-        memcpy(m_buf, str, len * sizeof(wchar_t));
-        if (len < c_capacity) {
-            m_buf[len] = 0;
-        }
-        return *this;
+        return assign(str);
     }
-
     SmallWString& assign(const wchar_t *str) {
         return assign(str, wcslen(str));
     }
