@@ -46,8 +46,8 @@ public:
     const wchar_t *end()   const { return &m_ptr[m_len]; }
 
 protected:
-    const wchar_t *m_ptr;
-    size_t m_len;
+    const wchar_t *     m_ptr;
+    size_t              m_len;
 }; // class WStringRef
 
 //////////////////////////////////////////////////////////////////////////////
