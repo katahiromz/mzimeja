@@ -15,6 +15,7 @@ extern "C" {
 // A function which handles WM_IME_KEYDOWN
 BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
                        LPBYTE lpbKeyState) {
+  FOOTMARK();
   InputContext *lpIMC;
   WORD vk = (wParam & 0x00FF);
 

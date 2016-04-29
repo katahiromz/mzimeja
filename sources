@@ -28,7 +28,7 @@ SOURCES= \
         uicomp.cpp \
         uiguide.cpp \
         uistate.cpp \
-        input_context.cpp \
+        input.cpp \
         comp_str.cpp \
         cand_info.cpp \
         keychar.cpp \

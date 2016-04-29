@@ -15,7 +15,7 @@
 
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development
-#include "input_context.h"  // for InputContext
+#include "input.h"          // for InputMode and InputContext
 #include "comp_str.h"       // for LogCompStr and CompStr
 #include "cand_info.h"      // for MZCAND, CandList, CandInfo
 
@@ -112,17 +112,6 @@
 
 #define GCS_RESULTALL \
   (GCS_RESULTSTR | GCS_RESULTREADSTR | GCS_RESULTCLAUSE | GCS_RESULTREADCLAUSE)
-
-//////////////////////////////////////////////////////////////////////////////
-// input modes
-
-enum InputMode {
-  IMODE_ZEN_HIRAGANA,
-  IMODE_ZEN_KATAKANA,
-  IMODE_ZEN_EISUU,
-  IMODE_HAN_KANA,
-  IMODE_HAN_EISUU
-};
 
 //////////////////////////////////////////////////////////////////////////////
 // Structures
@@ -234,15 +223,7 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam);
 
 // mzimeja.cpp
-BOOL IsInputModeOpen(InputMode imode);
-InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
-InputMode NextInputMode(InputMode imode);
-InputMode GetInputMode(HIMC hIMC);
-void SetInputMode(HIMC hIMC, InputMode imode);
 void RepositionWindow(HWND hWnd);
-BOOL IsRomanMode(HIMC hIMC);
-void SetRomanMode(HIMC hIMC, BOOL bRoman);
-UINT CommandFromInputMode(InputMode imode);
 HFONT CheckNativeCharset(HDC hDC);
 
 //////////////////////////////////////////////////////////////////////////////

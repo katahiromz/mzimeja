@@ -1,13 +1,35 @@
-// input_context.h --- input context
+// input.h --- input
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef INPUT_CONTEXT_H_
-#define INPUT_CONTEXT_H_
+#ifndef INPUT_H_
+#define INPUT_H_
 
 #include "comp_str.h"
 #include "cand_info.h"
 
 //////////////////////////////////////////////////////////////////////////////
+// input modes
+
+enum InputMode {
+  IMODE_ZEN_HIRAGANA,
+  IMODE_ZEN_KATAKANA,
+  IMODE_ZEN_EISUU,
+  IMODE_HAN_KANA,
+  IMODE_HAN_EISUU,
+  IMODE_DISABLED
+};
+
+BOOL IsInputModeOpen(InputMode imode);
+InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
+InputMode NextInputMode(InputMode imode);
+InputMode GetInputMode(HIMC hIMC);
+void SetInputMode(HIMC hIMC, InputMode imode);
+BOOL IsRomanMode(HIMC hIMC);
+void SetRomanMode(HIMC hIMC, BOOL bRoman);
+UINT CommandFromInputMode(InputMode imode);
+
+//////////////////////////////////////////////////////////////////////////////
+// input context
 
 struct InputContext : public INPUTCONTEXT {
   void Initialize();
@@ -74,6 +96,6 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////
 
-#endif  // ndef INPUT_CONTEXT_H_
+#endif  // ndef INPUT_H_
 
 //////////////////////////////////////////////////////////////////////////////

@@ -201,7 +201,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\input_context.cpp"
+				RelativePath=".\input.cpp"
 				>
 			</File>
 			<File
@@ -271,7 +271,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\input_context.h"
+				RelativePath=".\input.h"
 				>
 			</File>
 			<File
