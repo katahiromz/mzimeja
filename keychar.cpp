@@ -247,12 +247,7 @@ static TABLEENTRY reverse_table[] = {
 // Åyç~èáÇ…É\Å[ÉgÅzÇ±Ç±Ç©ÇÁ
   {L"Å`", L"~"},
   {L"Å[", L"-"},
-  {L"ÇÒÇ®", L"n'o"},
-  {L"ÇÒÇ¶", L"n'e"},
-  {L"ÇÒÇ§", L"n'u"},
-  {L"ÇÒÇ¢", L"n'i"},
-  {L"ÇÒÇ†", L"n'a"},
-  {L"ÇÒ", L"n"},
+  {L"ÇÒ", L"n'"},
   {L"Ç", L"wo"},
   {L"ÇÔ", L"we"},
   {L"ÇÓ", L"wi"},
@@ -1310,13 +1305,162 @@ BOOL is_fullwidth_ascii(WCHAR ch) {
   return (0xFF00 <= ch && ch <= 0xFFEF);
 }
 
-void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode) {
-  
+std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
+  WCHAR szBuf[1024];
+  const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+  ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
+    str.c_str(), -1, szBuf, 1024);
+  return szBuf;
 }
+
+std::wstring LogCompStrExtra::Join(const std::vector<SmallWString>& strs) const {
+  std::wstring str;
+  for (size_t i = 0; i < strs.size(); ++i) {
+    str += strs[i].c_str();
+  }
+  return str;
+}
+
+std::wstring LogCompStrExtra::JoinLeft(const std::vector<SmallWString>& strs) const {
+  std::wstring str;
+  for (DWORD i = 0; i < dwPhonemeCursor; ++i) {
+    str += strs[i].c_str();
+  }
+  return str;
+}
+
+std::wstring LogCompStrExtra::JoinRight(const std::vector<SmallWString>& strs) const {
+  std::wstring str;
+  const DWORD dwCount = (DWORD)strs.size();
+  for (DWORD i = dwPhonemeCursor; i < dwCount; ++i) {
+    str += strs[i].c_str();
+  }
+  return str;
+}
+
+void LogCompStrExtra::InsertPos(
+  std::vector<SmallWString>& strs, std::wstring& str)
+{
+  strs.insert(strs.begin() + dwPhonemeCursor, str.c_str());
+}
+
+void LogCompStr::AddChar0(
+  std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
+{
+  std::wstring strLeft, strRight;
+  // create the typed string
+  extra.InsertPos(extra.typing_phonemes, typed);
+  // create the translated string
+  extra.InsertPos(extra.hiragana_phonemes, translated);
+  // create the composition string
+  switch (imode) {
+  case IMODE_ZEN_HIRAGANA:
+    strLeft = extra.JoinLeft(extra.hiragana_phonemes);
+    strRight = extra.JoinRight(extra.hiragana_phonemes);
+    break;
+  case IMODE_ZEN_KATAKANA:
+    strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes), LCMAP_KATAKANA);
+    strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes), LCMAP_KATAKANA);
+    break;
+  case IMODE_HAN_KANA:
+    strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes),
+                    LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+    strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes),
+                     LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+    break;
+  default:
+    break;
+  }
+  comp_str = strLeft + strRight;
+  dwCursorPos = (DWORD)strLeft.size();
+  extra.dwPhonemeCursor++;
+} // LogCompStr::AddChar0
+
+void LogCompStr::AddChar1(
+  std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
+{
+  const WCHAR chTyped = typed[0];
+  // create the typed string and translated string
+  if (is_hiragana(chTyped)) {
+    translated = typed;
+    for (size_t i = 0; i < _countof(reverse_table); ++i) {
+      if (reverse_table[i].key == translated) {
+        typed = reverse_table[i].value;
+        break;
+      }
+    }
+    extra.InsertPos(extra.typing_phonemes, typed);
+    extra.InsertPos(extra.hiragana_phonemes, translated);
+  } else if (is_zenkaku_katakana(chTyped)) {
+    translated = lcmap(typed, LCMAP_HIRAGANA);
+    for (size_t i = 0; i < _countof(reverse_table); ++i) {
+      if (reverse_table[i].key == translated) {
+        typed = reverse_table[i].value;
+        break;
+      }
+    }
+    extra.InsertPos(extra.typing_phonemes, typed);
+    extra.InsertPos(extra.hiragana_phonemes, translated);
+  } else if (is_kanji(chTyped)) {
+    translated = typed;
+    extra.InsertPos(extra.typing_phonemes, typed);
+    extra.InsertPos(extra.hiragana_phonemes, translated);
+  } else if (std::isalnum(chTyped)) {
+    if (extra.dwPhonemeCursor > (DWORD)strs.size()) {
+      extra.dwPhonemeCursor = (DWORD)strs.size();
+    }
+    // TODO:
+  } else {
+    translated = typed;
+    extra.InsertPos(extra.typing_phonemes, typed);
+    extra.InsertPos(extra.hiragana_phonemes, translated);
+  }
+
+  // create the composition string
+  switch (imode) {
+  case IMODE_ZEN_HIRAGANA:
+    strLeft = extra.JoinLeft(extra.hiragana_phonemes);
+    strRight = extra.JoinRight(extra.hiragana_phonemes);
+    break;
+  case IMODE_ZEN_KATAKANA:
+    strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes), LCMAP_KATAKANA);
+    strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes), LCMAP_KATAKANA);
+    break;
+  case IMODE_HAN_KANA:
+    strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes),
+                    LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+    strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes),
+                     LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+    break;
+  default:
+    break;
+  }
+  comp_str = strLeft + strRight;
+  dwCursorPos = (DWORD)strLeft.size();
+  extra.dwPhonemeCursor++;
+} // LogCompStr::AddChar1
+
+void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode) {
+  std::wstring strTyped, strTranslated;
+  if (chTranslated) {   // kana input
+    assert(is_hiragana(chTranslated));
+    strTyped += chTyped;
+    strTranslated += chTranslated;
+    AddChar0(strTyped, strTranslated, imode);
+  } else {  // roman input
+    strTyped += chTyped;
+    strTranslated = strTyped;
+    AddChar1(strTyped, strTranslated, imode)
+  }
+  // create the reading string
+  std::wstring str = extra.Join(hiragana_phonemes);
+  comp_read_str = lcmap(str, LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+} // LogCompStr::AddChar
 
 void LogCompStr::Revert() {
   // reset composition
-  comp_str = comp_read_str;
+  comp_str = lcmap(extra.Join(comp_read_str),
+                   LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
   comp_clause.resize(2);
   comp_clause[0] = 0;
   comp_clause[1] = (DWORD)comp_str.size();

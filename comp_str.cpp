@@ -90,6 +90,15 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
 
 //////////////////////////////////////////////////////////////////////////////
 
+LogCompStr::LogCompStr() {
+  dwCursorPos = 0;
+  dwDeltaStart = 0;
+  comp_read_clause.clear();
+  comp_clause.clear();
+  result_read_clause.clear();
+  result_clause.clear();
+}
+
 DWORD LogCompStr::GetTotalSize() const {
   FOOTMARK();
   size_t total = sizeof(COMPOSITIONSTRING);

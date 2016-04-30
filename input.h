@@ -55,6 +55,10 @@ struct LogCompStrExtra {
     assert(hiragana_phonemes.size() == typing_phonemes.size());
     assert(dwPhonemeCursor <= (DWORD)hiragana_phonemes.size());
   }
+  std::wstring Join(const std::vector<SmallWString>& strs) const;
+  std::wstring JoinLeft(const std::vector<SmallWString>& strs) const;
+  std::wstring JoinRight(const std::vector<SmallWString>& strs) const;
+  void InsertPos(std::vector<SmallWString>& strs, std::wstring& str);
 }; // struct LogCompStrExtra
 
 struct COMPSTREXTRA {
@@ -99,14 +103,7 @@ struct LogCompStr {
   std::vector<DWORD>  result_clause;
   std::wstring        result_str;
   LogCompStrExtra     extra;
-  LogCompStr() {
-    dwCursorPos = 0;
-    dwDeltaStart = 0;
-    comp_read_clause.resize(2, 0);
-    comp_clause.resize(2, 0);
-    result_read_clause.resize(2, 0);
-    result_clause.resize(2, 0);
-  }
+  LogCompStr();
   DWORD GetTotalSize() const;
 
   void AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode);
@@ -119,6 +116,10 @@ struct LogCompStr {
   void MakeHankaku();
   void MakeZenEisuu();
   void MakeHanEisuu();
+
+protected:
+  void AddChar0(std::wstring& typed, std::wstring& translated, INPUT_MODE imode);
+  void AddChar1(std::wstring& typed, std::wstring& translated, INPUT_MODE imode);
 }; // struct LogCompStr
 
 inline void SetClause(LPDWORD lpdw, DWORD num) {

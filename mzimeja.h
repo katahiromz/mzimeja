@@ -10,6 +10,7 @@
 #include <tchar.h>
 
 #include <cstdio>
+#include <cctype>
 #include <cassert>
 #include <cstring>
 
