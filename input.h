@@ -60,6 +60,7 @@ protected:
 struct COMPSTREXTRA {
   DWORD dwSignature;
   DWORD dwPhonemeCursor;
+  DWORD dwCharDelta;
   DWORD dwHiraganaPhonemeLen;
   DWORD dwHiraganaPhonemeOffset;
   DWORD dwTypingPhonemeLen;

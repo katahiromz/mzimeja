@@ -29,6 +29,7 @@ void LogCompStrExtra::clear() {
 void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
   log.clear();
   log.dwPhonemeCursor = dwPhonemeCursor;
+  log.dwCharDelta = dwCharDelta;
 
   DWORD dwCount;
   LPWSTR pch = GetHiraganaPhonemes(dwCount);
@@ -53,6 +54,7 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
   assert(log);
   dwSignature = 0xDEADFACE;
   dwPhonemeCursor = log->dwPhonemeCursor;
+  dwCharDelta = log->dwCharDelta;
 
   LPBYTE pb = (LPBYTE)this;
   pb += sizeof(COMPSTREXTRA);
@@ -108,6 +110,7 @@ void LogCompStr::clear() {
   comp_clause.clear();
   result_read_clause.clear();
   result_clause.clear();
+  extra.clear();
 }
 
 DWORD LogCompStr::GetTotalSize() const {
