@@ -16,6 +16,16 @@ DWORD LogCompStrExtra::GetTotalSize() const {
   return total;
 }
 
+void LogCompStrExtra::clear() {
+  dwPhonemeCursor = 0;
+  dwCharDelta = 0;
+  hiragana_phonemes.clear();
+  typing_phonemes.clear();
+  phoneme_clauses.clear();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
   log.clear();
   log.dwPhonemeCursor = dwPhonemeCursor;
@@ -88,9 +98,10 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
   return (DWORD)(pb - (LPBYTE)this);
 } // COMPSTREXTRA::Store
 
+
 //////////////////////////////////////////////////////////////////////////////
 
-LogCompStr::LogCompStr() {
+void LogCompStr::clear() {
   dwCursorPos = 0;
   dwDeltaStart = 0;
   comp_read_clause.clear();

@@ -1305,6 +1305,38 @@ BOOL is_fullwidth_ascii(WCHAR ch) {
   return (0xFF00 <= ch && ch <= 0xFFEF);
 }
 
+WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1) {
+  switch (MAKELONG(ch0, ch1)) {
+  case MAKELONG(L'‚©', L'J'): return L'‚ª';
+  case MAKELONG(L'‚«', L'J'): return L'‚¬';
+  case MAKELONG(L'‚­', L'J'): return L'‚®';
+  case MAKELONG(L'‚¯', L'J'): return L'‚°';
+  case MAKELONG(L'‚±', L'J'): return L'‚²';
+  case MAKELONG(L'‚³', L'J'): return L'‚´';
+  case MAKELONG(L'‚µ', L'J'): return L'‚¶';
+  case MAKELONG(L'‚·', L'J'): return L'‚¸';
+  case MAKELONG(L'‚¹', L'J'): return L'‚º';
+  case MAKELONG(L'‚»', L'J'): return L'‚¼';
+  case MAKELONG(L'‚½', L'J'): return L'‚¾';
+  case MAKELONG(L'‚¿', L'J'): return L'‚À';
+  case MAKELONG(L'‚Â', L'J'): return L'‚Ã';
+  case MAKELONG(L'‚Ä', L'J'): return L'‚Å';
+  case MAKELONG(L'‚Æ', L'J'): return L'‚Ç';
+  case MAKELONG(L'‚Í', L'J'): return L'‚Î';
+  case MAKELONG(L'‚Ð', L'J'): return L'‚Ñ';
+  case MAKELONG(L'‚Ó', L'J'): return L'‚Ô';
+  case MAKELONG(L'‚Ö', L'J'): return L'‚×';
+  case MAKELONG(L'‚Ù', L'J'): return L'‚Ú';
+  case MAKELONG(L'‚¤', L'J'): return L'\u3094';
+  case MAKELONG(L'‚Í', L'K'): return L'‚Ï';
+  case MAKELONG(L'‚Ð', L'K'): return L'‚Ò';
+  case MAKELONG(L'‚Ó', L'K'): return L'‚Õ';
+  case MAKELONG(L'‚Ö', L'K'): return L'‚Ø';
+  case MAKELONG(L'‚Ù', L'K'): return L'‚Û';
+  default:                     return 0;
+  }
+}
+
 std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
   WCHAR szBuf[1024];
   const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
@@ -1344,15 +1376,19 @@ void LogCompStrExtra::InsertPos(
   strs.insert(strs.begin() + dwPhonemeCursor, str.c_str());
 }
 
-void LogCompStr::AddChar0(
-  std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
-{
+WCHAR LogCompStrExtra::GetPrevChar() const {
+  BOOL ret = 0;
+  if (dwPhonemeCursor > 0) {
+    std::wstring str = hiragana_phonemes[dwPhonemeCursor - 1].str();
+    if (str.size() > 0) {
+      ret = str[str.size() - 1];
+    }
+  }
+  return ret;
+}
+
+void LogCompStr::ExtraUpdated(INPUT_MODE imode) {
   std::wstring strLeft, strRight;
-  // create the typed string
-  extra.InsertPos(extra.typing_phonemes, typed);
-  // create the translated string
-  extra.InsertPos(extra.hiragana_phonemes, translated);
-  // create the composition string
   switch (imode) {
   case IMODE_ZEN_HIRAGANA:
     strLeft = extra.JoinLeft(extra.hiragana_phonemes);
@@ -1373,10 +1409,26 @@ void LogCompStr::AddChar0(
   }
   comp_str = strLeft + strRight;
   dwCursorPos = (DWORD)strLeft.size();
-  extra.dwPhonemeCursor++;
-} // LogCompStr::AddChar0
+}
 
-void LogCompStr::AddChar1(
+void LogCompStr::AddKanaChar(
+  std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
+{
+  WCHAR ch = dakuon_shori(extra.GetPrevChar(), translated[0]);
+  if (ch) {
+    hiragana_phonemes[dwPhonemeCursor - 1] = ch;
+  } else {
+    // create the typed string
+    extra.InsertPos(extra.typing_phonemes, typed);
+    // create the translated string
+    extra.InsertPos(extra.hiragana_phonemes, translated);
+    extra.dwPhonemeCursor++;
+  }
+  // create the composition string
+  ExtraUpdated(imode);
+} // LogCompStr::AddKanaChar
+
+void LogCompStr::AddRomanChar(
   std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
 {
   const WCHAR chTyped = typed[0];
@@ -1406,10 +1458,15 @@ void LogCompStr::AddChar1(
     extra.InsertPos(extra.typing_phonemes, typed);
     extra.InsertPos(extra.hiragana_phonemes, translated);
   } else if (std::isalnum(chTyped)) {
-    if (extra.dwPhonemeCursor > (DWORD)strs.size()) {
-      extra.dwPhonemeCursor = (DWORD)strs.size();
+    WCHAR ch = extra.GetPrevChar();
+    if (is_hiragana(ch) || ch == L'\'' || ch == 0) {
+      translated = typed;
+      extra.InsertPos(extra.typing_phonemes, typed);
+      extra.InsertPos(extra.hiragana_phonemes, translated);
+    } else {
+      ...
+      extra.typing_phonemes[extra.dwPhonemeCursor - 1];
     }
-    // TODO:
   } else {
     translated = typed;
     extra.InsertPos(extra.typing_phonemes, typed);
@@ -1417,28 +1474,8 @@ void LogCompStr::AddChar1(
   }
 
   // create the composition string
-  switch (imode) {
-  case IMODE_ZEN_HIRAGANA:
-    strLeft = extra.JoinLeft(extra.hiragana_phonemes);
-    strRight = extra.JoinRight(extra.hiragana_phonemes);
-    break;
-  case IMODE_ZEN_KATAKANA:
-    strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes), LCMAP_KATAKANA);
-    strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes), LCMAP_KATAKANA);
-    break;
-  case IMODE_HAN_KANA:
-    strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes),
-                    LCMAP_HALFWIDTH | LCMAP_KATAKANA);
-    strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes),
-                     LCMAP_HALFWIDTH | LCMAP_KATAKANA);
-    break;
-  default:
-    break;
-  }
-  comp_str = strLeft + strRight;
-  dwCursorPos = (DWORD)strLeft.size();
-  extra.dwPhonemeCursor++;
-} // LogCompStr::AddChar1
+  ExtraUpdated(imode);
+} // LogCompStr::AddRomanChar
 
 void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode) {
   std::wstring strTyped, strTranslated;
@@ -1446,11 +1483,11 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode) {
     assert(is_hiragana(chTranslated));
     strTyped += chTyped;
     strTranslated += chTranslated;
-    AddChar0(strTyped, strTranslated, imode);
+    AddKanaChar(strTyped, strTranslated, imode);
   } else {  // roman input
     strTyped += chTyped;
     strTranslated = strTyped;
-    AddChar1(strTyped, strTranslated, imode)
+    AddRomanChar(strTyped, strTranslated, imode);
   }
   // create the reading string
   std::wstring str = extra.Join(hiragana_phonemes);

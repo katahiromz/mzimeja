@@ -7,6 +7,14 @@
 
 #define MAX_CANDSTRS 32
 
+void LogCandInfo::clear() {
+  dwStyle = IME_CAND_READ;
+  dwSelection = 0;
+  dwPageStart = 0;
+  dwPageSize = 0;
+  cand_strs.clear();
+}
+
 DWORD LogCandInfo::GetTotalSize() const {
   FOOTMARK();
   DWORD num_strs = (DWORD)cand_strs.size();

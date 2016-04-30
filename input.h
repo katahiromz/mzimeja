@@ -12,8 +12,6 @@
 #include <string>
 #include <vector>
 
-#include "SmallWString.hpp"   // for SmallWString
-
 //////////////////////////////////////////////////////////////////////////////
 // input modes
 
@@ -40,17 +38,13 @@ UINT CommandFromInputMode(INPUT_MODE imode);
 
 struct LogCompStrExtra {
   DWORD                       dwPhonemeCursor;
-  std::vector<SmallWString>   hiragana_phonemes;
-  std::vector<SmallWString>   typing_phonemes;
+  DWORD                       dwCharDelta;
+  std::vector<std::wstring>   hiragana_phonemes;
+  std::vector<std::wstring>   typing_phonemes;
   std::vector<DWORD>          phoneme_clauses;  // for future use
-  LogCompStrExtra() : dwPhonemeCursor(0) {}
+  LogCompStrExtra() { clear(); }
+  void clear();
   DWORD GetTotalSize() const;
-  void clear() {
-    dwPhonemeCursor = 0;
-    hiragana_phonemes.clear();
-    typing_phonemes.clear();
-    phoneme_clauses.clear();
-  }
   void AssertValid() {
     assert(hiragana_phonemes.size() == typing_phonemes.size());
     assert(dwPhonemeCursor <= (DWORD)hiragana_phonemes.size());
@@ -58,7 +52,9 @@ struct LogCompStrExtra {
   std::wstring Join(const std::vector<SmallWString>& strs) const;
   std::wstring JoinLeft(const std::vector<SmallWString>& strs) const;
   std::wstring JoinRight(const std::vector<SmallWString>& strs) const;
+protected:
   void InsertPos(std::vector<SmallWString>& strs, std::wstring& str);
+  WCHAR GetPrevChar() const;
 }; // struct LogCompStrExtra
 
 struct COMPSTREXTRA {
@@ -103,7 +99,8 @@ struct LogCompStr {
   std::vector<DWORD>  result_clause;
   std::wstring        result_str;
   LogCompStrExtra     extra;
-  LogCompStr();
+  LogCompStr() { clear(); }
+  void clear();
   DWORD GetTotalSize() const;
 
   void AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode);
@@ -118,8 +115,9 @@ struct LogCompStr {
   void MakeHanEisuu();
 
 protected:
-  void AddChar0(std::wstring& typed, std::wstring& translated, INPUT_MODE imode);
-  void AddChar1(std::wstring& typed, std::wstring& translated, INPUT_MODE imode);
+  void AddKanaChar(std::wstring& typed, std::wstring& translated, INPUT_MODE imode);
+  void AddRomanChar(std::wstring& typed, std::wstring& translated, INPUT_MODE imode);
+  void ExtraUpdated(INPUT_MODE imode);
 }; // struct LogCompStr
 
 inline void SetClause(LPDWORD lpdw, DWORD num) {
@@ -189,13 +187,8 @@ struct LogCandInfo {
   DWORD   dwPageStart;
   DWORD   dwPageSize;
   std::vector<std::wstring> cand_strs;
-
-  LogCandInfo(DWORD dwCandStyle = IME_CAND_READ) {
-    dwStyle = dwCandStyle;
-    dwSelection = 0;
-    dwPageStart = 0;
-    dwPageSize = 0;
-  }
+  LogCandInfo() { clear(); }
+  void clear();
   DWORD GetTotalSize() const;
 }; // struct LogCandInfo
 
