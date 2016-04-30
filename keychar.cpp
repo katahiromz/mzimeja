@@ -1435,10 +1435,10 @@ void LogCompStr::ExtraUpdated(INPUT_MODE imode) {
 void LogCompStr::AddKanaChar(
   std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
 {
-  WCHAR ch = dakuon_shori(extra.GetPrevChar(), translated[0]);
-  if (ch) {
+  WCHAR chDakuon = dakuon_shori(extra.GetPrevChar(), translated[0]);
+  if (chDakuon) {
     std::wstring str;
-    str += ch;
+    str += chDakuon;
     hiragana_phonemes[dwPhonemeCursor - 1] = str;
   } else {
     // create the typed string
@@ -1646,5 +1646,58 @@ void LogCompStr::MakeHanEisuu() {
   comp_clause[0] = 0;
   comp_clause[1] = len;
 }
+
+void LogCompStr::MoveLeft() {
+  DWORD dwCursorPos = log.dwCursorPos;
+  if (bIsBeingConverted) {
+    size_t i, siz = log.comp_clause.size();
+    if (siz > 1) {
+      for (i = 0; i < siz; ++i) {
+        if (dwCursorPos <= log.comp_clause[i]) {
+          if (i == 0) {
+            i = siz - 2;
+          } else {
+            --i;
+          }
+          break;
+        }
+      }
+      dwCursorPos = log.comp_clause[i];
+    }
+  } else {
+    if (log.dwCursorPos > 0) {
+      --dwCursorPos;
+    } else {
+      return;
+    }
+  }
+  log.dwCursorPos = dwCursorPos;
+} // LogCompStr::MoveLeft
+
+void LogCompStr::MoveRight() {
+  DWORD dwCursorPos = log.dwCursorPos;
+  if (bIsBeingConverted) {
+    size_t i, k, siz = log.comp_clause.size();
+    if (siz > 1) {
+      for (i = k = 0; i < siz; ++i) {
+        if (log.comp_clause[i] <= dwCursorPos) {
+          if (siz <= i + 1) {
+            k = 0;
+          } else {
+            k = i + 1;
+          }
+        }
+      }
+      dwCursorPos = log.comp_clause[k];
+    }
+  } else {
+    if (log.dwCursorPos < (DWORD)log.comp_str.size()) {
+      ++dwCursorPos;
+    } else {
+      return;
+    }
+  }
+  log.dwCursorPos = dwCursorPos;
+} // LogCompStr::MoveRight
 
 //////////////////////////////////////////////////////////////////////////////

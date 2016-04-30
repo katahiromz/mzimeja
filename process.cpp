@@ -227,7 +227,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
   case VK_LEFT:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MoveLeft();
+      lpIMC->MoveLeft(bShift);
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -235,7 +235,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
   case VK_RIGHT:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MoveRight();
+      lpIMC->MoveRight(bShift);
       TheIME.UnlockIMC(hIMC);
     }
     break;

@@ -689,7 +689,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   }
 } // InputContext::DeleteChar
 
-void InputContext::MoveLeft() {
+void InputContext::MoveLeft(BOOL bShift) {
   FOOTMARK();
 
   // get logical data
@@ -702,30 +702,7 @@ void InputContext::MoveLeft() {
     UnlockCompStr();
   }
 
-  DWORD dwCursorPos = log.dwCursorPos;
-  if (bIsBeingConverted) {
-    size_t i, siz = log.comp_clause.size();
-    if (siz > 1) {
-      for (i = 0; i < siz; ++i) {
-        if (dwCursorPos <= log.comp_clause[i]) {
-          if (i == 0) {
-            i = siz - 2;
-          } else {
-            --i;
-          }
-          break;
-        }
-      }
-      dwCursorPos = log.comp_clause[i];
-    }
-  } else {
-    if (log.dwCursorPos > 0) {
-      --dwCursorPos;
-    } else {
-      return;
-    }
-  }
-  log.dwCursorPos = dwCursorPos;
+  log.MoveLeft(bShift);
 
   // recreate
   DumpCompStr();
@@ -736,7 +713,7 @@ void InputContext::MoveLeft() {
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
 } // InputContext::MoveLeft
 
-void InputContext::MoveRight() {
+void InputContext::MoveRight(BOOL bShift) {
   FOOTMARK();
 
   // get logical data
@@ -749,29 +726,7 @@ void InputContext::MoveRight() {
     UnlockCompStr();
   }
 
-  DWORD dwCursorPos = log.dwCursorPos;
-  if (bIsBeingConverted) {
-    size_t i, k, siz = log.comp_clause.size();
-    if (siz > 1) {
-      for (i = k = 0; i < siz; ++i) {
-        if (log.comp_clause[i] <= dwCursorPos) {
-          if (siz <= i + 1) {
-            k = 0;
-          } else {
-            k = i + 1;
-          }
-        }
-      }
-      dwCursorPos = log.comp_clause[k];
-    }
-  } else {
-    if (log.dwCursorPos < (DWORD)log.comp_str.size()) {
-      ++dwCursorPos;
-    } else {
-      return;
-    }
-  }
-  log.dwCursorPos = dwCursorPos;
+  log.MoveRight(bShift);
 
   // recreate
   DumpCompStr();
@@ -794,6 +749,8 @@ void InputContext::MoveToBeginning() {
   }
 
   log.dwCursorPos = 0;
+  log.extra.dwPhonemeCursor = 0;
+  log.extra.dwCharExtra = 0;
 
   // recreate
   DumpCompStr();
@@ -816,6 +773,8 @@ void InputContext::MoveToEnd() {
   }
 
   log.dwCursorPos = (DWORD)log.comp_str.size();
+  log.extra.dwPhonemeCursor = (DWORD)extra.hiragana_phonemes.size();
+  log.extra.dwCharExtra = 0;
 
   // recreate
   DumpCompStr();

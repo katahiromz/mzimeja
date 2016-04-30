@@ -109,6 +109,9 @@ struct LogCompStr {
   void DeleteChar(BOOL bBackSpace = FALSE);
   void MakeResult();
 
+  void MoveLeft(BOOL bShift);
+  void MoveRight(BOOL bShift);
+
   void MakeHiragana();
   void MakeKatakana();
   void MakeHankaku();
@@ -278,8 +281,8 @@ struct InputContext : public INPUTCONTEXT {
   void MakeZenEisuu();
   void MakeHanEisuu();
 
-  void MoveLeft();
-  void MoveRight();
+  void MoveLeft(BOOL bShift);
+  void MoveRight(BOOL bShift);
   void MoveToBeginning();
   void MoveToEnd();
 

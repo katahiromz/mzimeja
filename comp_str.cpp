@@ -230,6 +230,8 @@ void CompStr::GetLog(LogCompStr& log) {
       ADD_STRING(result_str);
 
       COMPSTREXTRA *extra = (COMPSTREXTRA *)pb;
+      lpCompStr->dwPrivateSize = extra->GetTotalSize();
+      lpCompStr->dwPrivateOffset = (DWORD)(pb - lpCompStr->GetBytes());
       pb += extra->Store(&log->extra);
 
       assert((DWORD)(pb - lpCompStr->GetBytes()) == total);
