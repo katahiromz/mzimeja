@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // input modes
 
-enum InputMode {
+enum INPUT_MODE {
   IMODE_ZEN_HIRAGANA,
   IMODE_ZEN_KATAKANA,
   IMODE_ZEN_EISUU,
@@ -26,14 +26,14 @@ enum InputMode {
   IMODE_DISABLED
 };
 
-BOOL IsInputModeOpen(InputMode imode);
-InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
-InputMode NextInputMode(InputMode imode);
-InputMode GetInputMode(HIMC hIMC);
-void SetInputMode(HIMC hIMC, InputMode imode);
+BOOL IsInputModeOpen(INPUT_MODE imode);
+INPUT_MODE InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
+INPUT_MODE NextInputMode(INPUT_MODE imode);
+INPUT_MODE GetInputMode(HIMC hIMC);
+void SetInputMode(HIMC hIMC, INPUT_MODE imode);
 BOOL IsRomanMode(HIMC hIMC);
 void SetRomanMode(HIMC hIMC, BOOL bRoman);
-UINT CommandFromInputMode(InputMode imode);
+UINT CommandFromInputMode(INPUT_MODE imode);
 
 //////////////////////////////////////////////////////////////////////////////
 // composition string
@@ -109,9 +109,7 @@ struct LogCompStr {
   }
   DWORD GetTotalSize() const;
 
-  void AddRomanChar(WCHAR ch, BOOL bMakeKatakana = FALSE);
-  void AddKanaChar(WCHAR ch, BOOL bMakeKatakana = FALSE);
-  void AddEisuuChar(WCHAR ch, BOOL bMakeZenkaku = FALSE);
+  void AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode);
   void Revert();
   void DeleteChar(BOOL bBackSpace = FALSE);
   void MakeResult();
@@ -243,6 +241,8 @@ struct InputContext : public INPUTCONTEXT {
   const DWORD& Conversion() const { return fdwConversion; }
         DWORD& Sentence()       { return fdwSentence; }
   const DWORD& Sentence() const { return fdwSentence; }
+  INPUT_MODE GetInputMode() const;
+  BOOL IsRoman() const;
 
   BOOL HasCandInfo();
   CandInfo *LockCandInfo();
@@ -269,7 +269,7 @@ struct InputContext : public INPUTCONTEXT {
   BOOL HasCompForm() const      { return (fdwInit & INIT_COMPFORM); }
   BOOL HasSoftKbdPos() const    { return (fdwInit & INIT_SOFTKBDPOS); }
 
-  void AddChar(WCHAR ch);
+  void AddChar(WCHAR chTyped, WCHAR chTranslated);
   void CancelText();
   void RevertText();
   void DeleteChar(BOOL bBackSpace = FALSE);

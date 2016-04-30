@@ -256,7 +256,7 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
   DWORD dwConversion, dwSentence;
   BOOL bOpen = ImmGetOpenStatus(hIMC);
   if (::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence)) {
-    InputMode imode;
+    INPUT_MODE imode;
     switch (hittest) {
     case SWHT_BUTTON_1:
       if (bOpen) {

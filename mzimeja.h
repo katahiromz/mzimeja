@@ -15,7 +15,7 @@
 
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development
-#include "input.h"          // for InputMode and InputContext
+#include "input.h"          // for INPUT_MODE and InputContext
 
 //////////////////////////////////////////////////////////////////////////////
 // _countof macro --- get the number of elements in an array

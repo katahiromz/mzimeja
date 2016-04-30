@@ -756,7 +756,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       bOpen = ImmGetOpenStatus(hIMC);
       DWORD dwConversion, dwSentence;
       ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
-      InputMode imode;
+      INPUT_MODE imode;
       imode = InputModeFromConversionMode(bOpen, dwConversion);
 
       for (size_t i = 0; i < _countof(top_menu_items); ++i) {

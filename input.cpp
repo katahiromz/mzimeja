@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // input modes
 
-BOOL IsInputModeOpen(InputMode imode) {
+BOOL IsInputModeOpen(INPUT_MODE imode) {
   FOOTMARK();
   switch (imode) {
   case IMODE_ZEN_HIRAGANA:
@@ -21,7 +21,7 @@ BOOL IsInputModeOpen(InputMode imode) {
   }
 }
 
-InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
+INPUT_MODE InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
   FOOTMARK();
   if (bOpen) {
     if (dwConversion & IME_CMODE_FULLSHAPE) {
@@ -46,7 +46,7 @@ InputMode InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
   }
 }
 
-UINT CommandFromInputMode(InputMode imode) {
+UINT CommandFromInputMode(INPUT_MODE imode) {
   FOOTMARK();
   switch (imode) {
   case IMODE_ZEN_HIRAGANA:
@@ -64,7 +64,7 @@ UINT CommandFromInputMode(InputMode imode) {
   }
 }
 
-InputMode GetInputMode(HIMC hIMC) {
+INPUT_MODE GetInputMode(HIMC hIMC) {
   FOOTMARK();
   if (hIMC) {
     DWORD dwConversion, dwSentence;
@@ -75,7 +75,7 @@ InputMode GetInputMode(HIMC hIMC) {
   return IMODE_DISABLED;
 }
 
-InputMode NextInputMode(InputMode imode) {
+INPUT_MODE NextInputMode(INPUT_MODE imode) {
   FOOTMARK();
   switch (imode) {
   case IMODE_ZEN_HIRAGANA:
@@ -94,7 +94,7 @@ InputMode NextInputMode(InputMode imode) {
   }
 }
 
-void SetInputMode(HIMC hIMC, InputMode imode) {
+void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
   FOOTMARK();
   if (imode == IMODE_DISABLED) {
     return;
@@ -150,6 +150,15 @@ void SetRomanMode(HIMC hIMC, BOOL bRoman) {
 
 //////////////////////////////////////////////////////////////////////////////
 // input context
+
+INPUT_MODE InputContext::GetInputMode() const {
+  FOOTMARK();
+  return InputModeFromConversionMode(fOpen, Conversion());
+}
+
+BOOL InputContext::IsRoman() const {
+  return Conversion() & IME_CMODE_ROMAN;
+}
 
 void InputContext::Initialize() {
   FOOTMARK();
@@ -286,7 +295,7 @@ void InputContext::UnlockGuideLine() {
   DebugPrint(TEXT("InputContext::UnlockGuideLine: unlocked %p\n"), hGuideLine);
 }
 
-void InputContext::AddChar(WCHAR ch) {
+void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   FOOTMARK();
 
   // get logical data
@@ -308,20 +317,8 @@ void InputContext::AddChar(WCHAR ch) {
     log.dwCursorPos = (DWORD)comp_str.size();
   }
 
-  // enter a char depending on the conversion mode
-  if (Conversion() & IME_CMODE_FULLSHAPE) {
-    if (Conversion() & IME_CMODE_JAPANESE) {
-      if (Conversion() & IME_CMODE_ROMAN) {
-        log.AddRomanChar(ch, (Conversion() & IME_CMODE_KATAKANA));
-      } else {
-        log.AddKanaChar(ch, (Conversion() & IME_CMODE_KATAKANA));
-      }
-    } else {
-      log.AddEisuuChar(ch, TRUE);
-    }
-  } else {
-    log.AddEisuuChar(ch, FALSE);
-  }
+  INPUT_MODE imode = GetInputMode();
+  log.AddChar(chTyped, chTranslated, imode);
 
   // recreate
   DumpCompStr();

@@ -14,7 +14,7 @@ extern "C" {
 
 // A function which handles WM_IME_KEYDOWN
 BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
-                       InputMode imode) {
+                       INPUT_MODE imode) {
   FOOTMARK();
   InputContext *lpIMC;
   BYTE vk = (BYTE)wParam;
@@ -40,8 +40,15 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
   if (bCtrl) {
     if (bOpen) {
       if (vk == VK_SPACE) {
-        // add ideographic space
-        TheIME.GenerateMessage(WM_IME_CHAR, L' ', 1);
+        lpIMC = TheIME.LockIMC(hIMC);
+        if (lpIMC) {
+          if (lpIMC->HasCompStr()) {
+            lpIMC->AddChar(' ', 0);
+          } else {
+            TheIME.GenerateMessage(WM_IME_CHAR, L' ', 1);
+          }
+          TheIME.UnlockIMC(hIMC);
+        }
         return TRUE;
       }
     }
@@ -64,7 +71,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
   if (chTranslated || chTyped) {
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->AddChar(chTyped, chTranslated, bRoman);
+      lpIMC->AddChar(chTyped, chTranslated);
       TheIME.UnlockIMC(hIMC);
     }
     return TRUE;
@@ -454,7 +461,7 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
   TheIME.m_uNumTransKey = 0;
 
   if (hIMC) {
-    InputMode imode = GetInputMode(hIMC);
+    INPUT_MODE imode = GetInputMode(hIMC);
     if (imode == IMODE_HAN_EISUU) {
       if ((uScanCode & 0x8000) == 0) {
         // key down

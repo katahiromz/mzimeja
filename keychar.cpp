@@ -1310,22 +1310,8 @@ BOOL is_fullwidth_ascii(WCHAR ch) {
   return (0xFF00 <= ch && ch <= 0xFFEF);
 }
 
-void LogCompStr::AddRomanChar(WCHAR ch, BOOL bMakeKatakana/* = FALSE*/) {
-  extra.AssertValid();
-  if (is_hiragana(ch)) {
-    // romanize
-  } else if (L'A' <= ch && ch <= L'Z') {
-  } else if (L'a' <= ch && ch <= L'z') {
-    
-  }
-}
-
-void LogCompStr::AddKanaChar(WCHAR ch, BOOL bMakeKatakana/* = FALSE*/) {
-  extra.AssertValid();
-}
-
-void LogCompStr::AddEisuuChar(WCHAR ch, BOOL bMakeZenkaku/* = FALSE*/) {
-  extra.AssertValid();
+void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode) {
+  
 }
 
 void LogCompStr::Revert() {
