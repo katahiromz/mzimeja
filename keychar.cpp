@@ -1345,7 +1345,11 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
   return szBuf;
 }
 
-std::wstring LogCompStrExtra::Join(const std::vector<SmallWString>& strs) const {
+//////////////////////////////////////////////////////////////////////////////
+// LogCompStrExtra
+
+std::wstring
+LogCompStrExtra::Join(const std::vector<SmallWString>& strs) const {
   std::wstring str;
   for (size_t i = 0; i < strs.size(); ++i) {
     str += strs[i].c_str();
@@ -1353,7 +1357,8 @@ std::wstring LogCompStrExtra::Join(const std::vector<SmallWString>& strs) const 
   return str;
 }
 
-std::wstring LogCompStrExtra::JoinLeft(const std::vector<SmallWString>& strs) const {
+std::wstring
+LogCompStrExtra::JoinLeft(const std::vector<SmallWString>& strs) const {
   std::wstring str;
   for (DWORD i = 0; i < dwPhonemeCursor; ++i) {
     str += strs[i].c_str();
@@ -1361,7 +1366,8 @@ std::wstring LogCompStrExtra::JoinLeft(const std::vector<SmallWString>& strs) co
   return str;
 }
 
-std::wstring LogCompStrExtra::JoinRight(const std::vector<SmallWString>& strs) const {
+std::wstring
+LogCompStrExtra::JoinRight(const std::vector<SmallWString>& strs) const {
   std::wstring str;
   const DWORD dwCount = (DWORD)strs.size();
   for (DWORD i = dwPhonemeCursor; i < dwCount; ++i) {
@@ -1377,15 +1383,22 @@ void LogCompStrExtra::InsertPos(
 }
 
 WCHAR LogCompStrExtra::GetPrevChar() const {
-  BOOL ret = 0;
-  if (dwPhonemeCursor > 0) {
-    std::wstring str = hiragana_phonemes[dwPhonemeCursor - 1].str();
-    if (str.size() > 0) {
+  WCHAR ret = 0;
+  if (dwCharDelta > 0) {
+    assert(dwCharDelta - 1 < (DWORD)hiragana_phonemes[dwPhonemeCursor].size());
+    ret = hiragana_phonemes[dwPhonemeCursor][dwCharDelta - 1];
+  } else {
+    if (dwPhonemeCursor > 0) {
+      const std::wstring& str = hiragana_phonemes[dwPhonemeCursor - 1];
+      assert(str.size() > 0);
       ret = str[str.size() - 1];
     }
   }
   return ret;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// LogCompStr
 
 void LogCompStr::ExtraUpdated(INPUT_MODE imode) {
   std::wstring strLeft, strRight;
@@ -1404,11 +1417,19 @@ void LogCompStr::ExtraUpdated(INPUT_MODE imode) {
     strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes),
                      LCMAP_HALFWIDTH | LCMAP_KATAKANA);
     break;
+  case IMODE_ZEN_EISUU:
+    strLeft = lcmap(extra.JoinLeft(extra.typing_phonemes), LCMAP_FULLWIDTH);
+    strRight = lcmap(extra.JoinRight(extra.typing_phonemes), LCMAP_FULLWIDTH);
+    break;
+  case IMODE_HAN_KANA:
+    strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes), LCMAP_HALFWIDTH);
+    strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes), LCMAP_HALFWIDTH);
+    break;
   default:
     break;
   }
   comp_str = strLeft + strRight;
-  dwCursorPos = (DWORD)strLeft.size();
+  dwCursorPos = (DWORD)strLeft.size() + extra.dwCharDelta;
 }
 
 void LogCompStr::AddKanaChar(
@@ -1416,7 +1437,9 @@ void LogCompStr::AddKanaChar(
 {
   WCHAR ch = dakuon_shori(extra.GetPrevChar(), translated[0]);
   if (ch) {
-    hiragana_phonemes[dwPhonemeCursor - 1] = ch;
+    std::wstring str;
+    str += ch;
+    hiragana_phonemes[dwPhonemeCursor - 1] = str;
   } else {
     // create the typed string
     extra.InsertPos(extra.typing_phonemes, typed);
@@ -1464,8 +1487,13 @@ void LogCompStr::AddRomanChar(
       extra.InsertPos(extra.typing_phonemes, typed);
       extra.InsertPos(extra.hiragana_phonemes, translated);
     } else {
-      ...
-      extra.typing_phonemes[extra.dwPhonemeCursor - 1];
+      if (extra.dwCharDelta) {
+        // TODO:
+      } else {
+        translated = typed;
+        extra.InsertPos(extra.typing_phonemes, typed);
+        extra.InsertPos(extra.hiragana_phonemes, translated);
+      }
     }
   } else {
     translated = typed;

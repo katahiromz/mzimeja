@@ -245,6 +245,8 @@ BOOL is_zenkaku_katakana(WCHAR ch);
 BOOL is_hankaku_katakana(WCHAR ch);
 BOOL is_kanji(WCHAR ch);
 BOOL is_fullwidth_ascii(WCHAR ch);
+WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1);
+std::wstring lcmap(const std::wstring& str, DWORD dwFlags);
 
 //////////////////////////////////////////////////////////////////////////////
 // C++ interface
