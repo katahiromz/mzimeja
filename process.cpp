@@ -13,11 +13,11 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // A function which handles WM_IME_KEYDOWN
-BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
-                       LPBYTE lpbKeyState) {
+BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
+                       InputMode imode) {
   FOOTMARK();
   InputContext *lpIMC;
-  WORD vk = (wParam & 0x00FF);
+  BYTE vk = (BYTE)wParam;
 
   // check open
   BOOL bOpen = FALSE;
@@ -30,6 +30,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
   }
 
   // check modifiers
+  BOOL bAlt = lpbKeyState[VK_MENU] & 0x80;
   BOOL bShift = lpbKeyState[VK_SHIFT] & 0x80;
   BOOL bCtrl = lpbKeyState[VK_CONTROL] & 0x80;
   BOOL bCapsLock = lpbKeyState[VK_CAPITAL] & 0x80;
@@ -47,9 +48,8 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     return FALSE;
   }
 
-  WCHAR chTyped;
-
   // get typed character
+  WCHAR chTyped;
   if (vk == VK_PACKET) {
     chTyped = HIWORD(wParam);
   } else {
@@ -83,13 +83,43 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPARAM lParam,
     }
     break;
 
+  case VK_KANA:
+    if (bAlt) {
+      SetRomanMode(hIMC, !IsRomanMode());
+      break;
+    }
+    switch (imode) {
+    case IMODE_ZEN_HIRAGANA:
+      if (bShift) SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+      break;
+    case IMODE_ZEN_KATAKANA:
+      if (!bShift) SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+      break;
+    case IMODE_ZEN_EISUU:
+    case IMODE_HAN_EISUU:
+      if (bShift) {
+        SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+      } else {
+        SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+      }
+      break;
+    case IMODE_HAN_KANA:
+      if (!bShift) {
+        SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+      }
+      break;
+    default:
+      break;
+    }
+    break;
+
   case VK_OEM_COPY:
     if (!bOpen) {
       ImmSetOpenStatus(hIMC, TRUE);
     }
-    if (lpbKeyState[VK_MENU] & 0x80) {
+    if (bAlt) {
       SetRomanMode(hIMC, !IsRomanMode(hIMC));
-    } else if (lpbKeyState[VK_SHIFT] & 0x80) {
+    } else if (bShift) {
       SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
     } else {
       SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
@@ -278,10 +308,10 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   case VK_KANJI:
   case VK_OEM_AUTO:
   case VK_OEM_ENLW:
-    if (!fShift && !fCtrl) {
-      // switch zenkaku/hankaku input mode
-      ret = TRUE;
-    }
+    if (!fShift && !fCtrl) ret = TRUE;
+    break;
+  case VK_KANA:
+    ret = TRUE;
     break;
   }
 
@@ -423,38 +453,49 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
   TheIME.m_lpCurTransKey = lpTransBuf;
   TheIME.m_uNumTransKey = 0;
 
-  // if hIMC is NULL, this means DISABLE IME.
   if (hIMC) {
-    InputContext *lpIMC = TheIME.LockIMC(hIMC);
-    if (lpIMC) {
-      BOOL fOpen = lpIMC->IsOpen();
-      TheIME.UnlockIMC(hIMC);
-
-      if (fOpen) {
-        if (uScanCode & 0x8000) {
-          // key up
-          ;
-        } else {
-          // key down
-          LPARAM lParam = ((DWORD)uScanCode << 16) + 1L;
-          IMEKeyDownHandler(hIMC, uVKey, lParam, lpbKeyState);
+    InputMode imode = GetInputMode(hIMC);
+    if (imode == IMODE_HAN_EISUU) {
+      if ((uScanCode & 0x8000) == 0) {
+        // key down
+        BYTE vk = (BYTE)wParam;
+        switch (vk) {
+        case VK_KANJI: case VK_OEM_AUTO: case VK_OEM_ENLW:
+          ::ImmSetOpenStatus(hIMC, TRUE);
+          break;
+        case VK_KANA:
+          ::ImmSetOpenStatus(hIMC, TRUE);
+          if (lpbKeyState[VK_MENU] & 0x80) {
+            SetRomanMode(hIMC, !IsRomanMode(hIMC));
+          } else if (lpbKeyState[VK_SHIFT] & 0x80) {
+            SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+          } else {
+            SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+          }
+          break;
+        default:
+          break;
         }
-
-        // Clear static value, no more generated message!
-        TheIME.m_lpCurTransKey = NULL;
       }
-
-      // If trans key buffer that is allocated by USER.EXE full up,
-      // the return value is the negative number.
-      if (TheIME.m_fOverTransKey) {
-        DebugPrint(TEXT("***************************************\n"));
-        DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *\n"));
-        DebugPrint(TEXT("*                by MZIMEJA.IME       *\n"));
-        DebugPrint(TEXT("***************************************\n"));
+    } else {
+      if ((uScanCode & 0x8000) == 0) {
+        // key down
+        IMEKeyDownHandler(hIMC, uVKey, lpbKeyState, imode);
       }
-      ret = TheIME.m_uNumTransKey;
     }
+
+    // If trans key buffer that is allocated by USER.EXE full up,
+    // the return value is the negative number.
+    if (TheIME.m_fOverTransKey) {
+      DebugPrint(TEXT("***************************************\n"));
+      DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *\n"));
+      DebugPrint(TEXT("*                by MZIMEJA.IME       *\n"));
+      DebugPrint(TEXT("***************************************\n"));
+    }
+    ret = TheIME.m_uNumTransKey;
   }
+
+  TheIME.m_lpCurTransKey = NULL;
   return ret;
 } // ImeToAsciiEx
 
