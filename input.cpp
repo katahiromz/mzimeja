@@ -157,6 +157,7 @@ INPUT_MODE InputContext::GetInputMode() const {
 }
 
 BOOL InputContext::IsRoman() const {
+  FOOTMARK();
   return Conversion() & IME_CMODE_ROMAN;
 }
 
@@ -164,7 +165,7 @@ void InputContext::Initialize() {
   FOOTMARK();
   if (!HasLogFont()) {
     lfFont.W.lfCharSet = SHIFTJIS_CHARSET;
-    lfFont.W.lfFaceName[0] = L'\0';
+    lfFont.W.lfFaceName[0] = 0;
     fdwInit |= INIT_LOGFONT;
   }
 
@@ -203,51 +204,77 @@ BOOL InputContext::HasCompStr() {
 }
 
 CandInfo *InputContext::LockCandInfo() {
+  FOOTMARK();
   DebugPrint(TEXT("InputContext::LockCandInfo: locking %p\n"), hCandInfo);
-  CandInfo *info = (CandInfo *)ImmLockIMCC(hCandInfo);
-  DebugPrint(TEXT("InputContext::LockCandInfo: locked %p\n"), hCandInfo);
+  CandInfo *info = (CandInfo *)::ImmLockIMCC(hCandInfo);
+  if (info) {
+    DebugPrint(TEXT("InputContext::LockCandInfo: locked %p\n"), hCandInfo);
+  } else {
+    DebugPrint(TEXT("InputContext::LockCandInfo: not locked %p\n"), hCandInfo);
+  }
   return info;
 }
 
 void InputContext::UnlockCandInfo() {
+  FOOTMARK();
   DebugPrint(TEXT("InputContext::UnlockCandInfo: unlocking %p\n"), hCandInfo);
-  ImmUnlockIMCC(hCandInfo);
-  DebugPrint(TEXT("InputContext::UnlockCandInfo: unlocked %p\n"), hCandInfo);
+  BOOL b = ::ImmUnlockIMCC(hCandInfo);
+  if (b) {
+    DebugPrint(TEXT("InputContext::UnlockCandInfo: unlocked %p\n"), hCandInfo);
+  } else {
+    DebugPrint(TEXT("InputContext::UnlockCandInfo: not unlocked %p\n"), hCandInfo);
+  }
 }
 
 CompStr *InputContext::LockCompStr() {
+  FOOTMARK();
   DebugPrint(TEXT("InputContext::LockCompStr: locking %p\n"), hCompStr);
-  CompStr *comp_str = (CompStr *)ImmLockIMCC(hCompStr);
-  DebugPrint(TEXT("InputContext::LockCompStr: locked %p\n"), hCompStr);
+  CompStr *comp_str = (CompStr *)::ImmLockIMCC(hCompStr);
+  if (comp_str) {
+    DebugPrint(TEXT("InputContext::LockCompStr: locked %p\n"), hCompStr);
+  } else {
+    DebugPrint(TEXT("InputContext::LockCompStr: not locked %p\n"), hCompStr);
+  }
   return comp_str;
 }
 
 void InputContext::UnlockCompStr() {
+  FOOTMARK();
   DebugPrint(TEXT("InputContext::UnlockCompStr: unlocking %p\n"), hCompStr);
-  ImmUnlockIMCC(hCompStr);
-  DebugPrint(TEXT("InputContext::UnlockCompStr: unlocked %p\n"), hCompStr);
+  BOOL b = ::ImmUnlockIMCC(hCompStr);
+  if (b) {
+    DebugPrint(TEXT("InputContext::UnlockCompStr: unlocked %p\n"), hCompStr);
+  } else {
+    DebugPrint(TEXT("InputContext::UnlockCompStr: not unlocked %p\n"), hCompStr);
+  }
 }
 
 LPTRANSMSG InputContext::LockMsgBuf() {
+  FOOTMARK();
   DebugPrint(TEXT("InputContext::LockMsgBuf: locking %p\n"), hMsgBuf);
-  LPTRANSMSG lpTransMsg = (LPTRANSMSG)ImmLockIMCC(hMsgBuf);
-  DebugPrint(TEXT("InputContext::LockMsgBuf: locked %p\n"), hMsgBuf);
+  LPTRANSMSG lpTransMsg = (LPTRANSMSG)::ImmLockIMCC(hMsgBuf);
+  if (lpTransMsg) {
+    DebugPrint(TEXT("InputContext::LockMsgBuf: locked %p\n"), hMsgBuf);
+  } else {
+    DebugPrint(TEXT("InputContext::LockMsgBuf: not locked %p\n"), hMsgBuf);
+  }
   return lpTransMsg;
 }
 
 void InputContext::UnlockMsgBuf() {
+  FOOTMARK();
   DebugPrint(TEXT("InputContext::UnlockMsgBuf: unlocking %p\n"), hMsgBuf);
-  ImmUnlockIMCC(hMsgBuf);
-  DebugPrint(TEXT("InputContext::UnlockMsgBuf: unlocked %p\n"), hMsgBuf);
+  BOOL b = ::ImmUnlockIMCC(hMsgBuf);
+  if (b) {
+    DebugPrint(TEXT("InputContext::UnlockMsgBuf: unlocked %p\n"), hMsgBuf);
+  } else {
+    DebugPrint(TEXT("InputContext::UnlockMsgBuf: not unlocked %p\n"), hMsgBuf);
+  }
 }
 
-DWORD& InputContext::NumMsgBuf() {
-  return dwNumMsgBuf;
-}
+DWORD& InputContext::NumMsgBuf() { return dwNumMsgBuf; }
 
-const DWORD& InputContext::NumMsgBuf() const {
-  return dwNumMsgBuf;
-}
+const DWORD& InputContext::NumMsgBuf() const { return dwNumMsgBuf; }
 
 void InputContext::MakeGuideLine(DWORD dwID) {
   FOOTMARK();
@@ -283,16 +310,26 @@ void InputContext::MakeGuideLine(DWORD dwID) {
 }
 
 LPGUIDELINE InputContext::LockGuideLine() {
+  FOOTMARK();
   DebugPrint(TEXT("InputContext::LockGuideLine: locking %p\n"), hGuideLine);
-  LPGUIDELINE guideline = (LPGUIDELINE)ImmLockIMCC(hGuideLine);
-  DebugPrint(TEXT("InputContext::LockGuideLine: locked %p\n"), hGuideLine);
+  LPGUIDELINE guideline = (LPGUIDELINE)::ImmLockIMCC(hGuideLine);
+  if (guideline) {
+    DebugPrint(TEXT("InputContext::LockGuideLine: locked %p\n"), hGuideLine);
+  } else {
+    DebugPrint(TEXT("InputContext::LockGuideLine: not locked %p\n"), hGuideLine);
+  }
   return guideline;
 }
 
 void InputContext::UnlockGuideLine() {
+  FOOTMARK();
   DebugPrint(TEXT("InputContext::UnlockGuideLine: unlocking %p\n"), hGuideLine);
-  ImmUnlockIMCC(hGuideLine);
-  DebugPrint(TEXT("InputContext::UnlockGuideLine: unlocked %p\n"), hGuideLine);
+  BOOL b = ::ImmUnlockIMCC(hGuideLine);
+  if (b) {
+    DebugPrint(TEXT("InputContext::UnlockGuideLine: unlocked %p\n"), hGuideLine);
+  } else {
+    DebugPrint(TEXT("InputContext::UnlockGuideLine: not unlocked %p\n"), hGuideLine);
+  }
 }
 
 void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
@@ -306,17 +343,22 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
     UnlockCompStr();
   }
 
+  // if the current position has a converted character, then
+  if (log.GetCharAttr(log.dwCursorPos) != ATTR_INPUT) {
+    // determinate composition
+    log.MakeResult();
+    LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
+    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+    TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
+  }
+
+  // if there is not a composition string, then
   if (log.comp_str.empty()) {
     // start composition
     TheIME.GenerateMessage(WM_IME_STARTCOMPOSITION);
   }
 
-  // fix cursor pos
-  std::wstring& comp_str = log.comp_str;
-  if ((DWORD)comp_str.size() < log.dwCursorPos) {
-    log.dwCursorPos = (DWORD)comp_str.size();
-  }
-
+  // add a character
   INPUT_MODE imode = GetInputMode();
   log.AddChar(chTyped, chTranslated, imode);
 
@@ -330,6 +372,8 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
 } // InputContext::AddChar
 
 void InputContext::GetCands(LogCandInfo& log_cand_info, std::wstring& str) {
+  FOOTMARK();
+  // TODO:
   DWORD dwCount = (DWORD)log_cand_info.cand_strs.size();
   if (dwCount > 0) {
     log_cand_info.dwSelection++;
@@ -348,30 +392,31 @@ void InputContext::GetCands(LogCandInfo& log_cand_info, std::wstring& str) {
 BOOL InputContext::DoConvert() {
   FOOTMARK();
 
+  // check the presence of dictionary
   if ((GetFileAttributes(TheIME.m_szDicFileName) == 0xFFFFFFFF) ||
       (GetFileAttributes(TheIME.m_szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
     MakeGuideLine(MYGL_NODICTIONARY);
     return FALSE;
   }
 
-  BOOL bHasCompStr = FALSE, bIsBeingConverted = FALSE;
+  // get logical data of composition info
   LogCompStr log_comp_str;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
     lpCompStr->GetLog(log_comp_str);
-    bIsBeingConverted = lpCompStr->IsBeingConverted();
     UnlockCompStr();
-    bHasCompStr = (log_comp_str.comp_str.size() > 0);
   }
 
+  // if there is no conposition, we cannot convert it
+  BOOL bHasCompStr = (log_comp_str.comp_str.size() > 0);
   if (!bHasCompStr) {
     return FALSE;
   }
 
-  if (bIsBeingConverted) {
-    // the composition string is being converted.
+  // is it being converted?
+  if (log_comp_str.IsBeingConverted()) {
+    // if there was no candidate,
     if (!HasCandInfo()) {
-      // there is no candidate.
       // open candidate
       TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
     }
@@ -388,19 +433,13 @@ BOOL InputContext::DoConvert() {
   // get candidates
   std::wstring str = log_comp_str.comp_str;
   GetCands(log_cand_info, str);
-  log_comp_str.comp_str = str;
 
-  // recreate candidate
+  // recreate candidate and generate message to change candidate
   hCandInfo = CandInfo::ReCreate(hCandInfo, &log_cand_info);
-  // generate message to change candidate
   TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
   // set composition string
-  log_comp_str.comp_str = str;
-  log_comp_str.comp_attr.assign(str.size(), ATTR_TARGET_CONVERTED);
-  log_comp_str.comp_clause.resize(2);
-  log_comp_str.comp_clause[0] = 0;
-  log_comp_str.comp_clause[1] = str.size();
+  log_comp_str.SetClauseString(log_comp_str.extra.dwSelectedClause, str, TRUE);
 
   // recreate composition
   DumpCompStr();
@@ -432,20 +471,7 @@ void InputContext::MakeResult() {
   }
 
   // set result
-  log.result_read_clause = log.comp_read_clause;
-  log.result_read_str = log.comp_read_str;
-  log.result_clause = log.comp_clause;
-  log.result_str = log.comp_str;
-
-  // clear compostion
-  log.dwCursorPos = 0;
-  log.dwDeltaStart = 0;
-  log.comp_read_attr.clear();
-  log.comp_read_clause.clear();
-  log.comp_read_str.clear();
-  log.comp_attr.clear();
-  log.comp_clause.clear();
-  log.comp_str.clear();
+  log.MakeResult();
 
   // recreate
   DumpCompStr();
@@ -453,7 +479,8 @@ void InputContext::MakeResult() {
   DumpCompStr();
 
   // generate messages to end composition
-  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_RESULTALL);
+  LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
   TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::MakeResult
 
@@ -616,14 +643,14 @@ void InputContext::CancelText() {
   DumpCompStr();
 
   // generate messages to end composition
-  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL);
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
   TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::CancelText
 
 void InputContext::RevertText() {
   FOOTMARK();
 
-  // close candidate
+  // close candidate if any
   if (HasCandInfo()) {
     hCandInfo = CandInfo::ReCreate(hCandInfo);
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
@@ -643,7 +670,7 @@ void InputContext::RevertText() {
   }
 
   // reset composition
-  log.Revert();
+  log.RevertText();
 
   // recreate
   DumpCompStr();
@@ -673,6 +700,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   hCompStr = CompStr::ReCreate(hCompStr, &log);
   DumpCompStr();
 
+  // if there is no composition, then
   if (log.comp_str.empty()) {
     // close candidate if any
     if (HasCandInfo()) {
@@ -680,6 +708,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     }
 
     // generate messages to end composition
+    LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION);
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
   } else {
@@ -702,6 +731,7 @@ void InputContext::MoveLeft(BOOL bShift) {
     UnlockCompStr();
   }
 
+  // move left
   log.MoveLeft(bShift);
 
   // recreate
@@ -726,6 +756,7 @@ void InputContext::MoveRight(BOOL bShift) {
     UnlockCompStr();
   }
 
+  // move right
   log.MoveRight(bShift);
 
   // recreate
@@ -748,9 +779,12 @@ void InputContext::MoveToBeginning() {
     UnlockCompStr();
   }
 
-  log.dwCursorPos = 0;
-  log.extra.dwPhonemeCursor = 0;
-  log.extra.dwCharExtra = 0;
+  // move to the beginning
+  if (log.HasClauseSelected()) {
+    log.extra.dwSelectedClause = 0;
+  } else {
+    log.dwCursorPos = 0;
+  }
 
   // recreate
   DumpCompStr();
@@ -772,9 +806,12 @@ void InputContext::MoveToEnd() {
     UnlockCompStr();
   }
 
-  log.dwCursorPos = (DWORD)log.comp_str.size();
-  log.extra.dwPhonemeCursor = (DWORD)extra.hiragana_phonemes.size();
-  log.extra.dwCharExtra = 0;
+  // move to the end
+  if (log.HasClauseSelected()) {
+    log.extra.dwSelectedClause = log.comp_clause.size() - 1;
+  } else {
+    log.dwCursorPos = (DWORD)log.comp_str.size();
+  }
 
   // recreate
   DumpCompStr();

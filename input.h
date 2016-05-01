@@ -37,34 +37,34 @@ UINT CommandFromInputMode(INPUT_MODE imode);
 // composition string
 
 struct LogCompStrExtra {
-  DWORD                       dwPhonemeCursor;
-  DWORD                       dwCharDelta;
+  DWORD                       dwSelectedClause;
+  DWORD                       dwSelectedPhoneme;
   std::vector<std::wstring>   hiragana_phonemes;
   std::vector<std::wstring>   typing_phonemes;
-  std::vector<DWORD>          phoneme_clauses;  // for future use
+  std::vector<DWORD>          phoneme_clauses;
+
   LogCompStrExtra() { clear(); }
   void clear();
   DWORD GetTotalSize() const;
-  void AssertValid() {
-    assert(hiragana_phonemes.size() == typing_phonemes.size());
-    assert(dwPhonemeCursor <= (DWORD)hiragana_phonemes.size());
-  }
   std::wstring Join(const std::vector<SmallWString>& strs) const;
   std::wstring JoinLeft(const std::vector<SmallWString>& strs) const;
   std::wstring JoinRight(const std::vector<SmallWString>& strs) const;
+  DWORD GetPhonemeCount() const;
+  WCHAR GetPrevChar() const;
+
 protected:
   void InsertPos(std::vector<SmallWString>& strs, std::wstring& str);
-  WCHAR GetPrevChar() const;
 }; // struct LogCompStrExtra
 
 struct COMPSTREXTRA {
-  DWORD dwSignature;
-  DWORD dwPhonemeCursor;
-  DWORD dwCharDelta;
-  DWORD dwHiraganaPhonemeLen;
-  DWORD dwHiraganaPhonemeOffset;
-  DWORD dwTypingPhonemeLen;
-  DWORD dwTypingPhonemeOffset;
+  DWORD   dwSignature;
+  DWORD   dwSelectedClause;
+  DWORD   dwSelectedPhoneme;
+  DWORD   dwHiraganaPhonemeLen;
+  DWORD   dwHiraganaPhonemeOffset;
+  DWORD   dwTypingPhonemeLen;
+  DWORD   dwTypingPhonemeOffset;
+
   LPBYTE GetBytes() { return (LPBYTE)this; }
 
   LPWSTR GetHiraganaPhonemes(DWORD& dwCount) {
@@ -89,8 +89,8 @@ struct COMPSTREXTRA {
 struct LogCompStr {
   DWORD               dwCursorPos;
   DWORD               dwDeltaStart;
-  std::vector<BYTE>   comp_read_attr;
-  std::vector<DWORD>  comp_read_clause;
+  std::vector<BYTE>   comp_read_attr;     // We don't use this member
+  std::vector<DWORD>  comp_read_clause;   // We don't use this member
   std::wstring        comp_read_str;
   std::vector<BYTE>   comp_attr;
   std::vector<DWORD>  comp_clause;
@@ -102,21 +102,52 @@ struct LogCompStr {
   LogCompStrExtra     extra;
   LogCompStr() { clear(); }
   void clear();
+  void clear_read();
+  void clear_comp();
+  void clear_result();
+  void clear_extra() { extra.clear(); }
   DWORD GetTotalSize() const;
 
   void AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode);
-  void Revert();
+  void RevertText();
   void DeleteChar(BOOL bBackSpace = FALSE);
   void MakeResult();
 
   void MoveLeft(BOOL bShift);
   void MoveRight(BOOL bShift);
 
+  BOOL HasClauseSelected() const;
+  DWORD GetClauseCount() const;
+  void SetClauseAttribute(DWORD iClause, BYTE attr);
+
+  DWORD GetPhonemeCount() const;
+  DWORD GetCharCount() const;
+
+  // conversion of composition
   void MakeHiragana();
   void MakeKatakana();
   void MakeHankaku();
   void MakeZenEisuu();
   void MakeHanEisuu();
+
+  // conversion of locative information
+  DWORD ClauseToPhoneme(DWORD iClause) const;
+  DWORD ClauseToCompChar(DWORD iClause) const;
+  DWORD PhonemeToClause(DWORD iPhoneme) const;
+  DWORD PhonemeToCompChar(DWORD iPhoneme) const;
+  DWORD CompCharToClause(DWORD iCompChar) const;
+  DWORD CompCharToPhoneme(DWORD iCompChar) const;
+
+  // get clause information
+  DWORD GetCurrentClause() const;
+  std::wstring GetLeft(DWORD iClause) const;
+  std::wstring GetRight(DWORD iClause) const;
+  std::wstring GetClauseCompString(DWORD iClause) const;
+  std::wstring GetClauseHiraganaString(DWORD iClause) const;
+  std::wstring GetClauseTypingString(DWORD iClause) const;
+  void SetClauseString(DWORD iClause, std::wstring& strClause, BOOL bConverted);
+  BYTE GetCharAttr(DWORD ich) const;
+  BOOL IsBeingConverted();
 
 protected:
   void AddKanaChar(std::wstring& typed, std::wstring& translated, INPUT_MODE imode);

@@ -473,7 +473,7 @@ static TABLEENTRY reverse_table[] = {
 // Åyç~èáÇ…É\Å[ÉgÅzÇ±Ç±Ç‹Ç≈
 };
 
-static TABLEENTRY romaji_table[] = {
+static TABLEENTRY roman_table[] = {
 // Åyç~èáÇ…É\Å[ÉgÅzÇ±Ç±Ç©ÇÁ
   {L"zyu", L"Ç∂Ç„"},
   {L"zyo", L"Ç∂ÇÂ"},
@@ -1053,109 +1053,35 @@ static TABLEENTRY sokuon_table[] = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-std::wstring zenkaku_to_hankaku(const std::wstring& zenkaku) {
-  std::wstring hankaku;
-  bool flag;
-  wchar_t ch;
-  for (size_t k = 0; k < zenkaku.size(); ++k) {
-    flag = true;
-    ch = zenkaku[k];
-    for (size_t i = 0; i < _countof(halfkana_table); ++i) {
-      if (ch == halfkana_table[i].key[0]) {
-        hankaku += halfkana_table[i].value;
-        flag = false;
-        break;
-      }
-    }
-    if (flag) {
-      hankaku += ch;
-    }
-  }
-  for (size_t i = 0; i < _countof(kigou_table); ++i) {
-    for (size_t k = 0; k < zenkaku.size(); ++k) {
-      if (hankaku[k] == kigou_table[i].value[0]) {
-        hankaku[k] = kigou_table[i].key[0];
-        break;
-      }
-    }
-  }
-  WCHAR szBuf[1024];
-  const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  szBuf[0] = 0;
-  DWORD dwFlags = LCMAP_HALFWIDTH;
-  ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
-                 hankaku.c_str(), -1, szBuf, 1024);
-  return szBuf;
-} // zenkaku_to_hankaku
-
-std::wstring hankaku_to_zenkaku(const std::wstring& hankaku) {
-  std::wstring zenkaku = hankaku;
-  for (size_t i = 0; i < _countof(kana_table); ++i) {
-    unboost::replace_all(zenkaku, kana_table[i].key, kana_table[i].value);
-  }
-  for (size_t i = 0; i < _countof(kigou_table); ++i) {
-    for (size_t k = 0; k < zenkaku.size(); ++k) {
-      if (zenkaku[k] == kigou_table[i].key[0]) {
-        zenkaku[k] = kigou_table[i].value[0];
-        break;
-      }
-    }
-  }
-  WCHAR szBuf[1024];
-  const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  szBuf[0] = 0;
-  DWORD dwFlags = LCMAP_FULLWIDTH;
-  ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
-                 zenkaku.c_str(), -1, szBuf, 1024);
-  return szBuf;
-} // hankaku_to_zenkaku
-
-std::wstring zenkaku_hiragana_to_katakana(const std::wstring& hiragana) {
-  WCHAR szBuf[1024];
-  const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  szBuf[0] = 0;
-  DWORD dwFlags = LCMAP_FULLWIDTH | LCMAP_KATAKANA;
-  ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
-                 hiragana.c_str(), -1, szBuf, 1024);
-  return szBuf;
-} // zenkaku_hiragana_to_katakana
-
-std::wstring zenkaku_katakana_to_hiragana(const std::wstring& katakana) {
-  WCHAR szBuf[1024];
-  const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  szBuf[0] = 0;
-  DWORD dwFlags = LCMAP_FULLWIDTH | LCMAP_HIRAGANA;
-  ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
-                 katakana.c_str(), -1, szBuf, 1024);
-  return szBuf;
-} // zenkaku_katakana_to_hiragana
-
-std::wstring hiragana_to_romaji(const std::wstring& hiragana) {
-  std::wstring romaji = hiragana;
+std::wstring hiragana_to_roman(const std::wstring& hiragana) {
+  FOOTMARK();
+  std::wstring roman = hiragana;
   for (size_t i = 0; i < _countof(sokuon_table); ++i) {
-    unboost::replace_all(romaji, sokuon_table[i].value, sokuon_table[i].key);
+    unboost::replace_all(roman, sokuon_table[i].value, sokuon_table[i].key);
   }
   for (size_t i = 0; i < _countof(reverse_table); ++i) {
-    unboost::replace_all(romaji, reverse_table[i].key, reverse_table[i].value);
+    unboost::replace_all(roman, reverse_table[i].key, reverse_table[i].value);
   }
-  for (size_t i = 0; i < _countof(romaji_table); ++i) {
-    unboost::replace_all(romaji, romaji_table[i].value, romaji_table[i].key);
+  for (size_t i = 0; i < _countof(roman_table); ++i) {
+    unboost::replace_all(roman, roman_table[i].value, roman_table[i].key);
   }
-  return romaji;
-} // hiragana_to_romaji
+  return roman;
+} // hiragana_to_roman
 
-std::wstring romaji_to_hiragana(const std::wstring& romaji) {
-  std::wstring hiragana = romaji;
+std::wstring roman_to_hiragana(const std::wstring& roman) {
+  FOOTMARK();
+  std::wstring hiragana = roman;
   for (size_t i = 0; i < _countof(sokuon_table); ++i) {
     unboost::replace_all(hiragana, sokuon_table[i].key, sokuon_table[i].value);
   }
-  for (size_t i = 0; i < _countof(romaji_table); ++i) {
-    unboost::replace_all(hiragana, romaji_table[i].key, romaji_table[i].value);
+  for (size_t i = 0; i < _countof(roman_table); ++i) {
+    unboost::replace_all(hiragana, roman_table[i].key, roman_table[i].value);
   }
   return hiragana;
-} // romaji_to_hiragana
+} // roman_to_hiragana
 
 WCHAR convert_key_to_kana(BYTE vk, BOOL bShift) {
+  FOOTMARK();
   switch (vk) {
   case VK_A:          return L'Çø';
   case VK_B:          return L'Ç±';
@@ -1210,6 +1136,7 @@ WCHAR convert_key_to_kana(BYTE vk, BOOL bShift) {
 } // convert_key_to_kana
 
 WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock) {
+  FOOTMARK();
   if (VK_A <= vk && vk <= VK_Z) {
     if (!bShift == !bCapsLock) {
       return vk + (L'a' - VK_A);
@@ -1261,6 +1188,7 @@ WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock) {
 } // typing_key_to_char
 
 BOOL is_hiragana(WCHAR ch) {
+  FOOTMARK();
   if (0x3040 <= ch && ch <= 0x309F) return TRUE;
   switch (ch) {
   case 0x3095: case 0x3096: case 0x3099: case 0x309A:
@@ -1273,6 +1201,7 @@ BOOL is_hiragana(WCHAR ch) {
 }
 
 BOOL is_zenkaku_katakana(WCHAR ch) {
+  FOOTMARK();
   if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
   switch (ch) {
   case 0x30FD: case 0x30FE: case 0x3099: case 0x309A:
@@ -1284,6 +1213,7 @@ BOOL is_zenkaku_katakana(WCHAR ch) {
 }
 
 BOOL is_hankaku_katakana(WCHAR ch) {
+  FOOTMARK();
   if (0xFF65 <= ch && ch <= 0xFF9F) return TRUE;
   switch (ch) {
   case 0xFF61: case 0xFF62: case 0xFF63: case 0xFF64:
@@ -1294,6 +1224,7 @@ BOOL is_hankaku_katakana(WCHAR ch) {
 }
 
 BOOL is_kanji(WCHAR ch) {
+  FOOTMARK();
   // CJKìùçáäøéö
   if (0x4E00 <= ch && ch <= 0x9FFF) return TRUE;
   // CJKå›ä∑äøéö
@@ -1302,10 +1233,12 @@ BOOL is_kanji(WCHAR ch) {
 }
 
 BOOL is_fullwidth_ascii(WCHAR ch) {
+  FOOTMARK();
   return (0xFF00 <= ch && ch <= 0xFFEF);
 }
 
 WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1) {
+  FOOTMARK();
   switch (MAKELONG(ch0, ch1)) {
   case MAKELONG(L'Ç©', L'ÅJ'): return L'Ç™';
   case MAKELONG(L'Ç´', L'ÅJ'): return L'Ç¨';
@@ -1338,6 +1271,7 @@ WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1) {
 }
 
 std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
+  FOOTMARK();
   WCHAR szBuf[1024];
   const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
   ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
@@ -1346,61 +1280,10 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// LogCompStrExtra
-
-std::wstring
-LogCompStrExtra::Join(const std::vector<SmallWString>& strs) const {
-  std::wstring str;
-  for (size_t i = 0; i < strs.size(); ++i) {
-    str += strs[i].c_str();
-  }
-  return str;
-}
-
-std::wstring
-LogCompStrExtra::JoinLeft(const std::vector<SmallWString>& strs) const {
-  std::wstring str;
-  for (DWORD i = 0; i < dwPhonemeCursor; ++i) {
-    str += strs[i].c_str();
-  }
-  return str;
-}
-
-std::wstring
-LogCompStrExtra::JoinRight(const std::vector<SmallWString>& strs) const {
-  std::wstring str;
-  const DWORD dwCount = (DWORD)strs.size();
-  for (DWORD i = dwPhonemeCursor; i < dwCount; ++i) {
-    str += strs[i].c_str();
-  }
-  return str;
-}
-
-void LogCompStrExtra::InsertPos(
-  std::vector<SmallWString>& strs, std::wstring& str)
-{
-  strs.insert(strs.begin() + dwPhonemeCursor, str.c_str());
-}
-
-WCHAR LogCompStrExtra::GetPrevChar() const {
-  WCHAR ret = 0;
-  if (dwCharDelta > 0) {
-    assert(dwCharDelta - 1 < (DWORD)hiragana_phonemes[dwPhonemeCursor].size());
-    ret = hiragana_phonemes[dwPhonemeCursor][dwCharDelta - 1];
-  } else {
-    if (dwPhonemeCursor > 0) {
-      const std::wstring& str = hiragana_phonemes[dwPhonemeCursor - 1];
-      assert(str.size() > 0);
-      ret = str[str.size() - 1];
-    }
-  }
-  return ret;
-}
-
-//////////////////////////////////////////////////////////////////////////////
 // LogCompStr
 
 void LogCompStr::ExtraUpdated(INPUT_MODE imode) {
+  FOOTMARK();
   std::wstring strLeft, strRight;
   switch (imode) {
   case IMODE_ZEN_HIRAGANA:
@@ -1429,12 +1312,12 @@ void LogCompStr::ExtraUpdated(INPUT_MODE imode) {
     break;
   }
   comp_str = strLeft + strRight;
-  dwCursorPos = (DWORD)strLeft.size() + extra.dwCharDelta;
 }
 
 void LogCompStr::AddKanaChar(
   std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
 {
+  FOOTMARK();
   WCHAR chDakuon = dakuon_shori(extra.GetPrevChar(), translated[0]);
   if (chDakuon) {
     std::wstring str;
@@ -1445,7 +1328,6 @@ void LogCompStr::AddKanaChar(
     extra.InsertPos(extra.typing_phonemes, typed);
     // create the translated string
     extra.InsertPos(extra.hiragana_phonemes, translated);
-    extra.dwPhonemeCursor++;
   }
   // create the composition string
   ExtraUpdated(imode);
@@ -1454,6 +1336,7 @@ void LogCompStr::AddKanaChar(
 void LogCompStr::AddRomanChar(
   std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
 {
+  FOOTMARK();
   const WCHAR chTyped = typed[0];
   // create the typed string and translated string
   if (is_hiragana(chTyped)) {
@@ -1487,7 +1370,7 @@ void LogCompStr::AddRomanChar(
       extra.InsertPos(extra.typing_phonemes, typed);
       extra.InsertPos(extra.hiragana_phonemes, translated);
     } else {
-      if (extra.dwCharDelta) {
+      if (HasClauseSelected()) {
         // TODO:
       } else {
         translated = typed;
@@ -1506,6 +1389,7 @@ void LogCompStr::AddRomanChar(
 } // LogCompStr::AddRomanChar
 
 void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode) {
+  FOOTMARK();
   std::wstring strTyped, strTranslated;
   if (chTranslated) {   // kana input
     assert(is_hiragana(chTranslated));
@@ -1522,182 +1406,74 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode) {
   comp_read_str = lcmap(str, LCMAP_HALFWIDTH | LCMAP_KATAKANA);
 } // LogCompStr::AddChar
 
-void LogCompStr::Revert() {
+void LogCompStr::RevertText() {
+  FOOTMARK();
   // reset composition
-  comp_str = lcmap(extra.Join(comp_read_str),
-                   LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
-  comp_clause.resize(2);
-  comp_clause[0] = 0;
-  comp_clause[1] = (DWORD)comp_str.size();
-  comp_attr.assign(comp_read_str.size(), ATTR_INPUT);
-  dwCursorPos = (DWORD)comp_str.size();
+  std::wstring str = GetClauseHiraganaString(extra.dwSelectedClause);
+  SetClauseString(extra.dwSelectedClause, str, FALSE);
+  dwCursorPos = GetCharCount();
   dwDeltaStart = 0;
 }
 
 void LogCompStr::DeleteChar(BOOL bBackSpace/* = FALSE*/) {
+  FOOTMARK();
   // delete char
+  if (HasClauseSelected()) {
+    std::wstring str = GetClauseHiraganaString(extra.dwSelectedClause);
+    SetClauseString(extra.dwSelectedClause, str, FALSE);
+    return;
+  }
   if (bBackSpace) {
-    if (dwCursorPos == 0) {
-      DebugPrint(TEXT("dwCursorPos == 0\n"));
-      return;
-    } else if (dwCursorPos <= comp_str.size()) {
+    if (0 < dwCursorPos && dwCursorPos <= (DWORD)comp_str.size()) {
       --dwCursorPos;
-      comp_str.erase(dwCursorPos);
-      dwDeltaStart = dwCursorPos;
-    } else {
-      dwCursorPos = (DWORD)comp_str.size();
-      dwDeltaStart = dwCursorPos;
+      comp_str.erase(dwCursorPos, 1);
     }
   } else {
-    if (dwCursorPos >= comp_str.size()) {
-      DebugPrint(TEXT("dwCursorPos >= comp_str.size()\n"));
-      return;
-    } else {
-      comp_str.erase(dwCursorPos);
-      dwCursorPos = dwDeltaStart;
+    if (0 <= dwCursorPos && dwCursorPos < (DWORD)comp_str.size()) {
+      comp_str.erase(dwCursorPos, 1);
     }
   }
-
-  // reset composition
-  comp_str = comp_read_str;
-  comp_clause.resize(2);
-  comp_clause[0] = 0;
-  comp_clause[1] = (DWORD)comp_str.size();
-  comp_attr.assign(comp_read_str.size(), ATTR_INPUT);
-  dwCursorPos = (DWORD)comp_str.size();
-  dwDeltaStart = 0;
+  // TODO: fix reading
 } // LogCompStr::DeleteChar
 
-void LogCompStr::MakeResult() {
-}
-
-void LogCompStr::MakeHiragana() {
-  std::wstring str;
-  str = romaji_to_hiragana(comp_read_str);
-  str = zenkaku_katakana_to_hiragana(str);
-
-  // update composition
-  comp_str = str;
-  DWORD len = (DWORD)comp_str.size();
-  dwCursorPos = len;
-  dwDeltaStart = 0;
-  comp_attr.assign(len, ATTR_INPUT);
-  comp_clause.resize(2);
-  comp_clause[0] = 0;
-  comp_clause[1] = len;
-}
-
-void LogCompStr::MakeKatakana() {
-  std::wstring str;
-  str = romaji_to_hiragana(comp_read_str);
-  str = zenkaku_hiragana_to_katakana(str);
-
-  comp_str = str;
-  DWORD len = (DWORD)comp_str.size();
-  dwCursorPos = len;
-  dwDeltaStart = 0;
-  comp_attr.assign(len, ATTR_INPUT);
-  comp_clause.resize(2);
-  comp_clause[0] = 0;
-  comp_clause[1] = len;
-}
-
-void LogCompStr::MakeHankaku() {
-  std::wstring str;
-  str = romaji_to_hiragana(comp_read_str);
-  str = zenkaku_to_hankaku(str);
-
-  comp_str = str;
-  DWORD len = (DWORD)comp_str.size();
-  dwCursorPos = len;
-  dwDeltaStart = 0;
-  comp_attr.assign(len, ATTR_INPUT);
-  comp_clause.resize(2);
-  comp_clause[0] = 0;
-  comp_clause[1] = len;
-}
-
-void LogCompStr::MakeZenEisuu() {
-  std::wstring str;
-  str = hiragana_to_romaji(comp_read_str);
-  str = hankaku_to_zenkaku(str);
-
-  comp_str = str;
-  DWORD len = (DWORD)comp_str.size();
-  dwCursorPos = len;
-  dwDeltaStart = 0;
-  comp_attr.assign(len, ATTR_INPUT);
-  comp_clause.resize(2);
-  comp_clause[0] = 0;
-  comp_clause[1] = len;
-}
-
-void LogCompStr::MakeHanEisuu() {
-  std::wstring str;
-  str = hiragana_to_romaji(comp_read_str);
-  str = zenkaku_to_hankaku(str);
-
-  comp_str = str;
-  DWORD len = (DWORD)comp_str.size();
-  dwCursorPos = len;
-  dwDeltaStart = 0;
-  comp_attr.assign(len, ATTR_INPUT);
-  comp_clause.resize(2);
-  comp_clause[0] = 0;
-  comp_clause[1] = len;
-}
-
-void LogCompStr::MoveLeft() {
-  DWORD dwCursorPos = log.dwCursorPos;
-  if (bIsBeingConverted) {
-    size_t i, siz = log.comp_clause.size();
-    if (siz > 1) {
-      for (i = 0; i < siz; ++i) {
-        if (dwCursorPos <= log.comp_clause[i]) {
-          if (i == 0) {
-            i = siz - 2;
-          } else {
-            --i;
-          }
-          break;
-        }
+void LogCompStr::MoveLeft(BOOL bShift) {
+  FOOTMARK();
+  assert(!bShift); // TODO
+  if (HasClauseSelected()) {
+    DWORD ich = ClauseToCompChar(extra.dwSelectedClause);
+    if (GetCharAttr(ich) != ATTR_INPUT) {
+      if (extra.dwSelectedClause > 0) {
+        --extra.dwSelectedClause;
+      } else {
+        assert(comp_clause.size() >= 2);
+        extra.dwSelectedClause = GetClauseCount() - 1;
       }
-      dwCursorPos = log.comp_clause[i];
-    }
-  } else {
-    if (log.dwCursorPos > 0) {
-      --dwCursorPos;
-    } else {
-      return;
     }
   }
-  log.dwCursorPos = dwCursorPos;
+  if (dwCursorPos > 0) {
+    --dwCursorPos;
+  }
+  if (dwCursorPos < comp_attr.size() &&
+      comp_attr[dwCursorPos] == ATTR_CONVERTED)
+  {
+    extra.dwSelectedClause = CompCharToClause(dwCursorPos);
+    dwCursorPos = (DWORD)comp_str.size();
+  }
 } // LogCompStr::MoveLeft
 
-void LogCompStr::MoveRight() {
-  DWORD dwCursorPos = log.dwCursorPos;
-  if (bIsBeingConverted) {
-    size_t i, k, siz = log.comp_clause.size();
-    if (siz > 1) {
-      for (i = k = 0; i < siz; ++i) {
-        if (log.comp_clause[i] <= dwCursorPos) {
-          if (siz <= i + 1) {
-            k = 0;
-          } else {
-            k = i + 1;
-          }
-        }
-      }
-      dwCursorPos = log.comp_clause[k];
+void LogCompStr::MoveRight(BOOL bShift) {
+  FOOTMARK();
+  assert(!bShift); // TODO
+  if (HasClauseSelected()) {
+    ++extra.dwSelectedClause;
+    if (extra.dwSelectedClause >= GetClauseCount()) {
+      extra.dwSelectedClause = 0;
     }
   } else {
-    if (log.dwCursorPos < (DWORD)log.comp_str.size()) {
+    if (dwCursorPos + 1 < (DWORD)comp_str.size()) {
       ++dwCursorPos;
-    } else {
-      return;
     }
   }
-  log.dwCursorPos = dwCursorPos;
 } // LogCompStr::MoveRight
 
 //////////////////////////////////////////////////////////////////////////////
