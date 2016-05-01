@@ -1,5 +1,7 @@
-// keychar.cpp
+// keychar.cpp --- mzimeja keys and characters
 //////////////////////////////////////////////////////////////////////////////
+// NOTE: This file uses Japanese Shift_JIS encoding. To compile this on g++,
+//       please add options: -finput-charset=CP932 -fexec-charset=CP932
 
 #include "mzimeja.h"
 #include "vksub.h"
@@ -243,11 +245,12 @@ static TABLEENTRY kigou_table[] = {
 // Åyç~èáÇ…É\Å[ÉgÅzÇ±Ç±Ç‹Ç≈
 };
 
-static TABLEENTRY reverse_table[] = {
+static TABLEENTRY reverse_roman_table[] = {
 // Åyç~èáÇ…É\Å[ÉgÅzÇ±Ç±Ç©ÇÁ
   {L"Å`", L"~"},
   {L"Å[", L"-"},
   {L"ÇÒ", L"n'"},
+  {L"ÇÒ", L"nn"},
   {L"Ç", L"wo"},
   {L"ÇÔ", L"we"},
   {L"ÇÓ", L"wi"},
@@ -1059,8 +1062,8 @@ std::wstring hiragana_to_roman(const std::wstring& hiragana) {
   for (size_t i = 0; i < _countof(sokuon_table); ++i) {
     unboost::replace_all(roman, sokuon_table[i].value, sokuon_table[i].key);
   }
-  for (size_t i = 0; i < _countof(reverse_table); ++i) {
-    unboost::replace_all(roman, reverse_table[i].key, reverse_table[i].value);
+  for (size_t i = 0; i < _countof(reverse_roman_table); ++i) {
+    unboost::replace_all(roman, reverse_roman_table[i].key, reverse_roman_table[i].value);
   }
   for (size_t i = 0; i < _countof(roman_table); ++i) {
     unboost::replace_all(roman, roman_table[i].value, roman_table[i].key);
@@ -1318,16 +1321,20 @@ void LogCompStr::AddKanaChar(
   std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
 {
   FOOTMARK();
+  // if there was dakuon combination
   WCHAR chDakuon = dakuon_shori(extra.GetPrevChar(), translated[0]);
   if (chDakuon) {
+    // store a dakuon combination
     std::wstring str;
     str += chDakuon;
     hiragana_phonemes[dwPhonemeCursor - 1] = str;
   } else {
-    // create the typed string
-    extra.InsertPos(extra.typing_phonemes, typed);
-    // create the translated string
-    extra.InsertPos(extra.hiragana_phonemes, translated);
+    // insert the typed and translated strings
+    extra.InsertThere(extra.typing_phonemes, typed);
+    extra.InsertThere(extra.hiragana_phonemes, translated);
+    // move cursor
+    ++dwCursorPos;
+    ++extra.dwPhonemeCursor;
   }
   // create the composition string
   ExtraUpdated(imode);
@@ -1341,47 +1348,47 @@ void LogCompStr::AddRomanChar(
   // create the typed string and translated string
   if (is_hiragana(chTyped)) {
     translated = typed;
-    for (size_t i = 0; i < _countof(reverse_table); ++i) {
-      if (reverse_table[i].key == translated) {
-        typed = reverse_table[i].value;
+    for (size_t i = 0; i < _countof(reverse_roman_table); ++i) {
+      if (reverse_roman_table[i].key == translated) {
+        typed = reverse_roman_table[i].value;
         break;
       }
     }
-    extra.InsertPos(extra.typing_phonemes, typed);
-    extra.InsertPos(extra.hiragana_phonemes, translated);
+    extra.InsertThere(extra.typing_phonemes, typed);
+    extra.InsertThere(extra.hiragana_phonemes, translated);
   } else if (is_zenkaku_katakana(chTyped)) {
     translated = lcmap(typed, LCMAP_HIRAGANA);
-    for (size_t i = 0; i < _countof(reverse_table); ++i) {
-      if (reverse_table[i].key == translated) {
-        typed = reverse_table[i].value;
+    for (size_t i = 0; i < _countof(reverse_roman_table); ++i) {
+      if (reverse_roman_table[i].key == translated) {
+        typed = reverse_roman_table[i].value;
         break;
       }
     }
-    extra.InsertPos(extra.typing_phonemes, typed);
-    extra.InsertPos(extra.hiragana_phonemes, translated);
+    extra.InsertThere(extra.typing_phonemes, typed);
+    extra.InsertThere(extra.hiragana_phonemes, translated);
   } else if (is_kanji(chTyped)) {
     translated = typed;
-    extra.InsertPos(extra.typing_phonemes, typed);
-    extra.InsertPos(extra.hiragana_phonemes, translated);
+    extra.InsertThere(extra.typing_phonemes, typed);
+    extra.InsertThere(extra.hiragana_phonemes, translated);
   } else if (std::isalnum(chTyped)) {
     WCHAR ch = extra.GetPrevChar();
     if (is_hiragana(ch) || ch == L'\'' || ch == 0) {
       translated = typed;
-      extra.InsertPos(extra.typing_phonemes, typed);
-      extra.InsertPos(extra.hiragana_phonemes, translated);
+      extra.InsertThere(extra.typing_phonemes, typed);
+      extra.InsertThere(extra.hiragana_phonemes, translated);
     } else {
       if (HasClauseSelected()) {
         // TODO:
       } else {
         translated = typed;
-        extra.InsertPos(extra.typing_phonemes, typed);
-        extra.InsertPos(extra.hiragana_phonemes, translated);
+        extra.InsertThere(extra.typing_phonemes, typed);
+        extra.InsertThere(extra.hiragana_phonemes, translated);
       }
     }
   } else {
     translated = typed;
-    extra.InsertPos(extra.typing_phonemes, typed);
-    extra.InsertPos(extra.hiragana_phonemes, translated);
+    extra.InsertThere(extra.typing_phonemes, typed);
+    extra.InsertThere(extra.hiragana_phonemes, translated);
   }
 
   // create the composition string
@@ -1409,10 +1416,11 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode) {
 void LogCompStr::RevertText() {
   FOOTMARK();
   // reset composition
+  assert(extra.dwSelectedClause != 0xFFFFFFFF);
   std::wstring str = GetClauseHiraganaString(extra.dwSelectedClause);
   SetClauseString(extra.dwSelectedClause, str, FALSE);
   dwCursorPos = GetCharCount();
-  dwDeltaStart = 0;
+  dwDeltaStart = ClauseToCompChar(extra.dwSelectedClause);
 }
 
 void LogCompStr::DeleteChar(BOOL bBackSpace/* = FALSE*/) {

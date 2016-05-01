@@ -1,4 +1,4 @@
-// input.cpp --- input
+// input.cpp --- mzimeja input context and related
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -389,6 +389,47 @@ void InputContext::GetCands(LogCandInfo& log_cand_info, std::wstring& str) {
   str = log_cand_info.cand_strs[log_cand_info.dwSelection];
 }
 
+void InputContext::OpenCandidate() {
+  BOOL ret = FALSE;
+  LogCompStr log_comp_str;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLog(log_comp_str);
+    UnlockCompStr();
+
+    LogCandInfo log_cand_info;
+    CandInfo *cand_info = LockCandInfo();
+    if (cand_info) {
+      cand_info->GetLog(log_cand_info);
+      UnlockCandInfo();
+
+      // get candidates
+      GetCands(log_cand_info, log_comp_str.comp_str);
+
+      // generate message to open candidate
+      TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+
+      // reset candidates
+      lpIMC->hCandInfo = CandInfo::ReCreate(lpIMC->hCandInfo, &log_cand_info);
+
+      // generate message to change candidate
+      TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+
+      ret = TRUE;
+    }
+  }
+  return ret;
+}
+
+BOOL InputContext::CloseCandidate() {
+  if (HasCandInfo()) {
+    hCandInfo = CandInfo::ReCreate(hCandInfo);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
+    return TRUE;
+  }
+  return FALSE;
+}
+
 BOOL InputContext::DoConvert() {
   FOOTMARK();
 
@@ -457,10 +498,7 @@ void InputContext::MakeResult() {
   FOOTMARK();
 
   // close candidate
-  if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo);
-    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
+  CloseCandidate();
 
   // get logical data
   LogCompStr log;
@@ -488,10 +526,7 @@ void InputContext::MakeHiragana() {
   FOOTMARK();
 
   // close candidate
-  if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo);
-    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
+  CloseCandidate();
 
   // get logical data
   LogCompStr log;
@@ -517,10 +552,7 @@ void InputContext::MakeKatakana() {
   FOOTMARK();
 
   // close candidate
-  if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo);
-    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
+  CloseCandidate();
 
   // get logical data
   LogCompStr log;
@@ -546,10 +578,7 @@ void InputContext::MakeHankaku() {
   FOOTMARK();
 
   // close candidate
-  if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo);
-    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
+  CloseCandidate();
 
   // get logical data
   LogCompStr log;
@@ -575,10 +604,7 @@ void InputContext::MakeZenEisuu() {
   FOOTMARK();
 
   // close candidate
-  if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo);
-    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
+  CloseCandidate();
 
   // get logical data
   LogCompStr log;
@@ -604,10 +630,7 @@ void InputContext::MakeHanEisuu() {
   FOOTMARK();
 
   // close candidate
-  if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo);
-    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
+  CloseCandidate();
 
   // get logical data
   LogCompStr log;
@@ -633,10 +656,7 @@ void InputContext::CancelText() {
   FOOTMARK();
 
   // close candidate
-  if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo);
-    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
+  CloseCandidate();
 
   DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr);
@@ -651,10 +671,7 @@ void InputContext::RevertText() {
   FOOTMARK();
 
   // close candidate if any
-  if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo);
-    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
-  }
+  CloseCandidate();
 
   // return if no composition string
   if (!HasCompStr()) {
@@ -669,8 +686,10 @@ void InputContext::RevertText() {
     UnlockCompStr();
   }
 
-  // reset composition
-  log.RevertText();
+  // reset composition of selected clause
+  if (extra.dwSelectedClause != 0xFFFFFFFF) {
+    log.RevertText();
+  }
 
   // recreate
   DumpCompStr();

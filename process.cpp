@@ -1,4 +1,4 @@
-// process.cpp
+// process.cpp --- mzimeja input process
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -262,36 +262,6 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
   return TRUE;
 } // IMEKeyDownHandler
 
-//  ImeProcessKey ()
-//  ImeProcessKey 関数は IMM を通して与えられた全てのキーストロークを前処
-//  理して、もしそのキーが与えられた Input Context で IME に必要なもので
-//  あれば TRUE を返す。
-//  BOOL
-//    ImeProcessKey(
-//    HIMC hIMC,
-//    UINT uVirKey,
-//    DWORD lParam,
-//    CONST LPBYTE lpbKeyState
-//  )
-//  Parameters
-//    hIMC
-//      Input context handle
-//    uVirKey
-//      処理されるべき仮想キー。
-//    lParam
-//      キーメッセージの lParam。(WM_KEYDOWN,WM_KEYUP の LPARAM)
-//    lpbKeyState
-//      現在のキーボードの状態を含んだ256バイトの配列を指すポインタ。
-//      IME はこの内容を変更すべきではない。
-//  Return Values
-//    成功なら TRUE。そうでなければ FALSE。
-//  Comments
-//    システムはキーが IME によって取り扱われるべきか否かをこの関数を
-//    呼び出すことによって決定している。アプリケーションがキーメッセー
-//    ジを受け取る前にこの関数が TRUE を返せば、IME はそのキーを処理す
-//    る。システムは ImeToAsciiEx 関数を呼び出す。
-//    FALSE を返したならば、システムはそのキーが IME によって処理され
-//    ないことが分かるのでキーメッセージはアプリケーションに送られる。
 BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
                           CONST LPBYTE lpbKeyState) {
   BOOL ret = FALSE;
@@ -414,44 +384,6 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   return ret;
 } // ImeProcessKey
 
-//  ImeToAsciiEx 
-//  ImeToAsciiEx 関数は hIMC パラメータに従って IME 変換エンジンを通して変
-//  換結果を生成します。
-//  UINT
-//    ImeToAsciiEx(
-//    UINT uVirKey,
-//    UINT uScanCode,
-//    CONST LPBYTE lpbKeyState,
-//    LPDWORD lpdwTransBuf,
-//    UINT fuState,
-//    HIMC hIMC
-//  )
-//  (パラメータ)
-//  uVirKey
-//    変換される仮想キーコードを指定します。プロパティの 
-//    IME_PROP_KBD_CHAR_FIRST ビットがオンだったら、仮想キーの上位バイト
-//    は補助キャラクタコード(?)になります。
-//    Unicode については、IME_PROP_KBD_CHAR_FIRST ビットがオンだったら 
-//    uVirKey の上位ワードが Unicode 文字を含みます。
-//  uScanCode
-//    変換されるキーのハードウェアスキャンコードを指定します。
-//  lpbKeyState
-//    現在のキーボードの状態を含んだ256バイトの配列へのポインタです。
-//    IME はこの内容を変更してはいけません。
-//  lpdwTransBuf
-//    変換結果を受け取る DWORD のバッファを指すポインタです。その書式は、
-//    [メッセージバッファの長さ][メッセージ1][wParam1][lParam1]
-//    [メッセージ2][wParam2][lParam2][...[...[...]]] のようになります。
-//  fuState
-//    Active menu flag. ？
-//  hIMC
-//    Input context handle.
-//  (返り値)
-//    返り値はメッセージの数を表します。もしその数がバッファサイズより
-//    大きければメッセージバッファは十分ではないです…って当然では…(^^;;
-//    システムは hMsgBuf をチェックしてメッセージを得ます。
-//  (See Also)
-//    ImmToAsciiEx
 UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
                          LPTRANSMSGLIST lpTransBuf, UINT fuState, HIMC hIMC) {
   UINT ret = 0;
@@ -491,9 +423,7 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
       }
     }
 
-    // If trans key buffer that is allocated by USER.EXE full up,
-    // the return value is the negative number.
-    if (TheIME.m_fOverTransKey) {
+    if (TheIME.m_fOverflowKey) {
       DebugPrint(TEXT("***************************************\n"));
       DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *\n"));
       DebugPrint(TEXT("*                by MZIMEJA.IME       *\n"));

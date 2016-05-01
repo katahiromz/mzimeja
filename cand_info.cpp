@@ -1,4 +1,4 @@
-// comp_str.cpp --- composition string
+// cand_info.cpp --- candidate info of mzimeja
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"

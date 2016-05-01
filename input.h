@@ -1,4 +1,4 @@
-// input.h --- input
+// input.h --- mzimeja input context and related
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef INPUT_H_
@@ -53,7 +53,7 @@ struct LogCompStrExtra {
   WCHAR GetPrevChar() const;
 
 protected:
-  void InsertPos(std::vector<SmallWString>& strs, std::wstring& str);
+  void InsertThere(std::vector<SmallWString>& strs, std::wstring& str);
 }; // struct LogCompStrExtra
 
 struct COMPSTREXTRA {
@@ -303,6 +303,8 @@ struct InputContext : public INPUTCONTEXT {
   void RevertText();
   void DeleteChar(BOOL bBackSpace = FALSE);
   BOOL DoConvert();
+  BOOL OpenCandidate();
+  BOOL CloseCandidate();
   void GetCands(LogCandInfo& log_cand_info, std::wstring& str);
 
   void MakeResult();

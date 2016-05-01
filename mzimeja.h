@@ -1,4 +1,4 @@
-// mzimeja.h --- MZ-IME Japanese Input
+// mzimeja.h --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef MZIMEJA_H_
@@ -254,7 +254,7 @@ struct MZIMEJA {
   BOOL            m_bWinLogOn;
   LPTRANSMSGLIST  m_lpCurTransKey;
   UINT            m_uNumTransKey;
-  BOOL            m_fOverTransKey;
+  BOOL            m_fOverflowKey;
   HIMC            m_hIMC;
   InputContext *  m_lpIMC;
 

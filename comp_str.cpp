@@ -1,4 +1,4 @@
-// comp_str.cpp --- composition string
+// comp_str.cpp --- composition string of mzimeja
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -48,7 +48,7 @@ DWORD LogCompStrExtra::GetPhonemeCount() const {
   return (DWORD)hiragana_phonemes.size();
 }
 
-void LogCompStrExtra::InsertPos(
+void LogCompStrExtra::InsertThere(
   std::vector<SmallWString>& strs, std::wstring& str)
 {
   strs.insert(strs.begin() + dwSelectedPhoneme, str.c_str());

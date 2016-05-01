@@ -1,4 +1,4 @@
-// mzimeja.cpp --- MZ-IME Japanese Input
+// mzimeja.cpp --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -80,7 +80,7 @@ MZIMEJA::MZIMEJA() {
   m_lpCurTransKey = NULL;
   m_uNumTransKey = 0;
 
-  m_fOverTransKey = FALSE;
+  m_fOverflowKey = FALSE;
 
   m_hIMC = NULL;
   m_lpIMC = NULL;
@@ -270,7 +270,7 @@ BOOL MZIMEJA::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
   FOOTMARK();
   ++m_uNumTransKey;
   if (m_uNumTransKey >= m_lpCurTransKey->uMsgCount) {
-    m_fOverTransKey = TRUE;
+    m_fOverflowKey = TRUE;
     return FALSE;
   }
 
