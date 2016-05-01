@@ -180,7 +180,7 @@ DWORD LogCompStr::GetCurrentClause() const {
 }
 
 DWORD LogCompStr::ClauseToPhoneme(DWORD iClause) const {
-  if (iClause == 0xFFFFFFFF) return (DWORD)extra.phoneme_clauses.size();
+  if (iClause == 0xFFFFFFFF) return CompCharToPhoneme(dwCursorPos);
   assert(iClause < (DWORD)extra.phoneme_clauses.size());
   return extra.phoneme_clauses[iClause];
 }
@@ -191,7 +191,7 @@ DWORD LogCompStr::PhonemeToClause(DWORD iPhoneme) const {
 }
 
 DWORD LogCompStr::ClauseToCompChar(DWORD iClause) const {
-  if (iClause == 0xFFFFFFFF) return (DWORD)comp_str.size();
+  if (iClause == 0xFFFFFFFF) return GetCharCount();
   assert(iClause < (DWORD)comp_clause.size());
   return comp_clause[iClause];
 }
@@ -212,13 +212,13 @@ DWORD LogCompStr::PhonemeToCompChar(DWORD iPhoneme) const {
 }
 
 DWORD LogCompStr::CompCharToPhoneme(DWORD iCompChar) const {
-  DWORD k = 0;
+  DWORD iPhoneme = 0;
   for (DWORD i = 0; i < (DWORD)comp_clause.size(); ++i) {
     if (iCompChar < comp_clause[i]) {
-      k = i;
+      iPhoneme = i;
     }
   }
-  return k;
+  return iPhoneme;
 }
 
 DWORD LogCompStr::GetClauseCount() const {
@@ -416,12 +416,12 @@ void LogCompStr::MakeResult() {
 }
 
 void LogCompStr::SetClauseAttribute(DWORD iClause, BYTE attr) {
-  assert(iClause != 0xFFFFFFFF);
-  assert(iClause < GetClauseCount());
-  DWORD ich = ClauseToCompChar(iClause);
-  DWORD ichEnd = ClauseToCompChar(iClause + 1);
-  for (DWORD i = ich; i < ichEnd; ++i) {
-    comp_attr[i] = attr;
+  if (iClause != 0xFFFFFFFF) {
+    DWORD ich = ClauseToCompChar(iClause);
+    DWORD ichEnd = ClauseToCompChar(iClause + 1);
+    for (DWORD i = ich; i < ichEnd; ++i) {
+      comp_attr[i] = attr;
+    }
   }
 }
 

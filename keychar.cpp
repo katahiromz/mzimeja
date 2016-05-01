@@ -1446,41 +1446,51 @@ void LogCompStr::DeleteChar(BOOL bBackSpace/* = FALSE*/) {
 
 void LogCompStr::MoveLeft(BOOL bShift) {
   FOOTMARK();
-  assert(!bShift); // TODO
-  if (HasClauseSelected()) {
-    DWORD ich = ClauseToCompChar(extra.dwSelectedClause);
-    if (GetCharAttr(ich) != ATTR_INPUT) {
-      if (extra.dwSelectedClause > 0) {
-        --extra.dwSelectedClause;
-      } else {
-        assert(comp_clause.size() >= 2);
-        extra.dwSelectedClause = GetClauseCount() - 1;
-      }
+  // TODO: bShift
+  DWORD ich = ClauseToCompChar(extra.dwSelectedClause);
+  if (GetCharAttr(ich) != ATTR_INPUT) {
+    SetClauseAttribute(extra.dwSelectedClause, ATTR_CONVERTED);
+    if (extra.dwSelectedClause > 0) {
+      --extra.dwSelectedClause;
+    } else {
+      assert(comp_clause.size() >= 2);
+      extra.dwSelectedClause = GetClauseCount() - 1;
     }
-  }
-  if (dwCursorPos > 0) {
-    --dwCursorPos;
-  }
-  if (dwCursorPos < comp_attr.size() &&
-      comp_attr[dwCursorPos] == ATTR_CONVERTED)
-  {
-    extra.dwSelectedClause = CompCharToClause(dwCursorPos);
-    dwCursorPos = (DWORD)comp_str.size();
+    SetClauseAttribute(extra.dwSelectedClause, ATTR_TARGET_CONVERTED);
+    extra.dwSelectedPhoneme = ClauseToPhoneme(extra.dwSelectedClause);
+  } else {
+    if (dwCursorPos > 0) --dwCursorPos;
+    if (GetCharAttr(dwCursorPos) != ATTR_INPUT) {
+      SetClauseAttribute(extra.dwSelectedClause, ATTR_CONVERTED);
+      extra.dwSelectedClause = CompCharToClause(dwCursorPos);
+      SetClauseAttribute(extra.dwSelectedClause, ATTR_TARGET_CONVERTED);
+    }
+    extra.dwSelectedPhoneme = CompCharToPhoneme(dwCursorPos);
   }
 } // LogCompStr::MoveLeft
 
 void LogCompStr::MoveRight(BOOL bShift) {
   FOOTMARK();
-  assert(!bShift); // TODO
-  if (HasClauseSelected()) {
+  // TODO: bShift
+  DWORD ich = ClauseToCompChar(extra.dwSelectedClause);
+  if (GetCharAttr(ich) != ATTR_INPUT) {
+    SetClauseAttribute(extra.dwSelectedClause, ATTR_CONVERTED);
     ++extra.dwSelectedClause;
     if (extra.dwSelectedClause >= GetClauseCount()) {
       extra.dwSelectedClause = 0;
     }
+    SetClauseAttribute(extra.dwSelectedClause, ATTR_TARGET_CONVERTED);
+    extra.dwSelectedPhoneme = ClauseToPhoneme(extra.dwSelectedClause);
   } else {
-    if (dwCursorPos + 1 < (DWORD)comp_str.size()) {
+    if (dwCursorPos + 1 < GetCharCount()) {
       ++dwCursorPos;
     }
+    if (GetCharAttr(dwCursorPos) != ATTR_INPUT) {
+      SetClauseAttribute(extra.dwSelectedClause, ATTR_CONVERTED);
+      extra.dwSelectedClause = CompCharToClause(dwCursorPos);
+      SetClauseAttribute(extra.dwSelectedClause, ATTR_TARGET_CONVERTED);
+    }
+    extra.dwSelectedPhoneme = CompCharToPhoneme(dwCursorPos);
   }
 } // LogCompStr::MoveRight
 
