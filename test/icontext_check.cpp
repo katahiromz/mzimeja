@@ -24,6 +24,10 @@ tstring     g_strResultRead;
 tstring     g_strResult;
 std::vector<BYTE> g_vecReadAttr;
 std::vector<BYTE> g_vecCompAttr;
+std::vector<DWORD> g_vecReadClause;
+std::vector<DWORD> g_vecCompClause;
+std::vector<DWORD> g_vecResultReadClause;
+std::vector<DWORD> g_vecResultClause;
 
 static const TCHAR s_szName[] = TEXT("katahiromz's input context checker");
 
@@ -34,8 +38,9 @@ void MainWnd_OnPaint(HWND hwnd)
     RECT rcClient;
 
     GetClientRect(hwnd, &rcClient);
-    std::wstring strReadAttr, strCompAttr;
     WCHAR sz[256];
+
+    std::wstring strReadAttr, strCompAttr;
     for (size_t i = 0; i < g_vecReadAttr.size(); ++i) {
         wsprintfW(sz, TEXT("%02X "), g_vecReadAttr[i]);
         strReadAttr += sz;
@@ -45,20 +50,45 @@ void MainWnd_OnPaint(HWND hwnd)
         strCompAttr += sz;
     }
 
+    std::wstring strReadClause, strCompClause;
+    for (size_t i = 0; i < g_vecReadClause.size(); ++i) {
+        wsprintfW(sz, TEXT("%08X "), g_vecReadClause[i]);
+        strReadClause += sz;
+    }
+    for (size_t i = 0; i < g_vecCompClause.size(); ++i) {
+        wsprintfW(sz, TEXT("%08X "), g_vecCompClause[i]);
+        strCompClause += sz;
+    }
+
+    std::wstring strResultReadClause, strResultClause;
+    for (size_t i = 0; i < g_vecResultReadClause.size(); ++i) {
+        wsprintfW(sz, TEXT("%08X "), g_vecResultReadClause[i]);
+        strResultReadClause += sz;
+    }
+    for (size_t i = 0; i < g_vecResultClause.size(); ++i) {
+        wsprintfW(sz, TEXT("%08X "), g_vecResultClause[i]);
+        strResultClause += sz;
+    }
+
     WCHAR szBuf[1024];
     wsprintfW(szBuf,
         L"dwCursorPos: %u\r\n"
         L"dwDeltaStart: %u\r\n"
         L"reading: %s\r\n"
+        L"reading clause: %s\r\n"
         L"reading attributes: %s\r\n"
         L"composition: %s\r\n"
+        L"composition clause: %s\r\n"
         L"composition attributes: %s\r\n"
         L"result reading: %s\r\n"
-        L"result: %s",
+        L"result reading clause: %s\r\n"
+        L"result: %s\r\n"
+        L"result clause: %s",
         g_dwCursorPos, g_dwDeltaStart,
-        g_strRead.c_str(), strReadAttr.c_str(),
-        g_strComp.c_str(), strCompAttr.c_str(),
-        g_strResultRead.c_str(), g_strResult.c_str());
+        g_strRead.c_str(), strReadClause.c_str(), strReadAttr.c_str(),
+        g_strComp.c_str(), strCompClause.c_str(), strCompAttr.c_str(),
+        g_strResultRead.c_str(), strResultReadClause.c_str(),
+        g_strResult.c_str(), strResultClause.c_str());
 
     hdc = BeginPaint(hwnd, &ps);
     if (hdc)
@@ -105,9 +135,12 @@ void MainWnd_OnImeComposition(HWND hwnd, WPARAM wParam, LPARAM lParam)
             // get read info
             LPTSTR pchRead = (LPTSTR)(LPBYTE(lpCompStr) + lpCompStr->dwCompReadStrOffset);
             g_strRead.assign(pchRead, lpCompStr->dwCompReadStrLen);
+            g_vecReadClause.clear();
             if (lpCompStr->dwCompReadClauseLen) {
                 LPDWORD pdw = (LPDWORD)(LPBYTE(lpCompStr) + lpCompStr->dwCompReadClauseOffset);
-                separate(g_strRead, pdw, lpCompStr->dwCompReadClauseLen / sizeof(DWORD));
+                DWORD count = lpCompStr->dwCompReadClauseLen / sizeof(DWORD);
+                separate(g_strRead, pdw, count);
+                g_vecReadClause.assign(pdw, pdw + count);
             }
             LPBYTE pbReadAttr = LPBYTE(lpCompStr) + lpCompStr->dwCompReadAttrOffset;
             g_vecReadAttr.assign(pbReadAttr, pbReadAttr + lpCompStr->dwCompReadAttrLen);
@@ -115,9 +148,12 @@ void MainWnd_OnImeComposition(HWND hwnd, WPARAM wParam, LPARAM lParam)
             // get comp info
             LPTSTR pchComp = (LPTSTR)(LPBYTE(lpCompStr) + lpCompStr->dwCompStrOffset);
             g_strComp.assign(pchComp, lpCompStr->dwCompStrLen);
+            g_vecCompClause.clear();
             if (lpCompStr->dwCompClauseLen) {
                 LPDWORD pdw = (LPDWORD)(LPBYTE(lpCompStr) + lpCompStr->dwCompClauseOffset);
-                separate(g_strComp, pdw, lpCompStr->dwCompClauseLen / sizeof(DWORD));
+                DWORD count = lpCompStr->dwCompClauseLen / sizeof(DWORD);
+                separate(g_strComp, pdw, count);
+                g_vecCompClause.assign(pdw, pdw + count);
             }
             LPBYTE pbCompAttr = LPBYTE(lpCompStr) + lpCompStr->dwCompAttrOffset;
             g_vecCompAttr.assign(pbCompAttr, pbCompAttr + lpCompStr->dwCompAttrLen);
@@ -125,17 +161,23 @@ void MainWnd_OnImeComposition(HWND hwnd, WPARAM wParam, LPARAM lParam)
             // get result reading
             LPTSTR pchResultRead = (LPTSTR)(LPBYTE(lpCompStr) + lpCompStr->dwResultReadStrOffset);
             g_strResultRead.assign(pchResultRead, lpCompStr->dwResultReadStrLen);
+            g_vecResultReadClause.clear();
             if (lpCompStr->dwResultReadClauseLen) {
                 LPDWORD pdw = (LPDWORD)(LPBYTE(lpCompStr) + lpCompStr->dwResultReadClauseOffset);
-                separate(g_strResultRead, pdw, lpCompStr->dwResultReadClauseLen / sizeof(DWORD));
+                DWORD count = lpCompStr->dwResultReadClauseLen / sizeof(DWORD);
+                separate(g_strResultRead, pdw, count);
+                g_vecResultReadClause.assign(pdw, pdw + count);
             }
 
             // get result
             LPTSTR pchResult = (LPTSTR)(LPBYTE(lpCompStr) + lpCompStr->dwResultStrOffset);
             g_strResult.assign(pchResult, lpCompStr->dwResultStrLen);
+            g_vecResultClause.clear();
             if (lpCompStr->dwResultClauseLen) {
                 LPDWORD pdw = (LPDWORD)(LPBYTE(lpCompStr) + lpCompStr->dwResultClauseOffset);
-                separate(g_strResult, pdw, lpCompStr->dwResultClauseLen / sizeof(DWORD));
+                DWORD count = lpCompStr->dwResultClauseLen / sizeof(DWORD);
+                separate(g_strResult, pdw, count);
+                g_vecResultClause.assign(pdw, pdw + count);
             }
 
             ImmUnlockIMCC(hCompStr);
