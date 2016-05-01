@@ -8,6 +8,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+// the window classes for mzimeja UI windows
 const TCHAR szUIServerClassName[] = TEXT("MZIMEUI");
 const TCHAR szCompStrClassName[]  = TEXT("MZIMECompStr");
 const TCHAR szCandClassName[]     = TEXT("MZIMECand");
@@ -40,6 +41,7 @@ HFONT CheckNativeCharset(HDC hDC) {
   return hOldFont;
 } // CheckNativeCharset
 
+// adjust window position
 void RepositionWindow(HWND hWnd) {
   FOOTMARK();
   RECT rc, rcWorkArea;
@@ -122,7 +124,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   WNDCLASSEX wcx;
   FOOTMARK();
 
-  // register class of UI window.
+  // register class of UI server window.
   wcx.cbSize = sizeof(WNDCLASSEX);
   wcx.style = CS_MZIME;
   wcx.lpfnWndProc = MZIMEWndProc;
@@ -203,19 +205,22 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
 }
 
 HKL MZIMEJA::GetHKL(VOID) {
-  HKL hKL = 0, *lphkl;
   FOOTMARK();
+  HKL hKL = NULL;
 
-  DWORD dwSize = GetKeyboardLayoutList(0, NULL);
-  lphkl = (HKL *)GlobalAlloc(GPTR, dwSize * sizeof(DWORD));
-  if (!lphkl) return NULL;
+  // get list size and allocate buffer for list
+  DWORD dwSize = ::GetKeyboardLayoutList(0, NULL);
+  HKL *lphkl = (HKL *)::GlobalAlloc(GPTR, dwSize * sizeof(DWORD));
+  if (lphkl == NULL) return NULL;
 
-  GetKeyboardLayoutList(dwSize, lphkl);
+  // get the list of keyboard layouts
+  ::GetKeyboardLayoutList(dwSize, lphkl);
 
+  // find hKL from the list
   TCHAR szFile[32];
   for (DWORD dwi = 0; dwi < dwSize; dwi++) {
     HKL hKLTemp = *(lphkl + dwi);
-    ImmGetIMEFileName(hKLTemp, szFile, _countof(szFile));
+    ::ImmGetIMEFileName(hKLTemp, szFile, _countof(szFile));
 
     if (!lstrcmp(szFile, MZIME_FILENAME)) {
       hKL = hKLTemp;
@@ -223,7 +228,8 @@ HKL MZIMEJA::GetHKL(VOID) {
     }
   }
 
-  GlobalFree(lphkl);
+  // free the list
+  ::GlobalFree(lphkl);
   return hKL;
 }
 
@@ -257,8 +263,8 @@ BOOL MZIMEJA::GenerateMessage(LPTRANSMSG lpGeneMsg) {
 }
 
 BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
-  TRANSMSG genmsg;
   FOOTMARK();
+  TRANSMSG genmsg;
   genmsg.message = message;
   genmsg.wParam = wParam;
   genmsg.lParam = lParam;
@@ -268,12 +274,17 @@ BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
 // Update the transrate key buffer
 BOOL MZIMEJA::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
   FOOTMARK();
+
+  // increment the number
   ++m_uNumTransKey;
+
+  // check overflow
   if (m_uNumTransKey >= m_lpCurTransKey->uMsgCount) {
     m_fOverflowKey = TRUE;
     return FALSE;
   }
 
+  // put one message to TRANSMSG buffer
   LPTRANSMSG lpgmT0 = m_lpCurTransKey->TransMsg + (m_uNumTransKey - 1);
   *lpgmT0 = *lpGeneMsg;
 
@@ -329,32 +340,24 @@ void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
     if (!m_hMyKL) return;
   }
 
-  HWND hwndIndicate = FindWindow(INDICATOR_CLASS, NULL);
-
-  BOOL fOpen = FALSE;
-  if (hIMC) {
-    InputContext *lpIMC = TheIME.LockIMC(hIMC);
-    if (lpIMC) {
-      fOpen = lpIMC->IsOpen();
-      TheIME.UnlockIMC(hIMC);
+  HWND hwndIndicate = ::FindWindow(INDICATOR_CLASS, NULL);
+  if (::IsWindow(hwndIndicate)) {
+    BOOL fOpen = FALSE;
+    if (hIMC) {
+      fOpen = ImmGetOpenStatus(hIMC);
     }
-  }
 
-  if (IsWindow(hwndIndicate)) {
-    ATOM atomTip;
-
-    atomTip = GlobalAddAtom(TEXT("MZ-IME Open"));
-    PostMessage(hwndIndicate, INDICM_SETIMEICON, fOpen ? 1 : (-1),
-                (LPARAM)m_hMyKL);
-    PostMessage(hwndIndicate, INDICM_SETIMETOOLTIPS, fOpen ? atomTip : (-1),
-                (LPARAM)m_hMyKL);
-    PostMessage(hwndIndicate, INDICM_REMOVEDEFAULTMENUITEMS,
-                // fOpen ? (RDMI_LEFT | RDMI_RIGHT) : 0, (LPARAM)m_hMyKL);
-                fOpen ? (RDMI_LEFT) : 0, (LPARAM)m_hMyKL);
+    ATOM atomTip = ::GlobalAddAtom(TEXT("MZ-IME Open"));
+    LPARAM lParam = (LPARAM)m_hMyKL;
+    ::PostMessage(hwndIndicate, INDICM_SETIMEICON, fOpen ? 1 : (-1), lParam);
+    ::PostMessage(hwndIndicate, INDICM_SETIMETOOLTIPS, (fOpen ? atomTip : (-1)),
+                  lParam);
+    ::PostMessage(hwndIndicate, INDICM_REMOVEDEFAULTMENUITEMS,
+                  (fOpen ? (RDMI_LEFT) : 0), lParam);
   }
 }
 
-VOID MZIMEJA::Destroy(VOID) {
+VOID MZIMEJA::Uninit(VOID) {
   FOOTMARK();
   ::UnregisterClass(szUIServerClassName, m_hInst);
   ::UnregisterClass(szCompStrClassName, m_hInst);
@@ -489,7 +492,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
 
   case DLL_PROCESS_DETACH:
     DebugPrint(TEXT("DLL_PROCESS_DETACH: hInst is %p\n"), TheIME.m_hInst);
-    TheIME.Destroy();
+    TheIME.Uninit();
     #ifndef NDEBUG
       ::SetUnhandledExceptionFilter(s_old_handler);
     #endif

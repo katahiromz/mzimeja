@@ -34,8 +34,9 @@ void SetRomanMode(HIMC hIMC, BOOL bRoman);
 UINT CommandFromInputMode(INPUT_MODE imode);
 
 //////////////////////////////////////////////////////////////////////////////
-// composition string
+// composition info
 
+// logical comp info extra
 struct LogCompStrExtra {
   DWORD                       dwSelectedClause;
   DWORD                       dwSelectedPhoneme;
@@ -56,6 +57,7 @@ protected:
   void InsertThere(std::vector<SmallWString>& strs, std::wstring& str);
 }; // struct LogCompStrExtra
 
+// physical comp info extar
 struct COMPSTREXTRA {
   DWORD   dwSignature;
   DWORD   dwSelectedClause;
@@ -86,6 +88,7 @@ struct COMPSTREXTRA {
   DWORD Store(const LogCompStrExtra *log);
 }; // struct COMPSTREXTRA
 
+// logical composition info
 struct LogCompStr {
   DWORD               dwCursorPos;
   DWORD               dwDeltaStart;
@@ -160,6 +163,7 @@ inline void SetClause(LPDWORD lpdw, DWORD num) {
   *(lpdw + 1) = num;
 }
 
+// physical composition info
 struct CompStr : public COMPOSITIONSTRING {
   static HIMCC ReCreate(HIMCC hCompStr, const LogCompStr *log = NULL);
 
@@ -216,6 +220,7 @@ private:
 //////////////////////////////////////////////////////////////////////////////
 // candidate info
 
+// logical candidate info
 struct LogCandInfo {
   DWORD   dwStyle;
   DWORD   dwSelection;
@@ -227,6 +232,7 @@ struct LogCandInfo {
   DWORD GetTotalSize() const;
 }; // struct LogCandInfo
 
+// physical candidate list
 struct CandList : public CANDIDATELIST {
   LPBYTE GetBytes() { return (LPBYTE)this; }
   LPTSTR GetCandString(DWORD i) { return LPTSTR(GetBytes() + dwOffset[i]); }
@@ -234,12 +240,13 @@ struct CandList : public CANDIDATELIST {
   DWORD  GetPageEnd() const { return dwPageStart + dwPageSize; }
 
 private:
-  // not implemented
+  // never be implemented
   CandList();
   CandList(const CandList&);
   CandList& operator=(const CandList&);
 }; // struct CandList
 
+// logical candidate info
 struct CandInfo : public CANDIDATEINFO {
   static HIMCC ReCreate(HIMCC hCandInfo, const LogCandInfo *log = NULL);
   void GetLog(LogCandInfo& log);
@@ -252,7 +259,7 @@ struct CandInfo : public CANDIDATEINFO {
   void Dump();
 
 private:
-  // not implement
+  // never be implemented
   CandInfo();
   CandInfo(const CandInfo&);
   CandInfo& operator=(const CandInfo&);
@@ -264,6 +271,7 @@ private:
 struct InputContext : public INPUTCONTEXT {
   void Initialize();
 
+  // get status information
         BOOL& IsOpen()       { return fOpen; }
   const BOOL& IsOpen() const { return fOpen; }
         DWORD& Conversion()       { return fdwConversion; }
@@ -272,25 +280,6 @@ struct InputContext : public INPUTCONTEXT {
   const DWORD& Sentence() const { return fdwSentence; }
   INPUT_MODE GetInputMode() const;
   BOOL IsRoman() const;
-
-  BOOL HasCandInfo();
-  CandInfo *LockCandInfo();
-  void UnlockCandInfo();
-
-  BOOL HasCompStr();
-  CompStr *LockCompStr();
-  void UnlockCompStr();
-
-  LPTRANSMSG LockMsgBuf();
-  void UnlockMsgBuf();
-
-        DWORD& NumMsgBuf();
-  const DWORD& NumMsgBuf() const;
-
-  void MakeGuideLine(DWORD dwID);
-  LPGUIDELINE LockGuideLine();
-  void UnlockGuideLine();
-
   BOOL HasStatusWndPos() const  { return (fdwInit & INIT_STATUSWNDPOS); }
   BOOL HasConversion() const    { return (fdwInit & INIT_CONVERSION); }
   BOOL HasSentence() const      { return (fdwInit & INIT_SENTENCE); }
@@ -298,6 +287,28 @@ struct InputContext : public INPUTCONTEXT {
   BOOL HasCompForm() const      { return (fdwInit & INIT_COMPFORM); }
   BOOL HasSoftKbdPos() const    { return (fdwInit & INIT_SOFTKBDPOS); }
 
+  // candidate info
+  BOOL HasCandInfo();
+  CandInfo *LockCandInfo();
+  void UnlockCandInfo();
+
+  // composition info
+  BOOL HasCompStr();
+  CompStr *LockCompStr();
+  void UnlockCompStr();
+
+  // message buffer
+  LPTRANSMSG LockMsgBuf();
+  void UnlockMsgBuf();
+        DWORD& NumMsgBuf();
+  const DWORD& NumMsgBuf() const;
+
+  // guideline
+  void MakeGuideLine(DWORD dwID);
+  LPGUIDELINE LockGuideLine();
+  void UnlockGuideLine();
+
+  // actions
   void AddChar(WCHAR chTyped, WCHAR chTranslated);
   void CancelText();
   void RevertText();
@@ -306,7 +317,10 @@ struct InputContext : public INPUTCONTEXT {
   BOOL OpenCandidate();
   BOOL CloseCandidate();
   void GetCands(LogCandInfo& log_cand_info, std::wstring& str);
-
+  void MoveLeft(BOOL bShift);
+  void MoveRight(BOOL bShift);
+  void MoveToBeginning();
+  void MoveToEnd();
   void MakeResult();
   void MakeHiragana();
   void MakeKatakana();
@@ -314,15 +328,12 @@ struct InputContext : public INPUTCONTEXT {
   void MakeZenEisuu();
   void MakeHanEisuu();
 
-  void MoveLeft(BOOL bShift);
-  void MoveRight(BOOL bShift);
-  void MoveToBeginning();
-  void MoveToEnd();
-
+  // for debugging
   void DumpCandInfo();
   void DumpCompStr();
 
 private:
+  // never be implemented
   InputContext();
   InputContext(const InputContext&);
   InputContext& operator=(const InputContext&);

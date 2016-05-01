@@ -232,17 +232,29 @@ HFONT CheckNativeCharset(HDC hDC);
 //////////////////////////////////////////////////////////////////////////////
 // keychar.cpp
 
+// conversion between roman and hiragana
 std::wstring hiragana_to_roman(const std::wstring& hiragana);
 std::wstring roman_to_hiragana(const std::wstring& roman);
+
+// character map for kana input
 WCHAR convert_key_to_kana(BYTE vk, BOOL bShift);
+// character map for typing keys
 WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock);
-BOOL is_hiragana(WCHAR ch);
-BOOL is_zenkaku_katakana(WCHAR ch);
-BOOL is_hankaku_katakana(WCHAR ch);
-BOOL is_kanji(WCHAR ch);
-BOOL is_fullwidth_ascii(WCHAR ch);
+// dakuon processor
 WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1);
+// locale-dependent string conversion
 std::wstring lcmap(const std::wstring& str, DWORD dwFlags);
+
+// is the character hiragana
+BOOL is_hiragana(WCHAR ch);
+// is the character zenkaku katakana
+BOOL is_zenkaku_katakana(WCHAR ch);
+// is the character hankaku katakana
+BOOL is_hankaku_katakana(WCHAR ch);
+// is the character kanji
+BOOL is_kanji(WCHAR ch);
+// is the character fullwidth ASCII
+BOOL is_fullwidth_ascii(WCHAR ch);
 
 //////////////////////////////////////////////////////////////////////////////
 // C++ interface
@@ -262,23 +274,42 @@ struct MZIMEJA {
   TCHAR           m_szDicFileName[256];
 
   MZIMEJA();
+
+  // initialize the IME
   BOOL Init(HINSTANCE hInstance);
-  VOID Destroy(VOID);
+
+  // register classes
+  BOOL RegisterClasses(HINSTANCE hInstance);
+
+  // uninitialize
+  VOID Uninit(VOID);
+
+  // load a bitmap from resource
   HBITMAP LoadBMP(LPCTSTR pszName);
   HBITMAP LoadBMP(UINT nID) {
     return LoadBMP(MAKEINTRESOURCE(nID));
   }
+
+  // load a string from resource
   LPTSTR LoadSTR(INT nID);
-  BOOL RegisterClasses(HINSTANCE hInstance);
+
+  // update the indicator icon
   void UpdateIndicIcon(HIMC hIMC);
+
+  // get the keyboard layout handle
   HKL GetHKL(VOID);
 
+  // lock the input context
   InputContext *LockIMC(HIMC hIMC);
+  // unlock the input context
   VOID UnlockIMC(HIMC hIMC);
+
+  // generate a message
   BOOL GenerateMessage(LPTRANSMSG lpGeneMsg);
   BOOL GenerateMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
   BOOL GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg);
 
+  // do command
   BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
 }; // struct MZIMEJA
 
