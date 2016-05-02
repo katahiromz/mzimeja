@@ -76,7 +76,8 @@
     }
   }
 
-  inline void FootmarkPrintCallStack() {
+  inline void FootmarkPrintCallStack(const char *fname, int line) {
+    FootmarkDebugPrint("%s (%d): FOOTMARK_PRINT_CALL_STACK()\n", fname, line);
     FootmarkDebugPrint("### CALL STACK ###\n");
     const FootmarkStackType& stack = GetFootmarkStack();
     for (size_t i = 0; i < stack.size(); ++i) {
@@ -99,7 +100,7 @@
       FootmarkLocation \
         object_for_debugging_##__LINE__(__FILE__, __LINE__, __FUNCTION__);
   #endif
-  #define FOOTMARK_PRINT_CALL_STACK() FootmarkPrintCallStack()
+  #define FOOTMARK_PRINT_CALL_STACK() FootmarkPrintCallStack(__FILE__, __LINE__)
 #else   // def NDEBUG
   #define FOOTMARK()                  /*empty*/
   #define FOOTMARK_PRINT_CALL_STACK() /*empty*/

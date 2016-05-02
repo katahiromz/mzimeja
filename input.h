@@ -55,6 +55,7 @@ struct LogCompStrExtra {
   void ErasePhoneme(DWORD iPhoneme);
   void InsertPhonemePair(std::wstring& typed, std::wstring& translated);
   void InsertThere(std::vector<std::wstring>& strs, std::wstring& str);
+  bool IsValid();
 }; // struct LogCompStrExtra
 
 // physical comp info extar
@@ -112,6 +113,7 @@ struct LogCompStr {
   void clear_result();
   void clear_extra() { extra.clear(); }
   DWORD GetTotalSize() const;
+  bool IsValid();
 
   void AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConversion);
   void RevertText();

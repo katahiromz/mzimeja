@@ -5,6 +5,36 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+bool LogCompStrExtra::IsValid() {
+  if (hiragana_phonemes.size() != typing_phonemes.size()) {
+    FOOTMARK_PRINT_CALL_STACK();
+    return false;
+  }
+  if (dwSelectedPhoneme > (DWORD)hiragana_phonemes.size()) {
+    FOOTMARK_PRINT_CALL_STACK();
+    return false;
+  }
+  for (size_t i = 0; i < hiragana_phonemes.size(); ++i) {
+    if (hiragana_phonemes[i].empty()) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+    if (typing_phonemes[i].empty()) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+    if (hiragana_phonemes[i].size() > 5) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+    if (typing_phonemes[i].size() > 5) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+  }
+  return true;
+} // LogCompStrExtra::IsValid
+
 void LogCompStrExtra::ErasePhoneme(DWORD iPhoneme) {
   assert(iPhoneme < GetPhonemeCount());
   hiragana_phonemes.erase(hiragana_phonemes.begin() + iPhoneme);
@@ -145,6 +175,78 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
 } // COMPSTREXTRA::Store
 
 //////////////////////////////////////////////////////////////////////////////
+
+bool LogCompStr::IsValid() {
+  if (dwCursorPos > GetCharCount()) {
+    FOOTMARK_PRINT_CALL_STACK();
+    return false;
+  }
+  if (comp_clause.size()) {
+    if (comp_clause[0] != 0) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+    if (comp_clause[comp_clause.size() - 1] != GetCharCount()) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+    if (extra.dwSelectedClause > (DWORD)comp_clause.size()) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+    for (size_t i = 1; i < comp_clause.size(); ++i) {
+      if (comp_clause[i] > GetCharCount()) {
+        FOOTMARK_PRINT_CALL_STACK();
+        return false;
+      }
+      if (comp_clause[i - 1] > comp_clause[i]) {
+        FOOTMARK_PRINT_CALL_STACK();
+        return false;
+      }
+    }
+  }
+  if (result_read_clause.size()) {
+    if (result_read_clause[0] != 0) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+    if (result_read_clause[result_read_clause.size() - 1] != 0) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+    for (size_t i = 1; i < result_read_clause.size(); ++i) {
+      if (result_read_clause[i] > (DWORD)result_read_str.size()) {
+        FOOTMARK_PRINT_CALL_STACK();
+        return false;
+      }
+      if (result_read_clause[i - 1] > result_read_clause[i]) {
+        FOOTMARK_PRINT_CALL_STACK();
+        return false;
+      }
+    }
+  }
+  if (result_clause.size()) {
+    if (result_clause[0] != 0) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+    if (result_clause[result_clause.size() - 1] != 0) {
+      FOOTMARK_PRINT_CALL_STACK();
+      return false;
+    }
+    for (size_t i = 1; i < result_clause.size(); ++i) {
+      if (result_clause[i] > (DWORD)result_str.size()) {
+        FOOTMARK_PRINT_CALL_STACK();
+        return false;
+      }
+      if (result_clause[i - 1] > result_clause[i]) {
+        FOOTMARK_PRINT_CALL_STACK();
+        return false;
+      }
+    }
+  }
+  return extra.IsValid();
+} // LogCompStr::IsValid
 
 void LogCompStr::clear() {
   dwCursorPos = 0;
