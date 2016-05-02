@@ -515,9 +515,9 @@ void InputContext::MakeResult() {
   }
 
   // set result
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   log.MakeResult();
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &log);
@@ -550,9 +550,9 @@ void InputContext::MakeHiragana() {
   }
 
   // update composition
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   log.MakeHiragana();
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   DumpCompStr();
@@ -579,9 +579,9 @@ void InputContext::MakeKatakana() {
   }
 
   // update composition
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   log.MakeKatakana();
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   DumpCompStr();
@@ -608,9 +608,9 @@ void InputContext::MakeHankaku() {
   }
 
   // update composition
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   log.MakeHankaku();
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   DumpCompStr();
@@ -637,9 +637,9 @@ void InputContext::MakeZenEisuu() {
   }
 
   // update composition
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   log.MakeZenEisuu();
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   DumpCompStr();
@@ -666,9 +666,9 @@ void InputContext::MakeHanEisuu() {
   }
 
   // update composition
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   log.MakeHanEisuu();
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   DumpCompStr();
@@ -693,7 +693,6 @@ void InputContext::CancelText() {
 
   // generate messages to end composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
-  log.clear();
   TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::CancelText
 
@@ -717,11 +716,11 @@ void InputContext::RevertText() {
   }
 
   // reset composition of selected clause
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   if (log.extra.dwSelectedClause != 0xFFFFFFFF) {
     log.RevertText();
   }
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   DumpCompStr();
@@ -744,9 +743,9 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   }
 
   // delete char
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   log.DeleteChar(IsRomanMode(), bBackSpace);
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // if there is no composition, then
   if (log.comp_str.empty()) {
@@ -786,9 +785,9 @@ void InputContext::MoveLeft(BOOL bShift) {
   }
 
   // move left
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   log.MoveLeft(bShift);
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   DumpCompStr();
@@ -811,9 +810,9 @@ void InputContext::MoveRight(BOOL bShift) {
   }
 
   // move right
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   log.MoveRight(bShift);
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   DumpCompStr();
@@ -836,13 +835,13 @@ void InputContext::MoveToBeginning() {
   }
 
   // move to the beginning
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   if (log.HasClauseSelected()) {
     log.extra.dwSelectedClause = 0;
   } else {
     log.dwCursorPos = 0;
   }
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   DumpCompStr();
@@ -865,13 +864,13 @@ void InputContext::MoveToEnd() {
   }
 
   // move to the end
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
   if (log.HasClauseSelected()) {
     log.extra.dwSelectedClause = log.comp_clause.size() - 1;
   } else {
     log.dwCursorPos = (DWORD)log.comp_str.size();
   }
-  assert(log_comp_str.IsValid());
+  assert(log.IsValid());
 
   // recreate
   DumpCompStr();
