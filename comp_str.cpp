@@ -5,6 +5,12 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+void LogCompStrExtra::ErasePhoneme(DWORD iPhoneme) {
+  assert(iPhoneme < GetPhonemeCount());
+  hiragana_phonemes.erase(hiragana_phonemes.begin() + iPhoneme);
+  typing_phonemes.erase(typing_phonemes.begin() + iPhoneme);
+}
+
 DWORD LogCompStrExtra::GetTotalSize() const {
   DWORD total = sizeof(COMPSTREXTRA);
   for (size_t i = 0; i < hiragana_phonemes.size(); ++i) {
@@ -25,7 +31,7 @@ void LogCompStrExtra::clear() {
 }
 
 std::wstring
-LogCompStrExtra::JoinLeft(const std::vector<SmallWString>& strs) const {
+LogCompStrExtra::JoinLeft(const std::vector<std::wstring>& strs) const {
   std::wstring str;
   for (DWORD i = 0; i < dwSelectedPhoneme; ++i) {
     str += strs[i].c_str();
@@ -34,7 +40,7 @@ LogCompStrExtra::JoinLeft(const std::vector<SmallWString>& strs) const {
 }
 
 std::wstring
-LogCompStrExtra::JoinRight(const std::vector<SmallWString>& strs) const {
+LogCompStrExtra::JoinRight(const std::vector<std::wstring>& strs) const {
   std::wstring str;
   const DWORD dwCount = (DWORD)strs.size();
   for (DWORD i = dwSelectedPhoneme; i < dwCount; ++i) {
@@ -49,21 +55,29 @@ DWORD LogCompStrExtra::GetPhonemeCount() const {
 }
 
 void LogCompStrExtra::InsertThere(
-  std::vector<SmallWString>& strs, std::wstring& str)
+  std::vector<std::wstring>& strs, std::wstring& str)
 {
   strs.insert(strs.begin() + dwSelectedPhoneme, str.c_str());
 }
 
+void LogCompStrExtra::InsertPhonemePair(
+  std::wstring& typed, std::wstring& translated)
+{
+  InsertThere(typing_phonemes, typed);
+  InsertThere(hiragana_phonemes, translated);
+}
+
 WCHAR LogCompStrExtra::GetPrevChar() const {
   if (dwSelectedPhoneme > 0) {
-    assert(hiragana_phonemes[dwSelectedPhoneme - 1].size());
-    return hiragana_phonemes[dwSelectedPhoneme - 1].back();
+    std::wstring str = hiragana_phonemes[dwSelectedPhoneme - 1];
+    assert(str.size());
+    return str[str.size() - 1];
   }
   return 0;
 }
 
 std::wstring
-LogCompStrExtra::Join(const std::vector<SmallWString>& strs) const {
+LogCompStrExtra::Join(const std::vector<std::wstring>& strs) const {
   std::wstring str;
   for (size_t i = 0; i < strs.size(); ++i) {
     str += strs[i].c_str();
@@ -337,8 +351,8 @@ std::wstring LogCompStr::GetClauseHiraganaString(DWORD iClause) const {
   std::wstring ret;
   assert(iClause != 0xFFFFFFFF);
   if (iClause + 1 < GetPhonemeCount()) {
-    DWORD iph = extra.phoneme_clauses[i];
-    DWORD iphNext = extra.phoneme_clauses[i + 1];
+    DWORD iph = extra.phoneme_clauses[iClause];
+    DWORD iphNext = extra.phoneme_clauses[iClause + 1];
     for (DWORD i = iph; i < iphNext; ++i) {
       ret += extra.hiragana_phonemes[i];
     }
@@ -350,8 +364,8 @@ std::wstring LogCompStr::GetClauseTypingString(DWORD iClause) const {
   std::wstring ret;
   assert(iClause != 0xFFFFFFFF);
   if (iClause + 1 < GetPhonemeCount()) {
-    DWORD iph = extra.typing_phonemes[i];
-    DWORD iphNext = extra.typing_phonemes[i + 1];
+    DWORD iph = extra.phoneme_clauses[iClause];
+    DWORD iphNext = extra.phoneme_clauses[iClause + 1];
     for (DWORD i = iph; i < iphNext; ++i) {
       ret += extra.typing_phonemes[i];
     }
@@ -536,7 +550,7 @@ void CompStr::GetLog(LogCompStr& log) {
       ADD_STRING(result_str);
 
       COMPSTREXTRA *extra = (COMPSTREXTRA *)pb;
-      lpCompStr->dwPrivateSize = extra->GetTotalSize();
+      lpCompStr->dwPrivateSize = log->extra.GetTotalSize();
       lpCompStr->dwPrivateOffset = (DWORD)(pb - lpCompStr->GetBytes());
       pb += extra->Store(&log->extra);
 

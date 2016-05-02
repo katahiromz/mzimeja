@@ -2,6 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
+#include "resource.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // input modes
@@ -125,6 +126,9 @@ void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
     ImmSetOpenStatus(hIMC, FALSE);
     dwConversion &= ~(IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
     break;
+  case IMODE_DISABLED:
+    assert(0);
+    break;
   }
   ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
 }
@@ -156,7 +160,7 @@ INPUT_MODE InputContext::GetInputMode() const {
   return InputModeFromConversionMode(fOpen, Conversion());
 }
 
-BOOL InputContext::IsRoman() const {
+BOOL InputContext::IsRomanMode() const {
   FOOTMARK();
   return Conversion() & IME_CMODE_ROMAN;
 }
@@ -359,8 +363,7 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   }
 
   // add a character
-  INPUT_MODE imode = GetInputMode();
-  log.AddChar(chTyped, chTranslated, imode);
+  log.AddChar(chTyped, chTranslated, Conversion());
 
   // recreate
   DumpCompStr();
@@ -389,7 +392,7 @@ void InputContext::GetCands(LogCandInfo& log_cand_info, std::wstring& str) {
   str = log_cand_info.cand_strs[log_cand_info.dwSelection];
 }
 
-void InputContext::OpenCandidate() {
+BOOL InputContext::OpenCandidate() {
   BOOL ret = FALSE;
   LogCompStr log_comp_str;
   CompStr *lpCompStr = LockCompStr();
@@ -405,13 +408,10 @@ void InputContext::OpenCandidate() {
 
       // get candidates
       GetCands(log_cand_info, log_comp_str.comp_str);
-
       // generate message to open candidate
       TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
-
       // reset candidates
-      lpIMC->hCandInfo = CandInfo::ReCreate(lpIMC->hCandInfo, &log_cand_info);
-
+      hCandInfo = CandInfo::ReCreate(hCandInfo, &log_cand_info);
       // generate message to change candidate
       TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
@@ -433,12 +433,12 @@ BOOL InputContext::CloseCandidate() {
 BOOL InputContext::DoConvert() {
   FOOTMARK();
 
-  // check the presence of dictionary
-  if ((GetFileAttributes(TheIME.m_szDicFileName) == 0xFFFFFFFF) ||
-      (GetFileAttributes(TheIME.m_szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
-    MakeGuideLine(MYGL_NODICTIONARY);
-    return FALSE;
-  }
+  //// check the presence of dictionary
+  //if ((GetFileAttributes(TheIME.m_szDicFileName) == 0xFFFFFFFF) ||
+  //    (GetFileAttributes(TheIME.m_szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
+  //  MakeGuideLine(MYGL_NODICTIONARY);
+  //  return FALSE;
+  //}
 
   // get logical data of composition info
   LogCompStr log_comp_str;
@@ -658,6 +658,7 @@ void InputContext::CancelText() {
   // close candidate
   CloseCandidate();
 
+  // reset composition
   DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr);
   DumpCompStr();
@@ -687,7 +688,7 @@ void InputContext::RevertText() {
   }
 
   // reset composition of selected clause
-  if (extra.dwSelectedClause != 0xFFFFFFFF) {
+  if (log.extra.dwSelectedClause != 0xFFFFFFFF) {
     log.RevertText();
   }
 
@@ -712,7 +713,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   }
 
   // delete char
-  log.DeleteChar(bBackSpace);
+  log.DeleteChar(IsRomanMode(), bBackSpace);
 
   // recreate
   DumpCompStr();
@@ -728,7 +729,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
 
     // generate messages to end composition
     LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
-    TheIME.GenerateMessage(WM_IME_COMPOSITION);
+    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
   } else {
     // update composition
@@ -742,10 +743,8 @@ void InputContext::MoveLeft(BOOL bShift) {
 
   // get logical data
   LogCompStr log;
-  BOOL bIsBeingConverted = FALSE;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    bIsBeingConverted = lpCompStr->IsBeingConverted();
     lpCompStr->GetLog(log);
     UnlockCompStr();
   }
@@ -767,10 +766,8 @@ void InputContext::MoveRight(BOOL bShift) {
 
   // get logical data
   LogCompStr log;
-  BOOL bIsBeingConverted = FALSE;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    bIsBeingConverted = lpCompStr->IsBeingConverted();
     lpCompStr->GetLog(log);
     UnlockCompStr();
   }

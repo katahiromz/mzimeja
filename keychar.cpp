@@ -1307,18 +1307,20 @@ void LogCompStr::ExtraUpdated(INPUT_MODE imode) {
     strLeft = lcmap(extra.JoinLeft(extra.typing_phonemes), LCMAP_FULLWIDTH);
     strRight = lcmap(extra.JoinRight(extra.typing_phonemes), LCMAP_FULLWIDTH);
     break;
-  case IMODE_HAN_KANA:
+  case IMODE_HAN_EISUU:
     strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes), LCMAP_HALFWIDTH);
     strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes), LCMAP_HALFWIDTH);
     break;
   default:
+    assert(0);
     break;
   }
+  dwCursorPos = (DWORD)strLeft.size();
   comp_str = strLeft + strRight;
 }
 
 void LogCompStr::AddKanaChar(
-  std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
+  std::wstring& typed, std::wstring& translated, DWORD dwConversion)
 {
   FOOTMARK();
   // if there was dakuon combination
@@ -1327,26 +1329,28 @@ void LogCompStr::AddKanaChar(
     // store a dakuon combination
     std::wstring str;
     str += chDakuon;
-    hiragana_phonemes[dwPhonemeCursor - 1] = str;
+    extra.hiragana_phonemes[extra.dwSelectedPhoneme - 1] = str;
+    extra.typing_phonemes[extra.dwSelectedPhoneme - 1] += L'Þ';
   } else {
     // insert the typed and translated strings
-    extra.InsertThere(extra.typing_phonemes, typed);
-    extra.InsertThere(extra.hiragana_phonemes, translated);
+    extra.InsertPhonemePair(typed, translated);
     // move cursor
     ++dwCursorPos;
-    ++extra.dwPhonemeCursor;
+    ++extra.dwSelectedPhoneme;
   }
   // create the composition string
+  INPUT_MODE imode = InputModeFromConversionMode(TRUE, dwConversion);
   ExtraUpdated(imode);
 } // LogCompStr::AddKanaChar
 
 void LogCompStr::AddRomanChar(
-  std::wstring& typed, std::wstring& translated, INPUT_MODE imode)
+  std::wstring& typed, std::wstring& translated, DWORD dwConversion)
 {
   FOOTMARK();
   const WCHAR chTyped = typed[0];
   // create the typed string and translated string
   if (is_hiragana(chTyped)) {
+    // a hiragana character was typed. do reverse roman conversion
     translated = typed;
     for (size_t i = 0; i < _countof(reverse_roman_table); ++i) {
       if (reverse_roman_table[i].key == translated) {
@@ -1354,62 +1358,115 @@ void LogCompStr::AddRomanChar(
         break;
       }
     }
-    extra.InsertThere(extra.typing_phonemes, typed);
-    extra.InsertThere(extra.hiragana_phonemes, translated);
+    // insert phonemes
+    extra.InsertPhonemePair(typed, translated);
+    ++extra.dwSelectedPhoneme;
   } else if (is_zenkaku_katakana(chTyped)) {
+    // a katakana character was typed. make it hiragana
     translated = lcmap(typed, LCMAP_HIRAGANA);
+    // do reverse roman conversion
     for (size_t i = 0; i < _countof(reverse_roman_table); ++i) {
       if (reverse_roman_table[i].key == translated) {
         typed = reverse_roman_table[i].value;
         break;
       }
     }
-    extra.InsertThere(extra.typing_phonemes, typed);
-    extra.InsertThere(extra.hiragana_phonemes, translated);
+    // insert phonemes
+    extra.InsertPhonemePair(typed, translated);
+    ++extra.dwSelectedPhoneme;
   } else if (is_kanji(chTyped)) {
+    // a kanji (Chinese-oriented) character was typed
     translated = typed;
-    extra.InsertThere(extra.typing_phonemes, typed);
-    extra.InsertThere(extra.hiragana_phonemes, translated);
-  } else if (std::isalnum(chTyped)) {
-    WCHAR ch = extra.GetPrevChar();
-    if (is_hiragana(ch) || ch == L'\'' || ch == 0) {
+    // insert phonemes without conversion
+    extra.InsertPhonemePair(typed, translated);
+    ++extra.dwSelectedPhoneme;
+  } else if (std::isalnum(chTyped) || chTyped == L'\'') {
+    // an alphabet or apostorophe was typed. get previous char
+    WCHAR chPrev = extra.GetPrevChar();
+    // if previous one is hiragana or apostorophe or none, then
+    if (is_hiragana(chPrev) || chPrev == L'\'' || chPrev == 0) {
+      // insert phonemes without conversion
       translated = typed;
-      extra.InsertThere(extra.typing_phonemes, typed);
-      extra.InsertThere(extra.hiragana_phonemes, translated);
+      extra.InsertPhonemePair(typed, translated);
+      ++extra.dwSelectedPhoneme;
     } else {
-      if (HasClauseSelected()) {
-        // TODO:
-      } else {
+      // if the char was not Japanese, then
+      if (!(dwConversion & IME_CMODE_JAPANESE)) {
+        // insert phonemes without conversion
         translated = typed;
-        extra.InsertThere(extra.typing_phonemes, typed);
-        extra.InsertThere(extra.hiragana_phonemes, translated);
+        extra.InsertPhonemePair(typed, translated);
+        ++extra.dwSelectedPhoneme;
+      } else {
+        // make hiragana phoneme from roman
+        std::wstring str;
+        str = extra.hiragana_phonemes[extra.dwSelectedPhoneme - 1];
+        str += typed;
+        std::wstring strConverted = roman_to_hiragana(str);
+        if (is_hiragana(strConverted[0]) && strConverted.size() == 1) {
+          // strConverted was one hiragana char
+          extra.hiragana_phonemes[extra.dwSelectedPhoneme - 1] = strConverted;
+          extra.typing_phonemes[extra.dwSelectedPhoneme - 1] += typed;
+        } else { // otherwise,
+          // get the difference of str and strConverted
+          std::wstring part;
+          for (size_t i = 0; i < strConverted.size(); ++i) {
+            if (str[i] == strConverted[i]) {
+              part += str[i];
+            } else {
+              break;
+            }
+          }
+          // if no match,
+          if (part.empty()) {
+            // insert phonemes without conversion
+            translated = typed;
+            extra.InsertPhonemePair(typed, translated);
+            ++extra.dwSelectedPhoneme;
+          } else {  // there was match
+            // if matching part was whole and match was longer than five, then
+            if (part.size() == str.size() && part.size() > 5) {
+              // shrink part to split phoneme
+              part = part.substr(0, 1);
+            }
+            // set part to phonemes
+            extra.hiragana_phonemes[extra.dwSelectedPhoneme - 1] = part;
+            extra.typing_phonemes[extra.dwSelectedPhoneme - 1] = part;
+            // get remainder and insert it
+            str = str.substr(part.size());
+            strConverted = strConverted.substr(part.size());
+            extra.InsertPhonemePair(str, strConverted);
+            ++extra.dwSelectedPhoneme;
+          }
+        }
       }
     }
   } else {
+    // otherwise insert phonemes without conversion
     translated = typed;
-    extra.InsertThere(extra.typing_phonemes, typed);
-    extra.InsertThere(extra.hiragana_phonemes, translated);
+    extra.InsertPhonemePair(typed, translated);
+    ++extra.dwSelectedPhoneme;
   }
 
   // create the composition string
+  INPUT_MODE imode = InputModeFromConversionMode(TRUE, dwConversion);
   ExtraUpdated(imode);
 } // LogCompStr::AddRomanChar
 
-void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode) {
+void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConversion) {
   FOOTMARK();
   std::wstring strTyped, strTranslated;
-  if (chTranslated) {   // kana input
+  if (chTranslated && !(dwConversion & IME_CMODE_ROMAN)) {   // kana input
     assert(is_hiragana(chTranslated));
     strTyped += chTyped;
     strTranslated += chTranslated;
-    AddKanaChar(strTyped, strTranslated, imode);
+    AddKanaChar(strTyped, strTranslated, dwConversion);
   } else {  // roman input
     strTyped += chTyped;
     strTranslated = strTyped;
-    AddRomanChar(strTyped, strTranslated, imode);
+    AddRomanChar(strTyped, strTranslated, dwConversion);
   }
   // create the reading string
-  std::wstring str = extra.Join(hiragana_phonemes);
+  std::wstring str = extra.Join(extra.hiragana_phonemes);
   comp_read_str = lcmap(str, LCMAP_HALFWIDTH | LCMAP_KATAKANA);
 } // LogCompStr::AddChar
 
@@ -1417,54 +1474,98 @@ void LogCompStr::RevertText() {
   FOOTMARK();
   // reset composition
   assert(extra.dwSelectedClause != 0xFFFFFFFF);
+  // get a hiragana string of the current clause
   std::wstring str = GetClauseHiraganaString(extra.dwSelectedClause);
+  // set the hiragana string to the current clause
   SetClauseString(extra.dwSelectedClause, str, FALSE);
-  dwCursorPos = GetCharCount();
+  // set delta start
   dwDeltaStart = ClauseToCompChar(extra.dwSelectedClause);
 }
 
-void LogCompStr::DeleteChar(BOOL bBackSpace/* = FALSE*/) {
+void LogCompStr::DeleteChar(BOOL bRoman, BOOL bBackSpace/* = FALSE*/) {
   FOOTMARK();
-  // delete char
-  if (HasClauseSelected()) {
+  // is the current clause being converted?
+  DWORD ich = ClauseToCompChar(extra.dwSelectedClause);
+  if (GetCharAttr(ich) != ATTR_INPUT) { // being converted
+    // set the hiragana string to the clause
     std::wstring str = GetClauseHiraganaString(extra.dwSelectedClause);
     SetClauseString(extra.dwSelectedClause, str, FALSE);
-    return;
-  }
-  if (bBackSpace) {
-    if (0 < dwCursorPos && dwCursorPos <= (DWORD)comp_str.size()) {
-      --dwCursorPos;
-      comp_str.erase(dwCursorPos, 1);
+  } else {  // not being converted
+    BOOL flag = FALSE;
+    // is it back space?
+    if (bBackSpace) { // back space
+      if (0 < dwCursorPos && dwCursorPos <= GetCharCount()) {
+        --dwCursorPos;  // move left
+        extra.dwSelectedPhoneme = CompCharToPhoneme(dwCursorPos);
+        flag = TRUE;
+      }
+    } else {  // not back space
+      if (0 <= dwCursorPos && dwCursorPos < GetCharCount()) {
+        assert(extra.dwSelectedPhoneme < GetPhonemeCount());
+        flag = TRUE;
+      }
     }
-  } else {
-    if (0 <= dwCursorPos && dwCursorPos < (DWORD)comp_str.size()) {
-      comp_str.erase(dwCursorPos, 1);
+    if (flag) {
+      // get the current phoneme string as str
+      std::wstring& str = extra.hiragana_phonemes[extra.dwSelectedPhoneme];
+      if (str.size() <= 1) {
+        extra.ErasePhoneme(extra.dwSelectedPhoneme);  // erase phoneme
+        comp_str.erase(dwCursorPos, 1);   // delete one char
+      } else {
+        comp_str.erase(dwCursorPos, 1);   // delete one char
+        // scan and compare comp_str and str
+        for (size_t i = 0; i < str.size(); ++i) {
+          if (str[i] != comp_str[dwCursorPos + i]) {
+            // erase one char of phoneme
+            str.erase(i, 1);
+            // generate typing phonemes
+            if (bRoman) {
+              extra.typing_phonemes[extra.dwSelectedPhoneme] =
+                hiragana_to_roman(str);
+            } else {
+              extra.typing_phonemes[extra.dwSelectedPhoneme] =
+                lcmap(str, LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+            }
+            break;
+          }
+        }
+      }
     }
   }
-  // TODO: fix reading
 } // LogCompStr::DeleteChar
 
 void LogCompStr::MoveLeft(BOOL bShift) {
   FOOTMARK();
   // TODO: bShift
+  // is the current clause being converted?
   DWORD ich = ClauseToCompChar(extra.dwSelectedClause);
-  if (GetCharAttr(ich) != ATTR_INPUT) {
+  if (GetCharAttr(ich) != ATTR_INPUT) { // being converted
+    // untarget
     SetClauseAttribute(extra.dwSelectedClause, ATTR_CONVERTED);
+    // set the current clause
     if (extra.dwSelectedClause > 0) {
       --extra.dwSelectedClause;
     } else {
       assert(comp_clause.size() >= 2);
       extra.dwSelectedClause = GetClauseCount() - 1;
     }
+    // retarget
     SetClauseAttribute(extra.dwSelectedClause, ATTR_TARGET_CONVERTED);
+    // set the current phoneme
     extra.dwSelectedPhoneme = ClauseToPhoneme(extra.dwSelectedClause);
   } else {
+    // move cursor
     if (dwCursorPos > 0) --dwCursorPos;
-    if (GetCharAttr(dwCursorPos) != ATTR_INPUT) {
+    // did it enter the converted?
+    if (GetCharAttr(dwCursorPos) != ATTR_INPUT) { // entered the converted
+      // untarget
       SetClauseAttribute(extra.dwSelectedClause, ATTR_CONVERTED);
+      // set the current clause
       extra.dwSelectedClause = CompCharToClause(dwCursorPos);
+      // retarget
       SetClauseAttribute(extra.dwSelectedClause, ATTR_TARGET_CONVERTED);
     }
+    // set the current phoneme
     extra.dwSelectedPhoneme = CompCharToPhoneme(dwCursorPos);
   }
 } // LogCompStr::MoveLeft
@@ -1472,24 +1573,35 @@ void LogCompStr::MoveLeft(BOOL bShift) {
 void LogCompStr::MoveRight(BOOL bShift) {
   FOOTMARK();
   // TODO: bShift
+  // is the current clause being converted?
   DWORD ich = ClauseToCompChar(extra.dwSelectedClause);
-  if (GetCharAttr(ich) != ATTR_INPUT) {
+  if (GetCharAttr(ich) != ATTR_INPUT) { // being converted
+    // untarget
     SetClauseAttribute(extra.dwSelectedClause, ATTR_CONVERTED);
+    // set current clause
     ++extra.dwSelectedClause;
-    if (extra.dwSelectedClause >= GetClauseCount()) {
+    if (extra.dwSelectedClause >= GetClauseCount()) { // exceeded
       extra.dwSelectedClause = 0;
     }
+    // retarget
     SetClauseAttribute(extra.dwSelectedClause, ATTR_TARGET_CONVERTED);
+    // set current phoneme
     extra.dwSelectedPhoneme = ClauseToPhoneme(extra.dwSelectedClause);
-  } else {
+  } else {  // not being converted
+    // move cursor
     if (dwCursorPos + 1 < GetCharCount()) {
       ++dwCursorPos;
     }
-    if (GetCharAttr(dwCursorPos) != ATTR_INPUT) {
+    // did it enter the converted?
+    if (GetCharAttr(dwCursorPos) != ATTR_INPUT) { // entered the converted
+      // untarget
       SetClauseAttribute(extra.dwSelectedClause, ATTR_CONVERTED);
+      // set current clause
       extra.dwSelectedClause = CompCharToClause(dwCursorPos);
+      // retarget
       SetClauseAttribute(extra.dwSelectedClause, ATTR_TARGET_CONVERTED);
     }
+    // set current phoneme
     extra.dwSelectedPhoneme = CompCharToPhoneme(dwCursorPos);
   }
 } // LogCompStr::MoveRight

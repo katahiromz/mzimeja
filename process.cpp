@@ -43,7 +43,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
           if (lpIMC->HasCompStr()) {
-            lpIMC->AddChar(' ', 0);
+            lpIMC->AddChar(L' ', L'\0');
           } else {
             TheIME.GenerateMessage(WM_IME_CHAR, L' ', 1);
           }
@@ -92,7 +92,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
 
   case VK_KANA:
     if (bAlt) {
-      SetRomanMode(hIMC, !IsRomanMode());
+      SetRomanMode(hIMC, !IsRomanMode(hIMC));
       break;
     }
     switch (imode) {
@@ -397,7 +397,7 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
     if (imode == IMODE_HAN_EISUU) {
       if ((uScanCode & 0x8000) == 0) {
         // key down
-        BYTE vk = (BYTE)wParam;
+        BYTE vk = (BYTE)uVKey;
         switch (vk) {
         case VK_KANJI: case VK_OEM_AUTO: case VK_OEM_ENLW:
           ::ImmSetOpenStatus(hIMC, TRUE);

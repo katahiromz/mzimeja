@@ -47,14 +47,14 @@ struct LogCompStrExtra {
   LogCompStrExtra() { clear(); }
   void clear();
   DWORD GetTotalSize() const;
-  std::wstring Join(const std::vector<SmallWString>& strs) const;
-  std::wstring JoinLeft(const std::vector<SmallWString>& strs) const;
-  std::wstring JoinRight(const std::vector<SmallWString>& strs) const;
+  std::wstring Join(const std::vector<std::wstring>& strs) const;
+  std::wstring JoinLeft(const std::vector<std::wstring>& strs) const;
+  std::wstring JoinRight(const std::vector<std::wstring>& strs) const;
   DWORD GetPhonemeCount() const;
   WCHAR GetPrevChar() const;
-
-protected:
-  void InsertThere(std::vector<SmallWString>& strs, std::wstring& str);
+  void ErasePhoneme(DWORD iPhoneme);
+  void InsertPhonemePair(std::wstring& typed, std::wstring& translated);
+  void InsertThere(std::vector<std::wstring>& strs, std::wstring& str);
 }; // struct LogCompStrExtra
 
 // physical comp info extar
@@ -111,9 +111,9 @@ struct LogCompStr {
   void clear_extra() { extra.clear(); }
   DWORD GetTotalSize() const;
 
-  void AddChar(WCHAR chTyped, WCHAR chTranslated, INPUT_MODE imode);
+  void AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConversion);
   void RevertText();
-  void DeleteChar(BOOL bBackSpace = FALSE);
+  void DeleteChar(BOOL bRoman, BOOL bBackSpace = FALSE);
   void MakeResult();
 
   void MoveLeft(BOOL bShift);
@@ -153,9 +153,9 @@ struct LogCompStr {
   BOOL IsBeingConverted();
 
 protected:
-  void AddKanaChar(std::wstring& typed, std::wstring& translated, INPUT_MODE imode);
-  void AddRomanChar(std::wstring& typed, std::wstring& translated, INPUT_MODE imode);
   void ExtraUpdated(INPUT_MODE imode);
+  void AddKanaChar(std::wstring& typed, std::wstring& translated, DWORD dwConversion);
+  void AddRomanChar(std::wstring& typed, std::wstring& translated, DWORD dwConversion);
 }; // struct LogCompStr
 
 inline void SetClause(LPDWORD lpdw, DWORD num) {
@@ -279,7 +279,7 @@ struct InputContext : public INPUTCONTEXT {
         DWORD& Sentence()       { return fdwSentence; }
   const DWORD& Sentence() const { return fdwSentence; }
   INPUT_MODE GetInputMode() const;
-  BOOL IsRoman() const;
+  BOOL IsRomanMode() const;
   BOOL HasStatusWndPos() const  { return (fdwInit & INIT_STATUSWNDPOS); }
   BOOL HasConversion() const    { return (fdwInit & INIT_CONVERSION); }
   BOOL HasSentence() const      { return (fdwInit & INIT_SENTENCE); }

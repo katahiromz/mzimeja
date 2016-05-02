@@ -189,7 +189,7 @@ BEGIN
         MENUITEM "半角カタカナ",                IDM_HAN_KATAKANA
         MENUITEM "半角英数",                    IDM_ALNUM
         MENUITEM SEPARATOR
-        MENUITEM "ローマ字入力",                IDM_ROMAJI_INPUT
+        MENUITEM "ローマ字入力",                IDM_ROMAN_INPUT
         MENUITEM "かな入力",                    IDM_KANA_INPUT
         MENUITEM SEPARATOR
         MENUITEM "キャンセル",                  IDM_CANCEL
@@ -226,7 +226,7 @@ BEGIN
     IDM_ZEN_ALNUM,              "全角英数"
     IDM_HAN_KATAKANA,           "半角カタカナ"
     IDM_ALNUM,                  "半角英数"
-    IDM_ROMAJI_INPUT,           "ローマ字入力"
+    IDM_ROMAN_INPUT,            "ローマ字入力"
     IDM_KANA_INPUT,             "かな入力"
     IDM_ADD_WORD,               "単語登録"
     IDM_RECONVERT,              "再変換"
