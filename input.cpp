@@ -516,9 +516,16 @@ void InputContext::MakeResult() {
   hCompStr = CompStr::ReCreate(hCompStr, &log);
   DumpCompStr();
 
-  // generate messages to end composition
+  // generate messages to set composition
   LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+
+  // reset composition
+  DumpCompStr();
+  hCompStr = CompStr::ReCreate(hCompStr);
+  DumpCompStr();
+
+  // generate messages to set composition
   TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::MakeResult
 
@@ -665,6 +672,7 @@ void InputContext::CancelText() {
 
   // generate messages to end composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
+  log.clear();
   TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::CancelText
 
@@ -726,6 +734,9 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     if (HasCandInfo()) {
       hCandInfo = CandInfo::ReCreate(hCandInfo);
     }
+
+    // clear composition
+    log.clear();
 
     // generate messages to end composition
     LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;

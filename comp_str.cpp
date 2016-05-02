@@ -113,54 +113,36 @@ void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
 DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
   assert(this);
   assert(log);
+
+  LPBYTE pb = GetBytes();
   dwSignature = 0xDEADFACE;
   dwSelectedClause = log->dwSelectedClause;
   dwSelectedPhoneme = log->dwSelectedPhoneme;
-
-  LPBYTE pb = (LPBYTE)this;
   pb += sizeof(COMPSTREXTRA);
 
-  DWORD size, dwCount;
-  LPWSTR pch;
+  DWORD size;
 
-  // calculate size and offset of hiragana phonemes
-  dwHiraganaPhonemeOffset = (DWORD)(pb - (LPBYTE)this);
-  size = 0;
+  dwHiraganaPhonemeOffset = (DWORD)(pb - GetBytes());
+  dwHiraganaPhonemeCount = 0;
   for (size_t i = 0; i < log->hiragana_phonemes.size(); ++i) {
-    size += (log->hiragana_phonemes[i].size() + 1);
+    size = (log->hiragana_phonemes[i].size() + 1) * sizeof(WCHAR);
+    memcpy(pb, &log->hiragana_phonemes[i][0], size);
+    ++dwHiraganaPhonemeCount;
+    pb += size;
   }
-  dwHiraganaPhonemeLen = size * sizeof(WCHAR);
-  pb += dwHiraganaPhonemeLen;
 
-  // calculate size and offset of typing phonemes
-  dwTypingPhonemeOffset = (DWORD)(pb - (LPBYTE)this);
-  size = 0;
+  dwTypingPhonemeOffset = (DWORD)(pb - GetBytes());
+  dwTypingPhonemeCount = 0;
   for (size_t i = 0; i < log->typing_phonemes.size(); ++i) {
-    size += (log->typing_phonemes[i].size() + 1);
-  }
-  dwTypingPhonemeLen = size * sizeof(WCHAR);
-  pb += dwTypingPhonemeLen;
-
-  // store hiragana phonemes
-  pch = GetHiraganaPhonemes(dwCount);
-  for (size_t i = 0; i < log->hiragana_phonemes.size(); ++i) {
-    size_t size = (log->hiragana_phonemes[i].size() + 1);
-    memcpy(pch, &log->hiragana_phonemes[i][0], size * sizeof(WCHAR));
-    pch += size;
+    size = (log->typing_phonemes[i].size() + 1) * sizeof(WCHAR);
+    memcpy(pb, &log->typing_phonemes[i][0], size);
+    ++dwTypingPhonemeCount;
+    pb += size;
   }
 
-  // store typing phonemes
-  pch = GetTypingPhonemes(dwCount);
-  for (size_t i = 0; i < log->typing_phonemes.size(); ++i) {
-    size_t size = (log->typing_phonemes[i].size() + 1);
-    memcpy(pch, &log->typing_phonemes[i][0], size * sizeof(WCHAR));
-    pch += size;
-  }
-
-  assert(log->GetTotalSize() == (DWORD)(pb - (LPBYTE)this));
-  return (DWORD)(pb - (LPBYTE)this);
+  assert(log->GetTotalSize() == (DWORD)(pb - GetBytes()));
+  return (DWORD)(pb - GetBytes());
 } // COMPSTREXTRA::Store
-
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -279,7 +261,7 @@ DWORD LogCompStr::GetTotalSize() const {
 void LogCompStr::SetClauseString(
   DWORD iClause, std::wstring& strNew, BOOL bConverted)
 {
-  assert(iClause < GetClauseCount());
+  if (iClause == 0xFFFFFFFF) return;
 
   // replace old with new
   std::wstring strOld = GetClauseCompString(iClause);
@@ -486,15 +468,14 @@ void CompStr::GetLog(LogCompStr& log) {
     log = &log_comp_str;
   }
   const DWORD total = log->GetTotalSize();
-  HIMCC hNewCompStr = ImmReSizeIMCC(hCompStr, total);
+  HIMCC hNewCompStr = ::ImmReSizeIMCC(hCompStr, total);
   if (hNewCompStr) {
-    CompStr *lpCompStr = (CompStr *)ImmLockIMCC(hNewCompStr);
+    CompStr *lpCompStr = (CompStr *)::ImmLockIMCC(hNewCompStr);
     if (lpCompStr) {
+      LPBYTE pb = lpCompStr->GetBytes();
       lpCompStr->dwSize = total;
       lpCompStr->dwCursorPos = log->dwCursorPos;
       lpCompStr->dwDeltaStart = log->dwDeltaStart;
-
-      LPBYTE pb = lpCompStr->GetBytes();
       pb += sizeof(COMPOSITIONSTRING);
 
 #define ADD_BYTES(member) \
@@ -556,7 +537,7 @@ void CompStr::GetLog(LogCompStr& log) {
 
       assert((DWORD)(pb - lpCompStr->GetBytes()) == total);
 
-      ImmUnlockIMCC(hNewCompStr);
+      ::ImmUnlockIMCC(hNewCompStr);
       hCompStr = hNewCompStr;
     } else {
       DebugPrint(TEXT("CompStr::ReCreate: failed #2"));

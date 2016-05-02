@@ -62,29 +62,31 @@ struct COMPSTREXTRA {
   DWORD   dwSignature;
   DWORD   dwSelectedClause;
   DWORD   dwSelectedPhoneme;
-  DWORD   dwHiraganaPhonemeLen;
+  DWORD   dwHiraganaPhonemeCount;
   DWORD   dwHiraganaPhonemeOffset;
-  DWORD   dwTypingPhonemeLen;
+  DWORD   dwTypingPhonemeCount;
   DWORD   dwTypingPhonemeOffset;
 
   LPBYTE GetBytes() { return (LPBYTE)this; }
 
   LPWSTR GetHiraganaPhonemes(DWORD& dwCount) {
-    dwCount = dwHiraganaPhonemeLen / sizeof(WCHAR);
+    dwCount = dwHiraganaPhonemeCount;
     if (dwCount) {
       return (LPWSTR)(GetBytes() + dwHiraganaPhonemeOffset);
     }
     return NULL;
   }
   LPWSTR GetTypingPhonemes(DWORD& dwCount) {
-    dwCount = dwTypingPhonemeLen / sizeof(WCHAR);
+    dwCount = dwTypingPhonemeCount;
     if (dwCount) {
       return (LPWSTR)(GetBytes() + dwTypingPhonemeOffset);
     }
     return NULL;
   }
 
+  // physical to logical
   void GetLog(LogCompStrExtra& log);
+  // physical from logical
   DWORD Store(const LogCompStrExtra *log);
 }; // struct COMPSTREXTRA
 
