@@ -698,11 +698,9 @@ void InputContext::RevertText() {
   }
 
   // reset composition of selected clause
-  if (log.extra.dwSelectedClause != 0xFFFFFFFF) {
-    assert(log.IsValid());
-    log.RevertText();
-    assert(log.IsValid());
-  }
+  assert(log.IsValid());
+  log.RevertText();
+  assert(log.IsValid());
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &log);

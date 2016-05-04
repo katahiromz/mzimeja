@@ -38,15 +38,18 @@ UINT CommandFromInputMode(INPUT_MODE imode);
 
 // logical comp info extra
 struct LogCompStrExtra {
-  // selected composition clause index (0xFFFFFFFF if clause was not selected)
+  // selected composition clause index
+  // assert(dwSelectedClause <= GetClauseCount());
   DWORD                       dwSelectedClause;
   // selected phoneme index
+  // assert(dwSelectedPhoneme <= GetPhonemeCount());
   DWORD                       dwSelectedPhoneme;
   // hiragana phonemes
   std::vector<std::wstring>   hiragana_phonemes;
   // typing phonemes
   std::vector<std::wstring>   typing_phonemes;
   // mapping from composition clause index to phoneme index
+  // assert((DWORD)phoneme_clauses.size() == GetClauseCount());
   std::vector<DWORD>          phoneme_clauses;
 
   LogCompStrExtra() { clear(); }
