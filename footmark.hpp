@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef FOOTMARK_HPP_
-#define FOOTMARK_HPP_   1   // Version 1
+#define FOOTMARK_HPP_   2   // Version 2
 
 #ifndef __cplusplus
   #error This library (footmark) needs C++. You lose.

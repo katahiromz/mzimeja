@@ -572,7 +572,12 @@ void LogCompStr::MakeResult() {
 
 void LogCompStr::MakeCompString(DWORD dwConversion) {
   // update comp_str, comp_clause, and dwCursorPos from phonemes
-  std::wstring new_comp_str;
+  std::vector<std::wstring> strs;
+  if (GetClauseCount() == 0) {
+    comp_clause.resize(2);
+    comp_clause[0] = 0;
+    comp_clause[1] = GetCompCharCount();
+  }
   DWORD i, count = GetClauseCount();
   for (i = 0; i < count; ++i) {
     if (GetClauseAttr(i) == ATTR_INPUT) {
@@ -587,17 +592,20 @@ void LogCompStr::MakeCompString(DWORD dwConversion) {
       }
       std::wstring str = Translate(hiragana, typing, dwConversion);
       SetClauseCompString(i, str, FALSE);
-      new_comp_str += str;
+      strs.push_back(str);
     } else {
-      new_comp_str += GetClauseCompString(i);
+      strs.push_back(GetClauseCompString(i));
     }
   }
+  DWORD ich = 0;
+  std::wstring str;
   for (i = 0; i < count; ++i) {
-    DWORD ich = ClauseToCompChar(i);
-    comp_clause[i] = ich;
+    comp_clause[i] = strs[i];
+    ich += strs[i].size();
+    str += strs[i];
   }
   comp_clause[i] = GetCompCharCount();
-  comp_str = new_comp_str;
+  comp_str = str;
   dwCursorPos = PhonemeToCompChar(extra.dwSelectedPhoneme);
 }
 
@@ -639,40 +647,6 @@ DWORD LogCompStr::GetCompCharCount() const {
   return (DWORD)comp_str.size();
 }
 
-void LogCompStr::ExtraUpdated(INPUT_MODE imode) {
-  FOOTMARK();
-  std::wstring strLeft, strRight;
-  switch (imode) {
-  case IMODE_ZEN_HIRAGANA:
-    strLeft = extra.JoinLeft(extra.hiragana_phonemes);
-    strRight = extra.JoinRight(extra.hiragana_phonemes);
-    break;
-  case IMODE_ZEN_KATAKANA:
-    strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes), LCMAP_KATAKANA);
-    strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes), LCMAP_KATAKANA);
-    break;
-  case IMODE_HAN_KANA:
-    strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes),
-                    LCMAP_HALFWIDTH | LCMAP_KATAKANA);
-    strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes),
-                     LCMAP_HALFWIDTH | LCMAP_KATAKANA);
-    break;
-  case IMODE_ZEN_EISUU:
-    strLeft = lcmap(extra.JoinLeft(extra.typing_phonemes), LCMAP_FULLWIDTH);
-    strRight = lcmap(extra.JoinRight(extra.typing_phonemes), LCMAP_FULLWIDTH);
-    break;
-  case IMODE_HAN_EISUU:
-    strLeft = lcmap(extra.JoinLeft(extra.hiragana_phonemes), LCMAP_HALFWIDTH);
-    strRight = lcmap(extra.JoinRight(extra.hiragana_phonemes), LCMAP_HALFWIDTH);
-    break;
-  default:
-    assert(0);
-    break;
-  }
-  dwCursorPos = (DWORD)strLeft.size();
-  comp_str = strLeft + strRight;
-}
-
 void LogCompStr::AddKanaChar(
   std::wstring& typed, std::wstring& translated, DWORD dwConversion)
 {
@@ -693,8 +667,7 @@ void LogCompStr::AddKanaChar(
     ++extra.dwSelectedPhoneme;
   }
   // create the composition string
-  INPUT_MODE imode = InputModeFromConversionMode(TRUE, dwConversion);
-  ExtraUpdated(imode);
+  MakeCompString(dwConversion);
 } // LogCompStr::AddKanaChar
 
 void LogCompStr::AddRomanChar(
@@ -792,8 +765,7 @@ void LogCompStr::AddRomanChar(
   }
 
   // create the composition string
-  INPUT_MODE imode = InputModeFromConversionMode(TRUE, dwConversion);
-  ExtraUpdated(imode);
+  MakeCompString(dwConversion);
 } // LogCompStr::AddRomanChar
 
 void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConversion) {

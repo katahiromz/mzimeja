@@ -173,7 +173,6 @@ struct LogCompStr {
   void Dump();
 
 protected:
-  void ExtraUpdated(INPUT_MODE imode);
   void AddKanaChar(std::wstring& typed, std::wstring& translated, DWORD dwConversion);
   void AddRomanChar(std::wstring& typed, std::wstring& translated, DWORD dwConversion);
 }; // struct LogCompStr
