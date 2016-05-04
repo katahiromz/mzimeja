@@ -16,12 +16,12 @@
 // input modes
 
 enum INPUT_MODE {
-  IMODE_ZEN_HIRAGANA,
-  IMODE_ZEN_KATAKANA,
-  IMODE_ZEN_EISUU,
-  IMODE_HAN_KANA,
-  IMODE_HAN_EISUU,
-  IMODE_DISABLED
+  IMODE_ZEN_HIRAGANA,   // zenkaku hiragana
+  IMODE_ZEN_KATAKANA,   // zenkaku katakana
+  IMODE_ZEN_EISUU,      // zenkaku alphanumeric
+  IMODE_HAN_KANA,       // hankaku katakana
+  IMODE_HAN_EISUU,      // hankaku alphanumeric
+  IMODE_DISABLED        // IME is disabled
 };
 
 BOOL IsInputModeOpen(INPUT_MODE imode);
@@ -38,10 +38,15 @@ UINT CommandFromInputMode(INPUT_MODE imode);
 
 // logical comp info extra
 struct LogCompStrExtra {
+  // selected clause index (0xFFFFFFFF if clause was not selected)
   DWORD                       dwSelectedClause;
+  // selected phoneme index
   DWORD                       dwSelectedPhoneme;
+  // hiragana phonemes
   std::vector<std::wstring>   hiragana_phonemes;
+  // typing phonemes
   std::vector<std::wstring>   typing_phonemes;
+  // mapping from composition clause index to phoneme index
   std::vector<DWORD>          phoneme_clauses;
 
   LogCompStrExtra() { clear(); }
@@ -95,17 +100,29 @@ struct COMPSTREXTRA {
 struct LogCompStr {
   DWORD               dwCursorPos;
   DWORD               dwDeltaStart;
-  std::vector<BYTE>   comp_read_attr;     // We don't use this member
-  std::vector<DWORD>  comp_read_clause;   // We don't use this member
+  // We don't use this member
+  std::vector<BYTE>   comp_read_attr;
+  // We don't use this member
+  std::vector<DWORD>  comp_read_clause;
+  // composition reading string
   std::wstring        comp_read_str;
+  // composition attributes (per composition character)
   std::vector<BYTE>   comp_attr;
+  // mapping from composition clause index to composition character index
   std::vector<DWORD>  comp_clause;
+  // composition string
   std::wstring        comp_str;
+  // mapping from result reading clause index to result reading character index
   std::vector<DWORD>  result_read_clause;
+  // result reading string
   std::wstring        result_read_str;
+  // mapping from result clause index to result character index
   std::vector<DWORD>  result_clause;
+  // result string
   std::wstring        result_str;
+  // extra information
   LogCompStrExtra     extra;
+
   LogCompStr() { clear(); }
   void clear();
   void clear_read();
