@@ -98,11 +98,13 @@ struct COMPSTREXTRA {
 
 // logical composition info
 struct LogCompStr {
+  // composition character index of the current position
   DWORD               dwCursorPos;
+  // index of first changed composition character
   DWORD               dwDeltaStart;
-  // We don't use this member
+  // We don't use this member: comp_read_attr
   std::vector<BYTE>   comp_read_attr;
-  // We don't use this member
+  // We don't use this member: comp_read_clause
   std::vector<DWORD>  comp_read_clause;
   // composition reading string
   std::wstring        comp_read_str;
@@ -131,9 +133,6 @@ struct LogCompStr {
   void clear_extra() { extra.clear(); }
   DWORD GetTotalSize() const;
 
-  bool IsValid();
-  void Dump();
-
   void AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConversion);
   void RevertText();
   void DeleteChar(BOOL bRoman, BOOL bBackSpace = FALSE);
@@ -148,7 +147,6 @@ struct LogCompStr {
   void SetClauseAttr(DWORD iClause, BYTE attr);
   BYTE GetCompCharAttr(DWORD ich) const;
   BOOL IsClauseConverted(DWORD iClause) const;
-
   DWORD GetPhonemeCount() const;
   DWORD GetCompCharCount() const;
 
@@ -179,6 +177,10 @@ struct LogCompStr {
   void MakeCompString(DWORD dwConversion);
   std::wstring Translate(
     const std::wstring& hiragana, const std::wstring& typing, DWORD dwConversion);
+
+  // for debugging
+  bool IsValid();
+  void Dump();
 
 protected:
   void ExtraUpdated(INPUT_MODE imode);

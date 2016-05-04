@@ -790,8 +790,7 @@ void LogCompStr::RevertText() {
 void LogCompStr::DeleteChar(BOOL bRoman, BOOL bBackSpace/* = FALSE*/) {
   FOOTMARK();
   // is the current clause being converted?
-  DWORD ich = ClauseToCompChar(extra.dwSelectedClause);
-  if (GetCompCharAttr(ich) != ATTR_INPUT) { // being converted
+  if (IsClauseConverted(extra.dwSelectedClause) != ATTR_INPUT) { // being converted
     // set the hiragana string to the clause
     std::wstring str = GetClauseHiraganaString(extra.dwSelectedClause);
     SetClauseCompString(extra.dwSelectedClause, str, FALSE);
@@ -843,8 +842,7 @@ void LogCompStr::MoveLeft(BOOL bShift) {
   FOOTMARK();
   // TODO: bShift
   // is the current clause being converted?
-  DWORD ich = ClauseToCompChar(extra.dwSelectedClause);
-  if (GetCompCharAttr(ich) != ATTR_INPUT) { // being converted
+  if (extra.dwSelectedClause(extra.dwSelectedClause)) { // being converted
     // untarget
     SetClauseAttr(extra.dwSelectedClause, ATTR_CONVERTED);
     // set the current clause
@@ -879,8 +877,7 @@ void LogCompStr::MoveRight(BOOL bShift) {
   FOOTMARK();
   // TODO: bShift
   // is the current clause being converted?
-  DWORD ich = ClauseToCompChar(extra.dwSelectedClause);
-  if (GetCompCharAttr(ich) != ATTR_INPUT) { // being converted
+  if (extra.dwSelectedClause(extra.dwSelectedClause)) { // being converted
     // untarget
     SetClauseAttr(extra.dwSelectedClause, ATTR_CONVERTED);
     // set current clause
