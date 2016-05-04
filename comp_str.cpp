@@ -125,6 +125,22 @@ LogCompStrExtra::Join(const std::vector<std::wstring>& strs) const {
 
 //////////////////////////////////////////////////////////////////////////////
 
+LPWSTR COMPSTREXTRA::GetHiraganaPhonemes(DWORD& dwPhonemeCount) {
+  dwPhonemeCount = dwHiraganaPhonemeCount;
+  if (dwPhonemeCount) {
+    return (LPWSTR)(GetBytes() + dwHiraganaPhonemeOffset);
+  }
+  return NULL;
+}
+
+LPWSTR COMPSTREXTRA::GetTypingPhonemes(DWORD& dwPhonemeCount) {
+  dwPhonemeCount = dwTypingPhonemeCount;
+  if (dwPhonemeCount) {
+    return (LPWSTR)(GetBytes() + dwTypingPhonemeOffset);
+  }
+  return NULL;
+}
+
 void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
   FOOTMARK();
   log.clear();
@@ -191,6 +207,12 @@ bool LogCompStr::IsValid() {
   if (dwCursorPos > GetCompCharCount()) {
     FOOTMARK_PRINT_CALL_STACK();
     ret = false;
+  }
+  if (comp_attr.size()) {
+    if (comp_attr.size() != comp_str.size()) {
+      FOOTMARK_PRINT_CALL_STACK();
+      ret = false;
+    }
   }
   if (comp_clause.size()) {
     if (comp_clause[0] != 0) {
@@ -275,11 +297,7 @@ void LogCompStr::clear() {
 
 BOOL LogCompStr::HasClauseSelected() const {
   FOOTMARK();
-  if (comp_clause.size() && extra.dwSelectedClause != 0xFFFFFFFF) {
-    assert(extra.dwSelectedClause < GetClauseCount());
-    return TRUE;
-  }
-  return FALSE;
+  return (extra.dwSelectedClause < GetClauseCount());
 }
 
 BYTE LogCompStr::GetCompCharAttr(DWORD ich) const {
@@ -291,39 +309,41 @@ BYTE LogCompStr::GetCompCharAttr(DWORD ich) const {
   return ret;
 }
 
-DWORD LogCompStr::GetCurrentClause() const {
-  FOOTMARK();
-  DWORD ret = 0;
-  if (extra.dwSelectedClause != 0xFFFFFFFF) ret = extra.dwSelectedClause;
-  return ret;
-}
-
 DWORD LogCompStr::ClauseToPhoneme(DWORD iClause) const {
   FOOTMARK();
-  if (iClause == 0xFFFFFFFF) return CompCharToPhoneme(dwCursorPos);
-  assert(iClause < (DWORD)extra.phoneme_clauses.size());
+  if (iClause == 0xFFFFFFFF) {
+    DWORD dwDeltaChar;
+    return CompCharToPhoneme(dwCursorPos, dwDeltaChar);
+  }
+  assert(iClause < extra.GetPhonemeCount());
   return extra.phoneme_clauses[iClause];
 }
 
 DWORD LogCompStr::PhonemeToClause(DWORD iPhoneme) const {
   FOOTMARK();
-  DWORD ich = PhonemeToCompChar(iPhoneme);
-  return CompCharToClause(ich, dwDeltaChar);
+  DWORD iClause = 0, count = GetClauseCount()
+  for (DWORD i = 1; i < count; ++i) {
+    if (iPhoneme < extra.phoneme_clauses[i]) {
+      iClause = i;
+    }
+  }
+  return iClause;
 }
 
 DWORD LogCompStr::ClauseToCompChar(DWORD iClause) const {
   FOOTMARK();
-  if (iClause == 0xFFFFFFFF) return GetCompCharCount();
-  assert(iClause < (DWORD)comp_clause.size());
-  return comp_clause[iClause];
+  if (iClause < GetClauseCount()) return comp_clause[iClause];
+  return GetCompCharCount();
 }
 
-DWORD LogCompStr::CompCharToClause(DWORD iCompChar) const {
+DWORD LogCompStr::CompCharToClause(DWORD iCompChar, DWORD& dwDeltaChar) const {
   FOOTMARK();
   DWORD iClause = 0xFFFFFFFF;
+  dwDeltaChar = 0;
   for (size_t i = 0; i < comp_clause.size(); ++i) {
     if (iCompChar < comp_clause[i]) {
       iClause = (DWORD)comp_clause[i];
+      dwDeltaChar = iCompChar - (DWORD)comp_clause[i];
     }
   }
   return iClause;
@@ -331,8 +351,6 @@ DWORD LogCompStr::CompCharToClause(DWORD iCompChar) const {
 
 DWORD LogCompStr::PhonemeToCompChar(DWORD iPhoneme, DWORD dwDeltaChar) const {
   FOOTMARK();
-  // TODO:
-  ...
 }
 
 DWORD LogCompStr::CompCharToPhoneme(DWORD iCompChar, DWORD& dwDeltaChar) const {

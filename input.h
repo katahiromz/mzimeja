@@ -21,7 +21,7 @@ enum INPUT_MODE {
   IMODE_ZEN_EISUU,      // zenkaku alphanumeric
   IMODE_HAN_KANA,       // hankaku katakana
   IMODE_HAN_EISUU,      // hankaku alphanumeric
-  IMODE_DISABLED        // IME is disabled
+  IMODE_DISABLED        // the IME is disabled
 };
 
 BOOL IsInputModeOpen(INPUT_MODE imode);
@@ -38,7 +38,7 @@ UINT CommandFromInputMode(INPUT_MODE imode);
 
 // logical comp info extra
 struct LogCompStrExtra {
-  // selected clause index (0xFFFFFFFF if clause was not selected)
+  // selected composition clause index (0xFFFFFFFF if clause was not selected)
   DWORD                       dwSelectedClause;
   // selected phoneme index
   DWORD                       dwSelectedPhoneme;
@@ -75,20 +75,8 @@ struct COMPSTREXTRA {
 
   LPBYTE GetBytes() { return (LPBYTE)this; }
 
-  LPWSTR GetHiraganaPhonemes(DWORD& dwCount) {
-    dwCount = dwHiraganaPhonemeCount;
-    if (dwCount) {
-      return (LPWSTR)(GetBytes() + dwHiraganaPhonemeOffset);
-    }
-    return NULL;
-  }
-  LPWSTR GetTypingPhonemes(DWORD& dwCount) {
-    dwCount = dwTypingPhonemeCount;
-    if (dwCount) {
-      return (LPWSTR)(GetBytes() + dwTypingPhonemeOffset);
-    }
-    return NULL;
-  }
+  LPWSTR GetHiraganaPhonemes(DWORD& dwPhonemeCount);
+  LPWSTR GetTypingPhonemes(DWORD& dwPhonemeCount);
 
   // physical to logical
   void GetLog(LogCompStrExtra& log);
@@ -102,9 +90,9 @@ struct LogCompStr {
   DWORD               dwCursorPos;
   // index of first changed composition character
   DWORD               dwDeltaStart;
-  // We don't use this member: comp_read_attr
+  // we don't use this member: comp_read_attr
   std::vector<BYTE>   comp_read_attr;
-  // We don't use this member: comp_read_clause
+  // we don't use this member: comp_read_clause
   std::vector<DWORD>  comp_read_clause;
   // composition reading string
   std::wstring        comp_read_str;
@@ -162,11 +150,10 @@ struct LogCompStr {
   DWORD ClauseToCompChar(DWORD iClause) const;
   DWORD PhonemeToClause(DWORD iPhoneme) const;
   DWORD PhonemeToCompChar(DWORD iPhoneme, DWORD dwDeltaChar) const;
-  DWORD CompCharToClause(DWORD iCompChar) const;
+  DWORD CompCharToClause(DWORD iCompChar, DWORD& dwDeltaChar) const;
   DWORD CompCharToPhoneme(DWORD iCompChar, DWORD& dwDeltaChar) const;
 
   // get clause information
-  DWORD GetCurrentClause() const;
   std::wstring GetLeft(DWORD iClause) const;
   std::wstring GetRight(DWORD iClause) const;
   std::wstring GetClauseCompString(DWORD iClause) const;
