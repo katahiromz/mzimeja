@@ -89,18 +89,18 @@ DWORD LogCompStrExtra::GetPhonemeCount() const {
 }
 
 void LogCompStrExtra::InsertThere(
-  std::vector<std::wstring>& strs, std::wstring& str)
+  DWORD iPhoneme, std::vector<std::wstring>& strs, std::wstring& str)
 {
   FOOTMARK();
-  strs.insert(strs.begin() + dwSelectedPhoneme, str.c_str());
+  strs.insert(strs.begin() + iPhoneme, str.c_str());
 }
 
 void LogCompStrExtra::InsertPhonemePair(
-  std::wstring& typed, std::wstring& translated)
+  DWORD iPhoneme, std::wstring& typed, std::wstring& translated)
 {
   FOOTMARK();
-  InsertThere(typing_phonemes, typed);
-  InsertThere(hiragana_phonemes, translated);
+  InsertThere(iPhoneme, typing_phonemes, typed);
+  InsertThere(iPhoneme, hiragana_phonemes, translated);
 }
 
 WCHAR LogCompStrExtra::GetPrevChar() const {
@@ -659,7 +659,7 @@ void LogCompStr::AddKanaChar(
     str += chDakuon;
     extra.hiragana_phonemes[extra.dwSelectedPhoneme - 1] = str;
     extra.typing_phonemes[extra.dwSelectedPhoneme - 1] += L'Þ';
-  } else {
+  } else {  // if not dakuon
     // insert the typed and translated strings
     extra.InsertPhonemePair(typed, translated);
     // move cursor
@@ -763,7 +763,6 @@ void LogCompStr::AddRomanChar(
     extra.InsertPhonemePair(typed, translated);
     ++extra.dwSelectedPhoneme;
   }
-
   // create the composition string
   MakeCompString(dwConversion);
 } // LogCompStr::AddRomanChar

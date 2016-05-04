@@ -61,8 +61,11 @@ struct LogCompStrExtra {
   DWORD GetPhonemeCount() const;
   WCHAR GetPrevChar() const;
   void ErasePhoneme(DWORD iPhoneme);
-  void InsertPhonemePair(std::wstring& typed, std::wstring& translated);
-  void InsertThere(std::vector<std::wstring>& strs, std::wstring& str);
+  void InsertPhonemePair(DWORD iPhoneme, std::wstring& typed, std::wstring& translated);
+  void InsertPhonemePair(std::wstring& typed, std::wstring& translated) {
+    InsertPhonemePair(dwSelectedPhoneme, typed, translated);
+  }
+  void InsertThere(DWORD iPhoneme, std::vector<std::wstring>& strs, std::wstring& str);
   bool IsValid();
 }; // struct LogCompStrExtra
 
