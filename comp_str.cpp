@@ -337,28 +337,26 @@ DWORD LogCompStr::ClauseToCompChar(DWORD iClause) const {
   return comp_clause[iClause];
 }
 
-DWORD LogCompStr::CompCharToClause(DWORD iCompChar, DWORD& dwDeltaChar) const {
+DWORD LogCompStr::CompCharToClause(DWORD iCompChar) const {
   FOOTMARK();
   DWORD iClause = GetClauseCount();
-  dwDeltaChar = 0;
   for (size_t i = 0; i < comp_clause.size(); ++i) {
     if (iCompChar <= comp_clause[i]) {
       iClause = i;
-      dwDeltaChar = iCompChar - (DWORD)comp_clause[i];
     }
   }
   return iClause;
 }
 
-DWORD LogCompStr::PhonemeToCompChar(DWORD iPhoneme, DWORD dwDeltaChar) const {
+DWORD LogCompStr::PhonemeToCompChar(DWORD iPhoneme) const {
   FOOTMARK();
   DWORD iClause = PhonemeToClause(iPhoneme);
-  return ClauseToCompChar(iClause) + dwDeltaChar;
+  return ClauseToCompChar(iClause);
 }
 
-DWORD LogCompStr::CompCharToPhoneme(DWORD iCompChar, DWORD& dwDeltaChar) const {
+DWORD LogCompStr::CompCharToPhoneme(DWORD iCompChar) const {
   FOOTMARK();
-  DWORD iClause = CompCharToClause(iCompChar, dwDeltaChar);
+  DWORD iClause = CompCharToClause(iCompChar);
   retrun ClauseToPhoneme(iClause);
 }
 
@@ -476,7 +474,7 @@ DWORD LogCompStr::GetPhonemeCount() const {
 std::wstring LogCompStr::GetClauseCompString(DWORD iClause) const {
   FOOTMARK();
   std::wstring ret;
-  if (iClause + 1 < (DWORD)comp_clause.size()) {
+  if (iClause + 1 <= GetClauseCount()) {
     DWORD ich = comp_clause[iClause], ichNext = comp_clause[iClause + 1];
     ret = comp_str.substr(ich, ichNext - ich);
   }
@@ -486,7 +484,7 @@ std::wstring LogCompStr::GetClauseCompString(DWORD iClause) const {
 std::wstring LogCompStr::GetClauseHiraganaString(DWORD iClause) const {
   FOOTMARK();
   std::wstring ret;
-  if (iClause + 1 < GetClauseCount()) {
+  if (iClause + 1 <= GetClauseCount()) {
     DWORD iph = extra.phoneme_clauses[iClause];
     DWORD iphNext = extra.phoneme_clauses[iClause + 1];
     for (DWORD i = iph; i < iphNext; ++i) {
@@ -499,7 +497,7 @@ std::wstring LogCompStr::GetClauseHiraganaString(DWORD iClause) const {
 std::wstring LogCompStr::GetClauseTypingString(DWORD iClause) const {
   FOOTMARK();
   std::wstring ret;
-  if (iClause + 1 < GetClauseCount()) {
+  if (iClause + 1 <= GetClauseCount()) {
     DWORD iph = extra.phoneme_clauses[iClause];
     DWORD iphNext = extra.phoneme_clauses[iClause + 1];
     for (DWORD i = iph; i < iphNext; ++i) {
@@ -572,11 +570,41 @@ void LogCompStr::MakeResult() {
   dwCursorPos = 0;
 }
 
+void LogCompStr::MakeCompString(DWORD dwConversion) {
+  // update comp_str, comp_clause, and dwCursorPos from phonemes
+  std::wstring new_comp_str;
+  DWORD i, count = GetClauseCount();
+  for (i = 0; i < count; ++i) {
+    if (GetClauseAttr(i) == ATTR_INPUT) {
+      DWORD ich = ClauseToCompChar(i);
+      DWORD ichNext = ClauseToCompChar(i + 1);
+      std::wstring hiragana, typing;
+      DWORD iph = CompCharToPhoneme(ich);
+      DWORD iphNext = CompCharToPhoneme(ichNext);
+      for (DWORD k = iph; k < iphNext; ++k) {
+        hiragana += extra.hiragana_phonemes[k];
+        typing += extra.typing_phonemes[k];
+      }
+      std::wstring str = Translate(hiragana, typing, dwConversion);
+      SetClauseCompString(i, str, FALSE);
+      new_comp_str += str;
+    } else {
+      new_comp_str += GetClauseCompString(i);
+    }
+  }
+  for (i = 0; i < count; ++i) {
+    DWORD ich = ClauseToCompChar(i);
+    comp_clause[i] = ich;
+  }
+  comp_clause[i] = GetCompCharCount();
+  comp_str = new_comp_str;
+  dwCursorPos = PhonemeToCompChar(extra.dwSelectedPhoneme);
+}
+
 BYTE LogCompStr::GetClauseAttr(DWORD iClause) const {
   FOOTMARK();
   BYTE ret = ATTR_INPUT;
   if (iClause < GetClauseCount()) {
-    assert(iClause < GetClauseCount());
     DWORD ich = ClauseToCompChar(iClause);
     ret = GetCompCharAttr(ich);
   }
@@ -589,7 +617,7 @@ BOOL LogCompStr::IsClauseConverted(DWORD iClause) const {
 
 void LogCompStr::SetClauseAttr(DWORD iClause, BYTE attr) {
   FOOTMARK();
-  if (iClause < GetClauseCount()) {
+  if (iClause + 1 <= GetClauseCount()) {
     DWORD ich = ClauseToCompChar(iClause);
     DWORD ichEnd = ClauseToCompChar(iClause + 1);
     for (DWORD i = ich; i < ichEnd; ++i) {
@@ -941,34 +969,6 @@ LogCompStr::Translate(
     return typing;
   }
 } // LogCompStr::Transfer
-
-void LogCompStr::MakeCompString(DWORD dwConversion) {
-  std::wstring new_comp_str;
-  DWORD i, count = GetClauseCount();
-  for (i = 0; i < count; ++i) {
-    DWORD ich = ClauseToCompChar(i);
-    DWORD ichNext = ClauseToCompChar(i + 1);
-    if (GetCompCharAttr(ich) == ATTR_INPUT) {
-      std::wstring hiragana, typing;
-      DWORD iph = CompCharToPhoneme(ich);
-      DWORD iphNext = CompCharToPhoneme(ichNext);
-      for (DWORD k = iph; k < iphNext; ++k) {
-        hiragana += extra.hiragana_phonemes[k];
-        typing += extra.typing_phonemes[k];
-      }
-      new_comp_str += Translate(hiragana, typing, dwConversion);
-    } else {
-      new_comp_str += GetClauseCompString(i);
-    }
-  }
-  for (i = 0; i < count; ++i) {
-    DWORD ich = ClauseToCompChar(i);
-    comp_clause[i] = ich;
-  }
-  comp_clause[i] = GetCompCharCount();
-  comp_str = new_comp_str;
-  dwCursorPos = PhonemeToCompChar(extra.dwSelectedPhoneme);
-}
 
 void LogCompStr::Dump() {
 #ifndef NDEBUG

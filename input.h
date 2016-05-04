@@ -152,9 +152,9 @@ struct LogCompStr {
   DWORD ClauseToPhoneme(DWORD iClause) const;
   DWORD ClauseToCompChar(DWORD iClause) const;
   DWORD PhonemeToClause(DWORD iPhoneme) const;
-  DWORD PhonemeToCompChar(DWORD iPhoneme, DWORD dwDeltaChar) const;
-  DWORD CompCharToClause(DWORD iCompChar, DWORD& dwDeltaChar) const;
-  DWORD CompCharToPhoneme(DWORD iCompChar, DWORD& dwDeltaChar) const;
+  DWORD PhonemeToCompChar(DWORD iPhoneme) const;
+  DWORD CompCharToClause(DWORD iCompChar) const;
+  DWORD CompCharToPhoneme(DWORD iCompChar) const;
 
   // get clause information
   std::wstring GetLeft(DWORD iClause) const;
