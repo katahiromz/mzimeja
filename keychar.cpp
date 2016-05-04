@@ -1048,7 +1048,7 @@ static TABLEENTRY sokuon_table[] = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-std::wstring hiragana_to_roman(const std::wstring& hiragana) {
+std::wstring hiragana_to_roman(std::wstring hiragana) {
   FOOTMARK();
   std::wstring roman;
   bool found;
@@ -1097,7 +1097,7 @@ std::wstring hiragana_to_roman(const std::wstring& hiragana) {
   return roman;
 } // hiragana_to_roman
 
-std::wstring roman_to_hiragana(const std::wstring& roman) {
+std::wstring roman_to_hiragana(std::wstring roman) {
   FOOTMARK();
   std::wstring hiragana, str;
   for (size_t k = 0; k < roman.size();) {
@@ -1121,8 +1121,9 @@ std::wstring roman_to_hiragana(const std::wstring& roman) {
           str += roman_table[i].extra;
           if (roman[k] == str[0]) {
             if (roman.find(str, k) == k) {
-              hiragana += sokuon_table[i].value;
-              k += str.size() - wcslen(roman_table[i].extra);
+              hiragana += roman_table[i].value;
+              roman.insert(k, roman_table[i].extra);
+              k += wcslen(roman_table[i].value);
               found = true;
               break;
             }

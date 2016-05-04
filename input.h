@@ -113,7 +113,9 @@ struct LogCompStr {
   void clear_result();
   void clear_extra() { extra.clear(); }
   DWORD GetTotalSize() const;
+
   bool IsValid();
+  void Dump();
 
   void AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConversion);
   void RevertText();
@@ -125,10 +127,13 @@ struct LogCompStr {
 
   BOOL HasClauseSelected() const;
   DWORD GetClauseCount() const;
-  void SetClauseAttribute(DWORD iClause, BYTE attr);
+  BYTE GetClauseAttr(DWORD iClause) const;
+  void SetClauseAttr(DWORD iClause, BYTE attr);
+  BYTE GetCompCharAttr(DWORD ich) const;
+  BOOL IsClauseConverted(DWORD iClause) const;
 
   DWORD GetPhonemeCount() const;
-  DWORD GetCharCount() const;
+  DWORD GetCompCharCount() const;
 
   // conversion of composition
   void MakeHiragana();
@@ -141,9 +146,9 @@ struct LogCompStr {
   DWORD ClauseToPhoneme(DWORD iClause) const;
   DWORD ClauseToCompChar(DWORD iClause) const;
   DWORD PhonemeToClause(DWORD iPhoneme) const;
-  DWORD PhonemeToCompChar(DWORD iPhoneme) const;
+  DWORD PhonemeToCompChar(DWORD iPhoneme, DWORD dwDeltaChar) const;
   DWORD CompCharToClause(DWORD iCompChar) const;
-  DWORD CompCharToPhoneme(DWORD iCompChar) const;
+  DWORD CompCharToPhoneme(DWORD iCompChar, DWORD& dwDeltaChar) const;
 
   // get clause information
   DWORD GetCurrentClause() const;
@@ -152,9 +157,11 @@ struct LogCompStr {
   std::wstring GetClauseCompString(DWORD iClause) const;
   std::wstring GetClauseHiraganaString(DWORD iClause) const;
   std::wstring GetClauseTypingString(DWORD iClause) const;
-  void SetClauseString(DWORD iClause, std::wstring& strClause, BOOL bConverted);
-  BYTE GetCharAttr(DWORD ich) const;
+  void SetClauseCompString(DWORD iClause, std::wstring& strClause, BOOL bConverted);
   BOOL IsBeingConverted();
+  void MakeCompString(DWORD dwConversion);
+  std::wstring Translate(
+    const std::wstring& hiragana, const std::wstring& typing, DWORD dwConversion);
 
 protected:
   void ExtraUpdated(INPUT_MODE imode);

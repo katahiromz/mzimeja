@@ -233,8 +233,8 @@ HFONT CheckNativeCharset(HDC hDC);
 // keychar.cpp
 
 // conversion between roman and hiragana
-std::wstring hiragana_to_roman(const std::wstring& hiragana);
-std::wstring roman_to_hiragana(const std::wstring& roman);
+std::wstring hiragana_to_roman(std::wstring hiragana);
+std::wstring roman_to_hiragana(std::wstring roman);
 
 // character map for kana input
 WCHAR convert_key_to_kana(BYTE vk, BOOL bShift);

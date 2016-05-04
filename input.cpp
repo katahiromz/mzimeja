@@ -348,7 +348,7 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   }
 
   // if the current position has a converted character, then
-  if (log.GetCharAttr(log.dwCursorPos) != ATTR_INPUT) {
+  if (log.GetCompCharAttr(log.dwCursorPos) != ATTR_INPUT) {
     // determinate composition
     log.MakeResult();
     LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
@@ -368,9 +368,7 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
@@ -485,13 +483,11 @@ BOOL InputContext::DoConvert() {
 
   // set composition string
   assert(log_comp_str.IsValid());
-  log_comp_str.SetClauseString(log_comp_str.extra.dwSelectedClause, str, TRUE);
+  log_comp_str.SetClauseCompString(log_comp_str.extra.dwSelectedClause, str, TRUE);
   assert(log_comp_str.IsValid());
 
   // recreate composition
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log_comp_str);
-  DumpCompStr();
 
   // generate message to change composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
@@ -527,9 +523,7 @@ void InputContext::MakeResult() {
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 
   // reset composition
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr);
-  DumpCompStr();
 
   // generate messages to set composition
   TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
@@ -555,9 +549,7 @@ void InputContext::MakeHiragana() {
   assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   // generate messages to update composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -584,9 +576,7 @@ void InputContext::MakeKatakana() {
   assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   // generate messages to update composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -613,9 +603,7 @@ void InputContext::MakeHankaku() {
   assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   // generate messages to update composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -642,9 +630,7 @@ void InputContext::MakeZenEisuu() {
   assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   // generate messages to update composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -671,9 +657,7 @@ void InputContext::MakeHanEisuu() {
   assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   // generate messages to update composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -687,9 +671,7 @@ void InputContext::CancelText() {
   CloseCandidate();
 
   // reset composition
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr);
-  DumpCompStr();
 
   // generate messages to end composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
@@ -716,16 +698,14 @@ void InputContext::RevertText() {
   }
 
   // reset composition of selected clause
-  assert(log.IsValid());
   if (log.extra.dwSelectedClause != 0xFFFFFFFF) {
+    assert(log.IsValid());
     log.RevertText();
+    assert(log.IsValid());
   }
-  assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
@@ -753,9 +733,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     CloseCandidate();
 
     // clear composition
-    DumpCompStr();
     hCompStr = CompStr::ReCreate(hCompStr);
-    DumpCompStr();
 
     // generate messages to end composition
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -763,9 +741,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
   } else {
     // recreate
-    DumpCompStr();
     hCompStr = CompStr::ReCreate(hCompStr, &log);
-    DumpCompStr();
 
     // update composition
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
@@ -790,9 +766,7 @@ void InputContext::MoveLeft(BOOL bShift) {
   assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
@@ -815,9 +789,7 @@ void InputContext::MoveRight(BOOL bShift) {
   assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
@@ -844,9 +816,7 @@ void InputContext::MoveToBeginning() {
   assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
@@ -873,9 +843,7 @@ void InputContext::MoveToEnd() {
   assert(log.IsValid());
 
   // recreate
-  DumpCompStr();
   hCompStr = CompStr::ReCreate(hCompStr, &log);
-  DumpCompStr();
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
