@@ -11,13 +11,18 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct TABLEENTRY {
+struct KEYVALUE {
+  LPCWSTR key;
+  LPCWSTR value;
+};
+
+struct KEYVALUEEXTRA {
   LPCWSTR key;
   LPCWSTR value;
   LPCWSTR extra;
 };
 
-static TABLEENTRY halfkana_table[] = {
+static KEYVALUE halfkana_table[] = {
   {L"ÅJ", L"ﬁ"},
   {L"ÅK", L"ﬂ"},
   {L"Å[", L"-"},
@@ -112,7 +117,7 @@ static TABLEENTRY halfkana_table[] = {
   {L"ÇÒ", L"›"},
 };
 
-static TABLEENTRY kana_table[] = {
+static KEYVALUE kana_table[] = {
   {L"∞", L"Å["},
   {L"ﬁ", L"ÅJ"},
   {L"ﬂ", L"ÅK"},
@@ -204,7 +209,7 @@ static TABLEENTRY kana_table[] = {
   {L"ÇŸﬂ", L"Ç€"},
 };
 
-static TABLEENTRY kigou_table[] = {
+static KEYVALUE kigou_table[] = {
   {L",", L"ÅA"},
   {L".", L"ÅB"},
   {L"/", L"ÅE"},
@@ -239,7 +244,7 @@ static TABLEENTRY kigou_table[] = {
   {L"-", L"Å["},
 };
 
-static TABLEENTRY reverse_roman_table[] = {
+static KEYVALUEEXTRA reverse_roman_table[] = {
   {L"Ç§ÅJÇü", L"va"},
   {L"Ç§ÅJÇ°", L"vi"},
   {L"Ç§ÅJ", L"vu"},
@@ -472,7 +477,7 @@ static TABLEENTRY reverse_roman_table[] = {
   {L"Åv", L"]"},
 };
 
-static TABLEENTRY roman_table[] = {
+static KEYVALUEEXTRA roman_table[] = {
   {L"a", L"Ç†"},
   {L"i", L"Ç¢"},
   {L"u", L"Ç§"},
@@ -778,7 +783,7 @@ static TABLEENTRY roman_table[] = {
   {L"n@", L"ÇÒ", L"@"},
 };
 
-static TABLEENTRY sokuon_table[] = {
+static KEYVALUE sokuon_table[] = {
   {L"kka", L"Ç¡Ç©"},
   {L"kki", L"Ç¡Ç´"},
   {L"kku", L"Ç¡Ç≠"},
@@ -1046,6 +1051,90 @@ static TABLEENTRY sokuon_table[] = {
   {L"xxn", L"Ç¡ÇÒ"},
 };
 
+static KEYVALUE kana2type_table[] = {
+  {L"Ç†", L"3"},
+  {L"Ç¢", L"e"},
+  {L"Ç§", L"4"},
+  {L"Ç¶", L"5"},
+  {L"Ç®", L"6"},
+  {L"Ç©", L"t"},
+  {L"Ç´", L"g"},
+  {L"Ç≠", L"h"},
+  {L"ÇØ", L":"},
+  {L"Ç±", L"b"},
+  {L"Ç≥", L"x"},
+  {L"Çµ", L"d"},
+  {L"Ç∑", L"r"},
+  {L"Çπ", L"p"},
+  {L"Çª", L"c"},
+  {L"ÇΩ", L"q"},
+  {L"Çø", L"a"},
+  {L"Ç¬", L"z"},
+  {L"Çƒ", L"w"},
+  {L"Ç∆", L"s"},
+  {L"Ç»", L"u"},
+  {L"Ç…", L"i"},
+  {L"Ç ", L"1"},
+  {L"ÇÀ", L","},
+  {L"ÇÃ", L"k"},
+  {L"ÇÕ", L"f"},
+  {L"Ç–", L"v"},
+  {L"Ç”", L"2"},
+  {L"Ç÷", L"^"},
+  {L"ÇŸ", L"-"},
+  {L"Ç‹", L"j"},
+  {L"Ç›", L"n"},
+  {L"Çﬁ", L"]"},
+  {L"Çﬂ", L"/"},
+  {L"Ç‡", L"m"},
+  {L"Ç‚", L"7"},
+  {L"Ç‰", L"8"},
+  {L"ÇÊ", L"9"},
+  {L"ÇÁ", L"o"},
+  {L"ÇË", L"l"},
+  {L"ÇÈ", L"."},
+  {L"ÇÍ", L";"},
+  {L"ÇÎ", L"\"},
+  {L"ÇÌ", L"0"},
+  {L"Ç", L"0"},
+  {L"ÇÒ", L"y"},
+  {L"Ç™", L"t@"},
+  {L"Ç¨", L"g@"},
+  {L"ÇÆ", L"h@"},
+  {L"Ç∞", L":@"},
+  {L"Ç≤", L"b@"},
+  {L"Ç¥", L"x@"},
+  {L"Ç∂", L"d@"},
+  {L"Ç∏", L"r@"},
+  {L"Ç∫", L"p@"},
+  {L"Çº", L"c@"},
+  {L"Çæ", L"q@"},
+  {L"Ç¿", L"a@"},
+  {L"Ç√", L"z@"},
+  {L"Ç≈", L"w@"},
+  {L"Ç«", L"s@"},
+  {L"ÇŒ", L"f@"},
+  {L"Ç—", L"v@"},
+  {L"Ç‘", L"2@"},
+  {L"Ç◊", L"^@"},
+  {L"Ç⁄", L"-@"},
+  {L"Çœ", L"f["},
+  {L"Ç“", L"v["},
+  {L"Ç’", L"2["},
+  {L"Çÿ", L"^["},
+  {L"Ç€", L"-["},
+  {L"Çü", L"#"},
+  {L"Ç°", L"E"},
+  {L"Ç£", L"$"},
+  {L"Ç•", L"%"},
+  {L"Çß", L"&"},
+  {L"ÇÏ", L"0"},
+  {L"Ç¡", L"Z"},
+  {L"ÅJ", L"@"},
+  {L"ÅK", L"["},
+  {L"Å[", L"-"},
+};
+
 //////////////////////////////////////////////////////////////////////////////
 
 std::wstring hiragana_to_roman(std::wstring hiragana) {
@@ -1140,12 +1229,42 @@ std::wstring roman_to_hiragana(std::wstring roman) {
         }
       }
     }
+    if (!found) {
+      for (size_t i = 0; i < _countof(kigou_table); ++i) {
+        if (roman[k] == kigou_table[i].key[0]) {
+          hiragana += roman_table[i].value;
+          k += 1;
+          found = true;
+          break;
+        }
+      }
+    }
     if (!found) hiragana += roman[k++];
   }
   return hiragana;
 } // roman_to_hiragana
 
-WCHAR convert_key_to_kana(BYTE vk, BOOL bShift) {
+std::wstring hiragana_to_typing(std::wstring hiragana) {
+  FOOTMARK();
+  std::wstring typing;
+  for (size_t k = 0; k < hiragana.size();) {
+    bool found = false;
+    if (!found) {
+      for (size_t i = 0; i < _countof(kana2type_table); ++i) {
+        if (hiragana[k] == kana2type_table[i].key[0]) {
+          hiragana += kana2type_table[i].value;
+          k += 1;
+          found = true;
+          break;
+        }
+      }
+    }
+    if (!found) typing += hiragana[k++];
+  }
+  return typing;
+} // hiragana_to_typing
+
+WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift) {
   FOOTMARK();
   switch (vk) {
   case VK_A:          return L'Çø';
@@ -1198,7 +1317,7 @@ WCHAR convert_key_to_kana(BYTE vk, BOOL bShift) {
   case VK_OEM_102:    return L'ÇÎ';
   default:            return 0;
   }
-} // convert_key_to_kana
+} // vkey_to_hiragana
 
 WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock) {
   FOOTMARK();

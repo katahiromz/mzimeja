@@ -237,13 +237,15 @@ std::wstring hiragana_to_roman(std::wstring hiragana);
 std::wstring roman_to_hiragana(std::wstring roman);
 
 // character map for kana input
-WCHAR convert_key_to_kana(BYTE vk, BOOL bShift);
+WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift);
 // character map for typing keys
 WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock);
 // dakuon processor
 WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1);
 // locale-dependent string conversion
 std::wstring lcmap(const std::wstring& str, DWORD dwFlags);
+// convert hiragana to typing characters
+std::wstring hiragana_to_typing(std::wstring hiragana);
 
 // is the character hiragana
 BOOL is_hiragana(WCHAR ch);
