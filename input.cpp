@@ -483,7 +483,7 @@ BOOL InputContext::DoConvert() {
 
   // set composition string
   assert(log_comp_str.IsValid());
-  log_comp_str.SetClauseCompString(log_comp_str.extra.dwSelectedClause, str, TRUE);
+  log_comp_str.SetClauseCompString(log_comp_str.extra.iClause, str, TRUE);
   assert(log_comp_str.IsValid());
 
   // recreate composition
@@ -807,7 +807,7 @@ void InputContext::MoveToBeginning() {
   // move to the beginning
   assert(log.IsValid());
   if (log.HasClauseSelected()) {
-    log.extra.dwSelectedClause = 0;
+    log.extra.iClause = 0;
   } else {
     log.dwCursorPos = 0;
   }
@@ -834,7 +834,7 @@ void InputContext::MoveToEnd() {
   // move to the end
   assert(log.IsValid());
   if (log.HasClauseSelected()) {
-    log.extra.dwSelectedClause = log.comp_clause.size() - 1;
+    log.extra.iClause = log.comp_clause.size() - 1;
   } else {
     log.dwCursorPos = (DWORD)log.comp_str.size();
   }

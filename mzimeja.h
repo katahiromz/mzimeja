@@ -29,9 +29,9 @@
 // for debugging
 
 #ifdef NDEBUG
-  #define DebugPrintA (void)
-  #define DebugPrintW (void)
-  #define DebugPrint  (void)
+  #define DebugPrintA   (void)
+  #define DebugPrintW   (void)
+  #define DebugPrint    (void)
 #else
   extern "C" {
     int DebugPrintA(LPCSTR lpszFormat, ...);
