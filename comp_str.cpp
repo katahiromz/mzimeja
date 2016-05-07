@@ -393,31 +393,46 @@ void LogCompStr::DeleteChar(BOOL bBackSpace/* = FALSE*/, DWORD dwConversion) {
       // erase the character
       DWORD dwIndex = dwCursorPos - ClauseToCompChar(extra.iClause);
       extra.comp_str_clauses[extra.iClause].erase(dwIndex, 1);
-      // fix extra info
-      BOOL bRoman = (dwConversion & IME_CMODE_ROMAN);
-      std::wstring str = extra.comp_str_clauses[extra.iClause];
-      str = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
-      if (bRoman) {
-        extra.hiragana_clauses[extra.iClause] = str;
-        extra.typing_clauses[extra.iClause] =
-          lcmap(hiragana_to_roman(str), LCMAP_HALFWIDTH);
-      } else {
-        extra.hiragana_clauses[extra.iClause] = str;
-        extra.typing_clauses[extra.iClause] =
-          lcmap(hiragana_to_typing(str), LCMAP_HALFWIDTH);
-      }
+      // update extra clause
+      UpdateExtraClause(extra.iClause, dwConversion);
       // update composition string
       UpdateCompStr();
     }
   }
 } // LogCompStr::DeleteChar
 
+void LogCompStr::UpdateExtraClause(DWORD iClause, DWORD dwConversion) {
+  // fix extra info
+  BOOL bRoman = (dwConversion & IME_CMODE_ROMAN);
+  std::wstring str = extra.comp_str_clauses[iClause];
+  str = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+  if (bRoman) {
+    extra.typing_clauses[iClause] =
+      lcmap(hiragana_to_roman(str), LCMAP_HALFWIDTH);
+    str = zenkaku_eisuu_to_hankaku(str);
+    extra.hiragana_clauses[iClause] = roman_to_hiragana(str);
+  } else {
+    extra.hiragana_clauses[iClause] = str;
+    extra.typing_clauses[iClause] =
+      lcmap(hiragana_to_typing(str), LCMAP_HALFWIDTH);
+  }
+} // LogCompStr::UpdateExtraClause
+
+WCHAR LogCompStr::PrevCharInClause() const {
+  if (dwCursorPos > 0) {
+    if (CompCharInClause(dwCursorPos - 1, extra.iClause)) {
+      return comp_str[dwCursorPos - 1];
+    }
+  }
+  return 0;
+}
+
 void LogCompStr::AddKanaChar(
   std::wstring& typed, std::wstring& translated, DWORD dwConversion)
 {
   FOOTMARK();
   // if there was dakuon combination
-  WCHAR chDakuon = dakuon_shori(extra.GetPrevChar(), translated[0]);
+  WCHAR chDakuon = dakuon_shori(PrevCharInClause(), translated[0]);
   if (chDakuon) {
     // store a dakuon combination
     std::wstring str;
@@ -467,7 +482,7 @@ void LogCompStr::AddRomanChar(
     // if a roman char or period was inputted
     if (std::isalnum(chTyped) || chTyped == L'\'') {
       // an alphabet or apostorophe was typed. get previous char
-      WCHAR chPrev = extra.GetPrevChar();
+      WCHAR chPrev = PrevCharInClause();
       if (GetPhonemeCount() == 0) {  // there is no phoneme
         if (dwConversion & IME_CMODE_ROMAN) {
           // insert phonemes with roman conversion

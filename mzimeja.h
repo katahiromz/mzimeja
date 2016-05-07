@@ -235,6 +235,9 @@ HFONT CheckNativeCharset(HDC hDC);
 // conversion between roman and hiragana
 std::wstring hiragana_to_roman(std::wstring hiragana);
 std::wstring roman_to_hiragana(std::wstring roman);
+std::wstring roman_to_hiragana(std::wstring roman, size_t ichTarget);
+// conversion between roman and katakana
+std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget);
 
 // character map for kana input
 WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift);
@@ -246,6 +249,8 @@ WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1);
 std::wstring lcmap(const std::wstring& str, DWORD dwFlags);
 // convert hiragana to typing characters
 std::wstring hiragana_to_typing(std::wstring hiragana);
+// convert zenkaku eisuu to hankaku
+std::wstring zenkaku_eisuu_to_hankaku(const std::wstring& str);
 
 // is the character hiragana
 BOOL is_hiragana(WCHAR ch);
