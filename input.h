@@ -41,32 +41,16 @@ struct LogCompStrExtra {
   // selected composition clause index
   // assert(iClause <= GetClauseCount());
   DWORD                       iClause;
-  // selected phoneme index
-  // assert(iPhoneme <= GetPhonemeCount());
-  DWORD                       iPhoneme;
-  // hiragana phonemes
-  std::vector<std::wstring>   hiragana_phonemes;
-  // typing phonemes
-  std::vector<std::wstring>   typing_phonemes;
-  // phoneme index to flags
-  std::vector<BYTE>           phoneme_to_flags;
-  // flags
-  static const BYTE PHFLAG_NONE = 0;
-  static const BYTE PHFLAG_CLAUSEHEAD = 1;
+  // hiragana clause strings
+  std::vector<std::wstring>   hiragana_clauses;
+  // typing clause strings
+  std::vector<std::wstring>   typing_clauses;
+  // composition clause strings
+  std::vector<std::wstring>   comp_str_clauses;
 
   LogCompStrExtra() { clear(); }
   void clear();
   DWORD GetTotalSize() const;
-  std::wstring Join(const std::vector<std::wstring>& strs) const;
-  DWORD GetPhonemeCount() const;
-  DWORD GetPhonemeCount2() const;
-  WCHAR GetPrevChar() const;
-  void ErasePhoneme(DWORD iPhoneme);
-  void InsertPhoneme(DWORD iPhoneme, std::wstring& typed, std::wstring& translated);
-  void InsertPhoneme(std::wstring& typed, std::wstring& translated) {
-    InsertPhoneme(iPhoneme, typed, translated);
-  }
-  void InsertThere(DWORD iPhoneme, std::vector<std::wstring>& strs, std::wstring& str);
   bool IsValid();
 }; // struct LogCompStrExtra
 
@@ -74,19 +58,15 @@ struct LogCompStrExtra {
 struct COMPSTREXTRA {
   DWORD   dwSignature;
   DWORD   iClause;
-  DWORD   iPhoneme;
-  DWORD   dwHiraganaPhonemeCount;
-  DWORD   dwHiraganaPhonemeOffset;
-  DWORD   dwTypingPhonemeCount;
-  DWORD   dwTypingPhonemeOffset;
-  DWORD   dwPhonemeToFlagsCount;
-  DWORD   dwPhonemeToFlagsOffset;
+  DWORD   dwHiraganaClauseCount;
+  DWORD   dwHiraganaClauseOffset;
+  DWORD   dwTypingClauseCount;
+  DWORD   dwTypingClauseOffset;
 
   LPBYTE GetBytes() { return (LPBYTE)this; }
 
-  LPWSTR GetHiraganaPhonemes(DWORD& dwPhonemeCount);
-  LPWSTR GetTypingPhonemes(DWORD& dwPhonemeCount);
-  LPBYTE GetPhonemeToFlags(DWORD& dwCount);
+  LPWSTR GetHiraganaClauses(DWORD& dwCount);
+  LPWSTR GetTypingClauses(DWORD& dwCount);
 
   // physical to logical
   void GetLog(LogCompStrExtra& log);
@@ -145,8 +125,8 @@ struct LogCompStr {
   void SetClauseAttr(DWORD dwClauseIndex, BYTE attr);
   BYTE GetCompCharAttr(DWORD ich) const;
   BOOL IsClauseConverted(DWORD dwClauseIndex) const;
-  DWORD GetPhonemeCount() const;
   DWORD GetCompCharCount() const;
+  DWORD GetClauseStrLen(DWORD iClause) const;
 
   // conversion of composition
   void MakeHiragana();
@@ -156,20 +136,12 @@ struct LogCompStr {
   void MakeHanEisuu();
 
   // conversion of locative information
-  DWORD ClauseToPhoneme(DWORD dwClauseIndex) const;
   DWORD ClauseToCompChar(DWORD dwClauseIndex) const;
-  DWORD PhonemeToClause(DWORD dwPhonemeIndex) const;
   DWORD CompCharToClause(DWORD iCompChar) const;
-  BYTE PhonemeToFlags(DWORD dwPhonemeIndex);
 
   // get clause information
-  BOOL CompCharInClause(DWORD iCompChar, DWORD iClause) const;
-  std::wstring GetLeft(DWORD dwClauseIndex) const;
-  std::wstring GetRight(DWORD dwClauseIndex) const;
-  std::wstring GetClauseCompString(DWORD dwClauseIndex) const;
-  std::wstring GetClauseHiraganaString(DWORD dwClauseIndex) const;
-  std::wstring GetClauseTypingString(DWORD dwClauseIndex) const;
-  void SetClauseCompString(DWORD dwClauseIndex, std::wstring& strClause, BOOL bConverted);
+  BOOL CompCharInClause(DWORD iCompChar, DWORD iClause,
+                        BOOL bExcludeEnd = FALSE) const;
   BOOL IsBeingConverted();
   void MakeCompString(DWORD dwConversion);
   std::wstring Translate(

@@ -66,7 +66,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
   // get translated char
   WCHAR chTranslated = 0;
   if (!bRoman) {
-    chTranslated = convert_key_to_kana(vk, bShift);
+    chTranslated = vkey_to_hiragana(vk, bShift);
   }
   if (chTranslated || chTyped) {
     lpIMC = TheIME.LockIMC(hIMC);

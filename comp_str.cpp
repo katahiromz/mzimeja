@@ -7,100 +7,36 @@
 
 DWORD LogCompStrExtra::GetTotalSize() const {
   DWORD total = sizeof(COMPSTREXTRA);
-  for (size_t i = 0; i < hiragana_phonemes.size(); ++i) {
-    total += (hiragana_phonemes[i].size() + 1) * sizeof(WCHAR);
+  for (size_t i = 0; i < hiragana_clauses.size(); ++i) {
+    total += (hiragana_clauses[i].size() + 1) * sizeof(WCHAR);
   }
-  for (size_t i = 0; i < typing_phonemes.size(); ++i) {
-    total += (typing_phonemes[i].size() + 1) * sizeof(WCHAR);
+  for (size_t i = 0; i < typing_clauses.size(); ++i) {
+    total += (typing_clauses[i].size() + 1) * sizeof(WCHAR);
   }
-  total += phoneme_to_flags.size() * sizeof(BYTE);
   return total;
 }
 
 void LogCompStrExtra::clear() {
   FOOTMARK();
   iClause = 0;
-  iPhoneme = 0;
-  hiragana_phonemes.clear();
-  typing_phonemes.clear();
-  phoneme_to_flags.clear();
-}
-
-DWORD LogCompStrExtra::GetPhonemeCount() const {
-  FOOTMARK();
-  return (DWORD)hiragana_phonemes.size();
-}
-
-DWORD LogCompStrExtra::GetPhonemeCount2() const {
-  FOOTMARK();
-  return (DWORD)phoneme_to_flags.size();
-}
-
-void LogCompStrExtra::InsertThere(
-  DWORD dwPhonemeIndex, std::vector<std::wstring>& strs, std::wstring& str)
-{
-  FOOTMARK();
-  strs.insert(strs.begin() + dwPhonemeIndex, str.c_str());
-}
-
-void LogCompStrExtra::InsertPhoneme(
-  DWORD dwPhonemeIndex, std::wstring& typed, std::wstring& translated)
-{
-  FOOTMARK();
-  if (phoneme_to_flags.empty()) phoneme_to_flags.push_back(1);
-  assert(dwPhonemeIndex < GetPhonemeCount2());
-  InsertThere(dwPhonemeIndex, typing_phonemes, typed);
-  InsertThere(dwPhonemeIndex, hiragana_phonemes, translated);
-  if (phoneme_to_flags[dwPhonemeIndex] & 1) {
-    phoneme_to_flags.insert(phoneme_to_flags.begin() + dwPhonemeIndex + 1, 0x00);
-  } else {
-    phoneme_to_flags.insert(phoneme_to_flags.begin() + dwPhonemeIndex, 0x00);
-  }
-}
-
-WCHAR LogCompStrExtra::GetPrevChar() const {
-  FOOTMARK();
-  if (0 < iPhoneme && iPhoneme < GetPhonemeCount()) {
-    std::wstring str = hiragana_phonemes[iPhoneme - 1];
-    if (str.size()) {
-      return str[str.size() - 1];
-    }
-  }
-  return 0;
-}
-
-std::wstring
-LogCompStrExtra::Join(const std::vector<std::wstring>& strs) const {
-  FOOTMARK();
-  std::wstring str;
-  for (size_t i = 0; i < strs.size(); ++i) {
-    str += strs[i].c_str();
-  }
-  return str;
+  hiragana_clauses.clear();
+  typing_clauses.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-LPWSTR COMPSTREXTRA::GetHiraganaPhonemes(DWORD& dwPhonemeCount) {
-  dwPhonemeCount = dwHiraganaPhonemeCount;
-  if (dwPhonemeCount) {
-    return (LPWSTR)(GetBytes() + dwHiraganaPhonemeOffset);
-  }
-  return NULL;
-}
-
-LPWSTR COMPSTREXTRA::GetTypingPhonemes(DWORD& dwPhonemeCount) {
-  dwPhonemeCount = dwTypingPhonemeCount;
-  if (dwPhonemeCount) {
-    return (LPWSTR)(GetBytes() + dwTypingPhonemeOffset);
-  }
-  return NULL;
-}
-
-LPBYTE COMPSTREXTRA::GetPhonemeToFlags(DWORD& dwCount) {
-  dwCount = dwPhonemeToFlagsCount;
+LPWSTR COMPSTREXTRA::GetHiraganaClauses(DWORD& dwCount) {
+  dwCount = dwHiraganaClauseCount;
   if (dwCount) {
-    return GetBytes() + dwPhonemeToFlagsOffset;
+    return (LPWSTR)(GetBytes() + dwHiraganaClauseOffset);
+  }
+  return NULL;
+}
+
+LPWSTR COMPSTREXTRA::GetTypingClauses(DWORD& dwCount) {
+  dwCount = dwTypingClauseCount;
+  if (dwCount) {
+    return (LPWSTR)(GetBytes() + dwTypingClauseOffset);
   }
   return NULL;
 }
@@ -109,29 +45,22 @@ void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
   FOOTMARK();
   log.clear();
   log.iClause = iClause;
-  log.iPhoneme = iPhoneme;
 
   DWORD dwCount;
-  LPWSTR pch = GetHiraganaPhonemes(dwCount);
+  LPWSTR pch = GetHiraganaClauses(dwCount);
   if (pch && dwCount) {
     while (dwCount--) {
-      log.hiragana_phonemes.push_back(pch);
+      log.hiragana_clauses.push_back(pch);
       pch += lstrlenW(pch) + 1;
     }
   }
 
-  pch = GetTypingPhonemes(dwCount);
+  pch = GetTypingClauses(dwCount);
   if (pch && dwCount) {
     while (dwCount--) {
-      log.typing_phonemes.push_back(pch);
+      log.typing_clauses.push_back(pch);
       pch += lstrlenW(pch) + 1;
     }
-  }
-
-  LPBYTE pb = GetPhonemeToFlags(dwCount);
-  if (pb && dwCount) {
-    log.phoneme_to_flags.resize(dwCount);
-    log.assign(pb, pb + dwCount);
   }
 } // COMPSTREXTRA::GetLog
 
@@ -143,33 +72,27 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
   LPBYTE pb = GetBytes();
   dwSignature = 0xDEADFACE;
   iClause = log->iClause;
-  iPhoneme = log->iPhoneme;
   pb += sizeof(COMPSTREXTRA);
 
   DWORD size;
 
-  dwHiraganaPhonemeOffset = (DWORD)(pb - GetBytes());
-  dwHiraganaPhonemeCount = 0;
-  for (size_t i = 0; i < log->hiragana_phonemes.size(); ++i) {
-    size = (log->hiragana_phonemes[i].size() + 1) * sizeof(WCHAR);
-    memcpy(pb, &log->hiragana_phonemes[i][0], size);
-    ++dwHiraganaPhonemeCount;
+  dwHiraganaClauseOffset = (DWORD)(pb - GetBytes());
+  dwHiraganaClauseCount = 0;
+  for (size_t i = 0; i < log->hiragana_clauses.size(); ++i) {
+    size = (log->hiragana_clauses[i].size() + 1) * sizeof(WCHAR);
+    memcpy(pb, &log->hiragana_clauses[i][0], size);
+    ++dwHiraganaClauseCount;
     pb += size;
   }
 
-  dwTypingPhonemeOffset = (DWORD)(pb - GetBytes());
-  dwTypingPhonemeCount = 0;
-  for (size_t i = 0; i < log->typing_phonemes.size(); ++i) {
-    size = (log->typing_phonemes[i].size() + 1) * sizeof(WCHAR);
-    memcpy(pb, &log->typing_phonemes[i][0], size);
-    ++dwTypingPhonemeCount;
+  dwTypingClauseOffset = (DWORD)(pb - GetBytes());
+  dwTypingClauseCount = 0;
+  for (size_t i = 0; i < log->typing_clauses.size(); ++i) {
+    size = (log->typing_clauses[i].size() + 1) * sizeof(WCHAR);
+    memcpy(pb, &log->typing_clauses[i][0], size);
+    ++dwTypingClauseCount;
     pb += size;
   }
-
-  dwPhonemeToFlagsOffset = (DWORD)(pb - GetBytes());
-  dwPhonemeToFlagsCount = (DWORD)log->phoneme_to_flags.size();
-  memcpy(pb, &log->phoneme_to_flags[0], dwPhonemeToFlagsCount);
-  pb += dwPhonemeToFlagsCount;
 
   assert(log->GetTotalSize() == (DWORD)(pb - GetBytes()));
   return (DWORD)(pb - GetBytes());
@@ -183,20 +106,18 @@ DWORD LogCompStr::GetClauseCount() const {
   return (DWORD)(comp_clause.size() - 1);
 }
 
-BOOL LogCompStr::CompCharInClause(DWORD iCompChar, DWORD iClause) const {
+BOOL LogCompStr::CompCharInClause(
+  DWORD iCompChar, DWORD iClause, BOOL bExcludeEnd/* = FALSE */) const {
   FOOTMARK();
-  return iClause < GetClauseCount() && comp_clause[iClause] <= iCompChar &&
-         iCompChar <= comp_clause[iClause + 1];
-}
-
-BYTE LogCompStr::PhonemeToFlags(DWORD dwPhonemeIndex) const {
-  const DWORD cPhoneme = GetPhonemeCount();
-  assert(dwPhonemeIndex <= cPhoneme);
-  if (dwPhonemeIndex < cPhoneme)
-    return extra.phoneme_to_flags[dwPhonemeIndex];
-  if (dwPhonemeIndex == cPhoneme)
-    return 1;
-  return 0;
+  if (bExcludeEnd) {
+    return (iClause < GetClauseCount() &&
+            comp_clause[iClause] <= iCompChar &&
+            iCompChar < comp_clause[iClause + 1]);
+  } else {
+    return (iClause < GetClauseCount() &&
+            comp_clause[iClause] <= iCompChar &&
+            iCompChar <= comp_clause[iClause + 1]);
+  }
 }
 
 BYTE LogCompStr::GetClauseAttr(DWORD dwClauseIndex) const {
@@ -212,9 +133,9 @@ BYTE LogCompStr::GetClauseAttr(DWORD dwClauseIndex) const {
 void LogCompStr::SetClauseAttr(DWORD dwClauseIndex, BYTE attr) {
   FOOTMARK();
   if (dwClauseIndex + 1 <= GetClauseCount()) {
-    DWORD ich = comp_clause[dwClauseIndex];
-    DWORD ichEnd = comp_clause[dwClauseIndex + 1];
-    for (DWORD i = ich; i < ichEnd; ++i) {
+    DWORD ich0 = comp_clause[dwClauseIndex];
+    DWORD ich1 = comp_clause[dwClauseIndex + 1];
+    for (DWORD i = ich0; i < ich1; ++i) {
       comp_attr[i] = attr;
     }
   }
@@ -236,32 +157,6 @@ BYTE LogCompStr::GetCompCharAttr(DWORD ich) const {
     ret = comp_attr[ich];
   }
   return ret;
-}
-
-DWORD LogCompStr::ClauseToPhoneme(DWORD dwClauseIndex) const {
-  FOOTMARK();
-  if (dwClauseIndex >= GetClauseCount()) return GetPhonemeCount();
-  DWORD iClause = 0;
-  const DWORD cPhoneme = GetPhonemeCount();
-  for (DWORD iPhoneme = 0; iPhoneme < cPhoneme; ++iPhoneme) {
-    if (PhonemeToFlags(iPhoneme) & 1) {
-      if (iClause == dwClauseIndex) return iPhoneme;
-      ++iClause;
-    }
-  }
-  return cPhoneme;
-}
-
-DWORD LogCompStr::PhonemeToClause(DWORD dwPhonemeIndex) const {
-  FOOTMARK();
-  if (dwPhonemeIndex >= GetPhonemeCount()) return GetClauseCount();
-  DWORD iClause = 0;
-  const DWORD cPhoneme = GetPhonemeCount();
-  for (DWORD iPhoneme = 0; iPhoneme < cPhoneme; ++iPhoneme) {
-    if (iPhoneme == dwPhonemeIndex) break;
-    if (PhonemeToFlags(iPhoneme) & 1) ++iClause;
-  }
-  return iClause;
 }
 
 DWORD LogCompStr::ClauseToCompChar(DWORD dwClauseIndex) const {
@@ -345,11 +240,6 @@ DWORD LogCompStr::GetTotalSize() const {
   return total;
 }
 
-DWORD LogCompStr::GetPhonemeCount() const {
-  FOOTMARK();
-  return extra.GetPhonemeCount();
-}
-
 std::wstring LogCompStr::GetClauseCompString(DWORD dwClauseIndex) const {
   FOOTMARK();
   std::wstring ret;
@@ -361,126 +251,66 @@ std::wstring LogCompStr::GetClauseCompString(DWORD dwClauseIndex) const {
   return ret;
 }
 
-std::wstring LogCompStr::GetClauseHiraganaString(DWORD dwClauseIndex) const {
+DWORD LogCompStr::GetClauseStrLen(DWORD iClause) const {
   FOOTMARK();
-  std::wstring ret;
-  if (dwClauseIndex + 1 <= GetClauseCount()) {
-    DWORD iph0 = extra.clause_to_phoneme[dwClauseIndex];
-    DWORD iph1 = extra.clause_to_phoneme[dwClauseIndex + 1];
-    for (DWORD i = iph0; i < iph1; ++i) {
-      ret += extra.hiragana_phonemes[i];
-    }
+  if (iClause + 1 <= GetClauseCount()) {
+    return comp_clause[iClause + 1] - comp_clause[iClause];
   }
-  return ret;
+  return 0;
 }
 
-std::wstring LogCompStr::GetClauseTypingString(DWORD dwClauseIndex) const {
-  FOOTMARK();
-  std::wstring ret;
-  if (dwClauseIndex + 1 <= GetClauseCount()) {
-    DWORD iph0 = extra.clause_to_phoneme[dwClauseIndex];
-    DWORD iph1 = extra.clause_to_phoneme[dwClauseIndex + 1];
-    for (DWORD i = iph0; i < iph1; ++i) {
-      ret += extra.typing_phonemes[i];
-    }
+void LogCompStr::UpdateCompStr() {
+  comp_str.clear();
+  size_t count = extra.comp_str_clauses.size();
+  for (size_t i = 0; i < count; ++i) {
+    comp_str += extra.comp_str_clauses[i];
   }
-  return ret;
-}
-
----
-
-void LogCompStr::SetClauseCompString(
-  DWORD dwClauseIndex, std::wstring& strNew, BOOL bConverted)
-{
-  FOOTMARK();
-  if (dwClauseIndex >= GetClauseCount()) return;
-
-  // replace old with new
-  std::wstring strOld = GetClauseCompString(dwClauseIndex);
-  std::wstring strLeft = GetLeft(dwClauseIndex);
-  comp_str.replace(strLeft.size(), strOld.size(), strNew);
-
-  // untarget
-  for (size_t i = 0; i < comp_attr.size(); ++i) {
-    if (comp_attr[i] == ATTR_TARGET_CONVERTED) comp_attr[i] = ATTR_CONVERTED;
-  }
-
-  // replace attr
-  comp_attr.erase(
-    comp_attr.begin() + strLeft.size(),
-    comp_attr.begin() + strLeft.size() + strOld.size());
-  comp_attr.insert(
-    comp_attr.begin() + strLeft.size(), strNew.size(),
-    (bConverted ? ATTR_TARGET_CONVERTED : ATTR_INPUT));
-
-  // update clause
-  if (strNew.size() > strOld.size()) {
-    for (size_t i = dwClauseIndex + 1; i < comp_clause.size(); ++i) {
-      comp_clause[i] += (DWORD)(strNew.size() - strOld.size());
-    }
-  } else {
-    if (strNew.size() < strOld.size()) {
-      for (size_t i = dwClauseIndex + 1; i < comp_clause.size(); ++i) {
-        comp_clause[i] -= (DWORD)(strOld.size() - strNew.size());
-      }
-    }
-  }
-
-  if (bConverted) {
-    dwCursorPos = (DWORD)comp_str.size();
-    extra.iClause = dwClauseIndex;
-  } else {
-    dwCursorPos = (DWORD)(strLeft.size() + strNew.size());
-    extra.iClause = GetClauseCount();
-  }
-} // LogCompStr::SetClauseCompString
-
-std::wstring LogCompStr::GetLeft(DWORD dwClauseIndex) const {
-  FOOTMARK();
-  assert(dwClauseIndex < (DWORD)comp_clause.size());
-  DWORD ich = comp_clause[dwClauseIndex];
-  return comp_str.substr(0, ich);
-}
-
-std::wstring LogCompStr::GetRight(DWORD dwClauseIndex) const {
-  FOOTMARK();
-  assert(dwClauseIndex < (DWORD)comp_clause.size());
-  DWORD ich = comp_clause[dwClauseIndex];
-  return comp_str.substr(ich);
 }
 
 void LogCompStr::MakeHiragana() {
   FOOTMARK();
-  std::wstring str = GetClauseHiraganaString(extra.iClause);
-  SetClauseCompString(extra.iClause, str, TRUE);
+  extra.comp_str_clauses[extra.iClause] =
+    lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_HIRAGANA);
+  UpdateCompStr();
+  SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+  dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeKatakana() {
   FOOTMARK();
-  std::wstring str = GetClauseHiraganaString(extra.iClause);
-  str = lcmap(str, LCMAP_KATAKANA);
-  SetClauseCompString(extra.iClause, str, TRUE);
+  extra.comp_str_clauses[extra.iClause] =
+    lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_KATAKANA);
+  UpdateCompStr();
+  SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+  dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeHankaku() {
   FOOTMARK();
-  std::wstring str = lcmap(GetClauseTypingString(extra.iClause),
-                           LCMAP_HALFWIDTH | LCMAP_KATAKANA);
-  SetClauseCompString(extra.iClause, str, TRUE);
+  extra.comp_str_clauses[extra.iClause] =
+    lcmap(extra.hiragana_clauses[extra.iClause],
+          LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+  UpdateCompStr();
+  SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+  dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeZenEisuu() {
   FOOTMARK();
-  std::wstring str = GetClauseTypingString(extra.iClause);
-  str = lcmap(str, LCMAP_FULLWIDTH);
-  SetClauseCompString(extra.iClause, str, TRUE);
+  extra.comp_str_clauses[extra.iClause] =
+    lcmap(extra.typing_clauses[extra.iClause], LCMAP_FULLWIDTH);
+  UpdateCompStr();
+  SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+  dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeHanEisuu() {
   FOOTMARK();
-  std::wstring str = GetClauseTypingString(extra.iClause);
-  str = lcmap(str, LCMAP_HALFWIDTH);
-  SetClauseCompString(extra.iClause, str, TRUE);
+  extra.comp_str_clauses[extra.iClause] =
+    lcmap(extra.typing_clauses[extra.iClause], LCMAP_HALFWIDTH);
+  UpdateCompStr();
+  SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+  dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeResult() {
@@ -495,49 +325,92 @@ void LogCompStr::MakeResult() {
   dwCursorPos = 0;
 }
 
-void LogCompStr::MakeCompString(DWORD dwConversion) {
-  // if no clause, create one
-  if (GetClauseCount() == 0) {
-    comp_clause.resize(2);
-    comp_clause[0] = 0;
-    comp_clause[1] = GetCompCharCount();
-  }
-  // extract and update composition clause strings
-  std::vector<std::wstring> strs;
-  DWORD i, count = GetClauseCount();
-  for (i = 0; i < count; ++i) {
-    if (GetClauseAttr(i) == ATTR_INPUT) {
-      DWORD ich = ClauseToCompChar(i);
-      DWORD ichNext = ClauseToCompChar(i + 1);
-      std::wstring hiragana, typing;
-      DWORD iph = CompCharToPhoneme(ich);
-      DWORD iphNext = CompCharToPhoneme(ichNext);
-      for (DWORD k = iph; k < iphNext; ++k) {
-        hiragana += extra.hiragana_phonemes[k];
-        typing += extra.typing_phonemes[k];
+void LogCompStr::MergeAt(std::vector<std::wstring>& strs, DWORD istr) {
+  strs[istr - 1] += strs[istr];
+  strs.erase(strs.begin() + istr);
+}
+
+void LogCompStr::RevertText() {
+  FOOTMARK();
+  // reset composition
+  if (extra.iClause < GetClauseCount()) {
+    // merge adjacent not converted clauses
+    if (extra.iClause > 0) {
+      if (!IsClauseConverted(extra.iClause - 1)) {
+        MergeAt(extra.hiragana_clauses, extra.iClause);
+        MergeAt(extra.typing_clauses, extra.iClause);
+        MergeAt(extra.comp_str_clauses, extra.iClause);
+        comp_clause.erase(comp_clause.begin() + extra.iClause);
+        --extra.iClause;
       }
-      std::wstring str = Translate(hiragana, typing, dwConversion);
-      SetClauseCompString(i, str, FALSE);
-      strs.push_back(str);
-    } else {
-      strs.push_back(GetClauseCompString(i));
+    }
+    if (extra.iClause + 1 < GetClauseCount()) {
+      if (!IsClauseConverted(extra.iClause + 1)) {
+        MergeAt(extra.hiragana_clauses, extra.iClause + 1);
+        MergeAt(extra.typing_clauses, extra.iClause + 1);
+        MergeAt(extra.comp_str_clauses, extra.iClause + 1);
+        comp_clause.erase(comp_clause.begin() + extra.iClause + 1);
+      }
+    }
+    // update composition string
+    extra.comp_str_clauses[extra.iClause] =
+      lcmap(extra.hiragana_clauses[extra.iClause],
+            LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+    UpdateCompStr();
+    // set cursor position
+    dwCursorPos = ClauseToCompChar(extra.iClause + 1);
+    // set delta start
+    dwDeltaStart = ClauseToCompChar(extra.iClause);
+    // untarget
+    SetClauseAttr(extra.iClause, ATTR_INPUT);
+  }
+}
+
+void LogCompStr::DeleteChar(BOOL bBackSpace/* = FALSE*/, DWORD dwConversion) {
+  FOOTMARK();
+  // is the current clause being converted?
+  if (IsClauseConverted(extra.iClause)) { // being converted
+    // set hiragana string to current clause
+    extra.comp_str_clauses[extra.iClause] =
+      extra.hiragana_clauses[extra.iClause];
+    UpdateCompStr();
+    SetClauseAttr(extra.iClause, ATTR_INPUT);
+    dwCursorPos = ClauseToCompChar(extra.iClause + 1);
+  } else {  // not being converted
+    BOOL flag = FALSE;
+    // is it back space?
+    if (bBackSpace) { // back space
+      if (CompCharInClause(dwCursorPos - 1, extra.iClause)) {
+        --dwCursorPos;  // move left
+        flag = TRUE;
+      }
+    } else {  // not back space
+      if (CompCharInClause(dwCursorPos, extra.iClause, TRUE)) {
+        flag = TRUE;
+      }
+    }
+    if (flag) {
+      // erase the character
+      DWORD dwIndex = dwCursorPos - ClauseToCompChar(extra.iClause);
+      extra.comp_str_clauses[extra.iClause].erase(dwIndex, 1);
+      // fix extra info
+      BOOL bRoman = (dwConversion & IME_CMODE_ROMAN);
+      std::wstring str = extra.comp_str_clauses[extra.iClause];
+      str = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+      if (bRoman) {
+        extra.hiragana_clauses[extra.iClause] = str;
+        extra.typing_clauses[extra.iClause] =
+          lcmap(hiragana_to_roman(str), LCMAP_HALFWIDTH);
+      } else {
+        extra.hiragana_clauses[extra.iClause] = str;
+        extra.typing_clauses[extra.iClause] =
+          lcmap(hiragana_to_typing(str), LCMAP_HALFWIDTH);
+      }
+      // update composition string
+      UpdateCompStr();
     }
   }
-  // create composition string from extracted clause strings
-  DWORD ich = 0;
-  std::wstring str;
-  for (i = 0; i < count; ++i) {
-    comp_clause[i] = ich;
-    ich += strs[i].size();
-    str += strs[i];
-  }
-  comp_str = str;
-  comp_clause[i] = GetCompCharCount();
-  dwCursorPos = PhonemeToCompChar(extra.iPhoneme);
-  // create the reading string
-  str = extra.Join(extra.hiragana_phonemes);
-  comp_read_str = lcmap(str, LCMAP_HALFWIDTH | LCMAP_KATAKANA);
-} // LogCompStr::MakeCompString
+} // LogCompStr::DeleteChar
 
 void LogCompStr::AddKanaChar(
   std::wstring& typed, std::wstring& translated, DWORD dwConversion)
@@ -661,9 +534,6 @@ void LogCompStr::AddRomanChar(
 
 void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConversion) {
   FOOTMARK();
-  if (extra.phoneme_to_flags.empty()) {
-    extra.phoneme_to_flags.push_back(1);
-  }
   std::wstring strTyped, strTranslated;
   if (chTranslated && !(dwConversion & IME_CMODE_ROMAN)) {   // kana input
     assert(is_hiragana(chTranslated));
@@ -677,80 +547,6 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConversion) 
   }
 } // LogCompStr::AddChar
 
-void LogCompStr::RevertText() {
-  FOOTMARK();
-  // reset composition
-  if (extra.iClause < GetClauseCount()) {
-    // get a hiragana string of the current clause
-    std::wstring str = GetClauseHiraganaString(extra.iClause);
-    // set the hiragana string to the current clause
-    SetClauseCompString(extra.iClause, str, FALSE);
-    // set delta start
-    dwDeltaStart = ClauseToCompChar(extra.iClause);
-  }
-}
-
-void LogCompStr::ErasePhoneme(DWORD dwPhonemeIndex) {
-  assert(dwPhonemeIndex < GetPhonemeCount());
-  hiragana_phonemes.erase(hiragana_phonemes.begin() + dwPhonemeIndex);
-  typing_phonemes.erase(typing_phonemes.begin() + dwPhonemeIndex);
-  if (PhonemeToFlags(dwPhonemeIndex) & 1) {
-    phoneme_to_flags.erase(phoneme_to_flags.begin() + dwPhonemeIndex);
-  } else {
-    phoneme_to_flags.erase(phoneme_to_flags.begin() + dwPhonemeIndex);
-  }
-}
-
-void LogCompStr::DeleteChar(BOOL bRoman, BOOL bBackSpace/* = FALSE*/) {
-  FOOTMARK();
-  // is the current clause being converted?
-  if (IsClauseConverted(extra.iClause) != ATTR_INPUT) { // being converted
-    // set the hiragana string to the clause
-    std::wstring str = GetClauseHiraganaString(extra.iClause);
-    SetClauseCompString(extra.iClause, str, FALSE);
-  } else {  // not being converted
-    BOOL flag = FALSE;
-    // is it back space?
-    if (bBackSpace) { // back space
-      if (0 < dwCursorPos && dwCursorPos <= GetCompCharCount()) {
-        --dwCursorPos;  // move left
-        extra.iPhoneme = CompCharToPhoneme(dwCursorPos);
-        flag = TRUE;
-      }
-    } else {  // not back space
-      if (0 <= dwCursorPos && dwCursorPos < GetCompCharCount()) {
-        assert(extra.iPhoneme < GetPhonemeCount());
-        flag = TRUE;
-      }
-    }
-    if (flag) {
-      // get the current phoneme string as str
-      std::wstring& str = extra.hiragana_phonemes[extra.iPhoneme];
-      if (str.size() <= 1) {
-        extra.ErasePhoneme(extra.iPhoneme);  // erase phoneme
-        comp_str.erase(dwCursorPos, 1);   // delete one char
-      } else {
-        comp_str.erase(dwCursorPos, 1);   // delete one char
-        // scan and compare comp_str and str
-        for (size_t i = 0; i < str.size(); ++i) {
-          if (str[i] != comp_str[dwCursorPos + i]) {
-            // erase one char of phoneme
-            str.erase(i, 1);
-            // generate typing phonemes
-            if (bRoman) {
-              extra.typing_phonemes[extra.iPhoneme] =
-                hiragana_to_roman(str);
-            } else {
-              extra.typing_phonemes[extra.iPhoneme] =
-                lcmap(str, LCMAP_HALFWIDTH | LCMAP_KATAKANA);
-            }
-            break;
-          }
-        }
-      }
-    }
-  }
-} // LogCompStr::DeleteChar
 
 void LogCompStr::MoveLeft(BOOL bShift) {
   FOOTMARK();
@@ -763,27 +559,32 @@ void LogCompStr::MoveLeft(BOOL bShift) {
     if (extra.iClause > 0) {
       --extra.iClause;
     } else {
-      assert(comp_clause.size() >= 2);
       extra.iClause = GetClauseCount() - 1;
     }
     // retarget
     SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
-    // set the current phoneme
-    extra.iPhoneme = ClauseToPhoneme(extra.iClause);
+    // move cursor
+    dwCursorPos = GetCompCharCount();
   } else {
     // move cursor
-    if (dwCursorPos > 0) --dwCursorPos;
-    // went out of clause?
-    if (!CompCharInClause(dwCursorPos, extra.iClause)) {
-      // untarget
-      SetClauseAttr(extra.iClause, ATTR_CONVERTED);
-      // set the current clause
-      extra.iClause = CompCharToClause(dwCursorPos);
-      // retarget
-      SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+    if (dwCursorPos > 0) {
+      --dwCursorPos;
+      // went out of clause?
+      if (!CompCharInClause(dwCursorPos, extra.iClause)) {
+        // set the current clause
+        extra.iClause = CompCharToClause(dwCursorPos);
+        // is the clause converted?
+        if (IsClauseConverted(extra.iClause)) {
+          // retarget
+          SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+          // move cursor
+          dwCursorPos = GetCompCharCount();
+        } else {
+          // move cursor
+          dwCursorPos = ClauseToCompChar(extra.iClause + 1);
+        }
+      }
     }
-    // set the current phoneme
-    extra.iPhoneme = CompCharToPhoneme(dwCursorPos);
   }
 } // LogCompStr::MoveLeft
 
@@ -801,47 +602,30 @@ void LogCompStr::MoveRight(BOOL bShift) {
     }
     // retarget
     SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
-    // set current phoneme
-    extra.iPhoneme = ClauseToPhoneme(extra.iClause);
+    // move cursor
+    dwCursorPos = GetCompCharCount();
   } else {  // not being converted
     // move cursor
     if (dwCursorPos + 1 < GetCompCharCount()) {
       ++dwCursorPos;
+      // went out of clause?
+      if (!CompCharInClause(dwCursorPos, extra.iClause)) {
+        // set current clause
+        extra.iClause = CompCharToClause(dwCursorPos);
+        // is the clause converted?
+        if (IsClauseConverted(extra.iClause)) {
+          // retarget
+          SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+          // move cursor
+          dwCursorPos = GetCompCharCount();
+        } else {
+          // move cursor
+          dwCursorPos = ClauseToCompChar(extra.iClause + 1);
+        }
+      }
     }
-    // went out of clause?
-    if (!CompCharInClause(dwCursorPos, extra.iClause)) {
-      // untarget
-      SetClauseAttr(extra.iClause, ATTR_CONVERTED);
-      // set current clause
-      extra.iClause = CompCharToClause(dwCursorPos);
-      // retarget
-      SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
-    }
-    // set current phoneme
-    extra.iPhoneme = CompCharToPhoneme(dwCursorPos);
   }
 } // LogCompStr::MoveRight
-
-std::wstring
-LogCompStr::Translate(
-  const std::wstring& hiragana, const std::wstring& typing,
-  DWORD dwConversion)
-{
-  INPUT_MODE imode = InputModeFromConversionMode(TRUE, dwConversion);
-  switch (imode) {
-  case IMODE_ZEN_HIRAGANA:
-    return lcmap(hiragana, LCMAP_HIRAGANA);
-  case IMODE_ZEN_KATAKANA:
-    return lcmap(hiragana, LCMAP_KATAKANA);
-  case IMODE_ZEN_EISUU:
-    return lcmap(typing, LCMAP_FULLWIDTH);
-  case IMODE_HAN_KANA: case IMODE_HAN_EISUU:
-    return lcmap(typing, LCMAP_HALFWIDTH | LCMAP_KATAKANA);
-  default:
-    break;
-  }
-  return typing;
-} // LogCompStr::Transfer
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -862,8 +646,16 @@ void CompStr::GetLog(LogCompStr& log) {
   COMPSTREXTRA *extra = GetExtra();
   if (extra && extra->dwSignature == 0xDEADFACE) {
     extra->GetLog(log.extra);
-  } else {
-    // TODO: do something
+
+    log.extra.comp_str_clauses.clear();
+    size_t count = log.comp_clause.size();
+    if (count > 1) {
+      for (size_t i = 0; i < count - 1; ++i) {
+        DWORD ich0 = log.comp_clause[i];
+        DWORD ich1 = log.comp_clause[i + 1];
+        log.extra.comp_str_clauses.push_back(log.comp_str.substr(ich0, ich1 - ich0));
+      }
+    }
   }
 }
 
@@ -963,35 +755,19 @@ void CompStr::GetLog(LogCompStr& log) {
 
 bool LogCompStrExtra::IsValid() {
   bool ret = true;
-  if (hiragana_phonemes.size() != typing_phonemes.size()) {
+  if (hiragana_clauses.size() != typing_clauses.size()) {
     FOOTMARK_PRINT_CALL_STACK();
     ret = false;
   }
-  if (iPhoneme > GetPhonemeCount()) {
-    FOOTMARK_PRINT_CALL_STACK();
-    ret = false;
-  }
-  for (size_t i = 0; i < hiragana_phonemes.size(); ++i) {
-    if (hiragana_phonemes[i].empty()) {
+  for (size_t i = 0; i < hiragana_clauses.size(); ++i) {
+    if (hiragana_clauses[i].empty()) {
       FOOTMARK_PRINT_CALL_STACK();
       ret = false;
     }
-    if (typing_phonemes[i].empty()) {
+    if (typing_clauses[i].empty()) {
       FOOTMARK_PRINT_CALL_STACK();
       ret = false;
     }
-    if (hiragana_phonemes[i].size() > 5) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
-    }
-    if (typing_phonemes[i].size() > 5) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
-    }
-  }
-  if (GetPhonemeCount() != GetPhonemeCount2()) {
-    FOOTMARK_PRINT_CALL_STACK();
-    ret = false;
   }
   return ret;
 } // LogCompStrExtra::IsValid
@@ -1070,12 +846,6 @@ bool LogCompStr::IsValid() {
         FOOTMARK_PRINT_CALL_STACK();
         ret = false;
       }
-    }
-  }
-  if (!extra.phoneme_to_flags.empty()) {
-    if ((DWORD)extra.phoneme_to_flags.size() != GetPhonemeCount()) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
     }
   }
   if (ret) {
@@ -1216,23 +986,16 @@ void LogCompStr::Dump() {
   DebugPrint(TEXT("\n"));
 
   DebugPrint(TEXT("+ extra.iClause: %08X\n"), extra.iClause);
-  DebugPrint(TEXT("+ extra.iPhoneme: %08X\n"), extra.iPhoneme);
 
-  DebugPrint(TEXT("+ extra.hiragana_phonemes: "));
-  for (size_t i = 0; i < extra.hiragana_phonemes.size(); ++i) {
-    DebugPrint(TEXT("%ls "), extra.hiragana_phonemes[i].c_str());
+  DebugPrint(TEXT("+ extra.hiragana_clauses: "));
+  for (size_t i = 0; i < extra.hiragana_clauses.size(); ++i) {
+    DebugPrint(TEXT("%ls "), extra.hiragana_clauses[i].c_str());
   }
   DebugPrint(TEXT("\n"));
 
-  DebugPrint(TEXT("+ extra.typing_phonemes: "));
-  for (size_t i = 0; i < extra.typing_phonemes.size(); ++i) {
-    DebugPrint(TEXT("%ls "), extra.typing_phonemes[i].c_str());
-  }
-  DebugPrint(TEXT("\n"));
-
-  DebugPrint(TEXT("+ extra.phoneme_to_flags: "));
-  for (size_t i = 0; i < extra.phoneme_to_flags.size(); ++i) {
-    DebugPrint(TEXT("%02X "), extra.phoneme_to_flags[i]);
+  DebugPrint(TEXT("+ extra.typing_clauses: "));
+  for (size_t i = 0; i < extra.typing_clauses.size(); ++i) {
+    DebugPrint(TEXT("%ls "), extra.typing_clauses[i].c_str());
   }
   DebugPrint(TEXT("\n"));
 #endif  // ndef NDEBUG
