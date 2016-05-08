@@ -137,6 +137,7 @@ struct LogCompStr {
 
   void AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv);
   void InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv);
+  void AddDakuonChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv);
 
   void AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv);
   void DeleteChar(BOOL bBackSpace/* = FALSE*/, DWORD dwConv);
