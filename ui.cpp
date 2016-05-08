@@ -344,18 +344,22 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
     break;
 
   case IMN_OPENSTATUSWINDOW:
-    StatusWnd_Create(hWnd, lpUIExtra);
+    if (lpUIExtra) {
+      StatusWnd_Create(hWnd, lpUIExtra);
+    }
     break;
 
   case IMN_SETCONVERSIONMODE:
-    StatusWnd_Update(lpUIExtra);
+    if (lpUIExtra) {
+      StatusWnd_Update(lpUIExtra);
+    }
     break;
 
   case IMN_SETSENTENCEMODE:
     break;
 
   case IMN_SETCOMPOSITIONFONT:
-    if (lpIMC) {
+    if (lpUIExtra && lpIMC) {
       lf = lpIMC->lfFont.W;
       if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont);
 
@@ -380,24 +384,28 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
     break;
 
   case IMN_SETOPENSTATUS:
-    StatusWnd_Update(lpUIExtra);
+    if (lpUIExtra) {
+      StatusWnd_Update(lpUIExtra);
+    }
     break;
 
   case IMN_OPENCANDIDATE:
-    if (lpIMC) {
+    if (lpUIExtra && lpIMC) {
       CandWnd_Create(hWnd, lpUIExtra, lpIMC);
     }
     break;
 
   case IMN_CHANGECANDIDATE:
-    if (lpIMC) {
+    if (lpUIExtra && lpIMC) {
       CandWnd_Resize(lpUIExtra, lpIMC);
       CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
     }
     break;
 
   case IMN_CLOSECANDIDATE:
-    CandWnd_Hide(lpUIExtra);
+    if (lpUIExtra) {
+      CandWnd_Hide(lpUIExtra);
+    }
     break;
 
   case IMN_GUIDELINE:
@@ -436,7 +444,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
     break;
 
   case IMN_SETCANDIDATEPOS:
-    if (lpIMC) {
+    if (lpIMC && lpUIExtra) {
       // MZ-IME supports only one candidate list.
       if (lParam != 0x01) break;
 
@@ -445,7 +453,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
     break;
 
   case IMN_SETCOMPOSITIONWINDOW:
-    if (lpIMC) {
+    if (lpIMC && lpUIExtra) {
       CompWnd_MoveMessage(hWnd, lpUIExtra);
       CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
     }

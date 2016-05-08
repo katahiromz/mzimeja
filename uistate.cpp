@@ -38,15 +38,15 @@ void StatusWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow) {
 // create status window
 HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
   FOOTMARK();
+  assert(lpUIExtra);
   const DWORD style = WS_DISABLED | WS_POPUP;
   const DWORD exstyle = WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
   HWND hwndStatus = lpUIExtra->uiStatus.hWnd;
   if (!::IsWindow(hwndStatus)) {
-    INT cx, cy;
-    cx = CX_MINICAPTION + CX_BUTTON * 3;
+    INT cx = CX_MINICAPTION + CX_BUTTON * 3;
     cx += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
     cx += 3 * CX_BTNEDGE * 2;
-    cy = CY_BUTTON;
+    INT cy = CY_BUTTON;
     cy += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
     cy += 2 * CY_BTNEDGE;
     if (lpUIExtra->uiStatus.pt.x == -1) {
@@ -57,8 +57,7 @@ HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
     }
     hwndStatus = ::CreateWindowEx(
       exstyle, szStatusClassName, NULL, style,
-      lpUIExtra->uiStatus.pt.x, lpUIExtra->uiStatus.pt.y,
-      cx, cy,
+      lpUIExtra->uiStatus.pt.x, lpUIExtra->uiStatus.pt.y, cx, cy,
       hWnd, NULL, TheIME.m_hInst, NULL);
     lpUIExtra->uiStatus.hWnd = hwndStatus;
   }
