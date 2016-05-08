@@ -64,6 +64,7 @@
 #define WM_UI_DEFCOMPMOVE (WM_USER + 602)
 #define WM_UI_CANDMOVE    (WM_USER + 603)
 #define WM_UI_GUIDEMOVE   (WM_USER + 604)
+#define WM_UI_COMPMOVE    (WM_USER + 605)
 
 // Escape Functions
 #define IME_ESC_PRI_GETDWORDTEST (IME_ESC_PRIVATE_FIRST + 0)
@@ -184,8 +185,10 @@ BOOL IsImeMessage(UINT message);
 HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra);
 LRESULT CALLBACK StatusWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void StatusWnd_Update(LPUIEXTRA lpUIExtra);
+void StatusWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow);
 
 // uicand.c
+void CandWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow);
 LRESULT CALLBACK CandWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CandWnd_Paint(HWND hCandWnd);
 void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
@@ -195,14 +198,18 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                   BOOL fForceComp);
 
 // uicomp.c
+void CompWnd_Show(LPUIEXTRA lpUIExtra, INT nIndex, BOOL bShow);
 LRESULT CALLBACK CompWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CompWnd_Paint(HWND hCompWnd);
 void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void CompWnd_Hide(LPUIEXTRA lpUIExtra);
 void CompWnd_SetFont(LPUIEXTRA lpUIExtra);
+void CompWnd_MoveMessage(HWND hSvrWnd, LPUIEXTRA lpUIExtra);
+BOOL MyGetTextExtentPoint(HDC hDC, LPCWSTR psz, int cch, LPSIZE psiz);
 
 // uiguide.c
+void GuideWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow);
 LRESULT CALLBACK GuideWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt, DWORD dwPushedGuide);
 void GuideWnd_Button(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -322,6 +329,13 @@ struct MZIMEJA {
 
   // do command
   BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
+
+  // UI extra-related
+  LPUIEXTRA LockUIExtra(HWND hSvrWnd);
+  void UnlockUIExtra(HWND hSvrWnd);
+  void FreeUIExtra(HWND hSvrWnd);
+  HGLOBAL GetUIExtraFromServerWnd(HWND hSvrWnd);
+  void SetUIExtraToServerWnd(HWND hSvrWnd, HGLOBAL hUIExtra);
 }; // struct MZIMEJA
 
 extern MZIMEJA TheIME;

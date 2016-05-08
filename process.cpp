@@ -44,10 +44,11 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
         if (lpIMC) {
           if (lpIMC->HasCompStr()) {
             lpIMC->AddChar(L' ', L'\0');
+            TheIME.UnlockIMC(hIMC);
           } else {
-            TheIME.GenerateMessage(WM_IME_CHAR, L' ', 1);
+            TheIME.UnlockIMC(hIMC);
+            return FALSE;
           }
-          TheIME.UnlockIMC(hIMC);
         }
         return TRUE;
       }
@@ -83,11 +84,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
   case VK_OEM_AUTO:
   case VK_OEM_ENLW:
     if (hIMC) {
-      if (bOpen) {
-        ImmSetOpenStatus(hIMC, FALSE);
-      } else {
-        ImmSetOpenStatus(hIMC, TRUE);
-      }
+      TheIME.GenerateMessage(WM_IME_CONTROL, IMC_SETOPENSTATUS, !bOpen);
     }
     break;
 
@@ -148,16 +145,11 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
     if (lpIMC) {
       if (lpIMC->HasCompStr()) {
         lpIMC->DeleteChar(vk == VK_BACK);
+        TheIME.UnlockIMC(hIMC);
       } else {
-        if (vk == VK_BACK) {
-          TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_BACK, 0);
-          TheIME.GenerateMessage(WM_IME_KEYUP, VK_BACK, 0);
-        } else {
-          TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_DELETE, 0);
-          TheIME.GenerateMessage(WM_IME_KEYUP, VK_DELETE, 0);
-        }
+        TheIME.UnlockIMC(hIMC);
+        return FALSE;
       }
-      TheIME.UnlockIMC(hIMC);
     }
     break;
 

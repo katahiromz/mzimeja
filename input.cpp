@@ -198,12 +198,13 @@ BOOL InputContext::HasCandInfo() {
 
 BOOL InputContext::HasCompStr() {
   FOOTMARK();
-  if (ImmGetIMCCSize(hCompStr) <= sizeof(COMPOSITIONSTRING)) return FALSE;
 
+  BOOL ret = FALSE;
   CompStr *pCompStr = LockCompStr();
-  BOOL ret = (pCompStr->dwCompStrLen > 0);
-  UnlockCompStr();
-
+  if (pCompStr) {
+    ret = (pCompStr->dwCompStrLen > 0);
+    UnlockCompStr();
+  }
   return ret;
 }
 
@@ -215,6 +216,7 @@ CandInfo *InputContext::LockCandInfo() {
     DebugPrint(TEXT("InputContext::LockCandInfo: locked %p\n"), hCandInfo);
   } else {
     DebugPrint(TEXT("InputContext::LockCandInfo: not locked %p\n"), hCandInfo);
+    FOOTMARK_PRINT_CALL_STACK();
   }
   return info;
 }
@@ -227,6 +229,7 @@ void InputContext::UnlockCandInfo() {
     DebugPrint(TEXT("InputContext::UnlockCandInfo: unlocked %p\n"), hCandInfo);
   } else {
     DebugPrint(TEXT("InputContext::UnlockCandInfo: not unlocked %p\n"), hCandInfo);
+    FOOTMARK_PRINT_CALL_STACK();
   }
 }
 
@@ -250,6 +253,7 @@ void InputContext::UnlockCompStr() {
     DebugPrint(TEXT("InputContext::UnlockCompStr: unlocked %p\n"), hCompStr);
   } else {
     DebugPrint(TEXT("InputContext::UnlockCompStr: not unlocked %p\n"), hCompStr);
+    FOOTMARK_PRINT_CALL_STACK();
   }
 }
 
@@ -261,6 +265,7 @@ LPTRANSMSG InputContext::LockMsgBuf() {
     DebugPrint(TEXT("InputContext::LockMsgBuf: locked %p\n"), hMsgBuf);
   } else {
     DebugPrint(TEXT("InputContext::LockMsgBuf: not locked %p\n"), hMsgBuf);
+    FOOTMARK_PRINT_CALL_STACK();
   }
   return lpTransMsg;
 }
@@ -273,6 +278,7 @@ void InputContext::UnlockMsgBuf() {
     DebugPrint(TEXT("InputContext::UnlockMsgBuf: unlocked %p\n"), hMsgBuf);
   } else {
     DebugPrint(TEXT("InputContext::UnlockMsgBuf: not unlocked %p\n"), hMsgBuf);
+    FOOTMARK_PRINT_CALL_STACK();
   }
 }
 
@@ -333,6 +339,7 @@ void InputContext::UnlockGuideLine() {
     DebugPrint(TEXT("InputContext::UnlockGuideLine: unlocked %p\n"), hGuideLine);
   } else {
     DebugPrint(TEXT("InputContext::UnlockGuideLine: not unlocked %p\n"), hGuideLine);
+    FOOTMARK_PRINT_CALL_STACK();
   }
 }
 

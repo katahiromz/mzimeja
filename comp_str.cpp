@@ -121,6 +121,7 @@ void LogCompStr::clear_read() {
 void LogCompStr::clear_comp() {
   FOOTMARK();
   dwCursorPos = 0;
+  dwDeltaStart = 0;
   comp_attr.clear();
   comp_clause.clear();
   comp_str.clear();
@@ -194,7 +195,7 @@ DWORD LogCompStr::GetClauseCompStrLen(DWORD dwClauseIndex) const {
 }
 
 void LogCompStr::UpdateClauseAttr() {
-  if (comp_attr.size() < comp_str.size()) {
+  if (comp_attr.size() != comp_str.size()) {
     std::vector<BYTE> data;
     DWORD cClause = GetClauseCount();
     for (size_t i = 0; i < cClause; ++i) {
@@ -634,6 +635,8 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
   } else {
     InsertChar(chTyped, chTranslated, dwConv);
   }
+  DebugPrint(TEXT("LogCompStr::AddChar\n"));
+  Dump();
 } // LogCompStr::AddChar
 
 void LogCompStr::DeleteChar(BOOL bBackSpace/* = FALSE*/, DWORD dwConv) {
@@ -828,26 +831,33 @@ void CompStr::GetLog(LogCompStr& log) {
   COMPSTREXTRA *extra = GetExtra();
   if (extra && extra->dwSignature == 0xDEADFACE) {
     extra->GetLog(log.extra);
-
-    log.extra.comp_str_clauses.clear();
-    size_t count = log.comp_clause.size();
-    if (count >= 1) {
-      std::wstring str;
-      for (size_t i = 0; i < count - 1; ++i) {
-        str = log.GetClauseCompString(i);
-        log.extra.comp_str_clauses.push_back(str);
-      }
-    } else {
+  }
+  if (log.comp_clause.empty()) {
+    log.comp_clause.push_back(0);
+    log.comp_clause.push_back((DWORD)log.comp_str.size());
+  }
+  log.extra.comp_str_clauses.clear();
+  size_t count = log.comp_clause.size();
+  if (count > 1) {
+    std::wstring str;
+    for (size_t i = 0; i < count - 1; ++i) {
+      str = log.GetClauseCompString(i);
+      log.extra.comp_str_clauses.push_back(str);
+    }
+  } else {
+    if (count == 0) {
       log.extra.comp_str_clauses.push_back(L"");
-    }
-    if (log.extra.hiragana_clauses.empty()) {
-      log.extra.hiragana_clauses.push_back(L"");
-    }
-    if (log.extra.typing_clauses.empty()) {
-      log.extra.typing_clauses.push_back(L"");
+    } else {
+      log.extra.comp_str_clauses.push_back(log.comp_str);
     }
   }
-}
+  if (log.extra.hiragana_clauses.empty()) {
+    log.extra.hiragana_clauses.push_back(L"");
+  }
+  if (log.extra.typing_clauses.empty()) {
+    log.extra.typing_clauses.push_back(L"");
+  }
+} // CompStr::GetLog
 
 /*static*/ HIMCC CompStr::ReCreate(HIMCC hCompStr, const LogCompStr *log) {
   FOOTMARK();
@@ -1161,6 +1171,12 @@ void LogCompStr::Dump() {
   DebugPrint(TEXT("+ extra.typing_clauses: "));
   for (size_t i = 0; i < extra.typing_clauses.size(); ++i) {
     DebugPrint(TEXT("%ls "), extra.typing_clauses[i].c_str());
+  }
+  DebugPrint(TEXT("\n"));
+
+  DebugPrint(TEXT("+ extra.comp_str_clauses: "));
+  for (size_t i = 0; i < extra.comp_str_clauses.size(); ++i) {
+    DebugPrint(TEXT("%ls "), extra.comp_str_clauses[i].c_str());
   }
   DebugPrint(TEXT("\n"));
 #endif  // ndef NDEBUG
