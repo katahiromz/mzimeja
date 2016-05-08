@@ -102,21 +102,24 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     DebugPrint(TEXT("NI_CONTEXTUPDATED\n"));
     switch (dwValue) {
     case IMC_SETOPENSTATUS:
-      if (dwIndex == 0) {
-        lpIMC = TheIME.LockIMC(hIMC);
-        if (lpIMC) {
+      DebugPrint(TEXT("IMC_SETOPENSTATUS\n"));
+      lpIMC = TheIME.LockIMC(hIMC);
+      if (lpIMC) {
+        if (lpIMC->fOpen && lpIMC->HasCompStr()) {
           lpIMC->CancelText();
-          TheIME.UnlockIMC(hIMC);
         }
+        TheIME.UnlockIMC(hIMC);
       }
       TheIME.UpdateIndicIcon(hIMC);
       ret = TRUE;
       break;
 
     case IMC_SETCONVERSIONMODE:
+      DebugPrint(TEXT("IMC_SETCONVERSIONMODE\n"));
       break;
 
     case IMC_SETCOMPOSITIONWINDOW:
+      DebugPrint(TEXT("IMC_SETCOMPOSITIONWINDOW\n"));
       break;
 
     default:
@@ -358,9 +361,9 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
   if (lpImeParentMenu == NULL) {
     if (dwFlags & IGIMIF_RIGHTMENU) {
       BOOL bOpen;
-      bOpen = ImmGetOpenStatus(hIMC);
+      bOpen = ::ImmGetOpenStatus(hIMC);
       DWORD dwConversion, dwSentence;
-      ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
+      ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
       INPUT_MODE imode;
       imode = InputModeFromConversionMode(bOpen, dwConversion);
 

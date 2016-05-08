@@ -263,16 +263,12 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
     return;
   }
   DWORD dwConversion, dwSentence;
-  BOOL bOpen = ImmGetOpenStatus(hIMC);
+  BOOL bOpen = ::ImmGetOpenStatus(hIMC);
   if (::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence)) {
     INPUT_MODE imode;
     switch (hittest) {
     case SWHT_BUTTON_1:
-      if (bOpen) {
-        SetInputMode(hIMC, IMODE_HAN_EISUU);
-      } else {
-        SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
-      }
+      ::ImmSetOpenStatus(hIMC, !bOpen);
       break;
     case SWHT_BUTTON_2:
       imode = InputModeFromConversionMode(bOpen, dwConversion);
@@ -285,7 +281,7 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
       } else {
         dwConversion |= IME_CMODE_ROMAN;
       }
-      ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
+      ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
       break;
     default:
       break;

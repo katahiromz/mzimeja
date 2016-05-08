@@ -104,26 +104,26 @@ void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
   ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
   switch (imode) {
   case IMODE_ZEN_HIRAGANA:
-    ImmSetOpenStatus(hIMC, TRUE);
+    ::ImmSetOpenStatus(hIMC, TRUE);
     dwConversion &= ~IME_CMODE_KATAKANA;
     dwConversion |= IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE;
     break;
   case IMODE_ZEN_KATAKANA:
-    ImmSetOpenStatus(hIMC, TRUE);
+    ::ImmSetOpenStatus(hIMC, TRUE);
     dwConversion |= IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE | IME_CMODE_KATAKANA;
     break;
   case IMODE_ZEN_EISUU:
-    ImmSetOpenStatus(hIMC, TRUE);
+    ::ImmSetOpenStatus(hIMC, TRUE);
     dwConversion &= ~(IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
     dwConversion |= IME_CMODE_FULLSHAPE;
     break;
   case IMODE_HAN_KANA:
-    ImmSetOpenStatus(hIMC, TRUE);
+    ::ImmSetOpenStatus(hIMC, TRUE);
     dwConversion &= ~IME_CMODE_FULLSHAPE;
     dwConversion |= IME_CMODE_JAPANESE | IME_CMODE_KATAKANA;
     break;
   case IMODE_HAN_EISUU:
-    ImmSetOpenStatus(hIMC, FALSE);
+    ::ImmSetOpenStatus(hIMC, FALSE);
     dwConversion &= ~(IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
     break;
   case IMODE_DISABLED:
