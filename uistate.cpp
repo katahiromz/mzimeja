@@ -26,13 +26,14 @@ extern "C" {
 
 void StatusWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow) {
   FOOTMARK();
-  if (bShow) {
-    ::ShowWindow(lpUIExtra->uiStatus.hWnd, SW_SHOWNOACTIVATE);
-    lpUIExtra->uiStatus.bShow = TRUE;
-  } else {
-    ::ShowWindow(lpUIExtra->uiStatus.hWnd, SW_HIDE);
-    lpUIExtra->uiStatus.bShow = FALSE;
+  if (::IsWindow(lpUIExtra->uiStatus.hWnd)) {
+    if (bShow) {
+      ::ShowWindow(lpUIExtra->uiStatus.hWnd, SW_SHOWNOACTIVATE);
+    } else {
+      ::ShowWindow(lpUIExtra->uiStatus.hWnd, SW_HIDE);
+    }
   }
+  lpUIExtra->uiStatus.bShow = bShow;
 }
 
 // create status window

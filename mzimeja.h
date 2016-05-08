@@ -193,7 +193,6 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CandWnd_Paint(HWND hCandWnd);
 void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
-void CandWnd_Hide(LPUIEXTRA lpUIExtra);
 void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                   BOOL fForceComp);
 
@@ -203,7 +202,6 @@ LRESULT CALLBACK CompWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CompWnd_Paint(HWND hCompWnd);
 void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
-void CompWnd_Hide(LPUIEXTRA lpUIExtra);
 void CompWnd_SetFont(LPUIEXTRA lpUIExtra);
 void CompWnd_MoveMessage(HWND hSvrWnd, LPUIEXTRA lpUIExtra);
 BOOL MyGetTextExtentPoint(HDC hDC, LPCWSTR psz, int cch, LPSIZE psiz);

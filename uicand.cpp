@@ -9,13 +9,19 @@ extern "C" {
 
 void CandWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow) {
   FOOTMARK();
-  if (bShow) {
-    ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_SHOWNOACTIVATE);
-    lpUIExtra->uiCand.bShow = TRUE;
-  } else {
-    ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
-    lpUIExtra->uiCand.bShow = FALSE;
+  if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
+    if (bShow) {
+      ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_SHOWNOACTIVATE);
+    } else {
+      RECT rc;
+      ::GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
+      lpUIExtra->uiCand.pt.x = rc.left;
+      lpUIExtra->uiCand.pt.y = rc.top;
+
+      ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
+    }
   }
+  lpUIExtra->uiCand.bShow = bShow;
 }
 
 LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
@@ -203,19 +209,6 @@ void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     MoveWindow(lpUIExtra->uiCand.hWnd, rc.left, rc.top,
                width + 4 * GetSystemMetrics(SM_CXEDGE),
                height + 4 * GetSystemMetrics(SM_CYEDGE), TRUE);
-  }
-}
-
-void CandWnd_Hide(LPUIEXTRA lpUIExtra) {
-  FOOTMARK();
-  RECT rc;
-
-  if (IsWindow(lpUIExtra->uiCand.hWnd)) {
-    GetWindowRect(lpUIExtra->uiCand.hWnd, (LPRECT)&rc);
-    lpUIExtra->uiCand.pt.x = rc.left;
-    lpUIExtra->uiCand.pt.y = rc.top;
-    MoveWindow(lpUIExtra->uiCand.hWnd, -1, -1, 0, 0, TRUE);
-    CandWnd_Show(lpUIExtra, FALSE);
   }
 }
 
