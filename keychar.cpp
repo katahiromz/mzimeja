@@ -1242,6 +1242,122 @@ std::wstring roman_to_hiragana(std::wstring roman) {
   return hiragana;
 } // roman_to_hiragana
 
+std::wstring roman_to_katakana(std::wstring roman) {
+  FOOTMARK();
+  std::wstring katakana, str;
+  for (size_t k = 0; k < roman.size();) {
+    bool found = false;
+    if (!found) {
+      for (size_t i = 0; i < _countof(sokuon_table); ++i) {
+        if (roman[k] == sokuon_table[i].key[0]) {
+          if (roman.find(sokuon_table[i].key, k) == k) {
+            k += wcslen(sokuon_table[i].key);
+            katakana += lcmap(sokuon_table[i].value, LCMAP_KATAKANA);
+            found = true;
+            break;
+          }
+        }
+      }
+    }
+    if (!found) {
+      for (size_t i = 0; i < _countof(normal_roman_table); ++i) {
+        if (normal_roman_table[i].extra) {
+          if (roman[k] == normal_roman_table[i].key[0]) {
+            if (roman.find(normal_roman_table[i].key, k) == k) {
+              roman.insert(k, normal_roman_table[i].extra);
+              k += wcslen(normal_roman_table[i].key);
+              katakana += lcmap(normal_roman_table[i].value, LCMAP_KATAKANA);
+              found = true;
+              break;
+            }
+          }
+        } else {
+          if (roman[k] == normal_roman_table[i].key[0]) {
+            if (roman.find(normal_roman_table[i].key, k) == k) {
+              k += wcslen(normal_roman_table[i].key);
+              katakana += lcmap(normal_roman_table[i].value, LCMAP_KATAKANA);
+              found = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+    if (!found) {
+      for (size_t i = 0; i < _countof(kigou_table); ++i) {
+        if (roman[k] == kigou_table[i].key[0]) {
+          katakana += kigou_table[i].value;
+          k += 1;
+          found = true;
+          break;
+        }
+      }
+    }
+    if (!found) katakana += roman[k++];
+  }
+  return katakana;
+} // roman_to_katakana
+
+std::wstring roman_to_hankaku_katakana(std::wstring roman) {
+  FOOTMARK();
+  std::wstring katakana, str;
+  for (size_t k = 0; k < roman.size();) {
+    bool found = false;
+    if (!found) {
+      for (size_t i = 0; i < _countof(sokuon_table); ++i) {
+        if (roman[k] == sokuon_table[i].key[0]) {
+          if (roman.find(sokuon_table[i].key, k) == k) {
+            k += wcslen(sokuon_table[i].key);
+            katakana += lcmap(sokuon_table[i].value,
+                              LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+            found = true;
+            break;
+          }
+        }
+      }
+    }
+    if (!found) {
+      for (size_t i = 0; i < _countof(normal_roman_table); ++i) {
+        if (normal_roman_table[i].extra) {
+          if (roman[k] == normal_roman_table[i].key[0]) {
+            if (roman.find(normal_roman_table[i].key, k) == k) {
+              roman.insert(k, normal_roman_table[i].extra);
+              k += wcslen(normal_roman_table[i].key);
+              katakana += lcmap(normal_roman_table[i].value,
+                                LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+              found = true;
+              break;
+            }
+          }
+        } else {
+          if (roman[k] == normal_roman_table[i].key[0]) {
+            if (roman.find(normal_roman_table[i].key, k) == k) {
+              k += wcslen(normal_roman_table[i].key);
+              katakana += lcmap(normal_roman_table[i].value,
+                                LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+              found = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+    if (!found) {
+      for (size_t i = 0; i < _countof(kigou_table); ++i) {
+        if (roman[k] == kigou_table[i].key[0]) {
+          katakana += lcmap(kigou_table[i].value,
+                            LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+          k += 1;
+          found = true;
+          break;
+        }
+      }
+    }
+    if (!found) katakana += roman[k++];
+  }
+  return katakana;
+} // roman_to_hankaku_katakana
+
 std::wstring roman_to_hiragana(std::wstring roman, size_t ichTarget) {
   std::wstring str, key, value, extra;
   size_t key_len = 0;
@@ -1311,7 +1427,7 @@ std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget) {
       if (roman.substr(ichTarget - key_len, key_len) == str) {
         if (key_len > key.size()) {
           key = str;
-          value = lcmap(sokuon_table[i].value, LCMAP_KATAKANA);
+          value = sokuon_table[i].value;
         }
       }
     }
@@ -1324,7 +1440,7 @@ std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget) {
         if (roman.substr(ichTarget - key_len, key_len) == str) {
           if (key_len > key.size()) {
             key = str;
-            value = lcmap(normal_roman_table[i].value, LCMAP_KATAKANA);
+            value = normal_roman_table[i].value;
             extra = normal_roman_table[i].extra;
           }
         }
@@ -1336,7 +1452,7 @@ std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget) {
         if (roman.substr(ichTarget - key_len, key_len) == str) {
           if (key_len > key.size()) {
             key = str;
-            value = lcmap(normal_roman_table[i].value, LCMAP_KATAKANA);
+            value = normal_roman_table[i].value;
             extra.clear();
           }
         }
@@ -1355,10 +1471,71 @@ std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget) {
     }
   }
   if (key.size()) {
+    value = lcmap(value, LCMAP_KATAKANA);
     roman.replace(ichTarget - key.size(), key.size(), value + extra);
   }
   return roman;
 } // roman_to_katakana
+
+std::wstring roman_to_hankaku_katakana(std::wstring roman, size_t ichTarget) {
+  std::wstring str, key, value, extra;
+  size_t key_len = 0;
+  for (size_t i = 0; i < _countof(sokuon_table); ++i) {
+    str = sokuon_table[i].key;
+    key_len = str.size();
+    if (key_len <= ichTarget) {
+      if (roman.substr(ichTarget - key_len, key_len) == str) {
+        if (key_len > key.size()) {
+          key = str;
+          value = sokuon_table[i].value;
+        }
+      }
+    }
+  }
+  for (size_t i = 0; i < _countof(normal_roman_table); ++i) {
+    if (normal_roman_table[i].extra) {
+      str = normal_roman_table[i].key;
+      key_len = str.size();
+      if (key_len <= ichTarget) {
+        if (roman.substr(ichTarget - key_len, key_len) == str) {
+          if (key_len > key.size()) {
+            key = str;
+            value = normal_roman_table[i].value;
+            extra = normal_roman_table[i].extra;
+          }
+        }
+      }
+    } else {
+      str = normal_roman_table[i].key;
+      key_len = str.size();
+      if (key_len <= ichTarget) {
+        if (roman.substr(ichTarget - key_len, key_len) == str) {
+          if (key_len > key.size()) {
+            key = str;
+            value = normal_roman_table[i].value;
+            extra.clear();
+          }
+        }
+      }
+    }
+  }
+  for (size_t i = 0; i < _countof(kigou_table); ++i) {
+    if (roman[k] == kigou_table[i].key[0]) {
+      key_len = 1;
+      if (roman[ichTarget - key_len] == kigou_table[i].key[0]) {
+        if (key_len <= ichTarget) {
+          key = kigou_table[i].key;
+          value = kigou_table[i].value;
+        }
+      }
+    }
+  }
+  if (key.size()) {
+    value = lcmap(value, LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+    roman.replace(ichTarget - key.size(), key.size(), value + extra);
+  }
+  return roman;
+} // roman_to_hankaku_katakana
 
 std::wstring hiragana_to_typing(std::wstring hiragana) {
   FOOTMARK();

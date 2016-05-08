@@ -55,19 +55,20 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
     return FALSE;
   }
 
-  // get typed character
-  WCHAR chTyped;
-  if (vk == VK_PACKET) {
-    chTyped = HIWORD(wParam);
-  } else {
-    chTyped = typing_key_to_char(vk, bShift, bCapsLock);
-  }
-
   // get translated char
   WCHAR chTranslated = 0;
   if (!bRoman) {
     chTranslated = vkey_to_hiragana(vk, bShift);
   }
+
+  // get typed character
+  WCHAR chTyped;
+  if (vk == VK_PACKET) {
+    chTyped = chTranslated = HIWORD(wParam);
+  } else {
+    chTyped = typing_key_to_char(vk, bShift, bCapsLock);
+  }
+
   if (chTranslated || chTyped) {
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {

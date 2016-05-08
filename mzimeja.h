@@ -237,7 +237,11 @@ std::wstring hiragana_to_roman(std::wstring hiragana);
 std::wstring roman_to_hiragana(std::wstring roman);
 std::wstring roman_to_hiragana(std::wstring roman, size_t ichTarget);
 // conversion between roman and katakana
+std::wstring roman_to_katakana(std::wstring roman);
 std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget);
+// conversion between roman and hankaku katakana
+std::wstring roman_to_hankaku_katakana(std::wstring roman);
+std::wstring roman_to_hankaku_katakana(std::wstring roman, size_t ichTarget);
 
 // character map for kana input
 WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift);

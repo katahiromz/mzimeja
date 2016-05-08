@@ -111,22 +111,22 @@ struct LogCompStr {
   void clear_extra() { extra.clear(); }
   DWORD GetTotalSize() const;
 
-  void AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConversion);
-  void RevertText();
-  void DeleteChar(BOOL bRoman, BOOL bBackSpace = FALSE);
-  void MakeResult();
-
-  void MoveLeft(BOOL bShift);
-  void MoveRight(BOOL bShift);
-
-  BOOL HasClauseSelected() const;
+  BOOL IsBeingConverted();
   DWORD GetClauseCount() const;
+  BOOL CompCharInClause(DWORD iCompChar, DWORD iClause,
+                        BOOL bExcludeEnd = FALSE) const;
   BYTE GetClauseAttr(DWORD dwClauseIndex) const;
   void SetClauseAttr(DWORD dwClauseIndex, BYTE attr);
-  BYTE GetCompCharAttr(DWORD ich) const;
   BOOL IsClauseConverted(DWORD dwClauseIndex) const;
+  BOOL HasClauseSelected() const;
+  std::wstring GetClauseCompString(DWORD dwClauseIndex) const;
+  WCHAR PrevCharInClause() const;
+
+  BYTE GetCompCharAttr(DWORD ich) const;
   DWORD GetCompCharCount() const;
-  DWORD GetClauseStrLen(DWORD iClause) const;
+
+  DWORD ClauseToCompChar(DWORD dwClauseIndex) const;
+  DWORD CompCharToClause(DWORD iCompChar) const;
 
   // conversion of composition
   void MakeHiragana();
@@ -135,25 +135,25 @@ struct LogCompStr {
   void MakeZenEisuu();
   void MakeHanEisuu();
 
-  // conversion of locative information
-  DWORD ClauseToCompChar(DWORD dwClauseIndex) const;
-  DWORD CompCharToClause(DWORD iCompChar) const;
+  void AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv);
+  void InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv);
 
-  // get clause information
-  BOOL CompCharInClause(DWORD iCompChar, DWORD iClause,
-                        BOOL bExcludeEnd = FALSE) const;
-  BOOL IsBeingConverted();
-  void MakeCompString(DWORD dwConversion);
-  std::wstring Translate(
-    const std::wstring& hiragana, const std::wstring& typing, DWORD dwConversion);
+  void AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv);
+  void DeleteChar(BOOL bBackSpace/* = FALSE*/, DWORD dwConv);
+  void RevertText();
+  void MakeResult();
+
+  void MoveLeft(BOOL bShift);
+  void MoveRight(BOOL bShift);
 
   // for debugging
   bool IsValid();
   void Dump();
 
 protected:
-  void AddKanaChar(std::wstring& typed, std::wstring& translated, DWORD dwConversion);
-  void AddRomanChar(std::wstring& typed, std::wstring& translated, DWORD dwConversion);
+  void MergeAt(std::vector<std::wstring>& strs, DWORD istr);
+  void UpdateExtraClause(DWORD iClause, DWORD dwConversion);
+  void UpdateCompStr();
 }; // struct LogCompStr
 
 inline void SetClause(LPDWORD lpdw, DWORD num) {
