@@ -100,7 +100,7 @@
       FootmarkLocation \
         object_for_debugging_##__LINE__(__FILE__, __LINE__, __FUNCTION__);
   #endif
-  #define FOOTMARK_POINT() FootmarkDebugPrint("%s (%d): FOOTMARK_POINT()\n",
+  #define FOOTMARK_POINT() FootmarkDebugPrint("%s (%d): FOOTMARK_POINT()\n", \
                                               __FILE__, __LINE__)
   #define FOOTMARK_PRINT_CALL_STACK() FootmarkPrintCallStack(__FILE__, __LINE__)
 #else   // def NDEBUG
