@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 DWORD LogCompStrExtra::GetTotalSize() const {
+  FOOTMARK();
   DWORD total = sizeof(COMPSTREXTRA);
   for (size_t i = 0; i < hiragana_clauses.size(); ++i) {
     total += (hiragana_clauses[i].size() + 1) * sizeof(WCHAR);
@@ -26,6 +27,7 @@ void LogCompStrExtra::clear() {
 //////////////////////////////////////////////////////////////////////////////
 
 LPWSTR COMPSTREXTRA::GetHiraganaClauses(DWORD& dwCount) {
+  FOOTMARK();
   dwCount = dwHiraganaClauseCount;
   if (dwCount) {
     return (LPWSTR)(GetBytes() + dwHiraganaClauseOffset);
@@ -34,6 +36,7 @@ LPWSTR COMPSTREXTRA::GetHiraganaClauses(DWORD& dwCount) {
 }
 
 LPWSTR COMPSTREXTRA::GetTypingClauses(DWORD& dwCount) {
+  FOOTMARK();
   dwCount = dwTypingClauseCount;
   if (dwCount) {
     return (LPWSTR)(GetBytes() + dwTypingClauseOffset);
@@ -198,6 +201,7 @@ void LogCompStr::SetClauseAttr(DWORD dwClauseIndex, BYTE attr) {
 }
 
 BOOL LogCompStr::IsClauseConverted(DWORD dwClauseIndex) const {
+  FOOTMARK();
   return GetClauseAttr(dwClauseIndex) != ATTR_INPUT;
 }
 
@@ -252,11 +256,13 @@ std::wstring LogCompStr::GetClauseCompString(DWORD dwClauseIndex) const {
 }
 
 void LogCompStr::MergeAt(std::vector<std::wstring>& strs, DWORD istr) {
+  FOOTMARK();
   strs[istr - 1] += strs[istr];
   strs.erase(strs.begin() + istr);
 }
 
 WCHAR LogCompStr::PrevCharInClause() const {
+  FOOTMARK();
   if (dwCursorPos > 0) {
     if (CompCharInClause(dwCursorPos - 1, extra.iClause)) {
       return comp_str[dwCursorPos - 1];
@@ -266,6 +272,7 @@ WCHAR LogCompStr::PrevCharInClause() const {
 }
 
 void LogCompStr::UpdateExtraClause(DWORD iClause, DWORD dwConversion) {
+  FOOTMARK();
   // fix extra info
   BOOL bRoman = (dwConversion & IME_CMODE_ROMAN);
   std::wstring str = extra.comp_str_clauses[iClause];
@@ -283,11 +290,17 @@ void LogCompStr::UpdateExtraClause(DWORD iClause, DWORD dwConversion) {
 } // LogCompStr::UpdateExtraClause
 
 void LogCompStr::UpdateCompStr() {
+  FOOTMARK();
   comp_str.clear();
+  size_t ich = 0;
   size_t count = extra.comp_str_clauses.size();
+  comp_clause.resize(count + 1);
   for (size_t i = 0; i < count; ++i) {
+    comp_clause[i] = ich;
     comp_str += extra.comp_str_clauses[i];
+    ich += extra.comp_str_clauses[i].size();
   }
+  comp_clause[count] = ich;
 }
 
 void LogCompStr::MakeHiragana() {
@@ -337,6 +350,7 @@ void LogCompStr::MakeHanEisuu() {
 }
 
 void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
+  FOOTMARK();
   BOOL bRoman = (dwConv & IME_CMODE_ROMAN);
   std::wstring str, typed, translated;
   typed += chTyped;
@@ -503,6 +517,7 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 } // LogCompStr::AddCharToEnd
 
 void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
+  FOOTMARK();
   std::wstring typed, translated;
   typed += chTyped;
   translated += chTranslated;
@@ -574,6 +589,7 @@ void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 
 void
 LogCompStr::AddDakuonChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
+  FOOTMARK();
   DWORD dwIndexInClause = dwCursorPos - ClauseToCompChar(extra.iClause);
   std::wstring str = extra.comp_str_clauses[extra.iClause];
   if (dwIndexInClause - 1 < str.size()) {
@@ -596,11 +612,6 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
     AddCharToEnd(chTyped, chTranslated, dwConv);
   } else {
     InsertChar(chTyped, chTranslated, dwConv);
-  }
-  if (GetClauseCount() == 0) {
-    comp_clause.resize(2);
-    comp_clause[0] = 0;
-    comp_clause[1] = GetCompCharCount();
   }
 } // LogCompStr::AddChar
 
@@ -767,6 +778,7 @@ void LogCompStr::MoveRight(BOOL bShift) {
 } // LogCompStr::MoveRight
 
 void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
+  FOOTMARK();
   if (iClause < GetClauseCount()) {
     extra.comp_str_clauses[iClause] = str;
     UpdateCompStr();
@@ -798,7 +810,7 @@ void CompStr::GetLog(LogCompStr& log) {
 
     log.extra.comp_str_clauses.clear();
     size_t count = log.comp_clause.size();
-    if (count > 1) {
+    if (count >= 1) {
       std::wstring str;
       for (size_t i = 0; i < count - 1; ++i) {
         str = log.GetClauseCompString(i);
@@ -806,6 +818,12 @@ void CompStr::GetLog(LogCompStr& log) {
       }
     } else {
       log.extra.comp_str_clauses.push_back(L"");
+    }
+    if (log.extra.hiragana_clauses.empty()) {
+      log.extra.hiragana_clauses.push_back(L"");
+    }
+    if (log.extra.typing_clauses.empty()) {
+      log.extra.typing_clauses.push_back(L"");
     }
   }
 }
@@ -904,109 +922,86 @@ void CompStr::GetLog(LogCompStr& log) {
 //////////////////////////////////////////////////////////////////////////////
 // for debugging
 
-bool LogCompStrExtra::IsValid() {
-  bool ret = true;
-  if (hiragana_clauses.size() != typing_clauses.size()) {
-    FOOTMARK_PRINT_CALL_STACK();
-    ret = false;
-  }
-  for (size_t i = 0; i < hiragana_clauses.size(); ++i) {
-    if (hiragana_clauses[i].empty()) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
-    }
-    if (typing_clauses[i].empty()) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
-    }
-  }
-  return ret;
-} // LogCompStrExtra::IsValid
-
-bool LogCompStr::IsValid() {
-  bool ret = true;
+void LogCompStr::AssertValid() {
   if (dwCursorPos > GetCompCharCount()) {
-    FOOTMARK_PRINT_CALL_STACK();
-    ret = false;
+    Dump();
+    assert(0);
   }
   if (comp_attr.size()) {
     if (comp_attr.size() != comp_str.size()) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
+      Dump();
+      assert(0);
     }
   }
   if (comp_clause.size()) {
     if (comp_clause[0] != 0) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
+      Dump();
+      assert(0);
     }
     if (comp_clause[comp_clause.size() - 1] != GetCompCharCount()) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
+      Dump();
+      assert(0);
     }
     if (extra.iClause > (DWORD)comp_clause.size()) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
+      Dump();
+      assert(0);
     }
     for (size_t i = 1; i < comp_clause.size(); ++i) {
       if (comp_clause[i] > GetCompCharCount()) {
-        FOOTMARK_PRINT_CALL_STACK();
-        ret = false;
+        Dump();
+        assert(0);
       }
       if (comp_clause[i - 1] > comp_clause[i]) {
-        FOOTMARK_PRINT_CALL_STACK();
-        ret = false;
+        Dump();
+        assert(0);
       }
     }
   }
   if (result_read_clause.size()) {
     if (result_read_clause[0] != 0) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
+      Dump();
+      assert(0);
     }
     if (result_read_clause[result_read_clause.size() - 1] != 0) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
+      Dump();
+      assert(0);
     }
     for (size_t i = 1; i < result_read_clause.size(); ++i) {
       if (result_read_clause[i] > (DWORD)result_read_str.size()) {
-        FOOTMARK_PRINT_CALL_STACK();
-        ret = false;
+        Dump();
+        assert(0);
       }
       if (result_read_clause[i - 1] > result_read_clause[i]) {
-        FOOTMARK_PRINT_CALL_STACK();
-        ret = false;
+        Dump();
+        assert(0);
       }
     }
   }
   if (result_clause.size()) {
     if (result_clause[0] != 0) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
+      Dump();
+      assert(0);
     }
     if (result_clause[result_clause.size() - 1] != 0) {
-      FOOTMARK_PRINT_CALL_STACK();
-      ret = false;
+      Dump();
+      assert(0);
     }
     for (size_t i = 1; i < result_clause.size(); ++i) {
       if (result_clause[i] > (DWORD)result_str.size()) {
-        FOOTMARK_PRINT_CALL_STACK();
-        ret = false;
+        Dump();
+        assert(0);
       }
       if (result_clause[i - 1] > result_clause[i]) {
-        FOOTMARK_PRINT_CALL_STACK();
-        ret = false;
+        Dump();
+        assert(0);
       }
     }
   }
-  if (ret) {
-    ret = extra.IsValid();
-  }
-  if (!ret) {
+  if (extra.hiragana_clauses.size() != extra.typing_clauses.size()) {
     Dump();
+    assert(0);
   }
-  return ret;
-} // LogCompStr::IsValid
+} // LogCompStr::AssertValid
 
 void CompStr::Dump() {
   FOOTMARK();
@@ -1135,6 +1130,8 @@ void LogCompStr::Dump() {
     DebugPrint(TEXT("%08X "), result_clause[i]);
   }
   DebugPrint(TEXT("\n"));
+
+  DebugPrint(TEXT("+ result_str: %ls\n"), result_str.c_str());
 
   DebugPrint(TEXT("+ extra.iClause: %08X\n"), extra.iClause);
 

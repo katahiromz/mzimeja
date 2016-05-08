@@ -51,7 +51,6 @@ struct LogCompStrExtra {
   LogCompStrExtra() { clear(); }
   void clear();
   DWORD GetTotalSize() const;
-  bool IsValid();
 }; // struct LogCompStrExtra
 
 // physical comp info extar
@@ -150,7 +149,7 @@ struct LogCompStr {
   void SetClauseCompString(DWORD iClause, std::wstring& str);
 
   // for debugging
-  bool IsValid();
+  void AssertValid();
   void Dump();
 
 protected:
