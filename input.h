@@ -24,14 +24,14 @@ enum INPUT_MODE {
   IMODE_DISABLED        // the IME is disabled
 };
 
-BOOL IsInputModeOpen(INPUT_MODE imode);
-INPUT_MODE InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
-INPUT_MODE NextInputMode(INPUT_MODE imode);
-INPUT_MODE GetInputMode(HIMC hIMC);
-void SetInputMode(HIMC hIMC, INPUT_MODE imode);
-BOOL IsRomanMode(HIMC hIMC);
-void SetRomanMode(HIMC hIMC, BOOL bRoman);
-UINT CommandFromInputMode(INPUT_MODE imode);
+BOOL        IsInputModeOpen(INPUT_MODE imode);
+INPUT_MODE  InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion);
+INPUT_MODE  NextInputMode(INPUT_MODE imode);
+INPUT_MODE  GetInputMode(HIMC hIMC);
+void        SetInputMode(HIMC hIMC, INPUT_MODE imode);
+BOOL        IsRomanMode(HIMC hIMC);
+void        SetRomanMode(HIMC hIMC, BOOL bRoman);
+UINT        CommandFromInputMode(INPUT_MODE imode);
 
 //////////////////////////////////////////////////////////////////////////////
 // composition info
