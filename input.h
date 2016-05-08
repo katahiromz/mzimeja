@@ -146,6 +146,7 @@ struct LogCompStr {
   void MoveLeft(BOOL bShift);
   void MoveRight(BOOL bShift);
 
+  DWORD GetClauseCompStrLen(DWORD dwClauseIndex) const;
   void SetClauseCompString(DWORD iClause, std::wstring& str);
 
   // for debugging
@@ -156,6 +157,7 @@ protected:
   void MergeAt(std::vector<std::wstring>& strs, DWORD istr);
   void UpdateExtraClause(DWORD iClause, DWORD dwConversion);
   void UpdateCompStr();
+  void UpdateClauseAttr();
 }; // struct LogCompStr
 
 inline void SetClause(LPDWORD lpdw, DWORD num) {
