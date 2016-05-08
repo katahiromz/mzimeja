@@ -483,7 +483,7 @@ BOOL InputContext::DoConvert() {
 
   // set composition string
   assert(log_comp_str.IsValid());
-  log_comp_str.SetClauseCompString(log_comp_str.extra.iClause, str, TRUE);
+  log_comp_str.SetClauseCompString(log_comp_str.extra.iClause, str);
   assert(log_comp_str.IsValid());
 
   // recreate composition

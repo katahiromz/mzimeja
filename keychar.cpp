@@ -1094,7 +1094,7 @@ static KEYVALUE kana2type_table[] = {
   {L"‚è", L"l"},
   {L"‚é", L"."},
   {L"‚ê", L";"},
-  {L"‚ë", L"\"},
+  {L"‚ë", L"\\"},
   {L"‚í", L"0"},
   {L"‚ð", L"0"},
   {L"‚ñ", L"y"},
@@ -1401,13 +1401,11 @@ std::wstring roman_to_hiragana(std::wstring roman, size_t ichTarget) {
     }
   }
   for (size_t i = 0; i < _countof(kigou_table); ++i) {
-    if (roman[k] == kigou_table[i].key[0]) {
-      key_len = 1;
-      if (roman[ichTarget - key_len] == kigou_table[i].key[0]) {
-        if (key_len <= ichTarget) {
-          key = kigou_table[i].key;
-          value = kigou_table[i].value;
-        }
+    key_len = 1;
+    if (roman[ichTarget - key_len] == kigou_table[i].key[0]) {
+      if (key_len <= ichTarget) {
+        key = kigou_table[i].key;
+        value = kigou_table[i].value;
       }
     }
   }
@@ -1460,13 +1458,11 @@ std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget) {
     }
   }
   for (size_t i = 0; i < _countof(kigou_table); ++i) {
-    if (roman[k] == kigou_table[i].key[0]) {
-      key_len = 1;
-      if (roman[ichTarget - key_len] == kigou_table[i].key[0]) {
-        if (key_len <= ichTarget) {
-          key = kigou_table[i].key;
-          value = kigou_table[i].value;
-        }
+    key_len = 1;
+    if (roman[ichTarget - key_len] == kigou_table[i].key[0]) {
+      if (key_len <= ichTarget) {
+        key = kigou_table[i].key;
+        value = kigou_table[i].value;
       }
     }
   }
@@ -1520,13 +1516,11 @@ std::wstring roman_to_hankaku_katakana(std::wstring roman, size_t ichTarget) {
     }
   }
   for (size_t i = 0; i < _countof(kigou_table); ++i) {
-    if (roman[k] == kigou_table[i].key[0]) {
-      key_len = 1;
-      if (roman[ichTarget - key_len] == kigou_table[i].key[0]) {
-        if (key_len <= ichTarget) {
-          key = kigou_table[i].key;
-          value = kigou_table[i].value;
-        }
+    key_len = 1;
+    if (roman[ichTarget - key_len] == kigou_table[i].key[0]) {
+      if (key_len <= ichTarget) {
+        key = kigou_table[i].key;
+        value = kigou_table[i].value;
       }
     }
   }
@@ -1769,6 +1763,7 @@ std::wstring zenkaku_eisuu_to_hankaku(const std::wstring& str) {
     }
     ret += ch;
   }
+  return ret;
 }
 
 //////////////////////////////////////////////////////////////////////////////

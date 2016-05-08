@@ -146,6 +146,8 @@ struct LogCompStr {
   void MoveLeft(BOOL bShift);
   void MoveRight(BOOL bShift);
 
+  void SetClauseCompString(DWORD iClause, std::wstring& str);
+
   // for debugging
   bool IsValid();
   void Dump();

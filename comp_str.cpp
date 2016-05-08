@@ -339,8 +339,10 @@ void LogCompStr::MakeHanEisuu() {
 void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
   BOOL bRoman = (dwConv & IME_CMODE_ROMAN);
   INPUT_MODE imode = InputModeFromConversionMode(TRUE, dwConv);
-  std::wstring str, typed = {chTyped}, translated = {chTranslated};
-  if (is_katakana(chTranslated)) {
+  std::wstring str, typed, translated;
+  typed += chTyped;
+  translated += chTranslated;
+  if (is_zenkaku_katakana(chTranslated)) {
     translated = lcmap(translated, LCMAP_HIRAGANA);
     chTranslated = translated[0];
   }
@@ -469,11 +471,12 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 } // LogCompStr::AddCharToEnd
 
 void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
-  BOOL bRoman = (dwConv & IME_CMODE_ROMAN);
   INPUT_MODE imode = InputModeFromConversionMode(TRUE, dwConv);
-  std::wstring typed = {chTyped}, translated = {translated};
+  std::wstring typed, translated;
+  typed += chTyped;
+  translated += chTranslated;
   DWORD dwIndexInClause = dwCursorPos - ClauseToCompChar(extra.iClause);
-  if (is_katakana(chTranslated)) {
+  if (is_zenkaku_katakana(chTranslated)) {
     translated = lcmap(translated, LCMAP_HIRAGANA);
     chTranslated = translated[0];
   }
@@ -534,7 +537,7 @@ void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
   extra.comp_str_clauses[extra.iClause] = str;
   dwCursorPos += len;
   UpdateCompStr();
-  UpdateExtraClause();
+  UpdateExtraClause(extra.iClause, dwConv);
 } // LogCompStr::InsertChar
 
 void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
@@ -543,6 +546,11 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
     AddCharToEnd(chTyped, chTranslated, dwConv);
   } else {
     InsertChar(chTyped, chTranslated, dwConv);
+  }
+  if (GetClauseCount() == 0) {
+    comp_clause.resize(2);
+    comp_clause[0] = 0;
+    comp_clause[1] = GetCompCharCount();
   }
 } // LogCompStr::AddChar
 
@@ -708,6 +716,16 @@ void LogCompStr::MoveRight(BOOL bShift) {
   }
 } // LogCompStr::MoveRight
 
+void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
+  if (iClause < GetClauseCount()) {
+    extra.comp_str_clauses[iClause] = str;
+    UpdateCompStr();
+    SetClauseAttr(extra.iClause, ATTR_CONVERTED);
+    extra.iClause = iClause;
+    SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 void CompStr::GetLog(LogCompStr& log) {
@@ -731,9 +749,9 @@ void CompStr::GetLog(LogCompStr& log) {
     log.extra.comp_str_clauses.clear();
     size_t count = log.comp_clause.size();
     if (count > 1) {
-      std::string str;
+      std::wstring str;
       for (size_t i = 0; i < count - 1; ++i) {
-        str = GetClauseCompString(i);
+        str = log.GetClauseCompString(i);
         log.extra.comp_str_clauses.push_back(str);
       }
     }
