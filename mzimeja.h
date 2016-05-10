@@ -88,7 +88,8 @@
 #define FIGWLP_CLOSEBMP     (FIGWLP_STATUSBMP + sizeof(LONG_PTR))
 #define FIGWL_PUSHSTATUS    (FIGWLP_CLOSEBMP + sizeof(LONG_PTR))
 #define FIGWLP_CHILDWND     (FIGWL_PUSHSTATUS + sizeof(LONG))
-#define UIEXTRASIZE         (FIGWLP_CHILDWND + sizeof(LONG_PTR))
+#define FIGWL_COMPINDEX     (FIGWLP_CHILDWND + sizeof(LONG_PTR))
+#define UIEXTRASIZE         (FIGWL_COMPINDEX + sizeof(LONG))
 
 // The flags of FIGWL_MOUSE
 #define FIM_CAPUTURED 0x01
