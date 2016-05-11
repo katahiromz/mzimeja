@@ -9,14 +9,13 @@ extern "C" {
 
 void GuideWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow) {
   FOOTMARK();
-  if (::IsWindow(lpUIExtra->uiGuide.hWnd)) {
-    if (bShow) {
-      ::ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
-    } else {
-      ::ShowWindow(lpUIExtra->uiGuide.hWnd, SW_HIDE);
-    }
+  if (bShow) {
+    ::ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
+    lpUIExtra->uiGuide.bShow = TRUE;
+  } else {
+    ::ShowWindow(lpUIExtra->uiGuide.hWnd, SW_HIDE);
+    lpUIExtra->uiGuide.bShow = FALSE;
   }
-  lpUIExtra->uiGuide.bShow = bShow;
 }
 
 LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,

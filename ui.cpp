@@ -12,10 +12,18 @@ void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag) {
   FOOTMARK();
   LPUIEXTRA lpUIExtra = LockUIExtra(hWnd);
   if (lpUIExtra) {
-    StatusWnd_Show(lpUIExtra, fFlag);
-    CandWnd_Show(lpUIExtra, fFlag);
-    CompWnd_Show(lpUIExtra, -2, fFlag);
-    GuideWnd_Show(lpUIExtra, fFlag);
+    if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
+      StatusWnd_Show(lpUIExtra, fFlag);
+    }
+    if (IsWindow(lpUIExtra->uiCand.hWnd)) {
+      CandWnd_Show(lpUIExtra, fFlag);
+    }
+    if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
+      CompWnd_Show(lpUIExtra, -1, fFlag);
+    }
+    if (IsWindow(lpUIExtra->uiGuide.hWnd)) {
+      GuideWnd_Show(lpUIExtra, fFlag);
+    }
     UnlockUIExtra(hWnd);
   }
 }
@@ -109,7 +117,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
           // updated.
           lpIMC = TheIME.LockIMC(hIMC);
           if (lpIMC) {
-            if (IsWindow(lpUIExtra->uiCand.hWnd)) CandWnd_Show(lpUIExtra, FALSE);
+            if (IsWindow(lpUIExtra->uiCand.hWnd)) CandWnd_Hide(lpUIExtra);
             if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
               if (lpIMC->HasCandInfo()) {
                 CandWnd_Create(hWnd, lpUIExtra, lpIMC);
@@ -117,23 +125,23 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                 CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
               }
             }
-            if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
-              CompWnd_Show(lpUIExtra, -2, FALSE);
-            }
+
+            if (IsWindow(lpUIExtra->uiDefComp.hWnd)) CompWnd_Hide(lpUIExtra);
+
             if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
               CompWnd_Create(hWnd, lpUIExtra, lpIMC);
               CompWnd_MoveMessage(hWnd, lpUIExtra);
             }
           } else {
-            CandWnd_Show(lpUIExtra, FALSE);
-            CompWnd_Show(lpUIExtra, -1, FALSE);
+            CandWnd_Hide(lpUIExtra);
+            CompWnd_Hide(lpUIExtra);
           }
           StatusWnd_Update(lpUIExtra);
           TheIME.UnlockIMC(hIMC);
         } else  // it is NULL input context.
         {
-          CandWnd_Show(lpUIExtra, FALSE);
-          CompWnd_Show(lpUIExtra, -2, FALSE);
+          CandWnd_Hide(lpUIExtra);
+          CompWnd_Hide(lpUIExtra);
         }
         UnlockUIExtra(hWnd);
       }
@@ -174,7 +182,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     // Finish to display the composition string.
     lpUIExtra = LockUIExtra(hWnd);
     if (lpUIExtra) {
-      CompWnd_Show(lpUIExtra, -2, FALSE);
+      CompWnd_Hide(lpUIExtra);
       UnlockUIExtra(hWnd);
     }
     break;
@@ -396,7 +404,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
 
   case IMN_CLOSECANDIDATE:
     if (lpUIExtra) {
-      CandWnd_Show(lpUIExtra, FALSE);
+      CandWnd_Hide(lpUIExtra);
     }
     break;
 
@@ -408,7 +416,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
         int dx, dy;
 
         if (lpUIExtra->uiGuide.pt.x == -1) {
-          ::GetWindowRect(lpIMC->hWnd, &rc);
+          GetWindowRect(lpIMC->hWnd, &rc);
           lpUIExtra->uiGuide.pt.x = rc.left;
           lpUIExtra->uiGuide.pt.y = rc.bottom;
         }

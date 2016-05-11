@@ -83,26 +83,21 @@ void CompWnd_Show(LPUIEXTRA lpUIExtra, INT nIndex, BOOL bShow) {
   if (!bShow) {
     FOOTMARK_PRINT_CALL_STACK();
   }
-  if (nIndex == -2) {
-    CompWnd_Show(lpUIExtra, -1, bShow);
-    for (int i = 0; i < MAXCOMPWND; i++) {
-      CompWnd_Show(lpUIExtra, i, FALSE);
-    }
-    return;
-  }
-  HWND hWnd;
   if (nIndex == -1) {
-    hWnd = lpUIExtra->uiDefComp.hWnd;
-    lpUIExtra->uiDefComp.bShow = bShow;
-  } else {
-    hWnd = lpUIExtra->uiComp[nIndex].hWnd;
-    lpUIExtra->uiComp[nIndex].bShow = bShow;
-  }
-  if (::IsWindow(hWnd)) {
     if (bShow) {
-      ::ShowWindow(hWnd, SW_SHOWNOACTIVATE);
+      ::ShowWindow(lpUIExtra->uiDefComp.hWnd, SW_SHOWNOACTIVATE);
+      lpUIExtra->uiDefComp.bShow = TRUE;
     } else {
-      ::ShowWindow(hWnd, SW_HIDE);
+      ::ShowWindow(lpUIExtra->uiDefComp.hWnd, SW_HIDE);
+      lpUIExtra->uiDefComp.bShow = FALSE;
+    }
+  } else {
+    if (bShow) {
+      ::ShowWindow(lpUIExtra->uiComp[nIndex].hWnd, SW_SHOWNOACTIVATE);
+      lpUIExtra->uiComp[nIndex].bShow = TRUE;
+    } else {
+      ::ShowWindow(lpUIExtra->uiComp[nIndex].hWnd, SW_HIDE);
+      lpUIExtra->uiComp[nIndex].bShow = FALSE;
     }
   }
 }
@@ -504,6 +499,24 @@ void CompWnd_Paint(HWND hCompWnd) {
   }
   if (hFont && hOldFont) SelectObject(hDC, hOldFont);
   EndPaint(hCompWnd, &ps);
+}
+
+void CompWnd_Hide(LPUIEXTRA lpUIExtra) {
+  FOOTMARK();
+
+  RECT rc;
+  if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
+    if (!lpUIExtra->dwCompStyle)
+      GetWindowRect(lpUIExtra->uiDefComp.hWnd, &rc);
+
+    CompWnd_Show(lpUIExtra, -1, FALSE);
+  }
+
+  for (int i = 0; i < MAXCOMPWND; i++) {
+    if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
+      CompWnd_Show(lpUIExtra, i, FALSE);
+    }
+  }
 }
 
 void CompWnd_SetFont(LPUIEXTRA lpUIExtra) {
