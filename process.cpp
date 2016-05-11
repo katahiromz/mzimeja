@@ -44,10 +44,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
         if (lpIMC) {
           if (lpIMC->HasCompStr()) {
             lpIMC->AddChar(L' ', L'\0');
-          } else {
-            TheIME.GenerateMessage(WM_IME_CHAR, L' ', 1);
           }
-          TheIME.UnlockIMC(hIMC);
         }
         return TRUE;
       }
@@ -82,12 +79,10 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
   case VK_KANJI:
   case VK_OEM_AUTO:
   case VK_OEM_ENLW:
-    if (hIMC) {
-      if (bOpen) {
-        ImmSetOpenStatus(hIMC, FALSE);
-      } else {
-        ImmSetOpenStatus(hIMC, TRUE);
-      }
+    if (bOpen) {
+      SetInputMode(hIMC, IMODE_HAN_EISUU);
+    } else {
+      SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
     }
     break;
 
@@ -146,7 +141,15 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
   case VK_BACK:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->DeleteChar(vk == VK_BACK);
+      if (lpIMC->HasCompStr()) {
+        lpIMC->DeleteChar(vk == VK_BACK);
+      } else {
+        if (vk == VK_BACK) {
+          TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_BACK);
+        } else {
+          TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_DELETE);
+        }
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -268,15 +271,12 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   BOOL ret = FALSE;
   FOOTMARK();
 
-  if (lKeyData & 0x80000000) {
+  BOOL bKeyUp = (lKeyData & 0x80000000);
+  if (bKeyUp) {
     return FALSE;
   }
 
   InputContext *lpIMC = TheIME.LockIMC(hIMC);
-  if (lpIMC == NULL) {
-    return FALSE;
-  }
-
   BOOL fOpen = lpIMC->IsOpen();
   BOOL fAlt = (lpbKeyState[VK_MENU] & 0x80);
   BOOL fCtrl = (lpbKeyState[VK_CONTROL] & 0x80);
@@ -291,9 +291,11 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   case VK_KANA:
     ret = TRUE;
     break;
+  default:
+    if (lpIMC == NULL) return FALSE;
   }
 
-  if (fOpen) {
+  if (!ret && fOpen) {
     BOOL fCompStr = lpIMC->HasCompStr();
     BOOL fCandInfo = lpIMC->HasCandInfo();
     if (fAlt) {
@@ -352,7 +354,10 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
         // arrow and moving key
         ret = TRUE;
         break;
-      case VK_SPACE: case VK_BACK: case VK_DELETE: case VK_RETURN:
+      case VK_SPACE:
+        if (!fCtrl || fCompStr) ret = TRUE;
+        break;
+      case VK_BACK: case VK_DELETE: case VK_RETURN:
       case VK_CAPITAL: case VK_CONVERT: case VK_NONCONVERT:
         // special keys
         ret = TRUE;
@@ -392,35 +397,32 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
 
   TheIME.m_lpCurTransKey = lpTransBuf;
   TheIME.m_uNumTransKey = 0;
+  BOOL bKeyUp = (uScanCode & 0x10000000);
 
   if (hIMC) {
-    INPUT_MODE imode = GetInputMode(hIMC);
-    if (imode == IMODE_HAN_EISUU) {
-      if ((uScanCode & 0x8000) == 0) {
-        // key down
-        BYTE vk = (BYTE)uVKey;
-        switch (vk) {
-        case VK_KANJI: case VK_OEM_AUTO: case VK_OEM_ENLW:
-          ::ImmSetOpenStatus(hIMC, TRUE);
-          break;
-        case VK_KANA:
-          ::ImmSetOpenStatus(hIMC, TRUE);
-          if (lpbKeyState[VK_MENU] & 0x80) {
-            SetRomanMode(hIMC, !IsRomanMode(hIMC));
-          } else if (lpbKeyState[VK_SHIFT] & 0x80) {
-            SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
-          } else {
-            SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
-          }
-          break;
-        default:
-          break;
+    if (!bKeyUp) {
+      INPUT_MODE imode = GetInputMode(hIMC);
+      switch ((BYTE)uVKey) {
+      case VK_KANJI: case VK_OEM_AUTO: case VK_OEM_ENLW:
+        if (::ImmGetOpenStatus(hIMC)) {
+          SetInputMode(hIMC, IMODE_HAN_EISUU);
+        } else {
+          SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
         }
-      }
-    } else {
-      if ((uScanCode & 0x8000) == 0) {
-        // key down
+        break;
+      case VK_KANA:
+        ::ImmSetOpenStatus(hIMC, TRUE);
+        if (lpbKeyState[VK_MENU] & 0x80) {
+          SetRomanMode(hIMC, !IsRomanMode(hIMC));
+        } else if (lpbKeyState[VK_SHIFT] & 0x80) {
+          SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+        } else {
+          SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+        }
+        break;
+      default:
         IMEKeyDownHandler(hIMC, uVKey, lpbKeyState, imode);
+        break;
       }
     }
 
