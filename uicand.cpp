@@ -7,17 +7,6 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-void CandWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow) {
-  FOOTMARK();
-  if (bShow) {
-    ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_SHOWNOACTIVATE);
-    lpUIExtra->uiCand.bShow = TRUE;
-  } else {
-    ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
-    lpUIExtra->uiCand.bShow = FALSE;
-  }
-}
-
 LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
   FOOTMARK();
@@ -116,7 +105,8 @@ void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   }
 
   SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
-  CandWnd_Show(lpUIExtra, lpUIExtra->uiCand.bShow);
+  ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
+  lpUIExtra->uiCand.bShow = FALSE;
 
   return;
 }
@@ -145,7 +135,7 @@ void CandWnd_Paint(HWND hCandWnd) {
         SIZE sz;
         HBRUSH hbr;
         LPTSTR lpstr = lpCandList->GetCandString(i);
-        MyGetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
+        GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
         if (lpCandList->dwSelection == i) {
           hbr = (HBRUSH)SelectObject(hDC, hbrHightLight);
           PatBlt(hDC, 0, height, rc.right, sz.cy, PATCOPY);
@@ -187,7 +177,7 @@ void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
            i < lpCandList->GetPageEnd(); i++) {
         LPTSTR lpstr = lpCandList->GetCandString(i);
         SIZE sz;
-        MyGetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
+        GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &sz);
         if (width < sz.cx) width = sz.cx;
         height += sz.cy;
       }
@@ -215,7 +205,8 @@ void CandWnd_Hide(LPUIEXTRA lpUIExtra) {
     lpUIExtra->uiCand.pt.x = rc.left;
     lpUIExtra->uiCand.pt.y = rc.top;
     MoveWindow(lpUIExtra->uiCand.hWnd, -1, -1, 0, 0, TRUE);
-    CandWnd_Show(lpUIExtra, FALSE);
+    ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
+    lpUIExtra->uiCand.bShow = FALSE;
   }
 }
 
@@ -245,7 +236,8 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
       GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
       MoveWindow(lpUIExtra->uiCand.hWnd, pt.x, pt.y, rc.right - rc.left,
                  rc.bottom - rc.top, TRUE);
-      CandWnd_Show(lpUIExtra, TRUE);
+      ShowWindow(lpUIExtra->uiCand.hWnd, SW_SHOWNOACTIVATE);
+      lpUIExtra->uiCand.bShow = TRUE;
       InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
       SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
     }
@@ -281,7 +273,8 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
       GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
       MoveWindow(lpUIExtra->uiCand.hWnd, pt.x, pt.y, rc.right - rc.left,
                  rc.bottom - rc.top, TRUE);
-      CandWnd_Show(lpUIExtra, TRUE);
+      ShowWindow(lpUIExtra->uiCand.hWnd, SW_SHOWNOACTIVATE);
+      lpUIExtra->uiCand.bShow = TRUE;
       InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
     }
     SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
@@ -294,7 +287,8 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
       GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
       MoveWindow(lpUIExtra->uiCand.hWnd, pt.x, pt.y, rc.right - rc.left,
                  rc.bottom - rc.top, TRUE);
-      CandWnd_Show(lpUIExtra, TRUE);
+      ShowWindow(lpUIExtra->uiCand.hWnd, SW_SHOWNOACTIVATE);
+      lpUIExtra->uiCand.bShow = TRUE;
       InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
     }
     SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));

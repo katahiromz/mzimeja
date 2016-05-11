@@ -24,17 +24,6 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-void StatusWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow) {
-  FOOTMARK();
-  if (bShow) {
-    ::ShowWindow(lpUIExtra->uiStatus.hWnd, SW_SHOWNOACTIVATE);
-    lpUIExtra->uiStatus.bShow = TRUE;
-  } else {
-    ::ShowWindow(lpUIExtra->uiStatus.hWnd, SW_HIDE);
-    lpUIExtra->uiStatus.bShow = FALSE;
-  }
-}
-
 // create status window
 HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
   FOOTMARK();
@@ -63,7 +52,8 @@ HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
     lpUIExtra->uiStatus.hWnd = hwndStatus;
   }
   RepositionWindow(hwndStatus);
-  StatusWnd_Show(lpUIExtra, TRUE);
+  ::ShowWindow(hwndStatus, SW_SHOWNOACTIVATE);
+  lpUIExtra->uiStatus.bShow = TRUE;
   SetWindowLongPtr(hwndStatus, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
   return hwndStatus;
 } // StatusWnd_Create

@@ -404,31 +404,6 @@ VOID MZIMEJA::UnlockIMC(HIMC hIMC) {
   }
 }
 
-HGLOBAL MZIMEJA::GetUIExtraFromServerWnd(HWND hSvrWnd) {
-  return (HGLOBAL)GetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE);
-}
-
-void MZIMEJA::SetUIExtraToServerWnd(HWND hSvrWnd, HGLOBAL hUIExtra) {
-  SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
-}
-
-LPUIEXTRA MZIMEJA::LockUIExtra(HWND hSvrWnd) {
-  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
-  return (LPUIEXTRA)::GlobalLock(hUIExtra);
-}
-
-void MZIMEJA::UnlockUIExtra(HWND hSvrWnd) {
-  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
-  ::GlobalUnlock(hUIExtra);
-  SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
-}
-
-void MZIMEJA::FreeUIExtra(HWND hSvrWnd) {
-  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
-  ::GlobalFree(hUIExtra);
-  SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
-}
-
 //////////////////////////////////////////////////////////////////////////////
 
 extern "C" {
