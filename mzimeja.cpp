@@ -409,6 +409,40 @@ VOID MZIMEJA::UnlockIMC(HIMC hIMC) {
 extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
+// UI extra related
+
+HGLOBAL GetUIExtraFromServerWnd(HWND hwndServer) {
+  FOOTMARK();
+  return (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE);
+}
+
+void SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra) {
+  FOOTMARK();
+  SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
+}
+
+LPUIEXTRA LockUIExtra(HWND hwndServer) {
+  FOOTMARK();
+  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
+  LPUIEXTRA lpUIExtra = (LPUIEXTRA)::GlobalLock(hUIExtra);
+  assert(lpUIExtra);
+  return lpUIExtra;
+}
+
+void UnlockUIExtra(HWND hwndServer) {
+  FOOTMARK();
+  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
+  ::GlobalUnlock(hUIExtra);
+}
+
+void FreeUIExtra(HWND hwndServer) {
+  FOOTMARK();
+  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
+  ::GlobalFree(hUIExtra);
+  SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // for debugging
 
 #ifndef NDEBUG

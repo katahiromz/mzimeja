@@ -222,8 +222,13 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam);
 
 // mzimeja.cpp
-void RepositionWindow(HWND hWnd);
-HFONT CheckNativeCharset(HDC hDC);
+void      RepositionWindow(HWND hWnd);
+HFONT     CheckNativeCharset(HDC hDC);
+HGLOBAL   GetUIExtraFromServerWnd(HWND hwndServer);
+void      SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra);
+LPUIEXTRA LockUIExtra(HWND hwndServer);
+void      UnlockUIExtra(HWND hwndServer);
+void      FreeUIExtra(HWND hwndServer);
 
 //////////////////////////////////////////////////////////////////////////////
 
