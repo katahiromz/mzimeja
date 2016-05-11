@@ -370,7 +370,7 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &log);
 
-  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
+  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 } // InputContext::AddChar
 
@@ -490,7 +490,7 @@ BOOL InputContext::DoConvert() {
   hCompStr = CompStr::ReCreate(hCompStr, &log_comp_str);
 
   // generate message to change composition
-  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
+  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 
   return TRUE;
@@ -699,7 +699,7 @@ void InputContext::RevertText() {
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &log);
 
-  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
+  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 } // InputContext::RevertText
 
@@ -736,7 +736,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     hCompStr = CompStr::ReCreate(hCompStr, &log);
 
     // update composition
-    LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS | GCS_DELTASTART;
+    LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
   }
 } // InputContext::DeleteChar

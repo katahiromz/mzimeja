@@ -121,6 +121,7 @@ void LogCompStr::clear_read() {
 void LogCompStr::clear_comp() {
   FOOTMARK();
   dwCursorPos = 0;
+  dwDeltaStart = 0;
   comp_attr.clear();
   comp_clause.clear();
   comp_str.clear();
