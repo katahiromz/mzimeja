@@ -521,7 +521,6 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
       s_old_handler = ::SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
     #endif
     DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %p\n"), TheIME.m_hInst);
-    DebugPrintA("ThreadID: %08X\n", ::GetCurrentThreadId());
     TheIME.Init(hInstDLL);
     break;
 
