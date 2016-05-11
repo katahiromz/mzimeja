@@ -982,10 +982,6 @@ void LogCompStr::AssertValid() {
       Dump();
       assert(0);
     }
-    if (result_clause[result_clause.size() - 1] != 0) {
-      Dump();
-      assert(0);
-    }
     for (size_t i = 1; i < result_clause.size(); ++i) {
       if (result_clause[i] > (DWORD)result_str.size()) {
         Dump();
