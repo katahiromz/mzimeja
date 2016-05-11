@@ -404,37 +404,34 @@ VOID MZIMEJA::UnlockIMC(HIMC hIMC) {
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
-
-extern "C" {
-
-//////////////////////////////////////////////////////////////////////////////
-// UI extra related
-
-HGLOBAL GetUIExtraFromServerWnd(HWND hSvrWnd) {
+HGLOBAL MZIMEJA::GetUIExtraFromServerWnd(HWND hSvrWnd) {
   return (HGLOBAL)GetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE);
 }
 
-void SetUIExtraToServerWnd(HWND hSvrWnd, HGLOBAL hUIExtra) {
+void MZIMEJA::SetUIExtraToServerWnd(HWND hSvrWnd, HGLOBAL hUIExtra) {
   SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
 }
 
-LPUIEXTRA LockUIExtra(HWND hSvrWnd) {
+LPUIEXTRA MZIMEJA::LockUIExtra(HWND hSvrWnd) {
   HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
   return (LPUIEXTRA)::GlobalLock(hUIExtra);
 }
 
-void UnlockUIExtra(HWND hSvrWnd) {
+void MZIMEJA::UnlockUIExtra(HWND hSvrWnd) {
   HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
   ::GlobalUnlock(hUIExtra);
   SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
 }
 
-void FreeUIExtra(HWND hSvrWnd) {
+void MZIMEJA::FreeUIExtra(HWND hSvrWnd) {
   HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
   ::GlobalFree(hUIExtra);
   SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
 }
+
+//////////////////////////////////////////////////////////////////////////////
+
+extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 // for debugging

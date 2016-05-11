@@ -231,11 +231,6 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 // mzimeja.cpp
 void RepositionWindow(HWND hWnd);
 HFONT CheckNativeCharset(HDC hDC);
-LPUIEXTRA LockUIExtra(HWND hSvrWnd);
-void UnlockUIExtra(HWND hSvrWnd);
-void FreeUIExtra(HWND hSvrWnd);
-HGLOBAL GetUIExtraFromServerWnd(HWND hSvrWnd);
-void SetUIExtraToServerWnd(HWND hSvrWnd, HGLOBAL hUIExtra);
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -334,6 +329,13 @@ struct MZIMEJA {
 
   // do command
   BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
+
+  // UI extra-related
+  LPUIEXTRA LockUIExtra(HWND hSvrWnd);
+  void UnlockUIExtra(HWND hSvrWnd);
+  void FreeUIExtra(HWND hSvrWnd);
+  HGLOBAL GetUIExtraFromServerWnd(HWND hSvrWnd);
+  void SetUIExtraToServerWnd(HWND hSvrWnd, HGLOBAL hUIExtra);
 }; // struct MZIMEJA
 
 extern MZIMEJA TheIME;

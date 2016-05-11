@@ -10,7 +10,7 @@ extern "C" {
 
 void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag) {
   FOOTMARK();
-  LPUIEXTRA lpUIExtra = LockUIExtra(hWnd);
+  LPUIEXTRA lpUIExtra = TheIME.LockUIExtra(hWnd);
   if (lpUIExtra) {
     if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
       StatusWnd_Show(lpUIExtra, fFlag);
@@ -24,7 +24,7 @@ void PASCAL ShowUIWindows(HWND hWnd, BOOL fFlag) {
     if (IsWindow(lpUIExtra->uiGuide.hWnd)) {
       GuideWnd_Show(lpUIExtra, fFlag);
     }
-    UnlockUIExtra(hWnd);
+    TheIME.UnlockUIExtra(hWnd);
   }
 }
 
@@ -99,13 +99,13 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
       GlobalUnlock(hUIExtra);
     }
-    SetUIExtraToServerWnd(hWnd, hUIExtra);
+    TheIME.SetUIExtraToServerWnd(hWnd, hUIExtra);
     break;
 
   case WM_IME_SETCONTEXT:
     DebugPrint(TEXT("WM_IME_SETCONTEXT\n"));
     if (wParam) {
-      lpUIExtra = LockUIExtra(hWnd);
+      lpUIExtra = TheIME.LockUIExtra(hWnd);
       if (lpUIExtra) {
         lpUIExtra->hIMC = hIMC;
 
@@ -143,7 +143,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
           CandWnd_Hide(lpUIExtra);
           CompWnd_Hide(lpUIExtra);
         }
-        UnlockUIExtra(hWnd);
+        TheIME.UnlockUIExtra(hWnd);
       }
     }
     // else
@@ -153,14 +153,14 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   case WM_IME_STARTCOMPOSITION:
     DebugPrint(TEXT("WM_IME_STARTCOMPOSITION\n"));
     // Start composition! Ready to display the composition string.
-    lpUIExtra = LockUIExtra(hWnd);
+    lpUIExtra = TheIME.LockUIExtra(hWnd);
     if (lpUIExtra) {
       lpIMC = TheIME.LockIMC(hIMC);
       if (lpIMC) {
         CompWnd_Create(hWnd, lpUIExtra, lpIMC);
         TheIME.UnlockIMC(hIMC);
       }
-      UnlockUIExtra(hWnd);
+      TheIME.UnlockUIExtra(hWnd);
     }
     break;
 
@@ -168,11 +168,11 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     DebugPrint(TEXT("WM_IME_COMPOSITION\n"));
     // Update to display the composition string.
     lpIMC = TheIME.LockIMC(hIMC);
-    lpUIExtra = LockUIExtra(hWnd);
+    lpUIExtra = TheIME.LockUIExtra(hWnd);
     if (lpUIExtra) {
       CompWnd_MoveMessage(hWnd, lpUIExtra);
       CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
-      UnlockUIExtra(hWnd);
+      TheIME.UnlockUIExtra(hWnd);
     }
     TheIME.UnlockIMC(hIMC);
     break;
@@ -180,10 +180,10 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   case WM_IME_ENDCOMPOSITION:
     DebugPrint(TEXT("WM_IME_ENDCOMPOSITION\n"));
     // Finish to display the composition string.
-    lpUIExtra = LockUIExtra(hWnd);
+    lpUIExtra = TheIME.LockUIExtra(hWnd);
     if (lpUIExtra) {
       CompWnd_Hide(lpUIExtra);
-      UnlockUIExtra(hWnd);
+      TheIME.UnlockUIExtra(hWnd);
     }
     break;
 
@@ -194,10 +194,10 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   case WM_IME_SELECT:
     DebugPrint(TEXT("WM_IME_SELECT\n"));
     if (wParam) {
-      lpUIExtra = LockUIExtra(hWnd);
+      lpUIExtra = TheIME.LockUIExtra(hWnd);
       if (lpUIExtra) {
         lpUIExtra->hIMC = hIMC;
-        UnlockUIExtra(hWnd);
+        TheIME.UnlockUIExtra(hWnd);
       }
     }
     break;
@@ -214,7 +214,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
   case WM_DESTROY:
     DebugPrint(TEXT("WM_DESTROY\n"));
-    lpUIExtra = LockUIExtra(hWnd);
+    lpUIExtra = TheIME.LockUIExtra(hWnd);
     if (lpUIExtra) {
       if (IsWindow(lpUIExtra->uiStatus.hWnd))
         DestroyWindow(lpUIExtra->uiStatus.hWnd);
@@ -235,8 +235,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
       if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont);
 
-      UnlockUIExtra(hWnd);
-      FreeUIExtra(hWnd);
+      TheIME.UnlockUIExtra(hWnd);
+      TheIME.FreeUIExtra(hWnd);
     }
     break;
 
@@ -244,11 +244,11 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     DebugPrint(TEXT("WM_UI_STATEMOVE\n"));
     // Set the position of the status window to UIExtra.
     // This message is sent by the status window.
-    lpUIExtra = LockUIExtra(hWnd);
+    lpUIExtra = TheIME.LockUIExtra(hWnd);
     if (lpUIExtra) {
       lpUIExtra->uiStatus.pt.x = (short)LOWORD(lParam);
       lpUIExtra->uiStatus.pt.y = (short)HIWORD(lParam);
-      UnlockUIExtra(hWnd);
+      TheIME.UnlockUIExtra(hWnd);
     }
     break;
 
@@ -256,13 +256,13 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     DebugPrint(TEXT("WM_UI_DEFCOMPMOVE\n"));
     // Set the position of the composition window to UIExtra.
     // This message is sent by the composition window.
-    lpUIExtra = LockUIExtra(hWnd);
+    lpUIExtra = TheIME.LockUIExtra(hWnd);
     if (lpUIExtra) {
       if (!lpUIExtra->dwCompStyle) {
         lpUIExtra->uiDefComp.pt.x = (short)LOWORD(lParam);
         lpUIExtra->uiDefComp.pt.y = (short)HIWORD(lParam);
       }
-      UnlockUIExtra(hWnd);
+      TheIME.UnlockUIExtra(hWnd);
     }
     break;
 
@@ -270,11 +270,11 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     DebugPrint(TEXT("WM_UI_CANDMOVE\n"));
     // Set the position of the candidate window to UIExtra.
     // This message is sent by the candidate window.
-    lpUIExtra = LockUIExtra(hWnd);
+    lpUIExtra = TheIME.LockUIExtra(hWnd);
     if (lpUIExtra) {
       lpUIExtra->uiCand.pt.x = (short)LOWORD(lParam);
       lpUIExtra->uiCand.pt.y = (short)HIWORD(lParam);
-      UnlockUIExtra(hWnd);
+      TheIME.UnlockUIExtra(hWnd);
     }
     break;
 
@@ -282,23 +282,23 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     DebugPrint(TEXT("WM_UI_GUIDEMOVE\n"));
     // Set the position of the status window to UIExtra.
     // This message is sent by the status window.
-    lpUIExtra = LockUIExtra(hWnd);
+    lpUIExtra = TheIME.LockUIExtra(hWnd);
     if (lpUIExtra) {
       lpUIExtra->uiGuide.pt.x = (long)LOWORD(lParam);
       lpUIExtra->uiGuide.pt.y = (long)HIWORD(lParam);
-      UnlockUIExtra(hWnd);
+      TheIME.UnlockUIExtra(hWnd);
     }
     break;
 
   case WM_UI_COMPMOVE:
-    lpUIExtra = LockUIExtra(hWnd);
+    lpUIExtra = TheIME.LockUIExtra(hWnd);
     if (lpUIExtra) {
       lpIMC = TheIME.LockIMC(hIMC);
       if (lpIMC) {
         CompWnd_Move(lpUIExtra, lpIMC);
         TheIME.UnlockIMC(hIMC);
       }
-      UnlockUIExtra(hWnd);
+      TheIME.UnlockUIExtra(hWnd);
     }
     break;
 
@@ -331,7 +331,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
   LOGFONT lf;
 
   InputContext *lpIMC = TheIME.LockIMC(hIMC);
-  lpUIExtra = LockUIExtra(hWnd);
+  lpUIExtra = TheIME.LockUIExtra(hWnd);
 
   switch (wParam) {
   case IMN_CLOSESTATUSWINDOW:
@@ -459,7 +459,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
     break;
   }
 
-  UnlockUIExtra(hWnd);
+  TheIME.UnlockUIExtra(hWnd);
   TheIME.UnlockIMC(hIMC);
 
   return lRet;
@@ -478,7 +478,7 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
   lpIMC = TheIME.LockIMC(hIMC);
   if (NULL == lpIMC) return 1L;
 
-  lpUIExtra = LockUIExtra(hWnd);
+  lpUIExtra = TheIME.LockUIExtra(hWnd);
 
   switch (wParam) {
   case IMC_GETCANDIDATEPOS:
@@ -502,7 +502,7 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
     break;
   }
 
-  UnlockUIExtra(hWnd);
+  TheIME.UnlockUIExtra(hWnd);
   TheIME.UnlockIMC(hIMC);
 
   return lRet;
