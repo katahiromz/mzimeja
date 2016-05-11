@@ -292,15 +292,16 @@ void LogCompStr::UpdateExtraClause(DWORD iClause, DWORD dwConversion) {
 
 void LogCompStr::UpdateCompStr() {
   FOOTMARK();
-  comp_str.clear();
+  std::wstring str;
   size_t ich = 0;
   size_t count = extra.comp_str_clauses.size();
   comp_clause.resize(count + 1);
   for (size_t i = 0; i < count; ++i) {
     comp_clause[i] = ich;
-    comp_str += extra.comp_str_clauses[i];
+    str += extra.comp_str_clauses[i];
     ich += extra.comp_str_clauses[i].size();
   }
+  comp_str = str;
   comp_clause[count] = ich;
 }
 
