@@ -146,8 +146,10 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
       } else {
         if (vk == VK_BACK) {
           TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_BACK);
+          TheIME.GenerateMessage(WM_IME_KEYUP, VK_BACK, 0x80000000);
         } else {
           TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_DELETE);
+          TheIME.GenerateMessage(WM_IME_KEYUP, VK_DELETE, 0x80000000);
         }
       }
       TheIME.UnlockIMC(hIMC);
