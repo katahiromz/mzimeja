@@ -6,12 +6,33 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct CriticalSection {
+  CRITICAL_SECTION m_cs;
+  CriticalSection() {
+    ::InitializeCriticalSection(&m_cs);
+  }
+  void Enter() {
+    ::EnterCriticalSection(&m_cs);
+  }
+  void Leave() {
+    ::LeaveCriticalSection(&m_cs);
+  }
+  ~CriticalSection() {
+    ::DeleteCriticalSection(&m_cs);
+  }
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
 extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
 BOOL MyGetTextExtentPoint(HDC hDC, LPCWSTR psz, int cch, LPSIZE psiz) {
+  static CriticalSection lock;
+  lock.Enter();
   BOOL ret = ::GetTextExtentPoint32W(hDC, psz, cch, psiz);
+  lock.Leave();
   return ret;
 }
 
@@ -105,7 +126,6 @@ void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra,
     SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_FONT,
                      (LONG_PTR)lpUIExtra->hFont);
     SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
-    SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPINDEX, i);
     CompWnd_Show(lpUIExtra, i, lpUIExtra->uiComp[i].bShow);
   }
 
@@ -122,8 +142,7 @@ void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra,
         lpUIExtra->uiDefComp.pt.y, 1, 1, hUIWnd, NULL, TheIME.m_hInst, NULL);
   }
 
-  SetWindowLong(lpUIExtra->uiDefComp.hWnd, FIGWL_COMPINDEX, -1);
-  SetWindowLongPtr(lpUIExtra->uiDefComp.hWnd, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont);
+  // SetWindowLong(lpUIExtra->uiDefComp.hWnd,FIGWLP_FONT,(DWORD)lpUIExtra->hFont);
   SetWindowLongPtr(lpUIExtra->uiDefComp.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
   CompWnd_Show(lpUIExtra, -1, lpUIExtra->uiDefComp.bShow);
 
@@ -181,7 +200,9 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     }
 
     // Hide the default composition window.
-    CompWnd_Show(lpUIExtra, -1, FALSE);
+    if (::IsWindow(lpUIExtra->uiDefComp.hWnd)) {
+      CompWnd_Show(lpUIExtra, -1, FALSE);
+    }
 
     pch = lpstr = lpCompStr->GetCompStr();
     num = 1;
