@@ -526,13 +526,7 @@ void InputContext::MakeResult() {
   hCompStr = CompStr::ReCreate(hCompStr, &log);
 
   // generate messages to set composition
-  LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
-  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
-
-  // reset composition
-  hCompStr = CompStr::ReCreate(hCompStr);
-
-  // generate messages to set composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_RESULTALL);
   TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::MakeResult
 

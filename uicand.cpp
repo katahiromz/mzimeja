@@ -27,7 +27,7 @@ void CandWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow) {
 LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
   FOOTMARK();
-  HWND hUIWnd;
+  HWND hwndServer;
 
   switch (message) {
     case WM_PAINT:
@@ -47,8 +47,8 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
 
     case WM_MOVE:
-      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
-      if (IsWindow(hUIWnd)) SendMessage(hUIWnd, WM_UI_CANDMOVE, wParam, lParam);
+      hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
+      if (IsWindow(hwndServer)) SendMessage(hwndServer, WM_UI_CANDMOVE, wParam, lParam);
       break;
 
     default:
@@ -105,7 +105,7 @@ BOOL PASCAL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
   return FALSE;
 }
 
-void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+void CandWnd_Create(HWND hwndServer, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
   POINT pt;
 
@@ -118,10 +118,10 @@ void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     lpUIExtra->uiCand.hWnd =
         CreateWindowEx(WS_EX_WINDOWEDGE, szCandClassName, NULL,
                        WS_COMPDEFAULT | WS_DLGFRAME, lpUIExtra->uiCand.pt.x,
-                       lpUIExtra->uiCand.pt.y, 1, 1, hUIWnd, NULL, TheIME.m_hInst, NULL);
+                       lpUIExtra->uiCand.pt.y, 1, 1, hwndServer, NULL, TheIME.m_hInst, NULL);
   }
 
-  SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
+  SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hwndServer);
   CandWnd_Show(lpUIExtra, lpUIExtra->uiCand.bShow);
 
   return;
@@ -135,10 +135,10 @@ void CandWnd_Paint(HWND hCandWnd) {
   PAINTSTRUCT ps;
   HDC hDC = BeginPaint(hCandWnd, &ps);
   SetBkMode(hDC, TRANSPARENT);
-  HWND hSvrWnd = (HWND)GetWindowLongPtr(hCandWnd, FIGWLP_SERVERWND);
+  HWND hwndServer = (HWND)GetWindowLongPtr(hCandWnd, FIGWLP_SERVERWND);
 
   HBRUSH hbrHightLight = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
-  HIMC hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+  HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
   if (hIMC) {
     InputContext *lpIMC = TheIME.LockIMC(hIMC);
     HFONT hOldFont = CheckNativeCharset(hDC);
@@ -212,7 +212,7 @@ void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   }
 }
 
-void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
+void CandWnd_Move(HWND hwndServer, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                   BOOL fForceComp) {
   FOOTMARK();
   RECT rc;
@@ -240,7 +240,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                  rc.bottom - rc.top, TRUE);
       CandWnd_Show(lpUIExtra, TRUE);
       InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
-      SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
+      SendMessage(hwndServer, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
     }
     return;
   }
@@ -277,7 +277,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
       CandWnd_Show(lpUIExtra, TRUE);
       InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
     }
-    SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
+    SendMessage(hwndServer, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
   } else if (lpIMC->cfCandForm[0].dwStyle == CFS_CANDIDATEPOS) {
     pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
     pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
@@ -290,7 +290,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
       CandWnd_Show(lpUIExtra, TRUE);
       InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
     }
-    SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
+    SendMessage(hwndServer, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
   }
 }
 

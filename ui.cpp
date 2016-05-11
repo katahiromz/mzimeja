@@ -102,11 +102,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         lpUIExtra->hIMC = hIMC;
 
         if (hIMC) {
-          //LPINPUTCONTEXT lpIMCT = NULL;
-          //
-          // input context was chenged.
-          // if there are the child windows, the display have to be
-          // updated.
           lpIMC = TheIME.LockIMC(hIMC);
           if (lpIMC) {
             if (IsWindow(lpUIExtra->uiCand.hWnd)) CandWnd_Show(lpUIExtra, FALSE);
@@ -120,9 +115,10 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
               CompWnd_Show(lpUIExtra, -2, FALSE);
             }
-            if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
-              CompWnd_Create(hWnd, lpUIExtra, lpIMC);
-              CompWnd_MoveMessage(hWnd, lpUIExtra);
+            if (lParam & ISC_SHOWUICOMPOSITIONWINDOW) {
+              if (lpIMC->HasCompStr()) {
+                CompWnd_MoveShowMessage(hWnd, lpUIExtra);
+              }
             }
           } else {
             CandWnd_Show(lpUIExtra, FALSE);
@@ -130,8 +126,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
           }
           StatusWnd_Update(lpUIExtra);
           TheIME.UnlockIMC(hIMC);
-        } else  // it is NULL input context.
-        {
+        } else {
           CandWnd_Show(lpUIExtra, FALSE);
           CompWnd_Show(lpUIExtra, -2, FALSE);
         }
@@ -162,7 +157,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     lpIMC = TheIME.LockIMC(hIMC);
     lpUIExtra = LockUIExtra(hWnd);
     if (lpUIExtra) {
-      CompWnd_MoveMessage(hWnd, lpUIExtra);
+      CompWnd_MoveShowMessage(hWnd, lpUIExtra);
       CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
       UnlockUIExtra(hWnd);
     }
@@ -282,18 +277,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     }
     break;
 
-  case WM_UI_COMPMOVE:
-    lpUIExtra = LockUIExtra(hWnd);
-    if (lpUIExtra) {
-      lpIMC = TheIME.LockIMC(hIMC);
-      if (lpIMC) {
-        CompWnd_Move(lpUIExtra, lpIMC);
-        TheIME.UnlockIMC(hIMC);
-      }
-      UnlockUIExtra(hWnd);
-    }
-    break;
-
   default:
     return DefWindowProc(hWnd, message, wParam, lParam);
   }
@@ -371,7 +354,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
 
       lpUIExtra->hFont = CreateFontIndirect(&lf);
       CompWnd_SetFont(lpUIExtra);
-      CompWnd_MoveMessage(hWnd, lpUIExtra);
+      CompWnd_MoveShowMessage(hWnd, lpUIExtra);
     }
     break;
 
@@ -446,7 +429,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
 
   case IMN_SETCOMPOSITIONWINDOW:
     if (lpIMC && lpUIExtra) {
-      CompWnd_MoveMessage(hWnd, lpUIExtra);
+      CompWnd_MoveShowMessage(hWnd, lpUIExtra);
       CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
     }
     break;

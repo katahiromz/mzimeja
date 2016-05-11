@@ -23,7 +23,7 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                      LPARAM lParam) {
   FOOTMARK();
   PAINTSTRUCT ps;
-  HWND hUIWnd;
+  HWND hwndServer;
   HDC hDC;
   HBITMAP hbmpGuide;
   RECT rc;
@@ -63,9 +63,9 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     break;
 
   case WM_MOVE:
-    hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
-    if (IsWindow(hUIWnd))
-      SendMessage(hUIWnd, WM_UI_GUIDEMOVE, wParam, lParam);
+    hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
+    if (IsWindow(hwndServer))
+      SendMessage(hwndServer, WM_UI_GUIDEMOVE, wParam, lParam);
     break;
 
   case WM_DESTROY:
@@ -107,15 +107,15 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
   HIMC hIMC;
   HDC hMemDC;
   HBITMAP hbmpOld;
-  HWND hSvrWnd;
+  HWND hwndServer;
   HANDLE hGLStr;
   LPTSTR lpGLStr;
   DWORD dwLevel;
   DWORD dwSize;
 
-  hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND);
+  hwndServer = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND);
 
-  hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+  hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
   if (hIMC) {
     HBITMAP hbmpGuide;
     HBRUSH hOldBrush, hBrush;
@@ -201,7 +201,7 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
   DWORD dwPushedGuide;
   DWORD dwTemp;
   HIMC hIMC;
-  HWND hSvrWnd;
+  HWND hwndServer;
   static POINT ptdif;
   static RECT drc;
   static RECT rc;
@@ -264,9 +264,9 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
                      rc.bottom, TRUE);
         }
       }
-      hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND);
+      hwndServer = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND);
 
-      hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+      hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
       if (hIMC) {
         GetCursorPos(&pt);
         dwPushedGuide = GetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS);
