@@ -412,31 +412,25 @@ extern "C" {
 // UI extra related
 
 HGLOBAL GetUIExtraFromServerWnd(HWND hSvrWnd) {
-  FOOTMARK();
   return (HGLOBAL)GetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE);
 }
 
 void SetUIExtraToServerWnd(HWND hSvrWnd, HGLOBAL hUIExtra) {
-  FOOTMARK();
   SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
 }
 
 LPUIEXTRA LockUIExtra(HWND hSvrWnd) {
-  FOOTMARK();
   HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
-  LPUIEXTRA lpUIExtra = (LPUIEXTRA)::GlobalLock(hUIExtra);
-  assert(lpUIExtra);
-  return lpUIExtra;
+  return (LPUIEXTRA)::GlobalLock(hUIExtra);
 }
 
 void UnlockUIExtra(HWND hSvrWnd) {
-  FOOTMARK();
   HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
   ::GlobalUnlock(hUIExtra);
+  SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
 }
 
 void FreeUIExtra(HWND hSvrWnd) {
-  FOOTMARK();
   HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
   ::GlobalFree(hUIExtra);
   SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)NULL);

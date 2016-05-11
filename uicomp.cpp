@@ -222,7 +222,6 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
           num = NumCharInDX(hDC, pch, dx);
           if (num) {
-            DebugPrintA("ThreadID: %08X\n", ::GetCurrentThreadId());
             DebugPrintA("!lpUIExtra->bVertical: '%lc', %d; %d, %d, %d, %d\n", *pch, num, curx, cury, siz.cx, siz.cy);
             MyGetTextExtentPoint(hDC, pch, num, &siz);
             assert(siz.cx);
@@ -274,7 +273,6 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
           siz.cx = siz.cy = 0;
           num = NumCharInDY(hDC, pch, dy);
           if (num) {
-            DebugPrintA("ThreadID: %08X\n", ::GetCurrentThreadId());
             DebugPrintA("lpUIExtra->bVertical: %d, %d, %d, %d\n", curx, cury, siz.cx, siz.cy);
             MyGetTextExtentPoint(hDC, pch, num, &siz);
             assert(siz.cx);
@@ -344,7 +342,6 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       MoveWindow(lpUIExtra->uiDefComp.hWnd, rc.left, rc.top,
                  width + 2 * GetSystemMetrics(SM_CXEDGE),
                  height + 2 * GetSystemMetrics(SM_CYEDGE), TRUE);
-      DebugPrintA("ThreadID: %08X\n", ::GetCurrentThreadId());
       DebugPrintA("default: %d, %d, %d, %d\n", rc.left, rc.top, width, height);
 
       CompWnd_Show(lpUIExtra, -1, TRUE);
