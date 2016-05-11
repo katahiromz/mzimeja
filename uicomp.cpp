@@ -59,6 +59,9 @@ static int NumCharInDY(HDC hDC, LPWSTR lp, int dy) {
 
 void CompWnd_Show(LPUIEXTRA lpUIExtra, INT nIndex, BOOL bShow) {
   FOOTMARK();
+  if (!bShow) {
+    FOOTMARK_PRINT_CALL_STACK();
+  }
   if (nIndex == -2) {
     CompWnd_Show(lpUIExtra, -1, bShow);
     for (int i = 0; i < MAXCOMPWND; i++) {
@@ -87,14 +90,13 @@ void CompWnd_Create(HWND hwndServer, LPUIEXTRA lpUIExtra,
                     InputContext *lpIMC) {
   RECT rc;
   FOOTMARK();
-  DebugPrintA("CompWnd_Create: ThreadID: %08X\n", ::GetCurrentThreadId());
 
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
   for (int i = 0; i < MAXCOMPWND; i++) {
     if (!IsWindow(lpUIExtra->uiComp[i].hWnd)) {
       lpUIExtra->uiComp[i].hWnd =
-          ::CreateWindowEx(0, szCompStrClassName, NULL, WS_COMPNODEFAULT,
-                           0, 0, 1, 1, hwndServer, NULL, TheIME.m_hInst, NULL);
+          CreateWindowEx(0, szCompStrClassName, NULL, WS_COMPNODEFAULT,
+                         0, 0, 1, 1, hwndServer, NULL, TheIME.m_hInst, NULL);
     }
     lpUIExtra->uiComp[i].rc.left = 0;
     lpUIExtra->uiComp[i].rc.top = 0;
@@ -102,8 +104,7 @@ void CompWnd_Create(HWND hwndServer, LPUIEXTRA lpUIExtra,
     lpUIExtra->uiComp[i].rc.bottom = 1;
     SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_FONT,
                      (LONG_PTR)lpUIExtra->hFont);
-    SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_SERVERWND,
-                     (LONG_PTR)hwndServer);
+    SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_SERVERWND, (LONG_PTR)hwndServer);
     SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPINDEX, i);
     CompWnd_Show(lpUIExtra, i, lpUIExtra->uiComp[i].bShow);
   }
@@ -118,8 +119,7 @@ void CompWnd_Create(HWND hwndServer, LPUIEXTRA lpUIExtra,
     lpUIExtra->uiDefComp.hWnd = CreateWindowEx(
         WS_EX_WINDOWEDGE, szCompStrClassName, NULL,
         WS_COMPDEFAULT | WS_DLGFRAME, lpUIExtra->uiDefComp.pt.x,
-        lpUIExtra->uiDefComp.pt.y, 1, 1, hwndServer,
-        NULL, TheIME.m_hInst, NULL);
+        lpUIExtra->uiDefComp.pt.y, 1, 1, hwndServer, NULL, TheIME.m_hInst, NULL);
   }
 
   SetWindowLong(lpUIExtra->uiDefComp.hWnd, FIGWL_COMPINDEX, -1);
@@ -513,13 +513,10 @@ void CompWnd_Paint(HWND hCompWnd) {
 
 void CompWnd_SetFont(LPUIEXTRA lpUIExtra) {
   FOOTMARK();
-  for (int i = 0; i < MAXCOMPWND; i++) {
+  for (int i = 0; i < MAXCOMPWND; i++)
     if (IsWindow(lpUIExtra->uiComp[i].hWnd))
       SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_FONT,
                        (LONG_PTR)lpUIExtra->hFont);
-  }
-  SetWindowLongPtr(lpUIExtra->uiDefComp.hWnd, FIGWLP_FONT,
-                   (LONG_PTR)lpUIExtra->hFont);
 }
 
 LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
