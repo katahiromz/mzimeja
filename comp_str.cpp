@@ -755,7 +755,7 @@ void LogCompStr::MoveRight(BOOL bShift) {
     dwCursorPos = GetCompCharCount();
   } else {  // not being converted
     // move cursor
-    if (dwCursorPos + 1 < GetCompCharCount()) {
+    if (dwCursorPos + 1 <= GetCompCharCount()) {
       ++dwCursorPos;
       // went out of clause?
       if (!CompCharInClause(dwCursorPos, extra.iClause)) {
