@@ -57,14 +57,14 @@
 #define MAXGLCHAR   32  // maximum number of guideline characters
 
 // special messages
-#define WM_UI_UPDATE          (WM_USER + 500)
-#define WM_UI_HIDE            (WM_USER + 501)
+#define WM_UI_UPDATE      (WM_USER + 500)
+#define WM_UI_HIDE        (WM_USER + 501)
 
-#define WM_UI_STATEMOVE       (WM_USER + 601)
-#define WM_UI_DEFCOMPMOVE     (WM_USER + 602)
-#define WM_UI_CANDMOVE        (WM_USER + 603)
-#define WM_UI_GUIDEMOVE       (WM_USER + 604)
-#define WM_UI_COMPMOVESHOW    (WM_USER + 605)
+#define WM_UI_STATEMOVE   (WM_USER + 601)
+#define WM_UI_DEFCOMPMOVE (WM_USER + 602)
+#define WM_UI_CANDMOVE    (WM_USER + 603)
+#define WM_UI_GUIDEMOVE   (WM_USER + 604)
+#define WM_UI_COMPMOVE    (WM_USER + 605)
 
 // Escape Functions
 #define IME_ESC_PRI_GETDWORDTEST (IME_ESC_PRIVATE_FIRST + 0)
@@ -192,18 +192,19 @@ void StatusWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow);
 void CandWnd_Show(LPUIEXTRA lpUIExtra, BOOL bShow);
 LRESULT CALLBACK CandWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CandWnd_Paint(HWND hCandWnd);
-void CandWnd_Create(HWND hwndServer, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
+void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
-void CandWnd_Move(HWND hwndServer, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
+void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                   BOOL fForceComp);
 
 // uicomp.c
 void CompWnd_Show(LPUIEXTRA lpUIExtra, INT nIndex, BOOL bShow);
 LRESULT CALLBACK CompWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CompWnd_Paint(HWND hCompWnd);
-void CompWnd_Create(HWND hwndServer, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
+void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
+void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void CompWnd_SetFont(LPUIEXTRA lpUIExtra);
-void CompWnd_MoveShowMessage(HWND hwndServer, LPUIEXTRA lpUIExtra);
+void CompWnd_MoveMessage(HWND hSvrWnd, LPUIEXTRA lpUIExtra);
 BOOL MyGetTextExtentPoint(HDC hDC, LPCWSTR psz, int cch, LPSIZE psiz);
 
 // uiguide.c
@@ -229,11 +230,11 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
 // mzimeja.cpp
 void      RepositionWindow(HWND hWnd);
 HFONT     CheckNativeCharset(HDC hDC);
-LPUIEXTRA LockUIExtra(HWND hwndServer);
-void      UnlockUIExtra(HWND hwndServer);
-void      FreeUIExtra(HWND hwndServer);
-HGLOBAL   GetUIExtraFromServerWnd(HWND hwndServer);
-void      SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra);
+LPUIEXTRA LockUIExtra(HWND hSvrWnd);
+void      UnlockUIExtra(HWND hSvrWnd);
+void      FreeUIExtra(HWND hSvrWnd);
+HGLOBAL   GetUIExtraFromServerWnd(HWND hSvrWnd);
+void      SetUIExtraToServerWnd(HWND hSvrWnd, HGLOBAL hUIExtra);
 
 //////////////////////////////////////////////////////////////////////////////
 

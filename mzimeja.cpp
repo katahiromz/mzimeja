@@ -118,7 +118,7 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   return TRUE;
 }
 
-#define CS_MZIME (CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_IME | CS_GLOBALCLASS)
+#define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
 
 BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   WNDCLASSEX wcx;
@@ -411,35 +411,35 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 // UI extra related
 
-HGLOBAL GetUIExtraFromServerWnd(HWND hwndServer) {
+HGLOBAL GetUIExtraFromServerWnd(HWND hSvrWnd) {
   FOOTMARK();
-  return (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE);
+  return (HGLOBAL)GetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE);
 }
 
-void SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra) {
+void SetUIExtraToServerWnd(HWND hSvrWnd, HGLOBAL hUIExtra) {
   FOOTMARK();
-  SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
+  SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
 }
 
-LPUIEXTRA LockUIExtra(HWND hwndServer) {
+LPUIEXTRA LockUIExtra(HWND hSvrWnd) {
   FOOTMARK();
-  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
+  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
   LPUIEXTRA lpUIExtra = (LPUIEXTRA)::GlobalLock(hUIExtra);
   assert(lpUIExtra);
   return lpUIExtra;
 }
 
-void UnlockUIExtra(HWND hwndServer) {
+void UnlockUIExtra(HWND hSvrWnd) {
   FOOTMARK();
-  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
+  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
   ::GlobalUnlock(hUIExtra);
 }
 
-void FreeUIExtra(HWND hwndServer) {
+void FreeUIExtra(HWND hSvrWnd) {
   FOOTMARK();
-  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
+  HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hSvrWnd);
   ::GlobalFree(hUIExtra);
-  SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
+  SetWindowLongPtr(hSvrWnd, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
 }
 
 //////////////////////////////////////////////////////////////////////////////
