@@ -237,11 +237,10 @@ HKL MZIMEJA::GetHKL(VOID) {
 BOOL MZIMEJA::GenerateMessage(LPTRANSMSG lpGeneMsg) {
   BOOL ret = FALSE;
   FOOTMARK();
-  DebugPrint(TEXT("(%u,%d,%d)\n"),
+  DebugPrint(TEXT("GenerateMessage(%u, %d, %d)\n"),
     lpGeneMsg->message, lpGeneMsg->wParam, lpGeneMsg->lParam);
 
-  if (m_lpCurTransKey)
-    return GenerateMessageToTransKey(lpGeneMsg);
+  if (m_lpCurTransKey) return GenerateMessageToTransKey(lpGeneMsg);
 
   if (m_lpIMC == NULL) {
     FOOTMARK_PRINT_CALL_STACK();
@@ -521,7 +520,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
       s_old_handler = ::SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
     #endif
     DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %p\n"), TheIME.m_hInst);
-    DebugPrintA("ThreadID: %08X\n", ::GetCurrentThreadId());
+    DebugPrintA("DllMain: ThreadID: %08X\n", ::GetCurrentThreadId());
     TheIME.Init(hInstDLL);
     break;
 

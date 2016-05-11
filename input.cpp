@@ -354,19 +354,19 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
     UnlockCompStr();
   }
 
-  // if the current position has a converted character, then
-  if (log.GetCompCharAttr(log.dwCursorPos) != ATTR_INPUT) {
-    // determinate composition
-    log.MakeResult();
-    LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
-    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
-    TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
-  }
-
   // if there is not a composition string, then
   if (log.comp_str.empty()) {
     // start composition
     TheIME.GenerateMessage(WM_IME_STARTCOMPOSITION);
+  } else {
+    //// if the current position has a converted character, then
+    //if (log.GetCompCharAttr(log.dwCursorPos) != ATTR_INPUT) {
+    //  // determinate composition
+    //  log.MakeResult();
+    //  LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
+    //  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+    //  TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
+    //}
   }
 
   // add a character
