@@ -777,6 +777,10 @@ void LogCompStr::MoveRight(BOOL bShift) {
   }
 } // LogCompStr::MoveRight
 
+DWORD LogCompStr::GetClauseCompStrLen(DWORD dwClauseIndex) const {
+  return (DWORD)extra.comp_str_clauses[dwClauseIndex].size();
+}
+
 void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
   FOOTMARK();
   if (iClause < GetClauseCount()) {
