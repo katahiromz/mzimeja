@@ -189,28 +189,8 @@ BYTE LogCompStr::GetClauseAttr(DWORD dwClauseIndex) const {
   return ret;
 }
 
-DWORD LogCompStr::GetClauseCompStrLen(DWORD dwClauseIndex) const {
-  return (DWORD)extra.comp_str_clauses[dwClauseIndex].size();
-}
-
-void LogCompStr::UpdateClauseAttr() {
-  if (comp_attr.size() < comp_str.size()) {
-    std::vector<BYTE> data;
-    DWORD cClause = GetClauseCount();
-    for (size_t i = 0; i < cClause; ++i) {
-      data.push_back(GetClauseAttr(i));
-    }
-    comp_attr.clear();
-    for (size_t i = 0; i < cClause; ++i) {
-      std::vector<BYTE> addition(GetClauseCompStrLen(i), data[i]);
-      comp_attr.insert(comp_attr.end(), addition.begin(), addition.end());
-    }
-  }
-}
-
 void LogCompStr::SetClauseAttr(DWORD dwClauseIndex, BYTE attr) {
   FOOTMARK();
-  UpdateClauseAttr();
   if (dwClauseIndex + 1 <= GetClauseCount()) {
     DWORD ich0 = comp_clause[dwClauseIndex];
     DWORD ich1 = comp_clause[dwClauseIndex + 1];
@@ -321,7 +301,6 @@ void LogCompStr::UpdateCompStr() {
     ich += extra.comp_str_clauses[i].size();
   }
   comp_clause[count] = ich;
-  UpdateClauseAttr();
 }
 
 void LogCompStr::MakeHiragana() {
@@ -1000,6 +979,10 @@ void LogCompStr::AssertValid() {
   }
   if (result_clause.size()) {
     if (result_clause[0] != 0) {
+      Dump();
+      assert(0);
+    }
+    if (result_clause[result_clause.size() - 1] != 0) {
       Dump();
       assert(0);
     }
