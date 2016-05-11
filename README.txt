@@ -1,4 +1,4 @@
-This is MZ-IME Japanese Input.
+This is MZ-IME Japanese Input (under construction).
 
 /////////////////////////////////////////////////////
 // Katayama Hirofumi MZ (katahiromz) [ANT]
