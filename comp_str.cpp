@@ -146,14 +146,14 @@ DWORD LogCompStr::GetTotalSize() const {
   size_t total = sizeof(COMPOSITIONSTRING);
   total += comp_read_attr.size() * sizeof(BYTE);
   total += comp_read_clause.size() * sizeof(DWORD);
-  total += (comp_read_str.size() + 1) * sizeof(WCHAR);
+  total += comp_read_str.size() * sizeof(WCHAR);
   total += comp_attr.size() * sizeof(BYTE);
   total += comp_clause.size() * sizeof(DWORD);
-  total += (comp_str.size() + 1) * sizeof(WCHAR);
+  total += comp_str.size() * sizeof(WCHAR);
   total += result_read_clause.size() * sizeof(DWORD);
-  total += (result_read_str.size() + 1) * sizeof(WCHAR);
+  total += result_read_str.size() * sizeof(WCHAR);
   total += result_clause.size() * sizeof(DWORD);
-  total += (result_str.size() + 1) * sizeof(WCHAR);
+  total += result_str.size() * sizeof(WCHAR);
   total += extra.GetTotalSize();
   return total;
 }
@@ -864,11 +864,8 @@ void CompStr::GetLog(LogCompStr& log) {
 
 #define ADD_STRING(member) \
   if (log->member.size()) { \
-    memcpy(pb, &log->member[0], (log->member.size() + 1) * sizeof(WCHAR)); \
-    pb += (log->member.size() + 1) * sizeof(WCHAR); \
-  } else { \
-    pb[0] = pb[1] = 0; \
-    pb += 1 * sizeof(WCHAR); \
+    memcpy(pb, &log->member[0], log->member.size() * sizeof(WCHAR)); \
+    pb += log->member.size() * sizeof(WCHAR); \
   }
 
       lpCompStr->dwCompReadAttrOffset = (DWORD)(pb - lpCompStr->GetBytes());
@@ -917,9 +914,11 @@ void CompStr::GetLog(LogCompStr& log) {
       hCompStr = hNewCompStr;
     } else {
       DebugPrint(TEXT("CompStr::ReCreate: failed #2"));
+      assert(0);
     }
   } else {
     DebugPrint(TEXT("CompStr::ReCreate: failed"));
+    assert(0);
   }
   return hCompStr;
 } // CompStr::ReCreate

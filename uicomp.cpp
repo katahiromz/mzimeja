@@ -8,7 +8,7 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // Count how may the char can be arranged in DX
-static int NumCharInDX(HDC hDC, LPWSTR psz, int dx) {
+static int NumCharInDX(HDC hDC, LPCWSTR psz, int dx) {
   int ret = 0;
   if (*psz) {
     SIZE siz;
@@ -27,7 +27,7 @@ static int NumCharInDX(HDC hDC, LPWSTR psz, int dx) {
 }
 
 // Count how may the char can be arranged in DY
-static int NumCharInDY(HDC hDC, LPWSTR psz, int dy) {
+static int NumCharInDY(HDC hDC, LPCWSTR psz, int dy) {
   int ret = 0;
   if (*psz) {
     SIZE siz;
@@ -99,7 +99,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   HFONT hFont = NULL;
   HFONT hOldFont = NULL;
   CompStr *lpCompStr;
-  LPTSTR lpstr;
+  LPCWSTR lpstr;
   RECT rc;
   RECT oldrc;
   SIZE siz;
@@ -110,7 +110,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
 
   if (lpIMC->cfCompForm.dwStyle) {  // Style is not CFS_DEFAULT.
-    LPTSTR pch;
+    LPCWSTR pch;
     int num;
 
     if (!lpIMC->HasCompStr()) {
@@ -147,7 +147,8 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       lpUIExtra->uiDefComp.bShow = FALSE;
     }
 
-    pch = lpstr = lpCompStr->GetCompStr();
+    std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
+    pch = lpstr = str.c_str();
     num = 1;
 
     if (!lpUIExtra->bVertical) {
@@ -171,7 +172,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
           num = NumCharInDX(hDC, pch, dx);
           if (num) {
-            GetTextExtentPoint(hDC, pch, num, &siz);
+            ::GetTextExtentPoint32W(hDC, pch, num, &siz);
 
             lpUIExtra->uiComp[i].rc.left = curx;
             lpUIExtra->uiComp[i].rc.top = cury;
@@ -224,7 +225,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
           siz.cy = 0;
           num = NumCharInDY(hDC, pch, dy);
           if (num) {
-            GetTextExtentPoint(hDC, pch, num, &siz);
+            ::GetTextExtentPoint32W(hDC, pch, num, &siz);
 
             lpUIExtra->uiComp[i].rc.left = curx - siz.cy;
             lpUIExtra->uiComp[i].rc.top = cury;
@@ -279,8 +280,10 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       if (lpCompStr) {
         if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
             (lpCompStr->dwCompStrLen > 0)) {
-          lpstr = lpCompStr->GetCompStr();
-          GetTextExtentPoint(hDC, lpstr, lstrlen(lpstr), &siz);
+
+          std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
+          lpstr = str.c_str();
+          ::GetTextExtentPoint32W(hDC, lpstr, lstrlenW(lpstr), &siz);
           width = siz.cx;
           height = siz.cy + 1;
         }
@@ -303,11 +306,11 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   }
 }
 
-void DrawTextOneLine(HWND hCompWnd, HDC hDC, LPTSTR lpstr,
+void DrawTextOneLine(HWND hCompWnd, HDC hDC, LPCWSTR lpstr,
                      LPBYTE lpattr, int num, BOOL fVert, DWORD dwCursor) {
   FOOTMARK();
   //LPTSTR lpStart = lpstr;
-  LPTSTR lpEnd = lpstr + num - 1;
+  LPCWSTR lpEnd = lpstr + num - 1;
   int x, y;
   RECT rc;
 
@@ -412,16 +415,17 @@ void CompWnd_Paint(HWND hCompWnd) {
     if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen > 0)) {
-        LPTSTR lpstr;
+        LPCWSTR lpstr;
         LPBYTE lpattr;
-        LONG lstart;
-        LONG num;
+        INT lstart;
+        INT num;
         BOOL fVert = FALSE;
         DWORD dwCursor = lpCompStr->dwCursorPos;
 
         if (hFont) fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
 
-        lpstr = lpCompStr->GetCompStr();
+        std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
+        lpstr = str.c_str();
         lpattr = lpCompStr->GetCompAttr();
         if (lpIMC->cfCompForm.dwStyle) {
           GetClientRect(hCompWnd, &rc);
@@ -437,7 +441,7 @@ void CompWnd_Paint(HWND hCompWnd) {
           dwCursor -= lstart;
           DrawTextOneLine(hCompWnd, hDC, lpstr, lpattr, num, fVert, dwCursor);
         } else {
-          num = lstrlen(lpstr);
+          num = (INT)str.size();
           DrawTextOneLine(hCompWnd, hDC, lpstr, lpattr, num, fVert, dwCursor);
         }
       }
