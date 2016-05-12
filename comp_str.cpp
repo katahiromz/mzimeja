@@ -604,6 +604,7 @@ LogCompStr::AddDakuonChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 
 void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
   FOOTMARK();
+  size_t size0 = comp_str.size();
   WCHAR ch = PrevCharInClause();
   if (ch) ch = dakuon_shori(ch, chTranslated);
   if (ch) {
@@ -614,6 +615,15 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
     AddCharToEnd(chTyped, chTranslated, dwConv);
   } else {
     InsertChar(chTyped, chTranslated, dwConv);
+  }
+  size_t size1 = comp_str.size();
+  DWORD ich = ClauseToCompChar(extra.iClause);
+  if (size0 < size1) {
+    std::vector<BYTE> addition(size1 - size0);
+    comp_attr.insert(comp_attr.begin() + ich, addition.begin(), addition.end());
+  } else if (size1 < size0) {
+    comp_attr.erase(comp_attr.begin() + ich,
+                    comp_attr.begin() + ich + DWORD(size0 - size1));
   }
 } // LogCompStr::AddChar
 
@@ -642,12 +652,15 @@ void LogCompStr::DeleteChar(BOOL bBackSpace/* = FALSE*/, DWORD dwConv) {
     }
     if (flag) {
       // erase the character
-      DWORD dwIndex = dwCursorPos - ClauseToCompChar(extra.iClause);
-      extra.comp_str_clauses[extra.iClause].erase(dwIndex, 1);
+      DWORD ich = ClauseToCompChar(extra.iClause);
+      DWORD delta = dwCursorPos - ich;
+      extra.comp_str_clauses[extra.iClause].erase(delta, 1);
       // update extra clause
       UpdateExtraClause(extra.iClause, dwConv);
       // update composition string
       UpdateCompStr();
+      // update comp_attr
+      comp_attr.erase(comp_attr.begin() + ich);
     }
   }
 } // LogCompStr::DeleteChar
