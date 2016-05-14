@@ -1,4 +1,4 @@
-// icontext_check.c --- Windows Input Context checker
+// comp_str_viewer.c --- Windows Composition String Viewer
 // Copyright (C) 2016 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>.
 // All Rights Reserved.
 
