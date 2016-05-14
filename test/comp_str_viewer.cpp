@@ -29,7 +29,7 @@ std::vector<DWORD> g_vecCompClause;
 std::vector<DWORD> g_vecResultReadClause;
 std::vector<DWORD> g_vecResultClause;
 
-static const TCHAR s_szName[] = TEXT("katahiromz's input context checker");
+static const TCHAR s_szName[] = TEXT("katahiromz's composition string checker");
 
 void MainWnd_OnPaint(HWND hwnd)
 {
@@ -97,7 +97,7 @@ void MainWnd_OnPaint(HWND hwnd)
         SetBkMode(hdc, TRANSPARENT);
         SetBkColor(hdc, RGB(255, 255, 255));
         DrawText(hdc, szBuf, -1, &rcClient,
-                 DT_LEFT | DT_VCENTER | DT_NOPREFIX);
+                 DT_LEFT | DT_VCENTER | DT_NOPREFIX | DT_WORDBREAK);
         EndPaint(hwnd, &ps);
     }
 }
