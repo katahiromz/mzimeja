@@ -193,7 +193,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
-          lpCandList = lpCandInfo->GetList();
+          lpCandList = lpCandInfo->GetList(0);
           if (lpCandList->dwCount > dwValue) {
             lpCandList->dwSelection = dwValue;
             TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
@@ -222,7 +222,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo && lpCandInfo->dwCount > 0) {
-          CandList *lpCandList = lpCandInfo->GetList();
+          CandList *lpCandList = lpCandInfo->GetList(0);
           lpCandList->dwPageSize = dwValue;
           lpIMC->UnlockCandInfo();
           TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
@@ -240,7 +240,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
         lpCandInfo = lpIMC->LockCandInfo();
         if (lpCandInfo) {
-          lpCandList = lpCandInfo->GetList();
+          lpCandList = lpCandInfo->GetList(0);
           if (dwValue < lpCandList->dwCount) {
             lpCandList->dwPageStart = dwValue;
             TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);

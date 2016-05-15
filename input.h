@@ -220,13 +220,23 @@ private:
 //////////////////////////////////////////////////////////////////////////////
 // candidate info
 
-// logical candidate info
-struct LogCandInfo {
+// logical candidate list
+struct LogCandList {
   DWORD   dwStyle;
   DWORD   dwSelection;
   DWORD   dwPageStart;
   DWORD   dwPageSize;
   std::vector<std::wstring> cand_strs;
+
+  LogCandList() { clear(); }
+  void clear();
+  DWORD GetTotalSize() const;
+};
+
+// logical candidate info
+struct LogCandInfo {
+  std::vector<LogCandList>  cand_lists;
+
   LogCandInfo() { clear(); }
   void clear();
   DWORD GetTotalSize() const;
@@ -234,10 +244,12 @@ struct LogCandInfo {
 
 // physical candidate list
 struct CandList : public CANDIDATELIST {
-  LPBYTE GetBytes() { return (LPBYTE)this; }
+  LPBYTE GetBytes()             { return (LPBYTE)this; }
   LPTSTR GetCandString(DWORD i) { return LPTSTR(GetBytes() + dwOffset[i]); }
-  LPTSTR GetCurString() { return GetCandString(dwSelection); }
-  DWORD  GetPageEnd() const { return dwPageStart + dwPageSize; }
+  LPTSTR GetCurString()         { return GetCandString(dwSelection); }
+  DWORD  GetPageEnd() const     { return dwPageStart + dwPageSize; }
+  void GetLog(LogCandList& log);
+  DWORD Store(const LogCandList *log);
 
 private:
   // never be implemented
@@ -250,11 +262,10 @@ private:
 struct CandInfo : public CANDIDATEINFO {
   static HIMCC ReCreate(HIMCC hCandInfo, const LogCandInfo *log = NULL);
   void GetLog(LogCandInfo& log);
+  DWORD Store(const LogCandInfo *log);
 
-  LPBYTE GetBytes() { return (LPBYTE)this; }
-  CandList *GetList(DWORD i = 0) {
-    return (CandList *)(GetBytes() + dwOffset[i]);
-  }
+  LPBYTE GetBytes()          { return (LPBYTE)this; }
+  CandList *GetList(DWORD i) { return (CandList *)(GetBytes() + dwOffset[i]); }
 
   void Dump();
 
@@ -316,7 +327,7 @@ struct InputContext : public INPUTCONTEXT {
   BOOL DoConvert();
   BOOL OpenCandidate();
   BOOL CloseCandidate();
-  void GetCands(LogCandInfo& log_cand_info, std::wstring& str);
+  void GetCands(LogCandInfo& log, std::wstring& str);
   void MoveLeft(BOOL bShift);
   void MoveRight(BOOL bShift);
   void MoveToBeginning();

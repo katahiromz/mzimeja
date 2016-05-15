@@ -129,7 +129,7 @@ void CandWnd_Paint(HWND hCandWnd) {
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
       int height = GetSystemMetrics(SM_CYEDGE);
-      CandList *lpCandList = lpCandInfo->GetList();
+      CandList *lpCandList = lpCandInfo->GetList(0);
       for (DWORD i = lpCandList->dwPageStart;
            i < lpCandList->GetPageEnd(); i++) {
         SIZE sz;
@@ -172,7 +172,7 @@ void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     HFONT hOldFont = CheckNativeCharset(hDC);
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
-      CandList *lpCandList = lpCandInfo->GetList();
+      CandList *lpCandList = lpCandInfo->GetList(0);
       for (DWORD i = lpCandList->dwPageStart;
            i < lpCandList->GetPageEnd(); i++) {
         LPTSTR lpstr = lpCandList->GetCandString(i);

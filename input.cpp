@@ -374,22 +374,24 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 } // InputContext::AddChar
 
-void InputContext::GetCands(LogCandInfo& log_cand_info, std::wstring& str) {
+void InputContext::GetCands(LogCandInfo& log, std::wstring& str) {
   FOOTMARK();
   // TODO:
-  DWORD dwCount = (DWORD)log_cand_info.cand_strs.size();
+  DWORD dwCount = (DWORD)log.cand_lists.size();
   if (dwCount > 0) {
-    log_cand_info.dwSelection++;
-    if (log_cand_info.dwSelection >= dwCount) {
-      log_cand_info.dwSelection = 0;
+    DWORD& dwSelection = log.cand_lists[0].dwSelection;
+    dwSelection++;
+    if (dwSelection >= dwCount) {
+      dwSelection = 0;
     }
   } else {
-    log_cand_info.dwSelection = 0;
-    log_cand_info.cand_strs.push_back(L"これは");
-    log_cand_info.cand_strs.push_back(L"テスト");
-    log_cand_info.cand_strs.push_back(L"です。");
+    LogCandList list;
+    list.cand_strs.push_back(L"これは");
+    list.cand_strs.push_back(L"テスト");
+    list.cand_strs.push_back(L"です。");
+    log.cand_lists.push_back(list);
   }
-  str = log_cand_info.cand_strs[log_cand_info.dwSelection];
+  str = log.cand_lists[0].cand_strs[log.cand_lists[0].dwSelection];
 }
 
 BOOL InputContext::OpenCandidate() {
