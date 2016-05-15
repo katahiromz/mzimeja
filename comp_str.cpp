@@ -818,6 +818,77 @@ void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
 
 //////////////////////////////////////////////////////////////////////////////
 
+DWORD CompStr::Store(const LogCompStr *log) {
+  const DWORD total = log->GetTotalSize();
+
+  LPBYTE pb = GetBytes();
+  dwSize = total;
+  dwCursorPos = log->dwCursorPos;
+  dwDeltaStart = log->dwDeltaStart;
+  pb += sizeof(COMPOSITIONSTRING);
+
+#define ADD_BYTES(member) \
+  if (log->member.size()) { \
+    memcpy(pb, &log->member[0], log->member.size() * sizeof(BYTE)); \
+    pb += log->member.size() * sizeof(BYTE); \
+  }
+
+#define ADD_DWORDS(member) \
+  if (log->member.size()) { \
+    memcpy(pb, &log->member[0], log->member.size() * sizeof(DWORD)); \
+    pb += log->member.size() * sizeof(DWORD); \
+  }
+
+#define ADD_STRING(member) \
+  if (log->member.size()) { \
+    memcpy(pb, &log->member[0], log->member.size() * sizeof(WCHAR)); \
+    pb += log->member.size() * sizeof(WCHAR); \
+  }
+
+  dwCompReadAttrOffset = DWORD(pb - GetBytes());
+  dwCompReadAttrLen = log->comp_read_attr.size() * sizeof(BYTE);
+  ADD_BYTES(comp_read_attr);
+  dwCompReadClauseOffset = DWORD(pb - GetBytes());
+  dwCompReadClauseLen = log->comp_read_clause.size() * sizeof(DWORD);
+  ADD_DWORDS(comp_read_clause);
+  dwCompReadStrOffset = DWORD(pb - GetBytes());
+  dwCompReadStrLen = log->comp_read_str.size();
+  ADD_STRING(comp_read_str);
+  dwCompAttrOffset = DWORD(pb - GetBytes());
+  dwCompAttrLen = log->comp_attr.size() * sizeof(BYTE);
+  ADD_BYTES(comp_attr);
+  dwCompClauseOffset = DWORD(pb - GetBytes());
+  dwCompClauseLen = log->comp_clause.size() * sizeof(DWORD);
+  ADD_DWORDS(comp_clause);
+  dwCompStrOffset = DWORD(pb - GetBytes());
+  dwCompStrLen = log->comp_str.size();
+  ADD_STRING(comp_str);
+  dwResultReadClauseOffset = DWORD(pb - GetBytes());
+  dwResultReadClauseLen = log->result_read_clause.size() * sizeof(DWORD);
+  ADD_DWORDS(result_read_clause);
+  dwResultReadStrOffset = DWORD(pb - GetBytes());
+  dwResultReadStrLen = log->result_read_str.size();
+  ADD_STRING(result_read_str);
+  dwResultClauseOffset = DWORD(pb - GetBytes());
+  dwResultClauseLen = log->result_clause.size() * sizeof(DWORD);
+  ADD_DWORDS(result_clause);
+  dwResultStrOffset = DWORD(pb - GetBytes());
+  dwResultStrLen = log->result_str.size();
+  ADD_STRING(result_str);
+
+  COMPSTREXTRA *pExtra = (COMPSTREXTRA *)pb;
+  dwPrivateSize = log->extra.GetTotalSize();
+  dwPrivateOffset = DWORD(pb - GetBytes());
+  pb += pExtra->Store(&log->extra);
+
+#undef ADD_BYTES
+#undef ADD_DWORDS
+#undef ADD_STRING
+  assert(DWORD(pb - GetBytes()) == total);
+
+  return DWORD(pb - GetBytes());
+} // CompStr::Store
+
 void CompStr::GetLog(LogCompStr& log) {
   FOOTMARK();
   log.dwCursorPos = dwCursorPos;
@@ -867,71 +938,8 @@ void CompStr::GetLog(LogCompStr& log) {
   if (hNewCompStr) {
     CompStr *lpCompStr = (CompStr *)::ImmLockIMCC(hNewCompStr);
     if (lpCompStr) {
-      LPBYTE pb = lpCompStr->GetBytes();
-      lpCompStr->dwSize = total;
-      lpCompStr->dwCursorPos = log->dwCursorPos;
-      lpCompStr->dwDeltaStart = log->dwDeltaStart;
-      pb += sizeof(COMPOSITIONSTRING);
-
-#define ADD_BYTES(member) \
-  if (log->member.size()) { \
-    memcpy(pb, &log->member[0], log->member.size() * sizeof(BYTE)); \
-    pb += log->member.size() * sizeof(BYTE); \
-  }
-
-#define ADD_DWORDS(member) \
-  if (log->member.size()) { \
-    memcpy(pb, &log->member[0], log->member.size() * sizeof(DWORD)); \
-    pb += log->member.size() * sizeof(DWORD); \
-  }
-
-#define ADD_STRING(member) \
-  if (log->member.size()) { \
-    memcpy(pb, &log->member[0], log->member.size() * sizeof(WCHAR)); \
-    pb += log->member.size() * sizeof(WCHAR); \
-  }
-
-      lpCompStr->dwCompReadAttrOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      lpCompStr->dwCompReadAttrLen = log->comp_read_attr.size() * sizeof(BYTE);
-      ADD_BYTES(comp_read_attr);
-      lpCompStr->dwCompReadClauseOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      lpCompStr->dwCompReadClauseLen = log->comp_read_clause.size() * sizeof(DWORD);
-      ADD_DWORDS(comp_read_clause);
-      lpCompStr->dwCompReadStrOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      lpCompStr->dwCompReadStrLen = log->comp_read_str.size();
-      ADD_STRING(comp_read_str);
-      lpCompStr->dwCompAttrOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      lpCompStr->dwCompAttrLen = log->comp_attr.size() * sizeof(BYTE);
-      ADD_BYTES(comp_attr);
-      lpCompStr->dwCompClauseOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      lpCompStr->dwCompClauseLen = log->comp_clause.size() * sizeof(DWORD);
-      ADD_DWORDS(comp_clause);
-      lpCompStr->dwCompStrOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      lpCompStr->dwCompStrLen = log->comp_str.size();
-      ADD_STRING(comp_str);
-      lpCompStr->dwResultReadClauseOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      lpCompStr->dwResultReadClauseLen = log->result_read_clause.size() * sizeof(DWORD);
-      ADD_DWORDS(result_read_clause);
-      lpCompStr->dwResultReadStrOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      lpCompStr->dwResultReadStrLen = log->result_read_str.size();
-      ADD_STRING(result_read_str);
-      lpCompStr->dwResultClauseOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      lpCompStr->dwResultClauseLen = log->result_clause.size() * sizeof(DWORD);
-      ADD_DWORDS(result_clause);
-      lpCompStr->dwResultStrOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      lpCompStr->dwResultStrLen = log->result_str.size();
-      ADD_STRING(result_str);
-
-      COMPSTREXTRA *extra = (COMPSTREXTRA *)pb;
-      lpCompStr->dwPrivateSize = log->extra.GetTotalSize();
-      lpCompStr->dwPrivateOffset = (DWORD)(pb - lpCompStr->GetBytes());
-      pb += extra->Store(&log->extra);
-
-#undef ADD_BYTES
-#undef ADD_DWORDS
-#undef ADD_STRING
-
-      assert((DWORD)(pb - lpCompStr->GetBytes()) == total);
+      DWORD size = lpCompStr->Store(log);
+      assert(size == total);
 
       ::ImmUnlockIMCC(hNewCompStr);
       hCompStr = hNewCompStr;
@@ -1025,146 +1033,146 @@ void LogCompStr::AssertValid() {
 void CompStr::Dump() {
   FOOTMARK();
 #ifndef NDEBUG
-  DebugPrint(TEXT("dwSize: %08X\n"), dwSize);
-  DebugPrint(TEXT("dwCursorPos: %08X\n"), dwCursorPos);
-  DebugPrint(TEXT("dwDeltaStart: %08X\n"), dwDeltaStart);
-  DebugPrint(TEXT("CompReadAttr: "));
+  DebugPrintA("dwSize: %08X\n", dwSize);
+  DebugPrintA("dwCursorPos: %08X\n", dwCursorPos);
+  DebugPrintA("dwDeltaStart: %08X\n", dwDeltaStart);
+  DebugPrintA("CompReadAttr: ");
   if (dwCompReadAttrLen) {
     LPBYTE attrs = GetCompReadAttr();
     for (DWORD i = 0; i < dwCompReadAttrLen; ++i) {
-      DebugPrint(TEXT("%02X "), attrs[i]);
+      DebugPrintA("%02X ", attrs[i]);
     }
   }
-  DebugPrint(TEXT("\n"));
-  DebugPrint(TEXT("CompReadClause: "));
+  DebugPrintA("\n");
+  DebugPrintA("CompReadClause: ");
   if (dwCompReadClauseLen) {
     LPDWORD clauses = GetCompReadClause();
     for (DWORD i = 0; i < dwCompReadClauseLen / 4; ++i) {
-      DebugPrint(TEXT("%08X "), clauses[i]);
+      DebugPrintA("%08X ", clauses[i]);
     }
   }
-  DebugPrint(TEXT("\n"));
-  DebugPrint(TEXT("CompReadStr: "));
+  DebugPrintA("\n");
+  DebugPrintA("CompReadStr: ");
   if (dwCompReadStrLen) {
     LPTSTR str = GetCompReadStr();
-    DebugPrint(TEXT("%s"), str);
+    DebugPrintA("%s", str);
   }
-  DebugPrint(TEXT("\n"));
-  DebugPrint(TEXT("CompAttr: "));
+  DebugPrintA("\n");
+  DebugPrintA("CompAttr: ");
   if (dwCompAttrLen) {
     LPBYTE attrs = GetCompAttr();
     for (DWORD i = 0; i < dwCompAttrLen; ++i) {
-      DebugPrint(TEXT("%02X "), attrs[i]);
+      DebugPrintA("%02X ", attrs[i]);
     }
   }
-  DebugPrint(TEXT("\n"));
-  DebugPrint(TEXT("CompClause: "));
+  DebugPrintA("\n");
+  DebugPrintA("CompClause: ");
   if (dwCompClauseLen) {
     LPDWORD clauses = GetCompClause();
     for (DWORD i = 0; i < dwCompClauseLen / 4; ++i) {
-      DebugPrint(TEXT("%08X "), clauses[i]);
+      DebugPrintA("%08X ", clauses[i]);
     }
   }
-  DebugPrint(TEXT("\n"));
-  DebugPrint(TEXT("CompStr: "));
+  DebugPrintA("\n");
+  DebugPrintA("CompStr: ");
   if (dwCompStrLen) {
     LPTSTR str = GetCompStr();
-    DebugPrint(TEXT("%s"), str);
+    DebugPrintA("%s", str);
   }
-  DebugPrint(TEXT("\n"));
-  DebugPrint(TEXT("ResultReadClause: "));
+  DebugPrintA("\n");
+  DebugPrintA("ResultReadClause: ");
   if (dwResultReadClauseLen) {
     LPDWORD clauses = GetResultReadClause();
     for (DWORD i = 0; i < dwResultReadClauseLen / 4; ++i) {
-      DebugPrint(TEXT("%08X "), clauses[i]);
+      DebugPrintA("%08X ", clauses[i]);
     }
   }
-  DebugPrint(TEXT("\n"));
-  DebugPrint(TEXT("ResultReadStr: "));
+  DebugPrintA("\n");
+  DebugPrintA("ResultReadStr: ");
   if (dwResultReadStrLen) {
     LPTSTR str = GetResultReadStr();
-    DebugPrint(TEXT("%s"), str);
+    DebugPrintA("%s", str);
   }
-  DebugPrint(TEXT("\n"));
-  DebugPrint(TEXT("ResultClause: "));
+  DebugPrintA("\n");
+  DebugPrintA("ResultClause: ");
   if (dwResultClauseLen) {
     LPDWORD clauses = GetResultClause();
     for (DWORD i = 0; i < dwResultClauseLen / 4; ++i) {
-      DebugPrint(TEXT("%08X "), clauses[i]);
+      DebugPrintA("%08X ", clauses[i]);
     }
   }
-  DebugPrint(TEXT("\n"));
-  DebugPrint(TEXT("ResultStr: "));
+  DebugPrintA("\n");
+  DebugPrintA("ResultStr: ");
   if (dwResultStrLen) {
     LPTSTR str = GetResultStr();
-    DebugPrint(TEXT("%s"), str);
+    DebugPrintA("%s", str);
   }
-  DebugPrint(TEXT("\n"));
+  DebugPrintA("\n");
 #endif  // ndef NDEBUG
 } // CompStr::Dump
 
 void LogCompStr::Dump() {
 #ifndef NDEBUG
-  DebugPrint(TEXT("### LogCompStr ###\n"));
-  DebugPrint(TEXT("+ dwCursorPos: %08X\n"), dwCursorPos);
-  DebugPrint(TEXT("+ dwDeltaStart: %08X\n"), dwDeltaStart);
+  DebugPrintA("### LogCompStr ###\n");
+  DebugPrintA("+ dwCursorPos: %08X\n", dwCursorPos);
+  DebugPrintA("+ dwDeltaStart: %08X\n", dwDeltaStart);
 
-  DebugPrint(TEXT("+ comp_read_attr: "));
+  DebugPrintA("+ comp_read_attr: ");
   for (size_t i = 0; i < comp_read_attr.size(); ++i) {
-    DebugPrint(TEXT("%02X "), comp_read_attr[i]);
+    DebugPrintA("%02X ", comp_read_attr[i]);
   }
-  DebugPrint(TEXT("\n"));
+  DebugPrintA("\n");
 
-  DebugPrint(TEXT("+ comp_read_clause: "));
+  DebugPrintA("+ comp_read_clause: ");
   for (size_t i = 0; i < comp_read_clause.size(); ++i) {
-    DebugPrint(TEXT("%08X "), comp_read_clause[i]);
+    DebugPrintA("%08X ", comp_read_clause[i]);
   }
-  DebugPrint(TEXT("\n"));
+  DebugPrintA("\n");
 
-  DebugPrint(TEXT("+ comp_read_str: %ls\n"), comp_read_str.c_str());
-  DebugPrint(TEXT("+ comp_attr: "));
+  DebugPrintA("+ comp_read_str: %ls\n", comp_read_str.c_str());
+  DebugPrintA("+ comp_attr: ");
   for (size_t i = 0; i < comp_attr.size(); ++i) {
-    DebugPrint(TEXT("%02X "), comp_attr[i]);
+    DebugPrintA("%02X ", comp_attr[i]);
   }
-  DebugPrint(TEXT("\n"));
+  DebugPrintA("\n");
 
-  DebugPrint(TEXT("+ comp_clause: "));
+  DebugPrintA("+ comp_clause: ");
   for (size_t i = 0; i < comp_clause.size(); ++i) {
-    DebugPrint(TEXT("%08X "), comp_clause[i]);
+    DebugPrintA("%08X ", comp_clause[i]);
   }
-  DebugPrint(TEXT("\n"));
+  DebugPrintA("\n");
 
-  DebugPrint(TEXT("+ comp_str: %ls\n"), comp_str.c_str());
+  DebugPrintA("+ comp_str: %ls\n", comp_str.c_str());
 
-  DebugPrint(TEXT("+ result_read_clause: "));
+  DebugPrintA("+ result_read_clause: ");
   for (size_t i = 0; i < result_read_clause.size(); ++i) {
-    DebugPrint(TEXT("%08X "), result_read_clause[i]);
+    DebugPrintA("%08X ", result_read_clause[i]);
   }
-  DebugPrint(TEXT("\n"));
+  DebugPrintA("\n");
 
-  DebugPrint(TEXT("+ result_read_str: %ls\n"), result_read_str.c_str());
+  DebugPrintA("+ result_read_str: %ls\n", result_read_str.c_str());
 
-  DebugPrint(TEXT("+ result_clause: "));
+  DebugPrintA("+ result_clause: ");
   for (size_t i = 0; i < result_clause.size(); ++i) {
-    DebugPrint(TEXT("%08X "), result_clause[i]);
+    DebugPrintA("%08X ", result_clause[i]);
   }
-  DebugPrint(TEXT("\n"));
+  DebugPrintA("\n");
 
-  DebugPrint(TEXT("+ result_str: %ls\n"), result_str.c_str());
+  DebugPrintA("+ result_str: %ls\n", result_str.c_str());
 
-  DebugPrint(TEXT("+ extra.iClause: %08X\n"), extra.iClause);
+  DebugPrintA("+ extra.iClause: %08X\n", extra.iClause);
 
-  DebugPrint(TEXT("+ extra.hiragana_clauses: "));
+  DebugPrintA("+ extra.hiragana_clauses: ");
   for (size_t i = 0; i < extra.hiragana_clauses.size(); ++i) {
-    DebugPrint(TEXT("%ls "), extra.hiragana_clauses[i].c_str());
+    DebugPrintA("%ls ", extra.hiragana_clauses[i].c_str());
   }
-  DebugPrint(TEXT("\n"));
+  DebugPrintA("\n");
 
-  DebugPrint(TEXT("+ extra.typing_clauses: "));
+  DebugPrintA("+ extra.typing_clauses: ");
   for (size_t i = 0; i < extra.typing_clauses.size(); ++i) {
-    DebugPrint(TEXT("%ls "), extra.typing_clauses[i].c_str());
+    DebugPrintA("%ls ", extra.typing_clauses[i].c_str());
   }
-  DebugPrint(TEXT("\n"));
+  DebugPrintA("\n");
 #endif  // ndef NDEBUG
 }
 

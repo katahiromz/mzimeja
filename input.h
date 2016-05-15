@@ -169,6 +169,7 @@ struct CompStr : public COMPOSITIONSTRING {
   static HIMCC ReCreate(HIMCC hCompStr, const LogCompStr *log = NULL);
 
   void GetLog(LogCompStr& log);
+  DWORD Store(const LogCompStr *log);
 
   LPBYTE GetBytes() { return (LPBYTE)this; }
 
