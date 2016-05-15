@@ -64,8 +64,8 @@ BOOL PASCAL GetCandPosFromCompWnd(LPUIEXTRA lpUIExtra, LPPOINT lppt) {
   return FALSE;
 }
 
-BOOL PASCAL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
-                                   LPPOINT lppt) {
+BOOL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
+                            LPPOINT lppt) {
   FOOTMARK();
   if (lpUIExtra->dwCompStyle) {
     if (lpIMC && lpIMC->HasCompForm()) {
