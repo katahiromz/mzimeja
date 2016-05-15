@@ -1055,7 +1055,7 @@ void CompStr::Dump() {
   DebugPrintA("CompReadStr: ");
   if (dwCompReadStrLen) {
     LPTSTR str = GetCompReadStr();
-    DebugPrintA("%s", str);
+    DebugPrintA("%ls", str);
   }
   DebugPrintA("\n");
   DebugPrintA("CompAttr: ");
@@ -1077,7 +1077,7 @@ void CompStr::Dump() {
   DebugPrintA("CompStr: ");
   if (dwCompStrLen) {
     LPTSTR str = GetCompStr();
-    DebugPrintA("%s", str);
+    DebugPrintA("%ls", str);
   }
   DebugPrintA("\n");
   DebugPrintA("ResultReadClause: ");
@@ -1091,7 +1091,7 @@ void CompStr::Dump() {
   DebugPrintA("ResultReadStr: ");
   if (dwResultReadStrLen) {
     LPTSTR str = GetResultReadStr();
-    DebugPrintA("%s", str);
+    DebugPrintA("%ls", str);
   }
   DebugPrintA("\n");
   DebugPrintA("ResultClause: ");
@@ -1105,7 +1105,7 @@ void CompStr::Dump() {
   DebugPrintA("ResultStr: ");
   if (dwResultStrLen) {
     LPTSTR str = GetResultStr();
-    DebugPrintA("%s", str);
+    DebugPrintA("%ls", str);
   }
   DebugPrintA("\n");
 #endif  // ndef NDEBUG
