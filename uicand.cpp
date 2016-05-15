@@ -268,7 +268,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
       if (pt.x < 0) pt.x = rcAppWnd.left + lpIMC->cfCandForm[0].rcArea.right;
     }
 
-    if (IsWindow(lpUIExtra->uiCand.hWnd)) {
+    if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
       ::GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
       ::MoveWindow(lpUIExtra->uiCand.hWnd, pt.x, pt.y, rc.right - rc.left,
                    rc.bottom - rc.top, TRUE);
