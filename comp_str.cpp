@@ -1174,6 +1174,6 @@ void LogCompStr::Dump() {
   }
   DebugPrintA("\n");
 #endif  // ndef NDEBUG
-}
+} // LogCompStr::Dump
 
 //////////////////////////////////////////////////////////////////////////////
