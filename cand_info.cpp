@@ -69,6 +69,7 @@ DWORD CandList::Store(const LogCandList *log) {
   dwSelection = log->dwSelection;
   dwPageStart = log->dwPageStart;
   dwPageSize = log->dwPageSize;
+  if (dwCount < dwPageSize) dwPageSize = dwCount;
 
   BYTE *pb = GetBytes();
   pb += sizeof(CANDIDATELIST);
@@ -107,7 +108,6 @@ DWORD CandInfo::Store(const LogCandInfo *log) {
     dwCount = MAX_CANDLISTS;
   }
   dwPrivateSize = 0;
-  dwPrivateOffset = 0;
 
   BYTE *pb = GetBytes();
   pb += sizeof(CANDIDATEINFO);
@@ -117,6 +117,8 @@ DWORD CandInfo::Store(const LogCandInfo *log) {
     CandList *pList = GetList(iList);
     pb += pList->Store(&log->cand_lists[iList]);
   }
+  dwPrivateOffset = DWORD(pb - GetBytes());
+
   assert(dwSize == DWORD(pb - GetBytes()));
   return DWORD(pb - GetBytes());
 }

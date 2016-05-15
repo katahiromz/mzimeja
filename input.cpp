@@ -167,6 +167,7 @@ BOOL InputContext::IsRomanMode() const {
 
 void InputContext::Initialize() {
   FOOTMARK();
+
   if (!HasLogFont()) {
     lfFont.W.lfCharSet = SHIFTJIS_CHARSET;
     lfFont.W.lfFaceName[0] = 0;
@@ -174,7 +175,8 @@ void InputContext::Initialize() {
   }
 
   if (!HasConversion()) {
-    fdwConversion = IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE;
+    fdwConversion =
+      IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE;
     fdwInit |= INIT_CONVERSION;
   }
 
