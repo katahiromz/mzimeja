@@ -12,22 +12,20 @@
 #include <string>
 #include <vector>
 
-typedef std::wstring tstring;
-
-HINSTANCE   g_hInstance;
-HWND        g_hMainWnd;
-DWORD       g_dwCursorPos = 0;
-DWORD       g_dwDeltaStart = 0;
-tstring     g_strRead;
-tstring     g_strComp;
-tstring     g_strResultRead;
-tstring     g_strResult;
-std::vector<BYTE> g_vecReadAttr;
-std::vector<BYTE> g_vecCompAttr;
-std::vector<DWORD> g_vecReadClause;
-std::vector<DWORD> g_vecCompClause;
-std::vector<DWORD> g_vecResultReadClause;
-std::vector<DWORD> g_vecResultClause;
+HINSTANCE           g_hInstance;
+HWND                g_hMainWnd;
+DWORD               g_dwCursorPos = 0;
+DWORD               g_dwDeltaStart = 0;
+std::wstring        g_strRead;
+std::wstring        g_strComp;
+std::wstring        g_strResultRead;
+std::wstring        g_strResult;
+std::vector<BYTE>   g_vecReadAttr;
+std::vector<BYTE>   g_vecCompAttr;
+std::vector<DWORD>  g_vecReadClause;
+std::vector<DWORD>  g_vecCompClause;
+std::vector<DWORD>  g_vecResultReadClause;
+std::vector<DWORD>  g_vecResultClause;
 
 static const TCHAR s_szName[] = TEXT("katahiromz's composition string checker");
 
@@ -127,7 +125,7 @@ void MainWnd_OnImeComposition(HWND hwnd, WPARAM wParam, LPARAM lParam)
     {
         HIMCC hCompStr = pContext->hCompStr;
         LPCOMPOSITIONSTRING lpCompStr = (LPCOMPOSITIONSTRING)ImmLockIMCC(hCompStr);
-        if (lpCompStr != NULL)
+        if (lpCompStr)
         {
             g_dwCursorPos = lpCompStr->dwCursorPos;
             g_dwDeltaStart = lpCompStr->dwDeltaStart;
