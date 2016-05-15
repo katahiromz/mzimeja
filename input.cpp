@@ -412,6 +412,7 @@ BOOL InputContext::OpenCandidate() {
       log_comp_str.AssertValid();
       GetCands(log_cand_info, log_comp_str.comp_str);
       log_comp_str.AssertValid();
+
       // generate message to open candidate
       TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
       // reset candidates

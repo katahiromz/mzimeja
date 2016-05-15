@@ -221,12 +221,14 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     if (lpIMC) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
         lpCandInfo = lpIMC->LockCandInfo();
-        if (lpCandInfo && lpCandInfo->dwCount > 0) {
-          CandList *lpCandList = lpCandInfo->GetList(0);
-          lpCandList->dwPageSize = dwValue;
+        if (lpCandInfo) {
+          if (lpCandInfo->dwCount > 0) {
+            CandList *lpCandList = lpCandInfo->GetList(0);
+            lpCandList->dwPageSize = dwValue;
+            TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+            ret = TRUE;
+          }
           lpIMC->UnlockCandInfo();
-          TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
-          ret = TRUE;
         }
       }
       TheIME.UnlockIMC(hIMC);

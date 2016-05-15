@@ -86,210 +86,210 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   }
 
   switch (message) {
-    case WM_CREATE:
-      // Allocate UI's extra memory block.
-      hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
-      lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
+  case WM_CREATE:
+    // Allocate UI's extra memory block.
+    hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
+    lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
+    if (lpUIExtra) {
+      lpUIExtra->uiStatus.pt.x = -1;
+      lpUIExtra->uiStatus.pt.y = -1;
+      lpUIExtra->uiDefComp.pt.x = -1;
+      lpUIExtra->uiDefComp.pt.y = -1;
+      lpUIExtra->uiCand.pt.x = -1;
+      lpUIExtra->uiCand.pt.y = -1;
+      lpUIExtra->uiGuide.pt.x = -1;
+      lpUIExtra->uiGuide.pt.y = -1;
+      lpUIExtra->hFont = NULL;
+      GlobalUnlock(hUIExtra);
+    }
+    SetUIExtraToServerWnd(hWnd, hUIExtra);
+    break;
+
+  case WM_IME_SETCONTEXT:
+    if (wParam) {
+      lpUIExtra = LockUIExtra(hWnd);
       if (lpUIExtra) {
-        lpUIExtra->uiStatus.pt.x = -1;
-        lpUIExtra->uiStatus.pt.y = -1;
-        lpUIExtra->uiDefComp.pt.x = -1;
-        lpUIExtra->uiDefComp.pt.y = -1;
-        lpUIExtra->uiCand.pt.x = -1;
-        lpUIExtra->uiCand.pt.y = -1;
-        lpUIExtra->uiGuide.pt.x = -1;
-        lpUIExtra->uiGuide.pt.y = -1;
-        lpUIExtra->hFont = NULL;
-        GlobalUnlock(hUIExtra);
-      }
-      SetUIExtraToServerWnd(hWnd, hUIExtra);
-      break;
+        lpUIExtra->hIMC = hIMC;
 
-    case WM_IME_SETCONTEXT:
-      if (wParam) {
-        lpUIExtra = LockUIExtra(hWnd);
-        if (lpUIExtra) {
-          lpUIExtra->hIMC = hIMC;
-
-          if (hIMC) {
-            //LPINPUTCONTEXT lpIMCT = NULL;
-            //
-            // input context was chenged.
-            // if there are the child windows, the display have to be
-            // updated.
-            lpIMC = TheIME.LockIMC(hIMC);
-            if (lpIMC) {
-              CompStr *lpCompStr = lpIMC->LockCompStr();
-              CandInfo *lpCandInfo = lpIMC->LockCandInfo();
-              if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
-                CandWnd_Hide(lpUIExtra);
-              }
-              if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
-                if (lpCandInfo->dwCount) {
-                  CandWnd_Create(hWnd, lpUIExtra, lpIMC);
-                  CandWnd_Resize(lpUIExtra, lpIMC);
-                  CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
-                }
-              }
-
-              if (IsWindow(lpUIExtra->uiDefComp.hWnd)) CompWnd_Hide(lpUIExtra);
-
-              if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
-                if (lpCompStr->dwCompStrLen) {
-                  CompWnd_Create(hWnd, lpUIExtra, lpIMC);
-                  CompWnd_Move(lpUIExtra, lpIMC);
-                }
-              }
-              lpIMC->UnlockCompStr();
-              lpIMC->UnlockCandInfo();
-            } else {
+        if (hIMC) {
+          //LPINPUTCONTEXT lpIMCT = NULL;
+          //
+          // input context was chenged.
+          // if there are the child windows, the display have to be
+          // updated.
+          lpIMC = TheIME.LockIMC(hIMC);
+          if (lpIMC) {
+            CompStr *lpCompStr = lpIMC->LockCompStr();
+            CandInfo *lpCandInfo = lpIMC->LockCandInfo();
+            if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
               CandWnd_Hide(lpUIExtra);
-              CompWnd_Hide(lpUIExtra);
             }
-            StatusWnd_Update(lpUIExtra);
-            TheIME.UnlockIMC(hIMC);
-          } else  // it is NULL input context.
-          {
+            if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
+              if (lpCandInfo->dwCount) {
+                CandWnd_Create(hWnd, lpUIExtra, lpIMC);
+                CandWnd_Resize(lpUIExtra, lpIMC);
+                CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
+              }
+            }
+
+            if (IsWindow(lpUIExtra->uiDefComp.hWnd)) CompWnd_Hide(lpUIExtra);
+
+            if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
+              if (lpCompStr->dwCompStrLen) {
+                CompWnd_Create(hWnd, lpUIExtra, lpIMC);
+                CompWnd_Move(lpUIExtra, lpIMC);
+              }
+            }
+            lpIMC->UnlockCompStr();
+            lpIMC->UnlockCandInfo();
+          } else {
             CandWnd_Hide(lpUIExtra);
             CompWnd_Hide(lpUIExtra);
           }
-          UnlockUIExtra(hWnd);
+          StatusWnd_Update(lpUIExtra);
+          TheIME.UnlockIMC(hIMC);
+        } else  // it is NULL input context.
+        {
+          CandWnd_Hide(lpUIExtra);
+          CompWnd_Hide(lpUIExtra);
         }
-      }
-      // else
-      //    ShowUIWindows(hWnd, FALSE);
-      break;
-
-    case WM_IME_STARTCOMPOSITION:
-      // Start composition! Ready to display the composition string.
-      lpUIExtra = LockUIExtra(hWnd);
-      if (lpUIExtra) {
-        lpIMC = TheIME.LockIMC(hIMC);
-        CompWnd_Create(hWnd, lpUIExtra, lpIMC);
-        TheIME.UnlockIMC(hIMC);
         UnlockUIExtra(hWnd);
       }
-      break;
+    }
+    // else
+    //    ShowUIWindows(hWnd, FALSE);
+    break;
 
-    case WM_IME_COMPOSITION:
-      // Update to display the composition string.
+  case WM_IME_STARTCOMPOSITION:
+    // Start composition! Ready to display the composition string.
+    lpUIExtra = LockUIExtra(hWnd);
+    if (lpUIExtra) {
       lpIMC = TheIME.LockIMC(hIMC);
-      if (lpIMC) {
-        lpUIExtra = LockUIExtra(hWnd);
-        if (lpUIExtra) {
-          CompWnd_Move(lpUIExtra, lpIMC);
-          CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
-          UnlockUIExtra(hWnd);
-        }
-        TheIME.UnlockIMC(hIMC);
-      }
-      break;
+      CompWnd_Create(hWnd, lpUIExtra, lpIMC);
+      TheIME.UnlockIMC(hIMC);
+      UnlockUIExtra(hWnd);
+    }
+    break;
 
-    case WM_IME_ENDCOMPOSITION:
-      // Finish to display the composition string.
+  case WM_IME_COMPOSITION:
+    // Update to display the composition string.
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
       lpUIExtra = LockUIExtra(hWnd);
       if (lpUIExtra) {
-        CompWnd_Hide(lpUIExtra);
+        CompWnd_Move(lpUIExtra, lpIMC);
+        CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
         UnlockUIExtra(hWnd);
       }
-      break;
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
 
-    case WM_IME_COMPOSITIONFULL:
-      break;
+  case WM_IME_ENDCOMPOSITION:
+    // Finish to display the composition string.
+    lpUIExtra = LockUIExtra(hWnd);
+    if (lpUIExtra) {
+      CompWnd_Hide(lpUIExtra);
+      UnlockUIExtra(hWnd);
+    }
+    break;
 
-    case WM_IME_SELECT:
-      if (wParam) {
-        lpUIExtra = LockUIExtra(hWnd);
-        if (lpUIExtra) {
-          lpUIExtra->hIMC = hIMC;
-          UnlockUIExtra(hWnd);
-        }
-      }
-      break;
+  case WM_IME_COMPOSITIONFULL:
+    break;
 
-    case WM_IME_CONTROL:
-      lRet = ControlCommand(hIMC, hWnd, message, wParam, lParam);
-      break;
-
-    case WM_IME_NOTIFY:
-      lRet = NotifyCommand(hIMC, hWnd, message, wParam, lParam);
-      break;
-
-    case WM_DESTROY:
+  case WM_IME_SELECT:
+    if (wParam) {
       lpUIExtra = LockUIExtra(hWnd);
       if (lpUIExtra) {
-        if (IsWindow(lpUIExtra->uiStatus.hWnd))
-          DestroyWindow(lpUIExtra->uiStatus.hWnd);
-
-        if (IsWindow(lpUIExtra->uiCand.hWnd))
-          DestroyWindow(lpUIExtra->uiCand.hWnd);
-
-        if (IsWindow(lpUIExtra->uiDefComp.hWnd))
-          DestroyWindow(lpUIExtra->uiDefComp.hWnd);
-
-        for (i = 0; i < MAXCOMPWND; i++) {
-          if (IsWindow(lpUIExtra->uiComp[i].hWnd))
-            DestroyWindow(lpUIExtra->uiComp[i].hWnd);
-        }
-
-        if (IsWindow(lpUIExtra->uiGuide.hWnd))
-          DestroyWindow(lpUIExtra->uiGuide.hWnd);
-
-        if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont);
-
-        UnlockUIExtra(hWnd);
-        FreeUIExtra(hWnd);
-      }
-      break;
-
-    case WM_UI_STATEMOVE:
-      // Set the position of the status window to UIExtra.
-      // This message is sent by the status window.
-      lpUIExtra = LockUIExtra(hWnd);
-      if (lpUIExtra) {
-        lpUIExtra->uiStatus.pt.x = (short)LOWORD(lParam);
-        lpUIExtra->uiStatus.pt.y = (short)HIWORD(lParam);
+        lpUIExtra->hIMC = hIMC;
         UnlockUIExtra(hWnd);
       }
-      break;
+    }
+    break;
 
-    case WM_UI_DEFCOMPMOVE:
-      // Set the position of the composition window to UIExtra.
-      // This message is sent by the composition window.
-      lpUIExtra = LockUIExtra(hWnd);
-      if (lpUIExtra) {
-        if (!lpUIExtra->dwCompStyle) {
-          lpUIExtra->uiDefComp.pt.x = (short)LOWORD(lParam);
-          lpUIExtra->uiDefComp.pt.y = (short)HIWORD(lParam);
-        }
-        UnlockUIExtra(hWnd);
+  case WM_IME_CONTROL:
+    lRet = ControlCommand(hIMC, hWnd, message, wParam, lParam);
+    break;
+
+  case WM_IME_NOTIFY:
+    lRet = NotifyCommand(hIMC, hWnd, message, wParam, lParam);
+    break;
+
+  case WM_DESTROY:
+    lpUIExtra = LockUIExtra(hWnd);
+    if (lpUIExtra) {
+      if (IsWindow(lpUIExtra->uiStatus.hWnd))
+        DestroyWindow(lpUIExtra->uiStatus.hWnd);
+
+      if (IsWindow(lpUIExtra->uiCand.hWnd))
+        DestroyWindow(lpUIExtra->uiCand.hWnd);
+
+      if (IsWindow(lpUIExtra->uiDefComp.hWnd))
+        DestroyWindow(lpUIExtra->uiDefComp.hWnd);
+
+      for (i = 0; i < MAXCOMPWND; i++) {
+        if (IsWindow(lpUIExtra->uiComp[i].hWnd))
+          DestroyWindow(lpUIExtra->uiComp[i].hWnd);
       }
-      break;
 
-    case WM_UI_CANDMOVE:
-      // Set the position of the candidate window to UIExtra.
-      // This message is sent by the candidate window.
-      lpUIExtra = LockUIExtra(hWnd);
-      if (lpUIExtra) {
-        lpUIExtra->uiCand.pt.x = (short)LOWORD(lParam);
-        lpUIExtra->uiCand.pt.y = (short)HIWORD(lParam);
-        UnlockUIExtra(hWnd);
+      if (IsWindow(lpUIExtra->uiGuide.hWnd))
+        DestroyWindow(lpUIExtra->uiGuide.hWnd);
+
+      if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont);
+
+      UnlockUIExtra(hWnd);
+      FreeUIExtra(hWnd);
+    }
+    break;
+
+  case WM_UI_STATEMOVE:
+    // Set the position of the status window to UIExtra.
+    // This message is sent by the status window.
+    lpUIExtra = LockUIExtra(hWnd);
+    if (lpUIExtra) {
+      lpUIExtra->uiStatus.pt.x = (short)LOWORD(lParam);
+      lpUIExtra->uiStatus.pt.y = (short)HIWORD(lParam);
+      UnlockUIExtra(hWnd);
+    }
+    break;
+
+  case WM_UI_DEFCOMPMOVE:
+    // Set the position of the composition window to UIExtra.
+    // This message is sent by the composition window.
+    lpUIExtra = LockUIExtra(hWnd);
+    if (lpUIExtra) {
+      if (!lpUIExtra->dwCompStyle) {
+        lpUIExtra->uiDefComp.pt.x = (short)LOWORD(lParam);
+        lpUIExtra->uiDefComp.pt.y = (short)HIWORD(lParam);
       }
-      break;
+      UnlockUIExtra(hWnd);
+    }
+    break;
 
-    case WM_UI_GUIDEMOVE:
-      // Set the position of the status window to UIExtra.
-      // This message is sent by the status window.
-      lpUIExtra = LockUIExtra(hWnd);
-      if (lpUIExtra) {
-        lpUIExtra->uiGuide.pt.x = (short)LOWORD(lParam);
-        lpUIExtra->uiGuide.pt.y = (short)HIWORD(lParam);
-        UnlockUIExtra(hWnd);
-      }
-      break;
+  case WM_UI_CANDMOVE:
+    // Set the position of the candidate window to UIExtra.
+    // This message is sent by the candidate window.
+    lpUIExtra = LockUIExtra(hWnd);
+    if (lpUIExtra) {
+      lpUIExtra->uiCand.pt.x = (short)LOWORD(lParam);
+      lpUIExtra->uiCand.pt.y = (short)HIWORD(lParam);
+      UnlockUIExtra(hWnd);
+    }
+    break;
 
-    default:
-      return DefWindowProc(hWnd, message, wParam, lParam);
+  case WM_UI_GUIDEMOVE:
+    // Set the position of the status window to UIExtra.
+    // This message is sent by the status window.
+    lpUIExtra = LockUIExtra(hWnd);
+    if (lpUIExtra) {
+      lpUIExtra->uiGuide.pt.x = (short)LOWORD(lParam);
+      lpUIExtra->uiGuide.pt.y = (short)HIWORD(lParam);
+      UnlockUIExtra(hWnd);
+    }
+    break;
+
+  default:
+    return DefWindowProc(hWnd, message, wParam, lParam);
   }
 
   return lRet;

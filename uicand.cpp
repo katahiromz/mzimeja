@@ -276,7 +276,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
       lpUIExtra->uiCand.bShow = TRUE;
       ::InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
     }
-    ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
+    ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));
   } else if (lpIMC->cfCandForm[0].dwStyle == CFS_CANDIDATEPOS) {
     pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
     pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
@@ -290,7 +290,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
       lpUIExtra->uiCand.bShow = TRUE;
       ::InvalidateRect(lpUIExtra->uiCand.hWnd, NULL, FALSE);
     }
-    ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
+    ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));
   }
 } // CandWnd_Move
 
