@@ -703,8 +703,18 @@ void LogCompStr::RevertText() {
 
 void LogCompStr::MakeResult() {
   FOOTMARK();
-  result_read_clause = comp_read_clause;  // TODO: generate reading
-  result_read_str = comp_read_str;
+
+  // setting result_read_clause and result_read_str
+  result_read_str.clear();
+  const size_t count = extra.hiragana_clauses.size();
+  result_read_clause.resize(count + 1);
+  for (size_t i = 0; i < count; ++i) {
+    result_read_clause[i] = DWORD(result_read_str.size());
+    result_read_str +=
+      lcmap(extra.hiragana_clauses[i], LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+  }
+  result_read_clause[count] = DWORD(result_read_str.size());
+
   result_clause = comp_clause;
   result_str = comp_str;
   clear_read();
@@ -976,10 +986,6 @@ void LogCompStr::AssertValid() {
   }
   if (result_read_clause.size()) {
     if (result_read_clause[0] != 0) {
-      Dump();
-      assert(0);
-    }
-    if (result_read_clause[result_read_clause.size() - 1] != 0) {
       Dump();
       assert(0);
     }
