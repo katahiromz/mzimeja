@@ -848,30 +848,39 @@ DWORD CompStr::Store(const LogCompStr *log) {
   dwCompReadAttrOffset = DWORD(pb - GetBytes());
   dwCompReadAttrLen = log->comp_read_attr.size() * sizeof(BYTE);
   ADD_BYTES(comp_read_attr);
+
   dwCompReadClauseOffset = DWORD(pb - GetBytes());
   dwCompReadClauseLen = log->comp_read_clause.size() * sizeof(DWORD);
   ADD_DWORDS(comp_read_clause);
+
   dwCompReadStrOffset = DWORD(pb - GetBytes());
   dwCompReadStrLen = log->comp_read_str.size();
   ADD_STRING(comp_read_str);
+
   dwCompAttrOffset = DWORD(pb - GetBytes());
   dwCompAttrLen = log->comp_attr.size() * sizeof(BYTE);
   ADD_BYTES(comp_attr);
+
   dwCompClauseOffset = DWORD(pb - GetBytes());
   dwCompClauseLen = log->comp_clause.size() * sizeof(DWORD);
   ADD_DWORDS(comp_clause);
+
   dwCompStrOffset = DWORD(pb - GetBytes());
   dwCompStrLen = log->comp_str.size();
   ADD_STRING(comp_str);
+
   dwResultReadClauseOffset = DWORD(pb - GetBytes());
   dwResultReadClauseLen = log->result_read_clause.size() * sizeof(DWORD);
   ADD_DWORDS(result_read_clause);
+
   dwResultReadStrOffset = DWORD(pb - GetBytes());
   dwResultReadStrLen = log->result_read_str.size();
   ADD_STRING(result_read_str);
+
   dwResultClauseOffset = DWORD(pb - GetBytes());
   dwResultClauseLen = log->result_clause.size() * sizeof(DWORD);
   ADD_DWORDS(result_clause);
+
   dwResultStrOffset = DWORD(pb - GetBytes());
   dwResultStrLen = log->result_str.size();
   ADD_STRING(result_str);
