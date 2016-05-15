@@ -13,29 +13,25 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
   int nsw = (fFlag ? SW_SHOWNOACTIVATE : SW_HIDE);
 
   LPUIEXTRA lpUIExtra = LockUIExtra(hwndServer);
-  if (lpUIExtra == NULL) return;
-
-  if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
-    ShowWindow(lpUIExtra->uiStatus.hWnd, nsw);
-    lpUIExtra->uiStatus.bShow = fFlag;
+  if (lpUIExtra) {
+    if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
+      ::ShowWindow(lpUIExtra->uiStatus.hWnd, nsw);
+      lpUIExtra->uiStatus.bShow = fFlag;
+    }
+    if (IsWindow(lpUIExtra->uiCand.hWnd)) {
+      ::ShowWindow(lpUIExtra->uiCand.hWnd, nsw);
+      lpUIExtra->uiCand.bShow = fFlag;
+    }
+    if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
+      ::ShowWindow(lpUIExtra->uiDefComp.hWnd, nsw);
+      lpUIExtra->uiDefComp.bShow = fFlag;
+    }
+    if (IsWindow(lpUIExtra->uiGuide.hWnd)) {
+      ::ShowWindow(lpUIExtra->uiGuide.hWnd, nsw);
+      lpUIExtra->uiGuide.bShow = fFlag;
+    }
+    UnlockUIExtra(hwndServer);
   }
-
-  if (IsWindow(lpUIExtra->uiCand.hWnd)) {
-    ShowWindow(lpUIExtra->uiCand.hWnd, nsw);
-    lpUIExtra->uiCand.bShow = fFlag;
-  }
-
-  if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
-    ShowWindow(lpUIExtra->uiDefComp.hWnd, nsw);
-    lpUIExtra->uiDefComp.bShow = fFlag;
-  }
-
-  if (IsWindow(lpUIExtra->uiGuide.hWnd)) {
-    ShowWindow(lpUIExtra->uiGuide.hWnd, nsw);
-    lpUIExtra->uiGuide.bShow = fFlag;
-  }
-
-  UnlockUIExtra(hwndServer);
 }
 
 #ifdef _DEBUG
@@ -125,7 +121,9 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             if (lpIMC) {
               CompStr *lpCompStr = lpIMC->LockCompStr();
               CandInfo *lpCandInfo = lpIMC->LockCandInfo();
-              if (IsWindow(lpUIExtra->uiCand.hWnd)) CandWnd_Hide(lpUIExtra);
+              if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
+                CandWnd_Hide(lpUIExtra);
+              }
               if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
                 if (lpCandInfo->dwCount) {
                   CandWnd_Create(hWnd, lpUIExtra, lpIMC);
@@ -453,7 +451,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
 LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
                     LPARAM lParam) {
   FOOTMARK();
-  LONG lRet = 1L;
+  LONG ret = 1L;
 
   InputContext *lpIMC = TheIME.LockIMC(hIMC);
   if (NULL == lpIMC) return 1L;
@@ -463,19 +461,18 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
     switch (wParam) {
     case IMC_GETCANDIDATEPOS:
       if (IsWindow(lpUIExtra->uiCand.hWnd)) {
-        // MZ-IME has only one candidate list.
         *(LPCANDIDATEFORM)lParam = lpIMC->cfCandForm[0];
-        lRet = 0;
+        ret = 0;
       }
       break;
 
     case IMC_GETCOMPOSITIONWINDOW:
       *(LPCOMPOSITIONFORM)lParam = lpIMC->cfCompForm;
-      lRet = 0;
+      ret = 0;
       break;
 
     case IMC_GETSTATUSWINDOWPOS:
-      lRet = MAKELONG(lpUIExtra->uiStatus.pt.x, lpUIExtra->uiStatus.pt.y);
+      ret = MAKELONG(lpUIExtra->uiStatus.pt.x, lpUIExtra->uiStatus.pt.y);
       break;
 
     default:
@@ -485,7 +482,7 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
   }
   TheIME.UnlockIMC(hIMC);
 
-  return lRet;
+  return ret;
 }
 
 // When draging the child window, this function draws the border
