@@ -108,8 +108,6 @@ void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
   ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
   lpUIExtra->uiCand.bShow = FALSE;
-
-  return;
 } // CandWnd_Create
 
 void CandWnd_Paint(HWND hCandWnd) {
