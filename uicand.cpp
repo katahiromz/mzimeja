@@ -42,7 +42,7 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
   return 0;
 } // CandWnd_WindowProc
 
-BOOL PASCAL GetCandPosFromCompWnd(LPUIEXTRA lpUIExtra, LPPOINT lppt) {
+BOOL GetCandPosFromCompWnd(LPUIEXTRA lpUIExtra, LPPOINT lppt) {
   FOOTMARK();
   RECT rc;
 
@@ -177,13 +177,15 @@ void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
         LPTSTR lpstr = lpCandList->GetCandString(i);
         SIZE sz;
         ::GetTextExtentPoint32W(hDC, lpstr, lstrlenW(lpstr), &sz);
+        assert(sz.cx);
+        assert(sz.cy);
         if (width < sz.cx) width = sz.cx;
         height += sz.cy;
       }
       lpIMC->UnlockCandInfo();
     }
     if (hOldFont) {
-      ::DeleteObject(SelectObject(hDC, hOldFont));
+      ::DeleteObject(::SelectObject(hDC, hOldFont));
     }
     ::ReleaseDC(lpUIExtra->uiCand.hWnd, hDC);
 

@@ -459,6 +459,14 @@ BOOL InputContext::DoConvert() {
     return FALSE;
   }
 
+  // get logical data of candidate info
+  LogCandInfo log_cand_info;
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLog(log_cand_info);
+    UnlockCandInfo();
+  }
+
   // is it being converted?
   if (log_comp_str.IsBeingConverted()) {
     // if there was no candidate,
@@ -468,20 +476,15 @@ BOOL InputContext::DoConvert() {
     }
   }
 
-  // get logical data of candidate info
-  LogCandInfo log_cand_info;
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->GetLog(log_cand_info);
-    UnlockCandInfo();
-  }
-
   // get candidates
   std::wstring str = log_comp_str.comp_str;
   GetCands(log_cand_info, str);
 
   // recreate candidate and generate message to change candidate
+  DumpCandInfo();
+  FOOTMARK_POINT();
   hCandInfo = CandInfo::ReCreate(hCandInfo, &log_cand_info);
+  DumpCandInfo();
   TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
   // set composition string

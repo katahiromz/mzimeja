@@ -170,6 +170,7 @@ void CandInfo::Dump() {
     for (DWORD k = 0; k < list->dwCount; ++k) {
       DebugPrintA("%ls ", list->GetCandString(k));
     }
+    DebugPrintA("\n");
   }
 #endif
 } // CandInfo::Dump
