@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef FOOTMARK_HPP_
-#define FOOTMARK_HPP_   2   // Version 2
+#define FOOTMARK_HPP_   3   // Version 3
 
 #ifndef __cplusplus
   #error This library (footmark) needs C++. You lose.
@@ -63,11 +63,15 @@
 
   inline void FootmarkLocation::Enter() {
     GetFootmarkStack().push_back(*this);
-    FootmarkDebugPrint("%s (%u): entering %s\n", m_file, m_line, m_func);
+    FootmarkDebugPrint("%s %s (%u): entering %s\n",
+      std::string(GetFootmarkStack().size(), '>').c_str(),
+      m_file, m_line, m_func);
   }
   inline void FootmarkLocation::Leave() {
     if (GetFootmarkStack().size()) {
-      FootmarkDebugPrint("%s: leaving %s\n", m_file, m_func);
+      FootmarkDebugPrint("%s %s: leaving %s\n",
+        std::string(GetFootmarkStack().size(), '>').c_str(),
+        m_file, m_func);
       GetFootmarkStack().pop_back();
     } else {
       FootmarkDebugPrint("Footmark: ERROR: The stack of footmarks was broken.\n");
