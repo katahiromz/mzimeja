@@ -98,7 +98,7 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
   HBITMAP hbmpOld;
   HWND hSvrWnd;
   HANDLE hGLStr;
-  LPTSTR lpGLStr;
+  WCHAR *lpGLStr;
   DWORD dwLevel;
   DWORD dwSize;
 

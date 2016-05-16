@@ -13,7 +13,7 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // A function which handles WM_IME_KEYDOWN
-BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, LPBYTE lpbKeyState,
+BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
                        INPUT_MODE imode) {
   FOOTMARK();
   InputContext *lpIMC;

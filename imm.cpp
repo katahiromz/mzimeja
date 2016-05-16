@@ -8,7 +8,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, LPTSTR lpszClassName,
+BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
                        DWORD dwSystemInfoFlags) {
   FOOTMARK();
 
@@ -68,7 +68,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
     break;
 
   case IME_ESC_GETHELPFILENAME:
-    lstrcpy((LPTSTR)lpData, TEXT("mzimeja.hlp"));
+    lstrcpyW((WCHAR *)lpData, TEXT("mzimeja.hlp"));
     ret = TRUE;
     break;
 
@@ -283,23 +283,6 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
   }
   return TRUE;
 }
-
-#ifdef _DEBUG
-void DumpRS(LPRECONVERTSTRING lpRS) {
-  LPTSTR lpDump = ((LPTSTR)lpRS) + lpRS->dwStrOffset;
-  *(LPTSTR)(lpDump + lpRS->dwStrLen) = 0;
-
-  DebugPrint(TEXT("DumpRS\n"));
-  DebugPrint(TEXT("dwSize            %x\n"), lpRS->dwSize);
-  DebugPrint(TEXT("dwStrLen          %x\n"), lpRS->dwStrLen);
-  DebugPrint(TEXT("dwStrOffset       %x\n"), lpRS->dwStrOffset);
-  DebugPrint(TEXT("dwCompStrLen      %x\n"), lpRS->dwCompStrLen);
-  DebugPrint(TEXT("dwCompStrOffset   %x\n"), lpRS->dwCompStrOffset);
-  DebugPrint(TEXT("dwTargetStrLen    %x\n"), lpRS->dwTargetStrLen);
-  DebugPrint(TEXT("dwTargetStrOffset %x\n"), lpRS->dwTargetStrOffset);
-  DebugPrint(TEXT("%s\n"), lpDump);
-}
-#endif  // ndef _DEBUG
 
 BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
                                     DWORD dwComp, LPVOID lpRead, DWORD dwRead) {

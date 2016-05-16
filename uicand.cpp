@@ -133,7 +133,7 @@ void CandWnd_Paint(HWND hCandWnd) {
            i < lpCandList->GetPageEnd(); i++) {
         SIZE sz;
         HBRUSH hbr;
-        LPTSTR lpstr = lpCandList->GetCandString(i);
+        WCHAR *lpstr = lpCandList->GetCandString(i);
         ::GetTextExtentPoint32W(hDC, lpstr, lstrlenW(lpstr), &sz);
         if (lpCandList->dwSelection == i) {
           hbr = (HBRUSH)::SelectObject(hDC, hbrHightLight);
@@ -174,7 +174,7 @@ void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       CandList *lpCandList = lpCandInfo->GetList(0);
       for (DWORD i = lpCandList->dwPageStart;
            i < lpCandList->GetPageEnd(); i++) {
-        LPTSTR lpstr = lpCandList->GetCandString(i);
+        WCHAR *lpstr = lpCandList->GetCandString(i);
         SIZE sz;
         ::GetTextExtentPoint32W(hDC, lpstr, lstrlenW(lpstr), &sz);
         assert(sz.cx);

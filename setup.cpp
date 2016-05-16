@@ -46,10 +46,10 @@ INT DoCopyFiles(VOID) {
   return 0;
 }
 
-BOOL DoSetRegSz(HKEY hKey, LPCWSTR pszName, LPCWSTR pszValue) {
+BOOL DoSetRegSz(HKEY hKey, const WCHAR *pszName, const WCHAR *pszValue) {
   DWORD cbData = (lstrlenW(pszValue) + 1) * sizeof(WCHAR);
   LONG result;
-  result = RegSetValueExW(hKey, pszName, 0, REG_SZ, (LPBYTE)pszValue, cbData);
+  result = RegSetValueExW(hKey, pszName, 0, REG_SZ, (BYTE *)pszValue, cbData);
   return result == ERROR_SUCCESS;
 }
 
@@ -87,27 +87,27 @@ INT WINAPI
 wWinMain(
   HINSTANCE hInstance,
   HINSTANCE HPrevInstance,
-  LPTSTR    lpCmdLine,
+  LPWSTR    lpCmdLine,
   INT       nCmdShow)
 {
   if (0 != DoSetRegistry()) {
-    MessageBox(NULL, DoLoadString(hInstance, 2), NULL, MB_ICONERROR);
+    ::MessageBoxW(NULL, DoLoadString(hInstance, 2), NULL, MB_ICONERROR);
     return 2;
   }
 
   if (0 != DoCopyFiles()) {
-    MessageBox(NULL, DoLoadString(hInstance, 3), NULL, MB_ICONERROR);
+    ::MessageBoxW(NULL, DoLoadString(hInstance, 3), NULL, MB_ICONERROR);
     return 1;
   }
 
   WCHAR szPath[MAX_PATH];
-  GetSystemDirectory(szPath, MAX_PATH);
+  ::GetSystemDirectoryW(szPath, MAX_PATH);
   wcscat(szPath, L"\\mzimeja.ime");
   if (!ImmInstallIME(szPath, DoLoadString(hInstance, 4))) {
-    TCHAR szMsg[128];
-    DWORD dwError = GetLastError();
-    wsprintf(szMsg, DoLoadString(hInstance, 5), dwError);
-    MessageBox(NULL, szMsg, NULL, MB_ICONERROR);
+    WCHAR szMsg[128];
+    DWORD dwError = ::GetLastError();
+    ::wsprintfW(szMsg, DoLoadString(hInstance, 5), dwError);
+    ::MessageBoxW(NULL, szMsg, NULL, MB_ICONERROR);
     return 3;
   }
 

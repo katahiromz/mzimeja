@@ -286,7 +286,7 @@ void InputContext::MakeGuideLine(DWORD dwID) {
   FOOTMARK();
   DWORD dwSize =
       sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(TCHAR)) * 2 * sizeof(TCHAR);
-  LPTSTR lpStr;
+  WCHAR *lpStr;
 
   hGuideLine = ImmReSizeIMCC(hGuideLine, dwSize);
   LPGUIDELINE lpGuideLine = LockGuideLine();

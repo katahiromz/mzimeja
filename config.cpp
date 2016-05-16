@@ -139,14 +139,14 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
         case PSN_APPLY:
 
           if (!GetDlgItemText(hDlg, ID_WR_READING, szRead, _countof(szRead))) {
-            LPTSTR psz = TheIME.LoadSTR(IDS_NOREADING);
-            MessageBox(hDlg, psz, NULL, MB_OK);
+            WCHAR *psz = TheIME.LoadSTR(IDS_NOREADING);
+            ::MessageBoxW(hDlg, psz, NULL, MB_OK);
             return FALSE;
           }
 
           if (!GetDlgItemText(hDlg, ID_WR_STRING, szString, _countof(szString))) {
-            LPTSTR psz = TheIME.LoadSTR(IDS_NOSTRING);
-            MessageBox(hDlg, psz, NULL, MB_OK);
+            WCHAR *psz = TheIME.LoadSTR(IDS_NOSTRING);
+            ::MessageBoxW(hDlg, psz, NULL, MB_OK);
             return FALSE;
           }
 
@@ -155,8 +155,8 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
               SendDlgItemMessage(hDlg, ID_WR_STYLE, CB_GETITEMDATA, dwIndex, 0);
 
           if (!ImeRegisterWord(szRead, (DWORD)dwStyle, szString)) {
-            LPTSTR psz = TheIME.LoadSTR(IDS_REGWORDRET);
-            MessageBox(hDlg, psz, NULL, MB_OK);
+            WCHAR *psz = TheIME.LoadSTR(IDS_REGWORDRET);
+            ::MessageBoxW(hDlg, psz, NULL, MB_OK);
           }
           break;
 
@@ -181,8 +181,8 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
             (LPSTYLEBUF)GlobalAlloc(GPTR, nItem * sizeof(STYLEBUF));
 
         if (!lpStyleBuf) {
-          LPTSTR psz = TheIME.LoadSTR(IDS_NOMEMORY);
-          MessageBox(hDlg, psz, NULL, MB_OK);
+          WCHAR *psz = TheIME.LoadSTR(IDS_NOMEMORY);
+          ::MessageBoxW(hDlg, psz, NULL, MB_OK);
           return TRUE;
         }
 

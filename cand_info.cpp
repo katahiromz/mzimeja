@@ -21,7 +21,7 @@ void LogCandList::clear() {
 DWORD LogCandList::GetTotalSize() const {
   FOOTMARK();
   DWORD total = sizeof(CANDIDATELIST);
-  total += (DWORD)((cand_strs.size() - 1) * sizeof(DWORD));
+  total += DWORD((cand_strs.size() - 1) * sizeof(DWORD));
   for (size_t i = 0; i < cand_strs.size(); ++i) {
     total += DWORD((cand_strs.size() + 1) * sizeof(WCHAR));
   }
@@ -136,7 +136,7 @@ DWORD CandInfo::Store(const LogCandInfo *log) {
     CandInfo *cand_info = (CandInfo *)::ImmLockIMCC(hNewCandInfo);
     if (cand_info) {
       DWORD cb = cand_info->Store(log);
-      assert(cb == log->GetTotalSize());
+      assert(cb == total);
 
       ImmUnlockIMCC(hNewCandInfo);
       hCandInfo = hNewCandInfo;

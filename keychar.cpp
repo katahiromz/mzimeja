@@ -12,14 +12,14 @@
 //////////////////////////////////////////////////////////////////////////////
 
 struct KEYVALUE {
-  LPCWSTR key;
-  LPCWSTR value;
+  const WCHAR *key;
+  const WCHAR *value;
 };
 
 struct KEYVALUEEXTRA {
-  LPCWSTR key;
-  LPCWSTR value;
-  LPCWSTR extra;
+  const WCHAR *key;
+  const WCHAR *value;
+  const WCHAR *extra;
 };
 
 static KEYVALUE halfkana_table[] = {

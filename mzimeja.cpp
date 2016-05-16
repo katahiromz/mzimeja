@@ -111,7 +111,7 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
 
   RegisterClasses(m_hInst);
 
-  LPTSTR lpDicFileName = m_szDicFileName;
+  WCHAR *lpDicFileName = m_szDicFileName;
   lpDicFileName += ::GetWindowsDirectory(lpDicFileName, _countof(m_szDicFileName));
   if (*(lpDicFileName - 1) != TEXT('\\')) *lpDicFileName++ = TEXT('\\');
   ::LoadString(hInstance, IDS_DICFILENAME, lpDicFileName, 128);
@@ -371,11 +371,11 @@ HBITMAP MZIMEJA::LoadBMP(LPCTSTR pszName) {
   return ::LoadBitmap(m_hInst, pszName);
 }
 
-LPTSTR MZIMEJA::LoadSTR(INT nID) {
+WCHAR *MZIMEJA::LoadSTR(INT nID) {
   FOOTMARK();
-  static TCHAR sz[512];
+  static WCHAR sz[512];
   sz[0] = 0;
-  ::LoadString(m_hInst, nID, sz, 512);
+  ::LoadStringW(m_hInst, nID, sz, 512);
   return sz;
 }
 
@@ -446,7 +446,7 @@ void FreeUIExtra(HWND hwndServer) {
 // for debugging
 
 #ifndef NDEBUG
-  int DebugPrintA(LPCSTR lpszFormat, ...) {
+  int DebugPrintA(const char *lpszFormat, ...) {
     int nCount;
     char szMsgA[1024];
 
@@ -474,7 +474,7 @@ void FreeUIExtra(HWND hwndServer) {
     }
     return nCount;
   }
-  int DebugPrintW(LPCWSTR lpszFormat, ...) {
+  int DebugPrintW(const WCHAR *lpszFormat, ...) {
     int nCount;
     WCHAR szMsg[1024];
 

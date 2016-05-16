@@ -34,8 +34,8 @@
   #define DebugPrint    (void)
 #else
   extern "C" {
-    int DebugPrintA(LPCSTR lpszFormat, ...);
-    int DebugPrintW(LPCWSTR lpszFormat, ...);
+    int DebugPrintA(const char *lpszFormat, ...);
+    int DebugPrintW(const WCHAR *lpszFormat, ...);
   } // extern "C"
   #define DebugPrintA DebugPrintA
   #define DebugPrintW DebugPrintW
@@ -307,7 +307,7 @@ struct MZIMEJA {
   }
 
   // load a string from resource
-  LPTSTR LoadSTR(INT nID);
+  WCHAR *LoadSTR(INT nID);
 
   // update the indicator icon
   void UpdateIndicIcon(HIMC hIMC);

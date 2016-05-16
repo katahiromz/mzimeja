@@ -8,7 +8,7 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // Count how may the char can be arranged in DX
-static int NumCharInDX(HDC hDC, LPCWSTR psz, int dx) {
+static int NumCharInDX(HDC hDC, const WCHAR *psz, int dx) {
   int ret = 0;
   if (*psz) {
     SIZE siz;
@@ -27,7 +27,7 @@ static int NumCharInDX(HDC hDC, LPCWSTR psz, int dx) {
 }
 
 // Count how may the char can be arranged in DY
-static int NumCharInDY(HDC hDC, LPCWSTR psz, int dy) {
+static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
   int ret = 0;
   if (*psz) {
     SIZE siz;
@@ -99,7 +99,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   HFONT hFont = NULL;
   HFONT hOldFont = NULL;
   CompStr *lpCompStr;
-  LPCWSTR lpstr;
+  const WCHAR *lpstr;
   RECT rc;
   RECT oldrc;
   SIZE siz;
@@ -110,7 +110,7 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
 
   if (lpIMC->cfCompForm.dwStyle) {  // Style is not CFS_DEFAULT.
-    LPCWSTR pch;
+    const WCHAR *pch;
     int num;
 
     if (!lpIMC->HasCompStr()) {
@@ -306,11 +306,10 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   }
 }
 
-void DrawTextOneLine(HWND hCompWnd, HDC hDC, LPCWSTR lpstr,
-                     LPBYTE lpattr, int num, BOOL fVert, DWORD dwCursor) {
+void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *lpstr,
+                     BYTE *lpattr, int num, BOOL fVert, DWORD dwCursor) {
   FOOTMARK();
-  //LPTSTR lpStart = lpstr;
-  LPCWSTR lpEnd = lpstr + num - 1;
+  const WCHAR *lpEnd = lpstr + num - 1;
   int x, y;
   RECT rc;
 
@@ -415,8 +414,8 @@ void CompWnd_Paint(HWND hCompWnd) {
     if (lpCompStr) {
       if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
           (lpCompStr->dwCompStrLen > 0)) {
-        LPCWSTR lpstr;
-        LPBYTE lpattr;
+        const WCHAR *lpstr;
+        BYTE *lpattr;
         INT lstart;
         INT num;
         BOOL fVert = FALSE;

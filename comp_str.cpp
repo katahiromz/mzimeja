@@ -26,20 +26,20 @@ void LogCompStrExtra::clear() {
 
 //////////////////////////////////////////////////////////////////////////////
 
-LPWSTR COMPSTREXTRA::GetHiraganaClauses(DWORD& dwCount) {
+WCHAR *COMPSTREXTRA::GetHiraganaClauses(DWORD& dwCount) {
   FOOTMARK();
   dwCount = dwHiraganaClauseCount;
   if (dwCount) {
-    return (LPWSTR)(GetBytes() + dwHiraganaClauseOffset);
+    return (WCHAR *)(GetBytes() + dwHiraganaClauseOffset);
   }
   return NULL;
 }
 
-LPWSTR COMPSTREXTRA::GetTypingClauses(DWORD& dwCount) {
+WCHAR *COMPSTREXTRA::GetTypingClauses(DWORD& dwCount) {
   FOOTMARK();
   dwCount = dwTypingClauseCount;
   if (dwCount) {
-    return (LPWSTR)(GetBytes() + dwTypingClauseOffset);
+    return (WCHAR *)(GetBytes() + dwTypingClauseOffset);
   }
   return NULL;
 }
@@ -50,7 +50,7 @@ void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
   log.iClause = iClause;
 
   DWORD dwCount;
-  LPWSTR pch = GetHiraganaClauses(dwCount);
+  WCHAR *pch = GetHiraganaClauses(dwCount);
   if (pch && dwCount) {
     while (dwCount--) {
       log.hiragana_clauses.push_back(pch);
@@ -72,7 +72,7 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
   assert(this);
   assert(log);
 
-  LPBYTE pb = GetBytes();
+  BYTE *pb = GetBytes();
   dwSignature = 0xDEADFACE;
   iClause = log->iClause;
   pb += sizeof(COMPSTREXTRA);
@@ -821,7 +821,7 @@ void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
 DWORD CompStr::Store(const LogCompStr *log) {
   const DWORD total = log->GetTotalSize();
 
-  LPBYTE pb = GetBytes();
+  BYTE *pb = GetBytes();
   dwSize = total;
   dwCursorPos = log->dwCursorPos;
   dwDeltaStart = log->dwDeltaStart;
@@ -1047,7 +1047,7 @@ void CompStr::Dump() {
   DebugPrintA("dwDeltaStart: %08X\n", dwDeltaStart);
   DebugPrintA("CompReadAttr: ");
   if (dwCompReadAttrLen) {
-    LPBYTE attrs = GetCompReadAttr();
+    BYTE *attrs = GetCompReadAttr();
     for (DWORD i = 0; i < dwCompReadAttrLen; ++i) {
       DebugPrintA("%02X ", attrs[i]);
     }
@@ -1063,13 +1063,13 @@ void CompStr::Dump() {
   DebugPrintA("\n");
   DebugPrintA("CompReadStr: ");
   if (dwCompReadStrLen) {
-    LPTSTR str = GetCompReadStr();
+    WCHAR *str = GetCompReadStr();
     DebugPrintA("%ls", str);
   }
   DebugPrintA("\n");
   DebugPrintA("CompAttr: ");
   if (dwCompAttrLen) {
-    LPBYTE attrs = GetCompAttr();
+    BYTE *attrs = GetCompAttr();
     for (DWORD i = 0; i < dwCompAttrLen; ++i) {
       DebugPrintA("%02X ", attrs[i]);
     }
@@ -1085,7 +1085,7 @@ void CompStr::Dump() {
   DebugPrintA("\n");
   DebugPrintA("CompStr: ");
   if (dwCompStrLen) {
-    LPTSTR str = GetCompStr();
+    WCHAR *str = GetCompStr();
     DebugPrintA("%ls", str);
   }
   DebugPrintA("\n");
@@ -1099,7 +1099,7 @@ void CompStr::Dump() {
   DebugPrintA("\n");
   DebugPrintA("ResultReadStr: ");
   if (dwResultReadStrLen) {
-    LPTSTR str = GetResultReadStr();
+    WCHAR *str = GetResultReadStr();
     DebugPrintA("%ls", str);
   }
   DebugPrintA("\n");
@@ -1113,7 +1113,7 @@ void CompStr::Dump() {
   DebugPrintA("\n");
   DebugPrintA("ResultStr: ");
   if (dwResultStrLen) {
-    LPTSTR str = GetResultStr();
+    WCHAR *str = GetResultStr();
     DebugPrintA("%ls", str);
   }
   DebugPrintA("\n");
