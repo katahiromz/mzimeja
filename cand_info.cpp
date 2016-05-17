@@ -4,7 +4,7 @@
 #include "mzimeja.h"
 
 #define MAX_CANDLISTS   32
-#define PAGE_SIZE       8
+#define CANDPAGE_SIZE       8
 
 //////////////////////////////////////////////////////////////////////////////
 // LogCandList
@@ -14,7 +14,7 @@ void LogCandList::clear() {
   dwStyle = IME_CAND_READ;
   dwSelection = 0;
   dwPageStart = 0;
-  dwPageSize = PAGE_SIZE;
+  dwPageSize = CANDPAGE_SIZE;
   cand_strs.clear();
 }
 
@@ -33,6 +33,7 @@ void LogCandList::MoveNext() {
   if (dwSelection >= (DWORD)cand_strs.size()) {
     dwSelection = 0;
   }
+  dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
 void LogCandList::MovePrev() {
@@ -41,6 +42,7 @@ void LogCandList::MovePrev() {
   } else {
     dwSelection = DWORD(cand_strs.size() - 1);
   }
+  dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
 //////////////////////////////////////////////////////////////////////////////
