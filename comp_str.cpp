@@ -813,6 +813,7 @@ void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
     SetClauseAttr(extra.iClause, ATTR_CONVERTED);
     extra.iClause = iClause;
     SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+    dwCursorPos = (DWORD)comp_str.size();
   }
 }
 

@@ -273,7 +273,20 @@ BOOL is_kanji(WCHAR ch);
 BOOL is_fullwidth_ascii(WCHAR ch);
 
 //////////////////////////////////////////////////////////////////////////////
-// C++ interface
+// C++ interfaces
+
+struct MzConversionCandidate {
+  std::wstring hiragana;
+  std::wstring converted;
+};
+
+struct MzConversionClause {
+  std::vector<MzConversionCandidate> candidates;
+};
+
+struct MzConversionResult {
+  std::vector<MzConversionClause> clauses;
+};
 
 struct MZIMEJA {
   HINSTANCE       m_hInst;
@@ -327,6 +340,13 @@ struct MZIMEJA {
 
   // do command
   BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
+
+  // convert
+  void FreeClauseConversion(LogCompStr& comp, LogCandInfo& cand);
+  void FreeClauseConversion(const std::wstring& strHiragana,
+                            MzConversionResult& result);
+  void FixedClauseConversion(const std::wstring& strHiragana,
+                             MzConversionClause& result);
 }; // struct MZIMEJA
 
 extern MZIMEJA TheIME;

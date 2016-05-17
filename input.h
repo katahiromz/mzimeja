@@ -241,6 +241,7 @@ struct LogCandInfo {
   LogCandInfo() { clear(); }
   void clear();
   DWORD GetTotalSize() const;
+  void Dump();
 }; // struct LogCandInfo
 
 // physical candidate list

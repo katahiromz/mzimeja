@@ -398,27 +398,27 @@ void InputContext::GetCands(LogCandInfo& log, std::wstring& str) {
 
 BOOL InputContext::OpenCandidate() {
   BOOL ret = FALSE;
-  LogCompStr log_comp_str;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log_comp_str);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
 
-    LogCandInfo log_cand_info;
+    LogCandInfo cand;
     CandInfo *cand_info = LockCandInfo();
     if (cand_info) {
-      cand_info->GetLog(log_cand_info);
+      cand_info->GetLog(cand);
       UnlockCandInfo();
 
       // get candidates
-      log_comp_str.AssertValid();
-      GetCands(log_cand_info, log_comp_str.comp_str);
-      log_comp_str.AssertValid();
+      comp.AssertValid();
+      GetCands(cand, comp.comp_str);
+      comp.AssertValid();
 
       // generate message to open candidate
       TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
       // reset candidates
-      hCandInfo = CandInfo::ReCreate(hCandInfo, &log_cand_info);
+      hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
       // generate message to change candidate
       TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
@@ -448,51 +448,47 @@ BOOL InputContext::DoConvert() {
   //}
 
   // get logical data of composition info
-  LogCompStr log_comp_str;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log_comp_str);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // if there is no conposition, we cannot convert it
-  BOOL bHasCompStr = (log_comp_str.comp_str.size() > 0);
+  BOOL bHasCompStr = (comp.comp_str.size() > 0);
   if (!bHasCompStr) {
     return FALSE;
   }
 
   // get logical data of candidate info
-  LogCandInfo log_cand_info;
+  LogCandInfo cand;
   CandInfo *lpCandInfo = LockCandInfo();
   if (lpCandInfo) {
-    lpCandInfo->GetLog(log_cand_info);
+    lpCandInfo->GetLog(cand);
     UnlockCandInfo();
   }
 
-  // get candidates
-  std::wstring str = log_comp_str.comp_str;
-  GetCands(log_cand_info, str);
-
-  // recreate candidate and generate message to change candidate
-  hCandInfo = CandInfo::ReCreate(hCandInfo, &log_cand_info);
-  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
-
-  // is it being converted?
-  if (log_comp_str.IsBeingConverted()) {
-    // if there was no candidate,
-    if (!HasCandInfo()) {
-      // open candidate
-      TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+  // convert
+  if (HasCandInfo()) {
+    LogCandList& cand_list = cand.cand_lists[comp.extra.iClause];
+    ++cand_list.dwSelection;
+    if (cand_list.dwSelection >= (DWORD)cand_list.cand_strs.size()) {
+      cand_list.dwSelection = 0;
     }
+    std::wstring str = cand_list.cand_strs[cand_list.dwSelection];
+    comp.SetClauseCompString(comp.extra.iClause, str);
+  } else {
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+    TheIME.FreeClauseConversion(comp, cand);
   }
 
-  // set composition string
-  log_comp_str.AssertValid();
-  log_comp_str.SetClauseCompString(log_comp_str.extra.iClause, str);
-  log_comp_str.AssertValid();
+  // recreate candidate and generate message to change candidate
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
   // recreate composition
-  hCompStr = CompStr::ReCreate(hCompStr, &log_comp_str);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // generate message to change composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;

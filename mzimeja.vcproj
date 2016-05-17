@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\convert.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\imm.cpp"
 				>
 			</File>

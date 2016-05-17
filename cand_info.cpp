@@ -21,7 +21,7 @@ void LogCandList::clear() {
 DWORD LogCandList::GetTotalSize() const {
   FOOTMARK();
   DWORD total = sizeof(CANDIDATELIST);
-  total += DWORD((cand_strs.size() - 1) * sizeof(DWORD));
+  total += DWORD(cand_strs.size() * sizeof(DWORD));
   for (size_t i = 0; i < cand_strs.size(); ++i) {
     total += DWORD((cand_strs.size() + 1) * sizeof(WCHAR));
   }
@@ -44,6 +44,24 @@ DWORD LogCandInfo::GetTotalSize() const {
   }
   return total;
 }
+
+void LogCandInfo::Dump() {
+#ifndef NDEBUG
+  DebugPrintA("LogCandInfo::Dump\n");
+  for (size_t i = 0; i < cand_lists.size(); ++i) {
+    DebugPrintA("### CandList %u ###\n", i);
+    DebugPrintA("+ dwStyle: %08X", cand_lists[i].dwStyle);
+    DebugPrintA("+ dwSelection: %08X", cand_lists[i].dwSelection);
+    DebugPrintA("+ dwPageStart: %08X", cand_lists[i].dwPageStart);
+    DebugPrintA("+ dwPageSize: %08X", cand_lists[i].dwPageSize);
+    DebugPrintA("+ cand_strs: ");
+    for (size_t k = 0; k < cand_lists[i].cand_strs.size(); ++k) {
+      DebugPrintA("%ls ", cand_lists[i].cand_strs[k].c_str());
+    }
+    DebugPrintA("\n");
+  }
+#endif
+} // LogCandInfo::Dump
 
 //////////////////////////////////////////////////////////////////////////////
 // CandList
@@ -73,7 +91,7 @@ DWORD CandList::Store(const LogCandList *log) {
 
   BYTE *pb = GetBytes();
   pb += sizeof(CANDIDATELIST);
-  pb += (dwCount - 1) * sizeof(DWORD);
+  pb += dwCount * sizeof(DWORD);
 
   for (DWORD iCand = 0; iCand < dwCount; ++iCand) {
     dwOffset[iCand] = DWORD(pb - GetBytes());
