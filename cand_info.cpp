@@ -44,7 +44,7 @@ void LogCandList::MovePrev() {
   if (dwSelection > 0) {
     --dwSelection;
   } else {
-    dwSelection = DWORD(GetCandCount() - 1);
+    dwSelection = GetCandCount() - 1;
   }
   dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
