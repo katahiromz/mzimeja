@@ -240,6 +240,7 @@ struct LogCandList {
   DWORD GetTotalSize() const;
   void MoveNext();
   void MovePrev();
+  DWORD GetCandCount() const;
 };
 
 // logical candidate info

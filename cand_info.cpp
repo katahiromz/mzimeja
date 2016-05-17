@@ -28,9 +28,13 @@ DWORD LogCandList::GetTotalSize() const {
   return total;
 }
 
+DWORD LogCandList::GetCandCount() const {
+  return (DWORD)cand_strs.size();
+}
+
 void LogCandList::MoveNext() {
   ++dwSelection;
-  if (dwSelection >= (DWORD)cand_strs.size()) {
+  if (dwSelection >= GetCandCount()) {
     dwSelection = 0;
   }
   dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
@@ -40,7 +44,7 @@ void LogCandList::MovePrev() {
   if (dwSelection > 0) {
     --dwSelection;
   } else {
-    dwSelection = DWORD(cand_strs.size() - 1);
+    dwSelection = DWORD(GetCandCount() - 1);
   }
   dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
