@@ -5,10 +5,10 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-void MZIMEJA::FreeClauseConversion(LogCompStr& comp, LogCandInfo& cand) {
+void MZIMEJA::PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand) {
   MzConversionResult result;
   std::wstring strHiragana = comp.extra.hiragana_clauses[comp.extra.iClause];
-  FreeClauseConversion(strHiragana, result);
+  PluralClauseConversion(strHiragana, result);
 
   // TODO: support multiple clauses
   // setting comp
@@ -45,10 +45,10 @@ void MZIMEJA::FreeClauseConversion(LogCompStr& comp, LogCandInfo& cand) {
     }
     cand.cand_lists.push_back(cand_list);
   }
-} // MZIMEJA::FreeClauseConversion
+} // MZIMEJA::PluralClauseConversion
 
-void MZIMEJA::FreeClauseConversion(const std::wstring& strHiragana,
-                                   MzConversionResult& result)
+void MZIMEJA::PluralClauseConversion(const std::wstring& strHiragana,
+                                     MzConversionResult& result)
 {
   // TODO:
   WCHAR sz[64];
@@ -57,20 +57,20 @@ void MZIMEJA::FreeClauseConversion(const std::wstring& strHiragana,
     MzConversionClause clause;
     for (DWORD iCand = 0; iCand < 15; ++iCand) {
       MzConversionCandidate cand;
-	  ::wsprintfW(sz, L"‚±‚¤‚Ù%u-%u", iClause, iCand);
+      ::wsprintfW(sz, L"‚±‚¤‚Ù%u-%u", iClause, iCand);
       cand.hiragana = sz;
-	  ::wsprintfW(sz, L"Œó•â%u-%u", iClause, iCand);
+      ::wsprintfW(sz, L"Œó•â%u-%u", iClause, iCand);
       cand.converted = sz;
       clause.candidates.push_back(cand);
     }
     result.clauses.push_back(clause);
   }
-} // MZIMEJA::FreeClauseConversion
+} // MZIMEJA::PluralClauseConversion
 
-void MZIMEJA::FixedClauseConversion(const std::wstring& strHiragana,
-                                    MzConversionClause& result)
+void MZIMEJA::SingleClauseConversion(const std::wstring& strHiragana,
+                                     MzConversionClause& result)
 {
   // TODO:
-} // MZIMEJA::FixedClauseConversion
+} // MZIMEJA::SingleClauseConversion
 
 //////////////////////////////////////////////////////////////////////////////

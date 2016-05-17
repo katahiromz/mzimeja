@@ -348,11 +348,11 @@ struct MZIMEJA {
   BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
 
   // convert
-  void FreeClauseConversion(LogCompStr& comp, LogCandInfo& cand);
-  void FreeClauseConversion(const std::wstring& strHiragana,
-                            MzConversionResult& result);
-  void FixedClauseConversion(const std::wstring& strHiragana,
-                             MzConversionClause& result);
+  void PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand);
+  void PluralClauseConversion(const std::wstring& strHiragana,
+                              MzConversionResult& result);
+  void SingleClauseConversion(const std::wstring& strHiragana,
+                              MzConversionClause& result);
 }; // struct MZIMEJA
 
 extern MZIMEJA TheIME;
