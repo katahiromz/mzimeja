@@ -160,7 +160,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       if (lpIMC->HasCompStr()) {
-        lpIMC->DoConvert();
+        lpIMC->Convert(bShift);
       } else {
         // add ideographic space
         TheIME.GenerateMessage(WM_IME_CHAR, L'@', 1);
@@ -172,7 +172,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_CONVERT:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->DoConvert();
+      lpIMC->Convert(bShift);
       TheIME.UnlockIMC(hIMC);
     }
     break;

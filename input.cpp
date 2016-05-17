@@ -437,7 +437,7 @@ BOOL InputContext::CloseCandidate() {
   return FALSE;
 }
 
-BOOL InputContext::DoConvert() {
+BOOL InputContext::Convert(BOOL bShift) {
   FOOTMARK();
 
   //// check the presence of dictionary
@@ -472,9 +472,10 @@ BOOL InputContext::DoConvert() {
   // convert
   if (HasCandInfo()) {
     LogCandList& cand_list = cand.cand_lists[comp.extra.iClause];
-    ++cand_list.dwSelection;
-    if (cand_list.dwSelection >= (DWORD)cand_list.cand_strs.size()) {
-      cand_list.dwSelection = 0;
+    if (bShift) {
+      cand_list.MovePrev();
+    } else {
+      cand_list.MoveNext();
     }
     std::wstring str = cand_list.cand_strs[cand_list.dwSelection];
     comp.SetClauseCompString(comp.extra.iClause, str);
@@ -495,7 +496,7 @@ BOOL InputContext::DoConvert() {
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 
   return TRUE;
-} // InputContext::DoConvert
+} // InputContext::Convert
 
 void InputContext::MakeResult() {
   FOOTMARK();

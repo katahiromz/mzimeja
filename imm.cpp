@@ -139,7 +139,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     case CPS_CONVERT:   // do convert
       lpIMC = TheIME.LockIMC(hIMC);
       if (lpIMC) {
-        lpIMC->DoConvert();
+        lpIMC->Convert(FALSE);
         ret = TRUE;
         TheIME.UnlockIMC(hIMC);
       }

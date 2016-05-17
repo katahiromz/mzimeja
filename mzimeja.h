@@ -278,14 +278,20 @@ BOOL is_fullwidth_ascii(WCHAR ch);
 struct MzConversionCandidate {
   std::wstring hiragana;
   std::wstring converted;
+  void clear() {
+    hiragana.clear();
+    converted.clear();
+  }
 };
 
 struct MzConversionClause {
   std::vector<MzConversionCandidate> candidates;
+  void clear() { candidates.clear(); }
 };
 
 struct MzConversionResult {
   std::vector<MzConversionClause> clauses;
+  void clear() { clauses.clear(); }
 };
 
 struct MZIMEJA {

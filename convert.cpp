@@ -3,6 +3,8 @@
 
 #include "mzimeja.h"
 
+//////////////////////////////////////////////////////////////////////////////
+
 void MZIMEJA::FreeClauseConversion(LogCompStr& comp, LogCandInfo& cand) {
   MzConversionResult result;
   std::wstring strHiragana = comp.extra.hiragana_clauses[comp.extra.iClause];
@@ -49,18 +51,20 @@ void MZIMEJA::FreeClauseConversion(const std::wstring& strHiragana,
                                    MzConversionResult& result)
 {
   // TODO:
-  MzConversionClause clause;
-  MzConversionCandidate cand;
-  cand.hiragana = L"これは";
-  cand.converted = L"これは";
-  clause.candidates.push_back(cand);
-  cand.hiragana = L"てすと";
-  cand.converted = L"テスト";
-  clause.candidates.push_back(cand);
-  cand.hiragana = L"です。";
-  cand.converted = L"です。";
-  clause.candidates.push_back(cand);
-  result.clauses.push_back(clause);
+  WCHAR sz[64];
+  result.clauses.clear();
+  for (DWORD iClause = 0; iClause < 5; ++iClause) {
+    MzConversionClause clause;
+    for (DWORD iCand = 0; iCand < 15; ++iCand) {
+      MzConversionCandidate cand;
+	  ::wsprintfW(sz, L"こうほ%u-%u", iClause, iCand);
+      cand.hiragana = sz;
+	  ::wsprintfW(sz, L"候補%u-%u", iClause, iCand);
+      cand.converted = sz;
+      clause.candidates.push_back(cand);
+    }
+    result.clauses.push_back(clause);
+  }
 } // MZIMEJA::FreeClauseConversion
 
 void MZIMEJA::FixedClauseConversion(const std::wstring& strHiragana,
@@ -68,3 +72,5 @@ void MZIMEJA::FixedClauseConversion(const std::wstring& strHiragana,
 {
   // TODO:
 } // MZIMEJA::FixedClauseConversion
+
+//////////////////////////////////////////////////////////////////////////////

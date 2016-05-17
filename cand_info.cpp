@@ -22,10 +22,25 @@ DWORD LogCandList::GetTotalSize() const {
   FOOTMARK();
   DWORD total = sizeof(CANDIDATELIST);
   total += DWORD(cand_strs.size() * sizeof(DWORD));
-  for (size_t i = 0; i < cand_strs.size(); ++i) {
-    total += DWORD((cand_strs.size() + 1) * sizeof(WCHAR));
+  for (size_t iCand = 0; iCand < cand_strs.size(); ++iCand) {
+    total += DWORD((cand_strs[iCand].size() + 1) * sizeof(WCHAR));
   }
   return total;
+}
+
+void LogCandList::MoveNext() {
+  ++dwSelection;
+  if (dwSelection >= (DWORD)cand_strs.size()) {
+    dwSelection = 0;
+  }
+}
+
+void LogCandList::MovePrev() {
+  if (dwSelection > 0) {
+    --dwSelection;
+  } else {
+    dwSelection = DWORD(cand_strs.size() - 1);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -103,6 +118,8 @@ DWORD CandList::Store(const LogCandList *log) {
     memcpy(pb, &str[0], cb);
     pb += cb;
   }
+
+  DebugPrintA("%u, %u\n", dwSize, DWORD(pb - GetBytes()));
   assert(dwSize == DWORD(pb - GetBytes()));
   return DWORD(pb - GetBytes());
 }

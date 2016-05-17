@@ -238,6 +238,8 @@ struct LogCandList {
   LogCandList() { clear(); }
   void clear();
   DWORD GetTotalSize() const;
+  void MoveNext();
+  void MovePrev();
 };
 
 // logical candidate info
@@ -248,6 +250,7 @@ struct LogCandInfo {
   LogCandInfo() { clear(); }
   void clear();
   DWORD GetTotalSize() const;
+
   void Dump();
 }; // struct LogCandInfo
 
@@ -334,7 +337,7 @@ struct InputContext : public INPUTCONTEXT {
   void CancelText();
   void RevertText();
   void DeleteChar(BOOL bBackSpace = FALSE);
-  BOOL DoConvert();
+  BOOL Convert(BOOL bShift);
   BOOL OpenCandidate();
   BOOL CloseCandidate();
   void GetCands(LogCandInfo& log, std::wstring& str);
