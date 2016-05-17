@@ -221,6 +221,12 @@ private:
 //////////////////////////////////////////////////////////////////////////////
 // candidate info
 
+// private data of CANDIDATEINFO
+struct CANDINFOEXTRA {
+  DWORD   dwSignature;  // must be 0xDEADFACE
+  DWORD   iClause;      // index of selected clause
+};
+
 // logical candidate list
 struct LogCandList {
   DWORD   dwStyle;
@@ -237,6 +243,7 @@ struct LogCandList {
 // logical candidate info
 struct LogCandInfo {
   std::vector<LogCandList>  cand_lists;
+  DWORD                     iClause;
 
   LogCandInfo() { clear(); }
   void clear();
@@ -265,6 +272,7 @@ struct CandInfo : public CANDIDATEINFO {
   static HIMCC ReCreate(HIMCC hCandInfo, const LogCandInfo *log = NULL);
   void GetLog(LogCandInfo& log);
   DWORD Store(const LogCandInfo *log);
+  CANDINFOEXTRA *GetExtra();
 
   BYTE *GetBytes()           { return (BYTE *)this; }
   CandList *GetList(DWORD i) { return (CandList *)(GetBytes() + dwOffset[i]); }

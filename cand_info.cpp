@@ -34,6 +34,7 @@ DWORD LogCandList::GetTotalSize() const {
 void LogCandInfo::clear() {
   FOOTMARK();
   cand_lists.clear();
+  iClause = 0;
 }
 
 DWORD LogCandInfo::GetTotalSize() const {
@@ -42,6 +43,7 @@ DWORD LogCandInfo::GetTotalSize() const {
   for (size_t i = 0; i < cand_lists.size(); ++i) {
     total += cand_lists[i].GetTotalSize();
   }
+  total += sizeof(CANDINFOEXTRA);
   return total;
 }
 
@@ -59,6 +61,7 @@ void LogCandInfo::Dump() {
       DebugPrintA("%ls ", cand_lists[i].cand_strs[k].c_str());
     }
     DebugPrintA("\n");
+    DebugPrintA("+ iClause: %u\n", iClause);
   }
 #endif
 } // LogCandInfo::Dump
@@ -110,11 +113,19 @@ DWORD CandList::Store(const LogCandList *log) {
 void CandInfo::GetLog(LogCandInfo& log) {
   FOOTMARK();
   log.clear();
-  LogCandList log_cand_list;
+
+  LogCandList cand;
   for (DWORD iList = 0; iList < dwCount; ++iList) {
     CandList *pList = GetList(iList);
-    pList->GetLog(log_cand_list);
-    log.cand_lists.push_back(log_cand_list);
+    pList->GetLog(cand);
+    log.cand_lists.push_back(cand);
+  }
+
+  CANDINFOEXTRA *extra = GetExtra();
+  if (extra && extra->dwSignature == 0xDEADFACE) {
+    log.iClause = extra->iClause;
+  } else {
+    log.iClause = 0;
   }
 }
 
@@ -125,7 +136,6 @@ DWORD CandInfo::Store(const LogCandInfo *log) {
   if (MAX_CANDLISTS < dwCount) {
     dwCount = MAX_CANDLISTS;
   }
-  dwPrivateSize = 0;
 
   BYTE *pb = GetBytes();
   pb += sizeof(CANDIDATEINFO);
@@ -135,10 +145,29 @@ DWORD CandInfo::Store(const LogCandInfo *log) {
     CandList *pList = GetList(iList);
     pb += pList->Store(&log->cand_lists[iList]);
   }
+
+  dwPrivateSize = sizeof(CANDINFOEXTRA);
   dwPrivateOffset = DWORD(pb - GetBytes());
+
+  CANDINFOEXTRA *extra = (CANDINFOEXTRA *)pb;
+  extra->dwSignature = 0xDEADFACE;
+  extra->iClause = log->iClause;
+  pb += sizeof(CANDINFOEXTRA);
 
   assert(dwSize == DWORD(pb - GetBytes()));
   return DWORD(pb - GetBytes());
+}
+
+CANDINFOEXTRA *CandInfo::GetExtra() {
+  if (dwPrivateSize >= sizeof(CANDINFOEXTRA)) {
+    BYTE *pb = GetBytes();
+    pb += dwPrivateOffset;
+    CANDINFOEXTRA *extra = (CANDINFOEXTRA *)pb;
+    if (extra->dwSignature == 0xDEADFACE) {
+      return extra;
+    }
+  }
+  return NULL;
 }
 
 /*static*/ HIMCC CandInfo::ReCreate(HIMCC hCandInfo, const LogCandInfo *log) {
