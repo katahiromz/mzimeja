@@ -5,7 +5,9 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-void MZIMEJA::PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand) {
+void MZIMEJA::PluralClauseConversion(
+  LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
+{
   MzConversionResult result;
   std::wstring strHiragana = comp.extra.hiragana_clauses[comp.extra.iClause];
   PluralClauseConversion(strHiragana, result);
@@ -21,7 +23,12 @@ void MZIMEJA::PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand) {
       MzConversionCandidate& cand = clause.candidates[i];
       comp.comp_clause[k] = (DWORD)comp.comp_str.size();
       comp.extra.hiragana_clauses.push_back(cand.hiragana);
-      std::wstring typing = hiragana_to_typing(cand.hiragana);
+      std::wstring typing;
+      if (bRoman) {
+        typing = hiragana_to_typing(cand.hiragana);
+      } else {
+        typing = hiragana_to_roman(cand.hiragana);
+      }
       comp.extra.typing_clauses.push_back(typing);
       comp.comp_str += cand.converted;
       break;
