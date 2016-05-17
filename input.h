@@ -275,10 +275,10 @@ struct CandInfo : public CANDIDATEINFO {
   static HIMCC ReCreate(HIMCC hCandInfo, const LogCandInfo *log = NULL);
   void GetLog(LogCandInfo& log);
   DWORD Store(const LogCandInfo *log);
-  CANDINFOEXTRA *GetExtra();
 
   BYTE *GetBytes()           { return (BYTE *)this; }
   CandList *GetList(DWORD i) { return (CandList *)(GetBytes() + dwOffset[i]); }
+  CANDINFOEXTRA *GetExtra();
 
   void Dump();
 

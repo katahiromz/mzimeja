@@ -163,37 +163,47 @@ void CandWnd_Paint(HWND hCandWnd) {
   ::DeleteObject(hbrHightLight);
 } // CandWnd_Paint
 
+SIZE CandWnd_CalcSize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+  int width = 0, height = 0;
+  HDC hDC = ::CreateCompatibleDC(NULL);
+  HFONT hOldFont = CheckNativeCharset(hDC);
+  CandInfo *lpCandInfo = lpIMC->LockCandInfo();
+  if (lpCandInfo) {
+    CANDINFOEXTRA *extra = lpCandInfo->GetExtra();
+    int iList = 0;
+    if (extra) iList = extra->iClause;
+    CandList *lpCandList = lpCandInfo->GetList(iList);
+    for (DWORD i = lpCandList->dwPageStart;
+         i < lpCandList->GetPageEnd(); i++) {
+      WCHAR *psz = lpCandList->GetCandString(i);
+      SIZE siz;
+      ::GetTextExtentPoint32W(hDC, psz, lstrlenW(psz), &siz);
+      if (width < siz.cx) width = siz.cx;
+      height += siz.cy;
+    }
+    lpIMC->UnlockCandInfo();
+  }
+  if (hOldFont) {
+    ::DeleteObject(::SelectObject(hDC, hOldFont));
+  }
+  ::DeleteDC(hDC);
+  SIZE ret;
+  ret.cx = width;
+  ret.cy = height;
+  return ret;
+} // CandWnd_CalcSize
+
 void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
   if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
-    int width = 0, height = 0;
-    HDC hDC = ::GetDC(lpUIExtra->uiCand.hWnd);
-    HFONT hOldFont = CheckNativeCharset(hDC);
-    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
-    if (lpCandInfo) {
-      CandList *lpCandList = lpCandInfo->GetList(0);
-      for (DWORD i = lpCandList->dwPageStart;
-           i < lpCandList->GetPageEnd(); i++) {
-        WCHAR *lpstr = lpCandList->GetCandString(i);
-        SIZE sz;
-        ::GetTextExtentPoint32W(hDC, lpstr, lstrlenW(lpstr), &sz);
-        assert(sz.cx);
-        assert(sz.cy);
-        if (width < sz.cx) width = sz.cx;
-        height += sz.cy;
-      }
-      lpIMC->UnlockCandInfo();
-    }
-    if (hOldFont) {
-      ::DeleteObject(::SelectObject(hDC, hOldFont));
-    }
-    ::ReleaseDC(lpUIExtra->uiCand.hWnd, hDC);
+    SIZE siz = CandWnd_CalcSize(lpUIExtra, lpIMC);
+    siz.cx += 4 * GetSystemMetrics(SM_CXEDGE);
+    siz.cy += 4 * GetSystemMetrics(SM_CYEDGE);
 
     RECT rc;
     ::GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
     ::MoveWindow(lpUIExtra->uiCand.hWnd, rc.left, rc.top,
-                 width + 4 * GetSystemMetrics(SM_CXEDGE),
-                 height + 4 * GetSystemMetrics(SM_CYEDGE), TRUE);
+                 siz.cx, siz.cy, TRUE);
   }
 } // CandWnd_Resize
 
