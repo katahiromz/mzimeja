@@ -722,30 +722,43 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
 void InputContext::MoveLeft(BOOL bShift) {
   FOOTMARK();
 
-  // get logical data
+  // get logical data of composition string
   LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
     lpCompStr->GetLog(comp);
     UnlockCompStr();
+  }
+
+  // get logical data of candidate info
+  LogCandInfo cand;
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLog(cand);
+    UnlockCandInfo();
   }
 
   // move left
   comp.AssertValid();
   comp.MoveLeft(bShift);
+  if (!bShift) cand.MoveLeft();
   comp.AssertValid();
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
+
+  // update candidate
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 } // InputContext::MoveLeft
 
 void InputContext::MoveRight(BOOL bShift) {
   FOOTMARK();
 
-  // get logical data
+  // get logical data of composition string
   LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
@@ -753,16 +766,28 @@ void InputContext::MoveRight(BOOL bShift) {
     UnlockCompStr();
   }
 
+  // get logical data of candidate info
+  LogCandInfo cand;
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLog(cand);
+    UnlockCandInfo();
+  }
+
   // move right
   comp.AssertValid();
   comp.MoveRight(bShift);
+  if (!bShift) cand.MoveRight();
   comp.AssertValid();
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
+  // update candidate
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 } // InputContext::MoveRight
 
 void InputContext::MoveToBeginning() {

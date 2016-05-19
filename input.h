@@ -251,6 +251,10 @@ struct LogCandInfo {
   LogCandInfo() { clear(); }
   void clear();
   DWORD GetTotalSize() const;
+  DWORD GetClauseCount() const;
+
+  void MoveLeft();
+  void MoveRight();
 
   void Dump();
 }; // struct LogCandInfo

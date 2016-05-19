@@ -58,6 +58,26 @@ void LogCandInfo::clear() {
   iClause = 0;
 }
 
+DWORD LogCandInfo::GetClauseCount() const {
+  return DWORD(cand_lists.size());
+}
+
+void LogCandInfo::MoveLeft() {
+  if (iClause > 0) {
+    --iClause;
+  } else {
+    iClause = GetClauseCount() - 1;
+  }
+}
+
+void LogCandInfo::MoveRight() {
+  if (iClause + 1 < GetClauseCount()) {
+    ++iClause;
+  } else {
+    iClause = 0;
+  }
+}
+
 DWORD LogCandInfo::GetTotalSize() const {
   FOOTMARK();
   DWORD total = sizeof(CANDIDATEINFO);
