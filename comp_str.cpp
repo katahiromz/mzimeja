@@ -192,11 +192,13 @@ BYTE LogCompStr::GetClauseAttr(DWORD dwClauseIndex) const {
 
 void LogCompStr::SetClauseAttr(DWORD dwClauseIndex, BYTE attr) {
   FOOTMARK();
-  if (dwClauseIndex + 1 <= GetClauseCount()) {
+  if (dwClauseIndex < GetClauseCount()) {
     DWORD ich0 = comp_clause[dwClauseIndex];
     DWORD ich1 = comp_clause[dwClauseIndex + 1];
     for (DWORD i = ich0; i < ich1; ++i) {
-      comp_attr[i] = attr;
+      if (i < comp_attr.size()) {
+        comp_attr[i] = attr;
+      }
     }
   }
 }
@@ -970,11 +972,15 @@ void CompStr::GetLog(LogCompStr& log) {
 void LogCompStr::AssertValid() {
   if (dwCursorPos > GetCompCharCount()) {
     Dump();
+    DebugPrintA("dwCursorPos: %u\n", dwCursorPos);
+    DebugPrintA("GetCompCharCount(): %u\n", GetCompCharCount());
     assert(0);
   }
   if (comp_attr.size()) {
     if (comp_attr.size() != comp_str.size()) {
       Dump();
+      DebugPrintA("comp_attr.size(): %u\n", (int)comp_attr.size());
+      DebugPrintA("comp_str.size(): %u\n", (int)comp_str.size());
       assert(0);
     }
   }
@@ -989,6 +995,8 @@ void LogCompStr::AssertValid() {
     }
     if (extra.iClause > (DWORD)comp_clause.size()) {
       Dump();
+      DebugPrintA("extra.iClause: %u\n", extra.iClause);
+      DebugPrintA("comp_clause.size(): %u\n", (int)comp_clause.size());
       assert(0);
     }
     for (size_t i = 1; i < comp_clause.size(); ++i) {
