@@ -128,7 +128,10 @@ void CandWnd_Paint(HWND hCandWnd) {
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
       int height = ::GetSystemMetrics(SM_CYEDGE);
-      CandList *lpCandList = lpCandInfo->GetList(0);
+      CANDINFOEXTRA *extra = lpCandInfo->GetExtra();
+      DWORD iList = 0;
+      if (extra) iList = extra->iClause;
+      CandList *lpCandList = lpCandInfo->GetList(iList);
       DWORD i, end = lpCandList->GetPageEnd();
       for (i = lpCandList->dwPageStart; i < end; i++) {
         SIZE sz;
@@ -170,7 +173,7 @@ SIZE CandWnd_CalcSize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   CandInfo *lpCandInfo = lpIMC->LockCandInfo();
   if (lpCandInfo) {
     CANDINFOEXTRA *extra = lpCandInfo->GetExtra();
-    int iList = 0;
+    DWORD iList = 0;
     if (extra) iList = extra->iClause;
     CandList *lpCandList = lpCandInfo->GetList(iList);
     DWORD i, end = lpCandList->GetPageEnd();

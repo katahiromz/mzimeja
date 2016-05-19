@@ -341,7 +341,6 @@ struct InputContext : public INPUTCONTEXT {
   BOOL Convert(BOOL bShift);
   BOOL OpenCandidate();
   BOOL CloseCandidate();
-  void GetCands(LogCandInfo& log, std::wstring& str);
   void MoveLeft(BOOL bShift);
   void MoveRight(BOOL bShift);
   void MoveToBeginning();

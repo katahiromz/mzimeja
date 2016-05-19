@@ -342,59 +342,39 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   FOOTMARK();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // if the current position has a converted character, then
-  if (log.GetCompCharAttr(log.dwCursorPos) != ATTR_INPUT) {
+  if (comp.GetCompCharAttr(comp.dwCursorPos) != ATTR_INPUT) {
     // determinate composition
-    log.MakeResult();
+    comp.MakeResult();
     LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
   }
 
   // if there is not a composition string, then
-  if (log.comp_str.empty()) {
+  if (comp.comp_str.empty()) {
     // start composition
     TheIME.GenerateMessage(WM_IME_STARTCOMPOSITION);
   }
 
   // add a character
-  log.AssertValid();
-  log.AddChar(chTyped, chTranslated, Conversion());
-  log.AssertValid();
+  comp.AssertValid();
+  comp.AddChar(chTyped, chTranslated, Conversion());
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 } // InputContext::AddChar
-
-void InputContext::GetCands(LogCandInfo& log, std::wstring& str) {
-  FOOTMARK();
-  // TODO:
-  DWORD dwCount = (DWORD)log.cand_lists.size();
-  if (dwCount > 0) {
-    DWORD& dwSelection = log.cand_lists[0].dwSelection;
-    dwSelection++;
-    if (dwSelection >= dwCount) {
-      dwSelection = 0;
-    }
-  } else {
-    LogCandList list;
-    list.cand_strs.push_back(L"これは");
-    list.cand_strs.push_back(L"テスト");
-    list.cand_strs.push_back(L"です。");
-    log.cand_lists.push_back(list);
-  }
-  str = log.cand_lists[0].cand_strs[log.cand_lists[0].dwSelection];
-}
 
 BOOL InputContext::OpenCandidate() {
   BOOL ret = FALSE;
@@ -409,11 +389,6 @@ BOOL InputContext::OpenCandidate() {
     if (cand_info) {
       cand_info->GetLog(cand);
       UnlockCandInfo();
-
-      // get candidates
-      comp.AssertValid();
-      GetCands(cand, comp.comp_str);
-      comp.AssertValid();
 
       // generate message to open candidate
       TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
