@@ -244,6 +244,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
 
   // not initialized yet?
   if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
+    FOOTMARK_POINT();
     if (GetCandPosFromCompWnd(lpUIExtra, &pt)) {
       lpUIExtra->uiCand.pt.x = pt.x;
       lpUIExtra->uiCand.pt.y = pt.y;
