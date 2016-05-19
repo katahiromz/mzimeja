@@ -810,11 +810,26 @@ DWORD LogCompStr::GetClauseCompStrLen(DWORD dwClauseIndex) const {
 void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
   FOOTMARK();
   if (iClause < GetClauseCount()) {
+    // fix comp_attr
+    std::wstring old_str = extra.comp_str_clauses[iClause];
+    DWORD ich = ClauseToCompChar(iClause);
+    if (old_str.size() < str.size()) {
+      size_t diff = str.size() - old_str.size();
+      comp_attr.insert(comp_attr.begin() + ich, diff);
+    } else if (old_str.size() > str.size()) {
+      size_t diff = old_str.size() - str.size();
+      comp_attr.erase(
+        comp_attr.begin() + ich, comp_attr.begin() + ich + diff);
+    }
+    // update comp str
     extra.comp_str_clauses[iClause] = str;
     UpdateCompStr();
+    // untarget
     SetClauseAttr(extra.iClause, ATTR_CONVERTED);
     extra.iClause = iClause;
+    // set target
     SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+    // update cursor pos
     dwCursorPos = (DWORD)comp_str.size();
   }
 }
