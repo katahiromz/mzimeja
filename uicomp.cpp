@@ -154,7 +154,6 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
           SIZE siz;
           siz.cy = 0;
-          RECT oldrc = lpUIExtra->uiComp[i].rc;
 
           num = NumCharInDX(hDC, pch, dx);
           if (num) {
@@ -180,7 +179,6 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
             ::ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_HIDE);
             lpUIExtra->uiComp[i].bShow = FALSE;
           }
-
           ::InvalidateRect(lpUIExtra->uiComp[i].hWnd, NULL, FALSE);
 
           dx = rcSrc.right - rcSrc.left;

@@ -241,6 +241,8 @@ struct LogCandList {
   void MoveNext();
   void MovePrev();
   DWORD GetCandCount() const;
+  std::wstring GetString() const;
+  std::wstring GetString(DWORD iCand) const;
 };
 
 // logical candidate info
@@ -255,6 +257,10 @@ struct LogCandInfo {
 
   void MoveLeft();
   void MoveRight();
+  void MoveNext();
+  void MovePrev();
+  std::wstring GetString() const;
+  std::wstring GetString(DWORD iCand) const;
 
   void Dump();
 }; // struct LogCandInfo
@@ -347,8 +353,10 @@ struct InputContext : public INPUTCONTEXT {
   BOOL CloseCandidate();
   void MoveLeft(BOOL bShift);
   void MoveRight(BOOL bShift);
-  void MoveToBeginning();
-  void MoveToEnd();
+  void MoveUp();
+  void MoveDown();
+  void MoveHome();
+  void MoveEnd();
   void MakeResult();
   void MakeHiragana();
   void MakeKatakana();

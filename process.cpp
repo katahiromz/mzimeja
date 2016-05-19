@@ -246,18 +246,34 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     }
     break;
 
-  case VK_HOME: case VK_UP:
+  case VK_UP:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MoveToBeginning();
+      lpIMC->MoveUp();
       TheIME.UnlockIMC(hIMC);
     }
     break;
 
-  case VK_END: case VK_DOWN:
+  case VK_DOWN:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MoveToEnd();
+      lpIMC->MoveDown();
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
+  case VK_HOME:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MoveHome();
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
+  case VK_END:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->MoveEnd();
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -317,7 +333,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
       // Shift key is down
       switch (vKey) {
       case VK_LEFT: case VK_RIGHT:
-        // fix clauses
+      case VK_SPACE:
         ret = TRUE;
         break;
       }

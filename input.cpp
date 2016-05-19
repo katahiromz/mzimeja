@@ -790,7 +790,77 @@ void InputContext::MoveRight(BOOL bShift) {
   TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 } // InputContext::MoveRight
 
-void InputContext::MoveToBeginning() {
+void InputContext::MoveUp() {
+  FOOTMARK();
+  if (!HasCandInfo()) return;
+
+  // get logical data of composition string
+  LogCompStr comp;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLog(comp);
+    UnlockCompStr();
+  }
+
+  // get logical data of candidate info
+  LogCandInfo cand;
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLog(cand);
+    UnlockCandInfo();
+  }
+
+  // candidate up
+  cand.MovePrev();
+  std::wstring& str = cand.GetString();
+  comp.SetClauseCompString(cand.iClause, str);
+
+  // recreate
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
+
+  // update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
+  // update candidate
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+}
+
+void InputContext::MoveDown() {
+  FOOTMARK();
+  if (!HasCandInfo()) return;
+
+  // get logical data of composition string
+  LogCompStr comp;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLog(comp);
+    UnlockCompStr();
+  }
+
+  // get logical data of candidate info
+  LogCandInfo cand;
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLog(cand);
+    UnlockCandInfo();
+  }
+
+  // candidate down
+  cand.MoveNext();
+  std::wstring& str = cand.GetString();
+  comp.SetClauseCompString(cand.iClause, str);
+
+  // recreate
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
+
+  // update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
+  // update candidate
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+}
+
+void InputContext::MoveHome() {
   FOOTMARK();
 
   // get logical data of composition string
@@ -809,27 +879,24 @@ void InputContext::MoveToBeginning() {
     UnlockCandInfo();
   }
 
-  // move to the beginning
-  comp.AssertValid();
-  if (comp.HasClauseSelected()) {
-    comp.extra.iClause = 0;
+  if (HasCandInfo()) {
     cand.iClause = 0;
+    comp.extra.iClause = 0;
   } else {
     comp.dwCursorPos = 0;
   }
-  comp.AssertValid();
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);
   hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
   // update composition
-  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
   // update candidate
   TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
-} // InputContext::MoveToBeginning
+} // InputContext::MoveHome
 
-void InputContext::MoveToEnd() {
+void InputContext::MoveEnd() {
   FOOTMARK();
 
   // get logical data of composition string
@@ -848,25 +915,23 @@ void InputContext::MoveToEnd() {
     UnlockCandInfo();
   }
 
-  // move to the end
-  comp.AssertValid();
-  if (comp.HasClauseSelected()) {
-    comp.extra.iClause = DWORD(comp.comp_clause.size() - 1);
-    cand.iClause = DWORD(comp.comp_clause.size() - 1);
+  if (HasCandInfo()) {
+    DWORD iClause = comp.GetClauseCount() - 1;
+    cand.iClause = iClause;
+    comp.extra.iClause = iClause;
   } else {
-    comp.dwCursorPos = (DWORD)comp.comp_str.size();
+    comp.dwCursorPos = comp.GetCompCharCount();
   }
-  comp.AssertValid();
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);
   hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
   // update composition
-  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
   // update candidate
   TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
-} // InputContext::MoveToEnd
+} // InputContext::MoveEnd
 
 void InputContext::DumpCompStr() {
   FOOTMARK();
