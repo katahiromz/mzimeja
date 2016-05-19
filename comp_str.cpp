@@ -803,6 +803,42 @@ void LogCompStr::MoveRight(BOOL bShift) {
   }
 } // LogCompStr::MoveRight
 
+void LogCompStr::MoveHome() {
+  FOOTMARK();
+  // is the current clause being converted?
+  if (IsClauseConverted(extra.iClause)) { // being converted
+    // untarget
+    SetClauseAttr(extra.iClause, ATTR_CONVERTED);
+    // set the current clause to first
+    extra.iClause = 0;
+    // retarget
+    SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+    // move cursor
+    dwCursorPos = GetCompCharCount();
+  } else {
+    // move cursor to head
+    dwCursorPos = 0;
+  }
+} // LogCompStr::MoveHome
+
+void LogCompStr::MoveEnd() {
+  FOOTMARK();
+  // is the current clause being converted?
+  if (IsClauseConverted(extra.iClause)) { // being converted
+    // untarget
+    SetClauseAttr(extra.iClause, ATTR_CONVERTED);
+    // set the current clause to last
+    extra.iClause = GetClauseCount() - 1;
+    // retarget
+    SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+    // move cursor
+    dwCursorPos = GetCompCharCount();
+  } else {
+    // move cursor to tail
+    dwCursorPos = GetCompCharCount();
+  }
+} // LogCompStr::MoveEnd
+
 DWORD LogCompStr::GetClauseCompStrLen(DWORD dwClauseIndex) const {
   return (DWORD)extra.comp_str_clauses[dwClauseIndex].size();
 }

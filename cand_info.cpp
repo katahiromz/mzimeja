@@ -94,6 +94,14 @@ void LogCandInfo::MovePrev() {
   cand_lists[iClause].MovePrev();
 }
 
+void LogCandInfo::MoveHome() {
+  iClause = 0;
+}
+
+void LogCandInfo::MoveEnd() {
+  iClause = GetClauseCount() - 1;
+}
+
 std::wstring LogCandInfo::GetString() const {
   return cand_lists[iClause].GetString(cand_lists[iClause].dwSelection);
 }

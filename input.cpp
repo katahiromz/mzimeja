@@ -879,12 +879,9 @@ void InputContext::MoveHome() {
     UnlockCandInfo();
   }
 
-  if (HasCandInfo()) {
-    cand.iClause = 0;
-    comp.extra.iClause = 0;
-  } else {
-    comp.dwCursorPos = 0;
-  }
+  // move to head
+  comp.MoveHome();
+  cand.MoveHome();
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);
@@ -915,13 +912,9 @@ void InputContext::MoveEnd() {
     UnlockCandInfo();
   }
 
-  if (HasCandInfo()) {
-    DWORD iClause = comp.GetClauseCount() - 1;
-    cand.iClause = iClause;
-    comp.extra.iClause = iClause;
-  } else {
-    comp.dwCursorPos = comp.GetCompCharCount();
-  }
+  // move to tail
+  comp.MoveEnd();
+  cand.MoveEnd();
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);
