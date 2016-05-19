@@ -262,6 +262,22 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     }
     break;
 
+  case VK_PRIOR: // Page Up
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->PageUp();
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
+  case VK_NEXT: // Page Down
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->PageDown();
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
   case VK_HOME:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {

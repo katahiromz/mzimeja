@@ -240,8 +240,12 @@ struct LogCandList {
   LogCandList() { clear(); }
   void clear();
   DWORD GetTotalSize() const;
+
   void MoveNext();
   void MovePrev();
+  void PageUp();
+  void PageDown();
+
   DWORD GetCandCount() const;
   std::wstring GetString() const;
   std::wstring GetString(DWORD iCand) const;
@@ -263,6 +267,9 @@ struct LogCandInfo {
   void MovePrev();
   void MoveHome();
   void MoveEnd();
+  void PageUp();
+  void PageDown();
+
   std::wstring GetString() const;
   std::wstring GetString(DWORD iCand) const;
 
@@ -355,12 +362,16 @@ struct InputContext : public INPUTCONTEXT {
   BOOL Convert(BOOL bShift);
   BOOL OpenCandidate();
   BOOL CloseCandidate();
+
   void MoveLeft(BOOL bShift);
   void MoveRight(BOOL bShift);
   void MoveUp();
   void MoveDown();
   void MoveHome();
   void MoveEnd();
+  void PageUp();
+  void PageDown();
+
   void MakeResult();
   void MakeHiragana();
   void MakeKatakana();

@@ -926,6 +926,74 @@ void InputContext::MoveEnd() {
   TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 } // InputContext::MoveEnd
 
+void InputContext::PageUp() {
+  FOOTMARK();
+
+  // get logical data of composition string
+  LogCompStr comp;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLog(comp);
+    UnlockCompStr();
+  }
+
+  // get logical data of candidate info
+  LogCandInfo cand;
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLog(cand);
+    UnlockCandInfo();
+  }
+
+  // go to previous page
+  cand.PageUp();
+  std::wstring& str = cand.GetString();
+  comp.SetClauseCompString(cand.iClause, str);
+
+  // recreate
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
+
+  // update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
+  // update candidate
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+} // InputContext::PageUp
+
+void InputContext::PageDown() {
+  FOOTMARK();
+
+  // get logical data of composition string
+  LogCompStr comp;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLog(comp);
+    UnlockCompStr();
+  }
+
+  // get logical data of candidate info
+  LogCandInfo cand;
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLog(cand);
+    UnlockCandInfo();
+  }
+
+  // move to next page
+  cand.PageDown();
+  std::wstring& str = cand.GetString();
+  comp.SetClauseCompString(cand.iClause, str);
+
+  // recreate
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
+
+  // update composition
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
+  // update candidate
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+} // InputContext::PageDown
+
 void InputContext::DumpCompStr() {
   FOOTMARK();
 #ifndef NDEBUG

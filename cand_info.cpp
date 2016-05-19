@@ -49,6 +49,24 @@ void LogCandList::MovePrev() {
   dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
+void LogCandList::PageUp() {
+  if (dwPageStart >= dwPageSize) {
+    dwSelection -= dwPageSize;
+  } else {
+    dwSelection = 0;
+  }
+  dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
+}
+
+void LogCandList::PageDown() {
+  if (dwPageStart + dwPageSize < GetCandCount()) {
+    dwSelection += dwPageSize;
+  } else {
+    dwSelection = GetCandCount() - 1;
+  }
+  dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
+}
+
 std::wstring LogCandList::GetString(DWORD iCand) const {
   return cand_strs[iCand];
 }
@@ -100,6 +118,14 @@ void LogCandInfo::MoveHome() {
 
 void LogCandInfo::MoveEnd() {
   iClause = GetClauseCount() - 1;
+}
+
+void LogCandInfo::PageUp() {
+  cand_lists[iClause].PageUp();
+}
+
+void LogCandInfo::PageDown() {
+  cand_lists[iClause].PageDown();
 }
 
 std::wstring LogCandInfo::GetString() const {
