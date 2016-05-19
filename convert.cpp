@@ -65,7 +65,7 @@ void MZIMEJA::PluralClauseConversion(const std::wstring& strHiragana,
   result.clauses.clear();
   for (DWORD iClause = 0; iClause < 5; ++iClause) {
     MzConversionClause clause;
-    for (DWORD iCand = 0; iCand < 15; ++iCand) {
+    for (DWORD iCand = 0; iCand < 18; ++iCand) {
       MzConversionCandidate cand;
       ::wsprintfW(sz, L"‚±‚¤‚Ù%u-%u", iClause, iCand);
       cand.hiragana = sz;

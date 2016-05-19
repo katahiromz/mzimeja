@@ -260,7 +260,7 @@ struct CandList : public CANDIDATELIST {
   BYTE *GetBytes()             { return (BYTE *)this; }
   WCHAR *GetCandString(DWORD i) { return LPTSTR(GetBytes() + dwOffset[i]); }
   WCHAR *GetCurString()         { return GetCandString(dwSelection); }
-  DWORD  GetPageEnd() const     { return dwPageStart + dwPageSize; }
+  DWORD  GetPageEnd() const;
   void GetLog(LogCandList& log);
   DWORD Store(const LogCandList *log);
 

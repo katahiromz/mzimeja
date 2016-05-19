@@ -129,12 +129,12 @@ void CandWnd_Paint(HWND hCandWnd) {
     if (lpCandInfo) {
       int height = ::GetSystemMetrics(SM_CYEDGE);
       CandList *lpCandList = lpCandInfo->GetList(0);
-      for (DWORD i = lpCandList->dwPageStart;
-           i < lpCandList->GetPageEnd(); i++) {
+      DWORD i, end = lpCandList->GetPageEnd();
+      for (i = lpCandList->dwPageStart; i < end; i++) {
         SIZE sz;
         HBRUSH hbr;
-        WCHAR *lpstr = lpCandList->GetCandString(i);
-        ::GetTextExtentPoint32W(hDC, lpstr, lstrlenW(lpstr), &sz);
+        WCHAR *psz = lpCandList->GetCandString(i);
+        ::GetTextExtentPoint32W(hDC, psz, lstrlenW(psz), &sz);
         if (lpCandList->dwSelection == i) {
           hbr = (HBRUSH)::SelectObject(hDC, hbrHightLight);
           ::PatBlt(hDC, 0, height, rc.right, sz.cy, PATCOPY);
@@ -147,8 +147,8 @@ void CandWnd_Paint(HWND hCandWnd) {
           ::SelectObject(hDC, hbr);
           ::SetTextColor(hDC, RGB(0, 0, 0));
         }
-        ::TextOutW(hDC, ::GetSystemMetrics(SM_CXEDGE), height, lpstr,
-                   lstrlenW(lpstr));
+        ::TextOutW(hDC, ::GetSystemMetrics(SM_CXEDGE), height, psz,
+                   lstrlenW(psz));
         height += sz.cy;
       }
       lpIMC->UnlockCandInfo();
@@ -173,8 +173,8 @@ SIZE CandWnd_CalcSize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     int iList = 0;
     if (extra) iList = extra->iClause;
     CandList *lpCandList = lpCandInfo->GetList(iList);
-    for (DWORD i = lpCandList->dwPageStart;
-         i < lpCandList->GetPageEnd(); i++) {
+    DWORD i, end = lpCandList->GetPageEnd();
+    for (i = lpCandList->dwPageStart; i < end; i++) {
       WCHAR *psz = lpCandList->GetCandString(i);
       SIZE siz;
       ::GetTextExtentPoint32W(hDC, psz, lstrlenW(psz), &siz);

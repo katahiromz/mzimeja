@@ -90,6 +90,12 @@ void LogCandInfo::Dump() {
 //////////////////////////////////////////////////////////////////////////////
 // CandList
 
+DWORD CandList::GetPageEnd() const {
+  DWORD dw = dwPageStart + dwPageSize;
+  if (dw > dwCount) dw = dwCount;
+  return dw;
+}
+
 void CandList::GetLog(LogCandList& log) {
   FOOTMARK();
   log.dwStyle = dwStyle;
