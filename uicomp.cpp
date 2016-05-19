@@ -78,7 +78,7 @@ void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   }
 
   HWND hwndDef = lpUIExtra->uiDefComp.hWnd;
-  if ::(!IsWindow(hwndDef)) {
+  if (!::IsWindow(hwndDef)) {
     hwndDef = CreateWindowEx(
         WS_EX_WINDOWEDGE, szCompStrClassName, NULL,
         WS_COMPDEFAULT | WS_DLGFRAME, lpUIExtra->uiDefComp.pt.x,
