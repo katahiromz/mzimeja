@@ -793,7 +793,7 @@ void InputContext::MoveRight(BOOL bShift) {
 void InputContext::MoveToBeginning() {
   FOOTMARK();
 
-  // get logical data
+  // get logical data of composition string
   LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
@@ -801,10 +801,19 @@ void InputContext::MoveToBeginning() {
     UnlockCompStr();
   }
 
+  // get logical data of candidate info
+  LogCandInfo cand;
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLog(cand);
+    UnlockCandInfo();
+  }
+
   // move to the beginning
   comp.AssertValid();
   if (comp.HasClauseSelected()) {
     comp.extra.iClause = 0;
+    cand.iClause = 0;
   } else {
     comp.dwCursorPos = 0;
   }
@@ -812,15 +821,18 @@ void InputContext::MoveToBeginning() {
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
-}
+  // update candidate
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+} // InputContext::MoveToBeginning
 
 void InputContext::MoveToEnd() {
   FOOTMARK();
 
-  // get logical data
+  // get logical data of composition string
   LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
@@ -828,10 +840,19 @@ void InputContext::MoveToEnd() {
     UnlockCompStr();
   }
 
+  // get logical data of candidate info
+  LogCandInfo cand;
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLog(cand);
+    UnlockCandInfo();
+  }
+
   // move to the end
   comp.AssertValid();
   if (comp.HasClauseSelected()) {
-    comp.extra.iClause = comp.comp_clause.size() - 1;
+    comp.extra.iClause = DWORD(comp.comp_clause.size() - 1);
+    cand.iClause = DWORD(comp.comp_clause.size() - 1);
   } else {
     comp.dwCursorPos = (DWORD)comp.comp_str.size();
   }
@@ -839,10 +860,13 @@ void InputContext::MoveToEnd() {
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
-}
+  // update candidate
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+} // InputContext::MoveToEnd
 
 void InputContext::DumpCompStr() {
   FOOTMARK();

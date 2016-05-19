@@ -3,6 +3,11 @@
 
 #include "mzimeja.h"
 
+#define UNDERLINE_HEIGHT  2
+#define CARET_WIDTH       2
+
+//////////////////////////////////////////////////////////////////////////////
+
 extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -87,71 +92,52 @@ void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra,
   SetWindowLongPtr(lpUIExtra->uiDefComp.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
   ShowWindow(lpUIExtra->uiDefComp.hWnd, SW_HIDE);
   lpUIExtra->uiDefComp.bShow = FALSE;
-
-  return;
 }
 
 // Calc the position of composition windows and move them
 void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
 
-  HDC hDC;
-  HFONT hFont = NULL;
-  HFONT hOldFont = NULL;
-  CompStr *lpCompStr;
-  const WCHAR *lpstr;
-  RECT rc;
-  RECT oldrc;
-  SIZE siz;
-  int width = 0;
-  int height = 0;
-
-  // Save the composition form style into lpUIExtra.
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
 
-  if (lpIMC->cfCompForm.dwStyle) {  // Style is not CFS_DEFAULT.
-    const WCHAR *pch;
-    int num;
-
-    if (!lpIMC->HasCompStr()) {
-      return;
-    }
-
-    // Lock the COMPOSITIONSTRING structure.
-    lpCompStr = lpIMC->LockCompStr();
-    if (lpCompStr == NULL) {
-      return;
-    }
+  HFONT hFont = NULL;
+  HFONT hOldFont = NULL;
+  if (lpIMC->cfCompForm.dwStyle) {  // style is not CFS_DEFAULT
+    // lock the COMPOSITIONSTRING structure
+    if (!lpIMC->HasCompStr()) return;
+    CompStr *lpCompStr = lpIMC->LockCompStr();
+    if (lpCompStr == NULL) return;
 
     // Set the rectangle for the composition string.
     RECT rcSrc;
     if (lpIMC->cfCompForm.dwStyle & CFS_RECT)
       rcSrc = lpIMC->cfCompForm.rcArea;
     else
-      GetClientRect(lpIMC->hWnd, &rcSrc);
+      ::GetClientRect(lpIMC->hWnd, &rcSrc);
 
     POINT ptSrc = lpIMC->cfCompForm.ptCurrentPos;
-    ClientToScreen(lpIMC->hWnd, &ptSrc);
-    ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.left);
-    ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.right);
+    ::ClientToScreen(lpIMC->hWnd, &ptSrc);
+    ::ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.left);
+    ::ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.right);
 
     // Check the start position.
-    if (!PtInRect(&rcSrc, ptSrc)) {
+    if (!::PtInRect(&rcSrc, ptSrc)) {
       lpIMC->UnlockCompStr();
       return;
     }
 
     // Hide the default composition window.
-    if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
-      ShowWindow(lpUIExtra->uiDefComp.hWnd, SW_HIDE);
+    if (::IsWindow(lpUIExtra->uiDefComp.hWnd)) {
+      ::ShowWindow(lpUIExtra->uiDefComp.hWnd, SW_HIDE);
       lpUIExtra->uiDefComp.bShow = FALSE;
     }
 
     std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
-    pch = lpstr = str.c_str();
-    num = 1;
+    const WCHAR *psz = str.c_str();
+    const WCHAR *pch = psz;
+    int num = 1;
 
-    if (!lpUIExtra->bVertical) {
+    if (!lpUIExtra->bVertical) {  // not vertical font
       int dx = rcSrc.right - ptSrc.x;
       int curx = ptSrc.x, cury = ptSrc.y;
 
@@ -159,16 +145,16 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       // The composition windows that are given the compostion string
       // will be moved and shown.
       for (int i = 0; i < MAXCOMPWND; i++) {
-        if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
-          hDC = GetDC(lpUIExtra->uiComp[i].hWnd);
-
+        if (::IsWindow(lpUIExtra->uiComp[i].hWnd)) {
+          HDC hDC = ::GetDC(lpUIExtra->uiComp[i].hWnd);
           hFont = (HFONT)GetWindowLongPtr(lpUIExtra->uiComp[i].hWnd,
                                           FIGWLP_FONT);
           if (hFont)
-            hOldFont = (HFONT)SelectObject(hDC, hFont);
+            hOldFont = (HFONT)::SelectObject(hDC, hFont);
 
+          SIZE siz;
           siz.cy = 0;
-          oldrc = lpUIExtra->uiComp[i].rc;
+          RECT oldrc = lpUIExtra->uiComp[i].rc;
 
           num = NumCharInDX(hDC, pch, dx);
           if (num) {
@@ -176,52 +162,48 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
             lpUIExtra->uiComp[i].rc.left = curx;
             lpUIExtra->uiComp[i].rc.top = cury;
-            lpUIExtra->uiComp[i].rc.right = siz.cx;
-            lpUIExtra->uiComp[i].rc.bottom = siz.cy + 1;
-            SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR,
-                          (DWORD)(pch - lpstr));
-            SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTNUM, num);
-            MoveWindow(lpUIExtra->uiComp[i].hWnd, curx, cury, siz.cx, siz.cy,
-                       TRUE);
-            ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_SHOWNOACTIVATE);
+            lpUIExtra->uiComp[i].rc.right = siz.cx + CARET_WIDTH;
+            lpUIExtra->uiComp[i].rc.bottom = siz.cy + UNDERLINE_HEIGHT;
+            ::SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR,
+                            DWORD(pch - psz));
+            ::SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTNUM, num);
+            ::MoveWindow(lpUIExtra->uiComp[i].hWnd, curx, cury, siz.cx, siz.cy,
+                         TRUE);
+            ::ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_SHOWNOACTIVATE);
             lpUIExtra->uiComp[i].bShow = TRUE;
 
             pch += num;
           } else {
-            lpUIExtra->uiComp[i].rc.left = 0;
-            lpUIExtra->uiComp[i].rc.top = 0;
-            lpUIExtra->uiComp[i].rc.right = 0;
-            lpUIExtra->uiComp[i].rc.bottom = 0;
-            SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR, 0L);
-            SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTNUM, 0L);
-            ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_HIDE);
+            ::SetRectEmpty(&lpUIExtra->uiComp[i].rc);
+            ::SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR, 0);
+            ::SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTNUM, 0);
+            ::ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_HIDE);
             lpUIExtra->uiComp[i].bShow = FALSE;
           }
 
-          InvalidateRect(lpUIExtra->uiComp[i].hWnd, NULL, FALSE);
+          ::InvalidateRect(lpUIExtra->uiComp[i].hWnd, NULL, FALSE);
 
           dx = rcSrc.right - rcSrc.left;
           curx = rcSrc.left;
-          cury += siz.cy + 1;
+          cury += siz.cy + UNDERLINE_HEIGHT;
 
-          if (hOldFont) SelectObject(hDC, hOldFont);
-          ReleaseDC(lpUIExtra->uiComp[i].hWnd, hDC);
+          if (hOldFont) ::SelectObject(hDC, hOldFont);
+          ::ReleaseDC(lpUIExtra->uiComp[i].hWnd, hDC);
         }
       }
-    } else {
-      // when it is vertical fonts.
+    } else {  // vertical font
       int dy = rcSrc.bottom - ptSrc.y;
       int curx = ptSrc.x, cury = ptSrc.y;
 
       for (int i = 0; i < MAXCOMPWND; i++) {
-        if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
-          hDC = GetDC(lpUIExtra->uiComp[i].hWnd);
-
+        if (::IsWindow(lpUIExtra->uiComp[i].hWnd)) {
+          HDC hDC = ::GetDC(lpUIExtra->uiComp[i].hWnd);
           hFont = (HFONT)GetWindowLongPtr(lpUIExtra->uiComp[i].hWnd,
                                           FIGWLP_FONT);
           if (hFont)
-            hOldFont = (HFONT)SelectObject(hDC, hFont);
+            hOldFont = (HFONT)::SelectObject(hDC, hFont);
 
+          SIZE siz;
           siz.cy = 0;
           num = NumCharInDY(hDC, pch, dy);
           if (num) {
@@ -229,164 +211,176 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
 
             lpUIExtra->uiComp[i].rc.left = curx - siz.cy;
             lpUIExtra->uiComp[i].rc.top = cury;
-            lpUIExtra->uiComp[i].rc.right = siz.cy + 1;
-            lpUIExtra->uiComp[i].rc.bottom = siz.cx;
+            lpUIExtra->uiComp[i].rc.right = siz.cy + UNDERLINE_HEIGHT;
+            lpUIExtra->uiComp[i].rc.bottom = siz.cx + CARET_WIDTH;
             SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR,
-                          (DWORD)(pch - lpstr));
+                          (DWORD)(pch - psz));
             SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTNUM, num);
-            MoveWindow(lpUIExtra->uiComp[i].hWnd, curx, cury, siz.cy, siz.cx,
-                       TRUE);
-            ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_SHOWNOACTIVATE);
+            ::MoveWindow(lpUIExtra->uiComp[i].hWnd, curx, cury, siz.cy, siz.cx,
+                         TRUE);
+            ::ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_SHOWNOACTIVATE);
             lpUIExtra->uiComp[i].bShow = TRUE;
 
             pch += num;
           } else {
-            lpUIExtra->uiComp[i].rc.left = 0;
-            lpUIExtra->uiComp[i].rc.top = 0;
-            lpUIExtra->uiComp[i].rc.right = 0;
-            lpUIExtra->uiComp[i].rc.bottom = 0;
-            SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR, 0L);
-            SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTNUM, 0L);
-            ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_HIDE);
+            ::SetRectEmpty(&lpUIExtra->uiComp[i].rc);
+            ::SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTSTR, 0L);
+            ::SetWindowLong(lpUIExtra->uiComp[i].hWnd, FIGWL_COMPSTARTNUM, 0L);
+            ::ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_HIDE);
             lpUIExtra->uiComp[i].bShow = FALSE;
           }
 
-          InvalidateRect(lpUIExtra->uiComp[i].hWnd, NULL, FALSE);
+          ::InvalidateRect(lpUIExtra->uiComp[i].hWnd, NULL, FALSE);
 
           dy = rcSrc.bottom - rcSrc.top;
           cury = rcSrc.top;
-          curx -= siz.cy + 1;
+          curx -= siz.cy + UNDERLINE_HEIGHT;
 
           if (hOldFont) SelectObject(hDC, hOldFont);
-          ReleaseDC(lpUIExtra->uiComp[i].hWnd, hDC);
+          ::ReleaseDC(lpUIExtra->uiComp[i].hWnd, hDC);
         }
       }
     }
 
     lpIMC->UnlockCompStr();
-  } else {
-    // When the style is DEFAULT, show the default composition window.
-    if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
+  } else {  // style is CFS_DEFAULT
+    if (::IsWindow(lpUIExtra->uiDefComp.hWnd)) {
+      // hide all non-default comp windows
       for (int i = 0; i < MAXCOMPWND; i++) {
         if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
-          ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_HIDE);
+          ::ShowWindow(lpUIExtra->uiComp[i].hWnd, SW_HIDE);
           lpUIExtra->uiComp[i].bShow = FALSE;
         }
       }
 
-      hDC = GetDC(lpUIExtra->uiDefComp.hWnd);
-
-      lpCompStr = lpIMC->LockCompStr();
+      // get width and height of composition string
+      int width = 0, height = 0;
+      HDC hDC = ::GetDC(lpUIExtra->uiDefComp.hWnd);
+      CompStr *lpCompStr = lpIMC->LockCompStr();
       if (lpCompStr) {
-        if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
-            (lpCompStr->dwCompStrLen > 0)) {
-
+        if (lpCompStr->dwCompStrLen > 0) {
           std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
-          lpstr = str.c_str();
-          ::GetTextExtentPoint32W(hDC, lpstr, lstrlenW(lpstr), &siz);
-          width = siz.cx;
-          height = siz.cy + 1;
+          const WCHAR *psz = str.c_str();
+          SIZE siz;
+          ::GetTextExtentPoint32W(hDC, psz, lstrlenW(psz), &siz);
+          width = siz.cx + CARET_WIDTH;
+          height = siz.cy + UNDERLINE_HEIGHT;
         }
         lpIMC->UnlockCompStr();
       }
+      ::ReleaseDC(lpUIExtra->uiDefComp.hWnd, hDC);
 
-      ReleaseDC(lpUIExtra->uiDefComp.hWnd, hDC);
-
-      GetWindowRect(lpUIExtra->uiDefComp.hWnd, &rc);
+      // calculate new window extent
+      RECT rc;
+      ::GetWindowRect(lpUIExtra->uiDefComp.hWnd, &rc);
       lpUIExtra->uiDefComp.pt.x = rc.left;
       lpUIExtra->uiDefComp.pt.y = rc.top;
-      MoveWindow(lpUIExtra->uiDefComp.hWnd, rc.left, rc.top,
-                 width + 2 * GetSystemMetrics(SM_CXEDGE),
-                 height + 2 * GetSystemMetrics(SM_CYEDGE), TRUE);
+      width += 2 * GetSystemMetrics(SM_CXEDGE);
+      height += 2 * GetSystemMetrics(SM_CYEDGE);
 
-      ShowWindow(lpUIExtra->uiDefComp.hWnd, SW_SHOWNOACTIVATE);
+      // move and show window
+      ::MoveWindow(lpUIExtra->uiDefComp.hWnd, rc.left, rc.top,
+                   width, height, TRUE);
+      ::ShowWindow(lpUIExtra->uiDefComp.hWnd, SW_SHOWNOACTIVATE);
       lpUIExtra->uiDefComp.bShow = TRUE;
-      InvalidateRect(lpUIExtra->uiDefComp.hWnd, NULL, FALSE);
+
+      // redraw window
+      ::InvalidateRect(lpUIExtra->uiDefComp.hWnd, NULL, FALSE);
     }
   }
 }
 
-void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *lpstr,
+void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *psz,
                      BYTE *lpattr, int num, BOOL fVert, DWORD dwCursor) {
   FOOTMARK();
-  const WCHAR *lpEnd = lpstr + num - 1;
-  int x, y;
-  RECT rc;
 
   if (num == 0) return;
 
-  GetClientRect(hCompWnd, &rc);
+  RECT rc;
+  ::GetClientRect(hCompWnd, &rc);
 
-  if (!fVert) {
-    x = 0;
+  int x, y;
+  if (fVert) {
+    x = rc.right - UNDERLINE_HEIGHT;
     y = 0;
   } else {
-    x = rc.right;
-    y = 0;
+    x = y = 0;
   }
 
   DWORD ich = 0;
-  while (lpstr <= lpEnd) {
-    BYTE bAttr = *lpattr;
-    SIZE siz;
-
-    BOOL bConverted = FALSE;
-    switch (bAttr) {
-    case ATTR_TARGET_CONVERTED:
-    case ATTR_CONVERTED:
-      bConverted = TRUE;
-      break;
-
-    default:
-      break;
-    }
-
+  const WCHAR *lpEnd = &psz[num - 1];
+  while (psz <= lpEnd) {
     HPEN hPen;
-    if (bConverted) {
-      SetTextColor(hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
-      SetBkMode(hDC, OPAQUE);
-      SetBkColor(hDC, GetSysColor(COLOR_HIGHLIGHT));
-      hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
-    } else {
-      SetTextColor(hDC, RGB(0, 127, 0));
-      SetBkMode(hDC, OPAQUE);
-      SetBkColor(hDC, RGB(255, 255, 255));
-      hPen = CreatePen(PS_DOT, 1, RGB(0, 127, 0));
+    ::SetBkMode(hDC, OPAQUE);
+    switch (*lpattr) {
+    case ATTR_TARGET_CONVERTED:
+      ::SetTextColor(hDC, RGB(255, 255, 255));
+      ::SetBkColor(hDC, RGB(0, 121, 0));
+      hPen = ::CreatePen(PS_SOLID, 1, RGB(0, 51, 0));
+      break;
+    case ATTR_CONVERTED:
+      ::SetTextColor(hDC, RGB(0, 51, 0));
+      ::SetBkColor(hDC, RGB(255, 255, 255));
+      hPen = ::CreatePen(PS_SOLID, 1, RGB(0, 51, 0));
+      break;
+    default:
+      ::SetTextColor(hDC, RGB(0, 51, 0));
+      ::SetBkColor(hDC, RGB(255, 255, 255));
+      hPen = ::CreatePen(PS_DOT, 1, RGB(0, 121, 0));
+      break;
     }
+    ::TextOutW(hDC, x, y, psz, 1);
 
-    TextOut(hDC, x, y, lpstr, 1);
-    GetTextExtentPoint(hDC, lpstr, 1, &siz);
+    SIZE siz;
+    ::GetTextExtentPoint32W(hDC, psz, 1, &siz);
 
-    HGDIOBJ hPenOld = SelectObject(hDC, hPen);
-    if (fVert) {
-      MoveToEx(hDC, x, y, NULL);
-      LineTo(hDC, x, y + siz.cx - 1);
-    } else {
-      MoveToEx(hDC, x, y + siz.cy - 1, NULL);
-      LineTo(hDC, x + siz.cx, y + siz.cy - 1);
-    }
-    SelectObject(hDC, hPenOld);
-    DeleteObject(hPen);
-
-    SelectObject(hDC, GetStockObject(BLACK_PEN));
-    if (dwCursor == ich) {
+    HGDIOBJ hPenOld = ::SelectObject(hDC, hPen);
+    if (*lpattr == ATTR_TARGET_CONVERTED) {
       if (fVert) {
-        MoveToEx(hDC, x, y, NULL);
-        LineTo(hDC, x + siz.cy, y);
+        ::MoveToEx(hDC, x + 1, y, NULL);
+        ::LineTo(hDC, x + 1, y + siz.cx);
+        ::MoveToEx(hDC, x + 2, y, NULL);
+        ::LineTo(hDC, x + 2, y + siz.cx);
       } else {
-        MoveToEx(hDC, x, y, NULL);
-        LineTo(hDC, x, y + siz.cy);
+        ::MoveToEx(hDC, x, y + siz.cy - 1, NULL);
+        ::LineTo(hDC, x + siz.cx, y + siz.cy - 1);
+        ::MoveToEx(hDC, x, y + siz.cy, NULL);
+        ::LineTo(hDC, x + siz.cx, y + siz.cy);
+      }
+    } else {
+      if (fVert) {
+        ::MoveToEx(hDC, x + 1, y, NULL);
+        ::LineTo(hDC, x + 1, y + siz.cx);
+      } else {
+        ::MoveToEx(hDC, x, y + siz.cy - 1, NULL);
+        ::LineTo(hDC, x + siz.cx, y + siz.cy - 1);
+      }
+    }
+    ::DeleteObject(::SelectObject(hDC, hPenOld));
+
+    if (dwCursor == ich) {
+      ::SelectObject(hDC, ::GetStockObject(BLACK_PEN));
+      if (fVert) {
+        ::MoveToEx(hDC, x, y, NULL);
+        ::LineTo(hDC, x + siz.cy, y);
+        ::MoveToEx(hDC, x, y + 1, NULL);
+        ::LineTo(hDC, x + siz.cy, y + 1);
+      } else {
+        ::MoveToEx(hDC, x, y, NULL);
+        ::LineTo(hDC, x, y + siz.cy);
+        ::MoveToEx(hDC, x + 1, y, NULL);
+        ::LineTo(hDC, x + 1, y + siz.cy);
       }
     }
 
-    ++lpstr;
+    ++psz;
     ++ich;
     ++lpattr;
 
-    if (!fVert)
-      x += siz.cx;
-    else
+    if (fVert)
       y += siz.cx;
+    else
+      x += siz.cx;
   }
 }
 
@@ -399,59 +393,56 @@ void CompWnd_Paint(HWND hCompWnd) {
   HFONT hOldFont = NULL;
 
   PAINTSTRUCT ps;
-  hDC = BeginPaint(hCompWnd, &ps);
+  hDC = ::BeginPaint(hCompWnd, &ps);
 
-  HFONT hFont = (HFONT)GetWindowLongPtr(hCompWnd, FIGWLP_FONT);
+  HFONT hFont = (HFONT)::GetWindowLongPtr(hCompWnd, FIGWLP_FONT);
   if (hFont)
-    hOldFont = (HFONT)SelectObject(hDC, hFont);
+    hOldFont = (HFONT)::SelectObject(hDC, hFont);
 
-  HWND hSvrWnd = (HWND)GetWindowLongPtr(hCompWnd, FIGWLP_SERVERWND);
+  HWND hSvrWnd = (HWND)::GetWindowLongPtr(hCompWnd, FIGWLP_SERVERWND);
 
-  hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+  hIMC = (HIMC)::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
     InputContext *lpIMC = TheIME.LockIMC(hIMC);
-    CompStr *lpCompStr = lpIMC->LockCompStr();
-    if (lpCompStr) {
-      if ((lpCompStr->dwSize > sizeof(COMPOSITIONSTRING)) &&
-          (lpCompStr->dwCompStrLen > 0)) {
-        const WCHAR *lpstr;
-        BYTE *lpattr;
-        INT lstart;
-        INT num;
-        BOOL fVert = FALSE;
-        DWORD dwCursor = lpCompStr->dwCursorPos;
+    if (lpIMC) {
+      CompStr *lpCompStr = lpIMC->LockCompStr();
+      if (lpCompStr) {
+        if (lpCompStr->dwCompStrLen > 0) {
+          do {
+            DWORD dwCursor = lpCompStr->dwCursorPos;
 
-        if (hFont) fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
+            BOOL fVert = FALSE;
+            if (hFont) fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
 
-        std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
-        lpstr = str.c_str();
-        lpattr = lpCompStr->GetCompAttr();
-        if (lpIMC->cfCompForm.dwStyle) {
-          GetClientRect(hCompWnd, &rc);
-          SetBkMode(hDC, OPAQUE);
+            std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
+            const WCHAR *pch = str.c_str();
+            BYTE *lpattr = lpCompStr->GetCompAttr();
+            if (lpIMC->cfCompForm.dwStyle) {
+              ::GetClientRect(hCompWnd, &rc);
+              ::SetBkMode(hDC, OPAQUE);
 
-          lstart = GetWindowLong(hCompWnd, FIGWL_COMPSTARTSTR);
-          num = GetWindowLong(hCompWnd, FIGWL_COMPSTARTNUM);
+              int lstart = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTSTR);
+              int num = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTNUM);
+              if (!num || ((lstart + num) > ::lstrlenW(pch))) break;
 
-          if (!num || ((lstart + num) > lstrlen(lpstr))) goto end_pcw;
-
-          lpstr += lstart;
-          lpattr += lstart;
-          dwCursor -= lstart;
-          DrawTextOneLine(hCompWnd, hDC, lpstr, lpattr, num, fVert, dwCursor);
-        } else {
-          num = (INT)str.size();
-          DrawTextOneLine(hCompWnd, hDC, lpstr, lpattr, num, fVert, dwCursor);
+              pch += lstart;
+              lpattr += lstart;
+              dwCursor -= lstart;
+              DrawTextOneLine(hCompWnd, hDC, pch, lpattr, num, fVert, dwCursor);
+            } else {
+              int num = int(str.size());
+              DrawTextOneLine(hCompWnd, hDC, pch, lpattr, num, fVert, dwCursor);
+            }
+          } while (0);
         }
+        lpIMC->UnlockCompStr();
       }
-    end_pcw:
-      lpIMC->UnlockCompStr();
+      TheIME.UnlockIMC(hIMC);
     }
-    TheIME.UnlockIMC(hIMC);
   }
-  if (hFont && hOldFont) SelectObject(hDC, hOldFont);
-  EndPaint(hCompWnd, &ps);
-}
+  if (hFont && hOldFont) ::SelectObject(hDC, hOldFont);
+  ::EndPaint(hCompWnd, &ps);
+} // CompWnd_Paint
 
 void CompWnd_Hide(LPUIEXTRA lpUIExtra) {
   FOOTMARK();
@@ -471,14 +462,16 @@ void CompWnd_Hide(LPUIEXTRA lpUIExtra) {
       lpUIExtra->uiComp[i].bShow = FALSE;
     }
   }
-}
+} // CompWnd_Hide
 
 void CompWnd_SetFont(LPUIEXTRA lpUIExtra) {
   FOOTMARK();
-  for (int i = 0; i < MAXCOMPWND; i++)
-    if (IsWindow(lpUIExtra->uiComp[i].hWnd))
-      SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_FONT,
-                       (LONG_PTR)lpUIExtra->hFont);
+  for (int i = 0; i < MAXCOMPWND; i++) {
+    if (IsWindow(lpUIExtra->uiComp[i].hWnd)) {
+      ::SetWindowLongPtr(lpUIExtra->uiComp[i].hWnd, FIGWLP_FONT,
+                         (LONG_PTR)lpUIExtra->hFont);
+    }
+  }
 }
 
 LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
