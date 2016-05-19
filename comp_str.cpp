@@ -815,7 +815,9 @@ void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
     DWORD ich = ClauseToCompChar(iClause);
     if (old_str.size() < str.size()) {
       size_t diff = str.size() - old_str.size();
-      comp_attr.insert(comp_attr.begin() + ich, diff);
+      std::vector<BYTE> addition(diff, ATTR_CONVERTED);
+      comp_attr.insert(
+        comp_attr.begin() + ich, addition.begin(), addition.end());
     } else if (old_str.size() > str.size()) {
       size_t diff = old_str.size() - str.size();
       comp_attr.erase(
