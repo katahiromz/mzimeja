@@ -177,7 +177,7 @@ SIZE CandWnd_CalcSize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
     for (i = lpCandList->dwPageStart; i < end; i++) {
       WCHAR *psz = lpCandList->GetCandString(i);
       SIZE siz;
-      ::GetTextExtentPoint32W(hDC, psz, lstrlenW(psz), &siz);
+      ::GetTextExtentPoint32W(hDC, psz, ::lstrlenW(psz), &siz);
       if (width < siz.cx) width = siz.cx;
       height += siz.cy;
     }
