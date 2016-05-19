@@ -812,7 +812,7 @@ void InputContext::MoveUp() {
 
   // candidate up
   cand.MovePrev();
-  std::wstring& str = cand.GetString();
+  std::wstring str = cand.GetString();
   comp.SetClauseCompString(cand.iClause, str);
 
   // recreate
@@ -847,7 +847,7 @@ void InputContext::MoveDown() {
 
   // candidate down
   cand.MoveNext();
-  std::wstring& str = cand.GetString();
+  std::wstring str = cand.GetString();
   comp.SetClauseCompString(cand.iClause, str);
 
   // recreate
@@ -947,7 +947,7 @@ void InputContext::PageUp() {
 
   // go to previous page
   cand.PageUp();
-  std::wstring& str = cand.GetString();
+  std::wstring str = cand.GetString();
   comp.SetClauseCompString(cand.iClause, str);
 
   // recreate
@@ -981,7 +981,7 @@ void InputContext::PageDown() {
 
   // move to next page
   cand.PageDown();
-  std::wstring& str = cand.GetString();
+  std::wstring str = cand.GetString();
   comp.SetClauseCompString(cand.iClause, str);
 
   // recreate
