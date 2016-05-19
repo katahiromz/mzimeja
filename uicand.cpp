@@ -148,7 +148,7 @@ void CandWnd_Paint(HWND hCandWnd) {
           ::SetTextColor(hDC, RGB(0, 0, 0));
         }
         ::TextOutW(hDC, ::GetSystemMetrics(SM_CXEDGE), height, psz,
-                   lstrlenW(psz));
+                   ::lstrlenW(psz));
         height += sz.cy;
       }
       lpIMC->UnlockCandInfo();
