@@ -72,16 +72,16 @@ void MZIMEJA::PluralClauseConversion(const std::wstring& strHiragana,
     }
     result.clauses.push_back(clause);
 
-    result.clause[0].candidates[0].hiragana = L"ひらりー";
-    result.clause[0].candidates[0].converted = L"ヒラリー";
-    result.clause[1].candidates[0].hiragana = L"とらんぷ";
-    result.clause[1].candidates[0].converted = L"トランプ";
-    result.clause[2].candidates[0].hiragana = L"さんだーす";
-    result.clause[2].candidates[0].converted = L"サンダース";
-    result.clause[3].candidates[0].hiragana = L"かたやま";
-    result.clause[3].candidates[0].converted = L"片山";
-    result.clause[4].candidates[0].hiragana = L"うちゅうじん";
-    result.clause[4].candidates[0].converted = L"宇宙人";
+    result.clauses[0].candidates[0].hiragana = L"ひらりー";
+    result.clauses[0].candidates[0].converted = L"ヒラリー";
+    result.clauses[1].candidates[0].hiragana = L"とらんぷ";
+    result.clauses[1].candidates[0].converted = L"トランプ";
+    result.clauses[2].candidates[0].hiragana = L"さんだーす";
+    result.clauses[2].candidates[0].converted = L"サンダース";
+    result.clauses[3].candidates[0].hiragana = L"かたやま";
+    result.clauses[3].candidates[0].converted = L"片山";
+    result.clauses[4].candidates[0].hiragana = L"うちゅうじん";
+    result.clauses[4].candidates[0].converted = L"宇宙人";
   }
 } // MZIMEJA::PluralClauseConversion
 
