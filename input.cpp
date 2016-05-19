@@ -481,20 +481,20 @@ void InputContext::MakeResult() {
   CloseCandidate();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // set result
-  log.AssertValid();
-  log.MakeResult();
-  log.AssertValid();
+  comp.AssertValid();
+  comp.MakeResult();
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // generate messages to set composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_RESULTALL);
@@ -508,20 +508,20 @@ void InputContext::MakeHiragana() {
   CloseCandidate();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // update composition
-  log.AssertValid();
-  log.MakeHiragana();
-  log.AssertValid();
+  comp.AssertValid();
+  comp.MakeHiragana();
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // generate messages to update composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -535,20 +535,20 @@ void InputContext::MakeKatakana() {
   CloseCandidate();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // update composition
-  log.AssertValid();
-  log.MakeKatakana();
-  log.AssertValid();
+  comp.AssertValid();
+  comp.MakeKatakana();
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // generate messages to update composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -562,20 +562,20 @@ void InputContext::MakeHankaku() {
   CloseCandidate();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // update composition
-  log.AssertValid();
-  log.MakeHankaku();
-  log.AssertValid();
+  comp.AssertValid();
+  comp.MakeHankaku();
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // generate messages to update composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -589,20 +589,20 @@ void InputContext::MakeZenEisuu() {
   CloseCandidate();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // update composition
-  log.AssertValid();
-  log.MakeZenEisuu();
-  log.AssertValid();
+  comp.AssertValid();
+  comp.MakeZenEisuu();
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // generate messages to update composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -616,20 +616,20 @@ void InputContext::MakeHanEisuu() {
   CloseCandidate();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // update composition
-  log.AssertValid();
-  log.MakeHanEisuu();
-  log.AssertValid();
+  comp.AssertValid();
+  comp.MakeHanEisuu();
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // generate messages to update composition
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -662,20 +662,20 @@ void InputContext::RevertText() {
   }
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // reset composition of selected clause
-  log.AssertValid();
-  log.RevertText();
-  log.AssertValid();
+  comp.AssertValid();
+  comp.RevertText();
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
@@ -685,20 +685,20 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
   FOOTMARK();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // delete char
-  log.AssertValid();
-  log.DeleteChar(IsRomanMode(), bBackSpace);
-  log.AssertValid();
+  comp.AssertValid();
+  comp.DeleteChar(IsRomanMode(), bBackSpace);
+  comp.AssertValid();
 
   // if there is no composition, then
-  if (log.comp_str.empty()) {
+  if (comp.comp_str.empty()) {
     // close candidate if any
     CloseCandidate();
 
@@ -711,7 +711,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
   } else {
     // recreate
-    hCompStr = CompStr::ReCreate(hCompStr, &log);
+    hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
     // update composition
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -723,20 +723,20 @@ void InputContext::MoveLeft(BOOL bShift) {
   FOOTMARK();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // move left
-  log.AssertValid();
-  log.MoveLeft(bShift);
-  log.AssertValid();
+  comp.AssertValid();
+  comp.MoveLeft(bShift);
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
@@ -746,20 +746,20 @@ void InputContext::MoveRight(BOOL bShift) {
   FOOTMARK();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // move right
-  log.AssertValid();
-  log.MoveRight(bShift);
-  log.AssertValid();
+  comp.AssertValid();
+  comp.MoveRight(bShift);
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
@@ -769,24 +769,24 @@ void InputContext::MoveToBeginning() {
   FOOTMARK();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // move to the beginning
-  log.AssertValid();
-  if (log.HasClauseSelected()) {
-    log.extra.iClause = 0;
+  comp.AssertValid();
+  if (comp.HasClauseSelected()) {
+    comp.extra.iClause = 0;
   } else {
-    log.dwCursorPos = 0;
+    comp.dwCursorPos = 0;
   }
-  log.AssertValid();
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
@@ -796,24 +796,24 @@ void InputContext::MoveToEnd() {
   FOOTMARK();
 
   // get logical data
-  LogCompStr log;
+  LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
-    lpCompStr->GetLog(log);
+    lpCompStr->GetLog(comp);
     UnlockCompStr();
   }
 
   // move to the end
-  log.AssertValid();
-  if (log.HasClauseSelected()) {
-    log.extra.iClause = log.comp_clause.size() - 1;
+  comp.AssertValid();
+  if (comp.HasClauseSelected()) {
+    comp.extra.iClause = comp.comp_clause.size() - 1;
   } else {
-    log.dwCursorPos = (DWORD)log.comp_str.size();
+    comp.dwCursorPos = (DWORD)comp.comp_str.size();
   }
-  log.AssertValid();
+  comp.AssertValid();
 
   // recreate
-  hCompStr = CompStr::ReCreate(hCompStr, &log);
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
