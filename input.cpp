@@ -481,7 +481,7 @@ BOOL InputContext::Convert(BOOL bShift) {
     comp.SetClauseCompString(comp.extra.iClause, str);
   } else {
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
-	BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
+    BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
     TheIME.PluralClauseConversion(comp, cand, bRoman);
   }
 

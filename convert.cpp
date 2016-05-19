@@ -8,6 +8,7 @@
 void MZIMEJA::PluralClauseConversion(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
+  FOOTMARK();
   MzConversionResult result;
   std::wstring strHiragana = comp.extra.hiragana_clauses[comp.extra.iClause];
   PluralClauseConversion(strHiragana, result);
@@ -57,6 +58,7 @@ void MZIMEJA::PluralClauseConversion(
 void MZIMEJA::PluralClauseConversion(const std::wstring& strHiragana,
                                      MzConversionResult& result)
 {
+  FOOTMARK();
   // TODO:
   WCHAR sz[64];
   result.clauses.clear();
@@ -71,23 +73,24 @@ void MZIMEJA::PluralClauseConversion(const std::wstring& strHiragana,
       clause.candidates.push_back(cand);
     }
     result.clauses.push_back(clause);
-
-    result.clauses[0].candidates[0].hiragana = L"ひらりー";
-    result.clauses[0].candidates[0].converted = L"ヒラリー";
-    result.clauses[1].candidates[0].hiragana = L"とらんぷ";
-    result.clauses[1].candidates[0].converted = L"トランプ";
-    result.clauses[2].candidates[0].hiragana = L"さんだーす";
-    result.clauses[2].candidates[0].converted = L"サンダース";
-    result.clauses[3].candidates[0].hiragana = L"かたやま";
-    result.clauses[3].candidates[0].converted = L"片山";
-    result.clauses[4].candidates[0].hiragana = L"うちゅうじん";
-    result.clauses[4].candidates[0].converted = L"宇宙人";
   }
+
+  result.clauses[0].candidates[0].hiragana = L"ひらりー";
+  result.clauses[0].candidates[0].converted = L"ヒラリー";
+  result.clauses[1].candidates[0].hiragana = L"とらんぷ";
+  result.clauses[1].candidates[0].converted = L"トランプ";
+  result.clauses[2].candidates[0].hiragana = L"さんだーす";
+  result.clauses[2].candidates[0].converted = L"サンダース";
+  result.clauses[3].candidates[0].hiragana = L"かたやま";
+  result.clauses[3].candidates[0].converted = L"片山";
+  result.clauses[4].candidates[0].hiragana = L"うちゅうじん";
+  result.clauses[4].candidates[0].converted = L"宇宙人";
 } // MZIMEJA::PluralClauseConversion
 
 void MZIMEJA::SingleClauseConversion(const std::wstring& strHiragana,
                                      MzConversionClause& result)
 {
+  FOOTMARK();
   // TODO:
 } // MZIMEJA::SingleClauseConversion
 
