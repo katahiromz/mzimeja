@@ -11,6 +11,7 @@ BOOL MZIMEJA::LoadDictionary() {
 } // MZIMEJA::LoadDictionary
 
 BOOL MZIMEJA::IsDictionaryLoaded() const {
+  // TODO:
   return FALSE;
 }
 
