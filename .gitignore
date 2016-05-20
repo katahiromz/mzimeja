@@ -13,3 +13,8 @@ x64
 objfre_w2k_x86
 .vs
 *-2in1.pdf
+build
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+Makefile
