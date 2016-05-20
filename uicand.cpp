@@ -50,14 +50,14 @@ BOOL GetCandPosFromCompWnd(LPUIEXTRA lpUIExtra, LPPOINT lppt) {
     if (lpUIExtra->uiComp[0].bShow) {
       ::GetWindowRect(lpUIExtra->uiComp[0].hWnd, &rc);
       lppt->x = rc.left;
-      lppt->y = rc.bottom + 1;
+      lppt->y = rc.bottom + 2;
       return TRUE;
     }
   } else {
     if (lpUIExtra->uiDefComp.bShow) {
       ::GetWindowRect(lpUIExtra->uiDefComp.hWnd, &rc);
       lppt->x = rc.left;
-      lppt->y = rc.bottom + 1;
+      lppt->y = rc.bottom + 2;
       return TRUE;
     }
   }
@@ -72,9 +72,9 @@ BOOL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
       int height = GetCompFontHeight(lpUIExtra);
       if (!lpUIExtra->bVertical) {
         lppt->x = lpIMC->cfCompForm.ptCurrentPos.x;
-        lppt->y = lpIMC->cfCompForm.ptCurrentPos.y + height;
+        lppt->y = lpIMC->cfCompForm.ptCurrentPos.y + height + 2;
       } else {
-        lppt->x = lpIMC->cfCompForm.ptCurrentPos.x - height;
+        lppt->x = lpIMC->cfCompForm.ptCurrentPos.x - height - 2;
         lppt->y = lpIMC->cfCompForm.ptCurrentPos.y;
       }
       return TRUE;
