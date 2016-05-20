@@ -279,7 +279,6 @@ BOOL is_kanji(WCHAR ch);
 BOOL is_fullwidth_ascii(WCHAR ch);
 
 //////////////////////////////////////////////////////////////////////////////
-// C++ interfaces
 
 struct MzConversionCandidate {
   std::wstring hiragana;
@@ -300,6 +299,7 @@ struct MzConversionResult {
   void clear() { clauses.clear(); }
 };
 
+// The IME
 struct MZIMEJA {
   HINSTANCE       m_hInst;
   HANDLE          m_hMutex;
