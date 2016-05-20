@@ -84,6 +84,10 @@ void LogCandInfo::clear() {
   iClause = 0;
 }
 
+BOOL LogCandInfo::HasCandInfo() const {
+  return cand_lists.size() > 0;
+}
+
 DWORD LogCandInfo::GetClauseCount() const {
   return DWORD(cand_lists.size());
 }

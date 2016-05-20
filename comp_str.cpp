@@ -166,6 +166,10 @@ BOOL LogCompStr::IsBeingConverted() {
   return FALSE;
 }
 
+BOOL LogCompStr::HasCompStr() const {
+  return comp_str.size() > 0;
+}
+
 BOOL LogCompStr::CompCharInClause(
   DWORD iCompChar, DWORD iClause, BOOL bExcludeEnd/* = FALSE */) const {
   FOOTMARK();

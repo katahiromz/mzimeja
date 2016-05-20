@@ -126,6 +126,7 @@ struct LogCompStr {
 
   DWORD ClauseToCompChar(DWORD dwClauseIndex) const;
   DWORD CompCharToClause(DWORD iCompChar) const;
+  BOOL HasCompStr() const;
 
   // conversion of composition
   void MakeHiragana();
@@ -260,6 +261,7 @@ struct LogCandInfo {
   void clear();
   DWORD GetTotalSize() const;
   DWORD GetClauseCount() const;
+  BOOL HasCandInfo() const;
 
   void MoveLeft();
   void MoveRight();
@@ -378,6 +380,8 @@ struct InputContext : public INPUTCONTEXT {
   void MakeHankaku();
   void MakeZenEisuu();
   void MakeHanEisuu();
+
+  void GetLogObjects(LogCompStr& comp, LogCandInfo& cand);
 
   // for debugging
   void DumpCandInfo();

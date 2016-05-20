@@ -180,8 +180,8 @@ void InputContext::Initialize() {
     fdwInit |= INIT_CONVERSION;
   }
 
-  hCompStr = CompStr::ReCreate(hCompStr);
-  hCandInfo = CandInfo::ReCreate(hCandInfo);
+  hCompStr = CompStr::ReCreate(hCompStr, NULL);
+  hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
 }
 
 BOOL InputContext::HasCandInfo() {
@@ -338,6 +338,20 @@ void InputContext::UnlockGuideLine() {
   }
 }
 
+void InputContext::GetLogObjects(LogCompStr& comp, LogCandInfo& cand) {
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLog(comp);
+    UnlockCompStr();
+  }
+
+  CandInfo *lpCandInfo = LockCandInfo();
+  if (lpCandInfo) {
+    lpCandInfo->GetLog(cand);
+    UnlockCandInfo();
+  }
+} // InputContext::GetLogObjects
+
 void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   FOOTMARK();
 
@@ -350,12 +364,15 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   }
 
   // if the current position has a converted character, then
-  if (comp.GetCompCharAttr(comp.dwCursorPos) != ATTR_INPUT) {
+  if (comp.GetClauseAttr(comp.extra.iClause) != ATTR_INPUT) {
     // determinate composition
-    comp.MakeResult();
-    LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
-    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
-    TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
+    MakeResult();
+
+    lpCompStr = LockCompStr();
+    if (lpCompStr) {
+      lpCompStr->GetLog(comp);
+      UnlockCompStr();
+    }
   }
 
   // if there is not a composition string, then
@@ -385,9 +402,9 @@ BOOL InputContext::OpenCandidate() {
     UnlockCompStr();
 
     LogCandInfo cand;
-    CandInfo *cand_info = LockCandInfo();
-    if (cand_info) {
-      cand_info->GetLog(cand);
+    CandInfo *lpCandInfo = LockCandInfo();
+    if (lpCandInfo) {
+      lpCandInfo->GetLog(cand);
       UnlockCandInfo();
 
       // generate message to open candidate
@@ -405,7 +422,7 @@ BOOL InputContext::OpenCandidate() {
 
 BOOL InputContext::CloseCandidate() {
   if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo);
+    hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
     return TRUE;
   }
@@ -422,30 +439,18 @@ BOOL InputContext::Convert(BOOL bShift) {
   //  return FALSE;
   //}
 
-  // get logical data of composition info
+  // get logical data
   LogCompStr comp;
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    lpCompStr->GetLog(comp);
-    UnlockCompStr();
-  }
+  LogCandInfo cand;
+  GetLogObjects(comp, cand);
 
   // if there is no conposition, we cannot convert it
-  BOOL bHasCompStr = (comp.comp_str.size() > 0);
-  if (!bHasCompStr) {
+  if (!comp.HasCompStr()) {
     return FALSE;
   }
 
-  // get logical data of candidate info
-  LogCandInfo cand;
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->GetLog(cand);
-    UnlockCandInfo();
-  }
-
   // convert
-  if (HasCandInfo()) {
+  if (cand.HasCandInfo()) {
     LogCandList& cand_list = cand.cand_lists[comp.extra.iClause];
     if (bShift) {
       cand_list.MovePrev();
@@ -643,7 +648,7 @@ void InputContext::CancelText() {
   CloseCandidate();
 
   // reset composition
-  hCompStr = CompStr::ReCreate(hCompStr);
+  hCompStr = CompStr::ReCreate(hCompStr, NULL);
 
   // generate messages to end composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
@@ -703,7 +708,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     CloseCandidate();
 
     // clear composition
-    hCompStr = CompStr::ReCreate(hCompStr);
+    hCompStr = CompStr::ReCreate(hCompStr, NULL);
 
     // generate messages to end composition
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
@@ -722,21 +727,10 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
 void InputContext::MoveLeft(BOOL bShift) {
   FOOTMARK();
 
-  // get logical data of composition string
+  // get logical data
   LogCompStr comp;
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    lpCompStr->GetLog(comp);
-    UnlockCompStr();
-  }
-
-  // get logical data of candidate info
   LogCandInfo cand;
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->GetLog(cand);
-    UnlockCandInfo();
-  }
+  GetLogObjects(comp, cand);
 
   // move left
   comp.AssertValid();
@@ -758,21 +752,10 @@ void InputContext::MoveLeft(BOOL bShift) {
 void InputContext::MoveRight(BOOL bShift) {
   FOOTMARK();
 
-  // get logical data of composition string
+  // get logical data
   LogCompStr comp;
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    lpCompStr->GetLog(comp);
-    UnlockCompStr();
-  }
-
-  // get logical data of candidate info
   LogCandInfo cand;
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->GetLog(cand);
-    UnlockCandInfo();
-  }
+  GetLogObjects(comp, cand);
 
   // move right
   comp.AssertValid();
@@ -794,21 +777,10 @@ void InputContext::MoveUp() {
   FOOTMARK();
   if (!HasCandInfo()) return;
 
-  // get logical data of composition string
+  // get logical data
   LogCompStr comp;
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    lpCompStr->GetLog(comp);
-    UnlockCompStr();
-  }
-
-  // get logical data of candidate info
   LogCandInfo cand;
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->GetLog(cand);
-    UnlockCandInfo();
-  }
+  GetLogObjects(comp, cand);
 
   // candidate up
   cand.MovePrev();
@@ -829,21 +801,10 @@ void InputContext::MoveDown() {
   FOOTMARK();
   if (!HasCandInfo()) return;
 
-  // get logical data of composition string
+  // get logical data
   LogCompStr comp;
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    lpCompStr->GetLog(comp);
-    UnlockCompStr();
-  }
-
-  // get logical data of candidate info
   LogCandInfo cand;
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->GetLog(cand);
-    UnlockCandInfo();
-  }
+  GetLogObjects(comp, cand);
 
   // candidate down
   cand.MoveNext();
@@ -863,21 +824,10 @@ void InputContext::MoveDown() {
 void InputContext::MoveHome() {
   FOOTMARK();
 
-  // get logical data of composition string
+  // get logical data
   LogCompStr comp;
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    lpCompStr->GetLog(comp);
-    UnlockCompStr();
-  }
-
-  // get logical data of candidate info
   LogCandInfo cand;
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->GetLog(cand);
-    UnlockCandInfo();
-  }
+  GetLogObjects(comp, cand);
 
   // move to head
   comp.MoveHome();
@@ -896,21 +846,10 @@ void InputContext::MoveHome() {
 void InputContext::MoveEnd() {
   FOOTMARK();
 
-  // get logical data of composition string
+  // get logical data
   LogCompStr comp;
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    lpCompStr->GetLog(comp);
-    UnlockCompStr();
-  }
-
-  // get logical data of candidate info
   LogCandInfo cand;
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->GetLog(cand);
-    UnlockCandInfo();
-  }
+  GetLogObjects(comp, cand);
 
   // move to tail
   comp.MoveEnd();
@@ -929,21 +868,10 @@ void InputContext::MoveEnd() {
 void InputContext::PageUp() {
   FOOTMARK();
 
-  // get logical data of composition string
+  // get logical data
   LogCompStr comp;
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    lpCompStr->GetLog(comp);
-    UnlockCompStr();
-  }
-
-  // get logical data of candidate info
   LogCandInfo cand;
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->GetLog(cand);
-    UnlockCandInfo();
-  }
+  GetLogObjects(comp, cand);
 
   // go to previous page
   cand.PageUp();
@@ -963,21 +891,10 @@ void InputContext::PageUp() {
 void InputContext::PageDown() {
   FOOTMARK();
 
-  // get logical data of composition string
+  // get logical data
   LogCompStr comp;
-  CompStr *lpCompStr = LockCompStr();
-  if (lpCompStr) {
-    lpCompStr->GetLog(comp);
-    UnlockCompStr();
-  }
-
-  // get logical data of candidate info
   LogCandInfo cand;
-  CandInfo *lpCandInfo = LockCandInfo();
-  if (lpCandInfo) {
-    lpCandInfo->GetLog(cand);
-    UnlockCandInfo();
-  }
+  GetLogObjects(comp, cand);
 
   // move to next page
   cand.PageDown();
