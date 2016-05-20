@@ -3,6 +3,9 @@
 #    ex) cmake -DCMAKE_BUILD_TYPE=Release -G "MSYS Makefiles" .
 ##############################################################################
 
+##############################################################################
+# PROJECT INFORMATION
+
 # CMake minimum version
 cmake_minimum_required(VERSION 2.4)
 
@@ -18,6 +21,9 @@ set(PROGRAM_AUTHORS "Katayama Hirofumi MZ")
 set(PROGRAM_YEARS "2016")
 set(VERSION_STRING "${PROGRAM_MAJOR}.${PROGRAM_MINOR}.${PROGRAM_BUILD}")
 set(VERSION_INFO_STRING "${PROGRAM_NAME} ${VERSION_STRING} by ${PROGRAM_AUTHORS}")
+
+##############################################################################
+# DO NOT EDIT HERE IF YOU ARE A COWARD.
 
 # check build type
 if (NOT CMAKE_BUILD_TYPE)
@@ -60,6 +66,9 @@ endif()
 # enable Win32 resource
 ENABLE_LANGUAGE(RC)
 
+##############################################################################
+# mzimeja.ime
+
 # add library mzimeja_cxx
 add_library(mzimeja_cxx STATIC
     config.cpp
@@ -87,6 +96,9 @@ add_library(mzimeja.ime SHARED mzimeja.cpp mzimeja_res.rc)
 
 # link libraries to mzimeja.ime
 target_link_libraries(mzimeja.ime mzimeja_cxx imm32.lib comctl32.lib)
+
+##############################################################################
+# setup.exe
 
 # add executable setup.exe
 add_executable(setup WIN32 setup.cpp setup_res.rc)
