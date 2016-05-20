@@ -154,6 +154,7 @@ struct LogCompStr {
 
   DWORD GetClauseCompStrLen(DWORD dwClauseIndex) const;
   void SetClauseCompString(DWORD iClause, std::wstring& str);
+  void SetClauseCompHiragana(DWORD iClause, std::wstring& str);
 
   // for debugging
   void AssertValid();

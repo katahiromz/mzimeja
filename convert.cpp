@@ -13,8 +13,7 @@ void MZIMEJA::PluralClauseConversion(
   std::wstring strHiragana = comp.extra.hiragana_clauses[comp.extra.iClause];
   PluralClauseConversion(strHiragana, result);
 
-  // TODO: support multiple clauses
-  // setting comp
+  // TODO:
   comp.comp_str.clear();
   comp.extra.clear();
   comp.comp_clause.resize(result.clauses.size() + 1);
@@ -88,11 +87,48 @@ void MZIMEJA::PluralClauseConversion(const std::wstring& strHiragana,
   result.clauses[4].candidates[0].converted = L"宇宙人";
 } // MZIMEJA::PluralClauseConversion
 
+void MZIMEJA::SingleClauseConversion(
+  LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
+{
+  FOOTMARK();
+  DWORD iClause = comp.extra.iClause;
+
+  MzConversionClause result;
+  std::wstring strHiragana = comp.extra.hiragana_clauses[iClause];
+  SingleClauseConversion(strHiragana, result);
+
+  comp.SetClauseCompString(iClause, result.candidates[0].converted);
+  comp.SetClauseCompHiragana(iClause, result.candidates[0].hiragana);
+
+  // setting cand
+  LogCandList cand_list;
+  for (size_t i = 0; i < result.candidates.size(); ++i) {
+    MzConversionCandidate& cand = result.candidates[i];
+    cand_list.cand_strs.push_back(cand.converted);
+  }
+  cand.cand_lists[iClause] = cand_list;
+  cand.iClause = 0;
+
+  comp.extra.iClause = 0;
+}
+
 void MZIMEJA::SingleClauseConversion(const std::wstring& strHiragana,
                                      MzConversionClause& result)
 {
   FOOTMARK();
+  result.clear();
+
   // TODO:
+  MzConversionCandidate cand;
+  cand.hiragana = L"たんいつぶんせつへんかん";
+  cand.converted = L"単一文節変換1";
+  result.candidates.push_back(cand);
+  cand.hiragana = L"たんいつぶんせつへんかん";
+  cand.converted = L"単一文節変換2";
+  result.candidates.push_back(cand);
+  cand.hiragana = L"たんいつぶんせつへんかん";
+  cand.converted = L"単一文節変換3";
+  result.candidates.push_back(cand);
 } // MZIMEJA::SingleClauseConversion
 
 //////////////////////////////////////////////////////////////////////////////

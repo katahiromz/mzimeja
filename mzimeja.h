@@ -357,6 +357,7 @@ struct MZIMEJA {
   void PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   void PluralClauseConversion(const std::wstring& strHiragana,
                               MzConversionResult& result);
+  void SingleClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   void SingleClauseConversion(const std::wstring& strHiragana,
                               MzConversionClause& result);
 }; // struct MZIMEJA

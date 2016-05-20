@@ -453,14 +453,20 @@ BOOL InputContext::Convert(BOOL bShift) {
 
   // convert
   if (cand.HasCandInfo()) {
-    LogCandList& cand_list = cand.cand_lists[comp.extra.iClause];
-    if (bShift) {
-      cand_list.MovePrev();
+    if (comp.IsClauseConverted()) {
+      LogCandList& cand_list = cand.cand_lists[comp.extra.iClause];
+      if (bShift) {
+        cand_list.MovePrev();
+      } else {
+        cand_list.MoveNext();
+      }
+      std::wstring str = cand_list.cand_strs[cand_list.dwSelection];
+      comp.SetClauseCompString(comp.extra.iClause, str);
     } else {
-      cand_list.MoveNext();
+      TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+      BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
+      TheIME.SingleClauseConversion(comp, cand, bRoman);
     }
-    std::wstring str = cand_list.cand_strs[cand_list.dwSelection];
-    comp.SetClauseCompString(comp.extra.iClause, str);
   } else {
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
     BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);

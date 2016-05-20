@@ -898,6 +898,13 @@ void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
     // update cursor pos
     dwCursorPos = (DWORD)comp_str.size();
   }
+} // LogCompStr::SetClauseCompString
+
+void LogCompStr::SetClauseCompHiragana(DWORD iClause, std::wstring& str) {
+  FOOTMARK();
+  if (iClause < GetClauseCount()) {
+    extra.hiragana_clauses[iClause] = str;
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
