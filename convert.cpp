@@ -98,7 +98,7 @@ void MZIMEJA::SingleClauseConversion(
   SingleClauseConversion(strHiragana, result);
 
   comp.SetClauseCompString(iClause, result.candidates[0].converted);
-  comp.SetClauseCompHiragana(iClause, result.candidates[0].hiragana);
+  comp.SetClauseCompHiragana(iClause, result.candidates[0].hiragana, bRoman);
 
   // setting cand
   LogCandList cand_list;

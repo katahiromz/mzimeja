@@ -907,6 +907,20 @@ void LogCompStr::SetClauseCompHiragana(DWORD iClause, std::wstring& str) {
   }
 }
 
+void LogCompStr::SetClauseCompHiragana(
+  DWORD iClause, std::wstring& str, BOOL bRoman)
+{
+  FOOTMARK();
+  if (iClause < GetClauseCount()) {
+    if (bRoman) {
+      extra.typing_clauses[iClause] =
+        hiragana_to_roman(zenkaku_eisuu_to_hankaku(str));
+    } else {
+      extra.typing_clauses[iClause] = hiragana_to_typing(str);
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 DWORD CompStr::Store(const LogCompStr *log) {
