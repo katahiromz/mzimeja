@@ -45,7 +45,6 @@ void MZIMEJA::PluralClauseConversion(
   comp.SetClauseAttr(comp.extra.iClause, ATTR_TARGET_CONVERTED);
   comp.dwCursorPos = (DWORD)comp.comp_str.size();
   comp.dwDeltaStart = 0;
-  DebugPrintA("Conversion: %d\n", (INT)comp.comp_attr.size());
 
   // setting cand
   cand.clear();
