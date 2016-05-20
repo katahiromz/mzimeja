@@ -693,10 +693,23 @@ void LogCompStr::RevertText() {
         comp_clause.erase(comp_clause.begin() + extra.iClause + 1);
       }
     }
+    // compare old and new string
+    std::wstring old_str = extra.comp_str_clauses[extra.iClause];
+    std::wstring str = lcmap(extra.hiragana_clauses[extra.iClause],
+                             LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+    DWORD ich = ClauseToCompChar(extra.iClause);
+    if (old_str.size() < str.size()) {
+      size_t diff = str.size() - old_str.size();
+      std::vector<BYTE> addition(diff, ATTR_CONVERTED);
+      comp_attr.insert(
+        comp_attr.begin() + ich, addition.begin(), addition.end());
+    } else if (old_str.size() > str.size()) {
+      size_t diff = old_str.size() - str.size();
+      comp_attr.erase(
+        comp_attr.begin() + ich, comp_attr.begin() + ich + diff);
+    }
     // update composition string
-    extra.comp_str_clauses[extra.iClause] =
-      lcmap(extra.hiragana_clauses[extra.iClause],
-            LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+    extra.comp_str_clauses[extra.iClause] = str;
     UpdateCompStr();
     // set cursor position
     dwCursorPos = ClauseToCompChar(extra.iClause + 1);

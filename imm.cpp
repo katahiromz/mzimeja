@@ -102,6 +102,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     DebugPrint(TEXT("NI_CONTEXTUPDATED\n"));
     switch (dwValue) {
     case IMC_SETOPENSTATUS:
+      DebugPrint(TEXT("IMC_SETOPENSTATUS\n"));
       if (dwIndex == 0) {
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
@@ -114,9 +115,11 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       break;
 
     case IMC_SETCONVERSIONMODE:
+      DebugPrint(TEXT("IMC_SETCONVERSIONMODE\n"));
       break;
 
     case IMC_SETCOMPOSITIONWINDOW:
+      DebugPrint(TEXT("IMC_SETCOMPOSITIONWINDOW\n"));
       break;
 
     default:

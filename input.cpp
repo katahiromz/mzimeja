@@ -363,7 +363,7 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
     UnlockCompStr();
   }
 
-  // if the current position has a converted character, then
+  // if the current clause is converted, 
   if (comp.GetClauseAttr(comp.extra.iClause) != ATTR_INPUT) {
     // determinate composition
     MakeResult();
@@ -640,6 +640,25 @@ void InputContext::MakeHanEisuu() {
   LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
+
+void InputContext::Escape() {
+  FOOTMARK();
+
+  // get logical data
+  LogCompStr comp;
+  CompStr *lpCompStr = LockCompStr();
+  if (lpCompStr) {
+    lpCompStr->GetLog(comp);
+    UnlockCompStr();
+  }
+
+  // if the current clause is converted, 
+  if (comp.GetClauseAttr(comp.extra.iClause) == ATTR_INPUT) {
+    CancelText();
+  } else {
+    RevertText();
+  }
+} // InputContext::Escape
 
 void InputContext::CancelText() {
   FOOTMARK();

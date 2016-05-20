@@ -167,22 +167,25 @@ void CandWnd_Paint(HWND hCandWnd) {
 } // CandWnd_Paint
 
 SIZE CandWnd_CalcSize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+  FOOTMARK();
   int width = 0, height = 0;
   HDC hDC = ::CreateCompatibleDC(NULL);
   HFONT hOldFont = CheckNativeCharset(hDC);
   CandInfo *lpCandInfo = lpIMC->LockCandInfo();
   if (lpCandInfo) {
-    CANDINFOEXTRA *extra = lpCandInfo->GetExtra();
-    DWORD iList = 0;
-    if (extra) iList = extra->iClause;
-    CandList *lpCandList = lpCandInfo->GetList(iList);
-    DWORD i, end = lpCandList->GetPageEnd();
-    for (i = lpCandList->dwPageStart; i < end; i++) {
-      WCHAR *psz = lpCandList->GetCandString(i);
-      SIZE siz;
-      ::GetTextExtentPoint32W(hDC, psz, ::lstrlenW(psz), &siz);
-      if (width < siz.cx) width = siz.cx;
-      height += siz.cy;
+    if (lpCandInfo->dwCount > 0) {
+      CANDINFOEXTRA *extra = lpCandInfo->GetExtra();
+      DWORD iList = 0;
+      if (extra) iList = extra->iClause;
+      CandList *lpCandList = lpCandInfo->GetList(iList);
+      DWORD i, end = lpCandList->GetPageEnd();
+      for (i = lpCandList->dwPageStart; i < end; i++) {
+        WCHAR *psz = lpCandList->GetCandString(i);
+        SIZE siz;
+        ::GetTextExtentPoint32W(hDC, psz, ::lstrlenW(psz), &siz);
+        if (width < siz.cx) width = siz.cx;
+        height += siz.cy;
+      }
     }
     lpIMC->UnlockCandInfo();
   }

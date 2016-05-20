@@ -132,7 +132,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_ESCAPE:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->CancelText();
+      lpIMC->Escape();
       TheIME.UnlockIMC(hIMC);
     }
     break;

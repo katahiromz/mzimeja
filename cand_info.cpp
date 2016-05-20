@@ -221,6 +221,12 @@ DWORD CandList::Store(const LogCandList *log) {
 //////////////////////////////////////////////////////////////////////////////
 // CandInfo
 
+CandList *CandInfo::GetList(DWORD i) {
+  FOOTMARK();
+  assert(i < dwCount);
+  return (CandList *)(GetBytes() + dwOffset[i]);
+}
+
 void CandInfo::GetLog(LogCandInfo& log) {
   FOOTMARK();
   log.clear();

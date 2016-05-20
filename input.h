@@ -301,7 +301,7 @@ struct CandInfo : public CANDIDATEINFO {
   DWORD Store(const LogCandInfo *log);
 
   BYTE *GetBytes()           { return (BYTE *)this; }
-  CandList *GetList(DWORD i) { return (CandList *)(GetBytes() + dwOffset[i]); }
+  CandList *GetList(DWORD i);
   CANDINFOEXTRA *GetExtra();
 
   void Dump();
@@ -358,6 +358,7 @@ struct InputContext : public INPUTCONTEXT {
 
   // actions
   void AddChar(WCHAR chTyped, WCHAR chTranslated);
+  void Escape();
   void CancelText();
   void RevertText();
   void DeleteChar(BOOL bBackSpace = FALSE);
