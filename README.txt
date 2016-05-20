@@ -1,4 +1,4 @@
-This is MZ-IME Japanese Input (under construction).
+This is MZ-IME Japanese Input for Windows 2000 (under construction).
 
 /////////////////////////////////////////////////////
 // Katayama Hirofumi MZ (katahiromz) [ANT]
