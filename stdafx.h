@@ -1,8 +1,10 @@
-// mzimeja.h --- MZ-IME Japanese Input (mzimeja)
+// stdafx.h --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef MZIMEJA_H_
 #define MZIMEJA_H_
+
+#define _CRT_SECURE_NO_WARNINGS
 
 #ifndef _INC_WINDOWS
   #include <windows.h>

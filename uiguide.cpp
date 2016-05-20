@@ -1,7 +1,7 @@
 // uiguide.cpp --- mzimeja guideline window UI
 //////////////////////////////////////////////////////////////////////////////
 
-#include "mzimeja.h"
+#include "stdafx.h"
 
 extern "C" {
 

@@ -1,8 +1,7 @@
 // mzimeja.cpp --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
 
-#define _CRT_SECURE_NO_WARNINGS
-#include "mzimeja.h"
+#include "stdafx.h"
 #include "immsec.h"
 #include "resource.h"
 

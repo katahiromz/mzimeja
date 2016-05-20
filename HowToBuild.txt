@@ -1,1 +1,1 @@
-Use CMake.
+Use CMake, Makefile.msys or projects.

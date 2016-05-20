@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mzimeja", "mzimeja.vcproj", "{E73C3006-DF03-407F-B96D-D99014CCF68F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setup", "setup.vcproj", "{F446B36F-C219-4064-B48F-E36EE36146F3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E73C3006-DF03-407F-B96D-D99014CCF68F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E73C3006-DF03-407F-B96D-D99014CCF68F}.Debug|Win32.Build.0 = Debug|Win32
+		{E73C3006-DF03-407F-B96D-D99014CCF68F}.Release|Win32.ActiveCfg = Release|Win32
+		{E73C3006-DF03-407F-B96D-D99014CCF68F}.Release|Win32.Build.0 = Release|Win32
+		{F446B36F-C219-4064-B48F-E36EE36146F3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F446B36F-C219-4064-B48F-E36EE36146F3}.Debug|Win32.Build.0 = Debug|Win32
+		{F446B36F-C219-4064-B48F-E36EE36146F3}.Release|Win32.ActiveCfg = Release|Win32
+		{F446B36F-C219-4064-B48F-E36EE36146F3}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
