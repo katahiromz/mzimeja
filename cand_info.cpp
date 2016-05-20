@@ -108,12 +108,6 @@ void LogCandInfo::MoveRight() {
   }
 }
 
-void LogCandInfo::ShiftLeft() {
-}
-
-void LogCandInfo::ShiftRight() {
-}
-
 void LogCandInfo::MoveNext() {
   cand_lists[iClause].MoveNext();
 }

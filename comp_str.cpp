@@ -823,14 +823,6 @@ void LogCompStr::MoveRight() {
   }
 } // LogCompStr::MoveRight
 
-void LogCompStr::ShiftLeft() {
-  // TODO:
-}
-
-void LogCompStr::ShiftRight() {
-  // TODO:
-}
-
 void LogCompStr::MoveHome() {
   FOOTMARK();
   // is the current clause being converted?

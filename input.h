@@ -147,8 +147,6 @@ struct LogCompStr {
 
   void MoveLeft();
   void MoveRight();
-  void ShiftLeft();
-  void ShiftRight();
   void MoveHome();
   void MoveEnd();
 
@@ -270,8 +268,6 @@ struct LogCandInfo {
 
   void MoveLeft();
   void MoveRight();
-  void ShiftLeft();
-  void ShiftRight();
   void MoveNext();
   void MovePrev();
   void MoveHome();

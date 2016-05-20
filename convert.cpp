@@ -143,12 +143,14 @@ BOOL MZIMEJA::StretchClauseLeft(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
   // TODO:
+  return FALSE;
 } // MZIMEJA::StretchClauseLeft
 
 BOOL MZIMEJA::StretchClauseRight(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
   // TODO:
+  return FALSE;
 } // MZIMEJA::StretchClauseRight
 
 //////////////////////////////////////////////////////////////////////////////

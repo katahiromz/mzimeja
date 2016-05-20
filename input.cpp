@@ -761,8 +761,10 @@ void InputContext::MoveLeft(BOOL bShift) {
 
   if (bShift) {
     if (cand.HasCandInfo()) {
-      comp.ShiftLeft();
-      cand.ShiftLeft();
+      BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
+      if (!TheIME.StretchClauseLeft(comp, cand, bRoman)) {
+        return;
+      }
     }
   } else {
     // move left
@@ -795,8 +797,10 @@ void InputContext::MoveRight(BOOL bShift) {
 
   if (bShift) {
     if (cand.HasCandInfo()) {
-      comp.ShiftRight();
-      cand.ShiftRight();
+      BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
+      if (!TheIME.StretchClauseRight(comp, cand, bRoman)) {
+        return;
+      }
     }
   } else {
     // move right
