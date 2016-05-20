@@ -26,7 +26,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
 
   lpIMEInfo->fdwSelectCaps = SELECT_CAP_CONVERSION;
 
-  lstrcpy(lpszClassName, szUIServerClassName);
+  ::lstrcpyW(lpszClassName, szUIServerClassName);
 
   if (dwSystemInfoFlags & IME_SYSINFO_WINLOGON) {
     TheIME.m_bWinLogOn = TRUE;
