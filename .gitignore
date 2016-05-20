@@ -27,3 +27,4 @@ ZERO_CHECK.vcxproj
 mzimeja.ime.vcxproj
 mzimeja_cxx.vcxproj
 mzimeja_ime.sln
+*.dir
