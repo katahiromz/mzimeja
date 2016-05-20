@@ -9,6 +9,10 @@
 #endif
 #include <tchar.h>
 
+#include <string>           // for std::string, std::wstring, ...
+#include <vector>           // for std::vector
+#include <set>              // for std::set
+
 #include <cstdio>
 #include <cctype>
 #include <cassert>
@@ -79,15 +83,16 @@
 
 // WndExtra of child UI windows
 #define FIGWL_MOUSE 0
-#define FIGWLP_SERVERWND    (FIGWL_MOUSE + sizeof(LONG))
-#define FIGWLP_FONT         (FIGWLP_SERVERWND + sizeof(LONG_PTR))
-#define FIGWL_COMPSTARTSTR  (FIGWLP_FONT + sizeof(LONG_PTR))
-#define FIGWL_COMPSTARTNUM  (FIGWL_COMPSTARTSTR + sizeof(LONG))
-#define FIGWLP_STATUSBMP    (FIGWL_COMPSTARTNUM + sizeof(LONG))
-#define FIGWLP_CLOSEBMP     (FIGWLP_STATUSBMP + sizeof(LONG_PTR))
-#define FIGWL_PUSHSTATUS    (FIGWLP_CLOSEBMP + sizeof(LONG_PTR))
-#define FIGWLP_CHILDWND     (FIGWL_PUSHSTATUS + sizeof(LONG))
-#define UIEXTRASIZE         (FIGWLP_CHILDWND + sizeof(LONG_PTR))
+#define FIGWLP_SERVERWND        (FIGWL_MOUSE + sizeof(LONG))
+#define FIGWLP_FONT             (FIGWLP_SERVERWND + sizeof(LONG_PTR))
+#define FIGWL_COMPSTARTSTR      (FIGWLP_FONT + sizeof(LONG_PTR))
+#define FIGWL_COMPSTARTNUM      (FIGWL_COMPSTARTSTR + sizeof(LONG))
+#define FIGWL_COMPSTARTCLAUSE   (FIGWL_COMPSTARTNUM + sizeof(LONG))
+#define FIGWLP_STATUSBMP        (FIGWL_COMPSTARTCLAUSE + sizeof(LONG))
+#define FIGWLP_CLOSEBMP         (FIGWLP_STATUSBMP + sizeof(LONG_PTR))
+#define FIGWL_PUSHSTATUS        (FIGWLP_CLOSEBMP + sizeof(LONG_PTR))
+#define FIGWLP_CHILDWND         (FIGWL_PUSHSTATUS + sizeof(LONG))
+#define UIEXTRASIZE             (FIGWLP_CHILDWND + sizeof(LONG_PTR))
 
 // The flags of FIGWL_MOUSE
 #define FIM_CAPUTURED 0x01
@@ -201,6 +206,7 @@ void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void CompWnd_Hide(LPUIEXTRA lpUIExtra);
 void CompWnd_SetFont(LPUIEXTRA lpUIExtra);
+HWND ClauseToCompWnd(LPUIEXTRA lpUIExtra, InputContext *lpIMC, DWORD iClause);
 
 // uiguide.c
 LRESULT CALLBACK GuideWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
