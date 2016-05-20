@@ -1,35 +1,38 @@
+// setup.rc
+// (Japanese, Shift_JIS)
+
 #include <windows.h>
 
 STRINGTABLE 
-{
+BEGIN
     1, "MZ-IME セットアップ"
     2, "レジストリの設定に失敗しました。管理者権限でインストールをやり直して下さい。"
     3, "ファイルのコピーに失敗しました。管理者権限でインストールをやり直して下さい。"
     4, "日本語 (MZ-IME)"
     5, "IMEのインストールに失敗しました。エラーコード%dを作者にご連絡下さい。"
-}
+END
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     0, 1, 0, 0
-PRODUCTVERSION  0, 1, 0, 0
+FILEVERSION     0, 2, 0, 0
+PRODUCTVERSION  0, 2, 0, 0
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
-{
+BEGIN
     // Japanese
     BLOCK "StringFileInfo"
-    {
+    BEGIN
         BLOCK "041103A4"
-        {
+        BEGIN
             VALUE "CompanyName", "片山博文MZ\0"
             VALUE "FileDescription", "MZ-IME日本語入力セットアップ\0"
-            VALUE "FileVersion", "0.1\0"
+            VALUE "FileVersion", "0.2\0"
             VALUE "LegalCopyright", "Copyright (C) 2016 片山博文MZ.\0"
             VALUE "ProductName", "MZ-IME日本語入力\0"
-            VALUE "ProductVersion", "0.1\0"
-        }
-    }
+            VALUE "ProductVersion", "0.2\0"
+        END
+    END
     BLOCK "VarFileInfo"
-    {
+    BEGIN
         VALUE "Translation", 0x0411, 0x03A4
-    }
-}
+    END
+END
