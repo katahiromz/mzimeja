@@ -364,6 +364,8 @@ struct MZIMEJA {
   void SingleClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   void SingleClauseConversion(const std::wstring& strHiragana,
                               MzConversionClause& result);
+  void StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
+  void StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
 }; // struct MZIMEJA
 
 extern MZIMEJA TheIME;

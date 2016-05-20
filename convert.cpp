@@ -139,4 +139,16 @@ void MZIMEJA::SingleClauseConversion(const std::wstring& strHiragana,
   result.candidates.push_back(cand);
 } // MZIMEJA::SingleClauseConversion
 
+void MZIMEJA::StretchClauseLeft(
+  LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
+{
+  // TODO:
+} // MZIMEJA::StretchClauseLeft
+
+void MZIMEJA::StretchClauseRight(
+  LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
+{
+  // TODO:
+} // MZIMEJA::StretchClauseRight
+
 //////////////////////////////////////////////////////////////////////////////
