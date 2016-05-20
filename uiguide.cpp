@@ -139,7 +139,7 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
     if (dwLevel) {
       dwSize = ImmGetGuideLine(hIMC, GGL_STRING, NULL, 0) + 1;
       if ((dwSize > 1) && (hGLStr = GlobalAlloc(GHND, dwSize))) {
-        lpGLStr = (LPTSTR)GlobalLock(hGLStr);
+        lpGLStr = (LPWSTR)GlobalLock(hGLStr);
         if (lpGLStr) {
           COLORREF rgb = 0;
           HBRUSH hbrLGR = (HBRUSH)GetStockObject(LTGRAY_BRUSH);

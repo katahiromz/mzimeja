@@ -312,7 +312,7 @@ struct MZIMEJA {
   InputContext *  m_lpIMC;
 
   // dictionary file name
-  TCHAR           m_szDicFileName[256];
+  WCHAR           m_szDicFileName[256];
 
   MZIMEJA();
 
@@ -326,9 +326,9 @@ struct MZIMEJA {
   VOID Uninit(VOID);
 
   // load a bitmap from resource
-  HBITMAP LoadBMP(LPCTSTR pszName);
+  HBITMAP LoadBMP(LPCWSTR pszName);
   HBITMAP LoadBMP(UINT nID) {
-    return LoadBMP(MAKEINTRESOURCE(nID));
+    return LoadBMP(MAKEINTRESOURCEW(nID));
   }
 
   // load a string from resource

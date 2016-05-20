@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 2.4)
 
 # project name and language
-project(mzimeja_ime CXX)
+project(mzimeja CXX)
 
 # set program information
 set(PROGRAM_MAJOR 0)
@@ -58,7 +58,7 @@ if (CMAKE_HOST_WIN32)
     ENABLE_LANGUAGE(RC)
 
     # add library mzimeja_cxx 
-    add_library(mzimeja_cxx 
+    add_library(mzimeja_cxx STATIC
         config.cpp 
         convert.cpp 
         imm.cpp 
@@ -76,7 +76,7 @@ if (CMAKE_HOST_WIN32)
         keychar.cpp)
 
     # add compile options to mzimeja_cxx
-    target_compile_options(mzimeja_cxx PUBLIC
+    target_compile_options(mzimeja_cxx PRIVATE -municode
         -DUNICODE -D_UNICODE -finput-charset=CP932 -fexec-charset=CP932)
 
     # add library mzimeja.ime
@@ -89,10 +89,14 @@ if (CMAKE_HOST_WIN32)
     add_executable(setup WIN32 setup.cpp setup_res.rc)
 
     # add compile options to setup.exe
-    target_compile_options(setup PUBLIC -DUNICODE -D_UNICODE)
+    target_compile_options(setup PRIVATE -DUNICODE -D_UNICODE)
 
     # link libraries to setup.exe
     target_link_libraries(setup imm32.lib)
+
+    # add compile options to mzimeja_cxx
+    target_compile_options(setup PRIVATE -municode
+        -DUNICODE -D_UNICODE -finput-charset=CP932 -fexec-charset=CP932)
 else()
     message(FATAL_ERROR "To build this project, use Win32 C++ compiler")
 endif()

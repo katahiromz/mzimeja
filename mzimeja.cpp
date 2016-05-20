@@ -112,9 +112,9 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   RegisterClasses(m_hInst);
 
   WCHAR *lpDicFileName = m_szDicFileName;
-  lpDicFileName += ::GetWindowsDirectory(lpDicFileName, _countof(m_szDicFileName));
+  lpDicFileName += ::GetWindowsDirectoryW(lpDicFileName, _countof(m_szDicFileName));
   if (*(lpDicFileName - 1) != TEXT('\\')) *lpDicFileName++ = TEXT('\\');
-  ::LoadString(hInstance, IDS_DICFILENAME, lpDicFileName, 128);
+  ::LoadStringW(hInstance, IDS_DICFILENAME, lpDicFileName, 128);
   return TRUE;
 }
 
@@ -131,7 +131,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.cbClsExtra = 0;
   wcx.cbWndExtra = 2 * sizeof(LONG_PTR);
   wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hCursor = ::LoadCursor(NULL, IDC_ARROW);
   wcx.hIcon = NULL;
   wcx.lpszMenuName = NULL;
   wcx.lpszClassName = szUIServerClassName;
@@ -146,7 +146,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.cbClsExtra = 0;
   wcx.cbWndExtra = UIEXTRASIZE;
   wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hCursor = ::LoadCursor(NULL, IDC_ARROW);
   wcx.hIcon = NULL;
   wcx.lpszMenuName = NULL;
   wcx.lpszClassName = szCompStrClassName;
@@ -161,7 +161,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.cbClsExtra = 0;
   wcx.cbWndExtra = UIEXTRASIZE;
   wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hCursor = ::LoadCursor(NULL, IDC_ARROW);
   wcx.hIcon = NULL;
   wcx.lpszMenuName = NULL;
   wcx.lpszClassName = szCandClassName;
@@ -176,7 +176,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.cbClsExtra = 0;
   wcx.cbWndExtra = UIEXTRASIZE;
   wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hCursor = ::LoadCursor(NULL, IDC_ARROW);
   wcx.hIcon = NULL;
   wcx.lpszMenuName = NULL;
   wcx.lpszClassName = szStatusClassName;
@@ -192,7 +192,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.cbClsExtra = 0;
   wcx.cbWndExtra = UIEXTRASIZE;
   wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hCursor = ::LoadCursor(NULL, IDC_ARROW);
   wcx.hIcon = NULL;
   wcx.lpszMenuName = NULL;
   wcx.lpszClassName = szGuideClassName;
@@ -366,9 +366,9 @@ VOID MZIMEJA::Uninit(VOID) {
   if (m_hMutex) ::CloseHandle(m_hMutex);
 }
 
-HBITMAP MZIMEJA::LoadBMP(LPCTSTR pszName) {
+HBITMAP MZIMEJA::LoadBMP(LPCWSTR pszName) {
   FOOTMARK();
-  return ::LoadBitmap(m_hInst, pszName);
+  return ::LoadBitmapW(m_hInst, pszName);
 }
 
 WCHAR *MZIMEJA::LoadSTR(INT nID) {

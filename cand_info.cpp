@@ -178,6 +178,11 @@ DWORD CandList::GetPageEnd() const {
   return dw;
 }
 
+WCHAR *CandList::GetCandString(DWORD i) {
+  assert(i < dwCount);
+  return (WCHAR *)(GetBytes() + dwOffset[i]);
+}
+
 void CandList::GetLog(LogCandList& log) {
   FOOTMARK();
   log.dwStyle = dwStyle;
