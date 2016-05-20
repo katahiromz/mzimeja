@@ -5,6 +5,11 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+BOOL MZIMEJA::LoadDictionary() {
+  // TODO:
+  return FALSE;
+} // MZIMEJA::LoadDictionary
+
 void MZIMEJA::PluralClauseConversion(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
