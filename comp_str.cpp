@@ -207,6 +207,11 @@ void LogCompStr::SetClauseAttr(DWORD dwClauseIndex, BYTE attr) {
   }
 }
 
+BOOL LogCompStr::IsClauseConverted() const {
+  FOOTMARK();
+  return IsClauseConverted(extra.iClause);
+}
+
 BOOL LogCompStr::IsClauseConverted(DWORD dwClauseIndex) const {
   FOOTMARK();
   return GetClauseAttr(dwClauseIndex) != ATTR_INPUT;

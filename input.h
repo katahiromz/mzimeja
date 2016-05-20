@@ -116,6 +116,7 @@ struct LogCompStr {
                         BOOL bExcludeEnd = FALSE) const;
   BYTE GetClauseAttr(DWORD dwClauseIndex) const;
   void SetClauseAttr(DWORD dwClauseIndex, BYTE attr);
+  BOOL IsClauseConverted() const;
   BOOL IsClauseConverted(DWORD dwClauseIndex) const;
   BOOL HasClauseSelected() const;
   std::wstring GetClauseCompString(DWORD dwClauseIndex) const;
@@ -368,7 +369,7 @@ struct InputContext : public INPUTCONTEXT {
   void DeleteChar(BOOL bBackSpace = FALSE);
   BOOL Convert(BOOL bShift);
   BOOL OpenCandidate();
-  BOOL CloseCandidate();
+  BOOL CloseCandidate(BOOL bClearCandInfo = TRUE);
 
   void MoveLeft(BOOL bShift);
   void MoveRight(BOOL bShift);

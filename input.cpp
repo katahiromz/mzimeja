@@ -364,7 +364,7 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   }
 
   // if the current clause is converted, 
-  if (comp.GetClauseAttr(comp.extra.iClause) != ATTR_INPUT) {
+  if (comp.IsClauseConverted()) {
     // determinate composition
     MakeResult();
 
@@ -420,9 +420,11 @@ BOOL InputContext::OpenCandidate() {
   return ret;
 }
 
-BOOL InputContext::CloseCandidate() {
+BOOL InputContext::CloseCandidate(BOOL bClearCandInfo/* = TRUE*/) {
   if (HasCandInfo()) {
-    hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
+    if (bClearCandInfo) {
+      hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
+    }
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
     return TRUE;
   }
@@ -653,10 +655,10 @@ void InputContext::Escape() {
   }
 
   // if the current clause is converted, 
-  if (comp.GetClauseAttr(comp.extra.iClause) == ATTR_INPUT) {
-    CancelText();
-  } else {
+  if (comp.IsClauseConverted()) {
     RevertText();
+  } else {
+    CancelText();
   }
 } // InputContext::Escape
 
@@ -676,6 +678,9 @@ void InputContext::CancelText() {
 
 void InputContext::RevertText() {
   FOOTMARK();
+
+  // close candidate
+  CloseCandidate(FALSE);
 
   // get logical data
   LogCompStr comp;
@@ -749,12 +754,16 @@ void InputContext::MoveLeft(BOOL bShift) {
   GetLogObjects(comp, cand);
 
   if (bShift) {
-    comp.ShiftLeft();
-    if (cand.HasCandInfo()) cand.ShiftLeft();
+    if (cand.HasCandInfo()) {
+      comp.ShiftLeft();
+      cand.ShiftLeft();
+    }
   } else {
     // move left
     comp.MoveLeft();
-    if (cand.HasCandInfo()) cand.MoveLeft();
+    if (cand.HasCandInfo() && comp.IsClauseConverted()) {
+      cand.MoveLeft();
+    }
   }
 
   // recreate
@@ -765,7 +774,9 @@ void InputContext::MoveLeft(BOOL bShift) {
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
 
   // update candidate
-  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+  if (cand.HasCandInfo() && comp.IsClauseConverted()) {
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+  }
 } // InputContext::MoveLeft
 
 void InputContext::MoveRight(BOOL bShift) {
@@ -777,12 +788,16 @@ void InputContext::MoveRight(BOOL bShift) {
   GetLogObjects(comp, cand);
 
   if (bShift) {
-    comp.ShiftRight();
-    if (cand.HasCandInfo()) cand.ShiftRight();
+    if (cand.HasCandInfo()) {
+      comp.ShiftRight();
+      cand.ShiftRight();
+    }
   } else {
     // move right
     comp.MoveRight();
-    if (cand.HasCandInfo()) cand.MoveRight();
+    if (cand.HasCandInfo() && comp.IsClauseConverted()) {
+      cand.MoveRight();
+    }
   }
 
   // recreate
@@ -792,7 +807,9 @@ void InputContext::MoveRight(BOOL bShift) {
   // update composition
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
   // update candidate
-  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+  if (cand.HasCandInfo() && comp.IsClauseConverted()) {
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+  }
 } // InputContext::MoveRight
 
 void InputContext::MoveUp() {
