@@ -741,9 +741,8 @@ void LogCompStr::MakeResult() {
   clear_extra();
 }
 
-void LogCompStr::MoveLeft(BOOL bShift) {
+void LogCompStr::MoveLeft() {
   FOOTMARK();
-  // TODO: bShift
   // is the current clause being converted?
   if (IsClauseConverted(extra.iClause)) { // being converted
     // untarget
@@ -781,9 +780,8 @@ void LogCompStr::MoveLeft(BOOL bShift) {
   }
 } // LogCompStr::MoveLeft
 
-void LogCompStr::MoveRight(BOOL bShift) {
+void LogCompStr::MoveRight() {
   FOOTMARK();
-  // TODO: bShift
   // is the current clause being converted?
   if (IsClauseConverted(extra.iClause)) { // being converted
     // untarget
@@ -819,6 +817,14 @@ void LogCompStr::MoveRight(BOOL bShift) {
     }
   }
 } // LogCompStr::MoveRight
+
+void LogCompStr::ShiftLeft() {
+  // TODO:
+}
+
+void LogCompStr::ShiftRight() {
+  // TODO:
+}
 
 void LogCompStr::MoveHome() {
   FOOTMARK();

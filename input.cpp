@@ -677,20 +677,17 @@ void InputContext::CancelText() {
 void InputContext::RevertText() {
   FOOTMARK();
 
-  // close candidate if any
-  CloseCandidate();
-
-  // return if no composition string
-  if (!HasCompStr()) {
-    return;
-  }
-
   // get logical data
   LogCompStr comp;
   CompStr *lpCompStr = LockCompStr();
   if (lpCompStr) {
     lpCompStr->GetLog(comp);
     UnlockCompStr();
+  }
+
+  // return if no comp str
+  if (!comp.HasCompStr()) {
+    return;
   }
 
   // reset composition of selected clause
@@ -751,11 +748,14 @@ void InputContext::MoveLeft(BOOL bShift) {
   LogCandInfo cand;
   GetLogObjects(comp, cand);
 
-  // move left
-  comp.AssertValid();
-  comp.MoveLeft(bShift);
-  if (!bShift) cand.MoveLeft();
-  comp.AssertValid();
+  if (bShift) {
+    comp.ShiftLeft();
+    if (cand.HasCandInfo()) cand.ShiftLeft();
+  } else {
+    // move left
+    comp.MoveLeft();
+    if (cand.HasCandInfo()) cand.MoveLeft();
+  }
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);
@@ -776,11 +776,14 @@ void InputContext::MoveRight(BOOL bShift) {
   LogCandInfo cand;
   GetLogObjects(comp, cand);
 
-  // move right
-  comp.AssertValid();
-  comp.MoveRight(bShift);
-  if (!bShift) cand.MoveRight();
-  comp.AssertValid();
+  if (bShift) {
+    comp.ShiftRight();
+    if (cand.HasCandInfo()) cand.ShiftRight();
+  } else {
+    // move right
+    comp.MoveRight();
+    if (cand.HasCandInfo()) cand.MoveRight();
+  }
 
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);

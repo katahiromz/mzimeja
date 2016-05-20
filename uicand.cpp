@@ -186,6 +186,10 @@ SIZE CandWnd_CalcSize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
         if (width < siz.cx) width = siz.cx;
         height += siz.cy;
       }
+    } else {
+      FOOTMARK_POINT();
+      lpCandInfo->Dump();
+      assert(0);
     }
     lpIMC->UnlockCandInfo();
   }
