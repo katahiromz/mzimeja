@@ -10,6 +10,10 @@ BOOL MZIMEJA::LoadDictionary() {
   return FALSE;
 } // MZIMEJA::LoadDictionary
 
+BOOL MZIMEJA::IsDictionaryLoaded() const {
+  return FALSE;
+}
+
 void MZIMEJA::PluralClauseConversion(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {

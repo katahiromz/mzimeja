@@ -355,6 +355,7 @@ struct MZIMEJA {
 
   // dictionary
   BOOL LoadDictionary();
+  BOOL IsDictionaryLoaded() const;
 
   // convert
   void PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
