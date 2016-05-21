@@ -57,22 +57,22 @@ if (CMAKE_HOST_WIN32)
     # enable Win32 resource
     ENABLE_LANGUAGE(RC)
 
-    # add library mzimeja_cxx
+    # add library mzimeja_cxx 
     add_library(mzimeja_cxx STATIC
-        config.cpp
-        convert.cpp
-        imm.cpp
-        immsec.cpp
-        process.cpp
-        regword.cpp
-        ui.cpp
-        uicand.cpp
-        uicomp.cpp
-        uiguide.cpp
-        uistate.cpp
-        input.cpp
-        comp_str.cpp
-        cand_info.cpp
+        config.cpp 
+        convert.cpp 
+        imm.cpp 
+        immsec.cpp 
+        process.cpp 
+        regword.cpp 
+        ui.cpp 
+        uicand.cpp 
+        uicomp.cpp 
+        uiguide.cpp 
+        uistate.cpp 
+        input.cpp 
+        comp_str.cpp 
+        cand_info.cpp 
         keychar.cpp)
 
     # add compile options to mzimeja_cxx
