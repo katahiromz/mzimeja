@@ -57,10 +57,11 @@ if (CMAKE_HOST_WIN32)
     # enable Win32 resource
     ENABLE_LANGUAGE(RC)
 
-    # add library mzimeja_cxx 
+    # Win32
     add_library(mzimeja_cxx 
         config.cpp 
         convert.cpp 
+        mzimeja.cpp 
         imm.cpp 
         immsec.cpp 
         process.cpp 
@@ -75,24 +76,17 @@ if (CMAKE_HOST_WIN32)
         cand_info.cpp 
         keychar.cpp)
 
-    # add compile options to mzimeja_cxx
-    target_compile_options(mzimeja_cxx PUBLIC
-        -DUNICODE -D_UNICODE -finput-charset=CP932 -fexec-charset=CP932)
+    if (CMAKE_GENERATOR_PLATFORM MATCHES "Visual Studio")
+        target_compile_options(mzimeja_cxx PRIVATE -DUNICODE -D_UNICODE)
+    else()
+        target_compile_options(mzimeja_cxx PRIVATE 
+            -DUNICODE -D_UNICODE -finput-charset=CP932 -fexec-charset=CP932)
+    endif()
 
-    # add library mzimeja.ime
-    add_library(mzimeja.ime SHARED mzimeja.cpp mzimeja_res.rc)
+    add_library(mzimeja.ime SHARED mzimeja_res.rc)
 
-    # link libraries to mzimeja.ime
+    # link libraries
     target_link_libraries(mzimeja.ime mzimeja_cxx imm32.lib comctl32.lib)
-
-    # add executable setup.exe
-    add_executable(setup WIN32 setup.cpp setup_res.rc)
-
-    # add compile options to setup.exe
-    target_compile_options(setup PUBLIC -DUNICODE -D_UNICODE)
-
-    # link libraries to setup.exe
-    target_link_libraries(setup imm32.lib)
 else()
     message(FATAL_ERROR "To build this project, use Win32 C++ compiler")
 endif()
