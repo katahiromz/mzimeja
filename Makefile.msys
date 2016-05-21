@@ -7,7 +7,7 @@ DOTEXE = .exe
 
 DEFS1 = -static -m32 -mthreads
 
-DEFS2 = -DUNICODE -D_UNICODE
+DEFS2 = -municode -DUNICODE -D_UNICODE
 
 DEFS3 = -g -ggdb -O0 -DDEBUG=1 -D_DEBUG=1
 #DEFS3 = -O9 -DNDEBUG=1
@@ -109,8 +109,8 @@ setup$(DOTOBJ): setup.cpp
 mzimeja_res$(DOTOBJ): mzimeja_res.rc
 	$(RC) $(RCFLAGS) -i mzimeja_res.rc -o mzimeja_res$(DOTOBJ)
 
-setup_res$(DOTOBJ): setup_res.rc
-	$(RC) $(RCFLAGS) -i setup_res.rc -o setup_res$(DOTOBJ)
+setup_res$(DOTOBJ): setup.rc
+	$(RC) $(RCFLAGS) -i setup.rc -o setup_res$(DOTOBJ)
 
 clean:
 	rm -f *$(DOTOBJ)
