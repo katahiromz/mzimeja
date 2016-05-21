@@ -325,15 +325,25 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   }
 } // CompWnd_Move
 
-void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *psz,
-                     BYTE *lpattr, int num, BOOL fVert, DWORD dwCursor) {
+void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
+                     DWORD ich, DWORD cch, CompStr *lpCompStr, BOOL fVert) {
   FOOTMARK();
 
-  if (num == 0) return;
+  if (cch == 0) return;
 
+  // attribute
+  BYTE *lpattr = lpCompStr->GetCompAttr();
+
+  // get clause info
+  DWORD *pdw = lpCompStr->GetCompClause();
+  DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
+  std::set<DWORD> clauses(pdw, pdwEnd);
+
+  // get client rect
   RECT rc;
   ::GetClientRect(hCompWnd, &rc);
 
+  // starting position
   int x, y;
   if (fVert) {
     x = rc.right - UNDERLINE_HEIGHT;
@@ -342,13 +352,15 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *psz,
     x = y = 0;
   }
 
-  DWORD ich = 0;
+  // is it end?
   SIZE siz;
-  const WCHAR *lpEnd = &psz[num];
-  while (psz < lpEnd) {
-    HPEN hPen;
+  const WCHAR *lpEnd = &pch[cch];
+  while (pch < lpEnd) {
     ::SetBkMode(hDC, OPAQUE);
-    switch (*lpattr) {
+
+    // set color and pen
+    HPEN hPen;
+    switch (lpattr[ich]) {
     case ATTR_TARGET_CONVERTED:
       ::SetTextColor(hDC, RGB(0, 51, 0));
       ::SetBkColor(hDC, RGB(255, 255, 255));
@@ -365,45 +377,52 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *psz,
       hPen = ::CreatePen(PS_DOT, 1, RGB(0, 121, 0));
       break;
     }
-    ::TextOutW(hDC, x, y, psz, 1);
+    // draw text
+    ::TextOutW(hDC, x, y, pch, 1);
 
-    ::GetTextExtentPoint32W(hDC, psz, 1, &siz);
+    // get size of text
+    ::GetTextExtentPoint32W(hDC, pch, 1, &siz);
 
+    // draw underline if target converted
+    INT nClauseSep = 2 * (clauses.count(ich + 1) > 0);
     HGDIOBJ hPenOld = ::SelectObject(hDC, hPen);
-    if (*lpattr == ATTR_TARGET_CONVERTED) {
+    if (lpattr[ich] == ATTR_TARGET_CONVERTED) {
       if (fVert) {
         ::MoveToEx(hDC, x + 1, y, NULL);
-        ::LineTo(hDC, x + 1, y + siz.cx);
+        ::LineTo(hDC, x + 1, y + siz.cx - nClauseSep);
         ::MoveToEx(hDC, x + 2, y, NULL);
-        ::LineTo(hDC, x + 2, y + siz.cx);
+        ::LineTo(hDC, x + 2, y + siz.cx - nClauseSep);
       } else {
         ::MoveToEx(hDC, x, y + siz.cy - 1, NULL);
-        ::LineTo(hDC, x + siz.cx, y + siz.cy - 1);
+        ::LineTo(hDC, x + siz.cx - nClauseSep, y + siz.cy - 1);
         ::MoveToEx(hDC, x, y + siz.cy, NULL);
-        ::LineTo(hDC, x + siz.cx, y + siz.cy);
+        ::LineTo(hDC, x + siz.cx - nClauseSep, y + siz.cy);
       }
     } else {
       if (fVert) {
         ::MoveToEx(hDC, x + 1, y, NULL);
-        ::LineTo(hDC, x + 1, y + siz.cx);
+        ::LineTo(hDC, x + 1, y + siz.cx - nClauseSep);
       } else {
         ::MoveToEx(hDC, x, y + siz.cy - 1, NULL);
-        ::LineTo(hDC, x + siz.cx, y + siz.cy - 1);
+        ::LineTo(hDC, x + siz.cx - nClauseSep, y + siz.cy - 1);
       }
     }
     ::DeleteObject(::SelectObject(hDC, hPenOld));
-    if (*lpattr != ATTR_TARGET_CONVERTED) {
+
+    // draw underline if not target converted
+    if (lpattr[ich] != ATTR_TARGET_CONVERTED) {
       ::SelectObject(hDC, ::GetStockObject(WHITE_PEN));
       if (fVert) {
         ::MoveToEx(hDC, x + 2, y, NULL);
-        ::LineTo(hDC, x + 2, y + siz.cx);
+        ::LineTo(hDC, x + 2, y + siz.cx - nClauseSep);
       } else {
         ::MoveToEx(hDC, x, y + siz.cy, NULL);
-        ::LineTo(hDC, x + siz.cx, y + siz.cy);
+        ::LineTo(hDC, x + siz.cx - nClauseSep, y + siz.cy);
       }
     }
 
-    if (dwCursor == ich) {
+    // draw cursor (caret)
+    if (lpCompStr->dwCursorPos == ich) {
       ::SelectObject(hDC, ::GetStockObject(BLACK_PEN));
       if (fVert) {
         ::MoveToEx(hDC, x, y, NULL);
@@ -418,17 +437,17 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *psz,
       }
     }
 
-    ++psz;
+    // go to next position
+    ++pch;
     ++ich;
-    ++lpattr;
-
     if (fVert)
       y += siz.cx;
     else
       x += siz.cx;
   }
+
   // draw caret at last if any
-  if (dwCursor == ich) {
+  if (lpCompStr->dwCursorPos == ich) {
     ::SelectObject(hDC, ::GetStockObject(BLACK_PEN));
   } else {
     ::SelectObject(hDC, ::GetStockObject(WHITE_PEN));
@@ -443,6 +462,29 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *psz,
     ::LineTo(hDC, x, y + siz.cy);
     ::MoveToEx(hDC, x + 1, y, NULL);
     ::LineTo(hDC, x + 1, y + siz.cy);
+  }
+}
+
+void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompStr) {
+  // get comp string
+  std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
+  const WCHAR *pch = str.c_str();
+
+  // is it vertical?
+  BOOL fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
+
+  if (lpIMC->cfCompForm.dwStyle) {
+    ::SetBkMode(hDC, OPAQUE);
+
+    DWORD ich = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTSTR);
+    DWORD cch = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTNUM);
+    if (cch && ich + cch <= DWORD(::lstrlenW(pch))) {
+      pch += ich;
+      DrawTextOneLine(hCompWnd, hDC, pch, ich, cch, lpCompStr, fVert);
+    }
+  } else {
+    int cch = int(str.size());
+    DrawTextOneLine(hCompWnd, hDC, pch, 0, cch, lpCompStr, fVert);
   }
 }
 
@@ -465,31 +507,7 @@ void CompWnd_Paint(HWND hCompWnd) {
       CompStr *lpCompStr = lpIMC->LockCompStr();
       if (lpCompStr) {
         if (lpCompStr->dwCompStrLen > 0) {
-          do {
-            DWORD dwCursor = lpCompStr->dwCursorPos;
-
-            BOOL fVert = FALSE;
-            if (hFont) fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
-
-            std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
-            const WCHAR *pch = str.c_str();
-            BYTE *lpattr = lpCompStr->GetCompAttr();
-            if (lpIMC->cfCompForm.dwStyle) {
-              ::SetBkMode(hDC, OPAQUE);
-
-              int lstart = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTSTR);
-              int num = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTNUM);
-              if (!num || ((lstart + num) > ::lstrlenW(pch))) break;
-
-              pch += lstart;
-              lpattr += lstart;
-              dwCursor -= lstart;
-              DrawTextOneLine(hCompWnd, hDC, pch, lpattr, num, fVert, dwCursor);
-            } else {
-              int num = int(str.size());
-              DrawTextOneLine(hCompWnd, hDC, pch, lpattr, num, fVert, dwCursor);
-            }
-          } while (0);
+          CompWnd_Draw(hCompWnd, hDC, lpIMC, lpCompStr);
         }
         lpIMC->UnlockCompStr();
       }
