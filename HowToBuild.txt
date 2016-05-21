@@ -1,1 +1,1 @@
-Use CMake, Makefile.msys or projects/mzimeja.sln.
+Use CMake, Makefile.msys or projects.
