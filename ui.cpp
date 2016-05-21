@@ -1,7 +1,7 @@
 // ui.cpp --- mzimeja UI
 //////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "mzimeja.h"
 #include "resource.h"
 
 extern "C" {

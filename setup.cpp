@@ -102,7 +102,7 @@ INT WINAPI WinMain(
   WCHAR szPath[MAX_PATH];
   ::GetSystemDirectoryW(szPath, MAX_PATH);
   wcscat(szPath, L"\\mzimeja.ime");
-  if (!::ImmInstallIMEW(szPath, DoLoadString(hInstance, 4))) {
+  if (!ImmInstallIME(szPath, DoLoadString(hInstance, 4))) {
     WCHAR szMsg[128];
     DWORD dwError = ::GetLastError();
     ::wsprintfW(szMsg, DoLoadString(hInstance, 5), dwError);

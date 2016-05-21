@@ -1,7 +1,7 @@
 // uistate.cpp --- mzimeja status window UI
 //////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "mzimeja.h"
 #include "resource.h"
 
 #define CX_MINICAPTION 10

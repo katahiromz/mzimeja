@@ -1,7 +1,7 @@
 // config.cpp --- mzimeja configuration
 //////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "mzimeja.h"
 #include <prsht.h>
 #include "resource.h"
 

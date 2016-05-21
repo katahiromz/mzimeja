@@ -1,7 +1,7 @@
 // uicand.cpp --- mzimeja candidate window UI
 //////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "mzimeja.h"
 
 extern "C" {
 

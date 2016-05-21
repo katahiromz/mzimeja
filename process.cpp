@@ -1,7 +1,7 @@
 // process.cpp --- mzimeja input process
 //////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "mzimeja.h"
 #include "vksub.h"
 
 #define IsCtrlPressed(x)  ((x)[VK_CONTROL] & 0x80)
