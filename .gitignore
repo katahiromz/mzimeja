@@ -18,12 +18,3 @@ CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
 Makefile
-ALL_BUILD.vcproj
-ZERO_CHECK.vcproj
-mzimeja.ime.vcproj
-mzimeja_cxx.vcproj
-ALL_BUILD.vcxproj
-ZERO_CHECK.vcxproj
-mzimeja.ime.vcxproj
-mzimeja_cxx.vcxproj
-mzimeja_ime.sln

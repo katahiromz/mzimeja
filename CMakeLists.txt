@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 2.4)
 
 # project name and language
-project(mzimeja_ime CXX)
+project(mzimeja CXX)
 
 # set program information
 set(PROGRAM_MAJOR 0)
@@ -58,7 +58,7 @@ if (CMAKE_HOST_WIN32)
     ENABLE_LANGUAGE(RC)
 
     # Win32
-    add_library(mzimeja_cxx 
+    add_library(mzimeja.ime SHARED
         config.cpp 
         convert.cpp 
         mzimeja.cpp 
@@ -74,21 +74,19 @@ if (CMAKE_HOST_WIN32)
         input.cpp 
         comp_str.cpp 
         cand_info.cpp 
-        keychar.cpp)
-
-    if (CMAKE_GENERATOR_PLATFORM MATCHES "Visual Studio")
-        target_compile_options(mzimeja_cxx PRIVATE -DUNICODE -D_UNICODE)
-    else()
-        target_compile_options(mzimeja_cxx PRIVATE 
-            -DUNICODE -D_UNICODE -finput-charset=CP932 -fexec-charset=CP932)
-    endif()
-
-    add_library(mzimeja.ime SHARED mzimeja_res.rc)
-
-    # link libraries
-    target_link_libraries(mzimeja.ime mzimeja_cxx imm32.lib comctl32.lib)
+        keychar.cpp 
+        mzimeja_res.rc)
 else()
     message(FATAL_ERROR "To build this project, use Win32 C++ compiler")
+endif()
+
+# link libraries
+target_link_libraries(mzimeja.ime -limm32 -lcomctl32)
+
+# add definitions for Unicode, Japanese
+if (MINGW)
+    target_compile_options(mzimeja.ime PRIVATE 
+        $<$<COMPILE_LANGUAGE:CXX>:-DUNICODE -D_UNICODE -finput-charset=CP932 -fexec-charset=CP932>)
 endif()
 
 ##############################################################################
