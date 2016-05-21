@@ -22,11 +22,9 @@ ALL_BUILD.vcproj
 ZERO_CHECK.vcproj
 mzimeja.ime.vcproj
 mzimeja_cxx.vcproj
-setup.vcproj
 ALL_BUILD.vcxproj
 ZERO_CHECK.vcxproj
 mzimeja.ime.vcxproj
 mzimeja_cxx.vcxproj
-setup.vcxproj
 mzimeja_ime.sln
 *.dir
