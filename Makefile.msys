@@ -106,8 +106,8 @@ keychar$(DOTOBJ): keychar.cpp
 setup$(DOTOBJ): setup.cpp
 	$(CXX) -c $(CXXFLAGS) -o setup$(DOTOBJ) setup.cpp
 
-mzimeja_res$(DOTOBJ): mzimeja_res.rc
-	$(RC) $(RCFLAGS) -i mzimeja_res.rc -o mzimeja_res$(DOTOBJ)
+mzimeja_res$(DOTOBJ): mzimeja.rc
+	$(RC) $(RCFLAGS) -i mzimeja.rc -o mzimeja_res$(DOTOBJ)
 
 setup_res$(DOTOBJ): setup.rc
 	$(RC) $(RCFLAGS) -i setup.rc -o setup_res$(DOTOBJ)
