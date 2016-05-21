@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="include"
+				AdditionalIncludeDirectories="..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MZIMEJA_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -55,7 +55,6 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -65,7 +64,7 @@
 				AdditionalDependencies="advapi32.lib comctl32.lib imm32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).ime"
 				LinkIncremental="2"
-				ModuleDefinitionFile="mzimeja.def"
+				ModuleDefinitionFile="..\mzimeja.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -119,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="include"
+				AdditionalIncludeDirectories="..\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;MZIMEJA_EXPORTS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -132,7 +131,6 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -181,67 +179,67 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\cand_info.cpp"
+				RelativePath="..\cand_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\comp_str.cpp"
+				RelativePath="..\comp_str.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\config.cpp"
+				RelativePath="..\config.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\convert.cpp"
+				RelativePath="..\convert.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\imm.cpp"
+				RelativePath="..\imm.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\immsec.cpp"
+				RelativePath="..\immsec.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\input.cpp"
+				RelativePath="..\input.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\keychar.cpp"
+				RelativePath="..\keychar.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\mzimeja.cpp"
+				RelativePath="..\mzimeja.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\process.cpp"
+				RelativePath="..\process.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\regword.cpp"
+				RelativePath="..\regword.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ui.cpp"
+				RelativePath="..\ui.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\uicand.cpp"
+				RelativePath="..\uicand.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\uicomp.cpp"
+				RelativePath="..\uicomp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\uiguide.cpp"
+				RelativePath="..\uiguide.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\uistate.cpp"
+				RelativePath="..\uistate.cpp"
 				>
 			</File>
 		</Filter>
@@ -251,39 +249,39 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\footmark.hpp"
+				RelativePath="..\footmark.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\immdev.h"
+				RelativePath="..\include\immdev.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\immsec.h"
+				RelativePath="..\include\immsec.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\indicml.h"
+				RelativePath="..\include\indicml.h"
 				>
 			</File>
 			<File
-				RelativePath=".\input.h"
+				RelativePath="..\input.h"
 				>
 			</File>
 			<File
-				RelativePath=".\mzimeja.h"
+				RelativePath="..\mzimeja.h"
 				>
 			</File>
 			<File
-				RelativePath=".\resource.h"
+				RelativePath="..\resource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\unboost.hpp"
+				RelativePath="..\unboost.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\vksub.h"
+				RelativePath="..\include\vksub.h"
 				>
 			</File>
 		</Filter>
@@ -293,7 +291,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\mzimeja.rc"
+				RelativePath="..\mzimeja.rc"
 				>
 			</File>
 		</Filter>

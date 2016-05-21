@@ -116,9 +116,9 @@ void MZIMEJA::SingleClauseConversion(
     cand_list.cand_strs.push_back(cand.converted);
   }
   cand.cand_lists[iClause] = cand_list;
-  cand.iClause = 0;
+  cand.iClause = iClause;
 
-  comp.extra.iClause = 0;
+  comp.extra.iClause = iClause;
 }
 
 void MZIMEJA::SingleClauseConversion(const std::wstring& strHiragana,
