@@ -9,11 +9,11 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // the window classes for mzimeja UI windows
-const WCHAR szUIServerClassName[] = L"MZIMEUI";
-const WCHAR szCompStrClassName[]  = L"MZIMECompStr";
-const WCHAR szCandClassName[]     = L"MZIMECand";
-const WCHAR szStatusClassName[]   = L"MZIMEStatus";
-const WCHAR szGuideClassName[]    = L"MZIMEGuide";
+const TCHAR szUIServerClassName[] = TEXT("MZIMEUI");
+const TCHAR szCompStrClassName[]  = TEXT("MZIMECompStr");
+const TCHAR szCandClassName[]     = TEXT("MZIMECand");
+const TCHAR szStatusClassName[]   = TEXT("MZIMEStatus");
+const TCHAR szGuideClassName[]    = TEXT("MZIMEGuide");
 
 const MZGUIDELINE glTable[] = {
   {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},
@@ -121,7 +121,7 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
 #define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
 
 BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
-  WNDCLASSEXW wcx;
+  WNDCLASSEX wcx;
   FOOTMARK();
 
   // register class of UI server window.
@@ -137,7 +137,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.lpszClassName = szUIServerClassName;
   wcx.hbrBackground = NULL;
   wcx.hIconSm = NULL;
-  if (!::RegisterClassExW(&wcx)) return FALSE;
+  if (!RegisterClassEx(&wcx)) return FALSE;
 
   // register class of composition window.
   wcx.cbSize = sizeof(WNDCLASSEX);
@@ -152,7 +152,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.lpszClassName = szCompStrClassName;
   wcx.hbrBackground = NULL;
   wcx.hIconSm = NULL;
-  if (!::RegisterClassExW(&wcx)) return FALSE;
+  if (!RegisterClassEx(&wcx)) return FALSE;
 
   // register class of candidate window.
   wcx.cbSize = sizeof(WNDCLASSEX);
@@ -167,7 +167,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.lpszClassName = szCandClassName;
   wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
   wcx.hIconSm = NULL;
-  if (!::RegisterClassExW(&wcx)) return FALSE;
+  if (!RegisterClassEx(&wcx)) return FALSE;
 
   // register class of status window.
   wcx.cbSize = sizeof(WNDCLASSEX);
@@ -183,7 +183,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.hbrBackground = NULL;
   wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
   wcx.hIconSm = NULL;
-  if (!::RegisterClassExW(&wcx)) return FALSE;
+  if (!RegisterClassEx(&wcx)) return FALSE;
 
   // register class of guideline window.
   wcx.cbSize = sizeof(WNDCLASSEX);
@@ -199,7 +199,7 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.hbrBackground = NULL;
   wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
   wcx.hIconSm = NULL;
-  if (!::RegisterClassExW(&wcx)) return FALSE;
+  if (!RegisterClassEx(&wcx)) return FALSE;
 
   return TRUE;
 }
@@ -359,10 +359,10 @@ void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
 
 VOID MZIMEJA::Uninit(VOID) {
   FOOTMARK();
-  ::UnregisterClassW(szUIServerClassName, m_hInst);
-  ::UnregisterClassW(szCompStrClassName, m_hInst);
-  ::UnregisterClassW(szCandClassName, m_hInst);
-  ::UnregisterClassW(szStatusClassName, m_hInst);
+  ::UnregisterClass(szUIServerClassName, m_hInst);
+  ::UnregisterClass(szCompStrClassName, m_hInst);
+  ::UnregisterClass(szCandClassName, m_hInst);
+  ::UnregisterClass(szStatusClassName, m_hInst);
   if (m_hMutex) ::CloseHandle(m_hMutex);
 }
 

@@ -158,11 +158,11 @@ typedef struct {
 //////////////////////////////////////////////////////////////////////////////
 // externs
 
-extern const WCHAR szUIServerClassName[];
-extern const WCHAR szCompStrClassName[];
-extern const WCHAR szCandClassName[];
-extern const WCHAR szStatusClassName[];
-extern const WCHAR szGuideClassName[];
+extern const TCHAR szUIServerClassName[];
+extern const TCHAR szCompStrClassName[];
+extern const TCHAR szCandClassName[];
+extern const TCHAR szStatusClassName[];
+extern const TCHAR szGuideClassName[];
 extern const MZGUIDELINE glTable[];
 
 //////////////////////////////////////////////////////////////////////////////
