@@ -24,15 +24,11 @@ RCFLAGS = -Iinclude -F pe-i386            # x86
 #RCFLAGS = -Iinclude -F pe-x86-64         # x64
 
 OBJS = \
-	cand_info$(DOTOBJ) \
-	comp_str$(DOTOBJ) \
 	config$(DOTOBJ) \
 	convert$(DOTOBJ) \
+	mzimeja$(DOTOBJ) \
 	imm$(DOTOBJ) \
 	immsec$(DOTOBJ) \
-	input$(DOTOBJ) \
-	keychar$(DOTOBJ) \
-	mzimeja$(DOTOBJ) \
 	process$(DOTOBJ) \
 	regword$(DOTOBJ) \
 	ui$(DOTOBJ) \
@@ -40,6 +36,10 @@ OBJS = \
 	uicomp$(DOTOBJ) \
 	uiguide$(DOTOBJ) \
 	uistate$(DOTOBJ) \
+	input$(DOTOBJ) \
+	comp_str$(DOTOBJ) \
+	cand_info$(DOTOBJ) \
+	keychar$(DOTOBJ) \
 	mzimeja_res$(DOTOBJ) \
 
 LIBS = \
@@ -70,25 +70,16 @@ $(IME_FILE): $(OBJS)
 $(SETUP_FILE): $(SETUP_OBJS)
 	$(CXX) -mwindows -o $(SETUP_FILE) $(CXXFLAGS) $(SETUP_OBJS) $(SETUP_LIBS)
 
-# mzimeja.ime
-cand_info$(DOTOBJ): cand_info.cpp
-	$(CXX) -c $(CXXFLAGS) -o cand_info$(DOTOBJ) cand_info.cpp
-comp_str$(DOTOBJ): comp_str.cpp
-	$(CXX) -c $(CXXFLAGS) -o comp_str$(DOTOBJ) comp_str.cpp
 config$(DOTOBJ): config.cpp
 	$(CXX) -c $(CXXFLAGS) -o config$(DOTOBJ) config.cpp
 convert$(DOTOBJ): convert.cpp
 	$(CXX) -c $(CXXFLAGS) -o convert$(DOTOBJ) convert.cpp
+mzimeja$(DOTOBJ): mzimeja.cpp
+	$(CXX) -c $(CXXFLAGS) -o mzimeja$(DOTOBJ) mzimeja.cpp
 imm$(DOTOBJ): imm.cpp
 	$(CXX) -c $(CXXFLAGS) -o imm$(DOTOBJ) imm.cpp
 immsec$(DOTOBJ): immsec.cpp
 	$(CXX) -c $(CXXFLAGS) -o immsec$(DOTOBJ) immsec.cpp
-input$(DOTOBJ): input.cpp
-	$(CXX) -c $(CXXFLAGS) -o input$(DOTOBJ) input.cpp
-keychar$(DOTOBJ): keychar.cpp
-	$(CXX) -c $(CXXFLAGS) -o keychar$(DOTOBJ) keychar.cpp
-mzimeja$(DOTOBJ): mzimeja.cpp
-	$(CXX) -c $(CXXFLAGS) -o mzimeja$(DOTOBJ) mzimeja.cpp
 process$(DOTOBJ): process.cpp
 	$(CXX) -c $(CXXFLAGS) -o process$(DOTOBJ) process.cpp
 regword$(DOTOBJ): regword.cpp
@@ -103,12 +94,21 @@ uiguide$(DOTOBJ): uiguide.cpp
 	$(CXX) -c $(CXXFLAGS) -o uiguide$(DOTOBJ) uiguide.cpp
 uistate$(DOTOBJ): uistate.cpp
 	$(CXX) -c $(CXXFLAGS) -o uistate$(DOTOBJ) uistate.cpp
+input$(DOTOBJ): input.cpp
+	$(CXX) -c $(CXXFLAGS) -o input$(DOTOBJ) input.cpp
+comp_str$(DOTOBJ): comp_str.cpp
+	$(CXX) -c $(CXXFLAGS) -o comp_str$(DOTOBJ) comp_str.cpp
+cand_info$(DOTOBJ): cand_info.cpp
+	$(CXX) -c $(CXXFLAGS) -o cand_info$(DOTOBJ) cand_info.cpp
+keychar$(DOTOBJ): keychar.cpp
+	$(CXX) -c $(CXXFLAGS) -o keychar$(DOTOBJ) keychar.cpp
+
+setup$(DOTOBJ): setup.cpp
+	$(CXX) -c $(CXXFLAGS) -o setup$(DOTOBJ) setup.cpp
+
 mzimeja_res$(DOTOBJ): mzimeja_res.rc
 	$(RC) $(RCFLAGS) -i mzimeja_res.rc -o mzimeja_res$(DOTOBJ)
 
-# setup.exe
-setup$(DOTOBJ): setup.cpp
-	$(CXX) -c $(CXXFLAGS) -o setup$(DOTOBJ) setup.cpp
 setup_res$(DOTOBJ): setup_res.rc
 	$(RC) $(RCFLAGS) -i setup_res.rc -o setup_res$(DOTOBJ)
 
