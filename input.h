@@ -186,7 +186,7 @@ struct CompStr : public COMPOSITIONSTRING {
     return (LPDWORD)(GetBytes() + dwCompReadClauseOffset);
   }
   WCHAR *GetCompReadStr() {
-    return (WCHAR *)(GetBytes() + dwCompReadStrOffset);
+    return (LPTSTR)(GetBytes() + dwCompReadStrOffset);
   }
   BYTE *GetCompAttr() {
     return GetBytes() + dwCompAttrOffset;
@@ -195,19 +195,19 @@ struct CompStr : public COMPOSITIONSTRING {
     return (LPDWORD)(GetBytes() + dwCompClauseOffset);
   }
   WCHAR *GetCompStr() {
-    return (WCHAR *)(GetBytes() + dwCompStrOffset);
+    return (LPTSTR)(GetBytes() + dwCompStrOffset);
   }
   LPDWORD GetResultReadClause() {
     return (LPDWORD)(GetBytes() + dwResultReadClauseOffset);
   }
   WCHAR *GetResultReadStr() {
-    return (WCHAR *)(GetBytes() + dwResultReadStrOffset);
+    return (LPTSTR)(GetBytes() + dwResultReadStrOffset);
   }
   LPDWORD GetResultClause() {
     return (LPDWORD)(GetBytes() + dwResultClauseOffset);
   }
   WCHAR *GetResultStr() {
-    return (WCHAR *)(GetBytes() + dwResultStrOffset);
+    return (LPTSTR)(GetBytes() + dwResultStrOffset);
   }
 
   // extension
@@ -283,9 +283,9 @@ struct LogCandInfo {
 
 // physical candidate list
 struct CandList : public CANDIDATELIST {
-  BYTE *GetBytes()      { return (BYTE *)this; }
-  WCHAR *GetCurString() { return GetCandString(dwSelection); }
-  WCHAR *GetCandString(DWORD i);
+  BYTE *GetBytes()             { return (BYTE *)this; }
+  WCHAR *GetCandString(DWORD i) { return LPTSTR(GetBytes() + dwOffset[i]); }
+  WCHAR *GetCurString()         { return GetCandString(dwSelection); }
   DWORD  GetPageEnd() const;
   void GetLog(LogCandList& log);
   DWORD Store(const LogCandList *log);

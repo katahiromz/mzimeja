@@ -295,15 +295,15 @@ void InputContext::MakeGuideLine(DWORD dwID) {
   lpGuideLine->dwLevel = glTable[dwID].dwLevel;
   lpGuideLine->dwIndex = glTable[dwID].dwIndex;
   lpGuideLine->dwStrOffset = sizeof(GUIDELINE);
-  lpStr = (LPWSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwStrOffset);
-  ::LoadStringW(TheIME.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
+  lpStr = (LPTSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwStrOffset);
+  LoadString(TheIME.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
   lpGuideLine->dwStrLen = lstrlen(lpStr);
 
   if (glTable[dwID].dwPrivateID) {
     lpGuideLine->dwPrivateOffset =
         sizeof(GUIDELINE) + (MAXGLCHAR + 1) * sizeof(TCHAR);
-    lpStr = (LPWSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwPrivateOffset);
-    ::LoadStringW(TheIME.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
+    lpStr = (LPTSTR)((LPBYTE)lpGuideLine + lpGuideLine->dwPrivateOffset);
+    LoadString(TheIME.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
     lpGuideLine->dwPrivateSize = lstrlen(lpStr) * sizeof(TCHAR);
   } else {
     lpGuideLine->dwPrivateOffset = 0L;
