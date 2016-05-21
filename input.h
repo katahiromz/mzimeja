@@ -108,6 +108,7 @@ struct LogCompStr {
   void clear_comp();
   void clear_result();
   void clear_extra() { extra.clear(); }
+  void fix();
   DWORD GetTotalSize() const;
 
   BOOL IsBeingConverted();
@@ -211,10 +212,7 @@ struct CompStr : public COMPOSITIONSTRING {
   }
 
   // extension
-  COMPSTREXTRA *GetExtra() {
-    if (dwPrivateSize) return (COMPSTREXTRA *)(GetBytes() + dwPrivateOffset);
-    return NULL;
-  }
+  COMPSTREXTRA *GetExtra();
 
   void Dump();
 

@@ -207,6 +207,8 @@ void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
 void CompWnd_Hide(LPUIEXTRA lpUIExtra);
 void CompWnd_SetFont(LPUIEXTRA lpUIExtra);
 HWND ClauseToCompWnd(LPUIEXTRA lpUIExtra, InputContext *lpIMC, DWORD iClause);
+BOOL GetCandPosHintFromComp(LPUIEXTRA lpUIExtra, InputContext *lpIMC,
+                            DWORD iClause, LPPOINT ppt);
 
 // uiguide.c
 LRESULT CALLBACK GuideWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);

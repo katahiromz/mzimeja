@@ -109,7 +109,28 @@ void LogCompStr::clear() {
   clear_comp();
   clear_result();
   clear_extra();
+  fix();
 }
+
+void LogCompStr::fix() {
+  extra.comp_str_clauses.clear();
+  size_t count = comp_clause.size();
+  if (count >= 1) {
+    std::wstring str;
+    for (size_t i = 0; i < count - 1; ++i) {
+      str = GetClauseCompString(i);
+      extra.comp_str_clauses.push_back(str);
+    }
+  } else {
+    extra.comp_str_clauses.push_back(L"");
+  }
+  if (extra.hiragana_clauses.empty()) {
+    extra.hiragana_clauses.push_back(L"");
+  }
+  if (extra.typing_clauses.empty()) {
+    extra.typing_clauses.push_back(L"");
+  }
+} // LogCompStr::fix
 
 void LogCompStr::clear_read() {
   FOOTMARK();
@@ -1012,24 +1033,7 @@ void CompStr::GetLog(LogCompStr& log) {
   COMPSTREXTRA *extra = GetExtra();
   if (extra && extra->dwSignature == 0xDEADFACE) {
     extra->GetLog(log.extra);
-
-    log.extra.comp_str_clauses.clear();
-    size_t count = log.comp_clause.size();
-    if (count >= 1) {
-      std::wstring str;
-      for (size_t i = 0; i < count - 1; ++i) {
-        str = log.GetClauseCompString(i);
-        log.extra.comp_str_clauses.push_back(str);
-      }
-    } else {
-      log.extra.comp_str_clauses.push_back(L"");
-    }
-    if (log.extra.hiragana_clauses.empty()) {
-      log.extra.hiragana_clauses.push_back(L"");
-    }
-    if (log.extra.typing_clauses.empty()) {
-      log.extra.typing_clauses.push_back(L"");
-    }
+    log.fix();
   }
 }
 
@@ -1059,6 +1063,19 @@ void CompStr::GetLog(LogCompStr& log) {
   }
   return hCompStr;
 } // CompStr::ReCreate
+
+// extension
+COMPSTREXTRA *CompStr::GetExtra() {
+  if (dwPrivateSize > sizeof(COMPSTREXTRA)) {
+    BYTE *pb = GetBytes();
+    pb += dwPrivateOffset;
+    COMPSTREXTRA *pExtra = (COMPSTREXTRA *)pb;
+    if (pExtra->dwSignature == 0xDEADFACE) {
+      return pExtra;
+    }
+  }
+  return NULL;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // for debugging

@@ -42,48 +42,37 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
   return 0;
 } // CandWnd_WindowProc
 
-BOOL GetCandPosFromCompWnd(LPUIEXTRA lpUIExtra, LPPOINT lppt) {
+BOOL GetCandPosFromCompWnd(InputContext *lpIMC, LPUIEXTRA lpUIExtra, LPPOINT lppt) {
   FOOTMARK();
-  RECT rc;
 
-  if (lpUIExtra->dwCompStyle) {
-    if (lpUIExtra->uiComp[0].bShow) {
-      ::GetWindowRect(lpUIExtra->uiComp[0].hWnd, &rc);
-      lppt->x = rc.left;
-      lppt->y = rc.bottom + 2;
-      return TRUE;
-    }
-  } else {
-    if (lpUIExtra->uiDefComp.bShow) {
-      ::GetWindowRect(lpUIExtra->uiDefComp.hWnd, &rc);
-      lppt->x = rc.left;
-      lppt->y = rc.bottom + 2;
-      return TRUE;
+  BOOL ret = FALSE;
+
+  DWORD iClause = 0;
+  CandInfo *lpCandInfo = lpIMC->LockCandInfo();
+  if (lpCandInfo) {
+    if (lpCandInfo->dwCount > 0) ret = TRUE;
+    CANDINFOEXTRA *extra = lpCandInfo->GetExtra();
+    if (extra) iClause = extra->iClause;
+    lpIMC->UnlockCandInfo();
+
+    if (ret) {
+      ret = FALSE;
+      HWND hCompWnd = ClauseToCompWnd(lpUIExtra, lpIMC, iClause);
+      if (GetCandPosHintFromComp(lpUIExtra, lpIMC, iClause, lppt)) {
+        ret = ::IsWindowVisible(hCompWnd);
+      }
     }
   }
-  return FALSE;
+
+  return ret;
 }
 
 BOOL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
                             LPPOINT lppt) {
   FOOTMARK();
-  if (lpUIExtra->dwCompStyle) {
-    if (lpIMC && lpIMC->HasCompForm()) {
-      int height = GetCompFontHeight(lpUIExtra);
-      if (!lpUIExtra->bVertical) {
-        lppt->x = lpIMC->cfCompForm.ptCurrentPos.x;
-        lppt->y = lpIMC->cfCompForm.ptCurrentPos.y + height + 2;
-      } else {
-        lppt->x = lpIMC->cfCompForm.ptCurrentPos.x - height - 2;
-        lppt->y = lpIMC->cfCompForm.ptCurrentPos.y;
-      }
-      return TRUE;
-    }
-  } else {
-    if (GetCandPosFromCompWnd(lpUIExtra, lppt)) {
-      ::ScreenToClient(lpIMC->hWnd, lppt);
-      return TRUE;
-    }
+  if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, lppt)) {
+    ::ScreenToClient(lpIMC->hWnd, lppt);
+    return TRUE;
   }
   return FALSE;
 } // GetCandPosFromCompForm
@@ -92,12 +81,12 @@ void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
   POINT pt;
 
-  if (GetCandPosFromCompWnd(lpUIExtra, &pt)) {
+  if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
     lpUIExtra->uiCand.pt.x = pt.x;
     lpUIExtra->uiCand.pt.y = pt.y;
   }
 
-  if (!IsWindow(lpUIExtra->uiCand.hWnd)) {
+  if (!::IsWindow(lpUIExtra->uiCand.hWnd)) {
     lpUIExtra->uiCand.hWnd =
         ::CreateWindowEx(WS_EX_WINDOWEDGE, szCandClassName, NULL,
                          WS_COMPDEFAULT | WS_DLGFRAME,
@@ -105,7 +94,7 @@ void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
                          1, 1, hUIWnd, NULL, TheIME.m_hInst, NULL);
   }
 
-  SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
+  ::SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
   ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
   lpUIExtra->uiCand.bShow = FALSE;
 } // CandWnd_Create
@@ -238,21 +227,11 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
   POINT pt;
   CANDIDATEFORM caf;
 
-  if (fForceComp) {
-    if (GetCandPosFromCompForm(lpIMC, lpUIExtra, &pt)) {
-      caf.dwIndex = 0;
-      caf.dwStyle = CFS_CANDIDATEPOS;
-      caf.ptCurrentPos.x = pt.x;
-      caf.ptCurrentPos.y = pt.y;
-      ::ImmSetCandidateWindow(lpUIExtra->hIMC, &caf);
-    }
-    return;
-  }
-
   // not initialized yet?
   if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
     FOOTMARK_POINT();
-    if (GetCandPosFromCompWnd(lpUIExtra, &pt)) {
+    lpIMC->DumpCandInfo();
+    if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
       lpUIExtra->uiCand.pt.x = pt.x;
       lpUIExtra->uiCand.pt.y = pt.y;
       HWND hwndCand = lpUIExtra->uiCand.hWnd;
@@ -273,6 +252,8 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
   if (lpIMC->HasCandInfo()) {
     DWORD dwStyle = lpIMC->cfCandForm[0].dwStyle;
     if (dwStyle == CFS_EXCLUDE) {
+      FOOTMARK_POINT();
+      lpIMC->DumpCandInfo();
       // get work area and app window rect
       RECT rcWork, rcAppWnd;
       ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
@@ -310,6 +291,8 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
       }
       ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));
     } else if (dwStyle == CFS_CANDIDATEPOS) {
+      FOOTMARK_POINT();
+      lpIMC->DumpCandInfo();
       // get the specified position in screen coordinates
       pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
       pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;

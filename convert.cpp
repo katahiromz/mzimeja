@@ -62,6 +62,7 @@ void MZIMEJA::PluralClauseConversion(
     }
     cand.cand_lists.push_back(cand_list);
   }
+  cand.iClause = 0;
 } // MZIMEJA::PluralClauseConversion
 
 void MZIMEJA::PluralClauseConversion(const std::wstring& strHiragana,

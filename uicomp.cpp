@@ -65,6 +65,7 @@ void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
       lpUIExtra->uiComp[i].hWnd = hwnd;
     }
     ::SetRectEmpty(&lpUIExtra->uiComp[i].rc);
+    ::SetWindowLong(hwnd, FIGWL_COMPSTARTCLAUSE, 0);
     ::SetWindowLongPtr(hwnd, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont);
     ::SetWindowLongPtr(hwnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
     ::ShowWindow(hwnd, SW_HIDE);
@@ -85,6 +86,7 @@ void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
         lpUIExtra->uiDefComp.pt.y, 1, 1, hUIWnd, NULL, TheIME.m_hInst, NULL);
     lpUIExtra->uiDefComp.hWnd = hwndDef;
   }
+  ::SetWindowLong(hwndDef, FIGWL_COMPSTARTCLAUSE, 0);
   ::SetWindowLong(hwndDef, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont);
   ::SetWindowLongPtr(hwndDef, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
   ::ShowWindow(hwndDef, SW_HIDE);
@@ -96,7 +98,7 @@ HWND ClauseToCompWnd(LPUIEXTRA lpUIExtra, InputContext *lpIMC, DWORD iClause) {
     HWND hwnd = lpUIExtra->uiComp[0].hWnd;
     for (int i = 0; i < MAXCOMPWND; i++) {
       DWORD clause = ::GetWindowLong(hwnd, FIGWL_COMPSTARTCLAUSE);
-      if (iClause < clause) {
+      if (clause < iClause) {
         break;
       }
       hwnd = lpUIExtra->uiComp[i].hWnd;
@@ -109,6 +111,88 @@ HWND ClauseToCompWnd(LPUIEXTRA lpUIExtra, InputContext *lpIMC, DWORD iClause) {
     return lpUIExtra->uiDefComp.hWnd;
   }
 }
+
+BOOL GetCandPosHintFromComp(LPUIEXTRA lpUIExtra, InputContext *lpIMC,
+                            DWORD iClause, LPPOINT ppt) {
+  FOOTMARK();
+  HWND hCompWnd = ClauseToCompWnd(lpUIExtra, lpIMC, iClause);
+  DWORD ich = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTSTR);
+  DWORD cch = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTNUM);
+  DWORD dwClauseIndex = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTCLAUSE);
+  DebugPrintA("GetCandPosHintFromComp: ich: %d, cch: %d, dwClauseIndex: %d, iClause: %d\n", ich, cch, dwClauseIndex, iClause);
+
+  // is it vertical?
+  BOOL fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
+
+  CompStr *lpCompStr = lpIMC->LockCompStr();
+  if (lpCompStr == NULL) return FALSE;
+
+  std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
+  const WCHAR *psz = str.c_str();
+  const WCHAR *pch = psz;
+
+  // get clause info
+  DWORD *pdw = lpCompStr->GetCompClause();
+  DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
+  std::set<DWORD> clauses(pdw, pdwEnd);
+
+  // get client rect
+  RECT rc;
+  ::GetClientRect(hCompWnd, &rc);
+
+  // starting position
+  int x, y;
+  if (fVert) {
+    x = rc.right - UNDERLINE_HEIGHT;
+    y = 0;
+  } else {
+    x = y = 0;
+  }
+
+  HDC hDC = ::GetDC(hCompWnd);
+  HFONT hFont = (HFONT)::GetWindowLongPtr(hCompWnd, FIGWLP_FONT);
+  HFONT hOldFont = NULL;
+  if (hFont) hOldFont = (HFONT)::SelectObject(hDC, hFont);
+
+  // is it end?
+  SIZE siz;
+  BOOL ret = FALSE;
+  const WCHAR *lpEnd = &pch[cch];
+  while (pch < lpEnd) {
+    // get size of text
+    ::GetTextExtentPoint32W(hDC, pch, 1, &siz);
+
+    if (dwClauseIndex == iClause) {
+      if (fVert) {
+        ppt->x = x;
+        ppt->y = y + siz.cx;
+      } else {
+        ppt->x = x;
+        ppt->y = y + siz.cy;
+      }
+      ::ClientToScreen(hCompWnd, ppt);
+      ret = TRUE;
+      break;
+    }
+
+    // go to next position
+    ++pch;
+    ++ich;
+    if (fVert)
+      y += siz.cx;
+    else
+      x += siz.cx;
+
+    if (clauses.count(ich) > 0) {
+      ++dwClauseIndex;
+    }
+  }
+  ::SelectObject(hDC, hOldFont);
+  ::ReleaseDC(hCompWnd, hDC);
+  lpIMC->UnlockCompStr();
+  DebugPrintA("GetCandPosHintFromComp: %d, %d, %d\n", ppt->x, ppt->y, ret);
+  return ret;
+} // GetCandPosHintFromComp
 
 // calc the position of composition windows and move them
 void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
@@ -339,9 +423,10 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
   DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
   std::set<DWORD> clauses(pdw, pdwEnd);
 
-  // get client rect
+  // get client rect and fill white
   RECT rc;
   ::GetClientRect(hCompWnd, &rc);
+  ::FillRect(hDC, &rc, (HBRUSH)GetStockObject(WHITE_BRUSH));
 
   // starting position
   int x, y;
@@ -352,11 +437,13 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
     x = y = 0;
   }
 
+  // set opaque mode
+  ::SetBkMode(hDC, OPAQUE);
+
   // is it end?
   SIZE siz;
   const WCHAR *lpEnd = &pch[cch];
   while (pch < lpEnd) {
-    ::SetBkMode(hDC, OPAQUE);
 
     // set color and pen
     HPEN hPen;
@@ -409,18 +496,6 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
     }
     ::DeleteObject(::SelectObject(hDC, hPenOld));
 
-    // draw underline if not target converted
-    if (lpattr[ich] != ATTR_TARGET_CONVERTED) {
-      ::SelectObject(hDC, ::GetStockObject(WHITE_PEN));
-      if (fVert) {
-        ::MoveToEx(hDC, x + 2, y, NULL);
-        ::LineTo(hDC, x + 2, y + siz.cx - nClauseSep);
-      } else {
-        ::MoveToEx(hDC, x, y + siz.cy, NULL);
-        ::LineTo(hDC, x + siz.cx - nClauseSep, y + siz.cy);
-      }
-    }
-
     // draw cursor (caret)
     if (lpCompStr->dwCursorPos == ich) {
       ::SelectObject(hDC, ::GetStockObject(BLACK_PEN));
@@ -449,19 +524,17 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
   // draw caret at last if any
   if (lpCompStr->dwCursorPos == ich) {
     ::SelectObject(hDC, ::GetStockObject(BLACK_PEN));
-  } else {
-    ::SelectObject(hDC, ::GetStockObject(WHITE_PEN));
-  }
-  if (fVert) {
-    ::MoveToEx(hDC, x, y, NULL);
-    ::LineTo(hDC, x + siz.cy, y);
-    ::MoveToEx(hDC, x, y + 1, NULL);
-    ::LineTo(hDC, x + siz.cy, y + 1);
-  } else {
-    ::MoveToEx(hDC, x, y, NULL);
-    ::LineTo(hDC, x, y + siz.cy);
-    ::MoveToEx(hDC, x + 1, y, NULL);
-    ::LineTo(hDC, x + 1, y + siz.cy);
+    if (fVert) {
+      ::MoveToEx(hDC, x, y, NULL);
+      ::LineTo(hDC, x + siz.cy, y);
+      ::MoveToEx(hDC, x, y + 1, NULL);
+      ::LineTo(hDC, x + siz.cy, y + 1);
+    } else {
+      ::MoveToEx(hDC, x, y, NULL);
+      ::LineTo(hDC, x, y + siz.cy);
+      ::MoveToEx(hDC, x + 1, y, NULL);
+      ::LineTo(hDC, x + 1, y + siz.cy);
+    }
   }
 }
 
