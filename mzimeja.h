@@ -269,19 +269,19 @@ std::wstring hiragana_to_typing(std::wstring hiragana);
 // convert zenkaku eisuu to hankaku
 std::wstring zenkaku_eisuu_to_hankaku(const std::wstring& str);
 
-// is it the character hiragana?
+// is the character hiragana?
 BOOL is_hiragana(WCHAR ch);
-// is it the character zenkaku katakana?
+// is the character zenkaku katakana?
 BOOL is_zenkaku_katakana(WCHAR ch);
-// is it the character hankaku katakana?
+// is the character hankaku katakana?
 BOOL is_hankaku_katakana(WCHAR ch);
-// is it the character kanji?
+// is the character kanji?
 BOOL is_kanji(WCHAR ch);
-// is it the education kanji?
+// is the character the education kanji?
 BOOL is_education_kanji(WCHAR ch);
-// is it the common use kanji?
+// is the character the common use kanji?
 BOOL is_common_use_kanji(WCHAR ch);
-// is it the character fullwidth ASCII?
+// is the character fullwidth ASCII?
 BOOL is_fullwidth_ascii(WCHAR ch);
 
 //////////////////////////////////////////////////////////////////////////////
