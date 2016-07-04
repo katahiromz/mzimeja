@@ -1,6 +1,6 @@
 // keychar.cpp --- mzimeja keys and characters
 //////////////////////////////////////////////////////////////////////////////
-// NOTE: This file uses Japanese Shift_JIS encoding. To compile this on g++,
+// NOTE: This file uses Japanese cp932 encoding. To compile this on g++,
 //       please add options: -finput-charset=CP932 -fexec-charset=CP932
 
 #include "mzimeja.h"
@@ -1662,9 +1662,8 @@ BOOL is_hiragana(WCHAR ch) {
   FOOTMARK();
   if (0x3040 <= ch && ch <= 0x309F) return TRUE;
   switch (ch) {
-  case 0x3095: case 0x3096: case 0x3099: case 0x309A:
-  case 0x309B: case 0x309C: case 0x309D: case 0x309E:
-  case 0x30FC:
+  case 0x3095: case 0x3096: case 0x3099: case 0x309A: case 0x309B:
+  case 0x309C: case 0x309D: case 0x309E: case 0x30FC:
     return TRUE;
   default:
     return FALSE;
@@ -1675,8 +1674,8 @@ BOOL is_zenkaku_katakana(WCHAR ch) {
   FOOTMARK();
   if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
   switch (ch) {
-  case 0x30FD: case 0x30FE: case 0x3099: case 0x309A:
-  case 0x309B: case 0x309C: case 0x30FC:
+  case 0x30FD: case 0x30FE: case 0x3099: case 0x309A: case 0x309B:
+  case 0x309C: case 0x30FC:
     return TRUE;
   default:
     return FALSE;
@@ -1696,11 +1695,14 @@ BOOL is_hankaku_katakana(WCHAR ch) {
 
 BOOL is_kanji(WCHAR ch) {
   FOOTMARK();
-  // CJK“‡Š¿Žš
   if (0x4E00 <= ch && ch <= 0x9FFF) return TRUE;
-  // CJKŒÝŠ·Š¿Žš
   if (0xF900 <= ch && ch <= 0xFAFF) return TRUE;
   return FALSE;
+}
+
+// education kanji
+BOOL is_kyouiku_kanji(WCHAR ch) {
+  return wcschr(L"ˆê‰¹‰J‰~‰¤‰Î‰ÔŠLŠw‹x‹ã‹Ê‹ó‹C‰ºŒŽŒ©Œ¢ŒÜŒûZ‹à¶ŽOŽRŽlŽqŽ…ŽšŽ¨ŽµŽÔŽè\o—¬³ãXl…¶ÂÔÎ—[çæì‘‘‘«‘º‘å’j’|’Ž’†’¬“V“c“y“ñ“ú“ü”N”’”ª•S–{–¼–Ø–Ú•¶‰E—Í—§—Ñ˜Zˆø‰H‰_‰“‰€‰Æ‰½‰Ä‰È‰Ì‰æ‰ï‰ñŠCŠGŠOŠpŠyŠˆŠÔŠçŠâŠÛ‹L‹D‹A‹|‹‹›‹³‹­‹ß¡ŒZŒ`‹žŒvŒ´Œ¾Œ³ŒÃŒËŒêŒßŒãLŒðHŒõŒöl‰©s‚‡‘’J•×ËìŽZŽ†–îŽoŽsŽ~ŽžŽ›Ž©FŽºŽÐŽãŽñTHt‘­êHVeS}“ª”¼¯º°áØ‘Dü‘O‘g‘–‘¾‘½‘Ì‘ä’í’r’n’m’ƒ’‹’·’©’¹’¼’Ê“_“X“d“~““–“š“Œ“¹“¯“Ç“à“ì“÷”n”ƒ”„”ž”¼”Ô•ƒ•à•—•ª•·•Ä•ê•û–k–ˆ–…–œ–Â–¾–Ñ–å–ì–é—F—j—p—ˆ—¢—˜bŽvˆ«ˆÀˆÃˆÓˆÏˆãˆç‰@ˆõˆù‰^‰j‰w‰¡‰›‰®‰·‰×ŠJŠEŠKŠÙŠ´Š¦Š¿ŠÝ‹NŠú‹q‹}‹‰‹…‹†‹Ž‹´‹Æ‹È‹Ç‹â‹ê‹æ‹ï‹{ŒN‰»ŒyŒWŒŒŒˆŒ§Œ¤ŒÎŒÉKŒü`†ªÕŽMŽwŽnŽ•Ž€ŽŽdŽgŽŸŽŽ–Ž®ŽÀŽÊŽÒÌŽðŽçŽåŽæŽóKEWIBdZh‹Š•ÁºÍ¤ŸæAgi\[^_¢®‘S‘z‘Š‘—‘§‘¬‘°‘¼‘Å‘ã‘Î‘Ò‘æ‘è’Z’Y’k’…’’Œ’²’ ’Ç’š’è’ë“J“S“]“s“x“‡“™“o“’“Š“¤“®“¶”_”g”z”{” ”¨”­”½”Ââ”ß”ç•@”ü•M•X•\•a•b•i•‰•”•Ÿ•ž•¨•½•Ô•×•ú–¡–½–Ê–â–ò–ð—R–û—V—L—\—t—z—r—m—l—Ž—·—¼—Î—¬—ç—ñ—û˜H˜aˆ¤ˆÄˆÈˆÊˆÝˆÍˆßˆó‰p‰h‰–‰­‰Ý‰Û‰Á‰Ê‰èŠB‰üŠQŠXŠoŠeŠÖŠ®ŠÇŠ¯ŠÏŠèŠì‹GŠø‹IŠó‹@Ší‹c‹~‹ƒ‹‹‹‹“‹¦‹¾‹£‹¤‹ÉŒPŒRŒSŒ^ŒaŒiŒ|Œ‹Œ‡ŒšŒ’Œ±ŒÅŒóŒ÷DqN·ÅØÞðŽEüŽDŽ@ŽQŽUŽYŽcŽŽjŽŽŽmŽiŽ¡Ž™Ž«Ž¸ŽØŽíŽüj‡‰¥ÎÄ¼ÜÛÆÈMb´Ã¬ÈÏßÜàí‘Ió‘ƒ‘ˆ‘q‘©‘¤‘±‘²‘·‘à‘Ñ’B’P’u’‡’™’›’°’â’á’ê“I“T“`“k“w“”“­“°“Á“¾“Å”M‘R”O”s”~”Ž”Ñ”ò”ï•K•[•W•t•{•s•v–³•›•²•º•Ê•Ó•Ï•Ö–@•ï–]–q–––ž–¢–¬–¯–ñ—E—v—{——˜—¤—Ê—Ç‹™—¿—Ö—Þ—ß—â—á—ð˜A˜V˜J˜^ˆ³ˆÚˆö‰i‰q‰c‰vˆÕ‰t‰‰÷‰ž‰‰¶‰¿‰ß‰Â‰Í‰¼‰ê‰ð‰õŠmŠiŠzŠµŠ²Š§Šá‹KŠîŠñ‹Z‹`‹t‹Œ‹v‹–‹‹«‹Ï‹Ö‹åŒQŒoŒ‰Œ¯ŒŸŒ”ŒŒ»ŒÀŒ¸ŒÂŒÌŒìŒøu\zkŒú‹»¬¸ÐÌÈÛÄÝßàŽGŽ^Ž_ŽxŽ‘ŽtŽuŽ”Ž}Ž¦Ž—Ž¯Ž¿ŽÓŽÉŽöCqp€˜Ø³µíóðîED»¸«­§¨ÅÓÑÝÚâã‘K‘c‘f‘‘‘œ‘¢‘¥‘ª‘®‘¹‘Ý‘Þ‘Ô’c’f’z’£’ö’ñ“G“K““º“±“¿“Æ”C”R”\”j”Æ”Å”»”ì”ä”ñ”õ•U•]•n•x•z•w••œ•¡•§•Ò•Ù•Û•æ–L•ñ–h–\–²–±–À–È—A—]—a—e—¦—ª—¯—Ì–f—¥ˆÙˆâˆæ‰F‰f‰ˆ‰„‰äŠDŠtŠvŠgŠ„Š”ŠÈŠ±ŠÅŠªŠëŠöŠ÷‹M‹^‹z‹½‹¹‹Ÿ‹Ø‹ÎŒhŒnŒxŒ€ŒƒŒŠŒ¦Œ›Œ ŒµŒ¹ŒÈŒÄŒëFc@g|~’œ¢»ÀÏÙôûŽ\ŽŽ‹Ž„ŽŒŽŠŽpŽ¥ŽÌŽËŽÚŽáŽ÷@ŽûOA]cknƒˆ”œá«éöjm„‚¡½¹·êéõòô‘P‘w‘•‘t‘€‘n‘‹‘ ‘Ÿ‘¸‘¶‘î’T’S’a’g’i’l’ˆ’‰’˜’ª’¸’¡’À’É“W“}“¢“œ“Í“ï“û”F”]”[”h”x”w”o”q”Ç”Ó”Û”é”á• •±•Ã•À•Â•â•é–K•ó–_–Y–S–‡–‹–§–¿–Í–ó—D—X—c—‚—~—‘———— —Õ˜_˜N•Ð", ch) != NULL;
 }
 
 BOOL is_fullwidth_ascii(WCHAR ch) {
@@ -1752,7 +1754,7 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
 
 std::wstring zenkaku_eisuu_to_hankaku(const std::wstring& str) {
   std::wstring ret;
-  size_t count = str.size();
+  const size_t count = str.size();
   wchar_t ch;
   for (size_t i = 0; i < count; ++i) {
     ch = str[i];
