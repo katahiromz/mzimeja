@@ -59,7 +59,7 @@ INT DoSetRegistry(VOID) {
   LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
     L"system\\currentcontrolset\\control\\keyboard layouts",
     0, KEY_WRITE, &hKey);
-  if (result == ERROR_SUCCESS && hKey != NULL) {
+  if (result == ERROR_SUCCESS && hKey) {
     HKEY hkLayouts;
     DWORD dwDisposition;
     result = RegCreateKeyExW(hKey, L"E0120411", 0, NULL, 0,
