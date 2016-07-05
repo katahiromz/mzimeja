@@ -1,16 +1,27 @@
-// setup.rc
-// (Japanese, Shift_JIS)
+// setup.rc --- resource of MZ-IME Japanese Input setup
+/////////////////////////////////////////////////////////////////////////////
 
+#define APSTUDIO_READONLY_SYMBOLS
 #include <windows.h>
+#undef APSTUDIO_READONLY_SYMBOLS
+
+// UTF-8
+#pragma code_page(65001)
+
+/////////////////////////////////////////////////////////////////////////////
+// Strings
 
 STRINGTABLE 
 BEGIN
-    1, "MZ-IME ƒZƒbƒgƒAƒbƒv"
-    2, "ƒŒƒWƒXƒgƒŠ‚ÌÝ’è‚ÉŽ¸”s‚µ‚Ü‚µ‚½BŠÇ—ŽÒŒ ŒÀ‚ÅƒCƒ“ƒXƒg[ƒ‹‚ð‚â‚è’¼‚µ‚Ä‰º‚³‚¢B"
-    3, "ƒtƒ@ƒCƒ‹‚ÌƒRƒs[‚ÉŽ¸”s‚µ‚Ü‚µ‚½BŠÇ—ŽÒŒ ŒÀ‚ÅƒCƒ“ƒXƒg[ƒ‹‚ð‚â‚è’¼‚µ‚Ä‰º‚³‚¢B"
-    4, "“ú–{Œê (MZ-IME)"
-    5, "IME‚ÌƒCƒ“ƒXƒg[ƒ‹‚ÉŽ¸”s‚µ‚Ü‚µ‚½BƒGƒ‰[ƒR[ƒh%d‚ðìŽÒ‚É‚²˜A—‰º‚³‚¢B"
+    1, "MZ-IME ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—"
+    2, "ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã®è¨­å®šã«å¤±æ•—ã—ã¾ã—ãŸã€‚ç®¡ç†è€…æ¨©é™ã§ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã‚’ã‚„ã‚Šç›´ã—ã¦ä¸‹ã•ã„ã€‚"
+    3, "ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚³ãƒ”ãƒ¼ã«å¤±æ•—ã—ã¾ã—ãŸã€‚ç®¡ç†è€…æ¨©é™ã§ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã‚’ã‚„ã‚Šç›´ã—ã¦ä¸‹ã•ã„ã€‚"
+    4, "æ—¥æœ¬èªž (MZ-IME)"
+    5, "IMEã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã«å¤±æ•—ã—ã¾ã—ãŸã€‚ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰%dã‚’ä½œè€…ã«ã”é€£çµ¡ä¸‹ã•ã„ã€‚"
 END
+
+/////////////////////////////////////////////////////////////////////////////
+// Version Info
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     0, 2, 0, 0
@@ -23,11 +34,11 @@ BEGIN
     BEGIN
         BLOCK "041103A4"
         BEGIN
-            VALUE "CompanyName", "•ÐŽR”Ž•¶MZ\0"
-            VALUE "FileDescription", "MZ-IME“ú–{Œê“ü—ÍƒZƒbƒgƒAƒbƒv\0"
+            VALUE "CompanyName", "ç‰‡å±±åšæ–‡MZ\0"
+            VALUE "FileDescription", "MZ-IMEæ—¥æœ¬èªžå…¥åŠ›ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—\0"
             VALUE "FileVersion", "0.2\0"
-            VALUE "LegalCopyright", "Copyright (C) 2016 •ÐŽR”Ž•¶MZ.\0"
-            VALUE "ProductName", "MZ-IME“ú–{Œê“ü—Í\0"
+            VALUE "LegalCopyright", "Copyright (C) 2016 ç‰‡å±±åšæ–‡MZ.\0"
+            VALUE "ProductName", "MZ-IMEæ—¥æœ¬èªžå…¥åŠ›\0"
             VALUE "ProductVersion", "0.2\0"
         END
     END
@@ -36,3 +47,5 @@ BEGIN
         VALUE "Translation", 0x0411, 0x03A4
     END
 END
+
+/////////////////////////////////////////////////////////////////////////////
