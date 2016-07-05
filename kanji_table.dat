@@ -1,4 +1,11 @@
-;#	通用字体	部首	総画数	読み
+; (Japanese, UTF-8)
+;-------------------------------------------------------------------------------
+; 『MZ-IME日本語入力・常用漢字表』片山博文MZ
+; "MZ-IME Japanese Input, The Common Use Kanji Table"
+; Copyright (C) 2016 Katayama Hirofumi MZ.
+; This file is public domain software (PDS).
+;-------------------------------------------------------------------------------
+;漢字ID	漢字	部首ID	総画数	読み
 1	亜	007	7	ア
 2	哀	030	9	アイ、あわ-れ、あわ-れむ
 3	挨	064	10	アイ
