@@ -52,7 +52,7 @@ INT DoCopyFiles(VOID) {
   }
 
   return 0;
-}
+} // DoCopyFiles
 
 BOOL DoSetRegSz(HKEY hKey, const WCHAR *pszName, const WCHAR *pszValue) {
   DWORD cbData = (lstrlenW(pszValue) + 1) * sizeof(WCHAR);
@@ -86,7 +86,7 @@ INT DoSetRegistry(VOID) {
     RegCloseKey(hKey);
   }
   return (ret ? 0 : -1);
-}
+} // DoSetRegistry
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -125,6 +125,6 @@ wWinMain(
   }
 
   return 0;
-}
+} // wWinMain
 
 //////////////////////////////////////////////////////////////////////////////
