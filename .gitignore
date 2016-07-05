@@ -7,7 +7,6 @@
 *.log
 *.wrn
 *.err
-*.ncb
 Debug
 Release
 x64
