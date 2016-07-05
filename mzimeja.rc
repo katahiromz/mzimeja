@@ -31,9 +31,6 @@ MODE4ICON               ICON    DISCARDABLE     "res\\mode4.ico"
 // Bitmap
 
 CLOSEBMP                BITMAP  DISCARDABLE     "res\\close.bmp"
-CHECKBMP                BITMAP  DISCARDABLE     "res\\check.bmp"
-UNCHECKBMP              BITMAP  DISCARDABLE     "res\\uncheck.bmp"
-FACEBMP                 BITMAP  DISCARDABLE     "res\\face.bmp"
 MODESBMP                BITMAP  DISCARDABLE     "res\\modes-large.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
