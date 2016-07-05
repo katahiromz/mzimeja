@@ -5,17 +5,22 @@
 #include <windows.h>
 #include <cstring>
 
+HINSTANCE g_hInstance;
+
 //////////////////////////////////////////////////////////////////////////////
 
-LPCTSTR DoLoadString(HINSTANCE hInstance, INT nID) {
+LPCTSTR DoLoadString(INT nID) {
   static WCHAR s_szBuf[1024];
   s_szBuf[0] = 0;
-  LoadStringW(hInstance, nID, s_szBuf, 1024);
+  LoadStringW(g_hInstance, nID, s_szBuf, 1024);
   return s_szBuf[0] ? s_szBuf : L"Internal Error";
 }
 
 INT DoCopyFiles(VOID) {
   WCHAR szPathSrc[MAX_PATH], szPathDest[MAX_PATH], *pch;
+
+  //////////////////////////////////////////////////////////
+  // {app}\mzimeja.dic --> %windir%\mzimeja.dic
 
   // source
   GetModuleFileName(NULL, szPathSrc, MAX_PATH);
@@ -29,6 +34,9 @@ INT DoCopyFiles(VOID) {
   if (!b0) {
     return 1;
   }
+
+  //////////////////////////////////////////////////////////
+  // {app}\mzimeja.ime --> C:\Windows\system32\mzimeja.ime
 
   // source
   GetModuleFileName(NULL, szPathSrc, MAX_PATH);
@@ -66,7 +74,7 @@ INT DoSetRegistry(VOID) {
                              KEY_WRITE, NULL, &hkLayouts, &dwDisposition);
     if (result == ERROR_SUCCESS && hkLayouts) {
       if (DoSetRegSz(hkLayouts, L"layout file", L"kbdjp.kbd") &&
-        DoSetRegSz(hkLayouts, L"layout text", L"“ú–{Œê (MZ-IME)") &&
+        DoSetRegSz(hkLayouts, L"layout text", DoLoadString(4)) &&
         DoSetRegSz(hkLayouts, L"layout file", L"kbdjp.kbd") &&
         DoSetRegSz(hkLayouts, L"IME file", L"mzimeja.ime"))
       {
@@ -86,27 +94,32 @@ extern "C"
 INT WINAPI
 wWinMain(
   HINSTANCE hInstance,
-  HINSTANCE HPrevInstance,
+  HINSTANCE hPrevInstance,
   LPWSTR    lpCmdLine,
   INT       nCmdShow)
 {
+  g_hInstance = hInstance;
+
   if (0 != DoSetRegistry()) {
-    ::MessageBoxW(NULL, DoLoadString(hInstance, 2), NULL, MB_ICONERROR);
+    // failure
+    ::MessageBoxW(NULL, DoLoadString(2), NULL, MB_ICONERROR);
     return 2;
   }
 
   if (0 != DoCopyFiles()) {
-    ::MessageBoxW(NULL, DoLoadString(hInstance, 3), NULL, MB_ICONERROR);
+    // failure
+    ::MessageBoxW(NULL, DoLoadString(3), NULL, MB_ICONERROR);
     return 1;
   }
 
   WCHAR szPath[MAX_PATH];
   ::GetSystemDirectoryW(szPath, MAX_PATH);
   wcscat(szPath, L"\\mzimeja.ime");
-  if (!ImmInstallIME(szPath, DoLoadString(hInstance, 4))) {
+  if (!ImmInstallIME(szPath, DoLoadString(4))) {
+    // failure
     WCHAR szMsg[128];
     DWORD dwError = ::GetLastError();
-    ::wsprintfW(szMsg, DoLoadString(hInstance, 5), dwError);
+    ::wsprintfW(szMsg, DoLoadString(5), dwError);
     ::MessageBoxW(NULL, szMsg, NULL, MB_ICONERROR);
     return 3;
   }
