@@ -225,7 +225,6 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
   FOOTMARK();
   RECT rc;
   POINT pt;
-  CANDIDATEFORM caf;
 
   // not initialized yet?
   if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
