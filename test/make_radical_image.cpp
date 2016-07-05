@@ -1,3 +1,5 @@
+// make_radical_image.cpp
+// (Japanese, Shift_JIS)
 #include <windows.h>
 #include <cstdio>
 #include <cstdlib>
