@@ -43,8 +43,8 @@ struct ENTRY {
 };
 
 std::vector<ENTRY> g_entries;
-std::map<wchar_t,wchar_t> g_dan_map;
-std::map<wchar_t,wchar_t> g_gyou_map;
+std::map<wchar_t,wchar_t> g_vowel_map;
+std::map<wchar_t,wchar_t> g_consonant_map;
 
 const wchar_t g_table[][5] = {
   {L'‚ ', L'‚¢', L'‚¤', L'‚¦', L'‚¨'},
@@ -312,10 +312,10 @@ bool do_katsuyou_godan_doushi(const ENTRY& entry) {
   std::wstring str = entry.post;
   if (str.empty()) return false;
   wchar_t ch = str[str.size() - 1];
-  if (g_dan_map[ch] != L'‚¤') return false;
+  if (g_vowel_map[ch] != L'‚¤') return false;
   str.resize(str.size() - 1);
 
-  wchar_t gyou = g_gyou_map[ch];
+  wchar_t gyou = g_consonant_map[ch];
   size_t ngyou = 0;
   const size_t count = sizeof(g_table) / sizeof(g_table[0]);
   for (size_t i = 0; i < count; ++i) {
@@ -326,7 +326,7 @@ bool do_katsuyou_godan_doushi(const ENTRY& entry) {
   }
 
   int type;
-  switch (g_gyou_map[ch]) {
+  switch (g_consonant_map[ch]) {
   case L'‚©': case L'‚ª':              type = 1; break;
   case L'‚È': case L'‚Î': case L'‚Ü':  type = 2; break;
   case L'‚½': case L'‚ç': case L'‚í':  type = 3; break;
@@ -573,10 +573,10 @@ void make_maps(void) {
   const size_t count = sizeof(g_table) / sizeof(g_table[0]);
   for (size_t i = 0; i < count; ++i) {
     for (size_t k = 0; k < 5; ++k) {
-      g_gyou_map[g_table[i][k]] = g_table[i][0];
+      g_consonant_map[g_table[i][k]] = g_table[i][0];
     }
     for (size_t k = 0; k < 5; ++k) {
-      g_dan_map[g_table[i][k]] = g_table[0][k];
+      g_vowel_map[g_table[i][k]] = g_table[0][k];
     }
   }
 } // make_maps
