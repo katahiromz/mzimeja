@@ -226,7 +226,7 @@ bool do_katsuyou_ikeiyoushi(const ENTRY& entry) {
   }
   str.resize(str.size() - 1);
 
-  std::wstring temp0, temp1, temp2;
+  std::wstring temp0, temp1, temp2, temp3;
   temp0 = str;
   temp0 += L"かろ";
   do_wprintf(L"未然形: %s\n", temp0.c_str());
@@ -237,11 +237,44 @@ bool do_katsuyou_ikeiyoushi(const ENTRY& entry) {
   temp1 += L"く";
   temp2 = str;
   temp2 += L"う";
-  do_wprintf(L"連用形: %s %s %s\n", temp0.c_str(), temp1.c_str(), temp2.c_str());
+  size_t i, count = sizeof(g_table) / sizeof(g_table[0]);
+  wchar_t ch0 = str[str.size() - 1];
+  wchar_t ch1 = g_consonant_map[ch0];
+  switch (g_vowel_map[ch0]) {
+  case L'あ':
+    temp3 = str.substr(0, str.size() - 1);
+    for (i = 0; i < count; ++i) {
+      if (g_table[i][0] == ch1) {
+        temp3 += g_table[i][4];
+        temp3 += L"う";
+        break;
+      }
+    }
+    if (i == count) temp3.clear();
+    break;
+  case L'い':
+    temp3 = str;
+    temp3 += L"ゅう";
+    break;
+  default:
+    temp3.clear();
+    break;
+  }
+  if (temp3.empty()) {
+    do_wprintf(L"連用形: %s %s %s\n",
+      temp0.c_str(), temp1.c_str(), temp2.c_str());
+  } else {
+    do_wprintf(L"連用形: %s %s %s %s\n",
+      temp0.c_str(), temp1.c_str(), temp2.c_str(), temp3.c_str());
+  }
 
   temp0 = str;
   temp0 += L"い";
-  do_wprintf(L"終止形: %s\n", temp0.c_str());
+  temp1 = str;
+  if (str[str.size() - 1] != L'し') {
+    temp1 += L"し";
+  }
+  do_wprintf(L"終止形: %s\n", temp0.c_str(), temp1.c_str());
   temp0 = str;
   temp0 += L"い";
   temp1 = str;
@@ -335,8 +368,13 @@ bool do_katsuyou_godan_doushi(const ENTRY& entry) {
 
   std::wstring temp0, temp1, temp2;
 
-  temp0 = str;
-  temp0 += g_table[ngyou][0];
+  if (ngyou == 0) {
+    temp0 = str;
+    temp0 += L'わ';
+  } else {
+    temp0 = str;
+    temp0 += g_table[ngyou][0];
+  }
   temp1 = str;
   temp1 += g_table[ngyou][4];
   do_wprintf(L"未然形: %s %s\n", temp0.c_str(), temp1.c_str());
