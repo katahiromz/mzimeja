@@ -1320,7 +1320,7 @@
             inline void trim_left(std::string& str) {
                 trim_left_if(str, is_space());
             }
-            inline void trim_right(std::string& str, const char_set_predicate& pred) {
+            inline void trim_right(std::string& str) {
                 trim_right_if(str, is_space());
             }
             inline void trim_if(std::wstring& str, const char_set_predicate& pred) {
