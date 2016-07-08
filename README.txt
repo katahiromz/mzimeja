@@ -29,6 +29,7 @@ Table of Contents
   mzimeja.h           | MZ-IME Japanese Input (mzimeja)
   mzimeja.rc          | resource file of MZ-IME Japanese Input
   process.cpp         | mzimeja input process
+  regword.cpp         | registering words
   setup.cpp           | MZ-IME setup program
   setup.rc            | resource of MZ-IME Japanese Input Setup
   ui.cpp              | mzimeja UI server
