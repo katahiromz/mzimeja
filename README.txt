@@ -24,6 +24,7 @@ Table of Contents
   immsec.cpp          | IMM security related
   input.cpp           | mzimeja input context and related
   input.h             | mzimeja input context and related
+  installer.iss       | Installer Settings for Inno Setup
   keychar.cpp         | mzimeja keys and characters
   Makefile.msys       | Makefile for MSYS
   mzimeja.cpp         | MZ-IME Japanese Input (mzimeja)
