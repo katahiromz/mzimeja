@@ -1,5 +1,5 @@
-; Japanese, UTF-8
-(English)	(Japanese)
+;UTF-8
+;(English)	(Japanese)
 candidate	候補
 clause	文節
 common use kanji	常用漢字
