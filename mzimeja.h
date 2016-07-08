@@ -5,9 +5,9 @@
 #define MZIMEJA_H_
 
 #ifndef _INC_WINDOWS
-  #include <windows.h>
+  #include <windows.h>      // for Windows
 #endif
-#include <tchar.h>
+#include <tchar.h>          // for Windows generic text
 
 #include <string>           // for std::string, std::wstring, ...
 #include <vector>           // for std::vector
