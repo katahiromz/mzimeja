@@ -22,6 +22,9 @@ const MZGUIDELINE glTable[] = {
    IDS_GL_TESTGUIDELINEPRIVATE}
 };
 
+// filename of the IME
+const TCHAR szImeFileName[] = TEXT("mzimeja.ime");
+
 //////////////////////////////////////////////////////////////////////////////
 
 HFONT CheckNativeCharset(HDC hDC) {
@@ -222,7 +225,7 @@ HKL MZIMEJA::GetHKL(VOID) {
     HKL hKLTemp = *(lphkl + dwi);
     ::ImmGetIMEFileName(hKLTemp, szFile, _countof(szFile));
 
-    if (!lstrcmp(szFile, MZIME_FILENAME)) {
+    if (!::lstrcmp(szFile, szImeFileName)) {
       hKL = hKLTemp;
       break;
     }

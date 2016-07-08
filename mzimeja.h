@@ -54,8 +54,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-#define MZIME_FILENAME    TEXT("mzimeja.ime")
-
 // for limit of MZ-IME
 #define MAXCOMPWND  10  // maximum number of composition windows
 #define MAXGLCHAR   32  // maximum number of guideline characters
