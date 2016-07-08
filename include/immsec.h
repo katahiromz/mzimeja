@@ -7,7 +7,7 @@
 
 extern "C" {
 
-PSECURITY_ATTRIBUTES CreateSecurityAttributes(VOID);
+PSECURITY_ATTRIBUTES CreateSecurityAttributes(void);
 VOID FreeSecurityAttributes(PSECURITY_ATTRIBUTES psa);
 BOOL IsNT(VOID);
 

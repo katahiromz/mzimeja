@@ -65,7 +65,7 @@ POSVERSIONINFO GetVersionInfo(VOID) {
 // Remarks:
 //      FreeSecurityAttributes() should be called to free up the
 //      SECURITY_ATTRIBUTES allocated by this function.
-PSECURITY_ATTRIBUTES CreateSecurityAttributes() {
+PSECURITY_ATTRIBUTES CreateSecurityAttributes(void) {
   if (!IsNT()) return NULL;
 
   // create a sid for everyone access
