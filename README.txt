@@ -11,6 +11,7 @@ Table of Contents
     (filenames)         | (descriptions)
     --------------------+---------------------------------------------------
     doc\                | the document folder (contains documentation)
+    include\            | the include folder
     projects\           | the projects folder (contains MSVC projects)
     res\                | the resource folder (contains dictionary)
     test\               | the test folder (contains test programs)
@@ -20,7 +21,6 @@ Table of Contents
     convert.cpp         | mzimeja kana kanji conversion
     imm.cpp             | IME/IMM related
     immsec.cpp          | IMM security related
-    include             | the include folder
     input.cpp           | mzimeja input context and related
     input.h             | mzimeja input context and related
     keychar.cpp         | mzimeja keys and characters
