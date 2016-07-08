@@ -28,8 +28,10 @@ Table of Contents
     Makefile.msys       | Makefile for MSYS
     mzimeja.cpp         | MZ-IME Japanese Input (mzimeja)
     mzimeja.h           | MZ-IME Japanese Input (mzimeja)
+    mzimeja.rc          | resource file of MZ-IME Japanese Input
     process.cpp         | mzimeja input process
     setup.cpp           | MZ-IME setup program
+    setup.rc            | resource of MZ-IME Japanese Input Setup
     ui.cpp              | mzimeja UI server
     uicand.cpp          | mzimeja candidate window UI
     uicomp.cpp          | mzimeja composition window UI
