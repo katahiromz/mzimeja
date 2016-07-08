@@ -1,0 +1,28 @@
+; Japanese, UTF-8
+(English)	(Japanese)
+candidate	候補
+clause	文節
+common use kanji	常用漢字
+composition	コンポジション
+context	コンテキスト
+conversion	変換
+convert	変換する
+disabled	無効な
+education kanji	教育漢字
+fullwidth	全角
+halfwidth	半角
+hiragana	ひらがな
+info	情報
+input	入力
+kanji	漢字
+kanji in common use	常用漢字
+katakana	カタカナ
+list	リスト
+logical	論理的な
+physical	物理的な
+reading	読み
+result	結果
+roman	ローマ字
+string	文字列
+typing	打ち込み
+virtual key	仮想キー
