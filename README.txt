@@ -18,7 +18,6 @@ Table of Contents
     comp_str.cpp        | composition string of mzimeja
     config.cpp          | mzimeja configuration
     convert.cpp         | mzimeja kana kanji conversion
-    footmark.hpp        | footmark for C++ debugging
     imm.cpp             | IME/IMM related
     immsec.cpp          | IMM security related
     include             | the include folder
