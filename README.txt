@@ -35,7 +35,6 @@ Table of Contents
     uicomp.cpp          | mzimeja composition window UI
     uiguide.cpp         | mzimeja guideline window UI
     uistate.cpp         | mzimeja status window UI
-    unboost.hpp         | Unboost by katahiromz
     --------------------+---------------------------------------------------
 
 /////////////////////////////////////////////////////
