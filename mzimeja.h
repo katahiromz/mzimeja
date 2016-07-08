@@ -13,10 +13,10 @@
 #include <vector>           // for std::vector
 #include <set>              // for std::set
 
-#include <cstdio>
-#include <cctype>
-#include <cassert>
-#include <cstring>
+#include <cstdio>           // for standard I/O
+#include <cctype>           // for C character type
+#include <cassert>          // for assert
+#include <cstring>          // for C string
 
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development
@@ -119,21 +119,21 @@
 // Structures
 
 // UICHILD
-typedef struct {
+struct UICHILD {
   HWND hWnd;
   BOOL bShow;
   POINT pt;
-} UICHILD;
+};
 
 // UICHILD2
-typedef struct {
+struct UICHILD2 {
   HWND hWnd;
   BOOL bShow;
   RECT rc;
-} UICHILD2;
+};
 
 // UIEXTRA
-typedef struct {
+struct UIEXTRA {
   HIMC      hIMC;
   UICHILD   uiStatus;
   UICHILD   uiCand;
@@ -143,15 +143,15 @@ typedef struct {
   UICHILD   uiDefComp;
   UICHILD2  uiComp[MAXCOMPWND];
   UICHILD   uiGuide;
-} UIEXTRA;
+};
 
 // MZGUIDELINE
-typedef struct {
+struct MZGUIDELINE {
   DWORD dwLevel;
   DWORD dwIndex;
   DWORD dwStrID;
   DWORD dwPrivateID;
-} MZGUIDELINE;
+};
 
 //////////////////////////////////////////////////////////////////////////////
 // externs
