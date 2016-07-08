@@ -53,15 +53,15 @@ UINT CommandFromInputMode(INPUT_MODE imode) {
   case IMODE_FULL_HIRAGANA:
     return IDM_HIRAGANA;
   case IMODE_FULL_KATAKANA:
-    return IDM_ZEN_KATAKANA;
+    return IDM_FULL_KATAKANA;
   case IMODE_FULL_ASCII:
-    return IDM_ZEN_ALNUM;
+    return IDM_FULL_ASCII;
   case IMODE_HALF_KANA:
-    return IDM_HAN_KATAKANA;
+    return IDM_HALF_KATAKANA;
   case IMODE_HALF_ASCII:
-    return IDM_ALNUM;
+    return IDM_HALF_ASCII;
   default:
-    return IDM_ALNUM;
+    return IDM_HALF_ASCII;
   }
 }
 

@@ -373,7 +373,7 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
     ::SetForegroundWindow(hWnd);
 
     UINT uCheck = CommandFromInputMode(GetInputMode(hIMC));
-    ::CheckMenuRadioItem(hSubMenu, IDM_HIRAGANA, IDM_ALNUM, uCheck, MF_BYCOMMAND);
+    ::CheckMenuRadioItem(hSubMenu, IDM_HIRAGANA, IDM_HALF_ASCII, uCheck, MF_BYCOMMAND);
 
     if (IsRomanMode(hIMC)) {
       ::CheckMenuRadioItem(hSubMenu, IDM_ROMAN_INPUT, IDM_KANA_INPUT,

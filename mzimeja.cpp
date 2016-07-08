@@ -301,16 +301,16 @@ BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
   case IDM_HIRAGANA:
     SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
     break;
-  case IDM_ZEN_KATAKANA:
+  case IDM_FULL_KATAKANA:
     SetInputMode(hIMC, IMODE_FULL_KATAKANA);
     break;
-  case IDM_ZEN_ALNUM:
+  case IDM_FULL_ASCII:
     SetInputMode(hIMC, IMODE_FULL_ASCII);
     break;
-  case IDM_HAN_KATAKANA:
+  case IDM_HALF_KATAKANA:
     SetInputMode(hIMC, IMODE_HALF_KANA);
     break;
-  case IDM_ALNUM:
+  case IDM_HALF_ASCII:
     SetInputMode(hIMC, IMODE_HALF_ASCII);
     break;
   case IDM_CANCEL:

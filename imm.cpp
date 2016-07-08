@@ -314,10 +314,10 @@ struct MYMENUITEM {
 };
 static const MYMENUITEM top_menu_items[] = {
   {IDM_HIRAGANA, IDM_HIRAGANA},
-  {IDM_ZEN_KATAKANA, IDM_ZEN_KATAKANA},
-  {IDM_ZEN_ALNUM, IDM_ZEN_ALNUM},
-  {IDM_HAN_KATAKANA, IDM_HAN_KATAKANA},
-  {IDM_ALNUM, IDM_ALNUM},
+  {IDM_FULL_KATAKANA, IDM_FULL_KATAKANA},
+  {IDM_FULL_ASCII, IDM_FULL_ASCII},
+  {IDM_HALF_KATAKANA, IDM_HALF_KATAKANA},
+  {IDM_HALF_ASCII, IDM_HALF_ASCII},
   {-1, -1},
   {IDM_ROMAN_INPUT, IDM_ROMAN_INPUT},
   {IDM_KANA_INPUT, IDM_KANA_INPUT},
@@ -366,25 +366,25 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
             lpImeMenu[i].fState = IMFS_CHECKED;
           }
           break;
-        case IDM_ZEN_KATAKANA:
+        case IDM_FULL_KATAKANA:
           lpImeMenu[i].fType = IMFT_RADIOCHECK;
           if (imode == IMODE_FULL_KATAKANA) {
             lpImeMenu[i].fState = IMFS_CHECKED;
           }
           break;
-        case IDM_ZEN_ALNUM:
+        case IDM_FULL_ASCII:
           lpImeMenu[i].fType = IMFT_RADIOCHECK;
           if (imode == IMODE_FULL_ASCII) {
             lpImeMenu[i].fState = IMFS_CHECKED;
           }
           break;
-        case IDM_HAN_KATAKANA:
+        case IDM_HALF_KATAKANA:
           lpImeMenu[i].fType = IMFT_RADIOCHECK;
           if (imode == IMODE_HALF_KANA) {
             lpImeMenu[i].fState = IMFS_CHECKED;
           }
           break;
-        case IDM_ALNUM:
+        case IDM_HALF_ASCII:
           lpImeMenu[i].fType = IMFT_RADIOCHECK;
           if (imode == IMODE_HALF_ASCII) {
             lpImeMenu[i].fState = IMFS_CHECKED;

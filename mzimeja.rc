@@ -138,10 +138,10 @@ BEGIN
     POPUP ""
     BEGIN
         MENUITEM "ひらがな",                    IDM_HIRAGANA
-        MENUITEM "全角カタカナ",                IDM_ZEN_KATAKANA
-        MENUITEM "全角英数",                    IDM_ZEN_ALNUM
-        MENUITEM "半角カタカナ",                IDM_HAN_KATAKANA
-        MENUITEM "半角英数",                    IDM_ALNUM
+        MENUITEM "全角カタカナ",                IDM_FULL_KATAKANA
+        MENUITEM "全角英数",                    IDM_FULL_ASCII
+        MENUITEM "半角カタカナ",                IDM_HALF_KATAKANA
+        MENUITEM "半角英数",                    IDM_HALF_ASCII
         MENUITEM SEPARATOR
         MENUITEM "ローマ字入力",                IDM_ROMAN_INPUT
         MENUITEM "かな入力",                    IDM_KANA_INPUT
@@ -155,36 +155,36 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_DICFILENAME             "mzimeja.DIC"
-    IDS_CONFIGNAME              "mzimeja.DLL"
+    IDS_DICFILENAME                 "mzimeja.DIC"
+    IDS_CONFIGNAME                  "mzimeja.DLL"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_GL_NODICTIONARY         "Can not find dictionary"
-    IDS_GL_TYPINGERROR          "Typing Error No Roman"
-    IDS_GL_TESTGUIDELINESTR     "TestGuideLine String"
-    IDS_GL_TESTGUIDELINEPRIVATE "TestGuideLine Private"
-    IDS_NOREADING               "There is no reading string\r\nPlease enter the reading string"
-    IDS_NOSTRING                "There is no string\r\nPlease enter the string"
-    IDS_NOMEMORY                "Memory Error"
-    IDS_REGWORDRET              "Fail to register Word"
+    IDS_GL_NODICTIONARY,            "Can not find dictionary"
+    IDS_GL_TYPINGERROR,             "Typing Error No Roman"
+    IDS_GL_TESTGUIDELINESTR,        "TestGuideLine String"
+    IDS_GL_TESTGUIDELINEPRIVATE,    "TestGuideLine Private"
+    IDS_NOREADING,                  "There is no reading string\r\nPlease enter the reading string"
+    IDS_NOSTRING,                   "There is no string\r\nPlease enter the string"
+    IDS_NOMEMORY,                   "Memory Error"
+    IDS_REGWORDRET,                 "Fail to register Word"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDM_HIRAGANA,               "ひらがな"
-    IDM_ZEN_KATAKANA,           "全角カタカナ"
-    IDM_ZEN_ALNUM,              "全角英数"
-    IDM_HAN_KATAKANA,           "半角カタカナ"
-    IDM_ALNUM,                  "半角英数"
-    IDM_ROMAN_INPUT,            "ローマ字入力"
-    IDM_KANA_INPUT,             "かな入力"
-    IDM_ADD_WORD,               "単語登録"
-    IDM_RECONVERT,              "再変換"
-    IDM_PROPERTY,               "プロパティ"
-    IDM_ABOUT,                  "バージョン情報"
-    IDM_CANCEL,                 "キャンセル"
+    IDM_HIRAGANA,                   "ひらがな"
+    IDM_FULL_KATAKANA,              "全角カタカナ"
+    IDM_FULL_ASCII,                 "全角英数"
+    IDM_HALF_KATAKANA,              "半角カタカナ"
+    IDM_HALF_ASCII,                 "半角英数"
+    IDM_ROMAN_INPUT,                "ローマ字入力"
+    IDM_KANA_INPUT,                 "かな入力"
+    IDM_ADD_WORD,                   "単語登録"
+    IDM_RECONVERT,                  "再変換"
+    IDM_PROPERTY,                   "プロパティ"
+    IDM_ABOUT,                      "バージョン情報"
+    IDM_CANCEL,                     "キャンセル"
 END
 
 /////////////////////////////////////////////////////////////////////////////
