@@ -81,7 +81,7 @@
 #define MYGL_TYPINGERROR    1
 #define MYGL_TESTGUIDELINE  2
 
-// WndExtra of child UI windows
+// window extra of child UI windows
 #define FIGWL_MOUSE 0
 #define FIGWLP_SERVERWND        (FIGWL_MOUSE + sizeof(LONG))
 #define FIGWLP_FONT             (FIGWLP_SERVERWND + sizeof(LONG_PTR))

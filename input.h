@@ -18,9 +18,9 @@
 enum INPUT_MODE {
   IMODE_FULL_HIRAGANA,  // fullwidth hiragana
   IMODE_FULL_KATAKANA,  // fullwidth katakana
-  IMODE_FULL_ASCII,     // fullwidth alphanumeric
+  IMODE_FULL_ASCII,     // fullwidth ASCII
   IMODE_HALF_KANA,      // halfwidth katakana
-  IMODE_HALF_ASCII,     // halfwidth alphanumeric
+  IMODE_HALF_ASCII,     // halfwidth ASCII
   IMODE_DISABLED        // the IME is disabled
 };
 
