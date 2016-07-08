@@ -15,6 +15,7 @@ Table of Contents
   projects\           | the projects folder (contains MSVC projects)
   res\                | the resource folder (contains dictionary)
   test\               | the test folder (contains test programs)
+  .gitignore          | specify the untracked files Git should ignore
   cand_info.cpp       | candidate info of mzimeja
   comp_str.cpp        | composition string of mzimeja
   config.cpp          | mzimeja configuration
