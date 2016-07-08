@@ -1298,7 +1298,7 @@ std::wstring roman_to_katakana(std::wstring roman) {
   return katakana;
 } // roman_to_katakana
 
-std::wstring roman_to_hankaku_katakana(std::wstring roman) {
+std::wstring roman_to_halfwidth_katakana(std::wstring roman) {
   FOOTMARK();
   std::wstring katakana, str;
   for (size_t k = 0; k < roman.size();) {
@@ -1356,7 +1356,7 @@ std::wstring roman_to_hankaku_katakana(std::wstring roman) {
     if (!found) katakana += roman[k++];
   }
   return katakana;
-} // roman_to_hankaku_katakana
+} // roman_to_halfwidth_katakana
 
 std::wstring roman_to_hiragana(std::wstring roman, size_t ichTarget) {
   std::wstring str, key, value, extra;
@@ -1473,7 +1473,7 @@ std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget) {
   return roman;
 } // roman_to_katakana
 
-std::wstring roman_to_hankaku_katakana(std::wstring roman, size_t ichTarget) {
+std::wstring roman_to_halfwidth_katakana(std::wstring roman, size_t ichTarget) {
   std::wstring str, key, value, extra;
   size_t key_len = 0;
   for (size_t i = 0; i < _countof(sokuon_table); ++i) {
@@ -1529,7 +1529,7 @@ std::wstring roman_to_hankaku_katakana(std::wstring roman, size_t ichTarget) {
     roman.replace(ichTarget - key.size(), key.size(), value + extra);
   }
   return roman;
-} // roman_to_hankaku_katakana
+} // roman_to_halfwidth_katakana
 
 std::wstring hiragana_to_typing(std::wstring hiragana) {
   FOOTMARK();
@@ -1670,7 +1670,7 @@ BOOL is_hiragana(WCHAR ch) {
   }
 }
 
-BOOL is_zenkaku_katakana(WCHAR ch) {
+BOOL is_fullwidth_katakana(WCHAR ch) {
   FOOTMARK();
   if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
   switch (ch) {
@@ -1682,7 +1682,7 @@ BOOL is_zenkaku_katakana(WCHAR ch) {
   }
 }
 
-BOOL is_hankaku_katakana(WCHAR ch) {
+BOOL is_halfwidth_katakana(WCHAR ch) {
   FOOTMARK();
   if (0xFF65 <= ch && ch <= 0xFF9F) return TRUE;
   switch (ch) {
@@ -1755,7 +1755,7 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
   return szBuf;
 }
 
-std::wstring zenkaku_eisuu_to_hankaku(const std::wstring& str) {
+std::wstring fullwidth_ascii_to_halfwidth(const std::wstring& str) {
   std::wstring ret;
   const size_t count = str.size();
   wchar_t ch;

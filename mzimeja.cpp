@@ -299,19 +299,19 @@ BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
   case IDM_ABOUT:
     break;
   case IDM_HIRAGANA:
-    SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+    SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
     break;
   case IDM_ZEN_KATAKANA:
-    SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+    SetInputMode(hIMC, IMODE_FULL_KATAKANA);
     break;
   case IDM_ZEN_ALNUM:
-    SetInputMode(hIMC, IMODE_ZEN_EISUU);
+    SetInputMode(hIMC, IMODE_FULL_ASCII);
     break;
   case IDM_HAN_KATAKANA:
-    SetInputMode(hIMC, IMODE_HAN_KANA);
+    SetInputMode(hIMC, IMODE_HALF_KANA);
     break;
   case IDM_ALNUM:
-    SetInputMode(hIMC, IMODE_HAN_EISUU);
+    SetInputMode(hIMC, IMODE_HALF_ASCII);
     break;
   case IDM_CANCEL:
     break;

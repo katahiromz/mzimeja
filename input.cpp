@@ -10,12 +10,12 @@
 BOOL IsInputModeOpen(INPUT_MODE imode) {
   FOOTMARK();
   switch (imode) {
-  case IMODE_ZEN_HIRAGANA:
-  case IMODE_ZEN_KATAKANA:
-  case IMODE_ZEN_EISUU:
-  case IMODE_HAN_KANA:
+  case IMODE_FULL_HIRAGANA:
+  case IMODE_FULL_KATAKANA:
+  case IMODE_FULL_ASCII:
+  case IMODE_HALF_KANA:
     return TRUE;
-  case IMODE_HAN_EISUU:
+  case IMODE_HALF_ASCII:
   case IMODE_DISABLED:
   default:
     return FALSE;
@@ -28,37 +28,37 @@ INPUT_MODE InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
     if (dwConversion & IME_CMODE_FULLSHAPE) {
       if (dwConversion & IME_CMODE_JAPANESE) {
         if (dwConversion & IME_CMODE_KATAKANA) {
-          return IMODE_ZEN_KATAKANA;
+          return IMODE_FULL_KATAKANA;
         } else {
-          return IMODE_ZEN_HIRAGANA;
+          return IMODE_FULL_HIRAGANA;
         }
       } else {
-        return IMODE_ZEN_EISUU;
+        return IMODE_FULL_ASCII;
       }
     } else {
       if (dwConversion & (IME_CMODE_JAPANESE | IME_CMODE_KATAKANA)) {
-        return IMODE_HAN_KANA;
+        return IMODE_HALF_KANA;
       } else {
-        return IMODE_HAN_EISUU;
+        return IMODE_HALF_ASCII;
       }
     }
   } else {
-    return IMODE_HAN_EISUU;
+    return IMODE_HALF_ASCII;
   }
 }
 
 UINT CommandFromInputMode(INPUT_MODE imode) {
   FOOTMARK();
   switch (imode) {
-  case IMODE_ZEN_HIRAGANA:
+  case IMODE_FULL_HIRAGANA:
     return IDM_HIRAGANA;
-  case IMODE_ZEN_KATAKANA:
+  case IMODE_FULL_KATAKANA:
     return IDM_ZEN_KATAKANA;
-  case IMODE_ZEN_EISUU:
+  case IMODE_FULL_ASCII:
     return IDM_ZEN_ALNUM;
-  case IMODE_HAN_KANA:
+  case IMODE_HALF_KANA:
     return IDM_HAN_KATAKANA;
-  case IMODE_HAN_EISUU:
+  case IMODE_HALF_ASCII:
     return IDM_ALNUM;
   default:
     return IDM_ALNUM;
@@ -79,19 +79,19 @@ INPUT_MODE GetInputMode(HIMC hIMC) {
 INPUT_MODE NextInputMode(INPUT_MODE imode) {
   FOOTMARK();
   switch (imode) {
-  case IMODE_ZEN_HIRAGANA:
-    return IMODE_ZEN_KATAKANA;
-  case IMODE_ZEN_KATAKANA:
-    return IMODE_ZEN_EISUU;
-  case IMODE_ZEN_EISUU:
-    return IMODE_HAN_KANA;
-  case IMODE_HAN_KANA:
-    return IMODE_HAN_EISUU;
+  case IMODE_FULL_HIRAGANA:
+    return IMODE_FULL_KATAKANA;
+  case IMODE_FULL_KATAKANA:
+    return IMODE_FULL_ASCII;
+  case IMODE_FULL_ASCII:
+    return IMODE_HALF_KANA;
+  case IMODE_HALF_KANA:
+    return IMODE_HALF_ASCII;
   case IMODE_DISABLED:
     return IMODE_DISABLED;
-  case IMODE_HAN_EISUU:
+  case IMODE_HALF_ASCII:
   default:
-    return IMODE_ZEN_HIRAGANA;
+    return IMODE_FULL_HIRAGANA;
   }
 }
 
@@ -103,26 +103,26 @@ void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
   DWORD dwConversion, dwSentence;
   ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
   switch (imode) {
-  case IMODE_ZEN_HIRAGANA:
+  case IMODE_FULL_HIRAGANA:
     ImmSetOpenStatus(hIMC, TRUE);
     dwConversion &= ~IME_CMODE_KATAKANA;
     dwConversion |= IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE;
     break;
-  case IMODE_ZEN_KATAKANA:
+  case IMODE_FULL_KATAKANA:
     ImmSetOpenStatus(hIMC, TRUE);
     dwConversion |= IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE | IME_CMODE_KATAKANA;
     break;
-  case IMODE_ZEN_EISUU:
+  case IMODE_FULL_ASCII:
     ImmSetOpenStatus(hIMC, TRUE);
     dwConversion &= ~(IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
     dwConversion |= IME_CMODE_FULLSHAPE;
     break;
-  case IMODE_HAN_KANA:
+  case IMODE_HALF_KANA:
     ImmSetOpenStatus(hIMC, TRUE);
     dwConversion &= ~IME_CMODE_FULLSHAPE;
     dwConversion |= IME_CMODE_JAPANESE | IME_CMODE_KATAKANA;
     break;
-  case IMODE_HAN_EISUU:
+  case IMODE_HALF_ASCII:
     ImmSetOpenStatus(hIMC, FALSE);
     dwConversion &= ~(IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
     break;

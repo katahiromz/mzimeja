@@ -16,11 +16,11 @@
 // input modes
 
 enum INPUT_MODE {
-  IMODE_ZEN_HIRAGANA,   // zenkaku hiragana
-  IMODE_ZEN_KATAKANA,   // zenkaku katakana
-  IMODE_ZEN_EISUU,      // zenkaku alphanumeric
-  IMODE_HAN_KANA,       // hankaku katakana
-  IMODE_HAN_EISUU,      // hankaku alphanumeric
+  IMODE_FULL_HIRAGANA,  // fullwidth hiragana
+  IMODE_FULL_KATAKANA,  // fullwidth katakana
+  IMODE_FULL_ASCII,     // fullwidth alphanumeric
+  IMODE_HALF_KANA,      // halfwidth katakana
+  IMODE_HALF_ASCII,     // halfwidth alphanumeric
   IMODE_DISABLED        // the IME is disabled
 };
 

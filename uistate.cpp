@@ -143,37 +143,37 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
         if (lpIMC->Conversion() & IME_CMODE_FULLSHAPE) {
           if (lpIMC->Conversion() & IME_CMODE_JAPANESE) {
             if (lpIMC->Conversion() & IME_CMODE_KATAKANA) {
-              // zenkaku katakana
+              // fullwidth katakana
               ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                        CX_BUTTON, CY_BUTTON,
                        hMemDC, 0, 1 * CY_BUTTON, SRCCOPY);
             } else {
-              // zenkaku hiragana
+              // fullwidth hiragana
               ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                        CX_BUTTON, CY_BUTTON,
                        hMemDC, 0, 0 * CY_BUTTON, SRCCOPY);
             }
           } else {
-            // zenkaku alphanumeric
+            // fullwidth alphanumeric
             ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 2 * CY_BUTTON, SRCCOPY);
           }
         } else {
           if (lpIMC->Conversion() & IME_CMODE_JAPANESE) {
-            // hankaku kana
+            // halfwidth kana
             ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 3 * CY_BUTTON, SRCCOPY);
           } else {
-            // hankaku alphanumeric
+            // halfwidth alphanumeric
             ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
           }
         }
       } else {
-        // hankaku alphanumeric
+        // halfwidth alphanumeric
         ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                  CX_BUTTON, CY_BUTTON,
                  hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
@@ -260,9 +260,9 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
     switch (hittest) {
     case SWHT_BUTTON_1:
       if (bOpen) {
-        SetInputMode(hIMC, IMODE_HAN_EISUU);
+        SetInputMode(hIMC, IMODE_HALF_ASCII);
       } else {
-        SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+        SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
       }
       break;
     case SWHT_BUTTON_2:

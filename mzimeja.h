@@ -252,29 +252,29 @@ std::wstring roman_to_hiragana(std::wstring roman, size_t ichTarget);
 // conversion between roman and katakana
 std::wstring roman_to_katakana(std::wstring roman);
 std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget);
-// conversion between roman and hankaku katakana
-std::wstring roman_to_hankaku_katakana(std::wstring roman);
-std::wstring roman_to_hankaku_katakana(std::wstring roman, size_t ichTarget);
+// conversion between roman and halfwidth katakana
+std::wstring roman_to_halfwidth_katakana(std::wstring roman);
+std::wstring roman_to_halfwidth_katakana(std::wstring roman, size_t ichTarget);
 
 // character map for kana input
 WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift);
 // character map for typing keys
 WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock);
-// dakuon processor
+// dakuon (voiced consonant) processor
 WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1);
 // locale-dependent string conversion
 std::wstring lcmap(const std::wstring& str, DWORD dwFlags);
 // convert hiragana to typing characters
 std::wstring hiragana_to_typing(std::wstring hiragana);
-// convert zenkaku eisuu to hankaku
-std::wstring zenkaku_eisuu_to_hankaku(const std::wstring& str);
+// convert fullwidth ascii to halfwidth
+std::wstring fullwidth_ascii_to_halfwidth(const std::wstring& str);
 
 // is the character hiragana?
 BOOL is_hiragana(WCHAR ch);
-// is the character zenkaku katakana?
-BOOL is_zenkaku_katakana(WCHAR ch);
-// is the character hankaku katakana?
-BOOL is_hankaku_katakana(WCHAR ch);
+// is the character fullwidth katakana?
+BOOL is_fullwidth_katakana(WCHAR ch);
+// is the character halfwidth katakana?
+BOOL is_halfwidth_katakana(WCHAR ch);
 // is the character kanji?
 BOOL is_kanji(WCHAR ch);
 // is the character the education kanji?

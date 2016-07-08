@@ -80,9 +80,9 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_OEM_AUTO:
   case VK_OEM_ENLW:
     if (bOpen) {
-      SetInputMode(hIMC, IMODE_HAN_EISUU);
+      SetInputMode(hIMC, IMODE_HALF_ASCII);
     } else {
-      SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+      SetInputMode(hIMC, IMODE_FULL_KATAKANA);
     }
     break;
 
@@ -92,23 +92,23 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
       break;
     }
     switch (imode) {
-    case IMODE_ZEN_HIRAGANA:
-      if (bShift) SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+    case IMODE_FULL_HIRAGANA:
+      if (bShift) SetInputMode(hIMC, IMODE_FULL_KATAKANA);
       break;
-    case IMODE_ZEN_KATAKANA:
-      if (!bShift) SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+    case IMODE_FULL_KATAKANA:
+      if (!bShift) SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
       break;
-    case IMODE_ZEN_EISUU:
-    case IMODE_HAN_EISUU:
+    case IMODE_FULL_ASCII:
+    case IMODE_HALF_ASCII:
       if (bShift) {
-        SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+        SetInputMode(hIMC, IMODE_FULL_KATAKANA);
       } else {
-        SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+        SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
       }
       break;
-    case IMODE_HAN_KANA:
+    case IMODE_HALF_KANA:
       if (!bShift) {
-        SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+        SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
       }
       break;
     default:
@@ -123,9 +123,9 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     if (bAlt) {
       SetRomanMode(hIMC, !IsRomanMode(hIMC));
     } else if (bShift) {
-      SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+      SetInputMode(hIMC, IMODE_FULL_KATAKANA);
     } else {
-      SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+      SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
     }
     break;
 
@@ -358,11 +358,11 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
       ret = FALSE;
       if (fCompStr) {
         switch (vKey) {
-        case VK_F6:     // make composition zenkaku Hiragana
-        case VK_F7:     // make composition zenkaku Katakana
-        case VK_F8:     // make composition hankaku Katakana
-        case VK_F9:     // make composition zenkaku alphanumeric
-        case VK_F10:    // make composition hankaku alphanumeric
+        case VK_F6:     // make composition fullwidth Hiragana
+        case VK_F7:     // make composition fullwidth Katakana
+        case VK_F8:     // make composition halfwidth Katakana
+        case VK_F9:     // make composition fullwidth alphanumeric
+        case VK_F10:    // make composition halfwidth alphanumeric
         case VK_ESCAPE: // close composition
           ret = TRUE;
           break;
@@ -439,9 +439,9 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
       switch ((BYTE)uVKey) {
       case VK_KANJI: case VK_OEM_AUTO: case VK_OEM_ENLW:
         if (::ImmGetOpenStatus(hIMC)) {
-          SetInputMode(hIMC, IMODE_HAN_EISUU);
+          SetInputMode(hIMC, IMODE_HALF_ASCII);
         } else {
-          SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+          SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
         }
         break;
       case VK_KANA:
@@ -449,9 +449,9 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
         if (lpbKeyState[VK_MENU] & 0x80) {
           SetRomanMode(hIMC, !IsRomanMode(hIMC));
         } else if (lpbKeyState[VK_SHIFT] & 0x80) {
-          SetInputMode(hIMC, IMODE_ZEN_KATAKANA);
+          SetInputMode(hIMC, IMODE_FULL_KATAKANA);
         } else {
-          SetInputMode(hIMC, IMODE_ZEN_HIRAGANA);
+          SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
         }
         break;
       default:

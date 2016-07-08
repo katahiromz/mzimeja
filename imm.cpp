@@ -362,31 +362,31 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
           break;
         case IDM_HIRAGANA:
           lpImeMenu[i].fType = IMFT_RADIOCHECK;
-          if (imode == IMODE_ZEN_HIRAGANA) {
+          if (imode == IMODE_FULL_HIRAGANA) {
             lpImeMenu[i].fState = IMFS_CHECKED;
           }
           break;
         case IDM_ZEN_KATAKANA:
           lpImeMenu[i].fType = IMFT_RADIOCHECK;
-          if (imode == IMODE_ZEN_KATAKANA) {
+          if (imode == IMODE_FULL_KATAKANA) {
             lpImeMenu[i].fState = IMFS_CHECKED;
           }
           break;
         case IDM_ZEN_ALNUM:
           lpImeMenu[i].fType = IMFT_RADIOCHECK;
-          if (imode == IMODE_ZEN_EISUU) {
+          if (imode == IMODE_FULL_ASCII) {
             lpImeMenu[i].fState = IMFS_CHECKED;
           }
           break;
         case IDM_HAN_KATAKANA:
           lpImeMenu[i].fType = IMFT_RADIOCHECK;
-          if (imode == IMODE_HAN_KANA) {
+          if (imode == IMODE_HALF_KANA) {
             lpImeMenu[i].fState = IMFS_CHECKED;
           }
           break;
         case IDM_ALNUM:
           lpImeMenu[i].fType = IMFT_RADIOCHECK;
-          if (imode == IMODE_HAN_EISUU) {
+          if (imode == IMODE_HALF_ASCII) {
             lpImeMenu[i].fState = IMFS_CHECKED;
           }
           break;
