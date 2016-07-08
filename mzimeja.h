@@ -13,7 +13,7 @@
 #include <vector>           // for std::vector
 #include <set>              // for std::set
 
-#include <cstdio>           // for standard I/O
+#include <cstdio>           // for C standard I/O
 #include <cctype>           // for C character types
 #include <cassert>          // for assert
 #include <cstring>          // for C string
