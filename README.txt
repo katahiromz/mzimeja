@@ -1,6 +1,6 @@
 This is MZ-IME Japanese Input (mzimeja; under construction).
 
-This program is an Input Method Editor (IME) for Japanese Windows.
+This program is an Input Method Editor (IME) for Japanese Windows 2000.
 
 /////////////////////////////////////////////////////
 // Katayama Hirofumi MZ (katahiromz) [ANT]
