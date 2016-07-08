@@ -12,7 +12,7 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
   FOOTMARK();
   int nsw = (fFlag ? SW_SHOWNOACTIVATE : SW_HIDE);
 
-  LPUIEXTRA lpUIExtra = LockUIExtra(hwndServer);
+  UIEXTRA *lpUIExtra = LockUIExtra(hwndServer);
   if (lpUIExtra) {
     if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
       ::ShowWindow(lpUIExtra->uiStatus.hWnd, nsw);
@@ -35,7 +35,7 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
 }
 
 #ifdef _DEBUG
-void PASCAL DumpUIExtra(LPUIEXTRA lpUIExtra) {
+void PASCAL DumpUIExtra(UIEXTRA *lpUIExtra) {
   FOOTMARK();
   DebugPrint(TEXT("Status hWnd %lX  [%d,%d]\n"),
              lpUIExtra->uiStatus.hWnd, lpUIExtra->uiStatus.pt.x,
@@ -65,7 +65,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
   FOOTMARK();
   InputContext *lpIMC;
-  LPUIEXTRA lpUIExtra;
+  UIEXTRA *lpUIExtra;
   HGLOBAL hUIExtra;
   LONG lRet = 0L;
   int i;
@@ -90,7 +90,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     DebugPrintA("WM_CREATE\n");
     // Allocate UI's extra memory block.
     hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
-    lpUIExtra = (LPUIEXTRA)GlobalLock(hUIExtra);
+    lpUIExtra = (UIEXTRA *)GlobalLock(hUIExtra);
     if (lpUIExtra) {
       lpUIExtra->uiStatus.pt.x = -1;
       lpUIExtra->uiStatus.pt.y = -1;
@@ -308,7 +308,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   return lRet;
 }
 
-int GetCompFontHeight(LPUIEXTRA lpUIExtra) {
+int GetCompFontHeight(UIEXTRA *lpUIExtra) {
   FOOTMARK();
   HDC hIC = CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL);
   HFONT hOldFont = NULL;
@@ -325,7 +325,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
                    LPARAM lParam) {
   FOOTMARK();
   LONG ret = 0;
-  LPUIEXTRA lpUIExtra;
+  UIEXTRA *lpUIExtra;
   RECT rc;
   LOGFONT lf;
 
@@ -482,7 +482,7 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
   InputContext *lpIMC = TheIME.LockIMC(hIMC);
   if (NULL == lpIMC) return 1L;
 
-  LPUIEXTRA lpUIExtra = LockUIExtra(hWnd);
+  UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
   if (lpUIExtra) {
     switch (wParam) {
     case IMC_GETCANDIDATEPOS:

@@ -25,7 +25,7 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // create status window
-HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra) {
+HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
   FOOTMARK();
   const DWORD style = WS_DISABLED | WS_POPUP;
   const DWORD exstyle = WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
@@ -240,7 +240,7 @@ STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
   return SWHT_NONE;
 } // StatusWnd_HitTest
 
-void StatusWnd_Update(LPUIEXTRA lpUIExtra) {
+void StatusWnd_Update(UIEXTRA *lpUIExtra) {
   FOOTMARK();
   if (IsWindow(lpUIExtra->uiStatus.hWnd))
     SendMessage(lpUIExtra->uiStatus.hWnd, WM_UI_UPDATE, 0, 0L);

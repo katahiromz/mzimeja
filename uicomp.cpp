@@ -52,7 +52,7 @@ static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
   RECT rc;
 
@@ -93,7 +93,7 @@ void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   lpUIExtra->uiDefComp.bShow = FALSE;
 }
 
-HWND ClauseToCompWnd(LPUIEXTRA lpUIExtra, InputContext *lpIMC, DWORD iClause) {
+HWND ClauseToCompWnd(UIEXTRA *lpUIExtra, InputContext *lpIMC, DWORD iClause) {
   if (lpIMC->cfCompForm.dwStyle) {
     HWND hwnd = lpUIExtra->uiComp[0].hWnd;
     for (int i = 0; i < MAXCOMPWND; i++) {
@@ -112,7 +112,7 @@ HWND ClauseToCompWnd(LPUIEXTRA lpUIExtra, InputContext *lpIMC, DWORD iClause) {
   }
 }
 
-BOOL GetCandPosHintFromComp(LPUIEXTRA lpUIExtra, InputContext *lpIMC,
+BOOL GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
                             DWORD iClause, LPPOINT ppt) {
   FOOTMARK();
   HWND hCompWnd = ClauseToCompWnd(lpUIExtra, lpIMC, iClause);
@@ -195,7 +195,7 @@ BOOL GetCandPosHintFromComp(LPUIEXTRA lpUIExtra, InputContext *lpIMC,
 } // GetCandPosHintFromComp
 
 // calc the position of composition windows and move them
-void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
 
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
@@ -591,7 +591,7 @@ void CompWnd_Paint(HWND hCompWnd) {
   ::EndPaint(hCompWnd, &ps);
 } // CompWnd_Paint
 
-void CompWnd_Hide(LPUIEXTRA lpUIExtra) {
+void CompWnd_Hide(UIEXTRA *lpUIExtra) {
   FOOTMARK();
 
   RECT rc;
@@ -613,7 +613,7 @@ void CompWnd_Hide(LPUIEXTRA lpUIExtra) {
   }
 } // CompWnd_Hide
 
-void CompWnd_SetFont(LPUIEXTRA lpUIExtra) {
+void CompWnd_SetFont(UIEXTRA *lpUIExtra) {
   FOOTMARK();
   for (int i = 0; i < MAXCOMPWND; i++) {
     HWND hwnd = lpUIExtra->uiComp[i].hWnd;

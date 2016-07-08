@@ -424,10 +424,10 @@ void SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra) {
   SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
 }
 
-LPUIEXTRA LockUIExtra(HWND hwndServer) {
+UIEXTRA *LockUIExtra(HWND hwndServer) {
   FOOTMARK();
   HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
-  LPUIEXTRA lpUIExtra = (LPUIEXTRA)::GlobalLock(hUIExtra);
+  UIEXTRA *lpUIExtra = (UIEXTRA *)::GlobalLock(hUIExtra);
   assert(lpUIExtra);
   return lpUIExtra;
 }

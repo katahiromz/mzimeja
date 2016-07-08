@@ -42,7 +42,7 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
   return 0;
 } // CandWnd_WindowProc
 
-BOOL GetCandPosFromCompWnd(InputContext *lpIMC, LPUIEXTRA lpUIExtra, LPPOINT lppt) {
+BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt) {
   FOOTMARK();
 
   BOOL ret = FALSE;
@@ -67,7 +67,7 @@ BOOL GetCandPosFromCompWnd(InputContext *lpIMC, LPUIEXTRA lpUIExtra, LPPOINT lpp
   return ret;
 }
 
-BOOL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
+BOOL GetCandPosFromCompForm(InputContext *lpIMC, UIEXTRA *lpUIExtra,
                             LPPOINT lppt) {
   FOOTMARK();
   if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, lppt)) {
@@ -77,7 +77,7 @@ BOOL GetCandPosFromCompForm(InputContext *lpIMC, LPUIEXTRA lpUIExtra,
   return FALSE;
 } // GetCandPosFromCompForm
 
-void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
   POINT pt;
 
@@ -155,7 +155,7 @@ void CandWnd_Paint(HWND hCandWnd) {
   ::DeleteObject(hbrHightLight);
 } // CandWnd_Paint
 
-SIZE CandWnd_CalcSize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
   int width = 0, height = 0;
   HDC hDC = ::CreateCompatibleDC(NULL);
@@ -192,7 +192,7 @@ SIZE CandWnd_CalcSize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   return ret;
 } // CandWnd_CalcSize
 
-void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
+void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
   if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
     SIZE siz = CandWnd_CalcSize(lpUIExtra, lpIMC);
@@ -206,7 +206,7 @@ void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC) {
   }
 } // CandWnd_Resize
 
-void CandWnd_Hide(LPUIEXTRA lpUIExtra) {
+void CandWnd_Hide(UIEXTRA *lpUIExtra) {
   FOOTMARK();
   RECT rc;
 
@@ -220,7 +220,7 @@ void CandWnd_Hide(LPUIEXTRA lpUIExtra) {
   }
 } // CandWnd_Hide
 
-void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
+void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
                   BOOL fForceComp) {
   FOOTMARK();
   RECT rc;

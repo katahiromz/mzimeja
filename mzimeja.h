@@ -123,14 +123,14 @@ typedef struct {
   HWND hWnd;
   BOOL bShow;
   POINT pt;
-} UICHILD, NEAR *PUICHILD, FAR *LPUICHILD;
+} UICHILD;
 
 // UICHILD2
 typedef struct {
   HWND hWnd;
   BOOL bShow;
   RECT rc;
-} UICHILD2, NEAR *PUICHILD2, FAR *LPUICHILD2;
+} UICHILD2;
 
 // UIEXTRA
 typedef struct {
@@ -143,7 +143,7 @@ typedef struct {
   UICHILD   uiDefComp;
   UICHILD2  uiComp[MAXCOMPWND];
   UICHILD   uiGuide;
-} UIEXTRA,  NEAR *PUIEXTRA, FAR *LPUIEXTRA;
+} UIEXTRA;
 
 // MZGUIDELINE
 typedef struct {
@@ -151,7 +151,7 @@ typedef struct {
   DWORD dwIndex;
   DWORD dwStrID;
   DWORD dwPrivateID;
-} MZGUIDELINE, NEAR *PMZGUIDELINE, FAR *LPMZGUIDELINE;
+} MZGUIDELINE;
 
 //////////////////////////////////////////////////////////////////////////////
 // externs
@@ -180,39 +180,39 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
                     LPARAM lParam);
 void DrawUIBorder(LPRECT lprc);
 void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-int GetCompFontHeight(LPUIEXTRA lpUIExtra);
+int GetCompFontHeight(UIEXTRA *lpUIExtra);
 BOOL IsImeMessage(UINT message);
 
 // uistate.c
-HWND StatusWnd_Create(HWND hWnd, LPUIEXTRA lpUIExtra);
+HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra);
 LRESULT CALLBACK StatusWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
-void StatusWnd_Update(LPUIEXTRA lpUIExtra);
+void StatusWnd_Update(UIEXTRA *lpUIExtra);
 
 // uicand.c
 LRESULT CALLBACK CandWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CandWnd_Paint(HWND hCandWnd);
-void CandWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
-void CandWnd_Resize(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
-void CandWnd_Hide(LPUIEXTRA lpUIExtra);
-void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, LPUIEXTRA lpUIExtra,
+void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC);
+void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC);
+void CandWnd_Hide(UIEXTRA *lpUIExtra);
+void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
                   BOOL fForceComp);
 
 // uicomp.c
 LRESULT CALLBACK CompWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CompWnd_Paint(HWND hCompWnd);
-void CompWnd_Create(HWND hUIWnd, LPUIEXTRA lpUIExtra, InputContext *lpIMC);
-void CompWnd_Move(LPUIEXTRA lpUIExtra, InputContext *lpIMC);
-void CompWnd_Hide(LPUIEXTRA lpUIExtra);
-void CompWnd_SetFont(LPUIEXTRA lpUIExtra);
-HWND ClauseToCompWnd(LPUIEXTRA lpUIExtra, InputContext *lpIMC, DWORD iClause);
-BOOL GetCandPosHintFromComp(LPUIEXTRA lpUIExtra, InputContext *lpIMC,
+void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC);
+void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC);
+void CompWnd_Hide(UIEXTRA *lpUIExtra);
+void CompWnd_SetFont(UIEXTRA *lpUIExtra);
+HWND ClauseToCompWnd(UIEXTRA *lpUIExtra, InputContext *lpIMC, DWORD iClause);
+BOOL GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
                             DWORD iClause, LPPOINT ppt);
 
 // uiguide.c
 LRESULT CALLBACK GuideWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt, DWORD dwPushedGuide);
 void GuideWnd_Button(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-void GuideWnd_Update(LPUIEXTRA lpUIExtra);
+void GuideWnd_Update(UIEXTRA *lpUIExtra);
 LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
 
 // config.c
@@ -232,7 +232,7 @@ void      RepositionWindow(HWND hWnd);
 HFONT     CheckNativeCharset(HDC hDC);
 HGLOBAL   GetUIExtraFromServerWnd(HWND hwndServer);
 void      SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra);
-LPUIEXTRA LockUIExtra(HWND hwndServer);
+UIEXTRA * LockUIExtra(HWND hwndServer);
 void      UnlockUIExtra(HWND hwndServer);
 void      FreeUIExtra(HWND hwndServer);
 

@@ -271,7 +271,7 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
   ReleaseDC(hGuideWnd, hDC);
 }
 
-void GuideWnd_Update(LPUIEXTRA lpUIExtra) {
+void GuideWnd_Update(UIEXTRA *lpUIExtra) {
   FOOTMARK();
   if (IsWindow(lpUIExtra->uiGuide.hWnd))
     SendMessage(lpUIExtra->uiGuide.hWnd, WM_UI_UPDATE, 0, 0L);
