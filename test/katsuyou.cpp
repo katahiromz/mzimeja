@@ -137,7 +137,7 @@ bool do_load(void) {
             str.find(L"[ínñº]") == std::wstring::npos &&
             str.find(L"[ìÆêAï®]") == std::wstring::npos)
         {
-          //printf("WARNING: non-common-use kanji found at Line %d\n", lineno);
+          //printf("..\\mzimeja.dic (%d): WARNING: non-common-use kanji found\n", lineno);
           break;
         }
       }
@@ -148,7 +148,7 @@ bool do_load(void) {
     unboost::split(fields, str, unboost::is_any_of(L"\t"));
 
     if (fields.empty()) {
-      printf("WARNING: empty line at Line %d\n", lineno);
+      printf("..\\mzimeja.dic (%d): WARNING: empty line\n", lineno);
       continue;
     }
 
@@ -186,7 +186,7 @@ bool do_load(void) {
       else if (bunrui_str == L"ê⁄ì™åÍ")       entry.bunrui = HB_SETTOUGO;
       else if (bunrui_str == L"ê⁄îˆåÍ")       entry.bunrui = HB_SETSUBIGO;
       else {
-        printf("WARNING: invalid bunrui at Line %d\n", lineno);
+        printf("..\\mzimeja.dic (%d): WARNING: invalid bunrui\n", lineno);
         continue;
       }
 
