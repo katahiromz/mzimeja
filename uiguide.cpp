@@ -17,55 +17,55 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
   RECT rc;
 
   switch (message) {
-    case WM_UI_HIDE:
-      ShowWindow(hWnd, SW_HIDE);
-      break;
+  case WM_UI_HIDE:
+    ShowWindow(hWnd, SW_HIDE);
+    break;
 
-    case WM_UI_UPDATE:
-      InvalidateRect(hWnd, NULL, FALSE);
-      break;
+  case WM_UI_UPDATE:
+    InvalidateRect(hWnd, NULL, FALSE);
+    break;
 
-    case WM_PAINT:
-      hDC = BeginPaint(hWnd, &ps);
-      GuideWnd_Paint(hWnd, hDC, NULL, 0);
-      EndPaint(hWnd, &ps);
-      break;
+  case WM_PAINT:
+    hDC = BeginPaint(hWnd, &ps);
+    GuideWnd_Paint(hWnd, hDC, NULL, 0);
+    EndPaint(hWnd, &ps);
+    break;
 
-    case WM_MOUSEMOVE:
-    case WM_SETCURSOR:
-    case WM_LBUTTONUP:
-    case WM_RBUTTONUP:
-      GuideWnd_Button(hWnd, message, wParam, lParam);
-      if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
-          (HIWORD(lParam) != WM_RBUTTONDOWN))
-        return DefWindowProc(hWnd, message, wParam, lParam);
-      if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
-        SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
-        SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0L);
-      }
-      break;
+  case WM_MOUSEMOVE:
+  case WM_SETCURSOR:
+  case WM_LBUTTONUP:
+  case WM_RBUTTONUP:
+    GuideWnd_Button(hWnd, message, wParam, lParam);
+    if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
+        (HIWORD(lParam) != WM_RBUTTONDOWN))
+      return DefWindowProc(hWnd, message, wParam, lParam);
+    if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
+      SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
+      SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0L);
+    }
+    break;
 
-    case WM_MOVE:
-      hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
-      if (IsWindow(hUIWnd))
-        SendMessage(hUIWnd, WM_UI_GUIDEMOVE, wParam, lParam);
-      break;
+  case WM_MOVE:
+    hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
+    if (IsWindow(hUIWnd))
+      SendMessage(hUIWnd, WM_UI_GUIDEMOVE, wParam, lParam);
+    break;
 
-    case WM_CREATE:
-      hbmpGuide = TheIME.LoadBMP(TEXT("CLOSEBMP"));
-      SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbmpGuide);
-      GetClientRect(hWnd, &rc);
-      break;
+  case WM_CREATE:
+    hbmpGuide = TheIME.LoadBMP(TEXT("CLOSEBMP"));
+    SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbmpGuide);
+    GetClientRect(hWnd, &rc);
+    break;
 
-    case WM_DESTROY:
-      hbmpGuide = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP);
-      DeleteObject(hbmpGuide);
-      break;
+  case WM_DESTROY:
+    hbmpGuide = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP);
+    DeleteObject(hbmpGuide);
+    break;
 
-    default:
-      if (!IsImeMessage(message))
-        return DefWindowProc(hWnd, message, wParam, lParam);
-      break;
+  default:
+    if (!IsImeMessage(message))
+      return DefWindowProc(hWnd, message, wParam, lParam);
+    break;
   }
   return 0;
 }
