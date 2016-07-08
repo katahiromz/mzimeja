@@ -249,7 +249,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\footmark.hpp"
+				RelativePath="..\include\footmark.hpp"
 				>
 			</File>
 			<File
@@ -277,7 +277,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\unboost.hpp"
+				RelativePath="..\include\unboost.hpp"
 				>
 			</File>
 			<File
