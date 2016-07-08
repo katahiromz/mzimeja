@@ -1706,7 +1706,7 @@ BOOL is_education_kanji(WCHAR ch) {
 
 BOOL is_common_use_kanji(WCHAR ch) {
   return wcschr(L"ˆŸˆ£ˆ¥ˆ¤žBˆ«ˆ¬ˆ³ˆµˆ¶—’ˆÀˆÄˆÃˆÈˆßˆÊˆÍˆãˆËˆÏˆÐˆ×ˆØˆÝˆÑˆÙˆÚˆÞˆÌˆÖœbˆÓˆáˆÛˆÔˆâˆÜˆæˆçˆêˆëˆíˆïˆðˆøˆóˆöˆôˆ÷ˆõ‰@ˆú‰Aˆù‰B‰C‰E‰F‰H‰J‰SŸT¤‰Y‰^‰_‰i‰j‰p‰f‰h‰c‰r‰e‰s‰qˆÕ‰u‰v‰t‰w‰x‰z‰y‰{‰~‰„‰ˆ‰Š‰…‰ƒ•Q‰‡‰€‰Œ‰Ž‰“‰”‰–‰‰‰‰‰˜‰¤‰š‰›‰ž‰‰Ÿ‰ ‰¢‰£÷‰¥‰œ‰¡‰ª‰®‰­‰¯‰°‹ñ‰³‰´‰µ‰¹‰¶‰·‰¸‰º‰»‰Î‰Á‰Â‰¼‰½‰Ô‰À‰¿‰Ê‰Í‰Õ‰È‰Ë‰Ä‰Æ‰×‰Ø‰Ù‰Ý‰Q‰ß‰Å‰É‰ÐŒC‰Ç‰Ì‰Ó‰Ò‰Û‰á‰åŠ¢‰ä‰æ‰è‰ê‰ë‰ì‰î‰ñŠD‰ï‰õ‰ú‰ü‰ö‰û‰÷ŠCŠEŠFŠBŠGŠJŠK‰òž²‰ð’×‰ó‰ùæ~ŠLŠOŠNŠQŠRŠUŠXŠSŠWŠYŠTŠ[Š_Š`ŠeŠpŠgŠvŠiŠjŠkŠsŠoŠrŠuŠtŠmŠlŠdŠnŠwŠxŠyŠzŠ{Š|ŠƒŠ‡ŠˆŠ…Š‰Š„Š‹ŠŠŠŒŠŠŽŠ”Š˜Š™Š Š±Š§ŠÃŠ¾ŠÊŠ®ŠÌŠ¯Š¥ŠªŠÅŠ×Š£Š¨Š³ŠÑŠ¦Š«Š¬Š·Š¸Š»Š¼ŠÔŠÕŠ©Š°Š²Š´Š¿ŠµŠÇŠÖŠ½ŠÄŠÉŠ¶ŠÒŠÙŠÂŠÈŠÏŠØŠÍŠÓŠÛŠÜŠÝŠâŠßŠáŠæŠçŠèŠéŠêŠëŠ÷‹CŠòŠóŠõ‹DŠï‹F‹G‹I‹OŠù‹L‹N‹Q‹S‹AŠîŠñ‹K‹TŠìŠôŠöŠúŠû‹MŠüšÊŠøŠí‹E‹P‹@‹R‹Z‹X‹U‹\‹`‹^‹V‹Y‹[‹]‹c‹e‹g‹i‹l‹p‹q‹r‹t‹s‹ã‹v‹y‹|‹u‹Œ‹x‹z‹€‰P‹‹†‹ƒ‹}‹‰‹Š‹{‹~‹…‹‹šk‹‡‹‹Ž‹‹‹‘‹’‹“‹•‹–‹—‹›Œä‹™‹¥‹¤‹©‹¶‹ž‹‹Ÿ‹¦‹µ‹¬‹²‹·‹°‹±‹¹‹º‹­‹³‹½‹«‹´‹¸‹¾‹£‹¿‹Á‹Â‹Å‹Æ‹Ã‹È‹Ç‹É‹Ê‹Ð‹Ò‹Ï‹ß‹à‹Û‹Î‹Õ‹Ø‹Í‹Ö‹Ù‹Ñ‹Þ‹Ý‹á‹â‹æ‹å‹ê‹ì‹ïœœ‹ð‹ó‹ô‹ö‹÷‹ø‹üŒ@ŒAŒFŒJŒNŒPŒMŒOŒRŒSŒQŒZŒYŒ`ŒnŒaŒsŒWŒ^Œ_ŒvŒbŒ[ŒfŒkŒoŒuŒhŒiŒyŒXŒgŒpŒwŒcœÛŒmŒeŒxŒ{Œ|Œ}Œ~Œ„Œ€Œ‚ŒƒŒ…Œ‡ŒŠŒŒŒˆŒ‹Œ†Œ‰ŒŽŒ¢ŒŒ©Œ”Œ¨ŒšŒ¤Œ§ŒŒ“Œ•ŒŒ¬Œ’Œ¯Œ—Œ˜ŒŸŒ™Œ£Œ¦Œ­Œ Œ›Œ«ŒªŒ®–šŒ°Œ±ŒœŒ³Œ¶ŒºŒ¾Œ·ŒÀŒ´Œ»Œ½Œ¸Œ¹ŒµŒÈŒËŒÃŒÄŒÅŒÒŒÕŒÇŒÊŒÌŒÍŒÂŒÉŒÎŒÙŒÖŒÛçüŒÚŒÜŒÝŒßŒàŒãŒâŒåŒéŒêŒëŒìŒûHŒöŒùEŒ÷ILbŒðŒõŒü@D]lsBFRUXŒøKSmŒòŒúP^cgrxŒóZkqv~‚NT[‰©AQ`di€az\jye‹»t|uwŒî†‡‰„˜ü‹Ž’J‘•’“–œ‹îž ¡¢©¦ª¥¬­®°¤§¶²¹¸»´·¼½ÀÁËÄÐÈÑÓÉÍÊÌÏÕÖ×ØÅÙÂÃÇÎÚÛéÝÞÜàßèìíðòõô|ïöçûŽDü™‹ŽAŽEŽ@ŽBŽCŽGŽMŽOŽRŽQŽVŽ\ŽSŽYŽPŽUŽZŽ_Ž^ŽcŽaŽbŽmŽqŽxŽ~ŽŽdŽjŽiŽlŽs–îŽ|Ž€Ž…ŽŠŽfŽuŽ„ŽgŽhŽnŽoŽ}ŽƒŽˆŽpŽvŽwŽ{Žtœ“Ž†Ž‰Ž‹Ž‡ŽŒŽ•ŽkŽŽŽŽ‘Ž”ŽŽ“•Ž’ŽŽ¦ŽšŽ›ŽŸŽ¨Ž©Ž—Ž™Ž–Ž˜Ž¡ŽŽžŽ ŽœŽ«Ž¥‰aŽ£Ž­Ž®Ž¯Ž²ŽµŽ¶Ž¸ŽºŽ¾Ž·Ž¼Ž¹Ž½Ž¿ŽÀŽÅŽÊŽÐŽÔŽÉŽÒŽËŽÌŽÍŽÎŽÏŽÕŽÓŽ×ŽÖŽÚŽØŽÞŽßŽÝŽáŽãŽâŽèŽåŽçŽéŽæŽëŽñŽêŽìŽðŽîŽíŽïŽõŽóŽôŽöŽùŽòŽ÷ŽûŽúBMGŽü@EHLC‘³IãµKTAOWDVXRP\`[Z_d]aebcfjhilkmnoqprtu{„‚y}ƒz‡€…ˆ‰Š‘Ž‹”—”@•˜–™œ¬¡­¢ °´Ñ®µ³¸¼Àºª«ÁÇËÌÎ¥¤ÂÍÐ×Ÿ¶»ÄÅÉÏÙØÛ§ÆÚ²á“²ÕÜžÊàãäçðóæéòèíîêôö“êëìù÷øF@HABüGúDEJKS\LbcghNM’Ã_OPUZ^j[aiXfQTVRkdelnmsvrwqt{}…‚†ƒˆŠ„Œ‹‡•ä‘•’”˜™ž¡£¥ˆä¢³¶¬¼º§©ª«ÂÄ­¯µÈ¦À´·–¹°¨¹½¸»¾Ã¿®ÁÅ—[ËÎÔÌÍÈÒÇÉÊÓÕÏÑÐØÜÙÞÚÝáÛßàãâçìåèæéêòóôõîðù‘Dí÷‘A‘B‘F‘Hâ³‘Köü‘J‘I‘E‘@‘N‘S‘O‘P‘R‘T‘Q‘V‘U‘_‘j‘c‘d‘f‘[‘e‘g‘a‘i‘Y‘k‘b‘o‘s‘‘ˆ‘–‘t‘Š‘‘‘‘—‘q‘{‘}ŒK‘ƒ‘|‘‚‘]‘u‘‹‘n‘r‘‰‘’‘•‘m‘z‘w‘‘˜‘…çH‘€‘‡‘š‘›‘”‘¢‘œ‘‘ž‘ ‘¡‘Ÿ‘¦‘©‘«‘£‘¥‘§‘¨‘¬‘¤‘ª‘­‘°‘®‘¯‘±‘²—¦‘¶‘º‘·‘¸‘¹‘»‘¼‘½‘¿‘Å‘Ã‘Á‘Â‘Ä‘Ê‘¾‘Î‘Ì‘Ï‘Ò‘Ó‘Ù‘Þ‘Ñ‘×‘Í‘Ü‘ß‘Ö‘Ý‘à‘Ø‘Ô‘Õ‘å‘ã‘ä‘æ‘è‘ê‘î‘ð‘ò‘ì‘ñ‘õ‘ó‘ø‘÷’A’B’E’D’I’N’O’U’S’P’Y’_’T’W’Z’Q’[’]’a’b’c’j’i’f’e’g’k’d’n’r’m’l’p’v’x’s’t’uãk’|’{’€’~’z’’‚’ƒ’…’„’†’‡’Ž‰«’ˆ’‰’Š’’‹’Œ’’‘’’’“’˜’™’š’¢’¡’›’¬’·’§’ ’£’¤’­’Þ’¸’¹’©“\’´’°’µ’¥š}’ªŸ’²’®’¦’¼’º’»’¾’¿’½’Â’À’Á’Ç’Å’Ä’Ê’É’Ë’Ð’Ø’Ü’ß’á’æ’ì’í’è’ê’ï“@’à’å’é’ù’ë’ü’â’ã’ç’ñ’ö’ø’÷’ú“D“I“J“E“H“K“G“M“R“N“S“O“P“V“T“X“_“W“Y“]“U“c“`“a“d“l“f“i“k“r“s“n“h“q“y“z“w“x“{““~“”“–“Š“¤“Œ“ž“¦“|“€“‚“‡““¢“§“}“‰““©“ƒ“‹““’“—“o“š“™“›“ˆî“¥“œ“ª“£“¡“¬“«“¯“´“·“®“°“¶“¹“­“º“±“µ“»“½“Á“¾“Â“¿“Ä“Å“Æ“Ç“È“Ê“Ë“Í“Ô“Ø“ÚæÃ“Ý“Ü˜¥“ß“Þ“à—œ“ä“ç“ì“î“ï“ñ“ò“ó“õ“÷“ø“ú“ü“û”A”C”D”E”F”J”M”N”O”P”S”R”Y”[”\”]”_”Z”c”g”h”j”e”n”k”l”q”t”w”x”o”z”r”s”p”y”„”{”~”|”†”}”ƒ”…”’”Œ””‘”—””•”Ž”–”ž”™”›”š” ”¢”¨”§”ª”«”­”¯”°”²”±”´”½”¼”Ã”Æ”¿”Ä”º”»âã”Â”Å”Ç”È”Ê”Ì”Á”Ñ”À”Ï”Ð”Í”É”Ë”Ó”Ô”Ø”Õ”ä”ç”Ü”Û”á”Þ”â”ì”ñ”Ú”ò”æ”é”í”ß”à”ï”è”ë”ð”ö”û”ü”õ”÷•@•G•I•C•K”å•M•P•S•X•\•U•[•]•Y•W•c•b•a•`”L•i•l•n•o•p•q•r•s•v•ƒ•t•z•}•{•|•Œ•æ]•‰•‹•‚•w•„•x••…•~•†•Š•ˆ•Ž••”•‘•••—•š•ž•›••œ•Ÿ• •¡•¢•¥•¦•§•¨•²•´•µ•¬•­•®•±•ª•¶•·•¸•½•º•¹•À•¿•Ã•Â•»•¼•¾•Á–Ý•Ä•Çàø•È•Ê•Ì•Ð•Ó•Ô•Ï•Î•Õ•Ò•Ù•Ö•×•à•ÛšM•ß•â•Ü•ê•å•æ•ç•é•ë•û•ï–F–M•ò•ó•ø•ú–@–A–E•î•í•ô–C•ö–K•ñ–I–L–O–J–D–S–R–Z–V–W–Y–h–[–b–^–`–U–a–]–T–X–_–f–e–\–c–d–j–k–Ø–p–q–r–l–n–o–v–u–x–{–z–|–}–~–ƒ–€––‚–ˆ–…–‡–†–„–‹–Œ––”–––•–œ–ž––Ÿ–¢–¡–£–¦–§–¨–¬–­–¯–°–µ–±–³–²–¶–º–¼–½–¾–À–»–¿–Á–Â–Å–Æ–Ê–È–Ë–Î–Í–Ñ–Ï–Ó–Õ–Ò–Ô–Ú–Ù–å–ä–â–è–é–ì–í–ï–ð–ñ–ó–ò–ôˆÅ—R–ûšg–ù—@—A–ü—B—F—L—E—H—I—X—N—P—T—V—Y—U—J—Z—D—^—\—]—_—a—c—p—r—d—m—v—e—f—g—h—t—z—n˜—lá‡—x—q—{—i—w—j—}—€——~—‚—ƒf—‡—…—ˆ—‹—Š——Ž—ç…——‘———”—•—“—™—˜—¢——Ÿ— —š—ž—£—¤—§—¥œÉ—ª–ö—¬—¯—³—±—²—°—µ—·—¸—¶—¹—¼—Ç—¿—Á—Â—Ë—Ê—»—Ì—¾—Ã—Ä—Æ—Í—Î—Ñ—Ð—Ï—Ö—×—Õ—Ú—Ü—Ý—Û—Þ—ß—ç—â—ã–ß—á—é—ë—ì—ê—î—í—ï—ð—ñ—ò—ó—ô—ö˜A—õ—û˜B˜C˜F˜G˜H˜I˜V˜J˜M˜Y˜N˜Q˜L˜O˜RâÄ˜Z˜^˜[˜_˜a˜b˜d˜e˜f˜g˜p˜r", ch) != NULL;
-}
+} // is_common_use_kanji
 
 BOOL is_fullwidth_ascii(WCHAR ch) {
   FOOTMARK();
