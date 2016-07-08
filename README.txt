@@ -11,7 +11,7 @@ Table of Contents
   (filenames)         | (descriptions)
   --------------------+---------------------------------------------------
   doc\                | the document folder (contains documentation)
-  include\            | the include folder
+  include\            | the include folder (contains C header files)
   projects\           | the projects folder (contains MSVC projects)
   res\                | the resource folder (contains dictionary)
   test\               | the test folder (contains test programs)
