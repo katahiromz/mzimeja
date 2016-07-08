@@ -10,10 +10,10 @@ Table of Contents
     --------------------+---------------------------------------------------
     (filenames)         | (descriptions)
     --------------------+---------------------------------------------------
-    doc\                | the document folder
-    projects\           | the projects folder
+    doc\                | the document folder (contains documentation)
+    projects\           | the projects folder (contains MSVC projects)
     res\                | the resource folder (contains dictionary)
-    test\               | the test folder
+    test\               | the test folder (contains test programs)
     cand_info.cpp       | candidate info of mzimeja
     comp_str.cpp        | composition string of mzimeja
     config.cpp          | mzimeja configuration
@@ -25,6 +25,7 @@ Table of Contents
     input.cpp           | mzimeja input context and related
     input.h             | mzimeja input context and related
     keychar.cpp         | mzimeja keys and characters
+    Makefile.msys       | Makefile for MSYS
     mzimeja.cpp         | MZ-IME Japanese Input (mzimeja)
     mzimeja.h           | MZ-IME Japanese Input (mzimeja)
     process.cpp         | mzimeja input process
