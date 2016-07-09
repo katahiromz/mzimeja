@@ -26,9 +26,9 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 [Files]
 Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "res\mzimeja.dic"; DestDir: "{app}"; Flags: ignoreversion
-Source: "res\kanji.dat"; DestDir: "{app}"; Flags: ignoreversion
-Source: "res\radical.dat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "mzimeja.dic"; DestDir: "{app}"; Flags: ignoreversion
+Source: "kanji.dat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "radical.dat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "projects\Debug\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
 Source: "projects\Debug\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files

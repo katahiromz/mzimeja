@@ -25,12 +25,15 @@ Table of Contents
   input.cpp           | mzimeja input context and related
   input.h             | mzimeja input context and related
   installer.iss       | Installer Settings for Inno Setup
+  kanji.dat           | mzimeja kanji data
   keychar.cpp         | mzimeja keys and characters
   Makefile.msys       | Makefile for MSYS
   mzimeja.cpp         | MZ-IME Japanese Input (mzimeja)
   mzimeja.h           | MZ-IME Japanese Input (mzimeja)
   mzimeja.rc          | resource file of MZ-IME Japanese Input
+  mzimeja.rc          | dictionary of MZ-IME Japanese Input
   process.cpp         | mzimeja input process
+  radical.dat         | mzimeja kanji radical data
   regword.cpp         | registering words
   setup.cpp           | MZ-IME setup program
   setup.rc            | resource of MZ-IME Japanese Input Setup
