@@ -12,6 +12,7 @@ using namespace std;
 #include "..\\unboost.hpp"
 
 enum HINSHI_BUNRUI {
+  HB_START_NODE,        // 開始ノード
   HB_MEISHI,            // 名詞
   HB_IKEIYOUSHI,        // い形容詞
   HB_NAKEIYOUSHI,       // な形容詞
@@ -33,6 +34,7 @@ enum HINSHI_BUNRUI {
   HB_KANGO,             // 漢語
   HB_SETTOUGO,          // 接頭語
   HB_SETSUBIGO,         // 接尾語
+  HB_END_NODE           // 終了ノード
 };
 
 struct DICT_ENTRY {
