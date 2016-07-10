@@ -49,6 +49,7 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<ENTRY>& entries) {
   entries.clear();
   entries.reserve(60000);
 
+  std::wstring filename = GetSettingString(L"basic dictionary file");
   FILE *fp = fopen("..\\mzimeja.dic", "rb");
   if (fp == NULL) return false;
 
