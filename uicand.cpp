@@ -3,6 +3,10 @@
 
 #include "mzimeja.h"
 
+#define CX_HEADER 32
+#define CX_BORDER ::GetSystemMetrics(SM_CXBORDER)
+#define CY_BORDER ::GetSystemMetrics(SM_CYBORDER)
+
 extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -106,42 +110,61 @@ void CandWnd_Paint(HWND hCandWnd) {
 
   PAINTSTRUCT ps;
   HDC hDC = ::BeginPaint(hCandWnd, &ps);
-  ::SetBkMode(hDC, TRANSPARENT);
-  HWND hSvrWnd = (HWND)GetWindowLongPtr(hCandWnd, FIGWLP_SERVERWND);
+  ::FillRect(hDC, &rc, (HBRUSH)(COLOR_WINDOW + 1));
 
-  HBRUSH hbrHightLight = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
-  HIMC hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+  ::SetBkMode(hDC, TRANSPARENT);
+  HWND hSvrWnd = (HWND)::GetWindowLongPtr(hCandWnd, FIGWLP_SERVERWND);
+
+  HIMC hIMC = (HIMC)::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
     InputContext *lpIMC = TheIME.LockIMC(hIMC);
     HFONT hOldFont = CheckNativeCharset(hDC);
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
-      int height = ::GetSystemMetrics(SM_CYEDGE);
+      INT x1 = ::GetSystemMetrics(SM_CXEDGE);
+      INT x2 = ::GetSystemMetrics(SM_CXEDGE) + CX_HEADER + CX_BORDER * 2;
+      INT y = ::GetSystemMetrics(SM_CYEDGE);
       CANDINFOEXTRA *extra = lpCandInfo->GetExtra();
       DWORD iList = 0;
       if (extra) iList = extra->iClause;
       CandList *lpCandList = lpCandInfo->GetList(iList);
-      DWORD i, end = lpCandList->GetPageEnd();
-      for (i = lpCandList->dwPageStart; i < end; i++) {
-        SIZE sz;
-        HBRUSH hbr;
+      WCHAR sz[4];
+      DWORD i, k = 1, end = lpCandList->GetPageEnd();
+      for (i = lpCandList->dwPageStart; i < end; ++i, ++k) {
+        // get size of cand string
         WCHAR *psz = lpCandList->GetCandString(i);
-        ::GetTextExtentPoint32W(hDC, psz, lstrlenW(psz), &sz);
+        SIZE siz;
+        ::GetTextExtentPoint32W(hDC, psz, lstrlenW(psz), &siz);
+
+        // draw header
+        RECT rcHeader;
+        ::SetRect(&rcHeader, x1, y + CY_BORDER,
+          x1 + CX_HEADER, y + siz.cy + CY_BORDER * 2);
+        ::DrawFrameControl(hDC, &rcHeader, DFC_BUTTON,
+                           DFCS_BUTTONPUSH | DFCS_ADJUSTRECT);
+        wsprintfW(sz, L"%u", k);
+        ::SetTextColor(hDC, ::GetSysColor(COLOR_BTNTEXT));
+        ::InflateRect(&rcHeader, -::GetSystemMetrics(SM_CXBORDER), 0);
+        ::DrawTextW(hDC, sz, -1, &rcHeader,
+          DT_SINGLELINE | DT_RIGHT | DT_VCENTER | DT_NOCLIP | DT_NOPREFIX);
+
+        // draw text
+        RECT rcText;
+        ::SetRect(&rcText, x2, y + CY_BORDER,
+                  rc.right, y + siz.cy + CY_BORDER * 2);
+        ::InflateRect(&rcHeader, -CX_BORDER, -CY_BORDER);
         if (lpCandList->dwSelection == i) {
-          hbr = (HBRUSH)::SelectObject(hDC, hbrHightLight);
-          ::PatBlt(hDC, 0, height, rc.right, sz.cy, PATCOPY);
-          ::SelectObject(hDC, hbr);
           ::SetTextColor(hDC, ::GetSysColor(COLOR_HIGHLIGHTTEXT));
+          ::FillRect(hDC, &rcText, (HBRUSH)(COLOR_HIGHLIGHT + 1));
         } else {
-          HBRUSH hbrLGR = (HBRUSH)::GetStockObject(LTGRAY_BRUSH);
-          hbr = (HBRUSH)::SelectObject(hDC, hbrLGR);
-          ::PatBlt(hDC, 0, height, rc.right, sz.cy, PATCOPY);
-          ::SelectObject(hDC, hbr);
-          ::SetTextColor(hDC, RGB(0, 0, 0));
+          ::SetTextColor(hDC, ::GetSysColor(COLOR_WINDOWTEXT));
+          ::FillRect(hDC, &rcText, (HBRUSH)(COLOR_WINDOW + 1));
         }
-        ::TextOutW(hDC, ::GetSystemMetrics(SM_CXEDGE), height, psz,
-                   ::lstrlenW(psz));
-        height += sz.cy;
+        ::DrawTextW(hDC, psz, -1, &rcText,
+          DT_SINGLELINE | DT_LEFT | DT_VCENTER | DT_NOCLIP | DT_NOPREFIX);
+
+        // go to next line
+        y += siz.cy + CY_BORDER * 2;
       }
       lpIMC->UnlockCandInfo();
     }
@@ -151,13 +174,11 @@ void CandWnd_Paint(HWND hCandWnd) {
     TheIME.UnlockIMC(hIMC);
   }
   ::EndPaint(hCandWnd, &ps);
-
-  ::DeleteObject(hbrHightLight);
 } // CandWnd_Paint
 
 SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
-  int width = 0, height = 0;
+  int width1 = 0, height = 0;
   HDC hDC = ::CreateCompatibleDC(NULL);
   HFONT hOldFont = CheckNativeCharset(hDC);
   CandInfo *lpCandInfo = lpIMC->LockCandInfo();
@@ -172,8 +193,8 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
         WCHAR *psz = lpCandList->GetCandString(i);
         SIZE siz;
         ::GetTextExtentPoint32W(hDC, psz, ::lstrlenW(psz), &siz);
-        if (width < siz.cx) width = siz.cx;
-        height += siz.cy;
+        if (width1 < siz.cx) width1 = siz.cx;
+        height += siz.cy + CX_BORDER * 2;
       }
     } else {
       FOOTMARK_POINT();
@@ -187,8 +208,8 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
   }
   ::DeleteDC(hDC);
   SIZE ret;
-  ret.cx = width;
-  ret.cy = height;
+  ret.cx = width1 + CX_HEADER + CX_BORDER * 4;
+  ret.cy = height + CY_BORDER * 2;
   return ret;
 } // CandWnd_CalcSize
 
