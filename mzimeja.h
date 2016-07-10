@@ -346,7 +346,7 @@ enum HINSHI_BUNRUI {
   HB_END_NODE           // èIóπÉmÅ[Éh
 };
 
-struct ENTRY {
+struct DICT_ENTRY {
   std::wstring  pre;
   HINSHI_BUNRUI bunrui;
   std::wstring  post;
@@ -455,9 +455,9 @@ protected:
   ImeBaseData *LockImeBaseData();
   void UnlockImeBaseData(ImeBaseData *data);
   void MakeMaps();
-  BOOL LoadBasicDictFile(std::vector<ENTRY>& entries);
+  BOOL LoadBasicDictFile(std::vector<DICT_ENTRY>& entries);
   BOOL DeployDictData(ImeBaseData *data, SECURITY_ATTRIBUTES *psa,
-                      const std::vector<ENTRY>& entries);
+                      const std::vector<DICT_ENTRY>& entries);
 }; // class MZIMEJA
 
 extern MZIMEJA TheIME;

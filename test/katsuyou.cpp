@@ -35,14 +35,14 @@ enum HINSHI_BUNRUI {
   HB_SETSUBIGO,         // ê⁄îˆåÍ
 };
 
-struct ENTRY {
+struct DICT_ENTRY {
   std::wstring  pre;
   HINSHI_BUNRUI bunrui;
   std::wstring  post;
   std::wstring  tags;
 };
 
-std::vector<ENTRY> g_entries;
+std::vector<DICT_ENTRY> g_entries;
 std::map<wchar_t,wchar_t> g_vowel_map;
 std::map<wchar_t,wchar_t> g_consonant_map;
 
@@ -109,7 +109,7 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
   return std::wstring(szBuf);
 }
 
-inline bool entry_compare(const ENTRY& e1, const ENTRY& e2) {
+inline bool entry_compare(const DICT_ENTRY& e1, const DICT_ENTRY& e2) {
   return (e1.pre < e2.pre);
 }
 
@@ -154,7 +154,7 @@ bool do_load(void) {
       continue;
     }
 
-    ENTRY entry;
+    DICT_ENTRY entry;
     if (fields.size() == 1) {
       entry.post = str;
       entry.bunrui = HB_MEISHI;
@@ -221,7 +221,7 @@ void do_wprintf(const wchar_t *format, ...) {
   va_end(va);
 }
 
-bool do_katsuyou_ikeiyoushi(const ENTRY& entry) {
+bool do_katsuyou_ikeiyoushi(const DICT_ENTRY& entry) {
   std::wstring str = entry.post;
   if (str.empty() || str[str.size() - 1] != L'Ç¢') {
     return false;
@@ -300,7 +300,7 @@ bool do_katsuyou_ikeiyoushi(const ENTRY& entry) {
   return true;
 }
 
-bool do_katsuyou_nakeiyoushi(const ENTRY& entry) {
+bool do_katsuyou_nakeiyoushi(const DICT_ENTRY& entry) {
   std::wstring str = entry.post;
   if (str.empty() || str[str.size() - 1] != L'Ç»') {
     return false;
@@ -343,7 +343,7 @@ bool do_katsuyou_nakeiyoushi(const ENTRY& entry) {
   return true;
 }
 
-bool do_katsuyou_godan_doushi(const ENTRY& entry) {
+bool do_katsuyou_godan_doushi(const DICT_ENTRY& entry) {
   std::wstring str = entry.post;
   if (str.empty()) return false;
   wchar_t ch = str[str.size() - 1];
@@ -416,7 +416,7 @@ bool do_katsuyou_godan_doushi(const ENTRY& entry) {
   return true;
 }
 
-bool do_katsuyou_ichidan_doushi(const ENTRY& entry) {
+bool do_katsuyou_ichidan_doushi(const DICT_ENTRY& entry) {
   std::wstring str = entry.post;
   if (str.empty() || str[str.size() - 1] != L'ÇÈ') {
     return false;
@@ -452,7 +452,7 @@ bool do_katsuyou_ichidan_doushi(const ENTRY& entry) {
   return true;
 }
 
-bool do_katsuyou_kahen_doushi(const ENTRY& entry) {
+bool do_katsuyou_kahen_doushi(const DICT_ENTRY& entry) {
   std::wstring str = entry.post;
   if (str.empty() || str.substr(str.size() - 2) != L"óàÇÈ") {
     return false;
@@ -485,7 +485,7 @@ bool do_katsuyou_kahen_doushi(const ENTRY& entry) {
   return true;
 }
 
-bool do_katsuyou_sahen_doushi(const ENTRY& entry) {
+bool do_katsuyou_sahen_doushi(const DICT_ENTRY& entry) {
   std::wstring str = entry.post;
   if (str.size() < 2) {
     return false;
@@ -566,7 +566,7 @@ bool do_katsuyou_sahen_doushi(const ENTRY& entry) {
 bool do_katsuyou(const wchar_t *data) {
   size_t count = g_entries.size();
   for (size_t i = 0; i < count; ++i) {
-    const ENTRY& entry = g_entries[i];
+    const DICT_ENTRY& entry = g_entries[i];
     if (data[0] != entry.pre[0]) continue;
     if (entry.pre == data) {
       if (entry.tags.find(L"[îÒïWèÄ]") != std::wstring::npos) continue;

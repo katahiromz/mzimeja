@@ -37,11 +37,11 @@ void MZIMEJA::MakeMaps() {
   }
 }
 
-inline bool entry_compare(const ENTRY& e1, const ENTRY& e2) {
+inline bool entry_compare(const DICT_ENTRY& e1, const DICT_ENTRY& e2) {
   return (e1.pre < e2.pre);
 }
 
-BOOL MZIMEJA::LoadBasicDictFile(std::vector<ENTRY>& entries) {
+BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
   char buf[256];
   wchar_t wbuf[256];
   std::wstring str;
@@ -69,7 +69,7 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<ENTRY>& entries) {
       continue;
     }
 
-    ENTRY entry;
+    DICT_ENTRY entry;
     if (fields.size() == 1) {
       entry.post = str;
       entry.bunrui = HB_MEISHI;
@@ -136,11 +136,11 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<ENTRY>& entries) {
 
 BOOL MZIMEJA::DeployDictData(
   ImeBaseData *data, SECURITY_ATTRIBUTES *psa,
-  const std::vector<ENTRY>& entries)
+  const std::vector<DICT_ENTRY>& entries)
 {
   size_t size = 0;
   for (size_t i = 0; i < entries.size(); ++i) {
-    const ENTRY& entry = entries[i];
+    const DICT_ENTRY& entry = entries[i];
     size += entry.pre.size();
     //size += 3;  // \t hb \t
     size += entry.post.size();
@@ -164,7 +164,7 @@ BOOL MZIMEJA::DeployDictData(
       // line format: pre \t hb \t post \t tags \n
       WCHAR *pch = reinterpret_cast<WCHAR *>(pv);
       for (size_t i = 0; i < entries.size(); ++i) {
-        const ENTRY& entry = entries[i];
+        const DICT_ENTRY& entry = entries[i];
         // pre \t
         cch = entry.pre.size();
         memcpy(pch, entry.pre.c_str(), cch * sizeof(WCHAR));
@@ -208,15 +208,20 @@ BOOL MZIMEJA::LoadBasicDict() {
 
       if (data->dwSharedDictDataSize != 0) {
         // get shared data
-        m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
-          PAGE_READWRITE, 0, data->dwSharedDictDataSize, L"mzimeja_basic_dict");
-        if (m_hBasicDictData) {
-          ret = TRUE;
+        if (WaitForSingleObject(m_hMutex, 5000) == WAIT_OBJECT_0) {
+          m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
+            PAGE_READWRITE, 0, data->dwSharedDictDataSize, L"mzimeja_basic_dict");
+          if (m_hBasicDictData) {
+            ret = TRUE;
+          }
+          ::ReleaseMutex(m_hMutex);
         }
       } else {
         // create shared data
-        std::vector<ENTRY> entries;
-        ret = LoadBasicDictFile(entries) && DeployDictData(data, psa, entries);
+        std::vector<DICT_ENTRY> entries;
+        if (LoadBasicDictFile(entries)) {
+          ret = DeployDictData(data, psa, entries);
+        }
       }
       FreeSecurityAttributes(psa);
     }
