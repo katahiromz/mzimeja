@@ -194,7 +194,7 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
         SIZE siz;
         ::GetTextExtentPoint32W(hDC, psz, ::lstrlenW(psz), &siz);
         if (width1 < siz.cx) width1 = siz.cx;
-        height += siz.cy + CX_BORDER * 2;
+        height += siz.cy + CY_BORDER * 2;
       }
     } else {
       FOOTMARK_POINT();
