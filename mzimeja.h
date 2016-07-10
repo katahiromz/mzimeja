@@ -424,11 +424,11 @@ public:
   // do command
   BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
 
-  // dictionary
-  BOOL LoadDict();
-  BOOL IsDictLoaded() const;
-  WCHAR *LockDict();
-  void UnlockDict(WCHAR *data);
+  // basic dictionary
+  BOOL LoadBasicDict();
+  BOOL IsBasicDictLoaded() const;
+  WCHAR *LockBasicDict();
+  void UnlockBasicDict(WCHAR *data);
 
   // convert
   void PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);

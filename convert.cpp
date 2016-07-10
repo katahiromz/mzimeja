@@ -197,7 +197,7 @@ BOOL MZIMEJA::DeployDictData(
 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL MZIMEJA::LoadDict() {
+BOOL MZIMEJA::LoadBasicDict() {
   BOOL ret = FALSE;
   ImeBaseData *data = LockImeBaseData();
   if (data) {
@@ -223,13 +223,13 @@ BOOL MZIMEJA::LoadDict() {
   }
 
   return ret;
-} // MZIMEJA::LoadDict
+} // MZIMEJA::LoadBasicDict
 
-BOOL MZIMEJA::IsDictLoaded() const {
+BOOL MZIMEJA::IsBasicDictLoaded() const {
   return m_hBasicDictData != NULL;
 }
 
-WCHAR *MZIMEJA::LockDict() {
+WCHAR *MZIMEJA::LockBasicDict() {
   // get size
   DWORD dwSize = 0;
   ImeBaseData *data = LockImeBaseData();
@@ -247,7 +247,7 @@ WCHAR *MZIMEJA::LockDict() {
   return NULL;
 }
 
-void MZIMEJA::UnlockDict(WCHAR *data) {
+void MZIMEJA::UnlockBasicDict(WCHAR *data) {
   ::UnmapViewOfFile(data);
 }
 

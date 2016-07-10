@@ -124,6 +124,9 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   // free sa
   FreeSecurityAttributes(psa);
 
+  // load basic dictionary
+  LoadBasicDict();
+
   // register window classes for IME
   return RegisterClasses(m_hInst);
 } // MZIMEJA::Init
