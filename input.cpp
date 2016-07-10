@@ -434,13 +434,6 @@ BOOL InputContext::CloseCandidate(BOOL bClearCandInfo/* = TRUE*/) {
 BOOL InputContext::Convert(BOOL bShift) {
   FOOTMARK();
 
-  //// check the presence of dictionary
-  //if ((GetFileAttributes(TheIME.m_szDicFileName) == 0xFFFFFFFF) ||
-  //    (GetFileAttributes(TheIME.m_szDicFileName) & FILE_ATTRIBUTE_DIRECTORY)) {
-  //  MakeGuideLine(MYGL_NODICTIONARY);
-  //  return FALSE;
-  //}
-
   // get logical data
   LogCompStr comp;
   LogCandInfo cand;

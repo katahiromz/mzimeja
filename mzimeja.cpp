@@ -89,8 +89,6 @@ MZIMEJA::MZIMEJA() {
 
   m_hIMC = NULL;
   m_lpIMC = NULL;
-
-  m_szDicFileName[0] = 0;
 }
 
 BOOL MZIMEJA::Init(HINSTANCE hInstance) {
@@ -114,10 +112,6 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
 
   RegisterClasses(m_hInst);
 
-  WCHAR *lpDicFileName = m_szDicFileName;
-  lpDicFileName += ::GetWindowsDirectory(lpDicFileName, _countof(m_szDicFileName));
-  if (*(lpDicFileName - 1) != TEXT('\\')) *lpDicFileName++ = TEXT('\\');
-  ::LoadString(hInstance, IDS_DICFILENAME, lpDicFileName, 128);
   return TRUE;
 }
 

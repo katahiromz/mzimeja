@@ -304,20 +304,16 @@ struct MzConversionResult {
 };
 
 // The IME
-struct MZIMEJA {
+class MZIMEJA {
+public:
   HINSTANCE       m_hInst;
-  HANDLE          m_hMutex;
   HKL             m_hMyKL;
   BOOL            m_bWinLogOn;
   LPTRANSMSGLIST  m_lpCurTransKey;
   UINT            m_uNumTransKey;
   BOOL            m_fOverflowKey;
-  HIMC            m_hIMC;
-  InputContext *  m_lpIMC;
 
-  // dictionary file name
-  TCHAR           m_szDicFileName[256];
-
+public:
   MZIMEJA();
 
   // initialize the IME
@@ -370,7 +366,12 @@ struct MZIMEJA {
                               MzConversionClause& result);
   BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-}; // struct MZIMEJA
+
+protected:
+  HANDLE          m_hMutex;
+  HIMC            m_hIMC;
+  InputContext *  m_lpIMC;
+}; // class MZIMEJA
 
 extern MZIMEJA TheIME;
 
