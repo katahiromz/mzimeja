@@ -4,6 +4,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define NOMINMAX
 #include <windows.h>
+#include <dlgs.h>
 #include <cstdlib>    // for __argc, __wargv
 #include <cstring>    // for wcsrchr
 #include <algorithm>  // for std::max
@@ -296,6 +297,33 @@ INT DoUninstall(VOID) {
 //////////////////////////////////////////////////////////////////////////////
 
 extern "C"
+INT_PTR CALLBACK
+DialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+  case WM_INITDIALOG:
+    return TRUE;
+  case WM_COMMAND:
+    switch (LOWORD(wParam)) {
+    case IDOK:
+      if (::IsDlgButtonChecked(hWnd, rad1) == BST_CHECKED) {
+        ::EndDialog(hWnd, rad1);
+        break;
+      }
+      if (::IsDlgButtonChecked(hWnd, rad2) == BST_CHECKED) {
+        ::EndDialog(hWnd, rad2);
+        break;
+      }
+      break;
+    case IDCANCEL:
+      ::EndDialog(hWnd, IDCANCEL);
+      break;
+    }
+  }
+  return FALSE;
+}
+//////////////////////////////////////////////////////////////////////////////
+
+extern "C"
 INT WINAPI
 wWinMain(
   HINSTANCE hInstance,
@@ -305,9 +333,8 @@ wWinMain(
 {
   g_hInstance = hInstance;
 
+  int ret;
   switch (__argc) {
-  case 1:
-    return DoInstall();
   case 2:
     if (lstrcmpiW(__wargv[1], L"/i") == 0) {
       return DoInstall();
@@ -317,6 +344,15 @@ wWinMain(
     }
     break;
   default:
+    ret = ::DialogBoxW(hInstance, MAKEINTRESOURCEW(1), NULL, DialogProc);
+    switch (ret) {
+    case rad1:
+      return DoInstall();
+    case rad2:
+      return DoUninstall();
+    default:
+      break;
+    }
     break;
   }
 

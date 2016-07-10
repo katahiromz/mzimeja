@@ -3,6 +3,7 @@
 
 #define APSTUDIO_READONLY_SYMBOLS
 #include <windows.h>
+#include <dlgs.h>
 #undef APSTUDIO_READONLY_SYMBOLS
 
 // UTF-8
@@ -20,6 +21,21 @@ BEGIN
     5, "IMEのインストールに失敗しました。エラーコード%dを作者にご連絡下さい。"
     6, "レジストリの削除に失敗しました。"
     7, "ファイルの削除に失敗しました。"
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// Dialog
+
+1 DIALOG 30, 28, 135, 63
+STYLE DS_MODALFRAME | DS_NOIDLEMSG | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "General"
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+FONT 10, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL "インストール(&I)", rad1, "BUTTON", BS_AUTORADIOBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 10, 10, 85, 14
+    CONTROL "アンインストール(&U)", rad2, "BUTTON", BS_AUTORADIOBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 10, 25, 85, 14
+    CONTROL "OK", IDOK, "BUTTON", BS_DEFPUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 5, 45, 60, 14
+    CONTROL "キャンセル", IDCANCEL, "BUTTON", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 70, 45, 60, 14
 END
 
 /////////////////////////////////////////////////////////////////////////////
