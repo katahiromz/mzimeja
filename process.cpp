@@ -224,7 +224,13 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
         // code input
         lpIMC->CancelText();
       } else {
-        lpIMC->MakeResult();
+        if (lpIMC->HasCompStr()) {
+          lpIMC->MakeResult();
+        } else {
+          // add new line
+          TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_RETURN, 1);
+          TheIME.GenerateMessage(WM_IME_KEYUP, VK_RETURN, 0xC0000001);
+        }
       }
       TheIME.UnlockIMC(hIMC);
     }
