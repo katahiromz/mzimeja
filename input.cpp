@@ -589,7 +589,6 @@ void InputContext::MakeHankaku() {
 
   // update composition
   comp.AssertValid();
-  switch (Conversion() & )
   if (Conversion() & IME_CMODE_JAPANESE) {
     if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
       comp.AddChar(L'n', L'n', Conversion());
