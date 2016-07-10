@@ -315,7 +315,7 @@ struct MzConversionResult {
 //////////////////////////////////////////////////////////////////////////////
 
 struct ImeBaseData {
-  BOOL    dwSignature;
+  DWORD   dwSignature;
   DWORD   dwSharedDictDataSize;
 };
 

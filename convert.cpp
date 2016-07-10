@@ -213,7 +213,6 @@ BOOL MZIMEJA::LoadDict() {
         }
       } else {
         // create shared data
-        MakeMaps();
         std::vector<ENTRY> entries;
         ret = LoadBasicDictFile(entries) && DeployDictData(data, psa, entries);
       }

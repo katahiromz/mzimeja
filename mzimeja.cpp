@@ -96,6 +96,8 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   FOOTMARK();
   m_hInst = hInstance;
 
+  MakeMaps();
+
   // CreateSecurityAttributes() will create
   // the proper security attribute for IME.
   SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes();
