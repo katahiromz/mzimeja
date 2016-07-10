@@ -186,6 +186,7 @@ BOOL MZIMEJA::DeployDictData(
         *pch++ = L'\n';
       }
       *pch++ = L'\0'; // NUL
+      assert(size == pch - reinterpret_cast<WCHAR *>(pv));
       ::UnmapViewOfFile(pv);
       ret = TRUE; // success
     }
