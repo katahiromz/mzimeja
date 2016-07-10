@@ -2,10 +2,49 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #define _CRT_SECURE_NO_WARNINGS
+#define NOMINMAX
 #include <windows.h>
-#include <cstring>
+#include <cstdlib>    // for __argc, __wargv
+#include <cstring>    // for wcsrchr
+#include <algorithm>  // for std::max
 
 HINSTANCE g_hInstance;
+
+//////////////////////////////////////////////////////////////////////////////
+
+LPWSTR GetSrcImePathName(LPWSTR pszPath) {
+  GetModuleFileName(NULL, pszPath, MAX_PATH);
+  LPWSTR pch = wcsrchr(pszPath, L'\\');
+  lstrcpyW(pch, L"\\mzimeja.ime");
+  return pszPath;
+}
+
+LPWSTR GetSystemImePathName(LPWSTR pszPath) {
+  GetSystemDirectory(pszPath, MAX_PATH);
+  wcscat(pszPath, L"\\mzimeja.ime");
+  return pszPath;
+}
+
+LPWSTR GetDictPathName(LPWSTR pszPath) {
+  GetModuleFileName(NULL, pszPath, MAX_PATH);
+  LPWSTR pch = wcsrchr(pszPath, L'\\');
+  lstrcpyW(pch, L"\\res\\mzimeja.dic");
+  return pszPath;
+}
+
+LPWSTR GetKanjiDataPathName(LPWSTR pszPath) {
+  GetModuleFileName(NULL, pszPath, MAX_PATH);
+  LPWSTR pch = wcsrchr(pszPath, L'\\');
+  lstrcpyW(pch, L"\\res\\kanji.dat");
+  return pszPath;
+}
+
+LPWSTR GetRadicalDataPathName(LPWSTR pszPath) {
+  GetModuleFileName(NULL, pszPath, MAX_PATH);
+  LPWSTR pch = wcsrchr(pszPath, L'\\');
+  lstrcpyW(pch, L"\\res\\kanji.dat");
+  return pszPath;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -17,34 +56,15 @@ LPCTSTR DoLoadString(INT nID) {
 }
 
 INT DoCopyFiles(VOID) {
-  WCHAR szPathSrc[MAX_PATH], szPathDest[MAX_PATH], *pch;
-
-  //////////////////////////////////////////////////////////
-  // {app}\mzimeja.dic --> %windir%\mzimeja.dic
-
-  // source
-  GetModuleFileName(NULL, szPathSrc, MAX_PATH);
-  pch = wcsrchr(szPathSrc, L'\\');
-  lstrcpy(pch, L"\\mzimeja.dic");
-  // dest
-  GetWindowsDirectory(szPathDest, MAX_PATH);
-  wcscat(szPathDest, L"\\mzimeja.dic");
-  // copy
-  BOOL b0 = CopyFile(szPathSrc, szPathDest, FALSE);
-  if (!b0) {
-    return 1;
-  }
+  WCHAR szPathSrc[MAX_PATH], szPathDest[MAX_PATH];
 
   //////////////////////////////////////////////////////////
   // {app}\mzimeja.ime --> C:\Windows\system32\mzimeja.ime
 
   // source
-  GetModuleFileName(NULL, szPathSrc, MAX_PATH);
-  pch = wcsrchr(szPathSrc, L'\\');
-  lstrcpy(pch, L"\\mzimeja.ime");
+  GetSrcImePathName(szPathSrc);
   // dest
-  GetSystemDirectory(szPathDest, MAX_PATH);
-  wcscat(szPathDest, L"\\mzimeja.ime");
+  GetSystemImePathName(szPathDest);
   // copy
   BOOL b1 = CopyFile(szPathSrc, szPathDest, FALSE);
   if (!b1) {
@@ -54,6 +74,14 @@ INT DoCopyFiles(VOID) {
   return 0;
 } // DoCopyFiles
 
+INT DoDeleteFiles(VOID) {
+  WCHAR szPath[MAX_PATH];
+  if (!DeleteFileW(GetSystemImePathName(szPath))) {
+    return 1;
+  }
+  return 0;
+}
+
 BOOL DoSetRegSz(HKEY hKey, const WCHAR *pszName, const WCHAR *pszValue) {
   DWORD cbData = (lstrlenW(pszValue) + 1) * sizeof(WCHAR);
   LONG result;
@@ -61,11 +89,11 @@ BOOL DoSetRegSz(HKEY hKey, const WCHAR *pszName, const WCHAR *pszValue) {
   return result == ERROR_SUCCESS;
 }
 
-INT DoSetRegistry(VOID) {
+INT DoSetRegistry1(VOID) {
   BOOL ret = FALSE;
   HKEY hKey;
   LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
-    L"system\\currentcontrolset\\control\\keyboard layouts",
+    L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts",
     0, KEY_WRITE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
     HKEY hkLayouts;
@@ -78,7 +106,6 @@ INT DoSetRegistry(VOID) {
         DoSetRegSz(hkLayouts, L"layout file", L"kbdjp.kbd") &&
         DoSetRegSz(hkLayouts, L"IME file", L"mzimeja.ime"))
       {
-        
         ret = TRUE;
       }
       RegCloseKey(hkLayouts);
@@ -86,21 +113,144 @@ INT DoSetRegistry(VOID) {
     RegCloseKey(hKey);
   }
   return (ret ? 0 : -1);
-} // DoSetRegistry
+} // DoSetRegistry1
+
+INT DoSetRegistry2(VOID) {
+  BOOL ret = FALSE;
+  HKEY hKey;
+  LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE", 0, KEY_WRITE, &hKey);
+  if (result == ERROR_SUCCESS && hKey) {
+    HKEY hkCompany;
+    DWORD dwDisposition;
+    result = RegCreateKeyExW(hKey, L"Katayama Hirofumi MZ", 0, NULL, 0,
+                             KEY_WRITE, NULL, &hkCompany, &dwDisposition);
+    if (result == ERROR_SUCCESS && hkCompany) {
+      HKEY hkSoftware;
+      result = RegCreateKeyExW(hkCompany, L"mzimeja", 0, NULL, 0,
+                               KEY_WRITE, NULL, &hkSoftware, &dwDisposition);
+      if (result == ERROR_SUCCESS && hkSoftware) {
+        TCHAR szDictPath[MAX_PATH];
+        TCHAR szKanjiPath[MAX_PATH];
+        TCHAR szRadicalPath[MAX_PATH];
+
+        GetDictPathName(szDictPath);
+        GetKanjiDataPathName(szKanjiPath);
+        GetRadicalDataPathName(szRadicalPath);
+
+        if (DoSetRegSz(hkSoftware, L"basic dictionary file", szDictPath) &&
+          DoSetRegSz(hkSoftware, L"kanji data file", szKanjiPath) &&
+          DoSetRegSz(hkSoftware, L"radical data file", szRadicalPath))
+        {
+          ret = TRUE;
+        }
+        RegCloseKey(hkSoftware);
+      }
+      RegCloseKey(hkCompany);
+    }
+    RegCloseKey(hKey);
+  }
+  return (ret ? 0 : -1);
+} // DoSetRegistry2
+
+LONG MyDeleteRegKey(HKEY hKey, LPCTSTR pszSubKey)
+{
+    LONG ret;
+    DWORD cchSubKeyMax, cchValueMax;
+    DWORD cchMax, cch;
+    TCHAR szNameBuf[MAX_PATH], *pszName = szNameBuf;
+    HKEY hSubKey = hKey;
+
+    if (pszSubKey != NULL)
+    {
+        ret = RegOpenKeyEx(hKey, pszSubKey, 0, KEY_READ, &hSubKey);
+        if (ret) return ret;
+    }
+
+    ret = RegQueryInfoKey(hSubKey, NULL, NULL, NULL, NULL,
+            &cchSubKeyMax, NULL, NULL, &cchValueMax, NULL, NULL, NULL);
+    if (ret) goto cleanup;
+
+    cchSubKeyMax++;
+    cchValueMax++;
+	cchMax = std::max(cchSubKeyMax, cchValueMax);
+    if (cchMax > sizeof(szNameBuf) / sizeof(TCHAR))
+    {
+        pszName = (LPTSTR)HeapAlloc(GetProcessHeap(), 0, cchMax * 
+                                    sizeof(TCHAR));
+        if (pszName == NULL)
+        {
+            ret = ERROR_NOT_ENOUGH_MEMORY;
+            goto cleanup;
+        }
+    }
+
+    while(TRUE)
+    {
+        cch = cchMax;
+        if (RegEnumKeyEx(hSubKey, 0, pszName, &cch, NULL,
+                         NULL, NULL, NULL)) break;
+
+        ret = MyDeleteRegKey(hSubKey, pszName);
+        if (ret) goto cleanup;
+    }
+
+    if (pszSubKey != NULL)
+        ret = RegDeleteKey(hKey, pszSubKey);
+    else
+        while(TRUE)
+        {
+            cch = cchMax;
+            if (RegEnumValue(hKey, 0, pszName, &cch,
+                             NULL, NULL, NULL, NULL)) break;
+
+            ret = RegDeleteValue(hKey, pszName);
+            if (ret) goto cleanup;
+        }
+
+cleanup:
+    if (pszName != szNameBuf)
+        HeapFree( GetProcessHeap(), 0, pszName);
+    if (pszSubKey != NULL)
+        RegCloseKey(hSubKey);
+    return ret;
+} // MyDeleteRegKey
+
+INT DoUnsetRegistry1(VOID) {
+  BOOL ret = FALSE;
+  HKEY hKey;
+  LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
+    L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts",
+    0, KEY_ALL_ACCESS, &hKey);
+  if (result == ERROR_SUCCESS && hKey) {
+    result = MyDeleteRegKey(hKey, L"E0120411");
+    if (result == ERROR_SUCCESS) {
+      ret = TRUE;
+    }
+    RegCloseKey(hKey);
+  }
+  return (ret ? 0 : -1);
+} // DoUnsetRegistry1
+
+INT DoUnsetRegistry2(VOID) {
+  BOOL ret = FALSE;
+  HKEY hKey;
+  LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
+    L"SOFTWARE\\Katayama Hirofumi MZ",
+    0, KEY_ALL_ACCESS, &hKey);
+  if (result == ERROR_SUCCESS && hKey) {
+    result = MyDeleteRegKey(hKey, L"mzimeja");
+    if (result == ERROR_SUCCESS) {
+      ret = TRUE;
+    }
+    RegCloseKey(hKey);
+  }
+  return (ret ? 0 : -1);
+} // DoUnsetRegistry2
 
 //////////////////////////////////////////////////////////////////////////////
 
-extern "C"
-INT WINAPI
-wWinMain(
-  HINSTANCE hInstance,
-  HINSTANCE hPrevInstance,
-  LPWSTR    lpCmdLine,
-  INT       nCmdShow)
-{
-  g_hInstance = hInstance;
-
-  if (0 != DoSetRegistry()) {
+INT DoInstall(VOID) {
+  if (0 != DoSetRegistry1() || 0 != DoSetRegistry2()) {
     // failure
     ::MessageBoxW(NULL, DoLoadString(2), NULL, MB_ICONERROR);
     return 2;
@@ -122,6 +272,52 @@ wWinMain(
     ::wsprintfW(szMsg, DoLoadString(5), dwError);
     ::MessageBoxW(NULL, szMsg, NULL, MB_ICONERROR);
     return 3;
+  }
+
+  return 0;
+} // DoInstall
+
+INT DoUninstall(VOID) {
+  if (0 != DoDeleteFiles()) {
+    // failure
+    ::MessageBoxW(NULL, DoLoadString(7), NULL, MB_ICONERROR);
+    return 1;
+  }
+
+  if (0 != DoUnsetRegistry1() || 0 != DoUnsetRegistry2()) {
+    // failure
+    ::MessageBoxW(NULL, DoLoadString(6), NULL, MB_ICONERROR);
+    return 2;
+  }
+
+  return 0;
+} // DoUninstall
+
+//////////////////////////////////////////////////////////////////////////////
+
+extern "C"
+INT WINAPI
+wWinMain(
+  HINSTANCE hInstance,
+  HINSTANCE hPrevInstance,
+  LPWSTR    lpCmdLine,
+  INT       nCmdShow)
+{
+  g_hInstance = hInstance;
+
+  switch (__argc) {
+  case 1:
+    return DoInstall();
+  case 2:
+    if (lstrcmpiW(__wargv[1], L"/i") == 0) {
+      return DoInstall();
+    }
+    if (lstrcmpiW(__wargv[1], L"/u") == 0) {
+      return DoUninstall();
+    }
+    break;
+  default:
+    break;
   }
 
   return 0;

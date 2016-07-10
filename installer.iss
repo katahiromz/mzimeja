@@ -24,19 +24,23 @@ VersionInfoTextVersion=0.3
 Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 
 [Files]
-Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "res\mzimeja.dic"; DestDir: "{app}"; Flags: ignoreversion
-Source: "res\kanji.dat"; DestDir: "{app}"; Flags: ignoreversion
-Source: "res\radical.dat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion
+Source: "res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
+Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "projects\Debug\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
 Source: "projects\Debug\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{group}\README.txt"; Filename: "{app}\README.txt"
+Name: "{group}\READMEJP.txt"; Filename: "{app}\READMEJP.txt"
 Name: "{group}\LICENSE.txt"; Filename: "{app}\LICENSE.txt"
 Name: "{group}\アンインストール"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\setup.exe"; Description: "{cm:LaunchProgram,MZ-IME日本語入力}"; Flags: nowait
+Filename: "{app}\setup.exe"; Parameters: "/i"
+
+[UninstallRun]
+Filename: "{app}\setup.exe"; Parameters: "/u"
+
