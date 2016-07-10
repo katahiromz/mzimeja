@@ -29,6 +29,7 @@
 #include "input.h"          // for INPUT_MODE and InputContext
 
 #define UNBOOST_USE_STRING_ALGORITHM
+#define UNBOOST_USE_UNORDERED_MAP
 #include "unboost.hpp"      // Unboost
 
 //////////////////////////////////////////////////////////////////////////////
@@ -448,8 +449,8 @@ protected:
   HIMC            m_hIMC;
   InputContext *  m_lpIMC;
   HANDLE          m_hBasicDictData; // file mapping
-  std::map<wchar_t,wchar_t>   m_vowel_map;
-  std::map<wchar_t,wchar_t>   m_consonant_map;
+  unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;
+  unboost::unordered_map<wchar_t,wchar_t>   m_consonant_map;
 
   ImeBaseData *LockImeBaseData();
   void UnlockImeBaseData(ImeBaseData *data);
