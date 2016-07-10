@@ -76,7 +76,7 @@ BOOL is_hiragana(WCHAR ch) {
   }
 }
 
-BOOL is_zenkaku_katakana(WCHAR ch) {
+BOOL is_fullwidth_katakana(WCHAR ch) {
   if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
   switch (ch) {
   case 0x30FD: case 0x30FE: case 0x3099: case 0x309A: case 0x309B:
@@ -158,7 +158,7 @@ bool do_load(void) {
     if (fields.size() == 1) {
       entry.post = str;
       entry.bunrui = HB_MEISHI;
-      if (is_zenkaku_katakana(str[0])) {
+      if (is_fullwidth_katakana(str[0])) {
         std::wstring hiragana = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
         entry.pre = hiragana;
       } else {

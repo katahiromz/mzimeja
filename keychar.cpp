@@ -6,9 +6,6 @@
 #include "mzimeja.h"
 #include "vksub.h"
 
-#define UNBOOST_USE_STRING_ALGORITHM
-#include "unboost.hpp"
-
 //////////////////////////////////////////////////////////////////////////////
 
 struct KEYVALUE {

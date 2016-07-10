@@ -65,7 +65,7 @@ POSVERSIONINFO GetVersionInfo(VOID) {
 // Remarks:
 //      FreeSecurityAttributes() should be called to free up the
 //      SECURITY_ATTRIBUTES allocated by this function.
-PSECURITY_ATTRIBUTES CreateSecurityAttributes(void) {
+SECURITY_ATTRIBUTES *CreateSecurityAttributes(void) {
   if (!IsNT()) return NULL;
 
   // create a sid for everyone access
@@ -118,7 +118,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes(void) {
   }
 
   // allocate security attribute
-  PSECURITY_ATTRIBUTES psa;
+  SECURITY_ATTRIBUTES *psa;
   psa = (PSECURITY_ATTRIBUTES)MEMALLOC(sizeof(SECURITY_ATTRIBUTES));
   if (psa == NULL) {
     DebugPrint(TEXT("CreateSecurityAttributes:LocalAlloc for psa failed"));
@@ -178,7 +178,7 @@ PSECURITY_ATTRIBUTES CreateSecurityAttributes(void) {
 // The purpose of this function:
 //      Frees the memory objects allocated by previous
 //      CreateSecurityAttributes() call.
-VOID FreeSecurityAttributes(PSECURITY_ATTRIBUTES psa) {
+VOID FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa) {
   if (psa == NULL) return;
 
   BOOL fResult;

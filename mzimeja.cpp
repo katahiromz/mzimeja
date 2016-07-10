@@ -1,9 +1,8 @@
 // mzimeja.cpp --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
+// (Japanese, Shift_JIS)
 
-#define _CRT_SECURE_NO_WARNINGS
 #include "mzimeja.h"
-#include "immsec.h"
 #include "resource.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -78,7 +77,6 @@ MZIMEJA TheIME;
 
 MZIMEJA::MZIMEJA() {
   m_hInst = NULL;
-  m_hMutex = NULL;
   m_hMyKL = 0;
   m_bWinLogOn = FALSE;
 
@@ -87,37 +85,79 @@ MZIMEJA::MZIMEJA() {
 
   m_fOverflowKey = FALSE;
 
+  m_hMutex = NULL;
+  m_hBaseData = NULL;
   m_hIMC = NULL;
   m_lpIMC = NULL;
+  m_hBasicDictData = NULL;
 }
 
 BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   FOOTMARK();
   m_hInst = hInstance;
 
-  // Create/open a system global named mutex.
-  // The initial ownership is not needed.
   // CreateSecurityAttributes() will create
   // the proper security attribute for IME.
-  PSECURITY_ATTRIBUTES psa = CreateSecurityAttributes();
-  if (psa != NULL) {
-    m_hMutex = CreateMutex(psa, FALSE, TEXT("mzimeja_mutex"));
-    FreeSecurityAttributes(psa);
-    assert(m_hMutex);
-  } else {
-    // Failed, not NT system
-    assert(0);
-    return FALSE;
+  SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes();
+  assert(psa);
+
+  // create a mutex
+  m_hMutex = ::CreateMutexW(psa, FALSE, L"mzimeja_mutex");
+  assert(m_hMutex);
+
+  // create base data
+  m_hBaseData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
+    PAGE_READWRITE, 0, sizeof(ImeBaseData), L"mzimeja_basedata");
+  assert(m_hBaseData);
+  if (m_hBaseData && ::GetLastError() != ERROR_ALREADY_EXISTS) {
+    // initialize base data
+    ImeBaseData *data = LockImeBaseData();
+    if (data) {
+      data->dwSignature = 0xDEADFACE;
+      data->dwSharedDictDataSize = 0;
+      UnlockImeBaseData(data);
+    }
   }
 
-  RegisterClasses(m_hInst);
+  // free sa
+  FreeSecurityAttributes(psa);
 
-  return TRUE;
+  // register window classes for IME
+  return RegisterClasses(m_hInst);
+} // MZIMEJA::Init
+
+ImeBaseData *MZIMEJA::LockImeBaseData() {
+  LPVOID pvData;
+  pvData = ::MapViewOfFile(m_hBaseData, FILE_MAP_ALL_ACCESS,
+                           0, 0, sizeof(ImeBaseData));
+  return reinterpret_cast<ImeBaseData *>(pvData);
 }
 
-#define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
+void MZIMEJA::UnlockImeBaseData(ImeBaseData *data) {
+  ::UnmapViewOfFile(data);
+}
+
+std::wstring MZIMEJA::GetSettingString(LPCWSTR szSettingName) const {
+  HKEY hKey;
+  LONG result;
+  WCHAR szValue[MAX_PATH * 2];
+  result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+    L"SOFTWARE\\Katayama Hirofumi MZ\\mzimaja",
+    0, KEY_READ, &hKey);
+  if (result == ERROR_SUCCESS && hKey) {
+    DWORD cbData = sizeof(szValue);
+    result = ::RegQueryValueExW(hKey, szSettingName, NULL, NULL, 
+      reinterpret_cast<LPBYTE>(szValue), &cbData);
+    ::RegCloseKey(hKey);
+    if (result == ERROR_SUCCESS) {
+      return std::wstring(szValue);
+    }
+  }
+  return std::wstring();
+} // MZIMEJA::GetSettingString
 
 BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
+#define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
   WNDCLASSEX wcx;
   FOOTMARK();
 
@@ -199,7 +239,8 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   if (!RegisterClassEx(&wcx)) return FALSE;
 
   return TRUE;
-}
+#undef CS_MZIME
+} // MZIMEJA::RegisterClasses
 
 HKL MZIMEJA::GetHKL(VOID) {
   FOOTMARK();
@@ -360,7 +401,14 @@ VOID MZIMEJA::Uninit(VOID) {
   ::UnregisterClass(szCompStrClassName, m_hInst);
   ::UnregisterClass(szCandClassName, m_hInst);
   ::UnregisterClass(szStatusClassName, m_hInst);
-  if (m_hMutex) ::CloseHandle(m_hMutex);
+  if (m_hMutex) {
+    ::CloseHandle(m_hMutex);
+    m_hMutex = NULL;
+  }
+  if (m_hBaseData) {
+    ::CloseHandle(m_hBaseData);
+    m_hBaseData = NULL;
+  }
 }
 
 HBITMAP MZIMEJA::LoadBMP(LPCTSTR pszName) {

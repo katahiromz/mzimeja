@@ -1,17 +1,22 @@
 // mzimeja.h --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
+// (Japanese, Shift_JIS)
 
 #ifndef MZIMEJA_H_
 #define MZIMEJA_H_
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #ifndef _INC_WINDOWS
-  #include <windows.h>      // for Windows
+  #include <windows.h>      // Windows
 #endif
 #include <tchar.h>          // for Windows generic text
 
 #include <string>           // for std::string, std::wstring, ...
 #include <vector>           // for std::vector
 #include <set>              // for std::set
+#include <map>              // for std::map
+#include <algorithm>        // for std::sort
 
 #include <cstdio>           // for C standard I/O
 #include <cctype>           // for C character types
@@ -20,7 +25,11 @@
 
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development
+#include "immsec.h"         // for IMM security
 #include "input.h"          // for INPUT_MODE and InputContext
+
+#define UNBOOST_USE_STRING_ALGORITHM
+#include "unboost.hpp"      // Unboost
 
 //////////////////////////////////////////////////////////////////////////////
 // _countof macro --- get the number of elements in an array
@@ -303,6 +312,67 @@ struct MzConversionResult {
   void clear() { clauses.clear(); }
 };
 
+//////////////////////////////////////////////////////////////////////////////
+
+struct ImeBaseData {
+  BOOL    dwSignature;
+  DWORD   dwSharedDictDataSize;
+};
+
+enum HINSHI_BUNRUI {
+  HB_START_NODE,        // 開始ノード
+  HB_MEISHI,            // 名詞
+  HB_IKEIYOUSHI,        // い形容詞
+  HB_NAKEIYOUSHI,       // な形容詞
+  HB_RENTAISHI,         // 連体詞
+  HB_FUKUSHI,           // 副詞
+  HB_SETSUZOKUSHI,      // 接続詞
+  HB_KANDOUSHI,         // 感動詞
+  HB_JOSHI,             // 助詞
+  HB_MIZEN_JODOUSHI,    // 未然助動詞
+  HB_RENYOU_JODOUSHI,   // 連用助動詞
+  HB_SHUUSHI_JODOUSHI,  // 終止助動詞
+  HB_RENTAI_JODOUSHI,   // 連体助動詞
+  HB_KATEI_JODOUSHI,    // 仮定助動詞
+  HB_MEIREI_JODOUSHI,   // 命令助動詞
+  HB_GODAN_DOUSHI,      // 五段動詞
+  HB_ICHIDAN_DOUSHI,    // 一段動詞
+  HB_KAHEN_DOUSHI,      // カ変動詞
+  HB_SAHEN_DOUSHI,      // サ変動詞
+  HB_KANGO,             // 漢語
+  HB_SETTOUGO,          // 接頭語
+  HB_SETSUBIGO,         // 接尾語
+  HB_END_NODE           // 終了ノード
+};
+
+struct ENTRY {
+  std::wstring  pre;
+  HINSHI_BUNRUI bunrui;
+  std::wstring  post;
+  std::wstring  tags;
+};
+
+const wchar_t g_table[][5] = {
+  {L'あ', L'い', L'う', L'え', L'お'},
+  {L'か', L'き', L'く', L'け', L'こ'},
+  {L'が', L'ぎ', L'ぐ', L'げ', L'ご'},
+  {L'さ', L'し', L'す', L'せ', L'そ'},
+  {L'ざ', L'じ', L'ず', L'ぜ', L'ぞ'},
+  {L'た', L'ち', L'つ', L'て', L'と'},
+  {L'だ', L'ぢ', L'づ', L'で', L'ど'},
+  {L'な', L'に', L'ぬ', L'ね', L'の'},
+  {L'は', L'ひ', L'ふ', L'へ', L'ほ'},
+  {L'ば', L'び', L'ぶ', L'べ', L'ぼ'},
+  {L'ぱ', L'ぴ', L'ぷ', L'ぺ', L'ぽ'},
+  {L'ま', L'み', L'む', L'め', L'も'},
+  {L'や', 0, L'ゆ', 0, L'よ'},
+  {L'ら', L'り', L'る', L'れ', L'ろ'},
+  {L'わ', 0, 0, 0, L'を'},
+  {L'ん', 0, 0, 0, 0},
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
 // The IME
 class MZIMEJA {
 public:
@@ -354,8 +424,10 @@ public:
   BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
 
   // dictionary
-  BOOL LoadDictionary();
-  BOOL IsDictionaryLoaded() const;
+  BOOL LoadDict();
+  BOOL IsDictLoaded() const;
+  WCHAR *LockDict();
+  void UnlockDict(WCHAR *data);
 
   // convert
   void PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
@@ -367,10 +439,24 @@ public:
   BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
 
+  // settings
+  std::wstring GetSettingString(LPCWSTR szSettingName) const;
+
 protected:
-  HANDLE          m_hMutex;
+  HANDLE          m_hMutex;         // mutex
+  HANDLE          m_hBaseData;      // file mapping
   HIMC            m_hIMC;
   InputContext *  m_lpIMC;
+  HANDLE          m_hBasicDictData; // file mapping
+  std::map<wchar_t,wchar_t>   m_vowel_map;
+  std::map<wchar_t,wchar_t>   m_consonant_map;
+
+  ImeBaseData *LockImeBaseData();
+  void UnlockImeBaseData(ImeBaseData *data);
+  void MakeMaps();
+  BOOL LoadBasicDictFile(std::vector<ENTRY>& entries);
+  BOOL DeployDictData(ImeBaseData *data, SECURITY_ATTRIBUTES *psa,
+                      const std::vector<ENTRY>& entries);
 }; // class MZIMEJA
 
 extern MZIMEJA TheIME;
