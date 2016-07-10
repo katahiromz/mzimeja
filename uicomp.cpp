@@ -102,7 +102,7 @@ HWND ClauseToCompWnd(UIEXTRA *lpUIExtra, InputContext *lpIMC, DWORD iClause) {
         break;
       }
       hwnd = lpUIExtra->uiComp[i].hWnd;
-      if (iClause == clause) {
+      if (clause == iClause) {
         break;
       }
     }
