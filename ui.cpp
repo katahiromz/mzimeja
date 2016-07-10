@@ -215,12 +215,12 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
   case WM_IME_CONTROL:
     DebugPrintA("WM_IME_CONTROL\n");
-    lRet = ControlCommand(hIMC, hWnd, message, wParam, lParam);
+    lRet = ControlCommand(hIMC, hWnd, wParam, lParam);
     break;
 
   case WM_IME_NOTIFY:
     DebugPrintA("WM_IME_NOTIFY\n");
-    lRet = NotifyCommand(hIMC, hWnd, message, wParam, lParam);
+    lRet = NotifyCommand(hIMC, hWnd, wParam, lParam);
     break;
 
   case WM_DESTROY:
@@ -321,8 +321,7 @@ int GetCompFontHeight(UIEXTRA *lpUIExtra) {
 }
 
 // Handle WM_IME_NOTIFY messages
-LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
-                   LPARAM lParam) {
+LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
   FOOTMARK();
   LONG ret = 0;
   UIEXTRA *lpUIExtra;
@@ -407,25 +406,25 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
 
   case IMN_GUIDELINE:
     DebugPrintA("IMN_GUIDELINE\n");
-    if (ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0)) {
-      if (!IsWindow(lpUIExtra->uiGuide.hWnd)) {
+    if (::ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0)) {
+      if (!::IsWindow(lpUIExtra->uiGuide.hWnd)) {
         HDC hdcIC;
         TEXTMETRIC tm;
         int dx, dy;
 
         if (lpUIExtra->uiGuide.pt.x == -1) {
-          GetWindowRect(lpIMC->hWnd, &rc);
+          ::GetWindowRect(lpIMC->hWnd, &rc);
           lpUIExtra->uiGuide.pt.x = rc.left;
           lpUIExtra->uiGuide.pt.y = rc.bottom;
         }
 
-        hdcIC = CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL);
-        GetTextMetrics(hdcIC, &tm);
+        hdcIC = ::CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL);
+        ::GetTextMetrics(hdcIC, &tm);
         dx = tm.tmAveCharWidth * MAXGLCHAR;
         dy = tm.tmHeight + tm.tmExternalLeading;
-        DeleteDC(hdcIC);
+        ::DeleteDC(hdcIC);
 
-        lpUIExtra->uiGuide.hWnd = CreateWindowEx(
+        lpUIExtra->uiGuide.hWnd = ::CreateWindowEx(
             WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME, szGuideClassName,
             NULL, WS_DISABLED | WS_POPUP | WS_BORDER, lpUIExtra->uiGuide.pt.x,
             lpUIExtra->uiGuide.pt.y, dx + 2 * GetSystemMetrics(SM_CXBORDER) +
@@ -435,9 +434,9 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
                 2 * GetSystemMetrics(SM_CYEDGE),
             hWnd, NULL, TheIME.m_hInst, NULL);
       }
-      ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
+      ::ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
       lpUIExtra->uiGuide.bShow = TRUE;
-      SetWindowLongPtr(lpUIExtra->uiGuide.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
+      ::SetWindowLongPtr(lpUIExtra->uiGuide.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
       GuideWnd_Update(lpUIExtra);
     }
     break;
@@ -474,8 +473,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
 //#define lpcfCandForm ((LPCANDIDATEFORM)lParam)
 
 // Handle WM_IME_CONTROL messages
-LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
-                    LPARAM lParam) {
+LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
   FOOTMARK();
   LONG ret = 1L;
 
@@ -545,51 +543,51 @@ void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   DWORD dwT;
 
   switch (message) {
-    case WM_SETCURSOR:
-      if (HIWORD(lParam) == WM_LBUTTONDOWN ||
-          HIWORD(lParam) == WM_RBUTTONDOWN) {
-        GetCursorPos(&pt);
-        SetCapture(hWnd);
-        GetWindowRect(hWnd, &drc);
-        ptdif.x = pt.x - drc.left;
-        ptdif.y = pt.y - drc.top;
-        rc = drc;
-        rc.right -= rc.left;
-        rc.bottom -= rc.top;
-        SetWindowLong(hWnd, FIGWL_MOUSE, FIM_CAPUTURED);
-      }
-      break;
+  case WM_SETCURSOR:
+    if (HIWORD(lParam) == WM_LBUTTONDOWN ||
+        HIWORD(lParam) == WM_RBUTTONDOWN) {
+      GetCursorPos(&pt);
+      SetCapture(hWnd);
+      GetWindowRect(hWnd, &drc);
+      ptdif.x = pt.x - drc.left;
+      ptdif.y = pt.y - drc.top;
+      rc = drc;
+      rc.right -= rc.left;
+      rc.bottom -= rc.top;
+      SetWindowLong(hWnd, FIGWL_MOUSE, FIM_CAPUTURED);
+    }
+    break;
 
-    case WM_MOUSEMOVE:
-      dwT = GetWindowLong(hWnd, FIGWL_MOUSE);
+  case WM_MOUSEMOVE:
+    dwT = GetWindowLong(hWnd, FIGWL_MOUSE);
+    if (dwT & FIM_MOVED) {
+      DrawUIBorder(&drc);
+      GetCursorPos(&pt);
+      drc.left = pt.x - ptdif.x;
+      drc.top = pt.y - ptdif.y;
+      drc.right = drc.left + rc.right;
+      drc.bottom = drc.top + rc.bottom;
+      DrawUIBorder(&drc);
+    } else if (dwT & FIM_CAPUTURED) {
+      DrawUIBorder(&drc);
+      SetWindowLong(hWnd, FIGWL_MOUSE, dwT | FIM_MOVED);
+    }
+    break;
+
+  case WM_LBUTTONUP:
+  case WM_RBUTTONUP:
+    dwT = GetWindowLong(hWnd, FIGWL_MOUSE);
+
+    if (dwT & FIM_CAPUTURED) {
+      ReleaseCapture();
       if (dwT & FIM_MOVED) {
         DrawUIBorder(&drc);
         GetCursorPos(&pt);
-        drc.left = pt.x - ptdif.x;
-        drc.top = pt.y - ptdif.y;
-        drc.right = drc.left + rc.right;
-        drc.bottom = drc.top + rc.bottom;
-        DrawUIBorder(&drc);
-      } else if (dwT & FIM_CAPUTURED) {
-        DrawUIBorder(&drc);
-        SetWindowLong(hWnd, FIGWL_MOUSE, dwT | FIM_MOVED);
+        MoveWindow(hWnd, pt.x - ptdif.x, pt.y - ptdif.y, rc.right, rc.bottom,
+                   TRUE);
       }
-      break;
-
-    case WM_LBUTTONUP:
-    case WM_RBUTTONUP:
-      dwT = GetWindowLong(hWnd, FIGWL_MOUSE);
-
-      if (dwT & FIM_CAPUTURED) {
-        ReleaseCapture();
-        if (dwT & FIM_MOVED) {
-          DrawUIBorder(&drc);
-          GetCursorPos(&pt);
-          MoveWindow(hWnd, pt.x - ptdif.x, pt.y - ptdif.y, rc.right, rc.bottom,
-                     TRUE);
-        }
-      }
-      break;
+    }
+    break;
   }
 }
 

@@ -184,10 +184,8 @@ BOOL PASCAL NotifyUCSetCompositionWindow(HIMC hIMC);
 
 // ui.c
 LRESULT CALLBACK MZIMEWndProc(HWND, UINT, WPARAM, LPARAM);
-LONG NotifyCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
-                   LPARAM lParam);
-LONG ControlCommand(HIMC hIMC, HWND hWnd, UINT message, WPARAM wParam,
-                    LPARAM lParam);
+LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam);
+LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam);
 void DrawUIBorder(LPRECT lprc);
 void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 int GetCompFontHeight(UIEXTRA *lpUIExtra);

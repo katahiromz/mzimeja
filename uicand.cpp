@@ -168,7 +168,7 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
       if (extra) iList = extra->iClause;
       CandList *lpCandList = lpCandInfo->GetList(iList);
       DWORD i, end = lpCandList->GetPageEnd();
-      for (i = lpCandList->dwPageStart; i < end; i++) {
+      for (i = lpCandList->dwPageStart; i < end; ++i) {
         WCHAR *psz = lpCandList->GetCandString(i);
         SIZE siz;
         ::GetTextExtentPoint32W(hDC, psz, ::lstrlenW(psz), &siz);
