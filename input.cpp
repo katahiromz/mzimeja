@@ -523,6 +523,10 @@ void InputContext::MakeHiragana() {
 
   // update composition
   comp.AssertValid();
+  if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
+    comp.AddChar(L'n', L'n', Conversion());
+  }
+  comp.AssertValid();
   comp.MakeHiragana();
   comp.AssertValid();
 
@@ -550,6 +554,10 @@ void InputContext::MakeKatakana() {
 
   // update composition
   comp.AssertValid();
+  if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
+    comp.AddChar(L'n', L'n', Conversion());
+  }
+  comp.AssertValid();
   comp.MakeKatakana();
   comp.AssertValid();
 
@@ -576,6 +584,10 @@ void InputContext::MakeHankaku() {
   }
 
   // update composition
+  comp.AssertValid();
+  if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
+    comp.AddChar(L'n', L'n', Conversion());
+  }
   comp.AssertValid();
   comp.MakeHankaku();
   comp.AssertValid();
