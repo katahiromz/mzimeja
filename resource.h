@@ -52,6 +52,7 @@
 #define IDM_HIDE 40012
 #define IDM_PROPERTY 40013
 #define IDM_ADD_WORD 40015
+#define IDM_IME_PAD 40016
 
 // Next default values for new objects
 //

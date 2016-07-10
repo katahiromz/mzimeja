@@ -370,6 +370,8 @@ BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
     break;
   case IDM_ADD_WORD:
     break;
+  case IDM_IME_PAD:
+    break;
   default:
     return FALSE;
   }

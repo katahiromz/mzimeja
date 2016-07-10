@@ -324,6 +324,7 @@ static const MYMENUITEM top_menu_items[] = {
   {-1, -1},
   {IDM_ADD_WORD, IDM_ADD_WORD},
   {IDM_RECONVERT, IDM_RECONVERT},
+  {IDM_IME_PAD, IDM_IME_PAD},
   {-1, -1},
   {IDM_PROPERTY, IDM_PROPERTY},
   {IDM_ABOUT, IDM_ABOUT},
