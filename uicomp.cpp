@@ -93,40 +93,19 @@ void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
   lpUIExtra->uiDefComp.bShow = FALSE;
 }
 
-HWND ClauseToCompWnd(UIEXTRA *lpUIExtra, InputContext *lpIMC, DWORD iClause) {
-  if (lpIMC->cfCompForm.dwStyle) {
-    HWND hwnd = lpUIExtra->uiComp[0].hWnd;
-    for (int i = 0; i < MAXCOMPWND; i++) {
-      DWORD clause = ::GetWindowLong(hwnd, FIGWL_COMPSTARTCLAUSE);
-      if (clause < iClause) {
-        break;
-      }
-      hwnd = lpUIExtra->uiComp[i].hWnd;
-      if (clause == iClause) {
-        break;
-      }
-    }
-    return hwnd;
-  } else {
-    return lpUIExtra->uiDefComp.hWnd;
-  }
-}
-
-BOOL GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
-                            DWORD iClause, LPPOINT ppt) {
+HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
+                            DWORD iClause, LPPOINT ppt)
+{
   FOOTMARK();
-  HWND hCompWnd = ClauseToCompWnd(lpUIExtra, lpIMC, iClause);
-  DWORD ich = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTSTR);
-  DWORD cch = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTNUM);
-  DWORD dwClauseIndex = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTCLAUSE);
-  DebugPrintA("GetCandPosHintFromComp: ich: %d, cch: %d, dwClauseIndex: %d, iClause: %d\n", ich, cch, dwClauseIndex, iClause);
+  HWND hCompWnd;
 
   // is it vertical?
   BOOL fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
 
+  // get comp str
   CompStr *lpCompStr = lpIMC->LockCompStr();
-  if (lpCompStr == NULL) return FALSE;
-
+  if (lpCompStr == NULL) return NULL;
+  // get comp str
   std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
   const WCHAR *psz = str.c_str();
   const WCHAR *pch = psz;
@@ -136,62 +115,80 @@ BOOL GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
   DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
   std::set<DWORD> clauses(pdw, pdwEnd);
 
-  // get client rect
-  RECT rc;
-  ::GetClientRect(hCompWnd, &rc);
+  DWORD ich = 0;
+  DWORD dwClauseIndex = 0;
+  for (int i = 0; i < MAXCOMPWND; i++) {
+    if (lpIMC->cfCompForm.dwStyle) {
+      hCompWnd = lpUIExtra->uiComp[i].hWnd;
+    } else {
+      hCompWnd = lpUIExtra->uiDefComp.hWnd;
+    }
 
-  // starting position
-  int x, y;
-  if (fVert) {
-    x = rc.right - UNDERLINE_HEIGHT;
-    y = 0;
-  } else {
-    x = y = 0;
-  }
+    // get client rect
+    RECT rc;
+    ::GetClientRect(hCompWnd, &rc);
 
-  HDC hDC = ::GetDC(hCompWnd);
-  HFONT hFont = (HFONT)::GetWindowLongPtr(hCompWnd, FIGWLP_FONT);
-  HFONT hOldFont = NULL;
-  if (hFont) hOldFont = (HFONT)::SelectObject(hDC, hFont);
+    // starting position
+    int x, y;
+    if (fVert) {
+      x = rc.right - UNDERLINE_HEIGHT;
+      y = 0;
+    } else {
+      x = y = 0;
+    }
 
-  // is it end?
-  SIZE siz;
-  BOOL ret = FALSE;
-  const WCHAR *lpEnd = &pch[cch];
-  while (pch < lpEnd) {
-    // get size of text
-    ::GetTextExtentPoint32W(hDC, pch, 1, &siz);
+    DWORD cch = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTNUM);
+    DebugPrintA("ich: %d, cch: %d, dwClauseIndex: %d\n", ich, cch, dwClauseIndex);
 
-    if (dwClauseIndex == iClause) {
-      if (fVert) {
-        ppt->x = x;
-        ppt->y = y + siz.cx;
-      } else {
-        ppt->x = x;
-        ppt->y = y + siz.cy;
+    HDC hDC = ::GetDC(hCompWnd);
+    HFONT hFont = (HFONT)::GetWindowLongPtr(hCompWnd, FIGWLP_FONT);
+    HFONT hOldFont = NULL;
+    if (hFont) hOldFont = (HFONT)::SelectObject(hDC, hFont);
+
+    // is it end?
+    SIZE siz;
+    BOOL bIsDone = FALSE;
+    const WCHAR *lpEnd = &pch[cch];
+    while (pch < lpEnd) {
+      // get size of text
+      ::GetTextExtentPoint32W(hDC, pch, 1, &siz);
+
+      if (dwClauseIndex == iClause) {
+        if (fVert) {
+          ppt->x = x;
+          ppt->y = y + siz.cx;
+        } else {
+          ppt->x = x;
+          ppt->y = y + siz.cy;
+        }
+        ::ClientToScreen(hCompWnd, ppt);
+        bIsDone = TRUE;
+        break;
       }
-      ::ClientToScreen(hCompWnd, ppt);
-      ret = TRUE;
+
+      // go to next position
+      ++pch;
+      ++ich;
+      if (fVert)
+        y += siz.cx;
+      else
+        x += siz.cx;
+
+      if (clauses.count(ich) > 0) {
+        ++dwClauseIndex;
+      }
+    }
+
+    ::SelectObject(hDC, hOldFont);
+    ::ReleaseDC(hCompWnd, hDC);
+
+    if (bIsDone || lpIMC->cfCompForm.dwStyle == 0) {
       break;
     }
-
-    // go to next position
-    ++pch;
-    ++ich;
-    if (fVert)
-      y += siz.cx;
-    else
-      x += siz.cx;
-
-    if (clauses.count(ich) > 0) {
-      ++dwClauseIndex;
-    }
   }
-  ::SelectObject(hDC, hOldFont);
-  ::ReleaseDC(hCompWnd, hDC);
+
   lpIMC->UnlockCompStr();
-  DebugPrintA("GetCandPosHintFromComp: %d, %d, %d\n", ppt->x, ppt->y, ret);
-  return ret;
+  return hCompWnd;
 } // GetCandPosHintFromComp
 
 // calc the position of composition windows and move them

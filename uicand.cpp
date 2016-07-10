@@ -60,11 +60,8 @@ BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt
     lpIMC->UnlockCandInfo();
 
     if (ret) {
-      ret = FALSE;
-      HWND hCompWnd = ClauseToCompWnd(lpUIExtra, lpIMC, iClause);
-      if (GetCandPosHintFromComp(lpUIExtra, lpIMC, iClause, lppt)) {
-        ret = ::IsWindowVisible(hCompWnd);
-      }
+      HWND hCompWnd = GetCandPosHintFromComp(lpUIExtra, lpIMC, iClause, lppt);
+      ret = ::IsWindowVisible(hCompWnd);
     }
   }
 
