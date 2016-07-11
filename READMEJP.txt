@@ -10,6 +10,15 @@
 これは、片山博文MZによる、「MZ-IME日本語入力」(mzimeja、開発中)です。
 このプログラムは、Windows 2000用の日本語IMEです。
 
+動作環境
+----------------
+
+ * 日本語 Windows 2000
+ * 日本語 Windows XP
+ * 日本語 Windows Vista
+ * 日本語 Windows Server 2003
+ * 日本語 Windows 7 
+
 インストール方法
 ----------------
 
