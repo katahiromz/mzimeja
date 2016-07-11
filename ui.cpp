@@ -60,6 +60,54 @@ void PASCAL DumpUIExtra(UIEXTRA *lpUIExtra) {
 }
 #endif  // def _DEBUG
 
+void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam) {
+  UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
+  if (lpUIExtra) {
+    // input context was changed.
+    lpUIExtra->hIMC = hIMC;
+
+    if (hIMC) {
+      // the display have to be updated.
+      InputContext *lpIMC = TheIME.LockIMC(hIMC);
+      if (lpIMC) {
+        CompStr *lpCompStr = lpIMC->LockCompStr();
+        CandInfo *lpCandInfo = lpIMC->LockCandInfo();
+        if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
+          CandWnd_Hide(lpUIExtra);
+        }
+        if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
+          if (lpCandInfo->dwCount) {
+            CandWnd_Create(hWnd, lpUIExtra, lpIMC);
+            CandWnd_Resize(lpUIExtra, lpIMC);
+            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
+          }
+        }
+
+        if (::IsWindow(lpUIExtra->uiDefComp.hWnd)) {
+          CompWnd_Hide(lpUIExtra);
+        }
+        if (lParam & ISC_SHOWUICOMPOSITIONWINDOW) {
+          if (lpCompStr->dwCompStrLen) {
+            CompWnd_Create(hWnd, lpUIExtra, lpIMC);
+            CompWnd_Move(lpUIExtra, lpIMC);
+          }
+        }
+        lpIMC->UnlockCompStr();
+        lpIMC->UnlockCandInfo();
+        StatusWnd_Update(lpUIExtra);
+        TheIME.UnlockIMC(hIMC);
+      } else {
+        CandWnd_Hide(lpUIExtra);
+        CompWnd_Hide(lpUIExtra);
+      }
+    } else { // it is NULL input context.
+      CandWnd_Hide(lpUIExtra);
+      CompWnd_Hide(lpUIExtra);
+    }
+    UnlockUIExtra(hWnd);
+  }
+} // OnImeSetContext
+
 // IME UI server window procedure
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
@@ -109,53 +157,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   case WM_IME_SETCONTEXT:
     DebugPrintA("WM_IME_SETCONTEXT\n");
     if (wParam) {
-      lpUIExtra = LockUIExtra(hWnd);
-      if (lpUIExtra) {
-        lpUIExtra->hIMC = hIMC;
-
-        if (hIMC) {
-          //LPINPUTCONTEXT lpIMCT = NULL;
-          //
-          // input context was changed.
-          // if there are the child windows, the display have to be
-          // updated.
-          lpIMC = TheIME.LockIMC(hIMC);
-          if (lpIMC) {
-            CompStr *lpCompStr = lpIMC->LockCompStr();
-            CandInfo *lpCandInfo = lpIMC->LockCandInfo();
-            if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
-              CandWnd_Hide(lpUIExtra);
-            }
-            if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
-              if (lpCandInfo->dwCount) {
-                CandWnd_Create(hWnd, lpUIExtra, lpIMC);
-                CandWnd_Resize(lpUIExtra, lpIMC);
-                CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
-              }
-            }
-
-            if (IsWindow(lpUIExtra->uiDefComp.hWnd)) CompWnd_Hide(lpUIExtra);
-
-            if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
-              if (lpCompStr->dwCompStrLen) {
-                CompWnd_Create(hWnd, lpUIExtra, lpIMC);
-                CompWnd_Move(lpUIExtra, lpIMC);
-              }
-            }
-            lpIMC->UnlockCompStr();
-            lpIMC->UnlockCandInfo();
-          } else {
-            CandWnd_Hide(lpUIExtra);
-            CompWnd_Hide(lpUIExtra);
-          }
-          StatusWnd_Update(lpUIExtra);
-          TheIME.UnlockIMC(hIMC);
-        } else { // it is NULL input context.
-          CandWnd_Hide(lpUIExtra);
-          CompWnd_Hide(lpUIExtra);
-        }
-        UnlockUIExtra(hWnd);
-      }
+      OnImeSetContext(hWnd, hIMC, lParam);
     }
     // else
     //    ShowUIWindows(hWnd, FALSE);
