@@ -437,7 +437,10 @@ public:
   BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
 
   // settings
-  std::wstring GetSettingString(LPCWSTR szSettingName) const;
+  std::wstring GetSettingString(LPCWSTR pszSettingName) const;
+  BOOL SetSettingString(LPCWSTR pszSettingName, LPCWSTR pszValue);
+  BOOL GetSettingData(LPCWSTR pszSettingName, void *ptr, DWORD size) const;
+  BOOL SetSettingData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 
 protected:
   HANDLE          m_hMutex;         // mutex

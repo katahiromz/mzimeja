@@ -142,16 +142,20 @@ void MZIMEJA::UnlockImeBaseData(ImeBaseData *data) {
   ::UnmapViewOfFile(data);
 }
 
-std::wstring MZIMEJA::GetSettingString(LPCWSTR szSettingName) const {
+//////////////////////////////////////////////////////////////////////////////
+
+static const WCHAR s_szRegKey[] = 
+  L"SOFTWARE\\Katayama Hirofumi MZ\\mzimaja";
+
+std::wstring MZIMEJA::GetSettingString(LPCWSTR pszSettingName) const {
   HKEY hKey;
   LONG result;
   WCHAR szValue[MAX_PATH * 2];
-  result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE,
-    L"SOFTWARE\\Katayama Hirofumi MZ\\mzimaja",
-    0, KEY_READ, &hKey);
+  result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szRegKey,
+                           0, KEY_READ, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
     DWORD cbData = sizeof(szValue);
-    result = ::RegQueryValueExW(hKey, szSettingName, NULL, NULL, 
+    result = ::RegQueryValueExW(hKey, pszSettingName, NULL, NULL, 
       reinterpret_cast<LPBYTE>(szValue), &cbData);
     ::RegCloseKey(hKey);
     if (result == ERROR_SUCCESS) {
@@ -160,6 +164,60 @@ std::wstring MZIMEJA::GetSettingString(LPCWSTR szSettingName) const {
   }
   return std::wstring();
 } // MZIMEJA::GetSettingString
+
+BOOL MZIMEJA::SetSettingString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
+  HKEY hKey;
+  LONG result;
+  result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szRegKey,
+                           0, KEY_WRITE, &hKey);
+  if (result == ERROR_SUCCESS && hKey) {
+    DWORD cbData = (::lstrlenW(pszValue) + 1) * sizeof(WCHAR);
+    result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_SZ, 
+      reinterpret_cast<const BYTE *>(pszValue), cbData);
+    ::RegCloseKey(hKey);
+    if (result == ERROR_SUCCESS) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+} // MZIMEJA::SetSettingString
+
+BOOL
+MZIMEJA::GetSettingData(LPCWSTR pszSettingName, void *ptr, DWORD size) const {
+  HKEY hKey;
+  LONG result;
+  result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szRegKey,
+                           0, KEY_READ, &hKey);
+  if (result == ERROR_SUCCESS && hKey) {
+    DWORD cbData = size;
+    result = ::RegQueryValueExW(hKey, pszSettingName, NULL, NULL, 
+      reinterpret_cast<LPBYTE>(ptr), &cbData);
+    ::RegCloseKey(hKey);
+    if (result == ERROR_SUCCESS) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+} // MZIMEJA::GetSettingData
+
+BOOL
+MZIMEJA::SetSettingData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
+  HKEY hKey;
+  LONG result;
+  result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szRegKey,
+                           0, KEY_WRITE, &hKey);
+  if (result == ERROR_SUCCESS && hKey) {
+    result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_BINARY, 
+      reinterpret_cast<const BYTE *>(ptr), size);
+    ::RegCloseKey(hKey);
+    if (result == ERROR_SUCCESS) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+} // MZIMEJA::SetSettingData
+
+//////////////////////////////////////////////////////////////////////////////
 
 BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
 #define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
