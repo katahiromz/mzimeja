@@ -108,6 +108,35 @@ void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam) {
   }
 } // OnImeSetContext
 
+void OnDestroy(HWND hWnd) {
+  UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
+  if (lpUIExtra) {
+    if (::IsWindow(lpUIExtra->uiStatus.hWnd))
+      ::DestroyWindow(lpUIExtra->uiStatus.hWnd);
+
+    if (::IsWindow(lpUIExtra->uiCand.hWnd))
+      ::DestroyWindow(lpUIExtra->uiCand.hWnd);
+
+    if (::IsWindow(lpUIExtra->uiDefComp.hWnd))
+      ::DestroyWindow(lpUIExtra->uiDefComp.hWnd);
+
+    for (INT i = 0; i < MAXCOMPWND; i++) {
+      if (::IsWindow(lpUIExtra->uiComp[i].hWnd))
+        ::DestroyWindow(lpUIExtra->uiComp[i].hWnd);
+    }
+
+    if (::IsWindow(lpUIExtra->uiGuide.hWnd))
+      ::DestroyWindow(lpUIExtra->uiGuide.hWnd);
+
+    if (lpUIExtra->hFont) {
+      ::DeleteObject(lpUIExtra->hFont);
+    }
+
+    UnlockUIExtra(hWnd);
+    FreeUIExtra(hWnd);
+  }
+}
+
 // IME UI server window procedure
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
@@ -116,14 +145,13 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   UIEXTRA *lpUIExtra;
   HGLOBAL hUIExtra;
   LONG lRet = 0;
-  int i;
 
   HIMC hIMC = (HIMC)GetWindowLongPtr(hWnd, IMMGWLP_IMC);
 
   // Even if there is no current UI. these messages should not be pass to
   // DefWindowProc().
   if (hIMC == NULL) {
-    if (IsImeMessage(message)) {
+    if (IsImeMessage2(message)) {
       DebugPrintA("Why hIMC is NULL?\n");
       DebugPrintA("hWnd: %x, message: %x, wParam: %x, lParam: %x\n",
         (LONG)hWnd, message, wParam, lParam);
@@ -225,30 +253,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
   case WM_DESTROY:
     DebugPrintA("WM_DESTROY\n");
-    lpUIExtra = LockUIExtra(hWnd);
-    if (lpUIExtra) {
-      if (IsWindow(lpUIExtra->uiStatus.hWnd))
-        DestroyWindow(lpUIExtra->uiStatus.hWnd);
-
-      if (IsWindow(lpUIExtra->uiCand.hWnd))
-        DestroyWindow(lpUIExtra->uiCand.hWnd);
-
-      if (IsWindow(lpUIExtra->uiDefComp.hWnd))
-        DestroyWindow(lpUIExtra->uiDefComp.hWnd);
-
-      for (i = 0; i < MAXCOMPWND; i++) {
-        if (IsWindow(lpUIExtra->uiComp[i].hWnd))
-          DestroyWindow(lpUIExtra->uiComp[i].hWnd);
-      }
-
-      if (IsWindow(lpUIExtra->uiGuide.hWnd))
-        DestroyWindow(lpUIExtra->uiGuide.hWnd);
-
-      if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont);
-
-      UnlockUIExtra(hWnd);
-      FreeUIExtra(hWnd);
-    }
+    OnDestroy(hWnd);
     break;
 
   case WM_UI_STATEMOVE:
@@ -324,14 +329,11 @@ int GetCompFontHeight(UIEXTRA *lpUIExtra) {
 LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
   FOOTMARK();
   LONG ret = 0;
-  UIEXTRA *lpUIExtra;
   RECT rc;
   LOGFONT lf;
+  InputContext *lpIMC;
 
-  InputContext *lpIMC = TheIME.LockIMC(hIMC);
-  if (NULL == lpIMC) return 0;
-
-  lpUIExtra = LockUIExtra(hWnd);
+  UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
 
   switch (wParam) {
   case IMN_CLOSESTATUSWINDOW:
@@ -361,26 +363,31 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
   case IMN_SETCOMPOSITIONFONT:
     DebugPrintA("IMN_SETCOMPOSITIONFONT\n");
-    lf = lpIMC->lfFont.W;
-    if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont);
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lf = lpIMC->lfFont.W;
+      if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont);
 
-    if (lf.lfEscapement == 2700)
-      lpUIExtra->bVertical = TRUE;
-    else {
-      lf.lfEscapement = 0;
-      lpUIExtra->bVertical = FALSE;
+      if (lf.lfEscapement == 2700)
+        lpUIExtra->bVertical = TRUE;
+      else {
+        lf.lfEscapement = 0;
+        lpUIExtra->bVertical = FALSE;
+      }
+
+      // if current font can't display Japanese characters,
+      // try to find Japanese font
+      if (lf.lfCharSet != SHIFTJIS_CHARSET) {
+        lf.lfCharSet = SHIFTJIS_CHARSET;
+        lf.lfFaceName[0] = 0;
+      }
+
+      lpUIExtra->hFont = CreateFontIndirect(&lf);
+      CompWnd_SetFont(lpUIExtra);
+      CompWnd_Move(lpUIExtra, lpIMC);
+
+      TheIME.UnlockIMC(hIMC);
     }
-
-    // if current font can't display Japanese characters,
-    // try to find Japanese font
-    if (lf.lfCharSet != SHIFTJIS_CHARSET) {
-      lf.lfCharSet = SHIFTJIS_CHARSET;
-      lf.lfFaceName[0] = 0;
-    }
-
-    lpUIExtra->hFont = CreateFontIndirect(&lf);
-    CompWnd_SetFont(lpUIExtra);
-    CompWnd_Move(lpUIExtra, lpIMC);
     break;
 
   case IMN_SETOPENSTATUS:
@@ -390,13 +397,21 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
   case IMN_OPENCANDIDATE:
     DebugPrintA("IMN_OPENCANDIDATE\n");
-    CandWnd_Create(hWnd, lpUIExtra, lpIMC);
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      CandWnd_Create(hWnd, lpUIExtra, lpIMC);
+      TheIME.UnlockIMC(hIMC);
+    }
     break;
 
   case IMN_CHANGECANDIDATE:
     DebugPrintA("IMN_CHANGECANDIDATE\n");
-    CandWnd_Resize(lpUIExtra, lpIMC);
-    CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      CandWnd_Resize(lpUIExtra, lpIMC);
+      CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
+      TheIME.UnlockIMC(hIMC);
+    }
     break;
 
   case IMN_CLOSECANDIDATE:
@@ -412,10 +427,14 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         TEXTMETRIC tm;
         int dx, dy;
 
-        if (lpUIExtra->uiGuide.pt.x == -1) {
-          ::GetWindowRect(lpIMC->hWnd, &rc);
-          lpUIExtra->uiGuide.pt.x = rc.left;
-          lpUIExtra->uiGuide.pt.y = rc.bottom;
+        lpIMC = TheIME.LockIMC(hIMC);
+        if (lpIMC) {
+          if (lpUIExtra->uiGuide.pt.x == -1) {
+            ::GetWindowRect(lpIMC->hWnd, &rc);
+            lpUIExtra->uiGuide.pt.x = rc.left;
+            lpUIExtra->uiGuide.pt.y = rc.bottom;
+          }
+          TheIME.UnlockIMC(hIMC);
         }
 
         hdcIC = ::CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL);
@@ -443,13 +462,21 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
   case IMN_SETCANDIDATEPOS:
     DebugPrintA("IMN_SETCANDIDATEPOS\n");
-    CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
+      TheIME.UnlockIMC(hIMC);
+    }
     break;
 
   case IMN_SETCOMPOSITIONWINDOW:
     DebugPrintA("IMN_SETCOMPOSITIONWINDOW\n");
-    CompWnd_Move(lpUIExtra, lpIMC);
-    CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      CompWnd_Move(lpUIExtra, lpIMC);
+      CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
+      TheIME.UnlockIMC(hIMC);
+    }
     break;
 
   case IMN_SETSTATUSWINDOWPOS:
@@ -465,7 +492,6 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
   }
 
   UnlockUIExtra(hWnd);
-  TheIME.UnlockIMC(hIMC);
 
   return ret;
 }
@@ -600,6 +626,23 @@ BOOL IsImeMessage(UINT message) {
   case WM_IME_COMPOSITION:
   case WM_IME_NOTIFY:
   case WM_IME_SETCONTEXT:
+  case WM_IME_CONTROL:
+  case WM_IME_COMPOSITIONFULL:
+  case WM_IME_SELECT:
+  case WM_IME_CHAR:
+    return TRUE;
+  }
+  return FALSE;
+}
+
+BOOL IsImeMessage2(UINT message) {
+  FOOTMARK();
+  switch (message) {
+  case WM_IME_STARTCOMPOSITION:
+  case WM_IME_ENDCOMPOSITION:
+  case WM_IME_COMPOSITION:
+  //case WM_IME_NOTIFY:
+  //case WM_IME_SETCONTEXT:
   case WM_IME_CONTROL:
   case WM_IME_COMPOSITIONFULL:
   case WM_IME_SELECT:

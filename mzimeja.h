@@ -189,6 +189,7 @@ void DrawUIBorder(LPRECT lprc);
 void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 int GetCompFontHeight(UIEXTRA *lpUIExtra);
 BOOL IsImeMessage(UINT message);
+BOOL IsImeMessage2(UINT message);
 
 // uistate.c
 HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra);
