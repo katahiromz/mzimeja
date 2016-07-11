@@ -632,7 +632,7 @@ LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
         (HIWORD(lParam) != WM_RBUTTONDOWN))
       return DefWindowProc(hWnd, message, wParam, lParam);
     if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP))
-      SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
+      SetWindowLong(hWnd, FIGWL_MOUSE, 0);
     break;
 
   case WM_MOVE:

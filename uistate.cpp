@@ -242,8 +242,8 @@ STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
 
 void StatusWnd_Update(UIEXTRA *lpUIExtra) {
   FOOTMARK();
-  if (IsWindow(lpUIExtra->uiStatus.hWnd))
-    SendMessage(lpUIExtra->uiStatus.hWnd, WM_UI_UPDATE, 0, 0L);
+  if (::IsWindow(lpUIExtra->uiStatus.hWnd))
+    ::SendMessage(lpUIExtra->uiStatus.hWnd, WM_UI_UPDATE, 0, 0);
 } // StatusWnd_Update
 
 void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {

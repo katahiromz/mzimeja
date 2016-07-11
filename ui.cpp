@@ -115,7 +115,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   InputContext *lpIMC;
   UIEXTRA *lpUIExtra;
   HGLOBAL hUIExtra;
-  LONG lRet = 0L;
+  LONG lRet = 0;
   int i;
 
   HIMC hIMC = (HIMC)GetWindowLongPtr(hWnd, IMMGWLP_IMC);
@@ -329,14 +329,14 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
   LOGFONT lf;
 
   InputContext *lpIMC = TheIME.LockIMC(hIMC);
-  if (NULL == lpIMC) return 0L;
+  if (NULL == lpIMC) return 0;
 
   lpUIExtra = LockUIExtra(hWnd);
 
   switch (wParam) {
   case IMN_CLOSESTATUSWINDOW:
     DebugPrintA("IMN_CLOSESTATUSWINDOW\n");
-    if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
+    if (::IsWindow(lpUIExtra->uiStatus.hWnd)) {
       ::GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
       lpUIExtra->uiStatus.pt.x = rc.left;
       lpUIExtra->uiStatus.pt.y = rc.top;
@@ -475,10 +475,10 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 // Handle WM_IME_CONTROL messages
 LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
   FOOTMARK();
-  LONG ret = 1L;
+  LONG ret = 1;
 
   InputContext *lpIMC = TheIME.LockIMC(hIMC);
-  if (NULL == lpIMC) return 1L;
+  if (NULL == lpIMC) return ret;
 
   UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
   if (lpUIExtra) {

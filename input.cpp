@@ -306,8 +306,8 @@ void InputContext::MakeGuideLine(DWORD dwID) {
     LoadString(TheIME.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
     lpGuideLine->dwPrivateSize = lstrlen(lpStr) * sizeof(TCHAR);
   } else {
-    lpGuideLine->dwPrivateOffset = 0L;
-    lpGuideLine->dwPrivateSize = 0L;
+    lpGuideLine->dwPrivateOffset = 0;
+    lpGuideLine->dwPrivateSize = 0;
   }
 
   TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_GUIDELINE, 0);

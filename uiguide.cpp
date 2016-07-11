@@ -40,8 +40,8 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
         (HIWORD(lParam) != WM_RBUTTONDOWN))
       return DefWindowProc(hWnd, message, wParam, lParam);
     if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
-      SetWindowLong(hWnd, FIGWL_MOUSE, 0L);
-      SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0L);
+      SetWindowLong(hWnd, FIGWL_MOUSE, 0);
+      SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0);
     }
     break;
 
@@ -273,8 +273,9 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
 
 void GuideWnd_Update(UIEXTRA *lpUIExtra) {
   FOOTMARK();
-  if (IsWindow(lpUIExtra->uiGuide.hWnd))
-    SendMessage(lpUIExtra->uiGuide.hWnd, WM_UI_UPDATE, 0, 0L);
+  if (::IsWindow(lpUIExtra->uiGuide.hWnd)) {
+    ::SendMessage(lpUIExtra->uiGuide.hWnd, WM_UI_UPDATE, 0, 0);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////

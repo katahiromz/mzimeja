@@ -17,7 +17,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
                            IME_PROP_UNICODE | IME_PROP_AT_CARET;
   lpIMEInfo->fdwConversionCaps = IME_CMODE_LANGUAGE | IME_CMODE_FULLSHAPE |
                                  IME_CMODE_ROMAN | IME_CMODE_CHARCODE;
-  lpIMEInfo->fdwSentenceCaps = 0L;
+  lpIMEInfo->fdwSentenceCaps = 0;
   lpIMEInfo->fdwUICaps = UI_CAP_2700;
 
   lpIMEInfo->fdwSCSCaps = 0;
