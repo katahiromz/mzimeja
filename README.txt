@@ -44,6 +44,12 @@ Table of Contents
   uistate.cpp         | mzimeja status window UI
   --------------------+---------------------------------------------------
 
+How To Build
+------------
+
+Use Visual C++ 2008 or later, or MSYS + g++.
+Use the solution file "projects\mzimeja.sln" or Makefile.msys to build.
+
 /////////////////////////////////////////////////////
 // Katayama Hirofumi MZ (katahiromz) [ARMYANT]
 // Homepage     http://katahiromz.web.fc2.com/
