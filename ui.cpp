@@ -124,11 +124,9 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   // DefWindowProc().
   if (hIMC == NULL) {
     if (IsImeMessage(message)) {
-      DebugPrintA("Why hIMC is NULL????\n");
-      DebugPrintA("\thWnd is %x\n", hWnd);
-      DebugPrintA("\tmessage is %x\n", message);
-      DebugPrintA("\twParam is %x\n", wParam);
-      DebugPrintA("\tlParam is %x\n", lParam);
+      DebugPrintA("Why hIMC is NULL?\n");
+      DebugPrintA("hWnd: %x, message: %x, wParam: %x, lParam: %x\n",
+        (LONG)hWnd, message, wParam, lParam);
       return 0;
     }
   }
