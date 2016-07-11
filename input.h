@@ -36,6 +36,8 @@ UINT        CommandFromInputMode(INPUT_MODE imode);
 //////////////////////////////////////////////////////////////////////////////
 // composition info
 
+struct LogCandInfo;
+
 // logical comp info extra
 struct LogCompStrExtra {
   // selected composition clause index
@@ -272,6 +274,7 @@ struct LogCandInfo {
   void MoveEnd();
   void PageUp();
   void PageDown();
+  void SelectCand(UINT uCandIndex);
 
   std::wstring GetString() const;
   std::wstring GetString(DWORD iCand) const;
@@ -358,6 +361,7 @@ struct InputContext : public INPUTCONTEXT {
   void UnlockGuideLine();
 
   // actions
+  void SelectCand(UINT uCandIndex);
   void AddChar(WCHAR chTyped, WCHAR chTranslated);
   void Escape();
   void CancelText();

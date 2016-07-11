@@ -69,7 +69,11 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   if (chTranslated || chTyped) {
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->AddChar(chTyped, chTranslated);
+      if (lpIMC->HasCandInfo() && L'1' <= chTyped && chTyped <= L'9') {
+        lpIMC->SelectCand(chTyped - L'1');
+      } else {
+        lpIMC->AddChar(chTyped, chTranslated);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     return TRUE;

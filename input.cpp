@@ -352,6 +352,32 @@ void InputContext::GetLogObjects(LogCompStr& comp, LogCandInfo& cand) {
   }
 } // InputContext::GetLogObjects
 
+void InputContext::SelectCand(UINT uCandIndex) {
+  FOOTMARK();
+
+  // get logical data
+  LogCompStr comp;
+  LogCandInfo cand;
+  GetLogObjects(comp, cand);
+
+  // select a candidate
+  if (cand.HasCandInfo() && comp.IsClauseConverted()) {
+    cand.SelectCand(uCandIndex);
+    std::wstring str = cand.GetString();
+    comp.SetClauseCompString(comp.extra.iClause, str);
+
+    // recreate
+    hCompStr = CompStr::ReCreate(hCompStr, &comp);
+    hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
+
+    // update composition
+    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL);
+
+    // update candidate
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+  }
+} // InputContext::SelectCand
+
 void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   FOOTMARK();
 
