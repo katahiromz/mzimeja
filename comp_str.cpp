@@ -1054,11 +1054,11 @@ void CompStr::GetLog(LogCompStr& log) {
       ::ImmUnlockIMCC(hNewCompStr);
       hCompStr = hNewCompStr;
     } else {
-      DebugPrint(TEXT("CompStr::ReCreate: failed #2"));
+      DebugPrintA("CompStr::ReCreate: failed #2");
       assert(0);
     }
   } else {
-    DebugPrint(TEXT("CompStr::ReCreate: failed"));
+    DebugPrintA("CompStr::ReCreate: failed");
     assert(0);
   }
   return hCompStr;

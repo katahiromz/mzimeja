@@ -305,11 +305,11 @@ CANDINFOEXTRA *CandInfo::GetExtra() {
       ImmUnlockIMCC(hNewCandInfo);
       hCandInfo = hNewCandInfo;
     } else {
-      DebugPrint(TEXT("CandInfo::ReCreate: failed #2"));
+      DebugPrintA("CandInfo::ReCreate: failed #2");
       assert(0);
     }
   } else {
-    DebugPrint(TEXT("CandInfo::ReCreate: failed"));
+    DebugPrintA("CandInfo::ReCreate: failed");
     assert(0);
   }
   return hCandInfo;

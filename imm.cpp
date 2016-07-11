@@ -99,10 +99,10 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 
   switch (dwAction) {
   case NI_CONTEXTUPDATED:
-    DebugPrint(TEXT("NI_CONTEXTUPDATED\n"));
+    DebugPrintA("NI_CONTEXTUPDATED\n");
     switch (dwValue) {
     case IMC_SETOPENSTATUS:
-      DebugPrint(TEXT("IMC_SETOPENSTATUS\n"));
+      DebugPrintA("IMC_SETOPENSTATUS\n");
       if (dwIndex == 0) {
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
@@ -115,11 +115,11 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
       break;
 
     case IMC_SETCONVERSIONMODE:
-      DebugPrint(TEXT("IMC_SETCONVERSIONMODE\n"));
+      DebugPrintA("IMC_SETCONVERSIONMODE\n");
       break;
 
     case IMC_SETCOMPOSITIONWINDOW:
-      DebugPrint(TEXT("IMC_SETCOMPOSITIONWINDOW\n"));
+      DebugPrintA("IMC_SETCOMPOSITIONWINDOW\n");
       break;
 
     default:
@@ -128,7 +128,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     break;
 
   case NI_COMPOSITIONSTR:
-    DebugPrint(TEXT("NI_COMPOSITIONSTR\n"));
+    DebugPrintA("NI_COMPOSITIONSTR\n");
     switch (dwIndex) {
     case CPS_COMPLETE:  // make result
       lpIMC = TheIME.LockIMC(hIMC);
@@ -172,7 +172,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     break;
 
   case NI_OPENCANDIDATE:  // open candidate
-    DebugPrint(TEXT("NI_OPENCANDIDATE\n"));
+    DebugPrintA("NI_OPENCANDIDATE\n");
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       lpIMC->OpenCandidate();
@@ -181,7 +181,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     break;
 
   case NI_CLOSECANDIDATE: // close candidate
-    DebugPrint(TEXT("NI_CLOSECANDIDATE\n"));
+    DebugPrintA("NI_CLOSECANDIDATE\n");
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       ret = lpIMC->CloseCandidate();
@@ -190,7 +190,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     break;
 
   case NI_SELECTCANDIDATESTR:
-    DebugPrint(TEXT("NI_SELECTCANDIDATESTR\n"));
+    DebugPrintA("NI_SELECTCANDIDATESTR\n");
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
@@ -210,7 +210,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     break;
 
   case NI_CHANGECANDIDATELIST:
-    DebugPrint(TEXT("NI_CHANGECANDIDATELIST\n"));
+    DebugPrintA("NI_CHANGECANDIDATELIST\n");
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) ret = TRUE;
@@ -219,7 +219,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     break;
 
   case NI_SETCANDIDATE_PAGESIZE:
-    DebugPrint(TEXT("NI_SETCANDIDATE_PAGESIZE\n"));
+    DebugPrintA("NI_SETCANDIDATE_PAGESIZE\n");
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
@@ -239,7 +239,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     break;
 
   case NI_SETCANDIDATE_PAGESTART:
-    DebugPrint(TEXT("NI_SETCANDIDATE_PAGESTART\n"));
+    DebugPrintA("NI_SETCANDIDATE_PAGESTART\n");
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       if (dwIndex == 1 && lpIMC->HasCandInfo()) {
@@ -259,12 +259,12 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     break;
 
   case NI_IMEMENUSELECTED:
-    DebugPrint(TEXT("NI_IMEMENUSELECTED\n"));
+    DebugPrintA("NI_IMEMENUSELECTED\n");
     TheIME.DoCommand(hIMC, dwIndex);
     break;
 
   default:
-    DebugPrint(TEXT("NI_(unknown)\n"));
+    DebugPrintA("NI_(unknown)\n");
     break;
   }
 
@@ -293,15 +293,15 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
 
   switch (dwIndex) {
     case SCS_QUERYRECONVERTSTRING:
-      DebugPrint(TEXT("SCS_QUERYRECONVERTSTRING\n"));
+      DebugPrintA("SCS_QUERYRECONVERTSTRING\n");
       break;
 
     case SCS_SETRECONVERTSTRING:
-      DebugPrint(TEXT("SCS_SETRECONVERTSTRING\n"));
+      DebugPrintA("SCS_SETRECONVERTSTRING\n");
       break;
 
     default:
-      DebugPrint(TEXT("SCS_(unknown)\n"));
+      DebugPrintA("SCS_(unknown)\n");
       break;
   }
 

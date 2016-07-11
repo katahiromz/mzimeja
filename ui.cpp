@@ -37,22 +37,22 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
 #ifdef _DEBUG
 void PASCAL DumpUIExtra(UIEXTRA *lpUIExtra) {
   FOOTMARK();
-  DebugPrint(TEXT("Status hWnd %lX  [%d,%d]\n"),
+  DebugPrintA("Status hWnd %lX  [%d,%d]\n",
              lpUIExtra->uiStatus.hWnd, lpUIExtra->uiStatus.pt.x,
              lpUIExtra->uiStatus.pt.y);
 
-  DebugPrint(TEXT("Cand hWnd %lX  [%d,%d]\n"),
+  DebugPrintA("Cand hWnd %lX  [%d,%d]\n",
              lpUIExtra->uiCand.hWnd, lpUIExtra->uiCand.pt.x,
              lpUIExtra->uiCand.pt.y);
 
-  DebugPrint(TEXT("CompStyle hWnd %lX]\n"), lpUIExtra->dwCompStyle);
+  DebugPrintA("CompStyle hWnd %lX]\n", lpUIExtra->dwCompStyle);
 
-  DebugPrint(TEXT("DefComp hWnd %lX  [%d,%d]\n"),
+  DebugPrintA("DefComp hWnd %lX  [%d,%d]\n",
              lpUIExtra->uiDefComp.hWnd, lpUIExtra->uiDefComp.pt.x,
              lpUIExtra->uiDefComp.pt.y);
 
   for (int i = 0; i < 5; i++) {
-    DebugPrint(TEXT("Comp hWnd %lX  [%d,%d]-[%d,%d]\n"),
+    DebugPrintA("Comp hWnd %lX  [%d,%d]-[%d,%d]\n",
                lpUIExtra->uiComp[i].hWnd, lpUIExtra->uiComp[i].rc.left,
                lpUIExtra->uiComp[i].rc.top, lpUIExtra->uiComp[i].rc.right,
                lpUIExtra->uiComp[i].rc.bottom);
@@ -76,11 +76,11 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
   // DefWindowProc().
   if (hIMC == NULL) {
     if (IsImeMessage(message)) {
-      DebugPrint(TEXT("Why hIMC is NULL????\n"));
-      DebugPrint(TEXT("\thWnd is %x\n"), hWnd);
-      DebugPrint(TEXT("\tmessage is %x\n"), message);
-      DebugPrint(TEXT("\twParam is %x\n"), wParam);
-      DebugPrint(TEXT("\tlParam is %x\n"), lParam);
+      DebugPrintA("Why hIMC is NULL????\n");
+      DebugPrintA("\thWnd is %x\n", hWnd);
+      DebugPrintA("\tmessage is %x\n", message);
+      DebugPrintA("\twParam is %x\n", wParam);
+      DebugPrintA("\tlParam is %x\n", lParam);
       return 0;
     }
   }

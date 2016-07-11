@@ -467,10 +467,10 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
     }
 
     if (TheIME.m_fOverflowKey) {
-      DebugPrint(TEXT("***************************************\n"));
-      DebugPrint(TEXT("*   TransKey OVER FLOW Messages!!!    *\n"));
-      DebugPrint(TEXT("*                by MZIMEJA.IME       *\n"));
-      DebugPrint(TEXT("***************************************\n"));
+      DebugPrintA("***************************************\n");
+      DebugPrintA("*   TransKey OVER FLOW Messages!!!    *\n");
+      DebugPrintA("*                by MZIMEJA.IME       *\n");
+      DebugPrintA("***************************************\n");
     }
     ret = TheIME.m_uNumTransKey;
   }

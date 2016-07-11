@@ -280,7 +280,7 @@ HKL MZIMEJA::GetHKL(VOID) {
 BOOL MZIMEJA::GenerateMessage(LPTRANSMSG lpGeneMsg) {
   BOOL ret = FALSE;
   FOOTMARK();
-  DebugPrint(TEXT("(%u,%d,%d)\n"),
+  DebugPrintA("(%u,%d,%d)\n",
     lpGeneMsg->message, lpGeneMsg->wParam, lpGeneMsg->lParam);
 
   if (m_lpCurTransKey)
@@ -433,23 +433,23 @@ WCHAR *MZIMEJA::LoadSTR(INT nID) {
 
 InputContext *MZIMEJA::LockIMC(HIMC hIMC) {
   FOOTMARK();
-  DebugPrint(TEXT("MZIMEJA::LockIMC: locking: %p\n"), hIMC);
+  DebugPrintA("MZIMEJA::LockIMC: locking: %p\n", hIMC);
   InputContext *context = (InputContext *)::ImmLockIMC(hIMC);
   if (context) {
     m_hIMC = hIMC;
     m_lpIMC = context;
-    DebugPrint(TEXT("MZIMEJA::LockIMC: locked: %p\n"), hIMC);
+    DebugPrintA("MZIMEJA::LockIMC: locked: %p\n", hIMC);
   } else {
-    DebugPrint(TEXT("MZIMEJA::LockIMC: cannot lock: %p\n"), hIMC);
+    DebugPrintA("MZIMEJA::LockIMC: cannot lock: %p\n", hIMC);
   }
   return context;
 }
 
 VOID MZIMEJA::UnlockIMC(HIMC hIMC) {
   FOOTMARK();
-  DebugPrint(TEXT("MZIMEJA::UnlockIMC: unlocking: %p\n"), hIMC);
+  DebugPrintA("MZIMEJA::UnlockIMC: unlocking: %p\n", hIMC);
   ::ImmUnlockIMC(hIMC);
-  DebugPrint(TEXT("MZIMEJA::UnlockIMC: unlocked: %p\n"), hIMC);
+  DebugPrintA("MZIMEJA::UnlockIMC: unlocked: %p\n", hIMC);
   if (::ImmGetIMCLockCount(hIMC) == 0) {
     m_hIMC = NULL;
     m_lpIMC = NULL;
@@ -554,7 +554,7 @@ void FreeUIExtra(HWND hwndServer) {
 
 #ifndef NDEBUG
   LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo) {
-    DebugPrint(TEXT("### Abnormal Status ###\n"));
+    DebugPrintA("### Abnormal Status ###\n");
     FOOTMARK_PRINT_CALL_STACK();
     return EXCEPTION_EXECUTE_HANDLER;
   }
@@ -572,12 +572,12 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
     #ifndef NDEBUG
       s_old_handler = ::SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
     #endif
-    DebugPrint(TEXT("DLL_PROCESS_ATTACH: hInst is %p\n"), TheIME.m_hInst);
+    DebugPrintA("DLL_PROCESS_ATTACH: hInst is %p\n", TheIME.m_hInst);
     TheIME.Init(hInstDLL);
     break;
 
   case DLL_PROCESS_DETACH:
-    DebugPrint(TEXT("DLL_PROCESS_DETACH: hInst is %p\n"), TheIME.m_hInst);
+    DebugPrintA("DLL_PROCESS_DETACH: hInst is %p\n", TheIME.m_hInst);
     TheIME.Uninit();
     #ifndef NDEBUG
       ::SetUnhandledExceptionFilter(s_old_handler);
@@ -585,11 +585,11 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
     break;
 
   case DLL_THREAD_ATTACH:
-    DebugPrint(TEXT("DLL_THREAD_ATTACH: hInst is %p\n"), TheIME.m_hInst);
+    DebugPrintA("DLL_THREAD_ATTACH: hInst is %p\n", TheIME.m_hInst);
     break;
 
   case DLL_THREAD_DETACH:
-    DebugPrint(TEXT("DLL_THREAD_DETACH: hInst is %p\n"), TheIME.m_hInst);
+    DebugPrintA("DLL_THREAD_DETACH: hInst is %p\n", TheIME.m_hInst);
     break;
   }
   return TRUE;

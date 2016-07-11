@@ -211,70 +211,70 @@ BOOL InputContext::HasCompStr() {
 
 CandInfo *InputContext::LockCandInfo() {
   FOOTMARK();
-  DebugPrint(TEXT("InputContext::LockCandInfo: locking %p\n"), hCandInfo);
+  DebugPrintA("InputContext::LockCandInfo: locking %p\n", hCandInfo);
   CandInfo *info = (CandInfo *)::ImmLockIMCC(hCandInfo);
   if (info) {
-    DebugPrint(TEXT("InputContext::LockCandInfo: locked %p\n"), hCandInfo);
+    DebugPrintA("InputContext::LockCandInfo: locked %p\n", hCandInfo);
   } else {
-    DebugPrint(TEXT("InputContext::LockCandInfo: not locked %p\n"), hCandInfo);
+    DebugPrintA("InputContext::LockCandInfo: not locked %p\n", hCandInfo);
   }
   return info;
 }
 
 void InputContext::UnlockCandInfo() {
   FOOTMARK();
-  DebugPrint(TEXT("InputContext::UnlockCandInfo: unlocking %p\n"), hCandInfo);
+  DebugPrintA("InputContext::UnlockCandInfo: unlocking %p\n", hCandInfo);
   BOOL b = ::ImmUnlockIMCC(hCandInfo);
   if (b) {
-    DebugPrint(TEXT("InputContext::UnlockCandInfo: unlocked %p\n"), hCandInfo);
+    DebugPrintA("InputContext::UnlockCandInfo: unlocked %p\n", hCandInfo);
   } else {
-    DebugPrint(TEXT("InputContext::UnlockCandInfo: not unlocked %p\n"), hCandInfo);
+    DebugPrintA("InputContext::UnlockCandInfo: not unlocked %p\n", hCandInfo);
   }
 }
 
 CompStr *InputContext::LockCompStr() {
   FOOTMARK();
-  DebugPrint(TEXT("InputContext::LockCompStr: locking %p\n"), hCompStr);
+  DebugPrintA("InputContext::LockCompStr: locking %p\n", hCompStr);
   CompStr *comp_str = (CompStr *)::ImmLockIMCC(hCompStr);
   if (comp_str) {
-    DebugPrint(TEXT("InputContext::LockCompStr: locked %p\n"), hCompStr);
+    DebugPrintA("InputContext::LockCompStr: locked %p\n", hCompStr);
   } else {
-    DebugPrint(TEXT("InputContext::LockCompStr: not locked %p\n"), hCompStr);
+    DebugPrintA("InputContext::LockCompStr: not locked %p\n", hCompStr);
   }
   return comp_str;
 }
 
 void InputContext::UnlockCompStr() {
   FOOTMARK();
-  DebugPrint(TEXT("InputContext::UnlockCompStr: unlocking %p\n"), hCompStr);
+  DebugPrintA("InputContext::UnlockCompStr: unlocking %p\n", hCompStr);
   BOOL b = ::ImmUnlockIMCC(hCompStr);
   if (b) {
-    DebugPrint(TEXT("InputContext::UnlockCompStr: unlocked %p\n"), hCompStr);
+    DebugPrintA("InputContext::UnlockCompStr: unlocked %p\n", hCompStr);
   } else {
-    DebugPrint(TEXT("InputContext::UnlockCompStr: not unlocked %p\n"), hCompStr);
+    DebugPrintA("InputContext::UnlockCompStr: not unlocked %p\n", hCompStr);
   }
 }
 
 LPTRANSMSG InputContext::LockMsgBuf() {
   FOOTMARK();
-  DebugPrint(TEXT("InputContext::LockMsgBuf: locking %p\n"), hMsgBuf);
+  DebugPrintA("InputContext::LockMsgBuf: locking %p\n", hMsgBuf);
   LPTRANSMSG lpTransMsg = (LPTRANSMSG)::ImmLockIMCC(hMsgBuf);
   if (lpTransMsg) {
-    DebugPrint(TEXT("InputContext::LockMsgBuf: locked %p\n"), hMsgBuf);
+    DebugPrintA("InputContext::LockMsgBuf: locked %p\n", hMsgBuf);
   } else {
-    DebugPrint(TEXT("InputContext::LockMsgBuf: not locked %p\n"), hMsgBuf);
+    DebugPrintA("InputContext::LockMsgBuf: not locked %p\n", hMsgBuf);
   }
   return lpTransMsg;
 }
 
 void InputContext::UnlockMsgBuf() {
   FOOTMARK();
-  DebugPrint(TEXT("InputContext::UnlockMsgBuf: unlocking %p\n"), hMsgBuf);
+  DebugPrintA("InputContext::UnlockMsgBuf: unlocking %p\n", hMsgBuf);
   BOOL b = ::ImmUnlockIMCC(hMsgBuf);
   if (b) {
-    DebugPrint(TEXT("InputContext::UnlockMsgBuf: unlocked %p\n"), hMsgBuf);
+    DebugPrintA("InputContext::UnlockMsgBuf: unlocked %p\n", hMsgBuf);
   } else {
-    DebugPrint(TEXT("InputContext::UnlockMsgBuf: not unlocked %p\n"), hMsgBuf);
+    DebugPrintA("InputContext::UnlockMsgBuf: not unlocked %p\n", hMsgBuf);
   }
 }
 
@@ -317,24 +317,24 @@ void InputContext::MakeGuideLine(DWORD dwID) {
 
 LPGUIDELINE InputContext::LockGuideLine() {
   FOOTMARK();
-  DebugPrint(TEXT("InputContext::LockGuideLine: locking %p\n"), hGuideLine);
+  DebugPrintA("InputContext::LockGuideLine: locking %p\n", hGuideLine);
   LPGUIDELINE guideline = (LPGUIDELINE)::ImmLockIMCC(hGuideLine);
   if (guideline) {
-    DebugPrint(TEXT("InputContext::LockGuideLine: locked %p\n"), hGuideLine);
+    DebugPrintA("InputContext::LockGuideLine: locked %p\n", hGuideLine);
   } else {
-    DebugPrint(TEXT("InputContext::LockGuideLine: not locked %p\n"), hGuideLine);
+    DebugPrintA("InputContext::LockGuideLine: not locked %p\n", hGuideLine);
   }
   return guideline;
 }
 
 void InputContext::UnlockGuideLine() {
   FOOTMARK();
-  DebugPrint(TEXT("InputContext::UnlockGuideLine: unlocking %p\n"), hGuideLine);
+  DebugPrintA("InputContext::UnlockGuideLine: unlocking %p\n", hGuideLine);
   BOOL b = ::ImmUnlockIMCC(hGuideLine);
   if (b) {
-    DebugPrint(TEXT("InputContext::UnlockGuideLine: unlocked %p\n"), hGuideLine);
+    DebugPrintA("InputContext::UnlockGuideLine: unlocked %p\n", hGuideLine);
   } else {
-    DebugPrint(TEXT("InputContext::UnlockGuideLine: not unlocked %p\n"), hGuideLine);
+    DebugPrintA("InputContext::UnlockGuideLine: not unlocked %p\n", hGuideLine);
   }
 }
 
@@ -979,7 +979,7 @@ void InputContext::DumpCompStr() {
     pCompStr->Dump();
     UnlockCompStr();
   } else {
-    DebugPrint(TEXT("(no comp str)\n"));
+    DebugPrintA("(no comp str)\n");
   }
 #endif
 } // InputContext::DumpCompStr
@@ -992,7 +992,7 @@ void InputContext::DumpCandInfo() {
     pCandInfo->Dump();
     UnlockCandInfo();
   } else {
-    DebugPrint(TEXT("(no cand info)\n"));
+    DebugPrintA("(no cand info)\n");
   }
 #endif
 } // InputContext::DumpCandInfo
