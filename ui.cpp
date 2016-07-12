@@ -481,10 +481,14 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
   case IMN_SETSTATUSWINDOWPOS:
     DebugPrintA("IMN_SETSTATUSWINDOWPOS\n");
+    // TODO: use INPUTCONTEXT.ptStatusWndPos
     break;
 
   case IMN_PRIVATE:
     DebugPrintA("IMN_PRIVATE\n");
+    if (HIWORD(lParam) == 0xFACE) {
+      // TODO: IME Pad
+    }
     break;
 
   default:
