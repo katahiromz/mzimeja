@@ -393,8 +393,8 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
   return TRUE;
 } // StatusWnd_OnRClick
 
-LRESULT CALLBACK StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
-                                      LPARAM lParam) {
+LRESULT CALLBACK
+StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   FOOTMARK();
   PAINTSTRUCT ps;
   HWND hwndServer;
