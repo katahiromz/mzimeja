@@ -146,6 +146,8 @@ BEGIN
         MENUITEM "ローマ字入力",                IDM_ROMAN_INPUT
         MENUITEM "かな入力",                    IDM_KANA_INPUT
         MENUITEM SEPARATOR
+        MENUITEM "IMEパッド",                   IDM_IME_PAD
+        MENUITEM SEPARATOR
         MENUITEM "キャンセル",                  IDM_CANCEL
     END
 END
