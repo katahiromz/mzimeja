@@ -1175,7 +1175,7 @@ void CompStr::Dump() {
   DebugPrintA("\n");
   DebugPrintA("CompReadClause: ");
   if (dwCompReadClauseLen) {
-    LPDWORD clauses = GetCompReadClause();
+    DWORD *clauses = GetCompReadClause();
     for (DWORD i = 0; i < dwCompReadClauseLen / 4; ++i) {
       DebugPrintA("%08X ", clauses[i]);
     }
@@ -1197,7 +1197,7 @@ void CompStr::Dump() {
   DebugPrintA("\n");
   DebugPrintA("CompClause: ");
   if (dwCompClauseLen) {
-    LPDWORD clauses = GetCompClause();
+    DWORD *clauses = GetCompClause();
     for (DWORD i = 0; i < dwCompClauseLen / 4; ++i) {
       DebugPrintA("%08X ", clauses[i]);
     }
@@ -1211,7 +1211,7 @@ void CompStr::Dump() {
   DebugPrintA("\n");
   DebugPrintA("ResultReadClause: ");
   if (dwResultReadClauseLen) {
-    LPDWORD clauses = GetResultReadClause();
+    DWORD *clauses = GetResultReadClause();
     for (DWORD i = 0; i < dwResultReadClauseLen / 4; ++i) {
       DebugPrintA("%08X ", clauses[i]);
     }
@@ -1225,7 +1225,7 @@ void CompStr::Dump() {
   DebugPrintA("\n");
   DebugPrintA("ResultClause: ");
   if (dwResultClauseLen) {
-    LPDWORD clauses = GetResultClause();
+    DWORD *clauses = GetResultClause();
     for (DWORD i = 0; i < dwResultClauseLen / 4; ++i) {
       DebugPrintA("%08X ", clauses[i]);
     }

@@ -440,6 +440,8 @@ public:
   // settings
   std::wstring GetSettingString(LPCWSTR pszSettingName) const;
   BOOL SetSettingString(LPCWSTR pszSettingName, LPCWSTR pszValue);
+  BOOL GetSettingDword(LPCWSTR pszSettingName, DWORD *ptr) const;
+  BOOL SetSettingDword(LPCWSTR pszSettingName, DWORD data);
   BOOL GetSettingData(LPCWSTR pszSettingName, void *ptr, DWORD size) const;
   BOOL SetSettingData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 

@@ -93,7 +93,6 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   BOOL ret = FALSE;
   CandInfo *lpCandInfo;
   CandList *lpCandList;
-  //LPDWORD lpdw;
 
   FOOTMARK();
 

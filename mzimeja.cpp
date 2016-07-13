@@ -217,6 +217,43 @@ MZIMEJA::SetSettingData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
   return FALSE;
 } // MZIMEJA::SetSettingData
 
+BOOL
+MZIMEJA::GetSettingDword(LPCWSTR pszSettingName, DWORD *ptr) const {
+  HKEY hKey;
+  LONG result;
+  result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szRegKey,
+                           0, KEY_READ, &hKey);
+  if (result == ERROR_SUCCESS && hKey) {
+    DWORD cbData = sizeof(DWORD);
+    result = ::RegQueryValueExW(hKey, pszSettingName, NULL, NULL, 
+      reinterpret_cast<LPBYTE>(ptr), &cbData);
+    ::RegCloseKey(hKey);
+    if (result == ERROR_SUCCESS) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+} // MZIMEJA::GetSettingData
+
+BOOL
+MZIMEJA::SetSettingDword(LPCWSTR pszSettingName, DWORD data) {
+  HKEY hKey;
+  LONG result;
+  DWORD dwData = data;
+  result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szRegKey,
+                           0, KEY_WRITE, &hKey);
+  if (result == ERROR_SUCCESS && hKey) {
+    DWORD size = sizeof(DWORD);
+    result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_BINARY, 
+      reinterpret_cast<const BYTE *>(&dwData), size);
+    ::RegCloseKey(hKey);
+    if (result == ERROR_SUCCESS) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+} // MZIMEJA::SetSettingData
+
 //////////////////////////////////////////////////////////////////////////////
 
 BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {

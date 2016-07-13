@@ -168,7 +168,7 @@ protected:
   void UpdateCompStr();
 }; // struct LogCompStr
 
-inline void SetClause(LPDWORD lpdw, DWORD num) {
+inline void SetClause(DWORD *lpdw, DWORD num) {
   *lpdw = 0;
   *(lpdw + 1) = num;
 }
@@ -185,8 +185,8 @@ struct CompStr : public COMPOSITIONSTRING {
   BYTE *GetCompReadAttr() {
     return GetBytes() + dwCompReadAttrOffset;
   }
-  LPDWORD GetCompReadClause() {
-    return (LPDWORD)(GetBytes() + dwCompReadClauseOffset);
+  DWORD *GetCompReadClause() {
+    return (DWORD *)(GetBytes() + dwCompReadClauseOffset);
   }
   WCHAR *GetCompReadStr() {
     return (LPTSTR)(GetBytes() + dwCompReadStrOffset);
@@ -194,20 +194,20 @@ struct CompStr : public COMPOSITIONSTRING {
   BYTE *GetCompAttr() {
     return GetBytes() + dwCompAttrOffset;
   }
-  LPDWORD GetCompClause() {
-    return (LPDWORD)(GetBytes() + dwCompClauseOffset);
+  DWORD *GetCompClause() {
+    return (DWORD *)(GetBytes() + dwCompClauseOffset);
   }
   WCHAR *GetCompStr() {
     return (LPTSTR)(GetBytes() + dwCompStrOffset);
   }
-  LPDWORD GetResultReadClause() {
-    return (LPDWORD)(GetBytes() + dwResultReadClauseOffset);
+  DWORD *GetResultReadClause() {
+    return (DWORD *)(GetBytes() + dwResultReadClauseOffset);
   }
   WCHAR *GetResultReadStr() {
     return (LPTSTR)(GetBytes() + dwResultReadStrOffset);
   }
-  LPDWORD GetResultClause() {
-    return (LPDWORD)(GetBytes() + dwResultClauseOffset);
+  DWORD *GetResultClause() {
+    return (DWORD *)(GetBytes() + dwResultClauseOffset);
   }
   WCHAR *GetResultStr() {
     return (LPTSTR)(GetBytes() + dwResultStrOffset);
