@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef UNBOOST_HPP_
-#define UNBOOST_HPP_    11 // Version 11
+#define UNBOOST_HPP_    12 // Version 12
 
 #ifndef __cplusplus
     #error Unboost needs C++ compiler. You lose.
@@ -1122,11 +1122,11 @@
 // string algorithm
 
 #ifdef UNBOOST_USE_STRING_ALGORITHM
-    #if ((defined(UNBOOST_USE_CXX_STRING_ALGORITHM) + defined(UNBOOST_USE_BOOST_STRING_ALGORITHM)) == 0)
+    #if ((defined(UNBOOST_USE_UNBOOST_STRING_ALGORITHM) + defined(UNBOOST_USE_BOOST_STRING_ALGORITHM)) == 0)
         #if defined(UNBOOST_USE_BOOST)
             #define UNBOOST_USE_BOOST_STRING_ALGORITHM
         #else
-            #define UNBOOST_USE_CXX_STRING_ALGORITHM
+            #define UNBOOST_USE_UNBOOST_STRING_ALGORITHM
         #endif
     #endif
     #ifdef UNBOOST_USE_BOOST_STRING_ALGORITHM
@@ -1164,7 +1164,7 @@
             using boost::replace_all;
             using boost::replace_all_copy;
         } // namespace unboost
-    #elif defined(UNBOOST_USE_CXX_STRING_ALGORITHM)
+    #elif defined(UNBOOST_USE_UNBOOST_STRING_ALGORITHM)
         #include <cctype>
         namespace unboost {
             // TODO: be locale aware
@@ -1480,7 +1480,7 @@
 // assert
 
 #ifdef UNBOOST_USE_ASSERT
-    #if ((defined(UNBOOST_USE_CXX_ASSERT) + defined(UNBOOST_USE_BOOST_ASSERT)) == 0)
+    #if ((defined(UNBOOST_USE_UNBOOST_ASSERT) + defined(UNBOOST_USE_BOOST_ASSERT)) == 0)
         #ifdef UNBOOST_USE_BOOST
             #define UNBOOST_USE_BOOST_ASSERT
         #endif
