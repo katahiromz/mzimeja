@@ -239,6 +239,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\uipad.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\uistate.cpp"
 				>
 			</File>

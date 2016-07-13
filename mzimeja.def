@@ -24,6 +24,7 @@ EXPORTS
                 StatusWnd_WindowProc
                 CompWnd_WindowProc
                 GuideWnd_WindowProc
+                ImePad_WindowProc
 
                 GeneralDlgProc
                 AboutDlgProc

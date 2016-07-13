@@ -39,6 +39,7 @@ OBJS = \
 	uicand$(DOTOBJ) \
 	uicomp$(DOTOBJ) \
 	uiguide$(DOTOBJ) \
+	uipad$(DOTOBJ) \
 	uistate$(DOTOBJ) \
 	mzimeja_res$(DOTOBJ) \
 
@@ -100,6 +101,8 @@ uicomp$(DOTOBJ): uicomp.cpp
 	$(CXX) -c $(CXXFLAGS) -o uicomp$(DOTOBJ) uicomp.cpp
 uiguide$(DOTOBJ): uiguide.cpp
 	$(CXX) -c $(CXXFLAGS) -o uiguide$(DOTOBJ) uiguide.cpp
+uipad$(DOTOBJ): uipad.cpp
+	$(CXX) -c $(CXXFLAGS) -o uipad$(DOTOBJ) uipad.cpp
 uistate$(DOTOBJ): uistate.cpp
 	$(CXX) -c $(CXXFLAGS) -o uistate$(DOTOBJ) uistate.cpp
 

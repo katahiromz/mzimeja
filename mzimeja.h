@@ -222,6 +222,10 @@ void GuideWnd_Button(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void GuideWnd_Update(UIEXTRA *lpUIExtra);
 LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
 
+// uipad.cpp
+HWND ImePad_Create(HWND hWnd, UIEXTRA *lpUIExtra);
+LRESULT CALLBACK ImePad_WindowProc(HWND, UINT, WPARAM, LPARAM);
+
 // config.c
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam);
