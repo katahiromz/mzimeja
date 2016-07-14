@@ -393,7 +393,8 @@ BOOL ImePad::OnCreate(HWND hWnd) {
 
   ::SetWindowLongPtr(m_hTabCtrl, GWLP_USERDATA, (LONG_PTR)this);
   m_fnWndProcOld = (WNDPROC)
-    SetWindowLongPtr(m_hTabCtrl, GWLP_WNDPROC, (LONG_PTR)TabCtrlWndProc);
+    SetWindowLongPtr(m_hTabCtrl, GWLP_WNDPROC,
+                     (LONG_PTR)ImePad::TabCtrlWndProc);
 
   // initialize tab control
   TC_ITEM item;
