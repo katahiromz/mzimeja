@@ -95,8 +95,9 @@ MZIMEJA::MZIMEJA() {
 BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   FOOTMARK();
   m_hInst = hInstance;
+  ::InitCommonControls();
 
-  MakeMaps();
+  MakeLiteralMaps();
 
   // CreateSecurityAttributes() will create
   // the proper security attribute for IME.
@@ -497,12 +498,16 @@ void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
   }
 }
 
-VOID MZIMEJA::Uninit(VOID) {
-  FOOTMARK();
+void MZIMEJA::UnregisterClasses() {
   ::UnregisterClass(szUIServerClassName, m_hInst);
   ::UnregisterClass(szCompStrClassName, m_hInst);
   ::UnregisterClass(szCandClassName, m_hInst);
   ::UnregisterClass(szStatusClassName, m_hInst);
+}
+
+VOID MZIMEJA::Uninit(VOID) {
+  FOOTMARK();
+  UnregisterClasses();
   if (m_hMutex) {
     ::CloseHandle(m_hMutex);
     m_hMutex = NULL;

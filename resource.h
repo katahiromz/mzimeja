@@ -53,6 +53,8 @@
 #define IDM_PROPERTY 40013
 #define IDM_ADD_WORD 40015
 #define IDM_IME_PAD 40016
+#define IDM_STROKES 40017
+#define IDM_RADICALS 40018
 
 // Next default values for new objects
 //

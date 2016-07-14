@@ -187,7 +187,9 @@ BEGIN
     IDM_PROPERTY,                   "プロパティ"
     IDM_ABOUT,                      "バージョン情報"
     IDM_CANCEL,                     "キャンセル"
-    IDM_IME_PAD,                    "IME パッド"
+    IDM_IME_PAD,                    "IMEパッド"
+    IDM_STROKES,                    "総字画"
+    IDM_RADICALS,                   "部首"
 END
 
 /////////////////////////////////////////////////////////////////////////////

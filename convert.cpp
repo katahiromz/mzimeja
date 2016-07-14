@@ -23,7 +23,7 @@ static const wchar_t s_hiragana_table[][5] = {
   {L'Вс', 0, 0, 0, 0},
 };
 
-void MZIMEJA::MakeMaps() {
+void MZIMEJA::MakeLiteralMaps() {
   m_consonant_map.clear();
   m_vowel_map.clear();
   const size_t count = sizeof(s_hiragana_table) / sizeof(s_hiragana_table[0]);

@@ -10,6 +10,7 @@
 #ifndef _INC_WINDOWS
   #include <windows.h>      // Windows
 #endif
+#include <commctrl.h>       // for Windows Common Controls
 #include <tchar.h>          // for Windows generic text
 
 #include <string>           // for std::string, std::wstring, ...
@@ -152,6 +153,7 @@ struct UIEXTRA {
   UICHILD   uiDefComp;
   UICHILD2  uiComp[MAXCOMPWND];
   UICHILD   uiGuide;
+  HWND      hImePad;
 };
 
 // MZGUIDELINE
@@ -160,6 +162,21 @@ struct MZGUIDELINE {
   DWORD dwIndex;
   DWORD dwStrID;
   DWORD dwPrivateID;
+};
+
+struct KANJI_ENTRY {
+  WORD          kanji_id;
+  WCHAR         kanji_char;
+  WORD          radical_id2;
+  WORD          strokes;
+  std::wstring  readings;
+};
+
+struct RADICAL_ENTRY {
+  WORD          radical_id;
+  WORD          radical_id2;
+  WORD          strokes;
+  std::wstring  readings;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -224,7 +241,6 @@ LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
 
 // uipad.cpp
 HWND ImePad_Create(HWND hWnd, UIEXTRA *lpUIExtra);
-LRESULT CALLBACK ImePad_WindowProc(HWND, UINT, WPARAM, LPARAM);
 
 // config.c
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
@@ -374,8 +390,66 @@ const wchar_t g_table[][5] = {
 };
 
 //////////////////////////////////////////////////////////////////////////////
+// IME Pad
 
+class ImePad {
+public:
+  ImePad();
+  ~ImePad();
+
+  BOOL PrepareForKanji();
+  static BOOL Create(HWND hwndParent);
+  static LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
+  static LRESULT CALLBACK TabCtrlWndProc(HWND, UINT, WPARAM, LPARAM);
+
+protected:
+  HWND            m_hWnd;
+
+  // data
+  std::vector<KANJI_ENTRY>            m_kanji_table;
+  std::map<WORD, std::vector<WORD> >  m_kanji_stroke_map;
+  std::vector<RADICAL_ENTRY>          m_radical_table;
+  std::map<WORD, std::vector<WORD> >  m_radical_stroke_map;
+  std::map<WORD, WORD>                m_radical_id_map;
+  std::map<WORD, std::vector<WORD> >  m_radical2_to_kanji_map;
+  BOOL LoadKanjiData();
+  BOOL LoadRadicalData();
+  BOOL LoadKanjiAndRadical();
+
+  // UI
+  HWND            m_hTabCtrl;
+  HWND            m_hListView;
+  HWND            m_hListBox1;
+  HWND            m_hListBox2;
+  WNDPROC         m_fnWndProcOld;
+
+  // images
+  HIMAGELIST      m_himlKanji;
+  HIMAGELIST      m_himlRadical;
+  HBITMAP         m_hbmRadical;
+  BOOL LoadRadicalImage();
+  BOOL CreateKanjiImageList();
+  BOOL CreateRadicalImageList();
+  void DeleteAllImages();
+
+  // fonts
+  HFONT           m_hSmallFont;
+  HFONT           m_hNormalFont;
+  HFONT           m_hLargeFont;
+  BOOL CreateAllFonts();
+  void DeleteAllFonts();
+
+  BOOL OnCreate(HWND hWnd);
+  void OnSize(HWND hWnd);
+  void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
+  void OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam);
+  void OnDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDraw);
+  void OnEraseBkGnd(HWND hWnd);
+}; // class ImePad
+
+//////////////////////////////////////////////////////////////////////////////
 // The IME
+
 class MZIMEJA {
 public:
   HINSTANCE       m_hInst;
@@ -393,6 +467,7 @@ public:
 
   // register classes
   BOOL RegisterClasses(HINSTANCE hInstance);
+  void UnregisterClasses();
 
   // uninitialize
   VOID Uninit(VOID);
@@ -452,18 +527,22 @@ public:
 protected:
   HANDLE          m_hMutex;         // mutex
   HANDLE          m_hBaseData;      // file mapping
-  HIMC            m_hIMC;
-  InputContext *  m_lpIMC;
-  HANDLE          m_hBasicDictData; // file mapping
-  unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;
-  unboost::unordered_map<wchar_t,wchar_t>   m_consonant_map;
-
-  ImeBaseData *LockImeBaseData();
-  void UnlockImeBaseData(ImeBaseData *data);
-  void MakeMaps();
   BOOL LoadBasicDictFile(std::vector<DICT_ENTRY>& entries);
   BOOL DeployDictData(ImeBaseData *data, SECURITY_ATTRIBUTES *psa,
                       const std::vector<DICT_ENTRY>& entries);
+
+  // input context
+  HIMC            m_hIMC;
+  InputContext *  m_lpIMC;
+
+  HANDLE          m_hBasicDictData; // file mapping
+  ImeBaseData *LockImeBaseData();
+  void UnlockImeBaseData(ImeBaseData *data);
+
+  // literal map
+  unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;
+  unboost::unordered_map<wchar_t,wchar_t>   m_consonant_map;
+  void MakeLiteralMaps();
 }; // class MZIMEJA
 
 extern MZIMEJA TheIME;
