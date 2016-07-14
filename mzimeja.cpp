@@ -8,11 +8,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // the window classes for mzimeja UI windows
-const TCHAR szUIServerClassName[] = TEXT("MZIMEUI");
-const TCHAR szCompStrClassName[]  = TEXT("MZIMECompStr");
-const TCHAR szCandClassName[]     = TEXT("MZIMECand");
-const TCHAR szStatusClassName[]   = TEXT("MZIMEStatus");
-const TCHAR szGuideClassName[]    = TEXT("MZIMEGuide");
+const WCHAR szUIServerClassName[] = L"MZIMEUI";
+const WCHAR szCompStrClassName[]  = L"MZIMECompStr";
+const WCHAR szCandClassName[]     = L"MZIMECand";
+const WCHAR szStatusClassName[]   = L"MZIMEStatus";
+const WCHAR szGuideClassName[]    = L"MZIMEGuide";
+const WCHAR szImePadClassName[]   = L"MZIMEPad";
 
 const MZGUIDELINE glTable[] = {
   {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},
@@ -22,7 +23,7 @@ const MZGUIDELINE glTable[] = {
 };
 
 // filename of the IME
-const TCHAR szImeFileName[] = TEXT("mzimeja.ime");
+const WCHAR szImeFileName[] = L"mzimeja.ime";
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -318,7 +319,6 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.hIcon = NULL;
   wcx.lpszMenuName = NULL;
   wcx.lpszClassName = szStatusClassName;
-  wcx.hbrBackground = NULL;
   wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
   wcx.hIconSm = NULL;
   if (!RegisterClassEx(&wcx)) return FALSE;
@@ -334,7 +334,21 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.hIcon = NULL;
   wcx.lpszMenuName = NULL;
   wcx.lpszClassName = szGuideClassName;
-  wcx.hbrBackground = NULL;
+  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+  wcx.hIconSm = NULL;
+  if (!RegisterClassEx(&wcx)) return FALSE;
+
+  // register class of IME Pad window.
+  wcx.cbSize = sizeof(WNDCLASSEX);
+  wcx.style = CS_MZIME;
+  wcx.lpfnWndProc = ImePad::WindowProc;
+  wcx.cbClsExtra = 0;
+  wcx.cbWndExtra = UIEXTRASIZE;
+  wcx.hInstance = hInstance;
+  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcx.hIcon = NULL;
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = szImePadClassName;
   wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
   wcx.hIconSm = NULL;
   if (!RegisterClassEx(&wcx)) return FALSE;

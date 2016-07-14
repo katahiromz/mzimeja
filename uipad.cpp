@@ -119,7 +119,7 @@ ImePad::TabCtrlWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
                   WS_SYSMENU | WS_SIZEBOX | WS_ACTIVECAPTION;
     DWORD exstyle = WS_EX_WINDOWEDGE | WS_EX_TOOLWINDOW;
     hImePad = ::CreateWindowEx(
-      exstyle, TEXT("IME Pad"), TheIME.LoadSTR(IDM_IME_PAD),
+      exstyle, szImePadClassName, TheIME.LoadSTR(IDM_IME_PAD),
       style, rc.left, rc.top, 200, 200,
       hwndParent, NULL, TheIME.m_hInst, NULL);
     lpUIExtra->hImePad = hImePad;

@@ -182,11 +182,12 @@ struct RADICAL_ENTRY {
 //////////////////////////////////////////////////////////////////////////////
 // externs
 
-extern const TCHAR szUIServerClassName[];
-extern const TCHAR szCompStrClassName[];
-extern const TCHAR szCandClassName[];
-extern const TCHAR szStatusClassName[];
-extern const TCHAR szGuideClassName[];
+extern const WCHAR szUIServerClassName[];
+extern const WCHAR szCompStrClassName[];
+extern const WCHAR szCandClassName[];
+extern const WCHAR szStatusClassName[];
+extern const WCHAR szGuideClassName[];
+extern const WCHAR szImePadClassName[];
 extern const MZGUIDELINE glTable[];
 
 //////////////////////////////////////////////////////////////////////////////
