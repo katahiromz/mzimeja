@@ -486,9 +486,11 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
   case IMN_PRIVATE:
     DebugPrintA("IMN_PRIVATE\n");
+    UnlockUIExtra(hWnd);
     if (HIWORD(lParam) == 0xFACE) {
-      // TODO: IME Pad
+      ret = ImePad::Create(hWnd);
     }
+    lpUIExtra = LockUIExtra(hWnd);
     break;
 
   default:

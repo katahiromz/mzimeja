@@ -481,6 +481,7 @@ BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
   case IDM_ADD_WORD:
     break;
   case IDM_IME_PAD:
+    GenerateMessage(WM_IME_NOTIFY, IMN_PRIVATE, MAKELPARAM(0, 0xFACE));
     break;
   default:
     return FALSE;
