@@ -1,13 +1,8 @@
 // imepad.cpp --- mzimeja IME Pad UI
 //////////////////////////////////////////////////////////////////////////////
 
-#define _CRT_SECURE_NO_WARNINGS
-
-// Windows 2000
-#define WINVER          0x0500
-#define _WIN32_WINNT    0x0500
-#define _WIN32_IE       0x0500
-#define NTDDI_VERSION   0x05000000
+#define _CRT_SECURE_NO_WARNINGS   // use fopen
+#include "targetver.h"      // target Windows version
 
 #include <windows.h>
 #include <commctrl.h>

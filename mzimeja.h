@@ -5,7 +5,9 @@
 #ifndef MZIMEJA_H_
 #define MZIMEJA_H_
 
-#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS   // use fopen
+
+#include "targetver.h"      // target Windows version
 
 #ifndef _INC_WINDOWS
   #include <windows.h>      // Windows
@@ -27,7 +29,6 @@
 
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development
-#include "immsec.h"         // for IMM security
 #include "input.h"          // for INPUT_MODE and InputContext
 
 #define UNBOOST_USE_STRING_ALGORITHM
@@ -236,6 +237,11 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam);
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam);
+
+// immsec.cpp
+SECURITY_ATTRIBUTES *CreateSecurityAttributes(void);
+void FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa);
+BOOL IsNT(void);
 
 // mzimeja.cpp
 void      RepositionWindow(HWND hWnd);

@@ -1,9 +1,7 @@
 // immsec.cpp --- IMM security related
 //////////////////////////////////////////////////////////////////////////////
 
-#include <windows.h>
 #include "mzimeja.h"
-#include "immsec.h"
 
 #define MEMALLOC(x) LocalAlloc(LMEM_FIXED, x)
 #define MEMFREE(x) LocalFree(x)
@@ -178,7 +176,7 @@ SECURITY_ATTRIBUTES *CreateSecurityAttributes(void) {
 // The purpose of this function:
 //      Frees the memory objects allocated by previous
 //      CreateSecurityAttributes() call.
-VOID FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa) {
+void FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa) {
   if (psa == NULL) return;
 
   BOOL fResult;
@@ -206,7 +204,7 @@ VOID FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa) {
 //      The implementation of this function is not multi-thread safe.
 //      You need to modify the function if you call the function in
 //      multi-thread environment.
-BOOL IsNT(VOID) {
+BOOL IsNT(void) {
   return GetVersionInfo()->dwPlatformId == VER_PLATFORM_WIN32_NT;
 }
 

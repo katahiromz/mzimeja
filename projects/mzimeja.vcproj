@@ -277,6 +277,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\targetver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\unboost.hpp"
 				>
 			</File>
