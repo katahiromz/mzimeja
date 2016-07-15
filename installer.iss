@@ -31,11 +31,13 @@ Source: "res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "projects\Debug\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
 Source: "projects\Debug\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "projects\Debug\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\READMEJP.txt"; Filename: "{app}\READMEJP.txt"
 Name: "{group}\LICENSE.txt"; Filename: "{app}\LICENSE.txt"
+Name: "{group}\MZ-IMEパッド"; Filename: "{app}\imepad.exe"
 Name: "{group}\アンインストール"; Filename: "{uninstallexe}"
 
 [Run]
@@ -43,4 +45,3 @@ Filename: "{app}\setup.exe"; Parameters: "/i"
 
 [UninstallRun]
 Filename: "{app}\setup.exe"; Parameters: "/u"
-

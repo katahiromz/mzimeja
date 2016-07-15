@@ -13,7 +13,6 @@ const WCHAR szCompStrClassName[]  = L"MZIMECompStr";
 const WCHAR szCandClassName[]     = L"MZIMECand";
 const WCHAR szStatusClassName[]   = L"MZIMEStatus";
 const WCHAR szGuideClassName[]    = L"MZIMEGuide";
-const WCHAR szImePadClassName[]   = L"MZIMEPad";
 
 const MZGUIDELINE glTable[] = {
   {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},
@@ -147,7 +146,7 @@ void MZIMEJA::UnlockImeBaseData(ImeBaseData *data) {
 //////////////////////////////////////////////////////////////////////////////
 
 static const WCHAR s_szRegKey[] = 
-  L"SOFTWARE\\Katayama Hirofumi MZ\\mzimaja";
+  L"SOFTWARE\\Katayama Hirofumi MZ\\mzimeja";
 
 std::wstring MZIMEJA::GetSettingString(LPCWSTR pszSettingName) const {
   HKEY hKey;
@@ -334,21 +333,6 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
   wcx.hIcon = NULL;
   wcx.lpszMenuName = NULL;
   wcx.lpszClassName = szGuideClassName;
-  wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
-  wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
-
-  // register class of IME Pad window.
-  wcx.cbSize = sizeof(WNDCLASSEX);
-  wcx.style = CS_MZIME;
-  wcx.lpfnWndProc = ImePad::WindowProc;
-  wcx.cbClsExtra = 0;
-  wcx.cbWndExtra = UIEXTRASIZE;
-  wcx.hInstance = hInstance;
-  wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wcx.hIcon = NULL;
-  wcx.lpszMenuName = NULL;
-  wcx.lpszClassName = szImePadClassName;
   wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
   wcx.hIconSm = NULL;
   if (!RegisterClassEx(&wcx)) return FALSE;

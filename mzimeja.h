@@ -19,6 +19,7 @@
 #include <map>              // for std::map
 #include <algorithm>        // for std::sort
 
+#include <cstdlib>          // for C standard library
 #include <cstdio>           // for C standard I/O
 #include <cctype>           // for C character types
 #include <cassert>          // for assert
@@ -164,21 +165,6 @@ struct MZGUIDELINE {
   DWORD dwPrivateID;
 };
 
-struct KANJI_ENTRY {
-  WORD          kanji_id;
-  WCHAR         kanji_char;
-  WORD          radical_id2;
-  WORD          strokes;
-  std::wstring  readings;
-};
-
-struct RADICAL_ENTRY {
-  WORD          radical_id;
-  WORD          radical_id2;
-  WORD          strokes;
-  std::wstring  readings;
-};
-
 //////////////////////////////////////////////////////////////////////////////
 // externs
 
@@ -187,7 +173,6 @@ extern const WCHAR szCompStrClassName[];
 extern const WCHAR szCandClassName[];
 extern const WCHAR szStatusClassName[];
 extern const WCHAR szGuideClassName[];
-extern const WCHAR szImePadClassName[];
 extern const MZGUIDELINE glTable[];
 
 //////////////////////////////////////////////////////////////////////////////
@@ -239,9 +224,6 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt, DWORD dwPushedGuide);
 void GuideWnd_Button(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void GuideWnd_Update(UIEXTRA *lpUIExtra);
 LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
-
-// uipad.cpp
-HWND ImePad_Create(HWND hWnd, UIEXTRA *lpUIExtra);
 
 // config.c
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
@@ -389,64 +371,6 @@ const wchar_t g_table[][5] = {
   {L'‚í', 0, 0, 0, L'‚ð'},
   {L'‚ñ', 0, 0, 0, 0},
 };
-
-//////////////////////////////////////////////////////////////////////////////
-// IME Pad
-
-class ImePad {
-public:
-  ImePad();
-  ~ImePad();
-
-  BOOL PrepareForKanji();
-  static BOOL Create(HWND hwndParent);
-  static LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-  static LRESULT CALLBACK TabCtrlWndProc(HWND, UINT, WPARAM, LPARAM);
-
-protected:
-  HWND            m_hWnd;
-
-  // data
-  std::vector<KANJI_ENTRY>            m_kanji_table;
-  std::map<WORD, std::vector<WORD> >  m_kanji_stroke_map;
-  std::vector<RADICAL_ENTRY>          m_radical_table;
-  std::map<WORD, std::vector<WORD> >  m_radical_stroke_map;
-  std::map<WORD, WORD>                m_radical_id_map;
-  std::map<WORD, std::vector<WORD> >  m_radical2_to_kanji_map;
-  BOOL LoadKanjiData();
-  BOOL LoadRadicalData();
-  BOOL LoadKanjiAndRadical();
-
-  // UI
-  HWND            m_hTabCtrl;
-  HWND            m_hListView;
-  HWND            m_hListBox1;
-  HWND            m_hListBox2;
-  WNDPROC         m_fnWndProcOld;
-
-  // images
-  HIMAGELIST      m_himlKanji;
-  HIMAGELIST      m_himlRadical;
-  HBITMAP         m_hbmRadical;
-  BOOL LoadRadicalImage();
-  BOOL CreateKanjiImageList();
-  BOOL CreateRadicalImageList();
-  void DeleteAllImages();
-
-  // fonts
-  HFONT           m_hSmallFont;
-  HFONT           m_hNormalFont;
-  HFONT           m_hLargeFont;
-  BOOL CreateAllFonts();
-  void DeleteAllFonts();
-
-  BOOL OnCreate(HWND hWnd);
-  void OnSize(HWND hWnd);
-  void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
-  void OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam);
-  void OnDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDraw);
-  void OnEraseBkGnd(HWND hWnd);
-}; // class ImePad
 
 //////////////////////////////////////////////////////////////////////////////
 // The IME

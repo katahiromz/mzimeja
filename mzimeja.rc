@@ -3,6 +3,7 @@
 
 #define APSTUDIO_READONLY_SYMBOLS
 #include <windows.h>
+#include <dlgs.h>
 #include "resource.h"
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -32,7 +33,6 @@ MODE4ICON               ICON    DISCARDABLE     "res\\mode4.ico"
 
 CLOSEBMP                BITMAP  DISCARDABLE     "res\\close.bmp"
 MODESBMP                BITMAP  DISCARDABLE     "res\\modes-large.bmp"
-RADICALBMP              BITMAP  DISCARDABLE     "res\\radical.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 // Dialog
@@ -187,9 +187,7 @@ BEGIN
     IDM_PROPERTY,                   "プロパティ"
     IDM_ABOUT,                      "バージョン情報"
     IDM_CANCEL,                     "キャンセル"
-    IDM_IME_PAD,                    "IMEパッド"
-    IDM_STROKES,                    "総字画"
-    IDM_RADICALS,                   "部首"
+    IDM_IME_PAD,                    "MZ-IMEパッド"
 END
 
 /////////////////////////////////////////////////////////////////////////////

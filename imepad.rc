@@ -1,0 +1,56 @@
+// setup.rc --- resource of MZ-IME Japanese Input Setup
+/////////////////////////////////////////////////////////////////////////////
+
+#define APSTUDIO_READONLY_SYMBOLS
+#include <windows.h>
+#include <dlgs.h>
+#include "resource.h"
+#undef APSTUDIO_READONLY_SYMBOLS
+
+// UTF-8
+#pragma code_page(65001)
+
+/////////////////////////////////////////////////////////////////////////////
+// Bitmap
+
+RADICALBMP              BITMAP  DISCARDABLE     "res\\radical.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+// Strings
+
+STRINGTABLE 
+BEGIN
+    IDM_IME_PAD,                "MZ-IMEパッド"
+    IDM_STROKES,                "総字画"
+    IDM_RADICALS,               "部首"
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// Version Info
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     0, 3, 0, 0
+PRODUCTVERSION  0, 3, 0, 0
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+BEGIN
+    // Japanese
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041103A4"
+        BEGIN
+            VALUE "CompanyName", "片山博文MZ\0"
+            VALUE "FileDescription", "MZ-IME日本語入力 IMEパッド\0"
+            VALUE "FileVersion", "0.3\0"
+            VALUE "LegalCopyright", "Copyright (C) 2016 片山博文MZ.\0"
+            VALUE "ProductName", "MZ-IME日本語入力\0"
+            VALUE "ProductVersion", "0.3\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0411, 0x03A4
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////

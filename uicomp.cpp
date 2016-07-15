@@ -586,7 +586,7 @@ void CompWnd_Hide(UIEXTRA *lpUIExtra) {
 
   RECT rc;
   HWND hwndDef = lpUIExtra->uiDefComp.hWnd;
-  if (IsWindow(hwndDef)) {
+  if (::IsWindow(hwndDef)) {
     if (!lpUIExtra->dwCompStyle) {
       ::GetWindowRect(hwndDef, &rc);
     }

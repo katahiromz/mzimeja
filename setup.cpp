@@ -43,7 +43,14 @@ LPWSTR GetKanjiDataPathName(LPWSTR pszPath) {
 LPWSTR GetRadicalDataPathName(LPWSTR pszPath) {
   GetModuleFileName(NULL, pszPath, MAX_PATH);
   LPWSTR pch = wcsrchr(pszPath, L'\\');
-  lstrcpyW(pch, L"\\res\\kanji.dat");
+  lstrcpyW(pch, L"\\res\\radical.dat");
+  return pszPath;
+}
+
+LPWSTR GetImePadPathName(LPWSTR pszPath) {
+  GetModuleFileName(NULL, pszPath, MAX_PATH);
+  LPWSTR pch = wcsrchr(pszPath, L'\\');
+  lstrcpyW(pch, L"\\imepad.exe");
   return pszPath;
 }
 
@@ -133,14 +140,17 @@ INT DoSetRegistry2(VOID) {
         TCHAR szDictPath[MAX_PATH];
         TCHAR szKanjiPath[MAX_PATH];
         TCHAR szRadicalPath[MAX_PATH];
+        TCHAR szImePadPath[MAX_PATH];
 
         GetDictPathName(szDictPath);
         GetKanjiDataPathName(szKanjiPath);
         GetRadicalDataPathName(szRadicalPath);
+        GetImePadPathName(szImePadPath);
 
         if (DoSetRegSz(hkSoftware, L"basic dictionary file", szDictPath) &&
           DoSetRegSz(hkSoftware, L"kanji data file", szKanjiPath) &&
-          DoSetRegSz(hkSoftware, L"radical data file", szRadicalPath))
+          DoSetRegSz(hkSoftware, L"radical data file", szRadicalPath) &&
+          DoSetRegSz(hkSoftware, L"imepad file", szImePadPath))
         {
           ret = TRUE;
         }

@@ -486,11 +486,11 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
   case IMN_PRIVATE:
     DebugPrintA("IMN_PRIVATE\n");
-    UnlockUIExtra(hWnd);
     if (HIWORD(lParam) == 0xFACE) {
-      ret = ImePad::Create(hWnd);
+      std::wstring imepad_file = TheIME.GetSettingString(L"imepad file");
+      ::ShellExecuteW(NULL, NULL, imepad_file.c_str(),
+                      NULL, NULL, SW_SHOWNOACTIVATE);
     }
-    lpUIExtra = LockUIExtra(hWnd);
     break;
 
   default:

@@ -39,7 +39,6 @@ OBJS = \
 	uicand$(DOTOBJ) \
 	uicomp$(DOTOBJ) \
 	uiguide$(DOTOBJ) \
-	uipad$(DOTOBJ) \
 	uistate$(DOTOBJ) \
 	mzimeja_res$(DOTOBJ) \
 
@@ -61,15 +60,29 @@ SETUP_LIBS = \
 
 SETUP_FILE = setup.exe
 
+IMEPAD_OBJS = imepad$(DOTOBJ) imepad_res$(DOTOBJ)
+IMEPAD_LIBS = \
+	-lkernel32 \
+	-luser32 \
+	-lgdi32 \
+	-ladvapi32 \
+	-lcomctl32 \
+	-limm32 \
+
+IMEPAD_FILE = imepad.exe
+
 #############################################################################
 
-all: $(IME_FILE) $(SETUP_FILE)
+all: $(IME_FILE) $(SETUP_FILE) $(IMEPAD_FILE)
 
 $(IME_FILE): $(OBJS)
 	$(CXX) -mdll -o $(IME_FILE) $(CXXFLAGS) $(OBJS) $(LIBS) mzimeja.def
 
 $(SETUP_FILE): $(SETUP_OBJS)
 	$(CXX) -mwindows -o $(SETUP_FILE) $(CXXFLAGS) $(SETUP_OBJS) $(SETUP_LIBS)
+
+$(IMEPAD_FILE): $(IMEPAD_OBJS)
+	$(CXX) -mwindows -o $(IMEPAD_FILE) $(CXXFLAGS) $(IMEPAD_OBJS) $(IMEPAD_LIBS)
 
 cand_info$(DOTOBJ): cand_info.cpp
 	$(CXX) -c $(CXXFLAGS) -o cand_info$(DOTOBJ) cand_info.cpp
@@ -101,8 +114,6 @@ uicomp$(DOTOBJ): uicomp.cpp
 	$(CXX) -c $(CXXFLAGS) -o uicomp$(DOTOBJ) uicomp.cpp
 uiguide$(DOTOBJ): uiguide.cpp
 	$(CXX) -c $(CXXFLAGS) -o uiguide$(DOTOBJ) uiguide.cpp
-uipad$(DOTOBJ): uipad.cpp
-	$(CXX) -c $(CXXFLAGS) -o uipad$(DOTOBJ) uipad.cpp
 uistate$(DOTOBJ): uistate.cpp
 	$(CXX) -c $(CXXFLAGS) -o uistate$(DOTOBJ) uistate.cpp
 
@@ -111,9 +122,13 @@ mzimeja_res$(DOTOBJ): mzimeja.rc
 
 setup$(DOTOBJ): setup.cpp
 	$(CXX) -c $(CXXFLAGS) -o setup$(DOTOBJ) setup.cpp
-
 setup_res$(DOTOBJ): setup.rc
 	$(RC) $(RCFLAGS) -i setup.rc -o setup_res$(DOTOBJ)
+
+imepad$(DOTOBJ): imepad.cpp
+	$(CXX) -c $(CXXFLAGS) -o imepad$(DOTOBJ) imepad.cpp
+imepad_res$(DOTOBJ): imepad.rc
+	$(RC) $(RCFLAGS) -i imepad.rc -o imepad_res$(DOTOBJ)
 
 clean:
 	rm -f *$(DOTOBJ)
