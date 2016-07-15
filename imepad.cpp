@@ -680,6 +680,8 @@ void ImePad::OnSize(HWND hWnd) {
 }
 
 void ImePad::OnLV1StrokesChanged(HWND hWnd) {
+  ::SendMessage(m_hListView, WM_HSCROLL, MAKEWPARAM(SB_LEFT, 0), 0);
+  ::SendMessage(m_hListView, WM_VSCROLL, MAKEWPARAM(SB_TOP, 0), 0);
   ListView_DeleteAllItems(m_hListView);
 
   INT i = SendMessage(m_hListBox1, LB_GETCURSEL, 0, 0);
@@ -710,6 +712,8 @@ void ImePad::OnLV1StrokesChanged(HWND hWnd) {
 }
 
 void ImePad::OnLV2StrokesChanged(HWND hWnd) {
+  ::SendMessage(m_hListView, WM_HSCROLL, MAKEWPARAM(SB_LEFT, 0), 0);
+  ::SendMessage(m_hListView, WM_VSCROLL, MAKEWPARAM(SB_TOP, 0), 0);
   ListView_DeleteAllItems(m_hListView);
 
   INT i = SendMessage(m_hListBox2, LB_GETCURSEL, 0, 0);
