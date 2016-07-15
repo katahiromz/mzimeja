@@ -102,12 +102,13 @@ INT DoSetRegistry1(VOID) {
   HKEY hKey;
   LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
     L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts",
-    0, KEY_WRITE, &hKey);
+    0, KEY_WRITE | KEY_WOW64_64KEY, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
     HKEY hkLayouts;
     DWORD dwDisposition;
     result = RegCreateKeyExW(hKey, L"E0120411", 0, NULL, 0,
-                             KEY_WRITE, NULL, &hkLayouts, &dwDisposition);
+                             KEY_WRITE | KEY_WOW64_64KEY,
+                             NULL, &hkLayouts, &dwDisposition);
     if (result == ERROR_SUCCESS && hkLayouts) {
       if (DoSetRegSz(hkLayouts, L"layout file", L"kbdjp.kbd") &&
         DoSetRegSz(hkLayouts, L"layout text", DoLoadString(4)) &&
@@ -126,16 +127,19 @@ INT DoSetRegistry1(VOID) {
 INT DoSetRegistry2(VOID) {
   BOOL ret = FALSE;
   HKEY hKey;
-  LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE", 0, KEY_WRITE, &hKey);
+  LONG result = RegOpenKeyExW(
+    HKEY_LOCAL_MACHINE, L"SOFTWARE", 0, KEY_WRITE | KEY_WOW64_64KEY, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
     HKEY hkCompany;
     DWORD dwDisposition;
     result = RegCreateKeyExW(hKey, L"Katayama Hirofumi MZ", 0, NULL, 0,
-                             KEY_WRITE, NULL, &hkCompany, &dwDisposition);
+                             KEY_WRITE | KEY_WOW64_64KEY, NULL,
+                             &hkCompany, &dwDisposition);
     if (result == ERROR_SUCCESS && hkCompany) {
       HKEY hkSoftware;
       result = RegCreateKeyExW(hkCompany, L"mzimeja", 0, NULL, 0,
-                               KEY_WRITE, NULL, &hkSoftware, &dwDisposition);
+                               KEY_WRITE | KEY_WOW64_64KEY, NULL,
+                               &hkSoftware, &dwDisposition);
       if (result == ERROR_SUCCESS && hkSoftware) {
         TCHAR szDictPath[MAX_PATH];
         TCHAR szKanjiPath[MAX_PATH];
@@ -231,7 +235,7 @@ INT DoUnsetRegistry1(VOID) {
   HKEY hKey;
   LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
     L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts",
-    0, KEY_ALL_ACCESS, &hKey);
+    0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
     result = MyDeleteRegKey(hKey, L"E0120411");
     if (result == ERROR_SUCCESS) {
@@ -247,7 +251,7 @@ INT DoUnsetRegistry2(VOID) {
   HKEY hKey;
   LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
     L"SOFTWARE\\Katayama Hirofumi MZ",
-    0, KEY_ALL_ACCESS, &hKey);
+    0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
     result = MyDeleteRegKey(hKey, L"mzimeja");
     if (result == ERROR_SUCCESS) {
