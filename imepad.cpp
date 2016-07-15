@@ -144,6 +144,10 @@ static std::wstring GetSettingString(LPCWSTR pszSettingName) {
   WCHAR szValue[MAX_PATH * 2];
   result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szRegKey,
                            0, KEY_READ | KEY_WOW64_64KEY, &hKey);
+  if (result != ERROR_SUCCESS) {
+    result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szRegKey,
+                             0, KEY_READ, &hKey);
+  }
   if (result == ERROR_SUCCESS && hKey) {
     DWORD cbData = sizeof(szValue);
     result = ::RegQueryValueExW(hKey, pszSettingName, NULL, NULL, 
@@ -448,6 +452,7 @@ BOOL ImePad::CreateAllFonts() {
   ZeroMemory(&lf, sizeof(lf));
   lf.lfHeight = 28;
   lf.lfCharSet = SHIFTJIS_CHARSET;
+  lf.lfQuality = ANTIALIASED_QUALITY;
   lf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
 
   lf.lfHeight = 10;
@@ -821,6 +826,9 @@ void ImePad::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam) {
   case NM_DBLCLK:
     if (pnmhdr->hwndFrom == m_hListView) {
       INT iItem = ListView_GetNextItem(m_hListView, -1, LVNI_ALL | LVNI_SELECTED);
+      if (iItem == -1) {
+        break;
+      }
       LV_ITEM item;
       ZeroMemory(&item, sizeof(item));
       item.mask = LVIF_IMAGE;

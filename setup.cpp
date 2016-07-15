@@ -99,18 +99,29 @@ BOOL DoSetRegSz(HKEY hKey, const WCHAR *pszName, const WCHAR *pszValue) {
   return result == ERROR_SUCCESS;
 }
 
+static const WCHAR s_szKeyboardLayouts[] = 
+  L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts";
+
 INT DoSetRegistry1(VOID) {
   BOOL ret = FALSE;
   HKEY hKey;
-  LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
-    L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts",
+  LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szKeyboardLayouts,
     0, KEY_WRITE | KEY_WOW64_64KEY, &hKey);
+  if (result != ERROR_SUCCESS) {
+    result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szKeyboardLayouts,
+      0, KEY_WRITE, &hKey);
+  }
   if (result == ERROR_SUCCESS && hKey) {
     HKEY hkLayouts;
     DWORD dwDisposition;
     result = RegCreateKeyExW(hKey, L"E0120411", 0, NULL, 0,
                              KEY_WRITE | KEY_WOW64_64KEY,
                              NULL, &hkLayouts, &dwDisposition);
+    if (result != ERROR_SUCCESS) {
+      result = RegCreateKeyExW(hKey, L"E0120411", 0, NULL, 0,
+                               KEY_WRITE,
+                               NULL, &hkLayouts, &dwDisposition);
+    }
     if (result == ERROR_SUCCESS && hkLayouts) {
       if (DoSetRegSz(hkLayouts, L"layout file", L"kbdjp.kbd") &&
         DoSetRegSz(hkLayouts, L"layout text", DoLoadString(4)) &&
@@ -131,17 +142,29 @@ INT DoSetRegistry2(VOID) {
   HKEY hKey;
   LONG result = RegOpenKeyExW(
     HKEY_LOCAL_MACHINE, L"SOFTWARE", 0, KEY_WRITE | KEY_WOW64_64KEY, &hKey);
+  if (result != ERROR_SUCCESS) {
+    result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE", 0,
+      KEY_WRITE, &hKey);
+  }
   if (result == ERROR_SUCCESS && hKey) {
     HKEY hkCompany;
     DWORD dwDisposition;
     result = RegCreateKeyExW(hKey, L"Katayama Hirofumi MZ", 0, NULL, 0,
                              KEY_WRITE | KEY_WOW64_64KEY, NULL,
                              &hkCompany, &dwDisposition);
+    if (result != ERROR_SUCCESS) {
+      result = RegCreateKeyExW(hKey, L"Katayama Hirofumi MZ", 0, NULL, 0,
+                               KEY_WRITE, NULL, &hkCompany, &dwDisposition);
+    }
     if (result == ERROR_SUCCESS && hkCompany) {
       HKEY hkSoftware;
       result = RegCreateKeyExW(hkCompany, L"mzimeja", 0, NULL, 0,
                                KEY_WRITE | KEY_WOW64_64KEY, NULL,
                                &hkSoftware, &dwDisposition);
+      if (result != ERROR_SUCCESS) {
+        result = RegCreateKeyExW(hkCompany, L"mzimeja", 0, NULL, 0,
+                                 KEY_WRITE, NULL, &hkSoftware, &dwDisposition);
+      }
       if (result == ERROR_SUCCESS && hkSoftware) {
         TCHAR szDictPath[MAX_PATH];
         TCHAR szKanjiPath[MAX_PATH];
@@ -179,7 +202,11 @@ LONG MyDeleteRegKey(HKEY hKey, LPCTSTR pszSubKey)
 
     if (pszSubKey != NULL)
     {
-        ret = RegOpenKeyEx(hKey, pszSubKey, 0, KEY_READ, &hSubKey);
+        ret = RegOpenKeyEx(hKey, pszSubKey, 0,
+          KEY_READ | KEY_WOW64_64KEY, &hSubKey);
+        if (ret != ERROR_SUCCESS) {
+          ret = RegOpenKeyEx(hKey, pszSubKey, 0, KEY_READ, &hSubKey);
+        }
         if (ret) return ret;
     }
 
@@ -226,7 +253,7 @@ LONG MyDeleteRegKey(HKEY hKey, LPCTSTR pszSubKey)
 
 cleanup:
     if (pszName != szNameBuf)
-        HeapFree( GetProcessHeap(), 0, pszName);
+        HeapFree(GetProcessHeap(), 0, pszName);
     if (pszSubKey != NULL)
         RegCloseKey(hSubKey);
     return ret;
@@ -235,9 +262,12 @@ cleanup:
 INT DoUnsetRegistry1(VOID) {
   BOOL ret = FALSE;
   HKEY hKey;
-  LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
-    L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts",
-    0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
+  LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+    s_szKeyboardLayouts, 0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
+  if (result != ERROR_SUCCESS) {
+    result = RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+        s_szKeyboardLayouts, 0, KEY_ALL_ACCESS, &hKey);
+  }
   if (result == ERROR_SUCCESS && hKey) {
     result = MyDeleteRegKey(hKey, L"E0120411");
     if (result == ERROR_SUCCESS) {
@@ -248,12 +278,18 @@ INT DoUnsetRegistry1(VOID) {
   return (ret ? 0 : -1);
 } // DoUnsetRegistry1
 
+static const WCHAR s_sz_katahiromz[] = 
+  L"SOFTWARE\\Katayama Hirofumi MZ";
+
 INT DoUnsetRegistry2(VOID) {
   BOOL ret = FALSE;
   HKEY hKey;
   LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
-    L"SOFTWARE\\Katayama Hirofumi MZ",
-    0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
+    s_sz_katahiromz, 0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
+  if (result != ERROR_SUCCESS) {
+    result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
+      s_sz_katahiromz, 0, KEY_ALL_ACCESS, &hKey);
+  }
   if (result == ERROR_SUCCESS && hKey) {
     result = MyDeleteRegKey(hKey, L"mzimeja");
     if (result == ERROR_SUCCESS) {
@@ -267,9 +303,14 @@ INT DoUnsetRegistry2(VOID) {
 //////////////////////////////////////////////////////////////////////////////
 
 INT DoInstall(VOID) {
-  if (0 != DoSetRegistry1() || 0 != DoSetRegistry2()) {
+  if (0 != DoSetRegistry1()) {
     // failure
     ::MessageBoxW(NULL, DoLoadString(2), NULL, MB_ICONERROR);
+    return 2;
+  }
+  if (0 != DoSetRegistry2()) {
+    // failure
+    ::MessageBoxW(NULL, DoLoadString(8), NULL, MB_ICONERROR);
     return 2;
   }
 
