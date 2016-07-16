@@ -6,7 +6,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{2FCD745D-F3C2-4115-B537-D6AE6E066B82}
 AppName=MZ-IME日本語入力
-AppVerName=MZ-IME日本語入力 0.3
+AppVerName=MZ-IME日本語入力 0.4
 AppPublisher=片山博文MZ
 AppPublisherURL=http://katahiromz.web.fc2.com/
 AppSupportURL=http://katahiromz.web.fc2.com/
@@ -14,11 +14,11 @@ AppUpdatesURL=http://katahiromz.web.fc2.com/
 DefaultDirName={pf}\mzimeja
 DefaultGroupName=MZ-IME日本語入力
 OutputDir=.
-OutputBaseFilename=mzimeja-0.3-setup
+OutputBaseFilename=mzimeja-0.4-setup
 Compression=lzma
 SolidCompression=yes
-VersionInfoVersion=0.3
-VersionInfoTextVersion=0.3
+VersionInfoVersion=0.4
+VersionInfoTextVersion=0.4
 
 [Languages]
 Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
