@@ -470,7 +470,7 @@ BOOL ImePad::CreateAllFonts() {
 
 BOOL ImePad::LoadRadicalImage() {
   if (m_hbmRadical == NULL) {
-    m_hbmRadical = LoadBitmapDx(L"RADICALBMP");
+    m_hbmRadical = LoadBitmapDx(1);
   }
   assert(m_hbmRadical);
   return m_hbmRadical != NULL;
