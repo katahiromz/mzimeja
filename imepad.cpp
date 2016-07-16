@@ -927,7 +927,7 @@ wWinMain(
   wcx.cbClsExtra = 0;
   wcx.cbWndExtra = 0;
   wcx.hInstance = hInstance;
-  wcx.hIcon = NULL;
+  wcx.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(1));
   wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
   wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
   wcx.lpszMenuName = NULL;
