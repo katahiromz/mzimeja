@@ -409,6 +409,12 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
 
   // add a character
   comp.AssertValid();
+  if ((Conversion() & IME_CMODE_JAPANESE) && !::IsCharAlphaW(chTyped)) {
+    if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
+      comp.AddChar(L'n', L'n', Conversion());
+    }
+  }
+  comp.AssertValid();
   comp.AddChar(chTyped, chTranslated, Conversion());
   comp.AssertValid();
 
