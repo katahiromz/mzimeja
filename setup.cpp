@@ -57,6 +57,32 @@ LPWSTR GetImePadPathName(LPWSTR pszPath) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// registry
+
+LONG OpenRegKey(HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) {
+  LONG result;
+  REGSAM sam = (bWrite ? KEY_WRITE : KEY_READ);
+  result = ::RegOpenKeyExW(hKey, pszSubKey, 0, sam | KEY_WOW64_64KEY, phSubKey);
+  if (result != ERROR_SUCCESS) {
+    result = ::RegOpenKeyExW(hKey, pszSubKey, 0, sam, phSubKey);
+  }
+  return result;
+} // OpenRegKey
+
+LONG CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey) {
+  LONG result;
+  DWORD dwDisposition;
+  const REGSAM sam = KEY_WRITE;
+  result = ::RegCreateKeyExW(hKey, pszSubKey, 0, NULL, 0, sam |
+                             KEY_WOW64_64KEY, NULL, phSubKey, &dwDisposition);
+  if (result != ERROR_SUCCESS) {
+    result = ::RegCreateKeyExW(hKey, pszSubKey, 0, NULL, 0, sam, NULL,
+                               phSubKey, &dwDisposition);
+  }
+  return result;
+} // CreateRegKey
+
+//////////////////////////////////////////////////////////////////////////////
 
 LPCTSTR DoLoadString(INT nID) {
   static WCHAR s_szBuf[1024];
@@ -105,23 +131,10 @@ static const WCHAR s_szKeyboardLayouts[] =
 INT DoSetRegistry1(VOID) {
   BOOL ret = FALSE;
   HKEY hKey;
-  LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szKeyboardLayouts,
-    0, KEY_WRITE | KEY_WOW64_64KEY, &hKey);
-  if (result != ERROR_SUCCESS) {
-    result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, s_szKeyboardLayouts,
-      0, KEY_WRITE, &hKey);
-  }
+  LONG result = OpenRegKey(HKEY_LOCAL_MACHINE, s_szKeyboardLayouts, TRUE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
     HKEY hkLayouts;
-    DWORD dwDisposition;
-    result = RegCreateKeyExW(hKey, L"E0120411", 0, NULL, 0,
-                             KEY_WRITE | KEY_WOW64_64KEY,
-                             NULL, &hkLayouts, &dwDisposition);
-    if (result != ERROR_SUCCESS) {
-      result = RegCreateKeyExW(hKey, L"E0120411", 0, NULL, 0,
-                               KEY_WRITE,
-                               NULL, &hkLayouts, &dwDisposition);
-    }
+    result = CreateRegKey(hKey, L"E0120411", &hkLayouts);
     if (result == ERROR_SUCCESS && hkLayouts) {
       if (DoSetRegSz(hkLayouts, L"layout file", L"kbdjp.kbd") &&
         DoSetRegSz(hkLayouts, L"layout text", DoLoadString(4)) &&
@@ -140,31 +153,13 @@ INT DoSetRegistry1(VOID) {
 INT DoSetRegistry2(VOID) {
   BOOL ret = FALSE;
   HKEY hKey;
-  LONG result = RegOpenKeyExW(
-    HKEY_LOCAL_MACHINE, L"SOFTWARE", 0, KEY_WRITE | KEY_WOW64_64KEY, &hKey);
-  if (result != ERROR_SUCCESS) {
-    result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE", 0,
-      KEY_WRITE, &hKey);
-  }
+  LONG result = OpenRegKey(HKEY_LOCAL_MACHINE, L"SOFTWARE", TRUE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
     HKEY hkCompany;
-    DWORD dwDisposition;
-    result = RegCreateKeyExW(hKey, L"Katayama Hirofumi MZ", 0, NULL, 0,
-                             KEY_WRITE | KEY_WOW64_64KEY, NULL,
-                             &hkCompany, &dwDisposition);
-    if (result != ERROR_SUCCESS) {
-      result = RegCreateKeyExW(hKey, L"Katayama Hirofumi MZ", 0, NULL, 0,
-                               KEY_WRITE, NULL, &hkCompany, &dwDisposition);
-    }
+    result = CreateRegKey(hKey, L"Katayama Hirofumi MZ", &hkCompany);
     if (result == ERROR_SUCCESS && hkCompany) {
       HKEY hkSoftware;
-      result = RegCreateKeyExW(hkCompany, L"mzimeja", 0, NULL, 0,
-                               KEY_WRITE | KEY_WOW64_64KEY, NULL,
-                               &hkSoftware, &dwDisposition);
-      if (result != ERROR_SUCCESS) {
-        result = RegCreateKeyExW(hkCompany, L"mzimeja", 0, NULL, 0,
-                                 KEY_WRITE, NULL, &hkSoftware, &dwDisposition);
-      }
+      result = CreateRegKey(hkCompany, L"mzimeja", &hkSoftware);
       if (result == ERROR_SUCCESS && hkSoftware) {
         TCHAR szDictPath[MAX_PATH];
         TCHAR szKanjiPath[MAX_PATH];
@@ -202,11 +197,7 @@ LONG MyDeleteRegKey(HKEY hKey, LPCTSTR pszSubKey)
 
     if (pszSubKey != NULL)
     {
-        ret = RegOpenKeyEx(hKey, pszSubKey, 0,
-          KEY_READ | KEY_WOW64_64KEY, &hSubKey);
-        if (ret != ERROR_SUCCESS) {
-          ret = RegOpenKeyEx(hKey, pszSubKey, 0, KEY_READ, &hSubKey);
-        }
+        ret = OpenRegKey(hKey, pszSubKey, FALSE, &hSubKey);
         if (ret) return ret;
     }
 

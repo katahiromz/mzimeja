@@ -474,6 +474,10 @@ protected:
   unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;
   unboost::unordered_map<wchar_t,wchar_t>   m_consonant_map;
   void MakeLiteralMaps();
+
+  // registry
+  LONG OpenRegKey(HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const;
+  LONG CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey);
 }; // class MZIMEJA
 
 extern MZIMEJA TheIME;
