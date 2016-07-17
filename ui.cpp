@@ -30,32 +30,6 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
   }
 }
 
-#ifdef _DEBUG
-void PASCAL DumpUIExtra(UIEXTRA *lpUIExtra) {
-  FOOTMARK();
-  DebugPrintA("Status hWnd %lX  [%d,%d]\n",
-             lpUIExtra->uiStatus.hWnd, lpUIExtra->uiStatus.pt.x,
-             lpUIExtra->uiStatus.pt.y);
-
-  DebugPrintA("Cand hWnd %lX  [%d,%d]\n",
-             lpUIExtra->uiCand.hWnd, lpUIExtra->uiCand.pt.x,
-             lpUIExtra->uiCand.pt.y);
-
-  DebugPrintA("CompStyle hWnd %lX]\n", lpUIExtra->dwCompStyle);
-
-  DebugPrintA("DefComp hWnd %lX  [%d,%d]\n",
-             lpUIExtra->uiDefComp.hWnd, lpUIExtra->uiDefComp.pt.x,
-             lpUIExtra->uiDefComp.pt.y);
-
-  for (int i = 0; i < 5; i++) {
-    DebugPrintA("Comp hWnd %lX  [%d,%d]-[%d,%d]\n",
-               lpUIExtra->uiComp[i].hWnd, lpUIExtra->uiComp[i].rc.left,
-               lpUIExtra->uiComp[i].rc.top, lpUIExtra->uiComp[i].rc.right,
-               lpUIExtra->uiComp[i].rc.bottom);
-  }
-}
-#endif  // def _DEBUG
-
 void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam) {
   UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
   if (lpUIExtra) {
@@ -162,8 +136,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
     lpUIExtra = (UIEXTRA *)GlobalLock(hUIExtra);
     if (lpUIExtra) {
-      lpUIExtra->uiStatus.pt.x = -1;
-      lpUIExtra->uiStatus.pt.y = -1;
       lpUIExtra->uiDefComp.pt.x = -1;
       lpUIExtra->uiDefComp.pt.y = -1;
       lpUIExtra->uiCand.pt.x = -1;
@@ -258,8 +230,12 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     // This message is sent by the status window.
     lpUIExtra = LockUIExtra(hWnd);
     if (lpUIExtra) {
-      lpUIExtra->uiStatus.pt.x = (short)LOWORD(lParam);
-      lpUIExtra->uiStatus.pt.y = (short)HIWORD(lParam);
+      RECT rc;
+      ::GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
+      POINT pt;
+      pt.x = (short)LOWORD(lParam);
+      pt.y = (short)HIWORD(lParam);
+      TheIME.SetUserData(L"ptStatusWindow", &pt, sizeof(pt));
       UnlockUIExtra(hWnd);
     }
     break;
@@ -336,8 +312,10 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
     DebugPrintA("IMN_CLOSESTATUSWINDOW\n");
     if (::IsWindow(lpUIExtra->uiStatus.hWnd)) {
       ::GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
-      lpUIExtra->uiStatus.pt.x = rc.left;
-      lpUIExtra->uiStatus.pt.y = rc.top;
+      POINT pt;
+      pt.x = rc.left;
+      pt.y = rc.top;
+      TheIME.SetUserData(L"ptStatusWindow", &pt, sizeof(pt));
       ::ShowWindow(lpUIExtra->uiStatus.hWnd, SW_HIDE);
     }
     break;
@@ -475,7 +453,15 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
   case IMN_SETSTATUSWINDOWPOS:
     DebugPrintA("IMN_SETSTATUSWINDOWPOS\n");
-    // TODO: use INPUTCONTEXT.ptStatusWndPos
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      POINT pt = lpIMC->ptStatusWndPos;
+      RECT rc;
+      ::GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
+      ::MoveWindow(lpUIExtra->uiStatus.hWnd, pt.x, pt.y,
+        rc.right - rc.left, rc.bottom - rc.top, TRUE);
+      TheIME.UnlockIMC(hIMC);
+    }
     break;
 
   case IMN_PRIVATE:
@@ -525,7 +511,11 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
     case IMC_GETSTATUSWINDOWPOS:
       DebugPrintA("IMC_GETSTATUSWINDOWPOS\n");
-      ret = MAKELONG(lpUIExtra->uiStatus.pt.x, lpUIExtra->uiStatus.pt.y);
+      {
+        RECT rc;
+        ::GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
+        ret = MAKELONG(rc.left, rc.top);
+      }
       break;
 
     default:

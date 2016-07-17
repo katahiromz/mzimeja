@@ -38,18 +38,20 @@ HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
     cy = CY_BUTTON;
     cy += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
     cy += 2 * CY_BTNEDGE;
-    if (lpUIExtra->uiStatus.pt.x == -1) {
+    POINT pt;
+    if (!TheIME.GetUserData(L"ptStatusWindow", &pt, sizeof(pt))) {
       RECT rcWorkArea;
       ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, FALSE);
-      lpUIExtra->uiStatus.pt.x = rcWorkArea.right - cx;
-      lpUIExtra->uiStatus.pt.y = rcWorkArea.bottom - cy;
+      pt.x = rcWorkArea.right - cx;
+      pt.y = rcWorkArea.bottom - cy;
     }
     hwndStatus = ::CreateWindowEx(
       exstyle, szStatusClassName, NULL, style,
-      lpUIExtra->uiStatus.pt.x, lpUIExtra->uiStatus.pt.y,
-      cx, cy,
+      pt.x, pt.y, cx, cy,
       hWnd, NULL, TheIME.m_hInst, NULL);
     lpUIExtra->uiStatus.hWnd = hwndStatus;
+  } else {
+    StatusWnd_Update(lpUIExtra);
   }
   RepositionWindow(hwndStatus);
   ::ShowWindow(hwndStatus, SW_SHOWNOACTIVATE);
@@ -241,8 +243,17 @@ STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
 
 void StatusWnd_Update(UIEXTRA *lpUIExtra) {
   FOOTMARK();
-  if (::IsWindow(lpUIExtra->uiStatus.hWnd))
-    ::SendMessage(lpUIExtra->uiStatus.hWnd, WM_UI_UPDATE, 0, 0);
+  HWND hwndStatus = lpUIExtra->uiStatus.hWnd;
+  if (::IsWindow(hwndStatus)) {
+    POINT pt;
+    if (TheIME.GetUserData(L"ptStatusWindow", &pt, sizeof(pt))) {
+      RECT rc;
+      ::GetWindowRect(hwndStatus, &rc);
+      ::MoveWindow(hwndStatus, pt.x, pt.y,
+        rc.right - rc.left, rc.bottom - rc.top, TRUE);
+    }
+    ::SendMessage(hwndStatus, WM_UI_UPDATE, 0, 0);
+  }
 } // StatusWnd_Update
 
 void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
