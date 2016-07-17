@@ -27,6 +27,7 @@ MODE1ICON               ICON    DISCARDABLE     "res\\mode1.ico"
 MODE2ICON               ICON    DISCARDABLE     "res\\mode2.ico"
 MODE3ICON               ICON    DISCARDABLE     "res\\mode3.ico"
 MODE4ICON               ICON    DISCARDABLE     "res\\mode4.ico"
+MODE5ICON               ICON    DISCARDABLE     "res\\mode5.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 // Bitmap
