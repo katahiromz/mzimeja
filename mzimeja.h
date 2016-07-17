@@ -152,7 +152,7 @@ struct UIEXTRA {
   BOOL      bVertical;
   HWND      hwndDefComp;
   UICHILD2  uiComp[MAXCOMPWND];
-  UICHILD   uiGuide;
+  HWND      hwndGuide;
   HWND      hImePad;
 };
 

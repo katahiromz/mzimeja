@@ -23,8 +23,8 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
     if (IsWindow(lpUIExtra->hwndDefComp)) {
       ::ShowWindow(lpUIExtra->hwndDefComp, nsw);
     }
-    if (IsWindow(lpUIExtra->uiGuide.hWnd)) {
-      ::ShowWindow(lpUIExtra->uiGuide.hWnd, nsw);
+    if (IsWindow(lpUIExtra->hwndGuide)) {
+      ::ShowWindow(lpUIExtra->hwndGuide, nsw);
     }
     UnlockUIExtra(hwndServer);
   }
@@ -95,8 +95,8 @@ void OnDestroy(HWND hWnd) {
         ::DestroyWindow(lpUIExtra->uiComp[i].hWnd);
     }
 
-    if (::IsWindow(lpUIExtra->uiGuide.hWnd))
-      ::DestroyWindow(lpUIExtra->uiGuide.hWnd);
+    if (::IsWindow(lpUIExtra->hwndGuide))
+      ::DestroyWindow(lpUIExtra->hwndGuide);
 
     if (lpUIExtra->hFont) {
       ::DeleteObject(lpUIExtra->hFont);
@@ -138,8 +138,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     if (lpUIExtra) {
       lpUIExtra->uiCand.pt.x = -1;
       lpUIExtra->uiCand.pt.y = -1;
-      lpUIExtra->uiGuide.pt.x = -1;
-      lpUIExtra->uiGuide.pt.y = -1;
       lpUIExtra->hFont = NULL;
       GlobalUnlock(hUIExtra);
     }
@@ -272,8 +270,10 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     // This message is sent by the status window.
     lpUIExtra = LockUIExtra(hWnd);
     if (lpUIExtra) {
-      lpUIExtra->uiGuide.pt.x = (short)LOWORD(lParam);
-      lpUIExtra->uiGuide.pt.y = (short)HIWORD(lParam);
+      POINT pt;
+      pt.x = (short)LOWORD(lParam);
+      pt.y = (short)HIWORD(lParam);
+      TheIME.SetUserData(L"ptGuide", &pt, sizeof(pt));
       UnlockUIExtra(hWnd);
     }
     break;
@@ -395,17 +395,18 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
   case IMN_GUIDELINE:
     DebugPrintA("IMN_GUIDELINE\n");
     if (::ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0)) {
-      if (!::IsWindow(lpUIExtra->uiGuide.hWnd)) {
+      if (!::IsWindow(lpUIExtra->hwndGuide)) {
         HDC hdcIC;
         TEXTMETRIC tm;
         int dx, dy;
+        POINT pt;
 
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
-          if (lpUIExtra->uiGuide.pt.x == -1) {
+          if (!TheIME.GetUserData(L"ptGuide", &pt, sizeof(pt))) {
             ::GetWindowRect(lpIMC->hWnd, &rc);
-            lpUIExtra->uiGuide.pt.x = rc.left;
-            lpUIExtra->uiGuide.pt.y = rc.bottom;
+            pt.x = rc.left;
+            pt.y = rc.bottom;
           }
           TheIME.UnlockIMC(hIMC);
         }
@@ -416,18 +417,16 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         dy = tm.tmHeight + tm.tmExternalLeading;
         ::DeleteDC(hdcIC);
 
-        lpUIExtra->uiGuide.hWnd = ::CreateWindowEx(
+        lpUIExtra->hwndGuide = ::CreateWindowEx(
             WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME, szGuideClassName,
-            NULL, WS_DISABLED | WS_POPUP | WS_BORDER, lpUIExtra->uiGuide.pt.x,
-            lpUIExtra->uiGuide.pt.y, dx + 2 * GetSystemMetrics(SM_CXBORDER) +
-                                         2 * GetSystemMetrics(SM_CXEDGE),
-            dy + GetSystemMetrics(SM_CYSMCAPTION) +
-                2 * GetSystemMetrics(SM_CYBORDER) +
+            NULL, WS_DISABLED | WS_POPUP | WS_BORDER, pt.x, pt.y,
+            dx + 2 * GetSystemMetrics(SM_CXBORDER) + 2 * GetSystemMetrics(SM_CXEDGE),
+            dy + GetSystemMetrics(SM_CYSMCAPTION) + 2 * GetSystemMetrics(SM_CYBORDER) +
                 2 * GetSystemMetrics(SM_CYEDGE),
             hWnd, NULL, TheIME.m_hInst, NULL);
       }
-      ::ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
-      ::SetWindowLongPtr(lpUIExtra->uiGuide.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
+      ::ShowWindow(lpUIExtra->hwndGuide, SW_SHOWNOACTIVATE);
+      ::SetWindowLongPtr(lpUIExtra->hwndGuide, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
       GuideWnd_Update(lpUIExtra);
     }
     break;

@@ -273,8 +273,8 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
 
 void GuideWnd_Update(UIEXTRA *lpUIExtra) {
   FOOTMARK();
-  if (::IsWindow(lpUIExtra->uiGuide.hWnd)) {
-    ::SendMessage(lpUIExtra->uiGuide.hWnd, WM_UI_UPDATE, 0, 0);
+  if (::IsWindow(lpUIExtra->hwndGuide)) {
+    ::SendMessage(lpUIExtra->hwndGuide, WM_UI_UPDATE, 0, 0);
   }
 }
 
