@@ -487,7 +487,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
   case IMN_PRIVATE:
     DebugPrintA("IMN_PRIVATE\n");
     if (HIWORD(lParam) == 0xFACE) {
-      std::wstring imepad_file = TheIME.GetSettingString(L"imepad file");
+      std::wstring imepad_file = TheIME.GetComputerString(L"imepad file");
       ::ShellExecuteW(NULL, NULL, imepad_file.c_str(),
                       NULL, NULL, SW_SHOWNOACTIVATE);
     }

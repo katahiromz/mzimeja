@@ -447,13 +447,21 @@ public:
   BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
 
-  // settings
-  std::wstring GetSettingString(LPCWSTR pszSettingName) const;
-  BOOL SetSettingString(LPCWSTR pszSettingName, LPCWSTR pszValue);
-  BOOL GetSettingDword(LPCWSTR pszSettingName, DWORD *ptr) const;
-  BOOL SetSettingDword(LPCWSTR pszSettingName, DWORD data);
-  BOOL GetSettingData(LPCWSTR pszSettingName, void *ptr, DWORD size) const;
-  BOOL SetSettingData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
+  // computer settings
+  std::wstring GetComputerString(LPCWSTR pszSettingName);
+  BOOL SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue);
+  BOOL GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr);
+  BOOL SetComputerDword(LPCWSTR pszSettingName, DWORD data);
+  BOOL GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size);
+  BOOL SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
+
+  // user settings
+  std::wstring GetUserString(LPCWSTR pszSettingName);
+  BOOL SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue);
+  BOOL GetUserDword(LPCWSTR pszSettingName, DWORD *ptr);
+  BOOL SetUserDword(LPCWSTR pszSettingName, DWORD data);
+  BOOL GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size);
+  BOOL SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 
 protected:
   HANDLE          m_hMutex;         // mutex
@@ -478,6 +486,8 @@ protected:
   // registry
   LONG OpenRegKey(HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const;
   LONG CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey);
+  LONG OpenComputerSettingKey(BOOL bWrite, HKEY *phKey);
+  LONG OpenUserSettingKey(BOOL bWrite, HKEY *phKey);
 }; // class MZIMEJA
 
 extern MZIMEJA TheIME;
