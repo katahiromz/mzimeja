@@ -397,6 +397,7 @@ struct DICT_ENTRY {
   HINSHI_BUNRUI bunrui;
   std::wstring  post;
   std::wstring  tags;
+  GYOU          gyou;
 };
 
 const wchar_t g_table[][5] = {

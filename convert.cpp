@@ -31,7 +31,7 @@ void MZIMEJA::MakeLiteralMaps() {
   }
   m_consonant_map.clear();
   m_vowel_map.clear();
-  const size_t count = sizeof(s_hiragana_table) / sizeof(s_hiragana_table[0]);
+  const size_t count = _countof(s_hiragana_table);
   for (size_t i = 0; i < count; ++i) {
     for (size_t k = 0; k < 5; ++k) {
       m_consonant_map[s_hiragana_table[i][k]] = s_hiragana_table[i][0];
@@ -42,7 +42,7 @@ void MZIMEJA::MakeLiteralMaps() {
   }
 }
 
-inline bool entry_compare(const DICT_ENTRY& e1, const DICT_ENTRY& e2) {
+inline bool entry_compare_pre(const DICT_ENTRY& e1, const DICT_ENTRY& e2) {
   return (e1.pre < e2.pre);
 }
 
@@ -56,108 +56,170 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
   entries.clear();
   entries.reserve(60000);
 
+  // open basic dictionary
   std::wstring filename = GetComputerString(L"basic dictionary file");
   FILE *fp = _wfopen(filename.c_str(), L"rb");
   if (fp == NULL) {
     DebugPrintW(L"ERROR: cannot open dict: %s\n", filename.c_str());
     assert(0);
-    return FALSE;
+    return FALSE; // failure
   }
 
+  // load each line
   int lineno = 0;
   while (fgets(buf, 256, fp) != NULL) {
     ++lineno;
-    if (buf[0] == ';') continue;
-    ::MultiByteToWideChar(CP_UTF8, 0, buf, -1, wbuf, 256);
+    if (buf[0] == ';') continue;  // comment
 
+    // convert to UTF-16
+    ::MultiByteToWideChar(CP_UTF8, 0, buf, -1, wbuf, 256);
     std::wstring str = wbuf;
 
+    // split to fields
     unboost::trim_right_if(str, unboost::is_any_of(L"\r\n"));
     std::vector<std::wstring> fields;
     unboost::split(fields, str, unboost::is_any_of(L"\t"));
 
-    if (fields.empty()) {
+    // is it an invalid line?
+    if (fields.empty() || fields[0].empty()) {
+      assert(0);
       continue;
     }
 
+    // parse a record
     DICT_ENTRY entry;
+    entry.gyou = GYOU_A;
     if (fields.size() == 1) {
+      // only one field, it's a noun (HB_MEISHI)
       entry.post = str;
       entry.bunrui = HB_MEISHI;
       if (is_fullwidth_katakana(str[0])) {
+        // convert to hiragana
         std::wstring hiragana = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
         entry.pre = hiragana;
       } else {
         entry.pre = str;
       }
+      entries.push_back(entry);
+      continue;
+    }
+
+    // more than 2 fields
+    // classify by the fields[1] string
+    const std::wstring& bunrui_str = fields[1];
+    if (bunrui_str.empty()) {
+      entry.bunrui = HB_MEISHI;
+    } else if (bunrui_str.size() == 2) {
+      if (bunrui_str == L"名詞")            entry.bunrui = HB_MEISHI;
+      else if (bunrui_str == L"副詞")       entry.bunrui = HB_FUKUSHI;
+      else if (bunrui_str == L"助詞")       entry.bunrui = HB_JOSHI;
+      else if (bunrui_str == L"漢語")       entry.bunrui = HB_KANGO;
+      else continue;
+    } else if (bunrui_str.size() == 3) {
+      if (bunrui_str == L"連体詞")          entry.bunrui = HB_RENTAISHI;
+      else if (bunrui_str == L"接続詞")     entry.bunrui = HB_SETSUZOKUSHI;
+      else if (bunrui_str == L"感動詞")     entry.bunrui = HB_KANDOUSHI;
+      else if (bunrui_str == L"接頭語")     entry.bunrui = HB_SETTOUGO;
+      else if (bunrui_str == L"接尾語")     entry.bunrui = HB_SETSUBIGO;
+      else continue;
+    } else if (bunrui_str.size() == 4) {
+      if (bunrui_str == L"い形容詞")        entry.bunrui = HB_IKEIYOUSHI;
+      else if (bunrui_str == L"な形容詞")   entry.bunrui = HB_NAKEIYOUSHI;
+      else if (bunrui_str == L"五段動詞")   entry.bunrui = HB_GODAN_DOUSHI;
+      else if (bunrui_str == L"一段動詞")   entry.bunrui = HB_ICHIDAN_DOUSHI;
+      else if (bunrui_str == L"カ変動詞")   entry.bunrui = HB_KAHEN_DOUSHI;
+      else if (bunrui_str == L"サ変動詞")   entry.bunrui = HB_SAHEN_DOUSHI;
+      else continue;
+    } else if (bunrui_str.size() == 5) {
+      if (bunrui_str == L"未然助動詞")      entry.bunrui = HB_MIZEN_JODOUSHI;
+      else if (bunrui_str == L"連用助動詞") entry.bunrui = HB_RENYOU_JODOUSHI;
+      else if (bunrui_str == L"終止助動詞") entry.bunrui = HB_SHUUSHI_JODOUSHI;
+      else if (bunrui_str == L"連体助動詞") entry.bunrui = HB_RENTAI_JODOUSHI;
+      else if (bunrui_str == L"仮定助動詞") entry.bunrui = HB_KATEI_JODOUSHI;
+      else if (bunrui_str == L"命令助動詞") entry.bunrui = HB_MEIREI_JODOUSHI;
+      else continue;
     } else {
-      const std::wstring& bunrui_str = fields[1];
-      if (bunrui_str.empty()) {
-        entry.bunrui = HB_MEISHI;
-      } else if (bunrui_str.size() == 2) {
-        if (bunrui_str == L"名詞")            entry.bunrui = HB_MEISHI;
-        else if (bunrui_str == L"副詞")       entry.bunrui = HB_FUKUSHI;
-        else if (bunrui_str == L"助詞")       entry.bunrui = HB_JOSHI;
-        else if (bunrui_str == L"漢語")       entry.bunrui = HB_KANGO;
-        else continue;
-      } else if (bunrui_str.size() == 3) {
-        if (bunrui_str == L"連体詞")          entry.bunrui = HB_RENTAISHI;
-        else if (bunrui_str == L"接続詞")     entry.bunrui = HB_SETSUZOKUSHI;
-        else if (bunrui_str == L"感動詞")     entry.bunrui = HB_KANDOUSHI;
-        else if (bunrui_str == L"接頭語")     entry.bunrui = HB_SETTOUGO;
-        else if (bunrui_str == L"接尾語")     entry.bunrui = HB_SETSUBIGO;
-        else continue;
-      } else if (bunrui_str.size() == 4) {
-        if (bunrui_str == L"い形容詞")        entry.bunrui = HB_IKEIYOUSHI;
-        else if (bunrui_str == L"な形容詞")   entry.bunrui = HB_NAKEIYOUSHI;
-        else if (bunrui_str == L"五段動詞")   entry.bunrui = HB_GODAN_DOUSHI;
-        else if (bunrui_str == L"一段動詞")   entry.bunrui = HB_ICHIDAN_DOUSHI;
-        else if (bunrui_str == L"カ変動詞")   entry.bunrui = HB_KAHEN_DOUSHI;
-        else if (bunrui_str == L"サ変動詞")   entry.bunrui = HB_SAHEN_DOUSHI;
-        else continue;
-      } else if (bunrui_str.size() == 5) {
-        if (bunrui_str == L"未然助動詞")      entry.bunrui = HB_MIZEN_JODOUSHI;
-        else if (bunrui_str == L"連用助動詞") entry.bunrui = HB_RENYOU_JODOUSHI;
-        else if (bunrui_str == L"終止助動詞") entry.bunrui = HB_SHUUSHI_JODOUSHI;
-        else if (bunrui_str == L"連体助動詞") entry.bunrui = HB_RENTAI_JODOUSHI;
-        else if (bunrui_str == L"仮定助動詞") entry.bunrui = HB_KATEI_JODOUSHI;
-        else if (bunrui_str == L"命令助動詞") entry.bunrui = HB_MEIREI_JODOUSHI;
-        else continue;
-      } else {
-        continue;
-      }
+      continue;
+    }
 
-      if (fields.size() == 2) {
-        fields.push_back(fields[0]);
-      } else if (fields[2].empty()) {
-        fields[2] = fields[0];
-      }
+    // complete field[2] if lacked
+    if (fields.size() == 2) {
+      fields.push_back(fields[0]);
+    } else if (fields[2].empty()) {
+      fields[2] = fields[0];
+    }
 
-      if (entry.bunrui == HB_NAKEIYOUSHI) {
-        //DebugPrintW(L"%s\n", fields[0].c_str());
-        assert(fields[0][fields[0].size() - 1] == L'な');
-        assert(fields[2][fields[2].size() - 1] == L'な');
-        fields[0].resize(fields[0].size() - 1);
-        fields[2].resize(fields[2].size() - 1);
-      } else if (entry.bunrui == HB_IKEIYOUSHI) {
-        //DebugPrintW(L"%s\n", fields[0].c_str());
-        assert(fields[0][fields[0].size() - 1] == L'い');
-        assert(fields[2][fields[2].size() - 1] == L'い');
-        fields[0].resize(fields[0].size() - 1);
-        fields[2].resize(fields[2].size() - 1);
+    // optimize
+    std::wstring substr;
+    wchar_t ch;
+    size_t i, ngyou;
+    switch (entry.bunrui) {
+    case HB_NAKEIYOUSHI:
+      i = fields[0].size() - 1;
+      if (fields[0][i] == L'な') fields[0].resize(i);
+      i = fields[2].size() - 1;
+      if (fields[2][i] == L'な') fields[2].resize(i);
+      break;
+    case HB_IKEIYOUSHI:
+      i = fields[0].size() - 1;
+      if (fields[0][i] == L'い') fields[0].resize(i);
+      i = fields[2].size() - 1;
+      if (fields[2][i] == L'い') fields[2].resize(i);
+      break;
+    case HB_ICHIDAN_DOUSHI:
+      DebugPrintW(L"%s\n", fields[0].c_str());
+      assert(fields[0][fields[0].size() - 1] == L'る');
+      assert(fields[2][fields[2].size() - 1] == L'る');
+      fields[0].resize(fields[0].size() - 1);
+      fields[2].resize(fields[2].size() - 1);
+      break;
+    case HB_KAHEN_DOUSHI:
+      if (fields[0] == L"くる") continue;
+      substr = fields[0].substr(fields[0].size() - 2, 2);
+      if (substr != L"くる") continue;
+      fields[0] = substr;
+      substr = fields[2].substr(fields[0].size() - 2, 2);
+      fields[2] = substr;
+      break;
+    case HB_SAHEN_DOUSHI:
+      if (fields[0] == L"する") continue;
+      substr = fields[0].substr(fields[0].size() - 2, 2);
+      if (substr == L"する") entry.gyou = GYOU_SA;
+      else if (substr != L"ずる") entry.gyou = GYOU_ZA;
+      else continue;
+      fields[0] = substr;
+      fields[2] = fields[2].substr(fields[0].size() - 2, 2);
+      break;
+    case HB_GODAN_DOUSHI:
+      ch = fields[0][fields[0].size() - 1];
+      if (m_vowel_map[ch] != L'う') continue;
+      fields[0].resize(fields[0].size() - 1);
+      fields[2].resize(fields[2].size() - 1);
+      ch = m_consonant_map[ch];
+      for (i = 0; i < _countof(s_hiragana_table); ++i) {
+        if (s_hiragana_table[i][0] == ch) {
+          ngyou = i;
+          break;
+        }
       }
+      entry.gyou = (GYOU)ngyou;
+      break;
+    default:
+      break;
+    }
 
-      entry.pre = fields[0];
-      entry.post = fields[2];
-      if (fields.size() >= 4) {
-        entry.tags = fields[3];
-      }
+    // store the parsed record to entries
+    entry.pre = fields[0];
+    entry.post = fields[2];
+    if (fields.size() >= 4) {
+      entry.tags = fields[3];
     }
     entries.push_back(entry);
   }
 
-  std::sort(entries.begin(), entries.end(), entry_compare);
-  return TRUE;
+  // sort by preconversion string
+  std::sort(entries.begin(), entries.end(), entry_compare_pre);
+  return TRUE;  // success
 } // MZIMEJA::LoadBasicDictFile
 
 BOOL MZIMEJA::DeployDictData(
@@ -165,6 +227,8 @@ BOOL MZIMEJA::DeployDictData(
   const std::vector<DICT_ENTRY>& entries)
 {
   FOOTMARK();
+
+  // calculate the total size
   size_t size = 0;
   size += 1;  // \n
   for (size_t i = 0; i < entries.size(); ++i) {
@@ -180,54 +244,63 @@ BOOL MZIMEJA::DeployDictData(
   size += 1;  // \0
   size *= sizeof(WCHAR);
 
+  // wait for locking dict data
   BOOL ret = FALSE;
   DWORD dwWait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds);
-  if (dwWait == WAIT_OBJECT_0) {
-    // create shared dict data
-    m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
-      PAGE_READWRITE, 0, size, L"mzimeja_basic_dict");
-    LPVOID pv = ::MapViewOfFile(
-      m_hBasicDictData, FILE_MAP_ALL_ACCESS, 0, 0, size);
-    if (pv) {
-      size_t cch;
-      WCHAR *pch = reinterpret_cast<WCHAR *>(pv);
-      *pch++ += L'\n';  // new line
-      for (size_t i = 0; i < entries.size(); ++i) {
-        // line format: pre \t hb \t post \t tags \n
-        const DICT_ENTRY& entry = entries[i];
-        // pre \t
-        cch = entry.pre.size();
-        memcpy(pch, entry.pre.c_str(), cch * sizeof(WCHAR));
-        pch += cch;
-        *pch++ = L'\t';
-        // hb \t
-        *pch++ = WCHAR(entry.bunrui);
-        *pch++ = L'\t';
-        // post \t
-        cch = entry.post.size();
-        memcpy(pch, entry.post.c_str(), cch * sizeof(WCHAR));
-        pch += cch;
-        *pch++ = L'\t';
-        // tags
-        cch = entry.tags.size();
-        memcpy(pch, entry.tags.c_str(), cch * sizeof(WCHAR));
-        pch += cch;
-        // new line
-        *pch++ = L'\n';
-      }
-      *pch++ = L'\0'; // NUL
-      assert(size / 2 == size_t(pch - reinterpret_cast<WCHAR *>(pv)));
-      #if 1
-        FILE *fp = fopen("c:\\TEST.txt", "wb");
-        fwrite(pv, 100, 1, fp);
-        fclose(fp);
-      #endif
-      ::UnmapViewOfFile(pv);
-      ret = TRUE; // success
-    }
-    data->dwSharedDictDataSize = size;
-    ::ReleaseMutex(m_hMutex);
+  if (dwWait != WAIT_OBJECT_0) {
+    return ret;
   }
+
+  // create shared dict data
+  m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
+    PAGE_READWRITE, 0, size, L"mzimeja_basic_dict");
+  LPVOID pv = ::MapViewOfFile(
+    m_hBasicDictData, FILE_MAP_ALL_ACCESS, 0, 0, size);
+  if (pv) {
+    // store all data
+    size_t cch;
+    WCHAR *pch = reinterpret_cast<WCHAR *>(pv);
+    *pch++ += L'\n';  // new line
+    for (size_t i = 0; i < entries.size(); ++i) {
+      // line format: pre \t MAKEWORD(bunrui, gyou) \t post \t tags \n
+      const DICT_ENTRY& entry = entries[i];
+      // pre \t
+      cch = entry.pre.size();
+      memcpy(pch, entry.pre.c_str(), cch * sizeof(WCHAR));
+      pch += cch;
+      *pch++ = L'\t';
+      // MAKEWORD(bunrui, gyou) \t
+      *pch++ = MAKEWORD(entry.bunrui, entry.gyou);
+      *pch++ = L'\t';
+      // post \t
+      cch = entry.post.size();
+      memcpy(pch, entry.post.c_str(), cch * sizeof(WCHAR));
+      pch += cch;
+      *pch++ = L'\t';
+      // tags
+      cch = entry.tags.size();
+      memcpy(pch, entry.tags.c_str(), cch * sizeof(WCHAR));
+      pch += cch;
+      // new line
+      *pch++ = L'\n';
+    }
+    *pch++ = L'\0'; // NUL
+    assert(size / 2 == size_t(pch - reinterpret_cast<WCHAR *>(pv)));
+    #if 0
+      FILE *fp = fopen("c:\\dictdata.txt", "wb");
+      fwrite(pv, size, 1, fp);
+      fclose(fp);
+    #endif
+    ::UnmapViewOfFile(pv);
+    ret = TRUE; // success
+  }
+
+  // store the total size
+  data->dwSharedDictDataSize = size;
+
+  // it's done, unlock the mutex
+  ::ReleaseMutex(m_hMutex);
+
   return ret;
 } // MZIMEJA::DeployDictData
 
@@ -236,37 +309,50 @@ BOOL MZIMEJA::DeployDictData(
 BOOL MZIMEJA::LoadBasicDict() {
   FOOTMARK();
   BOOL ret = FALSE;
-  // get shared data
+
+  // get the base shared data
   IMAGE_BASE *data = LockImeBaseData();
-  if (data) {
-    SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes();
-    assert(psa);
-    if (data->dwSignature == 0xDEADFACE) {
-      if (data->dwSharedDictDataSize == 0) {
-        // deploy dict data
-        std::vector<DICT_ENTRY> entries;
-        if (LoadBasicDictFile(entries)) {
-          ret = DeployDictData(data, psa, entries);
+  if (data == NULL) {
+    assert(0);
+    return ret; // failure
+  }
+
+  // create a security attributes
+  SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes();
+  assert(psa);
+
+  // is the signature valid?
+  if (data->dwSignature == 0xDEADFACE) {
+    // is it already stored?
+    if (data->dwSharedDictDataSize == 0) {
+      // no data, so deploy dict data
+      std::vector<DICT_ENTRY> entries;
+      if (LoadBasicDictFile(entries)) {
+        ret = DeployDictData(data, psa, entries);
+      }
+      assert(ret);
+    } else {
+      // data is already stored. wait for locking dict data
+      DWORD dwWait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds);
+      if (dwWait == WAIT_OBJECT_0) {
+        // open shared dict data
+        m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
+          PAGE_READONLY, 0, data->dwSharedDictDataSize, L"mzimeja_basic_dict");
+        if (m_hBasicDictData) {
+          ret = TRUE; // success
         }
         assert(ret);
-      } else {
-        // open shared dict data
-        DWORD dwWait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds);
-        if (dwWait == WAIT_OBJECT_0) {
-          m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
-            PAGE_READONLY, 0, data->dwSharedDictDataSize, L"mzimeja_basic_dict");
-          if (m_hBasicDictData) {
-            ret = TRUE;
-          }
-          assert(ret);
-          ::ReleaseMutex(m_hMutex);
-        }
+        // unlock the dict data
+        ::ReleaseMutex(m_hMutex);
       }
     }
-    FreeSecurityAttributes(psa);
-    UnlockImeBaseData(data);
   }
-  assert(ret);
+
+  // release the security attributes
+  FreeSecurityAttributes(psa);
+
+  // unlock the base shared data
+  UnlockImeBaseData(data);
 
   return ret;
 } // MZIMEJA::LoadBasicDict
@@ -290,7 +376,7 @@ WCHAR *MZIMEJA::LockBasicDict() {
     pv = ::MapViewOfFile(m_hBasicDictData, FILE_MAP_READ, 0, 0, dwSize);
     return reinterpret_cast<WCHAR *>(pv);
   }
-  return NULL;
+  return NULL;  // failure
 }
 
 void MZIMEJA::UnlockBasicDict(WCHAR *data) {
