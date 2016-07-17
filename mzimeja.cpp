@@ -197,7 +197,7 @@ LONG MZIMEJA::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
       result = CreateRegKey(hSoftware, L"Katayama Hirofumi MZ", &hCompany);
       if (result == ERROR_SUCCESS) {
         HKEY hMZIMEJA;
-        result = CreateRegKey(hSoftware, L"mzimeja", &hMZIMEJA);
+        result = CreateRegKey(hCompany, L"mzimeja", &hMZIMEJA);
         if (result == ERROR_SUCCESS) {
           ::RegCloseKey(hMZIMEJA);
         }
