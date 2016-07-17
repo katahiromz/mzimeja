@@ -133,14 +133,12 @@
 // UICHILD
 struct UICHILD {
   HWND hWnd;
-  BOOL bShow;
   POINT pt;
 };
 
 // UICHILD2
 struct UICHILD2 {
   HWND hWnd;
-  BOOL bShow;
   RECT rc;
 };
 
