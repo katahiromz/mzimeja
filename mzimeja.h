@@ -27,6 +27,8 @@
 #include <cassert>          // for assert
 #include <cstring>          // for C string
 
+#include <process.h>        // for _beginthreadex
+
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development
 #include "input.h"          // for INPUT_MODE and InputContext

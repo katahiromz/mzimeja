@@ -45,6 +45,7 @@ inline bool entry_compare(const DICT_ENTRY& e1, const DICT_ENTRY& e2) {
 }
 
 BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
+  FOOTMARK();
   char buf[256];
   wchar_t wbuf[256];
   std::wstring str;
@@ -55,7 +56,11 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
 
   std::wstring filename = GetComputerString(L"basic dictionary file");
   FILE *fp = _wfopen(filename.c_str(), L"rb");
-  if (fp == NULL) return false;
+  if (fp == NULL) {
+    DebugPrintW(L"ERROR: cannot open dict: %s\n", filename.c_str());
+    assert(0);
+    return FALSE;
+  }
 
   int lineno = 0;
   while (fgets(buf, 256, fp) != NULL) {
@@ -142,6 +147,7 @@ BOOL MZIMEJA::DeployDictData(
   ImeBaseData *data, SECURITY_ATTRIBUTES *psa,
   const std::vector<DICT_ENTRY>& entries)
 {
+  FOOTMARK();
   size_t size = 0;
   size += 1;  // \n
   for (size_t i = 0; i < entries.size(); ++i) {
@@ -193,7 +199,7 @@ BOOL MZIMEJA::DeployDictData(
       }
       *pch++ = L'\0'; // NUL
       assert(size / 2 == size_t(pch - reinterpret_cast<WCHAR *>(pv)));
-      #if 0
+      #if 1
         FILE *fp = fopen("c:\\TEST.txt", "wb");
         fwrite(pv, 100, 1, fp);
         fclose(fp);
@@ -210,6 +216,7 @@ BOOL MZIMEJA::DeployDictData(
 //////////////////////////////////////////////////////////////////////////////
 
 BOOL MZIMEJA::LoadBasicDict() {
+  FOOTMARK();
   BOOL ret = FALSE;
   // get shared data
   ImeBaseData *data = LockImeBaseData();
@@ -218,18 +225,25 @@ BOOL MZIMEJA::LoadBasicDict() {
     assert(psa);
     if (data->dwSignature == 0xDEADFACE) {
       if (data->dwSharedDictDataSize == 0) {
+        // deploy dict data
         std::vector<DICT_ENTRY> entries;
         if (LoadBasicDictFile(entries)) {
           ret = DeployDictData(data, psa, entries);
+          if (ret) {
+            DebugPrintA("dictionary was deployed\n");
+          }
         }
+        assert(ret);
       } else {
+        // open shared dict data
         if (::WaitForSingleObject(m_hMutex, 5000) == WAIT_OBJECT_0) {
-          // create dict data
           m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
-            PAGE_READWRITE, 0, data->dwSharedDictDataSize, L"mzimeja_basic_dict");
+            PAGE_READONLY, 0, data->dwSharedDictDataSize, L"mzimeja_basic_dict");
           if (m_hBasicDictData) {
+            DebugPrintA("dictionary was retrieved\n");
             ret = TRUE;
           }
+          assert(ret);
           ::ReleaseMutex(m_hMutex);
         }
       }
@@ -237,6 +251,7 @@ BOOL MZIMEJA::LoadBasicDict() {
     FreeSecurityAttributes(psa);
     UnlockImeBaseData(data);
   }
+  assert(ret);
 
   return ret;
 } // MZIMEJA::LoadBasicDict

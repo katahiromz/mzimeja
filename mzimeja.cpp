@@ -92,6 +92,14 @@ MZIMEJA::MZIMEJA() {
   m_hBasicDictData = NULL;
 }
 
+static unsigned int __stdcall loading_dict_proc(void *param) {
+  MZIMEJA *pIme = (MZIMEJA *)param;
+  // load basic dictionary
+  assert(pIme);
+  pIme->LoadBasicDict();
+  return 0;
+}
+
 BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   FOOTMARK();
   m_hInst = hInstance;
@@ -122,11 +130,14 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
     }
   }
 
+  // create a thread
+  HANDLE hThread;
+  hThread = (HANDLE)_beginthreadex(psa, 0, loading_dict_proc, this, 0, NULL);
+  assert(hThread);
+  ::CloseHandle(hThread);
+
   // free sa
   FreeSecurityAttributes(psa);
-
-  // load basic dictionary
-  LoadBasicDict();
 
   // register window classes for IME
   return RegisterClasses(m_hInst);
