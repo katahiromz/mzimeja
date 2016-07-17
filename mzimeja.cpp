@@ -122,11 +122,11 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
 
   // create base data
   m_hBaseData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
-    PAGE_READWRITE, 0, sizeof(ImeBaseData), L"mzimeja_basedata");
+    PAGE_READWRITE, 0, sizeof(IMAGE_BASE), L"mzimeja_basedata");
   assert(m_hBaseData);
   if (m_hBaseData && ::GetLastError() != ERROR_ALREADY_EXISTS) {
     // initialize base data
-    ImeBaseData *data = LockImeBaseData();
+    IMAGE_BASE *data = LockImeBaseData();
     if (data) {
       data->dwSignature = 0xDEADFACE;
       data->dwSharedDictDataSize = 0;
@@ -147,14 +147,14 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   return RegisterClasses(m_hInst);
 } // MZIMEJA::Init
 
-ImeBaseData *MZIMEJA::LockImeBaseData() {
+IMAGE_BASE *MZIMEJA::LockImeBaseData() {
   LPVOID pvData;
   pvData = ::MapViewOfFile(m_hBaseData, FILE_MAP_ALL_ACCESS,
-                           0, 0, sizeof(ImeBaseData));
-  return reinterpret_cast<ImeBaseData *>(pvData);
+                           0, 0, sizeof(IMAGE_BASE));
+  return reinterpret_cast<IMAGE_BASE *>(pvData);
 }
 
-void MZIMEJA::UnlockImeBaseData(ImeBaseData *data) {
+void MZIMEJA::UnlockImeBaseData(IMAGE_BASE *data) {
   ::UnmapViewOfFile(data);
 }
 

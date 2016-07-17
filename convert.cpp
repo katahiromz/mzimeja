@@ -6,23 +6,23 @@
 
 const DWORD c_dwMilliseconds = 8000;
 
-static const wchar_t s_hiragana_table[][5] = {
-  {L'‚ ', L'‚¢', L'‚¤', L'‚¦', L'‚¨'},
-  {L'‚©', L'‚«', L'‚­', L'‚¯', L'‚±'},
-  {L'‚ª', L'‚¬', L'‚®', L'‚°', L'‚²'},
-  {L'‚³', L'‚µ', L'‚·', L'‚¹', L'‚»'},
-  {L'‚´', L'‚¶', L'‚¸', L'‚º', L'‚¼'},
-  {L'‚½', L'‚¿', L'‚Â', L'‚Ä', L'‚Æ'},
-  {L'‚¾', L'‚À', L'‚Ã', L'‚Å', L'‚Ç'},
-  {L'‚È', L'‚É', L'‚Ê', L'‚Ë', L'‚Ì'},
-  {L'‚Í', L'‚Ð', L'‚Ó', L'‚Ö', L'‚Ù'},
-  {L'‚Î', L'‚Ñ', L'‚Ô', L'‚×', L'‚Ú'},
-  {L'‚Ï', L'‚Ò', L'‚Õ', L'‚Ø', L'‚Û'},
-  {L'‚Ü', L'‚Ý', L'‚Þ', L'‚ß', L'‚à'},
-  {L'‚â', 0, L'‚ä', 0, L'‚æ'},
-  {L'‚ç', L'‚è', L'‚é', L'‚ê', L'‚ë'},
-  {L'‚í', 0, 0, 0, L'‚ð'},
-  {L'‚ñ', 0, 0, 0, 0},
+static const wchar_t s_hiragana_table[][5] = {    
+  {L'‚ ', L'‚¢', L'‚¤', L'‚¦', L'‚¨'},   // GYOU_A
+  {L'‚©', L'‚«', L'‚­', L'‚¯', L'‚±'},   // GYOU_KA
+  {L'‚ª', L'‚¬', L'‚®', L'‚°', L'‚²'},   // GYOU_GA
+  {L'‚³', L'‚µ', L'‚·', L'‚¹', L'‚»'},   // GYOU_SA
+  {L'‚´', L'‚¶', L'‚¸', L'‚º', L'‚¼'},   // GYOU_ZA
+  {L'‚½', L'‚¿', L'‚Â', L'‚Ä', L'‚Æ'},   // GYOU_TA
+  {L'‚¾', L'‚À', L'‚Ã', L'‚Å', L'‚Ç'},   // GYOU_DA
+  {L'‚È', L'‚É', L'‚Ê', L'‚Ë', L'‚Ì'},   // GYOU_NA
+  {L'‚Í', L'‚Ð', L'‚Ó', L'‚Ö', L'‚Ù'},   // GYOU_HA
+  {L'‚Î', L'‚Ñ', L'‚Ô', L'‚×', L'‚Ú'},   // GYOU_BA
+  {L'‚Ï', L'‚Ò', L'‚Õ', L'‚Ø', L'‚Û'},   // GYOU_PA
+  {L'‚Ü', L'‚Ý', L'‚Þ', L'‚ß', L'‚à'},   // GYOU_MA
+  {L'‚â', 0, L'‚ä', 0, L'‚æ'},           // GYOU_YA
+  {L'‚ç', L'‚è', L'‚é', L'‚ê', L'‚ë'},   // GYOU_RA
+  {L'‚í', 0, 0, 0, L'‚ð'},               // GYOU_WA
+  {L'‚ñ', 0, 0, 0, 0},                   // GYOU_NN
 };
 
 void MZIMEJA::MakeLiteralMaps() {
@@ -161,7 +161,7 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
 } // MZIMEJA::LoadBasicDictFile
 
 BOOL MZIMEJA::DeployDictData(
-  ImeBaseData *data, SECURITY_ATTRIBUTES *psa,
+  IMAGE_BASE *data, SECURITY_ATTRIBUTES *psa,
   const std::vector<DICT_ENTRY>& entries)
 {
   FOOTMARK();
@@ -237,7 +237,7 @@ BOOL MZIMEJA::LoadBasicDict() {
   FOOTMARK();
   BOOL ret = FALSE;
   // get shared data
-  ImeBaseData *data = LockImeBaseData();
+  IMAGE_BASE *data = LockImeBaseData();
   if (data) {
     SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes();
     assert(psa);
@@ -278,7 +278,7 @@ BOOL MZIMEJA::IsBasicDictLoaded() const {
 WCHAR *MZIMEJA::LockBasicDict() {
   // get size
   DWORD dwSize = 0;
-  ImeBaseData *data = LockImeBaseData();
+  IMAGE_BASE *data = LockImeBaseData();
   if (data) {
     dwSize = data->dwSharedDictDataSize;
     UnlockImeBaseData(data);

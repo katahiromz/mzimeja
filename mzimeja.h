@@ -324,9 +324,36 @@ struct MzConversionResult {
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct ImeBaseData {
+struct IMAGE_BASE {
   DWORD   dwSignature;
   DWORD   dwSharedDictDataSize;
+};
+
+enum GYOU {
+  GYOU_A,
+  GYOU_KA,
+  GYOU_GA,
+  GYOU_SA,
+  GYOU_ZA,
+  GYOU_TA,
+  GYOU_DA,
+  GYOU_NA,
+  GYOU_HA,
+  GYOU_BA,
+  GYOU_PA,
+  GYOU_MA,
+  GYOU_YA,
+  GYOU_RA,
+  GYOU_WA,
+  GYOU_NN
+};
+
+enum DAN {
+  DAN_A,
+  DAN_I,
+  DAN_U,
+  DAN_E,
+  DAN_O
 };
 
 enum HINSHI_BUNRUI {
@@ -480,7 +507,7 @@ protected:
   HANDLE          m_hMutex;         // mutex
   HANDLE          m_hBaseData;      // file mapping
   BOOL LoadBasicDictFile(std::vector<DICT_ENTRY>& entries);
-  BOOL DeployDictData(ImeBaseData *data, SECURITY_ATTRIBUTES *psa,
+  BOOL DeployDictData(IMAGE_BASE *data, SECURITY_ATTRIBUTES *psa,
                       const std::vector<DICT_ENTRY>& entries);
 
   // input context
@@ -488,8 +515,8 @@ protected:
   InputContext *  m_lpIMC;
 
   HANDLE          m_hBasicDictData; // file mapping
-  ImeBaseData *LockImeBaseData();
-  void UnlockImeBaseData(ImeBaseData *data);
+  IMAGE_BASE *LockImeBaseData();
+  void UnlockImeBaseData(IMAGE_BASE *data);
 
   // literal map
   unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;
