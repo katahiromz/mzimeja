@@ -48,12 +48,13 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
   char buf[256];
   wchar_t wbuf[256];
   std::wstring str;
+  using namespace std;
 
   entries.clear();
   entries.reserve(60000);
 
   std::wstring filename = GetComputerString(L"basic dictionary file");
-  FILE *fp = fopen("..\\mzimeja.dic", "rb");
+  FILE *fp = _wfopen(filename.c_str(), L"rb");
   if (fp == NULL) return false;
 
   int lineno = 0;
@@ -166,7 +167,7 @@ BOOL MZIMEJA::DeployDictData(
     if (pv) {
       size_t cch;
       WCHAR *pch = reinterpret_cast<WCHAR *>(pv);
-      *pch += L'\n';  // new line
+      *pch++ += L'\n';  // new line
       for (size_t i = 0; i < entries.size(); ++i) {
         // line format: pre \t hb \t post \t tags \n
         const DICT_ENTRY& entry = entries[i];
@@ -191,7 +192,12 @@ BOOL MZIMEJA::DeployDictData(
         *pch++ = L'\n';
       }
       *pch++ = L'\0'; // NUL
-      assert(size == size_t(pch - reinterpret_cast<WCHAR *>(pv)));
+      assert(size / 2 == size_t(pch - reinterpret_cast<WCHAR *>(pv)));
+      #if 0
+        FILE *fp = fopen("c:\\TEST.txt", "wb");
+        fwrite(pv, 100, 1, fp);
+        fclose(fp);
+      #endif
       ::UnmapViewOfFile(pv);
       ret = TRUE; // success
     }
@@ -205,15 +211,20 @@ BOOL MZIMEJA::DeployDictData(
 
 BOOL MZIMEJA::LoadBasicDict() {
   BOOL ret = FALSE;
+  // get shared data
   ImeBaseData *data = LockImeBaseData();
   if (data) {
+    SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes();
+    assert(psa);
     if (data->dwSignature == 0xDEADFACE) {
-      SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes();
-      assert(psa);
-
-      if (data->dwSharedDictDataSize != 0) {
-        // get shared data
-        if (WaitForSingleObject(m_hMutex, 5000) == WAIT_OBJECT_0) {
+      if (data->dwSharedDictDataSize == 0) {
+        std::vector<DICT_ENTRY> entries;
+        if (LoadBasicDictFile(entries)) {
+          ret = DeployDictData(data, psa, entries);
+        }
+      } else {
+        if (::WaitForSingleObject(m_hMutex, 5000) == WAIT_OBJECT_0) {
+          // create dict data
           m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
             PAGE_READWRITE, 0, data->dwSharedDictDataSize, L"mzimeja_basic_dict");
           if (m_hBasicDictData) {
@@ -221,15 +232,9 @@ BOOL MZIMEJA::LoadBasicDict() {
           }
           ::ReleaseMutex(m_hMutex);
         }
-      } else {
-        // create shared data
-        std::vector<DICT_ENTRY> entries;
-        if (LoadBasicDictFile(entries)) {
-          ret = DeployDictData(data, psa, entries);
-        }
       }
-      FreeSecurityAttributes(psa);
     }
+    FreeSecurityAttributes(psa);
     UnlockImeBaseData(data);
   }
 
