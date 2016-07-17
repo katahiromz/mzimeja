@@ -347,7 +347,7 @@ enum HINSHI_BUNRUI {
   HB_SETTOUGO,          // 接頭語
   HB_SETSUBIGO,         // 接尾語
   HB_END_NODE           // 終了ノード
-};
+}; // enum HINSHI_BUNRUI
 
 enum KATSUYOU_KEI {
   MIZEN_KEI,            // 未然形
