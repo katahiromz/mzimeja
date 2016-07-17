@@ -127,13 +127,28 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
         continue;
       }
 
-      entry.pre = fields[0];
-      if (fields.size() < 3 || fields[2].empty()) {
-        entry.post = fields[0];
-      } else {
-        entry.post = fields[2];
+      if (fields.size() == 2) {
+        fields.push_back(fields[0]);
+      } else if (fields[2].empty()) {
+        fields[2] = fields[0];
       }
 
+      if (entry.bunrui == HB_NAKEIYOUSHI) {
+        //DebugPrintW(L"%s\n", fields[0].c_str());
+        assert(fields[0][fields[0].size() - 1] == L'‚È');
+        assert(fields[2][fields[2].size() - 1] == L'‚È');
+        fields[0].resize(fields[0].size() - 1);
+        fields[2].resize(fields[2].size() - 1);
+      } else if (entry.bunrui == HB_IKEIYOUSHI) {
+        //DebugPrintW(L"%s\n", fields[0].c_str());
+        assert(fields[0][fields[0].size() - 1] == L'‚¢');
+        assert(fields[2][fields[2].size() - 1] == L'‚¢');
+        fields[0].resize(fields[0].size() - 1);
+        fields[2].resize(fields[2].size() - 1);
+      }
+
+      entry.pre = fields[0];
+      entry.post = fields[2];
       if (fields.size() >= 4) {
         entry.tags = fields[3];
       }
@@ -232,9 +247,6 @@ BOOL MZIMEJA::LoadBasicDict() {
         std::vector<DICT_ENTRY> entries;
         if (LoadBasicDictFile(entries)) {
           ret = DeployDictData(data, psa, entries);
-          if (ret) {
-            DebugPrintA("dictionary was deployed\n");
-          }
         }
         assert(ret);
       } else {
@@ -244,7 +256,6 @@ BOOL MZIMEJA::LoadBasicDict() {
           m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
             PAGE_READONLY, 0, data->dwSharedDictDataSize, L"mzimeja_basic_dict");
           if (m_hBasicDictData) {
-            DebugPrintA("dictionary was retrieved\n");
             ret = TRUE;
           }
           assert(ret);

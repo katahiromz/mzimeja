@@ -96,7 +96,11 @@ static unsigned int __stdcall loading_dict_proc(void *param) {
   MZIMEJA *pIme = (MZIMEJA *)param;
   // load basic dictionary
   assert(pIme);
-  pIme->LoadBasicDict();
+  if (pIme->LoadBasicDict()) {
+    DebugPrintA("basic dictionary: loaded\n");
+  } else {
+    DebugPrintA("ERROR: basic dictionary: failed to load\n");
+  }
   return 0;
 }
 
