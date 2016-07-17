@@ -379,6 +379,9 @@ enum HINSHI_BUNRUI {
   HB_KANGO,             // 漢語
   HB_SETTOUGO,          // 接頭語
   HB_SETSUBIGO,         // 接尾語
+  HB_PERIOD,            // 句点（。）
+  HB_COMMA,             // 読点（、）
+  HB_SYMBOLS,           // 記号類
   HB_END_NODE           // 終了ノード
 }; // enum HINSHI_BUNRUI
 
@@ -389,7 +392,10 @@ enum KATSUYOU_KEI {
   RENTAI_KEI,           // 連体形
   KATEI_KEI,            // 仮定形
   MEIREI_KEI,           // 命令形
-  MEISHI_KEI            // 名詞形
+  MEISHI_KEI,           // 名詞形
+  PERIOD_KEI,           // 句点（。）
+  COMMA_KEI,            // 読点（、）
+  SYMBOLS_KEI           // 記号類
 };
 
 struct DICT_ENTRY {
