@@ -296,6 +296,10 @@ BOOL is_education_kanji(WCHAR ch);
 BOOL is_common_use_kanji(WCHAR ch);
 // is the character fullwidth ASCII?
 BOOL is_fullwidth_ascii(WCHAR ch);
+// is the character a period?
+BOOL is_period(WCHAR ch);
+// is the character a comma?
+BOOL is_comma(WCHAR ch);
 
 //////////////////////////////////////////////////////////////////////////////
 

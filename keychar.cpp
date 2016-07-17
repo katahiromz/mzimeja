@@ -1655,6 +1655,14 @@ WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock) {
   }
 } // typing_key_to_char
 
+BOOL is_period(WCHAR ch) {
+  return ch == L'。' || ch == L'．' || ch == L'.' || ch == L'｡';
+}
+
+BOOL is_comma(WCHAR ch) {
+  return ch == L'、' || ch == L'，' || ch == L',' || ch == L'､';
+}
+
 BOOL is_hiragana(WCHAR ch) {
   FOOTMARK();
   if (0x3040 <= ch && ch <= 0x309F) return TRUE;
