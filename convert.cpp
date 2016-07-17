@@ -139,6 +139,7 @@ BOOL MZIMEJA::DeployDictData(
   const std::vector<DICT_ENTRY>& entries)
 {
   size_t size = 0;
+  size += 1;  // \n
   for (size_t i = 0; i < entries.size(); ++i) {
     const DICT_ENTRY& entry = entries[i];
     size += entry.pre.size();
@@ -161,9 +162,10 @@ BOOL MZIMEJA::DeployDictData(
       m_hBasicDictData, FILE_MAP_ALL_ACCESS, 0, 0, size);
     if (pv) {
       size_t cch;
-      // line format: pre \t hb \t post \t tags \n
       WCHAR *pch = reinterpret_cast<WCHAR *>(pv);
+      *pch += L'\n';  // new line
       for (size_t i = 0; i < entries.size(); ++i) {
+        // line format: pre \t hb \t post \t tags \n
         const DICT_ENTRY& entry = entries[i];
         // pre \t
         cch = entry.pre.size();
