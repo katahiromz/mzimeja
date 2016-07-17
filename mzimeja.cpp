@@ -77,7 +77,7 @@ MZIMEJA TheIME;
 
 MZIMEJA::MZIMEJA() {
   m_hInst = NULL;
-  m_hMyKL = 0;
+  m_hMyKL = NULL;
   m_bWinLogOn = FALSE;
 
   m_lpCurTransKey = NULL;
@@ -382,7 +382,7 @@ HKL MZIMEJA::GetHKL(VOID) {
     HKL hKLTemp = *(lphkl + dwi);
     ::ImmGetIMEFileName(hKLTemp, szFile, _countof(szFile));
 
-    if (!::lstrcmp(szFile, szImeFileName)) {
+    if (::lstrcmp(szFile, szImeFileName) == 0) {
       hKL = hKLTemp;
       break;
     }
@@ -498,11 +498,12 @@ BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
 
 void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
   FOOTMARK();
-  if (!m_hMyKL) {
+  if (m_hMyKL == NULL) {
     m_hMyKL = GetHKL();
-    if (!m_hMyKL) return;
+    if (m_hMyKL == NULL) return;
   }
 
+  // TODO: enable pen icon update
   HWND hwndIndicate = ::FindWindow(INDICATOR_CLASS, NULL);
   if (::IsWindow(hwndIndicate)) {
     BOOL fOpen = FALSE;
