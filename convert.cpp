@@ -4,6 +4,8 @@
 
 #include "mzimeja.h"
 
+const DWORD c_dwMilliseconds = 8000;
+
 static const wchar_t s_hiragana_table[][5] = {
   {L'‚ ', L'‚¢', L'‚¤', L'‚¦', L'‚¨'},
   {L'‚©', L'‚«', L'‚­', L'‚¯', L'‚±'},
@@ -164,7 +166,8 @@ BOOL MZIMEJA::DeployDictData(
   size *= sizeof(WCHAR);
 
   BOOL ret = FALSE;
-  if (::WaitForSingleObject(m_hMutex, 5000) == WAIT_OBJECT_0) {
+  DWORD dwWait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds);
+  if (dwWait == WAIT_OBJECT_0) {
     // create shared dict data
     m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
       PAGE_READWRITE, 0, size, L"mzimeja_basic_dict");
@@ -236,7 +239,8 @@ BOOL MZIMEJA::LoadBasicDict() {
         assert(ret);
       } else {
         // open shared dict data
-        if (::WaitForSingleObject(m_hMutex, 5000) == WAIT_OBJECT_0) {
+        DWORD dwWait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds);
+        if (dwWait == WAIT_OBJECT_0) {
           m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
             PAGE_READONLY, 0, data->dwSharedDictDataSize, L"mzimeja_basic_dict");
           if (m_hBasicDictData) {
