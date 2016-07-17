@@ -97,7 +97,6 @@ void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 
   ::SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
   ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
-  lpUIExtra->uiCand.bShow = FALSE;
 } // CandWnd_Create
 
 void CandWnd_Paint(HWND hCandWnd) {
@@ -234,7 +233,6 @@ void CandWnd_Hide(UIEXTRA *lpUIExtra) {
     lpUIExtra->uiCand.pt.y = rc.top;
     ::MoveWindow(lpUIExtra->uiCand.hWnd, -1, -1, 0, 0, TRUE);
     ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
-    lpUIExtra->uiCand.bShow = FALSE;
   }
 } // CandWnd_Hide
 
@@ -258,7 +256,6 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
       cy = rc.bottom - rc.top;
       ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
       ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
-      lpUIExtra->uiCand.bShow = TRUE;
       ::InvalidateRect(hwndCand, NULL, FALSE);
       ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
     }
@@ -303,7 +300,6 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
         cy = rc.bottom - rc.top;
         ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
         ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
-        lpUIExtra->uiCand.bShow = TRUE;
         ::InvalidateRect(hwndCand, NULL, FALSE);
       }
       ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));
@@ -324,7 +320,6 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
         cy = rc.bottom - rc.top;
         ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
         ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
-        lpUIExtra->uiCand.bShow = TRUE;
         ::InvalidateRect(hwndCand, NULL, FALSE);
       }
       ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));

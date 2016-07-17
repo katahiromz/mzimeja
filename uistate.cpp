@@ -53,7 +53,6 @@ HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
   }
   RepositionWindow(hwndStatus);
   ::ShowWindow(hwndStatus, SW_SHOWNOACTIVATE);
-  lpUIExtra->uiStatus.bShow = TRUE;
   SetWindowLongPtr(hwndStatus, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
   return hwndStatus;
 } // StatusWnd_Create

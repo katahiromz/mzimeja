@@ -16,19 +16,15 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
   if (lpUIExtra) {
     if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
       ::ShowWindow(lpUIExtra->uiStatus.hWnd, nsw);
-      lpUIExtra->uiStatus.bShow = fFlag;
     }
     if (IsWindow(lpUIExtra->uiCand.hWnd)) {
       ::ShowWindow(lpUIExtra->uiCand.hWnd, nsw);
-      lpUIExtra->uiCand.bShow = fFlag;
     }
     if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
       ::ShowWindow(lpUIExtra->uiDefComp.hWnd, nsw);
-      lpUIExtra->uiDefComp.bShow = fFlag;
     }
     if (IsWindow(lpUIExtra->uiGuide.hWnd)) {
       ::ShowWindow(lpUIExtra->uiGuide.hWnd, nsw);
-      lpUIExtra->uiGuide.bShow = fFlag;
     }
     UnlockUIExtra(hwndServer);
   }
@@ -343,7 +339,6 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
       lpUIExtra->uiStatus.pt.x = rc.left;
       lpUIExtra->uiStatus.pt.y = rc.top;
       ::ShowWindow(lpUIExtra->uiStatus.hWnd, SW_HIDE);
-      lpUIExtra->uiStatus.bShow = FALSE;
     }
     break;
 
@@ -454,7 +449,6 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
             hWnd, NULL, TheIME.m_hInst, NULL);
       }
       ::ShowWindow(lpUIExtra->uiGuide.hWnd, SW_SHOWNOACTIVATE);
-      lpUIExtra->uiGuide.bShow = TRUE;
       ::SetWindowLongPtr(lpUIExtra->uiGuide.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
       GuideWnd_Update(lpUIExtra);
     }
