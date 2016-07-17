@@ -95,7 +95,7 @@ MZIMEJA::MZIMEJA() {
 BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   FOOTMARK();
   m_hInst = hInstance;
-  ::InitCommonControls();
+  //::InitCommonControls();
 
   MakeLiteralMaps();
 

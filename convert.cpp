@@ -24,6 +24,9 @@ static const wchar_t s_hiragana_table[][5] = {
 };
 
 void MZIMEJA::MakeLiteralMaps() {
+  if (m_consonant_map.size()) {
+    return;
+  }
   m_consonant_map.clear();
   m_vowel_map.clear();
   const size_t count = sizeof(s_hiragana_table) / sizeof(s_hiragana_table[0]);
