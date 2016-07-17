@@ -153,7 +153,6 @@ struct UIEXTRA {
   HWND      hwndDefComp;
   UICHILD2  uiComp[MAXCOMPWND];
   HWND      hwndGuide;
-  HWND      hImePad;
 };
 
 // MZGUIDELINE
