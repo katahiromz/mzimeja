@@ -14,8 +14,8 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
 
   UIEXTRA *lpUIExtra = LockUIExtra(hwndServer);
   if (lpUIExtra) {
-    if (IsWindow(lpUIExtra->uiStatus.hWnd)) {
-      ::ShowWindow(lpUIExtra->uiStatus.hWnd, nsw);
+    if (IsWindow(lpUIExtra->hwndStatus)) {
+      ::ShowWindow(lpUIExtra->hwndStatus, nsw);
     }
     if (IsWindow(lpUIExtra->uiCand.hWnd)) {
       ::ShowWindow(lpUIExtra->uiCand.hWnd, nsw);
@@ -81,8 +81,8 @@ void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam) {
 void OnDestroy(HWND hWnd) {
   UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
   if (lpUIExtra) {
-    if (::IsWindow(lpUIExtra->uiStatus.hWnd))
-      ::DestroyWindow(lpUIExtra->uiStatus.hWnd);
+    if (::IsWindow(lpUIExtra->hwndStatus))
+      ::DestroyWindow(lpUIExtra->hwndStatus);
 
     if (::IsWindow(lpUIExtra->uiCand.hWnd))
       ::DestroyWindow(lpUIExtra->uiCand.hWnd);
@@ -231,7 +231,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     lpUIExtra = LockUIExtra(hWnd);
     if (lpUIExtra) {
       RECT rc;
-      ::GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
+      ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
       POINT pt;
       pt.x = (short)LOWORD(lParam);
       pt.y = (short)HIWORD(lParam);
@@ -310,13 +310,13 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
   switch (wParam) {
   case IMN_CLOSESTATUSWINDOW:
     DebugPrintA("IMN_CLOSESTATUSWINDOW\n");
-    if (::IsWindow(lpUIExtra->uiStatus.hWnd)) {
-      ::GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
+    if (::IsWindow(lpUIExtra->hwndStatus)) {
+      ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
       POINT pt;
       pt.x = rc.left;
       pt.y = rc.top;
       TheIME.SetUserData(L"ptStatusWindow", &pt, sizeof(pt));
-      ::ShowWindow(lpUIExtra->uiStatus.hWnd, SW_HIDE);
+      ::ShowWindow(lpUIExtra->hwndStatus, SW_HIDE);
     }
     break;
 
@@ -457,8 +457,8 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
     if (lpIMC) {
       POINT pt = lpIMC->ptStatusWndPos;
       RECT rc;
-      ::GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
-      ::MoveWindow(lpUIExtra->uiStatus.hWnd, pt.x, pt.y,
+      ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
+      ::MoveWindow(lpUIExtra->hwndStatus, pt.x, pt.y,
         rc.right - rc.left, rc.bottom - rc.top, TRUE);
       TheIME.UnlockIMC(hIMC);
     }
@@ -513,7 +513,7 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
       DebugPrintA("IMC_GETSTATUSWINDOWPOS\n");
       {
         RECT rc;
-        ::GetWindowRect(lpUIExtra->uiStatus.hWnd, &rc);
+        ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
         ret = MAKELONG(rc.left, rc.top);
       }
       break;

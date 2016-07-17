@@ -145,7 +145,7 @@ struct UICHILD2 {
 // UIEXTRA
 struct UIEXTRA {
   HIMC      hIMC;
-  UICHILD   uiStatus;
+  HWND      hwndStatus;
   UICHILD   uiCand;
   DWORD     dwCompStyle;
   HFONT     hFont;

@@ -29,7 +29,7 @@ HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
   FOOTMARK();
   const DWORD style = WS_DISABLED | WS_POPUP;
   const DWORD exstyle = WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
-  HWND hwndStatus = lpUIExtra->uiStatus.hWnd;
+  HWND hwndStatus = lpUIExtra->hwndStatus;
   if (!::IsWindow(hwndStatus)) {
     INT cx, cy;
     cx = CX_MINICAPTION + CX_BUTTON * 3;
@@ -49,7 +49,7 @@ HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
       exstyle, szStatusClassName, NULL, style,
       pt.x, pt.y, cx, cy,
       hWnd, NULL, TheIME.m_hInst, NULL);
-    lpUIExtra->uiStatus.hWnd = hwndStatus;
+    lpUIExtra->hwndStatus = hwndStatus;
   } else {
     StatusWnd_Update(lpUIExtra);
   }
@@ -243,7 +243,7 @@ STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
 
 void StatusWnd_Update(UIEXTRA *lpUIExtra) {
   FOOTMARK();
-  HWND hwndStatus = lpUIExtra->uiStatus.hWnd;
+  HWND hwndStatus = lpUIExtra->hwndStatus;
   if (::IsWindow(hwndStatus)) {
     POINT pt;
     if (TheIME.GetUserData(L"ptStatusWindow", &pt, sizeof(pt))) {
