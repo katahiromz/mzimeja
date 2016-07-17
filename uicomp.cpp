@@ -55,6 +55,7 @@ static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
 void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
   FOOTMARK();
   RECT rc;
+  POINT pt;
 
   lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
   for (int i = 0; i < MAXCOMPWND; i++) {
@@ -70,19 +71,19 @@ void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     ::ShowWindow(hwnd, SW_HIDE);
   }
 
-  if (lpUIExtra->uiDefComp.pt.x == -1) {
+  if (TheIME.GetUserData(L"ptDefComp", &pt, sizeof(pt))) {
     ::GetWindowRect(lpIMC->hWnd, &rc);
-    lpUIExtra->uiDefComp.pt.x = rc.left;
-    lpUIExtra->uiDefComp.pt.y = rc.bottom + 1;
+    pt.x = rc.left;
+    pt.y = rc.bottom + 1;
   }
 
-  HWND hwndDef = lpUIExtra->uiDefComp.hWnd;
+  HWND hwndDef = lpUIExtra->hwndDefComp;
   if (!::IsWindow(hwndDef)) {
     hwndDef = CreateWindowEx(
         WS_EX_WINDOWEDGE, szCompStrClassName, NULL,
-        WS_COMPDEFAULT | WS_DLGFRAME, lpUIExtra->uiDefComp.pt.x,
-        lpUIExtra->uiDefComp.pt.y, 1, 1, hUIWnd, NULL, TheIME.m_hInst, NULL);
-    lpUIExtra->uiDefComp.hWnd = hwndDef;
+        WS_COMPDEFAULT | WS_DLGFRAME, pt.x, pt.y, 1, 1,
+        hUIWnd, NULL, TheIME.m_hInst, NULL);
+    lpUIExtra->hwndDefComp = hwndDef;
   }
   ::SetWindowLong(hwndDef, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont);
   ::SetWindowLongPtr(hwndDef, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
@@ -117,7 +118,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
     if (lpIMC->cfCompForm.dwStyle) {
       hCompWnd = lpUIExtra->uiComp[i].hWnd;
     } else {
-      hCompWnd = lpUIExtra->uiDefComp.hWnd;
+      hCompWnd = lpUIExtra->hwndDefComp;
     }
 
     // get client rect
@@ -220,7 +221,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     }
 
     // hide the default composition window
-    HWND hwndDef = lpUIExtra->uiDefComp.hWnd;
+    HWND hwndDef = lpUIExtra->hwndDefComp;
     if (::IsWindow(hwndDef)) {
       ::ShowWindow(hwndDef, SW_HIDE);
     }
@@ -342,7 +343,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     }
     lpIMC->UnlockCompStr();
   } else {  // style is CFS_DEFAULT
-    HWND hwndDef = lpUIExtra->uiDefComp.hWnd;
+    HWND hwndDef = lpUIExtra->hwndDefComp;
     if (::IsWindow(hwndDef)) {
       ::SetWindowLong(hwndDef, FIGWL_COMPSTARTSTR, 0);
       ::SetWindowLong(hwndDef, FIGWL_COMPSTARTNUM, 0);
@@ -375,8 +376,10 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
       // calculate new window extent
       RECT rc;
       ::GetWindowRect(hwndDef, &rc);
-      lpUIExtra->uiDefComp.pt.x = rc.left;
-      lpUIExtra->uiDefComp.pt.y = rc.top;
+      POINT pt;
+      pt.x = rc.left;
+      pt.y = rc.top;
+      TheIME.SetUserData(L"ptDefComp", &pt, sizeof(pt));
       width += 2 * ::GetSystemMetrics(SM_CXEDGE) + CARET_WIDTH;
       height += 2 * ::GetSystemMetrics(SM_CYEDGE) + UNDERLINE_HEIGHT;
 
@@ -576,7 +579,7 @@ void CompWnd_Hide(UIEXTRA *lpUIExtra) {
   FOOTMARK();
 
   RECT rc;
-  HWND hwndDef = lpUIExtra->uiDefComp.hWnd;
+  HWND hwndDef = lpUIExtra->hwndDefComp;
   if (::IsWindow(hwndDef)) {
     if (!lpUIExtra->dwCompStyle) {
       ::GetWindowRect(hwndDef, &rc);

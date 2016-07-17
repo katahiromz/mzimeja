@@ -20,8 +20,8 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
     if (IsWindow(lpUIExtra->uiCand.hWnd)) {
       ::ShowWindow(lpUIExtra->uiCand.hWnd, nsw);
     }
-    if (IsWindow(lpUIExtra->uiDefComp.hWnd)) {
-      ::ShowWindow(lpUIExtra->uiDefComp.hWnd, nsw);
+    if (IsWindow(lpUIExtra->hwndDefComp)) {
+      ::ShowWindow(lpUIExtra->hwndDefComp, nsw);
     }
     if (IsWindow(lpUIExtra->uiGuide.hWnd)) {
       ::ShowWindow(lpUIExtra->uiGuide.hWnd, nsw);
@@ -53,7 +53,7 @@ void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam) {
           }
         }
 
-        if (::IsWindow(lpUIExtra->uiDefComp.hWnd)) {
+        if (::IsWindow(lpUIExtra->hwndDefComp)) {
           CompWnd_Hide(lpUIExtra);
         }
         if (lParam & ISC_SHOWUICOMPOSITIONWINDOW) {
@@ -87,8 +87,8 @@ void OnDestroy(HWND hWnd) {
     if (::IsWindow(lpUIExtra->uiCand.hWnd))
       ::DestroyWindow(lpUIExtra->uiCand.hWnd);
 
-    if (::IsWindow(lpUIExtra->uiDefComp.hWnd))
-      ::DestroyWindow(lpUIExtra->uiDefComp.hWnd);
+    if (::IsWindow(lpUIExtra->hwndDefComp))
+      ::DestroyWindow(lpUIExtra->hwndDefComp);
 
     for (INT i = 0; i < MAXCOMPWND; i++) {
       if (::IsWindow(lpUIExtra->uiComp[i].hWnd))
@@ -136,8 +136,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
     lpUIExtra = (UIEXTRA *)GlobalLock(hUIExtra);
     if (lpUIExtra) {
-      lpUIExtra->uiDefComp.pt.x = -1;
-      lpUIExtra->uiDefComp.pt.y = -1;
       lpUIExtra->uiCand.pt.x = -1;
       lpUIExtra->uiCand.pt.y = -1;
       lpUIExtra->uiGuide.pt.x = -1;
@@ -247,8 +245,10 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     lpUIExtra = LockUIExtra(hWnd);
     if (lpUIExtra) {
       if (!lpUIExtra->dwCompStyle) {
-        lpUIExtra->uiDefComp.pt.x = (short)LOWORD(lParam);
-        lpUIExtra->uiDefComp.pt.y = (short)HIWORD(lParam);
+        POINT pt;
+        pt.x = (short)LOWORD(lParam);
+        pt.y = (short)HIWORD(lParam);
+        TheIME.SetUserData(L"ptDefComp", &pt, sizeof(pt));
       }
       UnlockUIExtra(hWnd);
     }

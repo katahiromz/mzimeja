@@ -150,7 +150,7 @@ struct UIEXTRA {
   DWORD     dwCompStyle;
   HFONT     hFont;
   BOOL      bVertical;
-  UICHILD   uiDefComp;
+  HWND      hwndDefComp;
   UICHILD2  uiComp[MAXCOMPWND];
   UICHILD   uiGuide;
   HWND      hImePad;
