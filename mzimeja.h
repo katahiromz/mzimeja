@@ -349,6 +349,16 @@ enum HINSHI_BUNRUI {
   HB_END_NODE           // 終了ノード
 };
 
+enum KATSUYOU_KEI {
+  MIZEN_KEI,            // 未然形
+  RENYOU_KEI,           // 連用形
+  SHUUSHI_KEI,          // 終止形
+  RENTAI_KEI,           // 連体形
+  KATEI_KEI,            // 仮定形
+  MEIREI_KEI,           // 命令形
+  MEISHI_KEI            // 名詞形
+};
+
 struct DICT_ENTRY {
   std::wstring  pre;
   HINSHI_BUNRUI bunrui;
