@@ -33,8 +33,9 @@
 #include "immdev.h"         // for IME/IMM development
 #include "input.h"          // for INPUT_MODE and InputContext
 
-#define UNBOOST_USE_STRING_ALGORITHM
-#define UNBOOST_USE_UNORDERED_MAP
+#define UNBOOST_USE_STRING_ALGORITHM  // for unboost::split, trim_...
+#define UNBOOST_USE_UNORDERED_MAP     // for unboost::unordered_map
+#define UNBOOST_USE_SMART_PTR         // for unboost::shared_ptr
 #include "unboost.hpp"      // Unboost
 
 //////////////////////////////////////////////////////////////////////////////
@@ -400,10 +401,31 @@ enum KATSUYOU_KEI {
 
 struct DICT_ENTRY {
   std::wstring  pre;
-  HINSHI_BUNRUI bunrui;
   std::wstring  post;
+  HINSHI_BUNRUI bunrui;
   std::wstring  tags;
   GYOU          gyou;
+};
+
+struct LATTICE_NODE;
+typedef unboost::shared_ptr<LATTICE_NODE>     LATTICE_NODE_PTR;
+typedef std::vector<LATTICE_NODE_PTR>         LATTICE_CHUNK;
+
+struct LATTICE_NODE {
+  std::wstring                    pre;
+  std::wstring                    post;
+  HINSHI_BUNRUI                   bunrui;
+  GYOU                            gyou;
+  DWORD                           cost;
+  std::vector<LATTICE_NODE_PTR>   children;
+};
+
+struct LATTICE {
+  std::wstring                    pre;
+  std::wstring                    post;
+  LATTICE_NODE_PTR                start_node;
+  LATTICE_NODE_PTR                end_node;
+  std::vector<LATTICE_CHUNK>      chunks;
 };
 
 //////////////////////////////////////////////////////////////////////////////
