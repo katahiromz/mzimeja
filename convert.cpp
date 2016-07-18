@@ -1331,7 +1331,10 @@ void MZIMEJA::SingleClauseConversion(const std::wstring& strHiragana,
   FOOTMARK();
   result.clear();
 
+#if 0
   // TODO:
+#else
+  // dummy sample
   MzConversionCandidate cand;
   cand.hiragana = L"‚½‚ñ‚¢‚Â‚Ô‚ñ‚¹‚Â‚Ö‚ñ‚©‚ñ";
   cand.converted = L"’Pˆê•¶ß•ÏŠ·1";
@@ -1342,6 +1345,7 @@ void MZIMEJA::SingleClauseConversion(const std::wstring& strHiragana,
   cand.hiragana = L"‚½‚ñ‚¢‚Â‚Ô‚ñ‚¹‚Â‚Ö‚ñ‚©‚ñ";
   cand.converted = L"’Pˆê•¶ß•ÏŠ·3";
   result.candidates.push_back(cand);
+#endif
 } // MZIMEJA::SingleClauseConversion
 
 BOOL MZIMEJA::StretchClauseLeft(
