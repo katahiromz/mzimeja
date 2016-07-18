@@ -410,10 +410,7 @@ bool do_katsuyou_godan_doushi(const DICT_ENTRY& entry) {
 
   temp0 = str;
   temp0 += g_table[ngyou][1];
-  temp1 = str;
-  temp1 += g_table[ngyou][1];
-  temp1 += L"方";
-  do_wprintf(L"名詞形: %s %s\n", temp0.c_str(), temp1.c_str());
+  do_wprintf(L"名詞形: %s\n", temp0.c_str());
 
   return true;
 }
@@ -447,9 +444,7 @@ bool do_katsuyou_ichidan_doushi(const DICT_ENTRY& entry) {
   do_wprintf(L"命令形: %s %s\n", temp0.c_str(), temp1.c_str());
 
   temp0 = str;
-  temp1 = str;
-  temp1 += L"方";
-  do_wprintf(L"名詞形: %s %s\n", temp0.c_str(), temp1.c_str());
+  do_wprintf(L"名詞形: %s\n", temp0.c_str());
 
   return true;
 }

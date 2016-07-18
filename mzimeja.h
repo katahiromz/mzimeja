@@ -358,7 +358,7 @@ enum DAN {
 };
 
 enum HINSHI_BUNRUI {
-  HB_START_NODE,        // 開始ノード
+  HB_NONE,              // (不正)
   HB_MEISHI,            // 名詞
   HB_IKEIYOUSHI,        // い形容詞
   HB_NAKEIYOUSHI,       // な形容詞
@@ -367,6 +367,7 @@ enum HINSHI_BUNRUI {
   HB_SETSUZOKUSHI,      // 接続詞
   HB_KANDOUSHI,         // 感動詞
   HB_JOSHI,             // 助詞
+  HB_JODOUSHI,          // 助動詞
   HB_MIZEN_JODOUSHI,    // 未然助動詞
   HB_RENYOU_JODOUSHI,   // 連用助動詞
   HB_SHUUSHI_JODOUSHI,  // 終止助動詞
@@ -382,8 +383,7 @@ enum HINSHI_BUNRUI {
   HB_SETSUBIGO,         // 接尾語
   HB_PERIOD,            // 句点（。）
   HB_COMMA,             // 読点（、）
-  HB_SYMBOLS,           // 記号類
-  HB_END_NODE           // 終了ノード
+  HB_SYMBOLS            // 記号類
 }; // enum HINSHI_BUNRUI
 
 enum KATSUYOU_KEI {
@@ -407,26 +407,27 @@ struct DICT_ENTRY {
   GYOU          gyou;
 };
 
-struct LATTICE_NODE;
-typedef unboost::shared_ptr<LATTICE_NODE>     LATTICE_NODE_PTR;
-typedef std::vector<LATTICE_NODE_PTR>         LATTICE_CHUNK;
-
 struct LATTICE_NODE {
   std::wstring                    pre;
   std::wstring                    post;
   HINSHI_BUNRUI                   bunrui;
   GYOU                            gyou;
+  KATSUYOU_KEI                    katsuyou;
   DWORD                           cost;
-  std::vector<LATTICE_NODE_PTR>   children;
 };
+typedef std::vector<LATTICE_NODE>     LATTICE_CHUNK;
 
 struct LATTICE {
+  size_t                          index;
   std::wstring                    pre;
-  std::wstring                    post;
-  LATTICE_NODE_PTR                start_node;
-  LATTICE_NODE_PTR                end_node;
   std::vector<LATTICE_CHUNK>      chunks;
+  std::vector<DWORD>              refs;
+  // pre.size() == chunks.size().
+  // pre.size() + 1 == refs.size().
 };
+
+typedef std::vector<std::wstring> RECORDS;
+typedef std::vector<std::wstring> FIELDS;
 
 //////////////////////////////////////////////////////////////////////////////
 // The IME
@@ -486,6 +487,21 @@ public:
   BOOL IsBasicDictLoaded() const;
   WCHAR *LockBasicDict();
   void UnlockBasicDict(WCHAR *data);
+
+  // make lattice
+  void MakeLattice(LATTICE& lattice);
+  void MakeLattice(LATTICE& lattice, const WCHAR *dict_data);
+  void CutExtraNodes(LATTICE& lattice);
+  void MakeResult(MzConversionResult& result, LATTICE& lattice);
+
+  BOOL ScanDict(RECORDS& records, const WCHAR *dict_data, WCHAR ch);
+  void ParseFields(LATTICE& lattice, size_t index, const FIELDS& fields);
+  void ParseIkeiyoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
+  void ParseNakeiyoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
+  void ParseGodanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
+  void ParseIchidanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
+  void ParseKahenDoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
+  void ParseSahenDoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
 
   // convert
   void PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
