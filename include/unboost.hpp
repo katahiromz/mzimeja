@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef UNBOOST_HPP_
-#define UNBOOST_HPP_    12 // Version 12
+#define UNBOOST_HPP_    13 // Version 13
 
 #ifndef __cplusplus
     #error Unboost needs C++ compiler. You lose.
@@ -176,6 +176,11 @@
         #endif
         namespace unboost {
             using std::tr1::shared_ptr;
+            template <typename T>
+            inline shared_ptr<T> make_shared() {
+                shared_ptr<T> ptr(new T());
+                return ptr;
+            }
             template <typename T>
             inline shared_ptr<T> make_shared(const T& value) {
                 shared_ptr<T> ptr(new T(value));
