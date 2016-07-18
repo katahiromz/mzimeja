@@ -585,7 +585,7 @@ MZIMEJA::ParseIkeiyoushi(LATTICE& lattice, size_t index, const FIELDS& fields) {
   } while(0);
 
   // 名詞形
-  node.katsuyou = MEISHI_KEI;
+  node.bunrui = HB_MEISHI;
   do {
     if (str[0] != L'さ') break;
     node.pre = fields[0] + L'さ';
@@ -683,9 +683,9 @@ MZIMEJA::ParseNakeiyoushi(LATTICE& lattice, size_t index, const FIELDS& fields) 
   } while(0);
 
   // 名詞形
+  node.bunrui = HB_MEISHI;
   do {
     if (str[0] != L'さ') break;
-    node.katsuyou = MEISHI_KEI;
     node.pre = fields[0] + L'さ';
     node.post = fields[2] + L'さ';
     lattice.chunks[index].push_back(node);
@@ -788,10 +788,10 @@ MZIMEJA::ParseGodanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields) 
   } while(0);
 
   // 名詞形
+  node.bunrui = HB_MEISHI;
   do {
     wchar_t ch = s_hiragana_table[node.gyou][DAN_I];
     if (str[0] != ch) break;
-    node.katsuyou = MEISHI_KEI;
     node.pre = fields[0] + ch;
     node.post = fields[2] + ch;
     lattice.chunks[index].push_back(node);
@@ -863,8 +863,8 @@ MZIMEJA::ParseIchidanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields
   } while(0);
 
   // 名詞形
+  node.bunrui = HB_MEISHI;
   do {
-    node.katsuyou = MEISHI_KEI;
     node.pre = fields[0];
     node.post = fields[2];
     lattice.chunks[index].push_back(node);
@@ -936,9 +936,9 @@ MZIMEJA::ParseKahenDoushi(LATTICE& lattice, size_t index, const FIELDS& fields) 
   } while(0);
 
   // 名詞形
+  node.bunrui = HB_MEISHI;
   do {
     if (str[0] != L'き') break;
-    node.katsuyou = MEIREI_KEI;
     node.pre = fields[0] + L'き';
     node.post = fields[2] + L'来';
     lattice.chunks[index].push_back(node);

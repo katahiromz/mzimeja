@@ -1663,6 +1663,14 @@ BOOL is_comma(WCHAR ch) {
   return ch == L'、' || ch == L'，' || ch == L',' || ch == L'､';
 }
 
+WCHAR get_period(void) {
+  return L'。';
+}
+
+WCHAR get_comma(void) {
+  return L'、';
+}
+
 BOOL is_hiragana(WCHAR ch) {
   FOOTMARK();
   if (0x3040 <= ch && ch <= 0x309F) return TRUE;

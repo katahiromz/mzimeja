@@ -302,6 +302,11 @@ BOOL is_period(WCHAR ch);
 // is the character a comma?
 BOOL is_comma(WCHAR ch);
 
+// returns a Japanese period
+WCHAR get_period(void);
+// returns a Japanese comma
+WCHAR get_comma(void);
+
 //////////////////////////////////////////////////////////////////////////////
 
 struct MzConversionCandidate {
