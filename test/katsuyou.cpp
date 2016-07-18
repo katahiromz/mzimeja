@@ -32,8 +32,8 @@ enum HINSHI_BUNRUI {
   HB_KAHEN_DOUSHI,      // カ変動詞
   HB_SAHEN_DOUSHI,      // サ変動詞
   HB_KANGO,             // 漢語
-  HB_SETTOUGO,          // 接頭語
-  HB_SETSUBIGO,         // 接尾語
+  HB_SETTOUJI,          // 接頭辞
+  HB_SETSUBIJI,         // 接尾辞
   HB_END_NODE           // 終了ノード
 };
 
@@ -187,8 +187,8 @@ bool do_load(void) {
       else if (bunrui_str == L"カ変動詞")     entry.bunrui = HB_KAHEN_DOUSHI;
       else if (bunrui_str == L"サ変動詞")     entry.bunrui = HB_SAHEN_DOUSHI;
       else if (bunrui_str == L"漢語")         entry.bunrui = HB_KANGO;
-      else if (bunrui_str == L"接頭語")       entry.bunrui = HB_SETTOUGO;
-      else if (bunrui_str == L"接尾語")       entry.bunrui = HB_SETSUBIGO;
+      else if (bunrui_str == L"接頭辞")       entry.bunrui = HB_SETTOUJI;
+      else if (bunrui_str == L"接尾辞")       entry.bunrui = HB_SETSUBIJI;
       else {
         printf("..\\mzimeja.dic (%d): WARNING: invalid bunrui\n", lineno);
         continue;

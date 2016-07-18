@@ -379,8 +379,8 @@ enum HINSHI_BUNRUI {
   HB_KAHEN_DOUSHI,      // カ変動詞
   HB_SAHEN_DOUSHI,      // サ変動詞
   HB_KANGO,             // 漢語
-  HB_SETTOUGO,          // 接頭語
-  HB_SETSUBIGO,         // 接尾語
+  HB_SETTOUJI,          // 接頭辞
+  HB_SETSUBIJI,         // 接尾辞
   HB_PERIOD,            // 句点（。）
   HB_COMMA,             // 読点（、）
   HB_SYMBOLS            // 記号類

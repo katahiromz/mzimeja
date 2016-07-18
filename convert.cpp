@@ -119,8 +119,8 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
       if (bunrui_str == L"˜A‘ÌŒ")          entry.bunrui = HB_RENTAISHI;
       else if (bunrui_str == L"Ú‘±Œ")     entry.bunrui = HB_SETSUZOKUSHI;
       else if (bunrui_str == L"Š´“®Œ")     entry.bunrui = HB_KANDOUSHI;
-      else if (bunrui_str == L"Ú“ªŒê")     entry.bunrui = HB_SETTOUGO;
-      else if (bunrui_str == L"Ú”öŒê")     entry.bunrui = HB_SETSUBIGO;
+      else if (bunrui_str == L"Ú“ª«")     entry.bunrui = HB_SETTOUJI;
+      else if (bunrui_str == L"Ú”ö«")     entry.bunrui = HB_SETSUBIJI;
       else continue;
     } else if (bunrui_str.size() == 4) {
       if (bunrui_str == L"‚¢Œ`—eŒ")        entry.bunrui = HB_IKEIYOUSHI;
@@ -1114,8 +1114,8 @@ MZIMEJA::ParseFields(LATTICE& lattice, size_t index, const FIELDS& fields) {
   case HB_KANDOUSHI:
   case HB_JOSHI:
   case HB_KANGO:
-  case HB_SETTOUGO:
-  case HB_SETSUBIGO:
+  case HB_SETTOUJI:
+  case HB_SETSUBIJI:
     if (lattice.pre.substr(index, length) == fields[0]) {
       node.pre = fields[0];
       node.post = fields[2];
