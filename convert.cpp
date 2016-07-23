@@ -757,6 +757,29 @@ void MzIme::UnlockBasicDict(WCHAR *data) {
 //////////////////////////////////////////////////////////////////////////////
 // MzConversionResult, MzConversionClause etc.
 
+void MzConversionClause::add(
+  const std::wstring& pre, const std::wstring& post, int the_cost)
+{
+  bool matched = false;
+  for (size_t i = 0; i < candidates.size(); ++i) {
+    if (candidates[i].converted == post) {
+      if (candidates[i].cost > the_cost)  {
+        candidates[i].cost = the_cost;
+      }
+      matched = true;
+      break;
+    }
+  }
+
+  if (!matched) {
+    MzConversionCandidate cand;
+    cand.hiragana = pre;
+    cand.converted = post;
+    cand.cost = the_cost;
+    candidates.push_back(cand);
+  }
+}
+
 static inline bool CandidateCompare(
   const MzConversionCandidate& cand1, const MzConversionCandidate& cand2)
 {
@@ -1950,13 +1973,17 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
     for (size_t i = 0; i < chunk.size(); ++i) {
       if (chunk[i]->pre.size() == size) {
         // add a candidate of same size
-        MzConversionCandidate cand;
-        cand.hiragana = chunk[i]->pre;
-        cand.converted = chunk[i]->post;
-        cand.cost = chunk[i]->cost;
-        clause.candidates.push_back(cand);
+        clause.add(chunk[i]->pre, chunk[i]->post, chunk[i]->cost);
       }
     }
+
+    const std::wstring& hiragana = chunk[0]->pre;
+    clause.add(hiragana, hiragana, 10);
+
+    std::wstring katakana;
+    katakana = lcmap(hiragana, LCMAP_FULLWIDTH | LCMAP_KATAKANA);
+    clause.add(katakana, katakana, 10);
+
     index += size;
     ++iClause;
   }

@@ -324,6 +324,7 @@ struct MzConversionClause {
   std::vector<MzConversionCandidate> candidates;
   void clear() { candidates.clear(); }
   void sort();
+  void add(const std::wstring& pre, const std::wstring& post, int the_cost);
 };
 
 struct MzConversionResult {
