@@ -25,10 +25,47 @@ static const wchar_t s_hiragana_table[][5] = {
   {L'ÇÒ', 0, 0, 0, 0},                   // GYOU_NN
 };
 
+static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
+  int index = int(bunrui) - int(HB_HEAD);
+  static const wchar_t *s_array[] = {
+    L"HB_HEAD",
+    L"HB_TAIL",
+    L"HB_UNKNOWN",
+    L"HB_MEISHI",
+    L"HB_IKEIYOUSHI",
+    L"HB_NAKEIYOUSHI",
+    L"HB_RENTAISHI",
+    L"HB_FUKUSHI",
+    L"HB_SETSUZOKUSHI",
+    L"HB_KANDOUSHI",
+    L"HB_KAKU_JOSHI",
+    L"HB_SETSUZOKU_JOSHI",
+    L"HB_FUKU_JOSHI",
+    L"HB_SHUU_JOSHI",
+    L"HB_JODOUSHI",
+    L"HB_MIZEN_JODOUSHI",
+    L"HB_RENYOU_JODOUSHI",
+    L"HB_SHUUSHI_JODOUSHI",
+    L"HB_RENTAI_JODOUSHI",
+    L"HB_KATEI_JODOUSHI",
+    L"HB_MEIREI_JODOUSHI",
+    L"HB_GODAN_DOUSHI",
+    L"HB_ICHIDAN_DOUSHI",
+    L"HB_KAHEN_DOUSHI",
+    L"HB_SAHEN_DOUSHI",
+    L"HB_KANGO",
+    L"HB_SETTOUJI",
+    L"HB_SETSUBIJI",
+    L"HB_PERIOD",
+    L"HB_COMMA",
+    L"HB_SYMBOLS"
+  };
+  return s_array[index];
+}
+
 // ïiéåÇÃòAåãâ¬î\ê´
 static BOOL
 IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
-  FOOTMARK();
   if (node2.bunrui == HB_PERIOD || node2.bunrui == HB_COMMA) return TRUE;
   if (node1.bunrui == HB_HEAD || node2.bunrui == HB_TAIL) return TRUE;
   if (node1.bunrui == HB_TAIL || node2.bunrui == HB_HEAD) return FALSE;
@@ -332,7 +369,6 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
   return TRUE;
 } // IsNodeConnectable
 
-
 static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
   FOOTMARK();
   assert(dict_data);
@@ -551,6 +587,8 @@ BOOL MzIme::LoadBasicDictFile(std::vector<DictEntry>& entries) {
     entry.post = fields[2];
     if (fields.size() >= 4) {
       entry.tags = fields[3];
+    } else {
+      entry.tags.clear();
     }
     entries.push_back(entry);
   }
@@ -904,7 +942,11 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
   FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  if (index + fields[0].size() > pre.size()) {
+  size_t length = fields[0].size();
+  if (index + length > pre.size()) {
+    return;
+  }
+  if (pre.substr(index, length) != fields[0]) {
     return;
   }
   std::wstring str = pre.substr(index + fields[0].size());
@@ -1067,6 +1109,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
   if (str.size() >= 2 && str[0] == L'Çª' && str[1] == L'Ç§') {
     WStrings new_fields = fields;
     new_fields[0] = fields[0] + L"ÇªÇ§";
+    new_fields[2] = fields[2] + L"ÇªÇ§";
     DoNakeiyoushi(index, new_fields);
   }
 
@@ -1084,7 +1127,11 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
   FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  if (index + fields[0].size() > pre.size()) {
+  size_t length = fields[0].size();
+  if (index + length > pre.size()) {
+    return;
+  }
+  if (pre.substr(index, length) != fields[0]) {
     return;
   }
   std::wstring str = pre.substr(index + fields[0].size());
@@ -1180,10 +1227,14 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
   FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  if (index + fields[0].size() > pre.size()) {
+  size_t length = fields[0].size();
+  if (index + length > pre.size()) {
     return;
   }
-  std::wstring str = pre.substr(index + fields[0].size());
+  if (pre.substr(index, length) != fields[0]) {
+    return;
+  }
+  std::wstring str = pre.substr(index + length);
   DebugPrintW(L"DoGodanDoushi: %s, %s\n", fields[0].c_str(), str.c_str());
 
   LatticeNode node;
@@ -1292,6 +1343,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
   {
     WStrings new_fields = fields;
     new_fields[0] += s_hiragana_table[node.gyou][DAN_I];
+    new_fields[2] += s_hiragana_table[node.gyou][DAN_I];
     DoIchidanDoushi(index, new_fields);
   }
 } // Lattice::DoGodanDoushi
@@ -1300,10 +1352,14 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
   FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  if (index + fields[0].size() > pre.size()) {
+  size_t length = fields[0].size();
+  if (index + length > pre.size()) {
     return;
   }
-  std::wstring str = pre.substr(index + fields[0].size());
+  if (pre.substr(index, length) != fields[0]) {
+    return;
+  }
+  std::wstring str = pre.substr(index + length);
 
   LatticeNode node;
   node.bunrui = HB_ICHIDAN_DOUSHI;
@@ -1378,10 +1434,14 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
   FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  if (index + fields[0].size() > pre.size()) {
+  size_t length = fields[0].size();
+  if (index + length > pre.size()) {
     return;
   }
-  std::wstring str = pre.substr(index + fields[0].size());
+  if (pre.substr(index, length) != fields[0]) {
+    return;
+  }
+  std::wstring str = pre.substr(index + length);
 
   LatticeNode node;
   node.bunrui = HB_KAHEN_DOUSHI;
@@ -1457,10 +1517,14 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
   FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  if (index + fields[0].size() > pre.size()) {
+  size_t length = fields[0].size();
+  if (index + length > pre.size()) {
     return;
   }
-  std::wstring str = pre.substr(index + fields[0].size());
+  if (pre.substr(index, length) != fields[0]) {
+    return;
+  }
+  std::wstring str = pre.substr(index + length);
 
   LatticeNode node;
   node.bunrui = HB_SAHEN_DOUSHI;
@@ -1618,6 +1682,9 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
   if (index + length > pre.size()) {
     return;
   }
+  if (pre.substr(index, length) != fields[0]) {
+    return;
+  }
   std::wstring str = pre.substr(index + length);
 
   LatticeNode node;
@@ -1649,6 +1716,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
   if (str.size() >= 2 && str[0] == L'Ç¡' && str[1] == L'Ç€') {
     WStrings new_fields = fields;
     new_fields[0] += L"Ç¡Ç€";
+    new_fields[2] += L"Ç¡Ç€";
     DoIkeiyoushi(index, new_fields);
   }
 } // Lattice::DoMeishi
@@ -1656,10 +1724,13 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
 void Lattice::DoFields(size_t index, const WStrings& fields) {
   assert(fields.size() == 4);
   const size_t len = fields[0].size();
-  if (index + fields[0].size() > pre.size()) {
+  if (index + len > pre.size()) {
     return;
   }
-
+  if (pre.substr(index, len) != fields[0]) {
+    return;
+  }
+  
   WORD w = fields[1][0];
 
   LatticeNode node;
@@ -1683,12 +1754,10 @@ void Lattice::DoFields(size_t index, const WStrings& fields) {
   case HB_KANGO:
   case HB_SETTOUJI:
   case HB_SETSUBIJI:
-    if (pre.substr(index, len) == fields[0]) {
-      node.pre = fields[0];
-      node.post = fields[2];
-      chunks[index].push_back(unboost::make_shared(node));
-      refs[index]++;
-    }
+    node.pre = fields[0];
+    node.post = fields[2];
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index]++;
     break;
   case HB_IKEIYOUSHI:
     DoIkeiyoushi(index, fields);
@@ -1697,64 +1766,52 @@ void Lattice::DoFields(size_t index, const WStrings& fields) {
     DoNakeiyoushi(index, fields);
     break;
   case HB_MIZEN_JODOUSHI:
-    if (pre.substr(index, len) == fields[0]) {
-      node.bunrui = HB_JODOUSHI;
-      node.katsuyou = MIZEN_KEI;
-      node.pre = fields[0];
-      node.post = fields[2];
-      chunks[index].push_back(unboost::make_shared(node));
-      refs[index]++;
-    }
+    node.bunrui = HB_JODOUSHI;
+    node.katsuyou = MIZEN_KEI;
+    node.pre = fields[0];
+    node.post = fields[2];
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index]++;
     break;
   case HB_RENYOU_JODOUSHI:
-    if (pre.substr(index, len) == fields[0]) {
-      node.bunrui = HB_JODOUSHI;
-      node.katsuyou = RENYOU_KEI;
-      node.pre = fields[0];
-      node.post = fields[2];
-      chunks[index].push_back(unboost::make_shared(node));
-      refs[index]++;
-    }
+    node.bunrui = HB_JODOUSHI;
+    node.katsuyou = RENYOU_KEI;
+    node.pre = fields[0];
+    node.post = fields[2];
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index]++;
     break;
   case HB_SHUUSHI_JODOUSHI:
-    if (pre.substr(index, len) == fields[0]) {
-      node.bunrui = HB_JODOUSHI;
-      node.katsuyou = SHUUSHI_KEI;
-      node.pre = fields[0];
-      node.post = fields[2];
-      chunks[index].push_back(unboost::make_shared(node));
-      refs[index]++;
-    }
+    node.bunrui = HB_JODOUSHI;
+    node.katsuyou = SHUUSHI_KEI;
+    node.pre = fields[0];
+    node.post = fields[2];
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index]++;
     break;
   case HB_RENTAI_JODOUSHI:
-    if (pre.substr(index, len) == fields[0]) {
-      node.bunrui = HB_JODOUSHI;
-      node.katsuyou = RENTAI_KEI;
-      node.pre = fields[0];
-      node.post = fields[2];
-      chunks[index].push_back(unboost::make_shared(node));
-      refs[index]++;
-    }
+    node.bunrui = HB_JODOUSHI;
+    node.katsuyou = RENTAI_KEI;
+    node.pre = fields[0];
+    node.post = fields[2];
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index]++;
     break;
   case HB_KATEI_JODOUSHI:
-    if (pre.substr(index, len) == fields[0]) {
-      node.bunrui = HB_JODOUSHI;
-      node.katsuyou = KATEI_KEI;
-      node.pre = fields[0];
-      node.post = fields[2];
-      chunks[index].push_back(unboost::make_shared(node));
-      refs[index]++;
-    }
+    node.bunrui = HB_JODOUSHI;
+    node.katsuyou = KATEI_KEI;
+    node.pre = fields[0];
+    node.post = fields[2];
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index]++;
     break;
   case HB_MEIREI_JODOUSHI:
-    if (pre.substr(index, len) == fields[0]) {
-      node.bunrui = HB_JODOUSHI;
-      node.katsuyou = MEIREI_KEI;
-      node.pre = fields[0];
-      node.post = fields[2];
-      chunks[index].push_back(unboost::make_shared(node));
-      refs[index]++;
-    }
+    node.bunrui = HB_JODOUSHI;
+    node.katsuyou = MEIREI_KEI;
+    node.pre = fields[0];
+    node.post = fields[2];
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index]++;
     break;
   case HB_GODAN_DOUSHI:
     DoGodanDoushi(index, fields);
@@ -1772,6 +1829,26 @@ void Lattice::DoFields(size_t index, const WStrings& fields) {
     break;
   }
 } // Lattice::DoFields
+
+void Lattice::Dump(int num) {
+#ifndef NDEBUG
+  const size_t length = pre.size();
+  DebugPrintW(L"### Lattice::Dump(%d) ###\n", num);
+  DebugPrintW(L"Lattice length: %d\n", int(length));
+  for (size_t i = 0; i < length; ++i) {
+    DebugPrintW(L"Lattice chunk #%d:", int(i));
+    for (size_t k = 0; k < chunks[i].size(); ++k) {
+      DebugPrintW(L" %s(%s)", chunks[i][k]->post.c_str(),
+        BunruiToString(chunks[i][k]->bunrui));
+      if (k >= 15) {
+        DebugPrintW(L" ...");
+        break;
+      }
+    }
+    DebugPrintW(L"\n");
+  }
+#endif  // ndef NDEBUG
+} // Lattice::Dump
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -1792,11 +1869,15 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
   if (dict_data) {
     // add nodes
     lattice.AddNodes(0, dict_data);
+    // dump
+    lattice.Dump(1);
     // repeat until linked to tail
     for (;;) {
       // link and cut not linked
       lattice.UpdateLinks();
       lattice.CutUnlinkedNodes();
+      // dump
+      lattice.Dump(2);
       // does it reach the last?
       size_t index = lattice.GetLastLinkedIndex();
       if (index == length) break;
@@ -1804,14 +1885,18 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
       lattice.UpdateRefs();
       lattice.AddComplement(index);
       lattice.AddNodes(index + 1, dict_data);
+      // dump
+      lattice.Dump(3);
 
       ++count;
-      if (count == 1000) break;
+      if (count >= 256) break;
     }
     // unlock the dictionary
     UnlockBasicDict(dict_data);
     return TRUE;  // success
   }
+  // dump
+  lattice.Dump(4);
   return FALSE; // failure
 } // MzIme::MakeLattice
 

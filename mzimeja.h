@@ -414,7 +414,7 @@ enum KatsuyouKei {
 struct DictEntry {
   std::wstring  pre;
   std::wstring  post;
-  HinshiBunrui bunrui;
+  HinshiBunrui  bunrui;
   std::wstring  tags;
   Gyou          gyou;
 };
@@ -469,6 +469,8 @@ struct Lattice {
   void DoIchidanDoushi(size_t index, const WStrings& fields);
   void DoKahenDoushi(size_t index, const WStrings& fields);
   void DoSahenDoushi(size_t index, const WStrings& fields);
+
+  void Dump(int num = 0);
 };
 
 //////////////////////////////////////////////////////////////////////////////
