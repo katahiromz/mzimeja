@@ -312,30 +312,36 @@ WCHAR get_comma(void);
 struct MzConversionCandidate {
   std::wstring hiragana;
   std::wstring converted;
+  int cost;
   void clear() {
     hiragana.clear();
     converted.clear();
+    cost = 0;
   }
 };
 
 struct MzConversionClause {
   std::vector<MzConversionCandidate> candidates;
   void clear() { candidates.clear(); }
+  void sort();
 };
 
 struct MzConversionResult {
   std::vector<MzConversionClause> clauses;
   void clear() { clauses.clear(); }
+  void sort();
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct IMAGE_BASE {
+typedef std::vector<std::wstring> WStrings;
+
+struct ImageBase {
   DWORD   dwSignature;
   DWORD   dwSharedDictDataSize;
 };
 
-enum GYOU {
+enum Gyou {
   GYOU_A,
   GYOU_KA,
   GYOU_GA,
@@ -354,7 +360,7 @@ enum GYOU {
   GYOU_NN
 };
 
-enum DAN {
+enum Dan {
   DAN_A,
   DAN_I,
   DAN_U,
@@ -362,8 +368,10 @@ enum DAN {
   DAN_O
 };
 
-enum HINSHI_BUNRUI {
-  HB_NONE,              // (不正)
+enum HinshiBunrui {
+  HB_HEAD = 0x21,       // 最初のノード
+  HB_TAIL,              // 最後のノード
+  HB_UNKNOWN,           // 未知の品詞
   HB_MEISHI,            // 名詞
   HB_IKEIYOUSHI,        // い形容詞
   HB_NAKEIYOUSHI,       // な形容詞
@@ -371,7 +379,10 @@ enum HINSHI_BUNRUI {
   HB_FUKUSHI,           // 副詞
   HB_SETSUZOKUSHI,      // 接続詞
   HB_KANDOUSHI,         // 感動詞
-  HB_JOSHI,             // 助詞
+  HB_KAKU_JOSHI,        // 格助詞
+  HB_SETSUZOKU_JOSHI,   // 接続助詞
+  HB_FUKU_JOSHI,        // 副助詞
+  HB_SHUU_JOSHI,        // 終助詞
   HB_JODOUSHI,          // 助動詞
   HB_MIZEN_JODOUSHI,    // 未然助動詞
   HB_RENYOU_JODOUSHI,   // 連用助動詞
@@ -389,55 +400,81 @@ enum HINSHI_BUNRUI {
   HB_PERIOD,            // 句点（。）
   HB_COMMA,             // 読点（、）
   HB_SYMBOLS            // 記号類
-}; // enum HINSHI_BUNRUI
+}; // enum HinshiBunrui
 
-enum KATSUYOU_KEI {
+enum KatsuyouKei {
   MIZEN_KEI,            // 未然形
   RENYOU_KEI,           // 連用形
   SHUUSHI_KEI,          // 終止形
   RENTAI_KEI,           // 連体形
   KATEI_KEI,            // 仮定形
-  MEIREI_KEI,           // 命令形
-  MEISHI_KEI,           // 名詞形
-  PERIOD_KEI,           // 句点（。）
-  COMMA_KEI,            // 読点（、）
-  SYMBOLS_KEI           // 記号類
+  MEIREI_KEI            // 命令形
 };
 
-struct DICT_ENTRY {
+struct DictEntry {
   std::wstring  pre;
   std::wstring  post;
-  HINSHI_BUNRUI bunrui;
+  HinshiBunrui bunrui;
   std::wstring  tags;
-  GYOU          gyou;
+  Gyou          gyou;
 };
 
-struct LATTICE_NODE {
-  std::wstring                    pre;
-  std::wstring                    post;
-  HINSHI_BUNRUI                   bunrui;
-  GYOU                            gyou;
-  KATSUYOU_KEI                    katsuyou;
-  DWORD                           cost;
-};
-typedef std::vector<LATTICE_NODE>     LATTICE_CHUNK;
+struct LatticeNode;
+typedef unboost::shared_ptr<LatticeNode>  LatticeNodePtr;
 
-struct LATTICE {
+struct LatticeNode {
+  std::wstring                        pre;
+  std::wstring                        post;
+  std::wstring                        tags;
+  HinshiBunrui                        bunrui;
+  Gyou                                gyou;
+  KatsuyouKei                         katsuyou;
+  DWORD                               cost;
+  DWORD                               linked;
+  std::vector<LatticeNodePtr>         branches;
+  LatticeNode() {
+    cost = 0;
+    linked = 0;
+  }
+  bool HasTag(const wchar_t *tag) const {
+    return tags.find(tag) != std::wstring::npos;
+  }
+  int CalcCost() const;
+};
+typedef std::vector<LatticeNodePtr>   LatticeChunk;
+
+struct Lattice {
   size_t                          index;
   std::wstring                    pre;
-  std::vector<LATTICE_CHUNK>      chunks;
+  LatticeNodePtr                  head;
+  std::vector<LatticeChunk>       chunks;
   std::vector<DWORD>              refs;
-  // pre.size() == chunks.size().
+  // pre.size() + 1 == chunks.size().
   // pre.size() + 1 == refs.size().
-};
 
-typedef std::vector<std::wstring> RECORDS;
-typedef std::vector<std::wstring> FIELDS;
+  void AddNodes(size_t index, const WCHAR *dict_data);
+  void UpdateRefs();
+  void UnlinkAllNodes();
+  void UpdateLinks();
+  void AddComplement(size_t index);
+  void CutUnlinkedNodes();
+  size_t GetLastLinkedIndex() const;
+
+  void DoFields(size_t index, const WStrings& fields);
+
+  void DoMeishi(size_t index, const WStrings& fields);
+  void DoIkeiyoushi(size_t index, const WStrings& fields);
+  void DoNakeiyoushi(size_t index, const WStrings& fields);
+  void DoGodanDoushi(size_t index, const WStrings& fields);
+  void DoIchidanDoushi(size_t index, const WStrings& fields);
+  void DoKahenDoushi(size_t index, const WStrings& fields);
+  void DoSahenDoushi(size_t index, const WStrings& fields);
+};
 
 //////////////////////////////////////////////////////////////////////////////
 // The IME
 
-class MZIMEJA {
+class MzIme {
 public:
   HINSTANCE       m_hInst;
   HKL             m_hMyKL;
@@ -447,7 +484,13 @@ public:
   BOOL            m_fOverflowKey;
 
 public:
-  MZIMEJA();
+  // literal map
+  unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;
+  unboost::unordered_map<wchar_t,wchar_t>   m_consonant_map;
+  void MakeLiteralMaps();
+
+public:
+  MzIme();
 
   // initialize the IME
   BOOL Init(HINSTANCE hInstance);
@@ -494,19 +537,9 @@ public:
   void UnlockBasicDict(WCHAR *data);
 
   // make lattice
-  void MakeLattice(LATTICE& lattice);
-  void MakeLattice(LATTICE& lattice, const WCHAR *dict_data);
-  void CutExtraNodes(LATTICE& lattice);
-  void MakeResult(MzConversionResult& result, LATTICE& lattice);
-
-  BOOL ScanDict(RECORDS& records, const WCHAR *dict_data, WCHAR ch);
-  void ParseFields(LATTICE& lattice, size_t index, const FIELDS& fields);
-  void ParseIkeiyoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
-  void ParseNakeiyoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
-  void ParseGodanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
-  void ParseIchidanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
-  void ParseKahenDoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
-  void ParseSahenDoushi(LATTICE& lattice, size_t index, const FIELDS& fields);
+  BOOL MakeLattice(Lattice& lattice, const std::wstring& pre);
+  void MakeResult(MzConversionResult& result, Lattice& lattice);
+  int CalcCost(const std::wstring& tags) const;
 
   // convert
   void PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
@@ -535,33 +568,28 @@ public:
   BOOL SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 
 protected:
-  HANDLE          m_hMutex;         // mutex
+  HANDLE          m_hDictLock;      // mutex for dictionary
   HANDLE          m_hBaseData;      // file mapping
-  BOOL LoadBasicDictFile(std::vector<DICT_ENTRY>& entries);
-  BOOL DeployDictData(IMAGE_BASE *data, SECURITY_ATTRIBUTES *psa,
-                      const std::vector<DICT_ENTRY>& entries);
+  BOOL LoadBasicDictFile(std::vector<DictEntry>& entries);
+  BOOL DeployDictData(ImageBase *data, SECURITY_ATTRIBUTES *psa,
+                      const std::vector<DictEntry>& entries);
 
   // input context
   HIMC            m_hIMC;
   InputContext *  m_lpIMC;
 
   HANDLE          m_hBasicDictData; // file mapping
-  IMAGE_BASE *LockImeBaseData();
-  void UnlockImeBaseData(IMAGE_BASE *data);
-
-  // literal map
-  unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;
-  unboost::unordered_map<wchar_t,wchar_t>   m_consonant_map;
-  void MakeLiteralMaps();
+  ImageBase *LockImeBaseData();
+  void UnlockImeBaseData(ImageBase *data);
 
   // registry
   LONG OpenRegKey(HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const;
   LONG CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey);
   LONG OpenComputerSettingKey(BOOL bWrite, HKEY *phKey);
   LONG OpenUserSettingKey(BOOL bWrite, HKEY *phKey);
-}; // class MZIMEJA
+}; // class MzIme
 
-extern MZIMEJA TheIME;
+extern MzIme TheIME;
 
 //////////////////////////////////////////////////////////////////////////////
 

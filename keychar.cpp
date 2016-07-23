@@ -1672,7 +1672,6 @@ WCHAR get_comma(void) {
 }
 
 BOOL is_hiragana(WCHAR ch) {
-  FOOTMARK();
   if (0x3040 <= ch && ch <= 0x309F) return TRUE;
   switch (ch) {
   case 0x3095: case 0x3096: case 0x3099: case 0x309A: case 0x309B:
@@ -1684,7 +1683,6 @@ BOOL is_hiragana(WCHAR ch) {
 }
 
 BOOL is_fullwidth_katakana(WCHAR ch) {
-  FOOTMARK();
   if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
   switch (ch) {
   case 0x30FD: case 0x30FE: case 0x3099: case 0x309A: case 0x309B:
@@ -1696,7 +1694,6 @@ BOOL is_fullwidth_katakana(WCHAR ch) {
 }
 
 BOOL is_halfwidth_katakana(WCHAR ch) {
-  FOOTMARK();
   if (0xFF65 <= ch && ch <= 0xFF9F) return TRUE;
   switch (ch) {
   case 0xFF61: case 0xFF62: case 0xFF63: case 0xFF64:
@@ -1707,7 +1704,6 @@ BOOL is_halfwidth_katakana(WCHAR ch) {
 }
 
 BOOL is_kanji(WCHAR ch) {
-  FOOTMARK();
   if (0x4E00 <= ch && ch <= 0x9FFF) return TRUE;
   if (0xF900 <= ch && ch <= 0xFAFF) return TRUE;
   return FALSE;
@@ -1722,7 +1718,6 @@ BOOL is_common_use_kanji(WCHAR ch) {
 } // is_common_use_kanji
 
 BOOL is_fullwidth_ascii(WCHAR ch) {
-  FOOTMARK();
   return (0xFF00 <= ch && ch <= 0xFFEF);
 }
 
@@ -1760,7 +1755,6 @@ WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1) {
 }
 
 std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
-  FOOTMARK();
   WCHAR szBuf[1024];
   const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
   ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,

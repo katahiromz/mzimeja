@@ -73,9 +73,9 @@ void RepositionWindow(HWND hWnd) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-MZIMEJA TheIME;
+MzIme TheIME;
 
-MZIMEJA::MZIMEJA() {
+MzIme::MzIme() {
   m_hInst = NULL;
   m_hMyKL = NULL;
   m_bWinLogOn = FALSE;
@@ -85,7 +85,7 @@ MZIMEJA::MZIMEJA() {
 
   m_fOverflowKey = FALSE;
 
-  m_hMutex = NULL;
+  m_hDictLock = NULL;
   m_hBaseData = NULL;
   m_hIMC = NULL;
   m_lpIMC = NULL;
@@ -93,7 +93,7 @@ MZIMEJA::MZIMEJA() {
 }
 
 static unsigned int __stdcall loading_dict_proc(void *param) {
-  MZIMEJA *pIme = (MZIMEJA *)param;
+  MzIme *pIme = (MzIme *)param;
   // load basic dictionary
   assert(pIme);
   if (pIme->LoadBasicDict()) {
@@ -104,7 +104,7 @@ static unsigned int __stdcall loading_dict_proc(void *param) {
   return 0;
 }
 
-BOOL MZIMEJA::Init(HINSTANCE hInstance) {
+BOOL MzIme::Init(HINSTANCE hInstance) {
   FOOTMARK();
   m_hInst = hInstance;
   //::InitCommonControls();
@@ -117,16 +117,16 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
   assert(psa);
 
   // create a mutex
-  m_hMutex = ::CreateMutexW(psa, FALSE, L"mzimeja_mutex");
-  assert(m_hMutex);
+  m_hDictLock = ::CreateMutexW(psa, FALSE, L"mzimeja_dict_lock");
+  assert(m_hDictLock);
 
   // create base data
   m_hBaseData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
-    PAGE_READWRITE, 0, sizeof(IMAGE_BASE), L"mzimeja_basedata");
+    PAGE_READWRITE, 0, sizeof(ImageBase), L"mzimeja_basedata");
   assert(m_hBaseData);
   if (m_hBaseData && ::GetLastError() != ERROR_ALREADY_EXISTS) {
     // initialize base data
-    IMAGE_BASE *data = LockImeBaseData();
+    ImageBase *data = LockImeBaseData();
     if (data) {
       data->dwSignature = 0xDEADFACE;
       data->dwSharedDictDataSize = 0;
@@ -145,23 +145,23 @@ BOOL MZIMEJA::Init(HINSTANCE hInstance) {
 
   // register window classes for IME
   return RegisterClasses(m_hInst);
-} // MZIMEJA::Init
+} // MzIme::Init
 
-IMAGE_BASE *MZIMEJA::LockImeBaseData() {
+ImageBase *MzIme::LockImeBaseData() {
   LPVOID pvData;
   pvData = ::MapViewOfFile(m_hBaseData, FILE_MAP_ALL_ACCESS,
-                           0, 0, sizeof(IMAGE_BASE));
-  return reinterpret_cast<IMAGE_BASE *>(pvData);
+                           0, 0, sizeof(ImageBase));
+  return reinterpret_cast<ImageBase *>(pvData);
 }
 
-void MZIMEJA::UnlockImeBaseData(IMAGE_BASE *data) {
+void MzIme::UnlockImeBaseData(ImageBase *data) {
   ::UnmapViewOfFile(data);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // registry
 
-LONG MZIMEJA::OpenRegKey(
+LONG MzIme::OpenRegKey(
   HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const
 {
   LONG result;
@@ -171,9 +171,9 @@ LONG MZIMEJA::OpenRegKey(
     result = ::RegOpenKeyExW(hKey, pszSubKey, 0, sam, phSubKey);
   }
   return result;
-} // MZIMEJA::OpenRegKey
+} // MzIme::OpenRegKey
 
-LONG MZIMEJA::CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey) {
+LONG MzIme::CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey) {
   LONG result;
   DWORD dwDisposition;
   const REGSAM sam = KEY_WRITE;
@@ -184,7 +184,7 @@ LONG MZIMEJA::CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey) {
                                phSubKey, &dwDisposition);
   }
   return result;
-} // MZIMEJA::CreateRegKey
+} // MzIme::CreateRegKey
 
 //////////////////////////////////////////////////////////////////////////////
 // settings
@@ -192,7 +192,7 @@ LONG MZIMEJA::CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey) {
 static const WCHAR s_szRegKey[] = 
   L"SOFTWARE\\Katayama Hirofumi MZ\\mzimeja";
 
-LONG MZIMEJA::OpenComputerSettingKey(BOOL bWrite, HKEY *phKey) {
+LONG MzIme::OpenComputerSettingKey(BOOL bWrite, HKEY *phKey) {
   LONG result;
   if (bWrite) {
     result = OpenRegKey(HKEY_LOCAL_MACHINE, s_szRegKey, TRUE, phKey);
@@ -202,7 +202,7 @@ LONG MZIMEJA::OpenComputerSettingKey(BOOL bWrite, HKEY *phKey) {
   return result;
 }
 
-LONG MZIMEJA::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
+LONG MzIme::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
   LONG result;
   if (bWrite) {
     HKEY hSoftware;
@@ -227,7 +227,7 @@ LONG MZIMEJA::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
   return result;
 }
 
-std::wstring MZIMEJA::GetComputerString(LPCWSTR pszSettingName) {
+std::wstring MzIme::GetComputerString(LPCWSTR pszSettingName) {
   HKEY hKey;
   WCHAR szValue[MAX_PATH * 2];
   LONG result = OpenComputerSettingKey(FALSE, &hKey);
@@ -241,9 +241,9 @@ std::wstring MZIMEJA::GetComputerString(LPCWSTR pszSettingName) {
     }
   }
   return std::wstring();
-} // MZIMEJA::GetComputerString
+} // MzIme::GetComputerString
 
-BOOL MZIMEJA::SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
+BOOL MzIme::SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
   HKEY hKey;
   LONG result = OpenComputerSettingKey(TRUE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
@@ -256,10 +256,10 @@ BOOL MZIMEJA::SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     }
   }
   return FALSE;
-} // MZIMEJA::SetComputerString
+} // MzIme::SetComputerString
 
 BOOL
-MZIMEJA::GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
+MzIme::GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
   HKEY hKey;
   LONG result = OpenComputerSettingKey(FALSE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
@@ -272,10 +272,10 @@ MZIMEJA::GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     }
   }
   return FALSE;
-} // MZIMEJA::GetComputerData
+} // MzIme::GetComputerData
 
 BOOL
-MZIMEJA::SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
+MzIme::SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
   HKEY hKey;
   LONG result = OpenComputerSettingKey(TRUE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
@@ -287,9 +287,9 @@ MZIMEJA::SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     }
   }
   return FALSE;
-} // MZIMEJA::SetComputerData
+} // MzIme::SetComputerData
 
-BOOL MZIMEJA::GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr) {
+BOOL MzIme::GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr) {
   HKEY hKey;
   LONG result = OpenComputerSettingKey(FALSE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
@@ -302,9 +302,9 @@ BOOL MZIMEJA::GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr) {
     }
   }
   return FALSE;
-} // MZIMEJA::GetComputerData
+} // MzIme::GetComputerData
 
-BOOL MZIMEJA::SetComputerDword(LPCWSTR pszSettingName, DWORD data) {
+BOOL MzIme::SetComputerDword(LPCWSTR pszSettingName, DWORD data) {
   HKEY hKey;
   DWORD dwData = data;
   LONG result = OpenComputerSettingKey(TRUE, &hKey);
@@ -318,9 +318,9 @@ BOOL MZIMEJA::SetComputerDword(LPCWSTR pszSettingName, DWORD data) {
     }
   }
   return FALSE;
-} // MZIMEJA::SetComputerData
+} // MzIme::SetComputerData
 
-std::wstring MZIMEJA::GetUserString(LPCWSTR pszSettingName) {
+std::wstring MzIme::GetUserString(LPCWSTR pszSettingName) {
   HKEY hKey;
   WCHAR szValue[MAX_PATH * 2];
   LONG result = OpenUserSettingKey(FALSE, &hKey);
@@ -334,9 +334,9 @@ std::wstring MZIMEJA::GetUserString(LPCWSTR pszSettingName) {
     }
   }
   return std::wstring();
-} // MZIMEJA::GetUserString
+} // MzIme::GetUserString
 
-BOOL MZIMEJA::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
+BOOL MzIme::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
   HKEY hKey;
   LONG result = OpenUserSettingKey(TRUE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
@@ -349,9 +349,9 @@ BOOL MZIMEJA::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     }
   }
   return FALSE;
-} // MZIMEJA::SetUserString
+} // MzIme::SetUserString
 
-BOOL MZIMEJA::GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
+BOOL MzIme::GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
   HKEY hKey;
   LONG result = OpenUserSettingKey(FALSE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
@@ -364,9 +364,9 @@ BOOL MZIMEJA::GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     }
   }
   return FALSE;
-} // MZIMEJA::GetUserData
+} // MzIme::GetUserData
 
-BOOL MZIMEJA::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
+BOOL MzIme::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
   HKEY hKey;
   LONG result = OpenUserSettingKey(TRUE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
@@ -378,9 +378,9 @@ BOOL MZIMEJA::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     }
   }
   return FALSE;
-} // MZIMEJA::SetUserData
+} // MzIme::SetUserData
 
-BOOL MZIMEJA::GetUserDword(LPCWSTR pszSettingName, DWORD *ptr) {
+BOOL MzIme::GetUserDword(LPCWSTR pszSettingName, DWORD *ptr) {
   HKEY hKey;
   LONG result = OpenUserSettingKey(FALSE, &hKey);
   if (result == ERROR_SUCCESS && hKey) {
@@ -393,9 +393,9 @@ BOOL MZIMEJA::GetUserDword(LPCWSTR pszSettingName, DWORD *ptr) {
     }
   }
   return FALSE;
-} // MZIMEJA::GetUserData
+} // MzIme::GetUserData
 
-BOOL MZIMEJA::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
+BOOL MzIme::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
   HKEY hKey;
   DWORD dwData = data;
   LONG result = OpenUserSettingKey(TRUE, &hKey);
@@ -409,11 +409,11 @@ BOOL MZIMEJA::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
     }
   }
   return FALSE;
-} // MZIMEJA::SetUserData
+} // MzIme::SetUserData
 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
+BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
 #define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
   WNDCLASSEX wcx;
   FOOTMARK();
@@ -495,9 +495,9 @@ BOOL MZIMEJA::RegisterClasses(HINSTANCE hInstance) {
 
   return TRUE;
 #undef CS_MZIME
-} // MZIMEJA::RegisterClasses
+} // MzIme::RegisterClasses
 
-HKL MZIMEJA::GetHKL(VOID) {
+HKL MzIme::GetHKL(VOID) {
   FOOTMARK();
   HKL hKL = NULL;
 
@@ -527,7 +527,7 @@ HKL MZIMEJA::GetHKL(VOID) {
 }
 
 // Update the transrate key buffer
-BOOL MZIMEJA::GenerateMessage(LPTRANSMSG lpGeneMsg) {
+BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
   BOOL ret = FALSE;
   FOOTMARK();
   DebugPrintA("(%u,%d,%d)\n",
@@ -555,7 +555,7 @@ BOOL MZIMEJA::GenerateMessage(LPTRANSMSG lpGeneMsg) {
   return ret;
 }
 
-BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
+BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
   FOOTMARK();
   TRANSMSG genmsg;
   genmsg.message = message;
@@ -565,7 +565,7 @@ BOOL MZIMEJA::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
 }
 
 // Update the transrate key buffer
-BOOL MZIMEJA::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
+BOOL MzIme::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
   FOOTMARK();
 
   // increment the number
@@ -584,7 +584,7 @@ BOOL MZIMEJA::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
   return TRUE;
 }
 
-BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
+BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
   FOOTMARK();
   switch (dwCommand) {
   case IDM_RECONVERT:
@@ -627,9 +627,9 @@ BOOL MZIMEJA::DoCommand(HIMC hIMC, DWORD dwCommand) {
     return FALSE;
   }
   return TRUE;
-} // MZIMEJA::DoCommand
+} // MzIme::DoCommand
 
-void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
+void MzIme::UpdateIndicIcon(HIMC hIMC) {
   FOOTMARK();
   if (m_hMyKL == NULL) {
     m_hMyKL = GetHKL();
@@ -654,19 +654,19 @@ void MZIMEJA::UpdateIndicIcon(HIMC hIMC) {
   }
 }
 
-void MZIMEJA::UnregisterClasses() {
+void MzIme::UnregisterClasses() {
   ::UnregisterClass(szUIServerClassName, m_hInst);
   ::UnregisterClass(szCompStrClassName, m_hInst);
   ::UnregisterClass(szCandClassName, m_hInst);
   ::UnregisterClass(szStatusClassName, m_hInst);
 }
 
-VOID MZIMEJA::Uninit(VOID) {
+VOID MzIme::Uninit(VOID) {
   FOOTMARK();
   UnregisterClasses();
-  if (m_hMutex) {
-    ::CloseHandle(m_hMutex);
-    m_hMutex = NULL;
+  if (m_hDictLock) {
+    ::CloseHandle(m_hDictLock);
+    m_hDictLock = NULL;
   }
   if (m_hBaseData) {
     ::CloseHandle(m_hBaseData);
@@ -674,12 +674,12 @@ VOID MZIMEJA::Uninit(VOID) {
   }
 }
 
-HBITMAP MZIMEJA::LoadBMP(LPCTSTR pszName) {
+HBITMAP MzIme::LoadBMP(LPCTSTR pszName) {
   FOOTMARK();
   return ::LoadBitmap(m_hInst, pszName);
 }
 
-WCHAR *MZIMEJA::LoadSTR(INT nID) {
+WCHAR *MzIme::LoadSTR(INT nID) {
   FOOTMARK();
   static WCHAR sz[512];
   sz[0] = 0;
@@ -687,25 +687,25 @@ WCHAR *MZIMEJA::LoadSTR(INT nID) {
   return sz;
 }
 
-InputContext *MZIMEJA::LockIMC(HIMC hIMC) {
+InputContext *MzIme::LockIMC(HIMC hIMC) {
   FOOTMARK();
-  DebugPrintA("MZIMEJA::LockIMC: locking: %p\n", hIMC);
+  DebugPrintA("MzIme::LockIMC: locking: %p\n", hIMC);
   InputContext *context = (InputContext *)::ImmLockIMC(hIMC);
   if (context) {
     m_hIMC = hIMC;
     m_lpIMC = context;
-    DebugPrintA("MZIMEJA::LockIMC: locked: %p\n", hIMC);
+    DebugPrintA("MzIme::LockIMC: locked: %p\n", hIMC);
   } else {
-    DebugPrintA("MZIMEJA::LockIMC: cannot lock: %p\n", hIMC);
+    DebugPrintA("MzIme::LockIMC: cannot lock: %p\n", hIMC);
   }
   return context;
 }
 
-VOID MZIMEJA::UnlockIMC(HIMC hIMC) {
+VOID MzIme::UnlockIMC(HIMC hIMC) {
   FOOTMARK();
-  DebugPrintA("MZIMEJA::UnlockIMC: unlocking: %p\n", hIMC);
+  DebugPrintA("MzIme::UnlockIMC: unlocking: %p\n", hIMC);
   ::ImmUnlockIMC(hIMC);
-  DebugPrintA("MZIMEJA::UnlockIMC: unlocked: %p\n", hIMC);
+  DebugPrintA("MzIme::UnlockIMC: unlocked: %p\n", hIMC);
   if (::ImmGetIMCLockCount(hIMC) == 0) {
     m_hIMC = NULL;
     m_lpIMC = NULL;

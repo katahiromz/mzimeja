@@ -1,5 +1,5 @@
 ; Installer Settings for Inno Setup
-; (Release Version)
+; (Debug Version)
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -15,7 +15,7 @@ AppUpdatesURL=http://katahiromz.web.fc2.com/
 DefaultDirName={pf}\mzimeja
 DefaultGroupName=MZ-IME“ú–{Œê“ü—Í
 OutputDir=.
-OutputBaseFilename=mzimeja-0.4-setup
+OutputBaseFilename=mzimeja-0.4-debug-setup
 Compression=lzma
 SolidCompression=yes
 VersionInfoVersion=0.4
@@ -30,9 +30,9 @@ Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
-Source: "projects\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
-Source: "projects\Release\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "projects\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "projects\Debug\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
+Source: "projects\Debug\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "projects\Debug\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

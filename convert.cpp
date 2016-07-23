@@ -25,7 +25,343 @@ static const wchar_t s_hiragana_table[][5] = {
   {L'ん', 0, 0, 0, 0},                   // GYOU_NN
 };
 
-void MZIMEJA::MakeLiteralMaps() {
+// 品詞の連結可能性
+static BOOL
+IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
+  FOOTMARK();
+  if (node2.bunrui == HB_PERIOD || node2.bunrui == HB_COMMA) return TRUE;
+  if (node1.bunrui == HB_HEAD || node2.bunrui == HB_TAIL) return TRUE;
+  if (node1.bunrui == HB_TAIL || node2.bunrui == HB_HEAD) return FALSE;
+  if (node1.bunrui == HB_SYMBOLS || node2.bunrui == HB_SYMBOLS) return TRUE;
+  if (node1.bunrui == HB_UNKNOWN || node2.bunrui == HB_UNKNOWN) return TRUE;
+
+  switch (node1.bunrui) {
+  case HB_MEISHI: // 名詞
+    switch (node2.bunrui) {
+    case HB_SETTOUJI:
+      return FALSE;
+    default:
+      return TRUE;
+    }
+    break;
+  case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI: // い形容詞、な形容詞
+    switch (node1.katsuyou) {
+    case MIZEN_KEI:
+      if (node2.bunrui == HB_JODOUSHI) {
+        if (node2.HasTag(L"[未然形に連結]")) {
+          if (node2.pre[0] == L'な' || node2.pre == L"う") {
+            return TRUE;
+          }
+        }
+      }
+      return FALSE;
+    case RENYOU_KEI:
+      switch (node2.bunrui) {
+      case HB_JODOUSHI:
+        if (node2.HasTag(L"[連用形に連結]")) {
+          return TRUE;
+        }
+        return FALSE;
+      case HB_MEISHI: case HB_SETTOUJI:
+      case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI:
+      case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
+      case HB_KAHEN_DOUSHI: case HB_SAHEN_DOUSHI:
+        return TRUE;
+      default:
+        return FALSE;
+      }
+      break;
+    case SHUUSHI_KEI:
+      if (node2.bunrui == HB_JODOUSHI) {
+        if (node2.HasTag(L"[終止形に連結]")) {
+          return TRUE;
+        }
+        if (node2.HasTag(L"[種々の語]")) {
+          return TRUE;
+        }
+      }
+      if (node2.bunrui == HB_SHUU_JOSHI) {
+        return TRUE;
+      }
+      return FALSE;
+    case RENTAI_KEI:
+      switch (node2.bunrui) {
+      case HB_KANDOUSHI: case HB_JODOUSHI:
+        return FALSE;
+      default:
+        return TRUE;
+      }
+    case KATEI_KEI:
+      switch (node2.bunrui) {
+      case HB_SETSUZOKU_JOSHI:
+        if (node2.pre == L"ば" || node2.pre == L"ども" || node2.pre == L"ど") {
+          return TRUE;
+        }
+      default:
+        break;
+      }
+      return FALSE;
+    case MEIREI_KEI:
+      switch (node2.bunrui) {
+      case HB_SHUU_JOSHI: case HB_MEISHI: case HB_SETTOUJI:
+        return TRUE;
+      default:
+        break;
+      }
+      return FALSE;
+    }
+    break;
+  case HB_RENTAISHI:  // 連体詞
+    switch (node2.bunrui) {
+    case HB_KANDOUSHI: case HB_JODOUSHI: case HB_SETSUBIJI:
+      return FALSE;
+    default:
+      return TRUE;
+    }
+    break;
+  case HB_FUKUSHI:  // 副詞
+    switch (node2.bunrui) {
+    case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI: case HB_FUKU_JOSHI:
+    case HB_SETSUBIJI:
+      return FALSE;
+    default:
+      return TRUE;
+    }
+    break;
+  case HB_SETSUZOKUSHI: // 接続詞
+    switch (node2.bunrui) {
+    case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
+    case HB_FUKU_JOSHI: case HB_SETSUBIJI:
+      return FALSE;
+    default:
+      return TRUE;
+    }
+    break;
+  case HB_KANDOUSHI:  // 感動詞
+    switch (node2.bunrui) {
+    case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
+    case HB_FUKU_JOSHI: case HB_SETSUBIJI: case HB_JODOUSHI:
+      return FALSE;
+    default:
+      return TRUE;
+    }
+    break;
+  case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI: case HB_FUKU_JOSHI:
+    // 終助詞以外の助詞
+    switch (node2.bunrui) {
+    case HB_SETSUBIJI:
+      return FALSE;
+    default:
+      return TRUE;
+    }
+    break;
+  case HB_SHUU_JOSHI: // 終助詞
+    switch (node2.bunrui) {
+    case HB_MEISHI: case HB_SETTOUJI: case HB_SHUU_JOSHI:
+      return TRUE;
+    default:
+      return FALSE;
+    }
+    break;
+  case HB_JODOUSHI: // 助動詞
+    switch (node1.katsuyou) {
+    case MIZEN_KEI:
+      if (node2.bunrui == HB_JODOUSHI) {
+        if (node2.HasTag(L"[未然形に連結]")) {
+          return TRUE;
+        }
+      }
+      return FALSE;
+    case RENYOU_KEI:
+      switch (node2.bunrui) {
+      case HB_JODOUSHI:
+        if (node2.HasTag(L"[連用形に連結]")) {
+          return TRUE;
+        }
+        return FALSE;
+      case HB_MEISHI: case HB_SETTOUJI:
+      case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI:
+      case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
+      case HB_KAHEN_DOUSHI: case HB_SAHEN_DOUSHI:
+        return TRUE;
+      default:
+        return FALSE;
+      }
+      break;
+    case SHUUSHI_KEI:
+      if (node2.bunrui == HB_JODOUSHI) {
+        if (node2.HasTag(L"[終止形に連結]")) {
+          return TRUE;
+        }
+        if (node2.HasTag(L"[種々の語]")) {
+          return TRUE;
+        }
+      }
+      if (node2.bunrui == HB_SHUU_JOSHI) {
+        return TRUE;
+      }
+      return FALSE;
+    case RENTAI_KEI:
+      switch (node2.bunrui) {
+      case HB_KANDOUSHI: case HB_JODOUSHI:
+        return FALSE;
+      default:
+        return TRUE;
+      }
+    case KATEI_KEI:
+      switch (node2.bunrui) {
+      case HB_SETSUZOKU_JOSHI:
+        if (node2.pre == L"ば" || node2.pre == L"ども" || node2.pre == L"ど") {
+          return TRUE;
+        }
+        break;
+      default:
+        break;
+      }
+      return FALSE;
+    case MEIREI_KEI:
+      switch (node2.bunrui) {
+      case HB_SHUU_JOSHI: case HB_MEISHI: case HB_SETTOUJI:
+        return TRUE;
+      default:
+        return FALSE;
+      }
+    }
+    break;
+  case HB_MIZEN_JODOUSHI: case HB_RENYOU_JODOUSHI:
+  case HB_SHUUSHI_JODOUSHI: case HB_RENTAI_JODOUSHI:
+  case HB_KATEI_JODOUSHI: case HB_MEIREI_JODOUSHI:
+    assert(0);
+    break;
+  case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
+  case HB_KAHEN_DOUSHI: case HB_SAHEN_DOUSHI:
+    // 動詞
+    switch (node1.katsuyou) {
+    case MIZEN_KEI:
+      if (node2.bunrui == HB_JODOUSHI) {
+        if (node2.HasTag(L"[未然形に連結]")) {
+          return TRUE;
+        }
+      }
+      return FALSE;
+    case RENYOU_KEI:
+      switch (node2.bunrui) {
+      case HB_JODOUSHI:
+        if (node2.HasTag(L"[連用形に連結]")) {
+          return TRUE;
+        }
+        return FALSE;
+      case HB_MEISHI: case HB_SETTOUJI:
+      case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI:
+      case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
+      case HB_KAHEN_DOUSHI: case HB_SAHEN_DOUSHI:
+        return TRUE;
+      default:
+        return FALSE;
+      }
+      break;
+    case SHUUSHI_KEI:
+      if (node2.bunrui == HB_JODOUSHI) {
+        if (node2.HasTag(L"[終止形に連結]")) {
+          return TRUE;
+        }
+        if (node2.HasTag(L"[種々の語]")) {
+          return TRUE;
+        }
+      }
+      if (node2.bunrui == HB_SHUU_JOSHI) {
+        return TRUE;
+      }
+      return FALSE;
+    case RENTAI_KEI:
+      switch (node2.bunrui) {
+      case HB_KANDOUSHI: case HB_JODOUSHI:
+        return FALSE;
+      default:
+        return TRUE;
+      }
+      break;
+    case KATEI_KEI:
+      switch (node2.bunrui) {
+      case HB_SETSUZOKU_JOSHI:
+        if (node2.pre == L"ば" || node2.pre == L"ども" || node2.pre == L"ど") {
+          return TRUE;
+        }
+      default:
+        break;
+      }
+      return FALSE;
+    case MEIREI_KEI:
+      switch (node2.bunrui) {
+      case HB_SHUU_JOSHI: case HB_MEISHI: case HB_SETTOUJI:
+        return TRUE;
+      default:
+        return FALSE;
+      }
+      break;
+    }
+    break;
+  case HB_SETTOUJI:   // 接頭辞
+    switch (node2.bunrui) {
+    case HB_MEISHI:
+      return TRUE;
+    default:
+      return FALSE;
+    }
+    break;
+  case HB_SETSUBIJI:  // 接尾辞
+    switch (node2.bunrui) {
+    case HB_SETTOUJI:
+      return FALSE;
+    default:
+      break;
+    }
+    break;
+  case HB_COMMA: case HB_PERIOD:  // 、。
+    switch (node2.bunrui) {
+    case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI: case HB_FUKU_JOSHI:
+    case HB_SHUU_JOSHI: case HB_SETSUBIJI: case HB_JODOUSHI:
+      return FALSE;
+    default:
+      break;
+    }
+    break;
+  default:
+    break;
+  }
+  return TRUE;
+} // IsNodeConnectable
+
+
+static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
+  FOOTMARK();
+  assert(dict_data);
+
+  WCHAR sz[3] = {L'\n', ch, 0};
+  const WCHAR *pch1 = wcsstr(dict_data, sz);
+  if (pch1 == NULL) {
+    return FALSE;
+  }
+
+  std::wstring str;
+  const WCHAR *pch2 = pch1;
+  const WCHAR *pch3;
+  for (;;) {
+    pch3 = wcsstr(pch2 + 1, sz);
+    if (pch3 == NULL) break;
+    pch2 = pch3;
+  }
+  pch3 = wcschr(pch2 + 1, L'\n');
+  assert(pch3);
+  str.assign(pch1 + 1, pch3);
+
+  unboost::split(records, str, unboost::is_any_of(L"\n"));
+  assert(records.size());
+  return records.size();
+} // ScanDict
+
+void MzIme::MakeLiteralMaps() {
+  FOOTMARK();
   if (m_consonant_map.size()) {
     return;
   }
@@ -40,13 +376,13 @@ void MZIMEJA::MakeLiteralMaps() {
       m_vowel_map[s_hiragana_table[i][k]] = s_hiragana_table[0][k];
     }
   }
-}
+} // MzIme::MakeLiteralMaps
 
-inline bool entry_compare_pre(const DICT_ENTRY& e1, const DICT_ENTRY& e2) {
+inline bool entry_compare_pre(const DictEntry& e1, const DictEntry& e2) {
   return (e1.pre < e2.pre);
 }
 
-BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
+BOOL MzIme::LoadBasicDictFile(std::vector<DictEntry>& entries) {
   FOOTMARK();
   char buf[256];
   wchar_t wbuf[256];
@@ -77,7 +413,7 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
 
     // split to fields
     unboost::trim_right_if(str, unboost::is_any_of(L"\r\n"));
-    FIELDS fields;
+    WStrings fields;
     unboost::split(fields, str, unboost::is_any_of(L"\t"));
 
     // is it an invalid line?
@@ -87,7 +423,7 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
     }
 
     // parse a record
-    DICT_ENTRY entry;
+    DictEntry entry;
     entry.gyou = GYOU_A;
     if (fields.size() == 1) {
       // only one field, it's a noun (HB_MEISHI)
@@ -112,7 +448,6 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
     } else if (bunrui_str.size() == 2) {
       if (bunrui_str == L"名詞")            entry.bunrui = HB_MEISHI;
       else if (bunrui_str == L"副詞")       entry.bunrui = HB_FUKUSHI;
-      else if (bunrui_str == L"助詞")       entry.bunrui = HB_JOSHI;
       else if (bunrui_str == L"漢語")       entry.bunrui = HB_KANGO;
       else continue;
     } else if (bunrui_str.size() == 3) {
@@ -121,6 +456,9 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
       else if (bunrui_str == L"感動詞")     entry.bunrui = HB_KANDOUSHI;
       else if (bunrui_str == L"接頭辞")     entry.bunrui = HB_SETTOUJI;
       else if (bunrui_str == L"接尾辞")     entry.bunrui = HB_SETSUBIJI;
+      else if (bunrui_str == L"格助詞")     entry.bunrui = HB_KAKU_JOSHI;
+      else if (bunrui_str == L"副助詞")     entry.bunrui = HB_FUKU_JOSHI;
+      else if (bunrui_str == L"終助詞")     entry.bunrui = HB_SHUU_JOSHI;
       else continue;
     } else if (bunrui_str.size() == 4) {
       if (bunrui_str == L"い形容詞")        entry.bunrui = HB_IKEIYOUSHI;
@@ -129,6 +467,7 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
       else if (bunrui_str == L"一段動詞")   entry.bunrui = HB_ICHIDAN_DOUSHI;
       else if (bunrui_str == L"カ変動詞")   entry.bunrui = HB_KAHEN_DOUSHI;
       else if (bunrui_str == L"サ変動詞")   entry.bunrui = HB_SAHEN_DOUSHI;
+      else if (bunrui_str == L"接続助詞")   entry.bunrui = HB_SETSUZOKU_JOSHI;
       else continue;
     } else if (bunrui_str.size() == 5) {
       if (bunrui_str == L"未然助動詞")      entry.bunrui = HB_MIZEN_JODOUSHI;
@@ -167,7 +506,6 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
       if (fields[2][i] == L'い') fields[2].resize(i);
       break;
     case HB_ICHIDAN_DOUSHI:
-      DebugPrintW(L"%s\n", fields[0].c_str());
       assert(fields[0][fields[0].size() - 1] == L'る');
       assert(fields[2][fields[2].size() - 1] == L'る');
       fields[0].resize(fields[0].size() - 1);
@@ -202,7 +540,7 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
           break;
         }
       }
-      entry.gyou = (GYOU)ngyou;
+      entry.gyou = (Gyou)ngyou;
       break;
     default:
       break;
@@ -220,11 +558,11 @@ BOOL MZIMEJA::LoadBasicDictFile(std::vector<DICT_ENTRY>& entries) {
   // sort by preconversion string
   std::sort(entries.begin(), entries.end(), entry_compare_pre);
   return TRUE;  // success
-} // MZIMEJA::LoadBasicDictFile
+} // MzIme::LoadBasicDictFile
 
-BOOL MZIMEJA::DeployDictData(
-  IMAGE_BASE *data, SECURITY_ATTRIBUTES *psa,
-  const std::vector<DICT_ENTRY>& entries)
+BOOL MzIme::DeployDictData(
+  ImageBase *data, SECURITY_ATTRIBUTES *psa,
+  const std::vector<DictEntry>& entries)
 {
   FOOTMARK();
 
@@ -232,7 +570,7 @@ BOOL MZIMEJA::DeployDictData(
   size_t size = 0;
   size += 1;  // \n
   for (size_t i = 0; i < entries.size(); ++i) {
-    const DICT_ENTRY& entry = entries[i];
+    const DictEntry& entry = entries[i];
     size += entry.pre.size();
     //size += 3;  // \t hb \t
     size += entry.post.size();
@@ -244,12 +582,7 @@ BOOL MZIMEJA::DeployDictData(
   size += 1;  // \0
   size *= sizeof(WCHAR);
 
-  // wait for locking dict data
   BOOL ret = FALSE;
-  DWORD dwWait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds);
-  if (dwWait != WAIT_OBJECT_0) {
-    return ret;
-  }
 
   // create shared dict data
   m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
@@ -263,7 +596,7 @@ BOOL MZIMEJA::DeployDictData(
     *pch++ += L'\n';  // new line
     for (size_t i = 0; i < entries.size(); ++i) {
       // line format: pre \t MAKEWORD(bunrui, gyou) \t post \t tags \n
-      const DICT_ENTRY& entry = entries[i];
+      const DictEntry& entry = entries[i];
       // pre \t
       cch = entry.pre.size();
       memcpy(pch, entry.pre.c_str(), cch * sizeof(WCHAR));
@@ -286,7 +619,7 @@ BOOL MZIMEJA::DeployDictData(
     }
     *pch++ = L'\0'; // NUL
     assert(size / 2 == size_t(pch - reinterpret_cast<WCHAR *>(pv)));
-    #if 0
+    #if 1
       FILE *fp = fopen("c:\\dictdata.txt", "wb");
       fwrite(pv, size, 1, fp);
       fclose(fp);
@@ -298,20 +631,18 @@ BOOL MZIMEJA::DeployDictData(
   // store the total size
   data->dwSharedDictDataSize = size;
 
-  // it's done, unlock the mutex
-  ::ReleaseMutex(m_hMutex);
-
   return ret;
-} // MZIMEJA::DeployDictData
+} // MzIme::DeployDictData
 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL MZIMEJA::LoadBasicDict() {
+BOOL MzIme::LoadBasicDict() {
   FOOTMARK();
-  BOOL ret = FALSE;
+  if (IsBasicDictLoaded()) return TRUE;
 
   // get the base shared data
-  IMAGE_BASE *data = LockImeBaseData();
+  BOOL ret = FALSE;
+  ImageBase *data = LockImeBaseData();
   if (data == NULL) {
     assert(0);
     return ret; // failure
@@ -323,18 +654,17 @@ BOOL MZIMEJA::LoadBasicDict() {
 
   // is the signature valid?
   if (data->dwSignature == 0xDEADFACE) {
-    // is it already stored?
-    if (data->dwSharedDictDataSize == 0) {
-      // no data, so deploy dict data
-      std::vector<DICT_ENTRY> entries;
-      if (LoadBasicDictFile(entries)) {
-        ret = DeployDictData(data, psa, entries);
-      }
-      assert(ret);
-    } else {
-      // data is already stored. wait for locking dict data
-      DWORD dwWait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds);
-      if (dwWait == WAIT_OBJECT_0) {
+    // lock the dictionary
+    DWORD dwWait = ::WaitForSingleObject(m_hDictLock, c_dwMilliseconds);
+    if (dwWait == WAIT_OBJECT_0) {
+      // is it already stored?
+      if (data->dwSharedDictDataSize == 0) {
+        // no data, so deploy dict data
+        std::vector<DictEntry> entries;
+        if (LoadBasicDictFile(entries)) {
+          ret = DeployDictData(data, psa, entries);
+        }
+      } else {
         // open shared dict data
         m_hBasicDictData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
           PAGE_READONLY, 0, data->dwSharedDictDataSize, L"mzimeja_basic_dict");
@@ -342,9 +672,9 @@ BOOL MZIMEJA::LoadBasicDict() {
           ret = TRUE; // success
         }
         assert(ret);
-        // unlock the dict data
-        ::ReleaseMutex(m_hMutex);
       }
+      // unlock the dictionary
+      ::ReleaseMutex(m_hDictLock);
     }
   }
 
@@ -355,16 +685,18 @@ BOOL MZIMEJA::LoadBasicDict() {
   UnlockImeBaseData(data);
 
   return ret;
-} // MZIMEJA::LoadBasicDict
+} // MzIme::LoadBasicDict
 
-BOOL MZIMEJA::IsBasicDictLoaded() const {
+BOOL MzIme::IsBasicDictLoaded() const {
+  FOOTMARK();
   return m_hBasicDictData != NULL;
 }
 
-WCHAR *MZIMEJA::LockBasicDict() {
+WCHAR *MzIme::LockBasicDict() {
+  FOOTMARK();
   // get size
   DWORD dwSize = 0;
-  IMAGE_BASE *data = LockImeBaseData();
+  ImageBase *data = LockImeBaseData();
   if (data) {
     dwSize = data->dwSharedDictDataSize;
     UnlockImeBaseData(data);
@@ -379,125 +711,248 @@ WCHAR *MZIMEJA::LockBasicDict() {
   return NULL;  // failure
 }
 
-void MZIMEJA::UnlockBasicDict(WCHAR *data) {
+void MzIme::UnlockBasicDict(WCHAR *data) {
+  FOOTMARK();
   ::UnmapViewOfFile(data);
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// making a lattice
+// MzConversionResult, MzConversionClause etc.
 
-void MZIMEJA::MakeLattice(LATTICE& lattice) {
-  WCHAR *dict_data = LockBasicDict();
-  MakeLattice(lattice, dict_data);
-  UnlockBasicDict(dict_data);
+static inline bool CandidateCompare(
+  const MzConversionCandidate& cand1, const MzConversionCandidate& cand2)
+{
+  FOOTMARK();
+  return cand1.cost < cand2.cost;
 }
 
-void MZIMEJA::MakeLattice(LATTICE& lattice, const WCHAR *dict_data) {
-  const std::wstring& pre = lattice.pre;
+void MzConversionClause::sort() {
+  FOOTMARK();
+  std::sort(candidates.begin() + 1, candidates.end(), CandidateCompare);
+}
+
+void MzConversionResult::sort() {
+  FOOTMARK();
+  for (size_t i = 0; i < clauses.size(); ++i) {
+    clauses[i].sort();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// LatticeNode
+
+int LatticeNode::CalcCost() const {
+  int ret = 0;
+  if (bunrui == HB_KANGO) ret += 200;
+  if (tags.size() != 0) {
+    if (HasTag(L"[非標準]")) ret += 100;
+    if (HasTag(L"[不謹慎]")) ret += 50;
+    if (HasTag(L"[人名]")) ret += 30;
+    else if (HasTag(L"[駅名]")) ret += 30;
+    else if (HasTag(L"[地名]")) ret += 30;
+  }
+  return ret;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Lattice
+
+void Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
+  FOOTMARK();
   const size_t length = pre.size();
   assert(length);
 
-  lattice.chunks.resize(length);
-  lattice.refs.resize(length + 1, 0);
-  lattice.refs[0] = 1;
-
-  for (size_t index = 0; index < length; ++index) {
-    if (lattice.refs[index] == 0) continue;
-    RECORDS records;
-    ScanDict(records, dict_data, pre[index]);
+  WStrings fields, records;
+  for (; index < length; ++index) {
+    if (refs[index] == 0) continue;
+    size_t count = ScanDict(records, dict_data, pre[index]);
+    DebugPrintW(L"ScanDict(%c) count: %d\n", pre[index], count);
     for (size_t k = 0; k < records.size(); ++k) {
       const std::wstring& record = records[k];
-      FIELDS fields;
       unboost::split(fields, record, unboost::is_any_of(L"\t"));
-      ParseFields(lattice, index, fields);
+      DoFields(index, fields);
     }
   }
-}
+} // Lattice::AddNodes
 
-void MZIMEJA::CutExtraNodes(LATTICE& lattice) {
-  const std::wstring& pre = lattice.pre;
+void Lattice::UpdateRefs() {
+  FOOTMARK();
+  const size_t length = pre.size();
+  refs.assign(length + 1, 0);
+  refs[0] = 1;
+
+  for (size_t index = 0; index < length; ++index) {
+    if (refs[index] == 0) continue;
+    LatticeChunk& chunk1 = chunks[index];
+    for (size_t k = 0; k < chunk1.size(); ++k) {
+      refs[index + chunk1[k]->pre.size()]++;
+    }
+  }
+} // Lattice::UpdateRefs
+
+void Lattice::UpdateLinks() {
+  FOOTMARK();
   const size_t length = pre.size();
   assert(length);
-  assert(length == lattice.chunks.size());
-  assert(length + 1 == lattice.refs.size());
+  assert(length + 1 == chunks.size());
+  assert(length + 1 == refs.size());
+
+  UnlinkAllNodes();
+
+  // add head and link to head
+  {
+    LatticeNode node;
+    node.bunrui = HB_HEAD;
+    node.linked = 1;
+    LatticeChunk& chunk1 = chunks[0];
+    for (size_t k = 0; k < chunk1.size(); ++k) {
+      chunk1[k]->linked = 1;
+      node.branches.push_back(chunk1[k]);
+    }
+    head = unboost::make_shared(node);
+  }
+  // add tail
+  {
+    LatticeNode node;
+    node.bunrui = HB_TAIL;
+    chunks[length].clear();
+    chunks[length].push_back(unboost::make_shared(node));
+  }
+
+  // add links and branches
+  size_t num_links = 0;
   for (size_t index = 0; index < length; ++index) {
-    if (lattice.refs[index] == 0) continue;
-    // TODO:
+    LatticeChunk& chunk1 = chunks[index];
+    for (size_t k = 0; k < chunk1.size(); ++k) {
+      if (!chunk1[k]->linked) continue;
+      const std::wstring& pre = chunk1[k]->pre;
+      LatticeChunk& chunk2 = chunks[index + pre.size()];
+      for (size_t m = 0; m < chunk2.size(); ++m) {
+        if (IsNodeConnectable(*chunk1[k].get(), *chunk2[m].get())) {
+          chunk1[k]->branches.push_back(chunk2[m]);
+          chunk2[m]->linked++;
+          num_links++;
+        }
+      }
+    }
   }
+  DebugPrintA("num_links: %d\n", (int)num_links);
+} // Lattice::UpdateLinks
+
+void Lattice::UnlinkAllNodes() {
+  FOOTMARK();
+  const size_t length = pre.size();
+  for (size_t index = 0; index < length; ++index) {
+    LatticeChunk& chunk1 = chunks[index];
+    for (size_t k = 0; k < chunk1.size(); ++k) {
+      chunk1[k]->linked = 0;
+      chunk1[k]->branches.clear();
+    }
+  }
+} // Lattice::UnlinkAllNodes
+
+void Lattice::AddComplement(size_t index) {
+  FOOTMARK();
+  const size_t length = pre.size();
+
+  WStrings fields(4);
+  fields[1].assign(1, MAKEWORD(HB_UNKNOWN, 0));
+  //fields[3].clear();
+  for (size_t count = 1; count <= 4; ++count) {
+    if (length < index + count) continue;
+    fields[0] = pre.substr(index, count);
+    fields[2] = fields[0];
+    DoFields(index, fields);
+  }
+} // Lattice::AddComplement
+
+static inline bool IsNodeUnlinked(const LatticeNodePtr& node) {
+  FOOTMARK();
+  return node->linked == 0;
 }
 
-BOOL MZIMEJA::ScanDict(RECORDS& records, const WCHAR *dict_data, WCHAR ch) {
-  WCHAR sz[3] = {ch, L'\n', 0};
-  const WCHAR *pch1 = wcsstr(dict_data, sz);
-  if (pch1 == NULL) {
-    return FALSE;
+void Lattice::CutUnlinkedNodes() {
+  FOOTMARK();
+  const size_t length = pre.size();
+  for (size_t index = 0; index < length; ++index) {
+    LatticeChunk& chunk1 = chunks[index];
+    std::remove_if(chunk1.begin(), chunk1.end(), IsNodeUnlinked);
+  }
+} // Lattice::CutUnlinkedNodes
+
+size_t Lattice::GetLastLinkedIndex() const {
+  FOOTMARK();
+  // is the last node linked?
+  const size_t length = pre.size();
+  if (chunks[length][0]->linked) {
+    return length;  // return the last index
   }
 
-  std::wstring str;
-  const WCHAR *pch2;
-  const WCHAR *pch3;
-  pch2 = pch1;
-  for (;;) {
-    pch3 = wcsstr(pch1, pch2 + 1);
-    if (pch3 == NULL) break;
-    pch2 = pch3;
+  // scan chunks in reverse order
+  for (size_t index = length; index > 0; ) {
+    --index;
+    for (size_t k = 0; k < chunks[index].size(); ++k) {
+      if (chunks[index][k]->linked) {
+        return index; // the linked node was found
+      }
+    }
   }
-  pch3 = wcschr(pch2, L'\n');
-  assert(pch3);
-  str.assign(pch1 + 1, pch3 - 1);
+  return 0;
+} // Lattice::GetLastLinkedIndex
 
-  unboost::split(records, str, unboost::is_any_of(L"\n"));
-  assert(records.size());
-  return TRUE;
-}
-
-void
-MZIMEJA::ParseIkeiyoushi(LATTICE& lattice, size_t index, const FIELDS& fields) {
+void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
+  FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  std::wstring str = lattice.pre.substr(index + fields[0].size());
-  LATTICE_NODE node;
+  if (index + fields[0].size() > pre.size()) {
+    return;
+  }
+  std::wstring str = pre.substr(index + fields[0].size());
+
+  LatticeNode node;
   node.bunrui = HB_IKEIYOUSHI;
-  node.cost = 0;
+  node.tags = fields[3];
+  node.cost = node.CalcCost();
 
   // 未然形
   do {
-    if (str.substr(0, 2) != L"かろ") break;
+    if (str.empty() || str.substr(0, 2) != L"かろ") break;
     node.katsuyou = MIZEN_KEI;
     node.pre = fields[0] + L"かろ";
     node.post = fields[2] + L"かろ";
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
 
   // 連用形
   node.katsuyou = RENYOU_KEI;
   do {
-    if (str.substr(0, 2) != L"かっ") break;
+    if (str.empty() || str.substr(0, 2) != L"かっ") break;
     node.pre = fields[0] + L"かっ";
     node.post = fields[2] + L"かっ";
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
   do {
-    if (str[0] != L'く') break;
+    if (str.empty() || str[0] != L'く') break;
     node.pre = fields[0] + L'く';
     node.post = fields[2] + L'く';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
-    if (str[0] != L'う') break;
+    if (str.empty() || str[0] != L'う') break;
     node.pre = fields[0] + L'う';
     node.post = fields[2] + L'う';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
+    if (fields[0].empty() || str.empty()) break;
     wchar_t ch0 = fields[0][fields[0].size() - 1];
-    wchar_t ch1 = m_consonant_map[ch0];
+    wchar_t ch1 = TheIME.m_consonant_map[ch0];
     std::wstring addition;
-    switch (m_vowel_map[ch0]) {
+    switch (TheIME.m_vowel_map[ch0]) {
     case L'あ':
       str = fields[1].substr(0, fields[1].size() - 1);
       for (size_t i = 0; i < _countof(s_hiragana_table); ++i) {
@@ -519,16 +974,16 @@ MZIMEJA::ParseIkeiyoushi(LATTICE& lattice, size_t index, const FIELDS& fields) {
         }
       }
       node.pre = str;
-      if (str.substr(0, addition.size()) != addition) break;
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index + fields[0].size() + addition.size()]++;
+      if (str.empty() || str.substr(0, addition.size()) != addition) break;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index + fields[0].size() + addition.size()]++;
       break;
     case L'い':
-      if (str.substr(0, 2) != L"ゅう") break;
+      if (str.empty() || str.substr(0, 2) != L"ゅう") break;
       node.pre = fields[0] + L"ゅう";
       node.post = fields[2] + L"ゅう";
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index + fields[0].size() + 2]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index + fields[0].size() + 2]++;
     default:
       break;
     }
@@ -537,173 +992,207 @@ MZIMEJA::ParseIkeiyoushi(LATTICE& lattice, size_t index, const FIELDS& fields) {
   // 終止形
   node.katsuyou = SHUUSHI_KEI;
   do {
-    if (str[0] != L'い') break;
+    if (str.empty() || str[0] != L'い') break;
     node.pre = fields[0] + L'い';
     node.post = fields[2] + L'い';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
-    if (str[0] != L'し') {
+    if (str.size() && str[0] != L'し') {
       node.pre = fields[0] + L'し';
       node.post = fields[2] + L'し';
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index + fields[0].size() + 1]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index + fields[0].size() + 1]++;
     } else {
       node.pre = fields[0];
       node.post = fields[2];
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index + fields[0].size()]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index + fields[0].size()]++;
     }
   } while(0);
 
   // 連体形
   node.katsuyou = RENTAI_KEI;
   do {
-    if (str[0] != L'い') break;
+    if (str.empty() || str[0] != L'い') break;
     node.pre = fields[0] + L'い';
     node.post = fields[2] + L'い';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
-    if (str[0] != L'き') break;
+    if (str.empty() || str[0] != L'き') break;
     node.pre = fields[0] + L'き';
     node.post = fields[2] + L'き';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 仮定形
   do {
-    if (str.substr(0, 2) != L"けれ") break;
+    if (str.empty() || str.substr(0, 2) != L"けれ") break;
     node.katsuyou = KATEI_KEI;
     node.pre = fields[0] + L"けれ";
     node.post = fields[2] + L"けれ";
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
 
   // 名詞形
   node.bunrui = HB_MEISHI;
   do {
-    if (str[0] != L'さ') break;
+    if (str.empty() || str[0] != L'さ') break;
     node.pre = fields[0] + L'さ';
     node.post = fields[2] + L'さ';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
-    if (str[0] != L'み') break;
+    if (str.empty() || str[0] != L'み') break;
     node.pre = fields[0] + L'み';
     node.post = fields[2] + L'み';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
-    if (str[0] != L'め') break;
+    if (str.empty() || str[0] != L'め') break;
     node.pre = fields[0] + L'め';
     node.post = fields[2] + L'目';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
-}
 
-void
-MZIMEJA::ParseNakeiyoushi(LATTICE& lattice, size_t index, const FIELDS& fields) {
+  // (い形容詞の語幹)+"そうだ"
+  if (str.size() >= 2 && str[0] == L'そ' && str[1] == L'う') {
+    WStrings new_fields = fields;
+    new_fields[0] = fields[0] + L"そう";
+    DoNakeiyoushi(index, new_fields);
+  }
+
+  // 「痛。」「寒。」など
+  if (str.size()) {
+    switch (str[0]) {
+    case L'。': case L'、': case L'，': case L'．': case 0:
+      DoMeishi(index, fields);
+      break;
+    }
+  }
+} // Lattice::DoIkeiyoushi
+
+void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
+  FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  std::wstring str = lattice.pre.substr(index + fields[0].size());
-  LATTICE_NODE node;
+  if (index + fields[0].size() > pre.size()) {
+    return;
+  }
+  std::wstring str = pre.substr(index + fields[0].size());
+
+  LatticeNode node;
   node.bunrui = HB_NAKEIYOUSHI;
-  node.cost = 0;
+  node.tags = fields[3];
+  node.cost = node.CalcCost();
 
   // 未然形
   do {
-    if (str.substr(0, 2) != L"だろ") break;
+    if (str.empty() || str.substr(0, 2) != L"だろ") break;
     node.katsuyou = MIZEN_KEI;
     node.pre = fields[0] + L"だろ";
     node.post = fields[2] + L"だろ";
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
 
   // 連用形
   node.katsuyou = RENYOU_KEI;
   do {
-    if (str.substr(0, 2) != L"だっ") break;
+    if (str.empty() || str.substr(0, 2) != L"だっ") break;
     node.pre = fields[0] + L"だっ";
     node.post = fields[2] + L"だっ";
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
   do {
-    if (str[0] != L'で') break;
+    if (str.empty() || str[0] != L'で') break;
     node.pre = fields[0] + L'で';
     node.post = fields[2] + L'で';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
-    if (str[0] != L'に') break;
+    if (str.empty() || str[0] != L'に') break;
     node.pre = fields[0] + L'に';
     node.post = fields[2] + L'に';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 終止形
   do {
-    if (str[0] != L'だ') break;
+    if (str.empty() || str[0] != L'だ') break;
     node.katsuyou = SHUUSHI_KEI;
     node.pre = fields[0] + L'だ';
     node.post = fields[2] + L'だ';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 連体形
   do {
-    if (str[0] != L'な') break;
+    if (str.empty() || str[0] != L'な') break;
     node.katsuyou = RENTAI_KEI;
     node.pre = fields[0] + L'な';
     node.post = fields[2] + L'な';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 仮定形
   do {
-    if (str.substr(0, 2) != L"なら") break;
+    if (str.empty() || str.substr(0, 2) != L"なら") break;
     node.katsuyou = KATEI_KEI;
     node.pre = fields[0] + L"なら";
     node.post = fields[2] + L"なら";
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
 
   // 名詞形
   node.bunrui = HB_MEISHI;
   do {
-    if (str[0] != L'さ') break;
+    if (str.empty() || str[0] != L'さ') break;
     node.pre = fields[0] + L'さ';
     node.post = fields[2] + L'さ';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
-}
 
-void
-MZIMEJA::ParseGodanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields) {
+  // 「きれい。」「静か。」など
+  switch (str[0]) {
+  case L'。': case L'、': case L'，': case L'．': case 0:
+    DoMeishi(index, fields);
+    break;
+  }
+} // Lattice::DoNakeiyoushi
+
+void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
+  FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  std::wstring str = lattice.pre.substr(index + fields[0].size());
-  LATTICE_NODE node;
+  if (index + fields[0].size() > pre.size()) {
+    return;
+  }
+  std::wstring str = pre.substr(index + fields[0].size());
+  DebugPrintW(L"DoGodanDoushi: %s, %s\n", fields[0].c_str(), str.c_str());
+
+  LatticeNode node;
   node.bunrui = HB_GODAN_DOUSHI;
-  node.cost = 0;
+  node.tags = fields[3];
+  node.cost = node.CalcCost();
 
   WORD w = fields[1][0];
-  node.gyou = (GYOU)HIBYTE(w);
+  node.gyou = (Gyou)HIBYTE(w);
 
   int type;
   switch (node.gyou) {
@@ -717,18 +1206,18 @@ MZIMEJA::ParseGodanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields) 
   do {
     node.katsuyou = MIZEN_KEI;
     if (node.gyou == GYOU_A) {
-      if (str[0] != L'わ') break;
+      if (str.empty() || str[0] != L'わ') break;
       node.pre = fields[0] + L'わ';
       node.post = fields[2] + L'わ';
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index + fields[0].size() + 1]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index + fields[0].size() + 1]++;
     } else {
       wchar_t ch = s_hiragana_table[node.gyou][DAN_A];
-      if (str[0] != ch) break;
+      if (str.empty() || str[0] != ch) break;
       node.pre = fields[0] + ch;
       node.post = fields[2] + ch;
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index + fields[0].size() + 1]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index + fields[0].size() + 1]++;
     }
   } while(0);
 
@@ -736,11 +1225,11 @@ MZIMEJA::ParseGodanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields) 
   node.katsuyou = RENYOU_KEI;
   do {
     wchar_t ch = s_hiragana_table[node.gyou][DAN_I];
-    if (str[0] != ch) break;
+    if (str.empty() || str[0] != ch) break;
     node.pre = fields[0] + ch;
     node.post = fields[2] + ch;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
     if (type == 0) break;
@@ -750,63 +1239,76 @@ MZIMEJA::ParseGodanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields) 
     case 2:   ch = L'ん'; break;
     case 3:   ch = L'っ'; break;
     }
-    if (str[0] != ch) break;
+    if (str.empty() || str[0] != ch) break;
     node.pre = fields[0] + ch;
     node.post = fields[2] + ch;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 終止形
   // 連体形
   do {
     wchar_t ch = s_hiragana_table[node.gyou][DAN_U];
-    if (str[0] != ch) break;
+    if (str.empty() || str[0] != ch) break;
     node.katsuyou = SHUUSHI_KEI;
     node.pre = fields[0] + ch;
     node.post = fields[2] + ch;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
     node.katsuyou = RENTAI_KEI;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 仮定形
   // 命令形
   do {
     wchar_t ch = s_hiragana_table[node.gyou][DAN_E];
-    if (str[0] != ch) break;
+    if (str.empty() || str[0] != ch) break;
     node.katsuyou = KATEI_KEI;
     node.pre = fields[0] + ch;
     node.post = fields[2] + ch;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
     node.katsuyou = MEIREI_KEI;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 名詞形
   node.bunrui = HB_MEISHI;
   do {
     wchar_t ch = s_hiragana_table[node.gyou][DAN_I];
-    if (str[0] != ch) break;
+    if (str.empty() || str[0] != ch) break;
     node.pre = fields[0] + ch;
     node.post = fields[2] + ch;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
-}
 
-void
-MZIMEJA::ParseIchidanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields) {
+  // 「動く(五段)」→「動ける(一段)」、
+  // 「聞く(五段)」→「聞ける(一段)」など
+  {
+    WStrings new_fields = fields;
+    new_fields[0] += s_hiragana_table[node.gyou][DAN_I];
+    DoIchidanDoushi(index, new_fields);
+  }
+} // Lattice::DoGodanDoushi
+
+void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
+  FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  std::wstring str = lattice.pre.substr(index + fields[0].size());
-  LATTICE_NODE node;
+  if (index + fields[0].size() > pre.size()) {
+    return;
+  }
+  std::wstring str = pre.substr(index + fields[0].size());
+
+  LatticeNode node;
   node.bunrui = HB_ICHIDAN_DOUSHI;
-  node.cost = 0;
+  node.tags = fields[3];
+  node.cost = node.CalcCost();
 
   // 未然形
   // 連用形
@@ -814,52 +1316,52 @@ MZIMEJA::ParseIchidanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields
     node.katsuyou = MIZEN_KEI;
     node.pre = fields[0];
     node.post = fields[2];
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size()]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size()]++;
     node.katsuyou = RENYOU_KEI;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size()]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size()]++;
   } while(0);
 
   // 終止形
   // 連体形
   do {
-    if (str[0] != L'る') break;
+    if (str.empty() || str[0] != L'る') break;
     node.katsuyou = SHUUSHI_KEI;
     node.pre = fields[0] + L'る';
     node.post = fields[2] + L'る';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
     node.katsuyou = RENTAI_KEI;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 仮定形
   do {
-    if (str[0] != L'れ') break;
+    if (str.empty() || str[0] != L'れ') break;
     node.katsuyou = KATEI_KEI;
     node.pre = fields[0] + L'れ';
     node.post = fields[2] + L'れ';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 命令形
   node.katsuyou = MEIREI_KEI;
   do {
-    if (str[0] != L'ろ') break;
+    if (str.empty() || str[0] != L'ろ') break;
     node.pre = fields[0] + L'ろ';
     node.post = fields[2] + L'ろ';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
-    if (str[0] != L'よ') break;
+    if (str.empty() || str[0] != L'よ') break;
     node.pre = fields[0] + L'よ';
     node.post = fields[2] + L'よ';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 名詞形
@@ -867,346 +1369,517 @@ MZIMEJA::ParseIchidanDoushi(LATTICE& lattice, size_t index, const FIELDS& fields
   do {
     node.pre = fields[0];
     node.post = fields[2];
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size()]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size()]++;
   } while(0);
-}
+} // Lattice::DoIchidanDoushi
 
-void
-MZIMEJA::ParseKahenDoushi(LATTICE& lattice, size_t index, const FIELDS& fields) {
+void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
+  FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  std::wstring str = lattice.pre.substr(index + fields[0].size());
-  LATTICE_NODE node;
+  if (index + fields[0].size() > pre.size()) {
+    return;
+  }
+  std::wstring str = pre.substr(index + fields[0].size());
+
+  LatticeNode node;
   node.bunrui = HB_KAHEN_DOUSHI;
-  node.cost = 0;
+  node.tags = fields[3];
+  node.cost = node.CalcCost();
 
   // 未然形
   do {
-    if (str[0] != L'こ') break;
+    if (str.empty() || str[0] != L'こ') break;
     node.katsuyou = MIZEN_KEI;
     node.pre = fields[0] + L'こ';
     node.post = fields[2] + L'来';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 連用形
   do {
-    if (str[0] != L'き') break;
+    if (str.empty() || str[0] != L'き') break;
     node.katsuyou = RENYOU_KEI;
     node.pre = fields[0] + L'き';
     node.post = fields[2] + L'来';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 終止形
   // 連用形
   do {
-    if (str.substr(0, 2) != L"くる") break;
+    if (str.empty() || str.substr(0, 2) != L"くる") break;
     node.katsuyou = SHUUSHI_KEI;
     node.pre = fields[0] + L"くる";
     node.post = fields[2] + L"来る";
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
     node.katsuyou = RENYOU_KEI;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
 
   // 仮定形
   do {
-    if (str.substr(0, 2) != L"くれ") break;
+    if (str.empty() || str.substr(0, 2) != L"くれ") break;
     node.katsuyou = KATEI_KEI;
     node.pre = fields[0] + L"くれ";
     node.post = fields[2] + L"来れ";
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
 
   // 命令形
   do {
-    if (str.substr(0, 2) != L"こい") break;
+    if (str.empty() || str.substr(0, 2) != L"こい") break;
     node.katsuyou = MEIREI_KEI;
     node.pre = fields[0] + L"こい";
     node.post = fields[2] + L"来い";
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
 
   // 名詞形
   node.bunrui = HB_MEISHI;
   do {
-    if (str[0] != L'き') break;
+    if (str.empty() || str[0] != L'き') break;
     node.pre = fields[0] + L'き';
     node.post = fields[2] + L'来';
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
-}
+} // Lattice::DoKahenDoushi
 
-void
-MZIMEJA::ParseSahenDoushi(LATTICE& lattice, size_t index, const FIELDS& fields) {
+void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
+  FOOTMARK();
   assert(fields.size() == 4);
   assert(fields[0].size());
-  std::wstring str = lattice.pre.substr(index + fields[0].size());
-  LATTICE_NODE node;
+  if (index + fields[0].size() > pre.size()) {
+    return;
+  }
+  std::wstring str = pre.substr(index + fields[0].size());
+
+  LatticeNode node;
   node.bunrui = HB_SAHEN_DOUSHI;
-  node.cost = 0;
+  node.tags = fields[3];
+  node.cost = node.CalcCost();
 
   WORD w = fields[1][0];
-  node.gyou = (GYOU)HIBYTE(w);
+  node.gyou = (Gyou)HIBYTE(w);
 
   // 未然形
   node.katsuyou = MIZEN_KEI;
   do {
     if (node.gyou == GYOU_ZA) {
-      if (str[0] != L'ざ') break;
+      if (str.empty() || str[0] != L'ざ') break;
       node.pre = fields[0] + L'ざ';
       node.post = fields[2] + L'ざ';
     } else {
-      if (str[0] != L'さ') break;
+      if (str.empty() || str[0] != L'さ') break;
       node.pre = fields[0] + L'さ';
       node.post = fields[2] + L'さ';
     }
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
     if (node.gyou == GYOU_ZA) {
-      if (str[0] != L'じ') break;
+      if (str.empty() || str[0] != L'じ') break;
       node.pre = fields[0] + L'じ';
       node.post = fields[2] + L'じ';
     } else {
-      if (str[0] != L'し') break;
+      if (str.empty() || str[0] != L'し') break;
       node.pre = fields[0] + L'し';
       node.post = fields[2] + L'し';
     }
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
   do {
     if (node.gyou == GYOU_ZA) {
-      if (str[0] != L'ぜ') break;
+      if (str.empty() || str[0] != L'ぜ') break;
       node.pre = fields[0] + L'ぜ';
       node.post = fields[2] + L'ぜ';
     } else {
-      if (str[0] != L'せ') break;
+      if (str.empty() || str[0] != L'せ') break;
       node.pre = fields[0] + L'せ';
       node.post = fields[2] + L'せ';
     }
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 連用形
   node.katsuyou = RENYOU_KEI;
   do {
     if (node.gyou == GYOU_ZA) {
-      if (str[0] != L'じ') break;
+      if (str.empty() || str[0] != L'じ') break;
       node.pre = fields[0] + L'じ';
       node.post = fields[2] + L'じ';
     } else {
-      if (str[0] != L'し') break;
+      if (str.empty() || str[0] != L'し') break;
       node.pre = fields[0] + L'し';
       node.post = fields[2] + L'し';
     }
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 終止形
   // 連用形
   do {
     if (node.gyou == GYOU_ZA) {
-      if (str.substr(0, 2) != L"ずる") break;
+      if (str.empty() || str.substr(0, 2) != L"ずる") break;
       node.pre = fields[0] + L"ずる";
       node.post = fields[2] + L"ずる";
     } else {
-      if (str.substr(0, 2) != L"する") break;
+      if (str.empty() || str.substr(0, 2) != L"する") break;
       node.pre = fields[0] + L"する";
       node.post = fields[2] + L"する";
     }
     node.katsuyou = SHUUSHI_KEI;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
 
     node.katsuyou = RENYOU_KEI;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
   do {
     if (node.gyou == GYOU_ZA) {
-      if (str[0] != L'ず') break;
+      if (str.empty() || str[0] != L'ず') break;
       node.pre = fields[0] + L'ず';
       node.post = fields[2] + L'ず';
     } else {
-      if (str[0] != L'す') break;
+      if (str.empty() || str[0] != L'す') break;
       node.pre = fields[0] + L'す';
       node.post = fields[2] + L'す';
     }
     node.katsuyou = SHUUSHI_KEI;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 1]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 1]++;
   } while(0);
 
   // 仮定形
   do {
     if (node.gyou == GYOU_ZA) {
-      if (str.substr(0, 2) != L"ずれ") break;
+      if (str.empty() || str.substr(0, 2) != L"ずれ") break;
       node.pre = fields[0] + L"ずれ";
       node.post = fields[2] + L"ずれ";
     } else {
-      if (str.substr(0, 2) != L"すれ") break;
+      if (str.empty() || str.substr(0, 2) != L"すれ") break;
       node.pre = fields[0] + L"すれ";
       node.post = fields[2] + L"すれ";
     }
     node.katsuyou = KATEI_KEI;
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
 
   // 命令形
   node.katsuyou = MEIREI_KEI;
   do {
     if (node.gyou == GYOU_ZA) {
-      if (str.substr(0, 2) != L"じろ") break;
+      if (str.empty() || str.substr(0, 2) != L"じろ") break;
       node.pre = fields[0] + L"じろ";
       node.post = fields[2] + L"じろ";
     } else {
-      if (str.substr(0, 2) != L"しろ") break;
+      if (str.empty() || str.substr(0, 2) != L"しろ") break;
       node.pre = fields[0] + L"しろ";
       node.post = fields[2] + L"しろ";
     }
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
   do {
     if (node.gyou == GYOU_ZA) {
-      if (str.substr(0, 2) != L"ぜよ") break;
+      if (str.empty() || str.substr(0, 2) != L"ぜよ") break;
       node.pre = fields[0] + L"ぜよ";
       node.post = fields[2] + L"ぜよ";
     } else {
-      if (str.substr(0, 2) != L"せよ") break;
+      if (str.empty() || str.substr(0, 2) != L"せよ") break;
       node.pre = fields[0] + L"せよ";
       node.post = fields[2] + L"せよ";
     }
-    lattice.chunks[index].push_back(node);
-    lattice.refs[index + fields[0].size() + 2]++;
+    chunks[index].push_back(unboost::make_shared(node));
+    refs[index + fields[0].size() + 2]++;
   } while(0);
-}
+} // Lattice::DoSahenDoushi
 
-void
-MZIMEJA::ParseFields(LATTICE& lattice, size_t index, const FIELDS& fields) {
+void Lattice::DoMeishi(size_t index, const WStrings& fields) {
+  FOOTMARK();
   assert(fields.size() == 4);
+  assert(fields[0].size());
+
   size_t length = fields[0].size();
+  if (index + length > pre.size()) {
+    return;
+  }
+  std::wstring str = pre.substr(index + length);
+
+  LatticeNode node;
+  node.bunrui = HB_MEISHI;
+  node.tags = fields[3];
+  node.cost = node.CalcCost();
+
+  if (pre.substr(index, length) == fields[0]) {
+    if (node.HasTag(L"[動植物]")) {
+      // animals or plants are written in katakana
+      node.pre = fields[0];
+      node.post = lcmap(fields[0], LCMAP_KATAKANA | LCMAP_FULLWIDTH);
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index]++;
+
+      node.cost += 30;
+      node.pre = fields[0];
+      node.post = fields[2];
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index]++;
+    } else {
+      node.pre = fields[0];
+      node.post = fields[2];
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index]++;
+    }
+  }
+
+  if (str.size() >= 2 && str[0] == L'っ' && str[1] == L'ぽ') {
+    WStrings new_fields = fields;
+    new_fields[0] += L"っぽ";
+    DoIkeiyoushi(index, new_fields);
+  }
+} // Lattice::DoMeishi
+
+void Lattice::DoFields(size_t index, const WStrings& fields) {
+  assert(fields.size() == 4);
+  const size_t len = fields[0].size();
+  if (index + fields[0].size() > pre.size()) {
+    return;
+  }
+
   WORD w = fields[1][0];
-  LATTICE_NODE node;
-  node.bunrui = (HINSHI_BUNRUI)LOBYTE(w);
-  node.gyou = (GYOU)HIBYTE(w);
-  node.cost = 0;
+
+  LatticeNode node;
+  node.bunrui = (HinshiBunrui)LOBYTE(w);
+  node.gyou = (Gyou)HIBYTE(w);
+  node.tags = fields[3];
+  node.cost = node.CalcCost();
+
   switch (node.bunrui) {
   case HB_MEISHI:
+    DoMeishi(index, fields);
+    break;
   case HB_RENTAISHI:
   case HB_FUKUSHI:
   case HB_SETSUZOKUSHI:
   case HB_KANDOUSHI:
-  case HB_JOSHI:
+  case HB_KAKU_JOSHI:
+  case HB_SETSUZOKU_JOSHI:
+  case HB_FUKU_JOSHI:
+  case HB_SHUU_JOSHI:
   case HB_KANGO:
   case HB_SETTOUJI:
   case HB_SETSUBIJI:
-    if (lattice.pre.substr(index, length) == fields[0]) {
+    if (pre.substr(index, len) == fields[0]) {
       node.pre = fields[0];
       node.post = fields[2];
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index]++;
     }
     break;
   case HB_IKEIYOUSHI:
-    ParseIkeiyoushi(lattice, index, fields);
+    DoIkeiyoushi(index, fields);
     break;
   case HB_NAKEIYOUSHI:
-    ParseNakeiyoushi(lattice, index, fields);
+    DoNakeiyoushi(index, fields);
     break;
   case HB_MIZEN_JODOUSHI:
-    if (lattice.pre.substr(index, length) == fields[0]) {
+    if (pre.substr(index, len) == fields[0]) {
       node.bunrui = HB_JODOUSHI;
       node.katsuyou = MIZEN_KEI;
       node.pre = fields[0];
       node.post = fields[2];
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index]++;
     }
     break;
   case HB_RENYOU_JODOUSHI:
-    if (lattice.pre.substr(index, length) == fields[0]) {
+    if (pre.substr(index, len) == fields[0]) {
       node.bunrui = HB_JODOUSHI;
       node.katsuyou = RENYOU_KEI;
       node.pre = fields[0];
       node.post = fields[2];
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index]++;
     }
     break;
   case HB_SHUUSHI_JODOUSHI:
-    if (lattice.pre.substr(index, length) == fields[0]) {
+    if (pre.substr(index, len) == fields[0]) {
       node.bunrui = HB_JODOUSHI;
       node.katsuyou = SHUUSHI_KEI;
       node.pre = fields[0];
       node.post = fields[2];
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index]++;
     }
     break;
   case HB_RENTAI_JODOUSHI:
-    if (lattice.pre.substr(index, length) == fields[0]) {
+    if (pre.substr(index, len) == fields[0]) {
       node.bunrui = HB_JODOUSHI;
       node.katsuyou = RENTAI_KEI;
       node.pre = fields[0];
       node.post = fields[2];
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index]++;
     }
     break;
   case HB_KATEI_JODOUSHI:
-    if (lattice.pre.substr(index, length) == fields[0]) {
+    if (pre.substr(index, len) == fields[0]) {
       node.bunrui = HB_JODOUSHI;
       node.katsuyou = KATEI_KEI;
       node.pre = fields[0];
       node.post = fields[2];
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index]++;
     }
     break;
   case HB_MEIREI_JODOUSHI:
-    if (lattice.pre.substr(index, length) == fields[0]) {
+    if (pre.substr(index, len) == fields[0]) {
       node.bunrui = HB_JODOUSHI;
       node.katsuyou = MEIREI_KEI;
       node.pre = fields[0];
       node.post = fields[2];
-      lattice.chunks[index].push_back(node);
-      lattice.refs[index]++;
+      chunks[index].push_back(unboost::make_shared(node));
+      refs[index]++;
     }
     break;
   case HB_GODAN_DOUSHI:
-    ParseGodanDoushi(lattice, index, fields);
+    DoGodanDoushi(index, fields);
     break;
   case HB_ICHIDAN_DOUSHI:
-    ParseIchidanDoushi(lattice, index, fields);
+    DoIchidanDoushi(index, fields);
     break;
   case HB_KAHEN_DOUSHI:
-    ParseKahenDoushi(lattice, index, fields);
+    DoKahenDoushi(index, fields);
     break;
   case HB_SAHEN_DOUSHI:
-    ParseSahenDoushi(lattice, index, fields);
+    DoSahenDoushi(index, fields);
     break;
   default:
     break;
   }
-}
+} // Lattice::DoFields
 
-void MZIMEJA::PluralClauseConversion(
+//////////////////////////////////////////////////////////////////////////////
+
+BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
+  FOOTMARK();
+
+  // initialize lattice
+  assert(pre.size() != 0);
+  const size_t length = pre.size();
+  lattice.pre = pre;
+  lattice.chunks.resize(length + 1);
+  lattice.refs.assign(length + 1, 0);
+  lattice.refs[0] = 1;
+
+  // lock the dictionary
+  WCHAR *dict_data = LockBasicDict();
+  size_t count = 0;
+  if (dict_data) {
+    // add nodes
+    lattice.AddNodes(0, dict_data);
+    // repeat until linked to tail
+    for (;;) {
+      // link and cut not linked
+      lattice.UpdateLinks();
+      lattice.CutUnlinkedNodes();
+      // does it reach the last?
+      size_t index = lattice.GetLastLinkedIndex();
+      if (index == length) break;
+      // add complement
+      lattice.UpdateRefs();
+      lattice.AddComplement(index);
+      lattice.AddNodes(index + 1, dict_data);
+
+      ++count;
+      if (count == 1000) break;
+    }
+    // unlock the dictionary
+    UnlockBasicDict(dict_data);
+    return TRUE;  // success
+  }
+  return FALSE; // failure
+} // MzIme::MakeLattice
+
+void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
+  FOOTMARK();
+  result.clear();
+
+  const size_t length = lattice.pre.size();
+  LatticeNodePtr node1 = lattice.head;
+  LatticeNodePtr tail = lattice.chunks[length][0];
+  while (node1 != tail) {
+    size_t kb1 = 0, max_len = 0, last_len1 = 0;
+    for (size_t ib1 = 0; ib1 < node1->branches.size(); ++ib1) {
+      LatticeNodePtr& node2 = node1->branches[ib1];
+      for (size_t ib2 = 0; ib2 < node2->branches.size(); ++ib2) {
+        LatticeNodePtr& node3 = node2->branches[ib2];
+        size_t len = node2->pre.size() + node3->pre.size();
+        if (max_len < len) {
+          last_len1 = node2->pre.size();
+          max_len = len;
+          kb1 = ib1;
+        } else if (max_len == len) {
+          if (last_len1 > node2->pre.size()) {
+            last_len1 = node2->pre.size();
+            max_len = len;
+            kb1 = ib1;
+          }
+        }
+      }
+    }
+    // make cand
+    MzConversionCandidate cand;
+    cand.hiragana = node1->branches[kb1]->pre;
+    cand.converted = node1->branches[kb1]->post;
+    cand.cost = node1->cost;
+    // make clause
+    MzConversionClause clause;
+    clause.candidates.push_back(cand);
+    // add clause
+    result.clauses.push_back(clause);
+    // go next
+    node1 = node1->branches[kb1];
+  }
+
+  // add other candidates
+  size_t index = 0, iClause = 0;
+  while (index < length && iClause < result.clauses.size()) {
+    const LatticeChunk& chunk = lattice.chunks[index];
+    MzConversionClause& clause = result.clauses[iClause];
+    const size_t size = clause.candidates[0].hiragana.size();
+    for (size_t i = 0; i < chunk.size(); ++i) {
+      if (chunk[i]->pre.size() == size) {
+        // add a candidate of same size
+        MzConversionCandidate cand;
+        cand.hiragana = chunk[i]->pre;
+        cand.converted = chunk[i]->post;
+        cand.cost = chunk[i]->cost;
+        clause.candidates.push_back(cand);
+      }
+    }
+    index += size;
+    ++iClause;
+  }
+
+  result.sort();
+} // MzIme::MakeResult
+
+void MzIme::PluralClauseConversion(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
   FOOTMARK();
@@ -1253,23 +1926,22 @@ void MZIMEJA::PluralClauseConversion(
     cand.cand_lists.push_back(cand_list);
   }
   cand.iClause = 0;
-} // MZIMEJA::PluralClauseConversion
+} // MzIme::PluralClauseConversion
 
-void MZIMEJA::MakeResult(MzConversionResult& result, LATTICE& lattice) {
-  // TODO:
-}
-
-void MZIMEJA::PluralClauseConversion(const std::wstring& strHiragana,
-                                     MzConversionResult& result)
+void MzIme::PluralClauseConversion(const std::wstring& strHiragana,
+                                   MzConversionResult& result)
 {
   FOOTMARK();
 
-#if 0
-  // TODO:
-  LATTICE lattice;
-  lattice.pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
-  MakeLattice(lattice);
-  CutExtraNodes(lattice);
+#if 1
+  if (!LoadBasicDict()) {
+    ::MessageBoxA(NULL, "ERROR", NULL, 0);
+    return;
+  }
+
+  Lattice lattice;
+  std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+  MakeLattice(lattice, pre);
   MakeResult(result, lattice);
 #else
   // dummy sample
@@ -1298,9 +1970,9 @@ void MZIMEJA::PluralClauseConversion(const std::wstring& strHiragana,
   result.clauses[4].candidates[0].hiragana = L"うちゅうじん";
   result.clauses[4].candidates[0].converted = L"宇宙人";
 #endif
-} // MZIMEJA::PluralClauseConversion
+} // MzIme::PluralClauseConversion
 
-void MZIMEJA::SingleClauseConversion(
+void MzIme::SingleClauseConversion(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
   FOOTMARK();
@@ -1323,9 +1995,9 @@ void MZIMEJA::SingleClauseConversion(
   cand.iClause = iClause;
 
   comp.extra.iClause = iClause;
-}
+} // MzIme::SingleClauseConversion
 
-void MZIMEJA::SingleClauseConversion(const std::wstring& strHiragana,
+void MzIme::SingleClauseConversion(const std::wstring& strHiragana,
                                      MzConversionClause& result)
 {
   FOOTMARK();
@@ -1346,20 +2018,22 @@ void MZIMEJA::SingleClauseConversion(const std::wstring& strHiragana,
   cand.converted = L"単一文節変換3";
   result.candidates.push_back(cand);
 #endif
-} // MZIMEJA::SingleClauseConversion
+} // MzIme::SingleClauseConversion
 
-BOOL MZIMEJA::StretchClauseLeft(
+BOOL MzIme::StretchClauseLeft(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
+  FOOTMARK();
   // TODO:
   return FALSE;
-} // MZIMEJA::StretchClauseLeft
+} // MzIme::StretchClauseLeft
 
-BOOL MZIMEJA::StretchClauseRight(
+BOOL MzIme::StretchClauseRight(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
+  FOOTMARK();
   // TODO:
   return FALSE;
-} // MZIMEJA::StretchClauseRight
+} // MzIme::StretchClauseRight
 
 //////////////////////////////////////////////////////////////////////////////
