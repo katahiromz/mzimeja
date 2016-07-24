@@ -762,10 +762,21 @@ void Lattice::AddExtra() {
     return;
   }
   if (pre == L"‚©‚Á‚±") {
-    static const wchar_t kakko[] =
-      L"()\tij\tyz\tuv\twx\tst\tqr\táâ\tkl\tƒ„\tmn\top\t{}\t<>";
     WStrings items;
-    unboost::split(items, kakko, unboost::is_any_of(L"\t"));
+    unboost::split(items, TheIME.LoadSTR(101), unboost::is_any_of(L"\t"));
+
+    WStrings fields(4);
+    fields[0] = pre;
+    fields[1].assign(1, MAKEWORD(HB_SYMBOLS, 0));
+    for (size_t i = 0; i < items.size(); ++i) {
+      fields[2] = items[i];
+      DoFields(0, fields);
+    }
+    return;
+  }
+  if (pre == L"‚¯‚¢‚¹‚ñ") {
+    WStrings items;
+    unboost::split(items, TheIME.LoadSTR(100), unboost::is_any_of(L"\t"));
 
     WStrings fields(4);
     fields[0] = pre;

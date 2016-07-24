@@ -158,8 +158,14 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_DICFILENAME                 "mzimeja.DIC"
-    IDS_CONFIGNAME                  "mzimeja.DLL"
+    100, "─\t│\t┌\t┐\t┘\t└\t├\t┬\t┤\t┴\t┼\t━\t┃\t┏\t┓\t┛\t┗\t┣\t┳\t┫\t┻\t╋\t┠\t┯\t┨\t┷\t┿\t┝\t┰\t┥\t┸\t╂"
+    101, "()\t（）\t【】\t「」\t『』\t《》\t〈〉\t≪≫\t〔〕\t＜＞\t［］\t｛｝\t{}\t<>"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_DICFILENAME,                "mzimeja.DIC"
+    IDS_CONFIGNAME,                 "mzimeja.DLL"
 END
 
 STRINGTABLE DISCARDABLE 
