@@ -70,6 +70,10 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+// separator
+#define RECORD_SEP   L'\uFFFD'
+#define FIELD_SEP    L'\uFFFC'
+
 // for limit of MZ-IME
 #define MAXCOMPWND  10  // maximum number of composition windows
 #define MAXGLCHAR   32  // maximum number of guideline characters

@@ -436,7 +436,7 @@ static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
   FOOTMARK();
   assert(dict_data);
 
-  WCHAR sz[3] = {L'\n', ch, 0};
+  WCHAR sz[3] = {RECORD_SEP, ch, 0};
   const WCHAR *pch1 = wcsstr(dict_data, sz);
   if (pch1 == NULL) {
     return FALSE;
@@ -450,11 +450,13 @@ static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
     if (pch3 == NULL) break;
     pch2 = pch3;
   }
-  pch3 = wcschr(pch2 + 1, L'\n');
+  pch3 = wcschr(pch2 + 1, RECORD_SEP);
   assert(pch3);
   str.assign(pch1 + 1, pch3);
 
-  unboost::split(records, str, unboost::is_any_of(L"\n"));
+  sz[0] = RECORD_SEP;
+  sz[1] = 0;
+  unboost::split(records, str, unboost::is_any_of(sz));
   assert(records.size());
   return records.size();
 } // ScanDict
@@ -687,6 +689,9 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
   const size_t length = pre.size();
   assert(length);
 
+  std::wstring sep;
+  sep += FIELD_SEP;
+
   WStrings fields, records;
   for (; index < length; ++index) {
     if (refs[index] == 0) continue;
@@ -710,7 +715,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
     DebugPrintW(L"ScanDict(%c) count: %d\n", pre[index], count);
     for (size_t k = 0; k < records.size(); ++k) {
       const std::wstring& record = records[k];
-      unboost::split(fields, record, unboost::is_any_of(L"\t"));
+      unboost::split(fields, record, unboost::is_any_of(sep));
       DoFields(index, fields);
     }
 
@@ -746,12 +751,15 @@ struct DeleteDifferentSizeNode {
 BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
   FOOTMARK();
 
+  std::wstring sep;
+  sep += FIELD_SEP;
+
   WStrings fields, records;
   size_t count = ScanDict(records, dict_data, pre[0]);
   DebugPrintW(L"ScanDict(%c) count: %d\n", pre[0], count);
   for (size_t k = 0; k < records.size(); ++k) {
     const std::wstring& record = records[k];
-    unboost::split(fields, record, unboost::is_any_of(L"\t"));
+    unboost::split(fields, record, unboost::is_any_of(sep));
     DoFields(0, fields);
   }
 

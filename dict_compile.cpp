@@ -264,35 +264,36 @@ BOOL CreateDictFile(
   wchar_t *pch = (wchar_t *)pv;
 
   size_t cch;
-  *pch++ += L'\n';  // new line
+  *pch++ += RECORD_SEP;
   for (size_t i = 0; i < entries.size(); ++i) {
-    // line format: pre \t MAKEWORD(bunrui, gyou) \t post \t tags \n
+    // line format:
+    // pre FIELD_SEP MAKEWORD(bunrui, gyou) FIELD_SEP post FIELD_SEP tags RECORD_SEP
     const DictEntry& entry = entries[i];
     // pre \t
     cch = entry.pre.size();
     memcpy(pch, entry.pre.c_str(), cch * sizeof(WCHAR));
     pch += cch;
-    *pch++ = L'\t';
+    *pch++ = FIELD_SEP;
     // MAKEWORD(bunrui, gyou) \t
     *pch++ = MAKEWORD(entry.bunrui, entry.gyou);
-    *pch++ = L'\t';
+    *pch++ = FIELD_SEP;
     // post \t
     cch = entry.post.size();
     memcpy(pch, entry.post.c_str(), cch * sizeof(WCHAR));
     pch += cch;
-    *pch++ = L'\t';
+    *pch++ = FIELD_SEP;
     // tags
     cch = entry.tags.size();
     memcpy(pch, entry.tags.c_str(), cch * sizeof(WCHAR));
     pch += cch;
     // new line
-    *pch++ = L'\n';
+    *pch++ = RECORD_SEP;
   }
   *pch++ = L'\0'; // NUL
   assert(size / 2 == size_t(pch - reinterpret_cast<WCHAR *>(pv)));
 
   pch = (wchar_t *)pv;
-  *pch = L'\n';
+  *pch = RECORD_SEP;
 
   BOOL ret = FALSE;
 
