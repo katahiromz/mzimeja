@@ -309,32 +309,6 @@ WCHAR get_comma(void);
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct MzConversionCandidate {
-  std::wstring hiragana;
-  std::wstring converted;
-  int cost;
-  void clear() {
-    hiragana.clear();
-    converted.clear();
-    cost = 0;
-  }
-};
-
-struct MzConversionClause {
-  std::vector<MzConversionCandidate> candidates;
-  void clear() { candidates.clear(); }
-  void sort();
-  void add(const std::wstring& pre, const std::wstring& post, int the_cost);
-};
-
-struct MzConversionResult {
-  std::vector<MzConversionClause> clauses;
-  void clear() { clauses.clear(); }
-  void sort();
-};
-
-//////////////////////////////////////////////////////////////////////////////
-
 typedef std::vector<std::wstring> WStrings;
 
 enum Gyou {
@@ -425,7 +399,7 @@ struct LatticeNode {
   HinshiBunrui                        bunrui;
   Gyou                                gyou;
   KatsuyouKei                         katsuyou;
-  DWORD                               cost;
+  int                                 cost;
   DWORD                               linked;
   std::vector<LatticeNodePtr>         branches;
   LatticeNode() {
@@ -468,6 +442,35 @@ struct Lattice {
   void DoSahenDoushi(size_t index, const WStrings& fields);
 
   void Dump(int num = 0);
+  void Fix(const std::wstring& pre);
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
+struct MzConversionCandidate {
+  std::wstring            hiragana;
+  std::wstring            converted;
+  int                     cost;
+  std::set<HinshiBunrui>  bunruis;
+  void clear() {
+    hiragana.clear();
+    converted.clear();
+    cost = 0;
+    bunruis.clear();
+  }
+};
+
+struct MzConversionClause {
+  std::vector<MzConversionCandidate> candidates;
+  void clear() { candidates.clear(); }
+  void sort();
+  void add(const LatticeNode *node);
+};
+
+struct MzConversionResult {
+  std::vector<MzConversionClause> clauses;
+  void clear() { clauses.clear(); }
+  void sort();
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -562,6 +565,7 @@ public:
   BOOL MakeLattice(Lattice& lattice, const std::wstring& pre);
   BOOL MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre);
   void MakeResult(MzConversionResult& result, Lattice& lattice);
+  void MakeResult(MzConversionResult& result, const std::wstring& pre);
   void MakeResultForSingle(MzConversionResult& result, Lattice& lattice);
   int CalcCost(const std::wstring& tags) const;
 
