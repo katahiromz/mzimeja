@@ -34,6 +34,7 @@ Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "projects\Debug\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
 Source: "projects\Debug\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "projects\Debug\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "projects\Debug\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
