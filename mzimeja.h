@@ -448,11 +448,12 @@ struct Lattice {
   // pre.size() + 1 == chunks.size().
   // pre.size() + 1 == refs.size().
 
-  void AddNodes(size_t index, const WCHAR *dict_data);
+  BOOL AddNodes(size_t index, const WCHAR *dict_data);
+  BOOL AddNodesForSingle(const WCHAR *dict_data);
   void UpdateRefs();
   void UnlinkAllNodes();
   void UpdateLinks();
-  void AddComplement(size_t index);
+  void AddComplement(size_t index, size_t min_size, size_t max_size);
   void CutUnlinkedNodes();
   size_t GetLastLinkedIndex() const;
 
@@ -559,7 +560,9 @@ public:
 
   // make lattice
   BOOL MakeLattice(Lattice& lattice, const std::wstring& pre);
+  BOOL MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre);
   void MakeResult(MzConversionResult& result, Lattice& lattice);
+  void MakeResultForSingle(MzConversionResult& result, Lattice& lattice);
   int CalcCost(const std::wstring& tags) const;
 
   // convert
@@ -568,7 +571,7 @@ public:
                               MzConversionResult& result);
   BOOL SingleClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL SingleClauseConversion(const std::wstring& strHiragana,
-                              MzConversionClause& result);
+                              MzConversionResult& result);
   BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
 

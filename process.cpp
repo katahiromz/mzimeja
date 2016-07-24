@@ -136,7 +136,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_ESCAPE:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->Escape();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->Escape();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_ESCAPE, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_ESCAPE, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -184,7 +189,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_F6:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MakeHiragana();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MakeHiragana();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_F6, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_F6, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -192,7 +202,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_F7:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MakeKatakana();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MakeKatakana();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_F7, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_F7, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -200,7 +215,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_F8:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MakeHankaku();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MakeHankaku();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_F8, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_F8, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -208,7 +228,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_F9:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MakeZenEisuu();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MakeZenEisuu();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_F9, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_F9, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -216,7 +241,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_F10:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MakeHanEisuu();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MakeHanEisuu();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_F10, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_F10, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -243,7 +273,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_LEFT:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MoveLeft(bShift);
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MoveLeft(bShift);
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_LEFT, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_LEFT, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -251,7 +286,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_RIGHT:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MoveRight(bShift);
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MoveRight(bShift);
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_RIGHT, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_RIGHT, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -259,7 +299,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_UP:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MoveUp();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MoveUp();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_UP, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_UP, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -267,7 +312,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_DOWN:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MoveDown();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MoveDown();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_DOWN, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_DOWN, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -275,7 +325,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_PRIOR: // Page Up
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->PageUp();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->PageUp();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_PRIOR, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_PRIOR, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -283,7 +338,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_NEXT: // Page Down
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->PageDown();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->PageDown();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_NEXT, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_NEXT, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -291,7 +351,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_HOME:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MoveHome();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MoveHome();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_HOME, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_HOME, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;
@@ -299,7 +364,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
   case VK_END:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      lpIMC->MoveEnd();
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MoveEnd();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_END, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_END, 0xC0000001);
+      }
       TheIME.UnlockIMC(hIMC);
     }
     break;

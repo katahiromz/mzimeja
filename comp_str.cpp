@@ -662,7 +662,7 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 void LogCompStr::DeleteChar(BOOL bBackSpace/* = FALSE*/, DWORD dwConv) {
   FOOTMARK();
   // is the current clause being converted?
-  if (IsClauseConverted(extra.iClause)) { // being converted
+  if (IsClauseConverted()) { // being converted
     // set hiragana string to current clause
     extra.comp_str_clauses[extra.iClause] =
       extra.hiragana_clauses[extra.iClause];
@@ -767,10 +767,10 @@ void LogCompStr::MakeResult() {
   clear_extra();
 }
 
-void LogCompStr::MoveLeft() {
+BOOL LogCompStr::MoveLeft() {
   FOOTMARK();
   // is the current clause being converted?
-  if (IsClauseConverted(extra.iClause)) { // being converted
+  if (IsClauseConverted()) { // being converted
     // untarget
     SetClauseAttr(extra.iClause, ATTR_CONVERTED);
     // set the current clause
@@ -783,6 +783,7 @@ void LogCompStr::MoveLeft() {
     SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
     // move cursor
     dwCursorPos = GetCompCharCount();
+    return TRUE;
   } else {
     // move cursor
     if (dwCursorPos > 0) {
@@ -792,11 +793,12 @@ void LogCompStr::MoveLeft() {
         // set the current clause
         extra.iClause = CompCharToClause(dwCursorPos);
         // is the clause converted?
-        if (IsClauseConverted(extra.iClause)) {
+        if (IsClauseConverted()) {
           // retarget
           SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
           // move cursor
           dwCursorPos = GetCompCharCount();
+          return TRUE;
         } else {
           // move cursor
           dwCursorPos = ClauseToCompChar(extra.iClause + 1);
@@ -804,12 +806,13 @@ void LogCompStr::MoveLeft() {
       }
     }
   }
+  return FALSE;
 } // LogCompStr::MoveLeft
 
-void LogCompStr::MoveRight() {
+BOOL LogCompStr::MoveRight() {
   FOOTMARK();
   // is the current clause being converted?
-  if (IsClauseConverted(extra.iClause)) { // being converted
+  if (IsClauseConverted()) { // being converted
     // untarget
     SetClauseAttr(extra.iClause, ATTR_CONVERTED);
     // set current clause
@@ -821,6 +824,7 @@ void LogCompStr::MoveRight() {
     SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
     // move cursor
     dwCursorPos = GetCompCharCount();
+    return TRUE;
   } else {  // not being converted
     // move cursor
     if (dwCursorPos + 1 <= GetCompCharCount()) {
@@ -830,11 +834,12 @@ void LogCompStr::MoveRight() {
         // set current clause
         extra.iClause = CompCharToClause(dwCursorPos);
         // is the clause converted?
-        if (IsClauseConverted(extra.iClause)) {
+        if (IsClauseConverted()) {
           // retarget
           SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
           // move cursor
           dwCursorPos = GetCompCharCount();
+          return TRUE;
         } else {
           // move cursor
           dwCursorPos = ClauseToCompChar(extra.iClause + 1);
@@ -842,12 +847,13 @@ void LogCompStr::MoveRight() {
       }
     }
   }
+  return FALSE;
 } // LogCompStr::MoveRight
 
-void LogCompStr::MoveHome() {
+BOOL LogCompStr::MoveHome() {
   FOOTMARK();
   // is the current clause being converted?
-  if (IsClauseConverted(extra.iClause)) { // being converted
+  if (IsClauseConverted()) { // being converted
     // untarget
     SetClauseAttr(extra.iClause, ATTR_CONVERTED);
     // set the current clause to first
@@ -856,16 +862,18 @@ void LogCompStr::MoveHome() {
     SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
     // move cursor
     dwCursorPos = GetCompCharCount();
+    return TRUE;
   } else {
     // move cursor to head
     dwCursorPos = 0;
+    return FALSE;
   }
 } // LogCompStr::MoveHome
 
-void LogCompStr::MoveEnd() {
+BOOL LogCompStr::MoveEnd() {
   FOOTMARK();
   // is the current clause being converted?
-  if (IsClauseConverted(extra.iClause)) { // being converted
+  if (IsClauseConverted()) { // being converted
     // untarget
     SetClauseAttr(extra.iClause, ATTR_CONVERTED);
     // set the current clause to last
@@ -874,9 +882,11 @@ void LogCompStr::MoveEnd() {
     SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
     // move cursor
     dwCursorPos = GetCompCharCount();
+    return TRUE;
   } else {
     // move cursor to tail
     dwCursorPos = GetCompCharCount();
+    return FALSE;
   }
 } // LogCompStr::MoveEnd
 

@@ -148,15 +148,16 @@ struct LogCompStr {
   void RevertText();
   void MakeResult();
 
-  void MoveLeft();
-  void MoveRight();
-  void MoveHome();
-  void MoveEnd();
+  BOOL MoveLeft();
+  BOOL MoveRight();
+  BOOL MoveHome();
+  BOOL MoveEnd();
 
   DWORD GetClauseCompStrLen(DWORD dwClauseIndex) const;
   void SetClauseCompString(DWORD iClause, std::wstring& str);
   void SetClauseCompHiragana(DWORD iClause, std::wstring& str);
   void SetClauseCompHiragana(DWORD iClause, std::wstring& str, BOOL bRoman);
+  void UpdateExtraClause(DWORD iClause, DWORD dwConversion);
 
   // for debugging
   void AssertValid();
@@ -164,7 +165,6 @@ struct LogCompStr {
 
 protected:
   void MergeAt(std::vector<std::wstring>& strs, DWORD istr);
-  void UpdateExtraClause(DWORD iClause, DWORD dwConversion);
   void UpdateCompStr();
 }; // struct LogCompStr
 
@@ -249,6 +249,8 @@ struct LogCandList {
   void MovePrev();
   void PageUp();
   void PageDown();
+  void MoveHome();
+  void MoveEnd();
 
   DWORD GetCandCount() const;
   std::wstring GetString() const;
@@ -266,8 +268,6 @@ struct LogCandInfo {
   DWORD GetClauseCount() const;
   BOOL HasCandInfo() const;
 
-  void MoveLeft();
-  void MoveRight();
   void MoveNext();
   void MovePrev();
   void MoveHome();
