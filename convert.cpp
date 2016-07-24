@@ -696,6 +696,44 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
   for (; index < length; ++index) {
     if (refs[index] == 0) continue;
 
+    if (is_period(pre[index])) {
+      size_t saved = index;
+      do {
+        ++index;
+      } while (is_period(pre[index]));
+
+      fields.resize(4);
+      fields[0] = pre.substr(saved, index - saved);
+      fields[1] = MAKEWORD(HB_PERIOD, 0);
+      switch (index - saved) {
+      case 2:
+        fields[2] += L'd';
+        break;
+      case 3:
+        fields[2] += L'c';
+        break;
+      default:
+        fields[2] = fields[0];
+        break;
+      }
+      DoFields(saved, fields);
+      --index;
+      continue;
+    }
+    if (is_comma(pre[index])) {
+      size_t saved = index;
+      do {
+        ++index;
+      } while (is_comma(pre[index]));
+
+      fields.resize(4);
+      fields[0] = pre.substr(saved, index - saved);
+      fields[1] = MAKEWORD(HB_COMMA, 0);
+      fields[2] = fields[0];
+      DoFields(saved, fields);
+      --index;
+      continue;
+    }
     if (!is_hiragana(pre[index])) {
       size_t saved = index;
       do {
@@ -1689,6 +1727,8 @@ void Lattice::DoFields(size_t index, const WStrings& fields) {
   case HB_MEISHI:
     DoMeishi(index, fields);
     break;
+  case HB_PERIOD:
+  case HB_COMMA:
   case HB_RENTAISHI:
   case HB_FUKUSHI:
   case HB_SETSUZOKUSHI:

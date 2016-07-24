@@ -129,6 +129,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
       else if (bunrui_str == L"格助詞")     entry.bunrui = HB_KAKU_JOSHI;
       else if (bunrui_str == L"副助詞")     entry.bunrui = HB_FUKU_JOSHI;
       else if (bunrui_str == L"終助詞")     entry.bunrui = HB_SHUU_JOSHI;
+      else if (bunrui_str == L"カンマ")     entry.bunrui = HB_COMMA;
       else continue;
     } else if (bunrui_str.size() == 4) {
       if (bunrui_str == L"い形容詞")        entry.bunrui = HB_IKEIYOUSHI;
@@ -138,6 +139,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
       else if (bunrui_str == L"カ変動詞")   entry.bunrui = HB_KAHEN_DOUSHI;
       else if (bunrui_str == L"サ変動詞")   entry.bunrui = HB_SAHEN_DOUSHI;
       else if (bunrui_str == L"接続助詞")   entry.bunrui = HB_SETSUZOKU_JOSHI;
+      else if (bunrui_str == L"ピリオド")   entry.bunrui = HB_PERIOD;
       else continue;
     } else if (bunrui_str.size() == 5) {
       if (bunrui_str == L"未然助動詞")      entry.bunrui = HB_MIZEN_JODOUSHI;
