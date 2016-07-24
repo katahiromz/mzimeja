@@ -389,22 +389,19 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
     UnlockCompStr();
   }
 
-  // if the current clause is converted, 
+  // if the current clause is converted,
+  BOOL bHasResult = FALSE;
   if (comp.IsClauseConverted()) {
     // determinate composition
-    MakeResult();
-
-    lpCompStr = LockCompStr();
-    if (lpCompStr) {
-      lpCompStr->GetLog(comp);
-      UnlockCompStr();
+    comp.MakeResult();
+    CloseCandidate();
+    bHasResult = TRUE;
+  } else {
+    // if there is not a composition string, then
+    if (comp.comp_str.empty()) {
+      // start composition
+      TheIME.GenerateMessage(WM_IME_STARTCOMPOSITION);
     }
-  }
-
-  // if there is not a composition string, then
-  if (comp.comp_str.empty()) {
-    // start composition
-    TheIME.GenerateMessage(WM_IME_STARTCOMPOSITION);
   }
 
   // add a character
@@ -421,8 +418,13 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
   // recreate
   hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
-  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+  if (bHasResult) {
+    LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
+    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+  } else {
+    LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
+    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+  }
 } // InputContext::AddChar
 
 BOOL InputContext::OpenCandidate() {
@@ -493,6 +495,11 @@ BOOL InputContext::Convert(BOOL bShift) {
       TheIME.SingleClauseConversion(comp, cand, bRoman);
     }
   } else {
+    if (Conversion() & IME_CMODE_JAPANESE) {
+      if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
+        comp.AddChar(L'n', L'n', Conversion());
+      }
+    }
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
     BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
     TheIME.PluralClauseConversion(comp, cand, bRoman);

@@ -433,9 +433,9 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
         ret = TRUE;
         break;
       }
-    } else {
+    }
+    if (!ret) {
       // Neither Ctrl nor Shift key is down
-      ret = FALSE;
       if (fCompStr) {
         switch (vKey) {
         case VK_F6:     // make composition fullwidth Hiragana

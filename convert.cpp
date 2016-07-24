@@ -72,6 +72,14 @@ HinshiConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2) {
   if (bunrui1 == HB_SYMBOLS || bunrui2 == HB_SYMBOLS) return 0;
   if (bunrui1 == HB_UNKNOWN || bunrui2 == HB_UNKNOWN) return 0;
   switch (bunrui1) {
+  case HB_HEAD:
+    switch (bunrui2) {
+    case HB_JODOUSHI: case HB_SHUU_JOSHI:
+      return 5;
+    default:
+      break;
+    }
+    break;
   case HB_MEISHI: // –¼ŽŒ
     switch (bunrui2) {
     case HB_MEISHI: case HB_SETTOUJI:
@@ -682,12 +690,43 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
   WStrings fields, records;
   for (; index < length; ++index) {
     if (refs[index] == 0) continue;
+
+    if (!is_hiragana(pre[index])) {
+      size_t saved = index;
+      do {
+        ++index;
+      } while (!is_hiragana(pre[index]) && pre[index]);
+
+      fields.resize(4);
+      fields[0] = pre.substr(saved, index - saved);
+      fields[1] = MAKEWORD(HB_MEISHI, 0);
+      fields[2] = fields[0];
+      DoMeishi(saved, fields);
+      --index;
+      continue;
+    }
+
     size_t count = ScanDict(records, dict_data, pre[index]);
     DebugPrintW(L"ScanDict(%c) count: %d\n", pre[index], count);
     for (size_t k = 0; k < records.size(); ++k) {
       const std::wstring& record = records[k];
       unboost::split(fields, record, unboost::is_any_of(L"\t"));
       DoFields(index, fields);
+    }
+
+    switch (pre[index]) {
+    case L'‚±': case L'‚«': case L'‚­':
+      fields.resize(4);
+      fields[1].push_back(MAKEWORD(HB_KAHEN_DOUSHI, GYOU_KA));
+      DoKahenDoushi(index, fields);
+      break;
+    case L'‚³': case L'‚µ': case L'‚¹': case L'‚·':
+      fields.resize(4);
+      fields[1].push_back(MAKEWORD(HB_SAHEN_DOUSHI, GYOU_SA));
+      DoSahenDoushi(index, fields);
+      break;
+    default:
+      break;
     }
   }
 
@@ -1873,9 +1912,11 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
     }
 
     // add clause
-    MzConversionClause clause;
-    clause.add(node1->branches[kb1].get());
-    result.clauses.push_back(clause);
+    if (node1->branches[kb1]->pre.size()) {
+      MzConversionClause clause;
+      clause.add(node1->branches[kb1].get());
+      result.clauses.push_back(clause);
+    }
 
     // go next
     node1 = node1->branches[kb1];
@@ -1883,7 +1924,7 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
 
   // add other candidates
   size_t index = 0, iClause = 0;
-  while (index < length && iClause < result.clauses.size() - 1) {
+  while (index < length && iClause < result.clauses.size()) {
     const LatticeChunk& chunk = lattice.chunks[index];
     MzConversionClause& clause = result.clauses[iClause];
 
@@ -1896,24 +1937,36 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
       }
     }
 
-    {
+    if (is_hiragana(hiragana[0])) {
       LatticeNode node;
+      node.bunrui = HB_UNKNOWN;
+      node.cost = 10;
+
       node.pre = hiragana;
       node.post = hiragana;
-      node.bunrui = HB_UNKNOWN;
-      node.cost = 10;
       clause.add(&node);
-    }
 
-    {
       std::wstring katakana;
       katakana = lcmap(hiragana, LCMAP_FULLWIDTH | LCMAP_KATAKANA);
-
-      LatticeNode node;
-      node.pre = hiragana;
       node.post = katakana;
+      clause.add(&node);
+    } else {
+      LatticeNode node;
       node.bunrui = HB_UNKNOWN;
       node.cost = 10;
+
+      node.pre = hiragana;
+      node.post = lcmap(hiragana, LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
+      clause.add(&node);
+      node.post = lcmap(hiragana, LCMAP_UPPERCASE | LCMAP_FULLWIDTH);
+      clause.add(&node);
+      node.post = node.post[0] + lcmap(hiragana.substr(1), LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
+      clause.add(&node);
+      node.post = lcmap(hiragana, LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
+      clause.add(&node);
+      node.post = lcmap(hiragana, LCMAP_UPPERCASE | LCMAP_HALFWIDTH);
+      clause.add(&node);
+      node.post = node.post[0] + lcmap(hiragana.substr(1), LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
       clause.add(&node);
     }
 

@@ -765,6 +765,7 @@ void LogCompStr::MakeResult() {
   clear_read();
   clear_comp();
   clear_extra();
+  fix();
 }
 
 BOOL LogCompStr::MoveLeft() {
