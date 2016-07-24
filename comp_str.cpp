@@ -1,3 +1,4 @@
+
 // comp_str.cpp --- composition string of mzimeja
 //////////////////////////////////////////////////////////////////////////////
 
@@ -339,47 +340,37 @@ void LogCompStr::UpdateCompStr() {
 
 void LogCompStr::MakeHiragana() {
   FOOTMARK();
-  extra.comp_str_clauses[extra.iClause] =
-    lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_HIRAGANA);
-  UpdateCompStr();
-  SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+  SetClauseCompString(extra.iClause,
+    lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_HIRAGANA));
   dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeKatakana() {
   FOOTMARK();
-  extra.comp_str_clauses[extra.iClause] =
-    lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_KATAKANA);
-  UpdateCompStr();
-  SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+  SetClauseCompString(extra.iClause,
+    lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_KATAKANA));
   dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeHankaku() {
   FOOTMARK();
-  extra.comp_str_clauses[extra.iClause] =
+  SetClauseCompString(extra.iClause,
     lcmap(extra.hiragana_clauses[extra.iClause],
-          LCMAP_HALFWIDTH | LCMAP_KATAKANA);
-  UpdateCompStr();
-  SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+          LCMAP_HALFWIDTH | LCMAP_KATAKANA));
   dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeZenEisuu() {
   FOOTMARK();
-  extra.comp_str_clauses[extra.iClause] =
-    lcmap(extra.typing_clauses[extra.iClause], LCMAP_FULLWIDTH);
-  UpdateCompStr();
-  SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+  SetClauseCompString(extra.iClause,
+    lcmap(extra.typing_clauses[extra.iClause], LCMAP_FULLWIDTH));
   dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeHanEisuu() {
   FOOTMARK();
-  extra.comp_str_clauses[extra.iClause] =
-    lcmap(extra.typing_clauses[extra.iClause], LCMAP_HALFWIDTH);
-  UpdateCompStr();
-  SetClauseAttr(extra.iClause, ATTR_TARGET_CONVERTED);
+  SetClauseCompString(extra.iClause,
+    lcmap(extra.typing_clauses[extra.iClause], LCMAP_HALFWIDTH));
   dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 

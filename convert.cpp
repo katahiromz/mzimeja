@@ -684,6 +684,46 @@ int LatticeNode::CalcCost() const {
 //////////////////////////////////////////////////////////////////////////////
 // Lattice
 
+void Lattice::AddExtra() {
+  if (pre == L"きょう") {
+    SYSTEMTIME st;
+    ::GetLocalTime(&st);
+    WCHAR sz[32];
+
+    WStrings fields(4);
+    fields[0] = pre;
+    fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
+
+    wsprintfW(sz, L"%u年%u月%u日", st.wYear, st.wMonth, st.wDay);
+    fields[2] = sz;
+    DoFields(0, fields);
+
+    wsprintfW(sz, L"%04u/%02u/%02u", st.wYear, st.wMonth, st.wDay);
+    fields[2] = sz;
+    DoFields(0, fields);
+
+    wsprintfW(sz, L"%02u/%02u/%04u", st.wMonth, st.wDay, st.wYear);
+    fields[2] = sz;
+    DoFields(0, fields);
+    return;
+  }
+  if (pre == L"かっこ") {
+    static const wchar_t kakko[] =
+      L"()\t（）\t【】\t「」\t『』\t《》\t〈〉\t≪≫\t〔〕\t＜＞\t［］\t｛｝\t{}\t<>";
+    WStrings items;
+    unboost::split(items, kakko, unboost::is_any_of(L"\t"));
+
+    WStrings fields(4);
+    fields[0] = pre;
+    fields[1].assign(1, MAKEWORD(HB_SYMBOLS, 0));
+    for (size_t i = 0; i < items.size(); ++i) {
+      fields[2] = items[i];
+      DoFields(0, fields);
+    }
+    return;
+  }
+}
+
 BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
   FOOTMARK();
   const size_t length = pre.size();
@@ -1727,19 +1767,12 @@ void Lattice::DoFields(size_t index, const WStrings& fields) {
   case HB_MEISHI:
     DoMeishi(index, fields);
     break;
-  case HB_PERIOD:
-  case HB_COMMA:
-  case HB_RENTAISHI:
-  case HB_FUKUSHI:
-  case HB_SETSUZOKUSHI:
-  case HB_KANDOUSHI:
-  case HB_KAKU_JOSHI:
-  case HB_SETSUZOKU_JOSHI:
-  case HB_FUKU_JOSHI:
-  case HB_SHUU_JOSHI:
-  case HB_KANGO:
-  case HB_SETTOUJI:
-  case HB_SETSUBIJI:
+  case HB_PERIOD: case HB_COMMA: case HB_SYMBOLS:
+  case HB_RENTAISHI: case HB_FUKUSHI:
+  case HB_SETSUZOKUSHI: case HB_KANDOUSHI:
+  case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
+  case HB_FUKU_JOSHI: case HB_SHUU_JOSHI:
+  case HB_KANGO: case HB_SETTOUJI: case HB_SETSUBIJI:
     node.pre = fields[0];
     node.post = fields[2];
     chunks[index].push_back(unboost::make_shared(node));
@@ -2152,8 +2185,10 @@ BOOL MzIme::PluralClauseConversion(const std::wstring& strHiragana,
   Lattice lattice;
   std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
   if (MakeLattice(lattice, pre)) {
+    lattice.AddExtra();
     MakeResult(result, lattice);
   } else {
+    lattice.AddExtra();
     MakeResult(result, pre);
   }
 #else
@@ -2228,6 +2263,7 @@ BOOL MzIme::SingleClauseConversion(const std::wstring& strHiragana,
   Lattice lattice;
   std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
   MakeLatticeForSingle(lattice, pre);
+  lattice.AddExtra();
   MakeResultForSingle(result, lattice);
 #else
   // dummy sample
