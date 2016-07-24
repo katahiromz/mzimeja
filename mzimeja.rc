@@ -20,7 +20,6 @@
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-MZIMEICON               ICON    DISCARDABLE     "res\\mzimeja.ico"
 INDICOPENICON           ICON    DISCARDABLE     "res\\sigma_japan.ico"
 MODE0ICON               ICON    DISCARDABLE     "res\\mode0.ico"
 MODE1ICON               ICON    DISCARDABLE     "res\\mode1.ico"
