@@ -707,6 +707,60 @@ void Lattice::AddExtra() {
     DoFields(0, fields);
     return;
   }
+  if (pre == L"‚±‚Æ‚µ") {
+    SYSTEMTIME st;
+    ::GetLocalTime(&st);
+    WCHAR sz[32];
+
+    WStrings fields(4);
+    fields[0] = pre;
+    fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
+
+    wsprintfW(sz, L"%u”N", st.wYear);
+    fields[2] = sz;
+    DoFields(0, fields);
+    return;
+  }
+  if (pre == L"‚¶‚±‚­") {
+    SYSTEMTIME st;
+    ::GetLocalTime(&st);
+    WCHAR sz[32];
+
+    WStrings fields(4);
+    fields[0] = pre;
+    fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
+
+    wsprintfW(sz, L"%u%u•ª%u•b", st.wHour, st.wMinute, st.wSecond);
+    fields[2] = sz;
+    DoFields(0, fields);
+
+    wsprintfW(sz, L"%02u%02u•ª%02u•b", st.wHour, st.wMinute, st.wSecond);
+    fields[2] = sz;
+    DoFields(0, fields);
+
+    if (st.wHour >= 12) {
+      wsprintfW(sz, L"ŒßŒã%u%u•ª%u•b", st.wHour - 12, st.wMinute, st.wSecond);
+      fields[2] = sz;
+      DoFields(0, fields);
+
+      wsprintfW(sz, L"ŒßŒã%02u%02u•ª%02u•b", st.wHour - 12, st.wMinute, st.wSecond);
+      fields[2] = sz;
+      DoFields(0, fields);
+    } else {
+      wsprintfW(sz, L"Œß‘O%u%u•ª%u•b", st.wHour, st.wMinute, st.wSecond);
+      fields[2] = sz;
+      DoFields(0, fields);
+
+      wsprintfW(sz, L"Œß‘O%02u%02u•ª%02u•b", st.wHour, st.wMinute, st.wSecond);
+      fields[2] = sz;
+      DoFields(0, fields);
+    }
+
+    wsprintfW(sz, L"%02u:%02u:%02u", st.wHour, st.wMinute, st.wSecond);
+    fields[2] = sz;
+    DoFields(0, fields);
+    return;
+  }
   if (pre == L"‚©‚Á‚±") {
     static const wchar_t kakko[] =
       L"()\tij\tyz\tuv\twx\tst\tqr\táâ\tkl\tƒ„\tmn\top\t{}\t<>";
