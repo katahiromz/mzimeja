@@ -776,6 +776,18 @@ void Lattice::AddExtra() {
     }
     return;
   }
+  if (pre == L"‚¶‚Ô‚ñ") {
+    WCHAR sz[64];
+    DWORD dwSize = _countof(sz);
+    if (::GetUserNameW(sz, &dwSize)) {
+      WStrings fields(4);
+      fields[0] = pre;
+      fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
+      fields[2] = sz;
+      DoFields(0, fields);
+    }
+    return;
+  }
 }
 
 BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
