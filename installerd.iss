@@ -28,6 +28,7 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 Source: "READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion
+Source: "res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "projects\Debug\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion

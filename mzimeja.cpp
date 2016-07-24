@@ -85,23 +85,46 @@ MzIme::MzIme() {
 
   m_fOverflowKey = FALSE;
 
-  m_hDictLock = NULL;
-  m_hBaseData = NULL;
   m_hIMC = NULL;
   m_lpIMC = NULL;
-  m_hBasicDictData = NULL;
 }
 
-static unsigned int __stdcall loading_dict_proc(void *param) {
-  MzIme *pIme = (MzIme *)param;
-  // load basic dictionary
-  assert(pIme);
-  if (pIme->LoadBasicDict()) {
-    DebugPrintA("basic dictionary: loaded\n");
+BOOL MzIme::LoadDict() {
+  BOOL ret = TRUE;
+  DWORD dw;
+
+  std::wstring basic;
+  if (!GetUserDword(L"BasicDictDisabled", &dw) || !dw) {
+    if (GetUserString(L"BasicDictPathName", basic) ||
+        GetComputerString(L"BasicDictPathName", basic))
+    {
+      if (!m_basic_dict.Load(basic.c_str(), L"BasicDictObject")) {
+        ret = FALSE;
+      }
+    }
   } else {
-    DebugPrintA("ERROR: basic dictionary: failed to load\n");
+    m_basic_dict.Unload();
   }
-  return 0;
+
+  std::wstring name;
+  if (!GetUserDword(L"NameDictDisabled", &dw) || !dw) {
+    if (GetUserString(L"NameDictPathName", name) ||
+        GetComputerString(L"NameDictPathName", name))
+    {
+      if (!m_name_dict.Load(name.c_str(), L"NameDictObject")) {
+        ret = FALSE;
+      }
+    }
+  } else {
+    m_name_dict.Unload();
+  }
+
+  return ret;
+}
+
+void MzIme::UnloadDict() {
+  m_basic_dict.Unload();
+  m_name_dict.Unload();
 }
 
 BOOL MzIme::Init(HINSTANCE hInstance) {
@@ -111,51 +134,17 @@ BOOL MzIme::Init(HINSTANCE hInstance) {
 
   MakeLiteralMaps();
 
-  // CreateSecurityAttributes() will create
-  // the proper security attribute for IME.
-  SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes();
-  assert(psa);
-
-  // create a mutex
-  m_hDictLock = ::CreateMutexW(psa, FALSE, L"mzimeja_dict_lock");
-  assert(m_hDictLock);
-
-  // create base data
-  m_hBaseData = ::CreateFileMappingW(INVALID_HANDLE_VALUE, psa,
-    PAGE_READWRITE, 0, sizeof(ImageBase), L"mzimeja_basedata");
-  assert(m_hBaseData);
-  if (m_hBaseData && ::GetLastError() != ERROR_ALREADY_EXISTS) {
-    // initialize base data
-    ImageBase *data = LockImeBaseData();
-    if (data) {
-      data->dwSignature = 0xDEADFACE;
-      data->dwSharedDictDataSize = 0;
-      UnlockImeBaseData(data);
-    }
-  }
-
-  // create a thread
-  HANDLE hThread;
-  hThread = (HANDLE)_beginthreadex(psa, 0, loading_dict_proc, this, 0, NULL);
-  assert(hThread);
-  ::CloseHandle(hThread);
-
-  // free sa
-  FreeSecurityAttributes(psa);
+  // load dict
+  LoadDict();
 
   // register window classes for IME
   return RegisterClasses(m_hInst);
 } // MzIme::Init
 
-ImageBase *MzIme::LockImeBaseData() {
-  LPVOID pvData;
-  pvData = ::MapViewOfFile(m_hBaseData, FILE_MAP_ALL_ACCESS,
-                           0, 0, sizeof(ImageBase));
-  return reinterpret_cast<ImageBase *>(pvData);
-}
-
-void MzIme::UnlockImeBaseData(ImageBase *data) {
-  ::UnmapViewOfFile(data);
+VOID MzIme::Uninit(VOID) {
+  FOOTMARK();
+  UnregisterClasses();
+  UnloadDict();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -227,7 +216,7 @@ LONG MzIme::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
   return result;
 }
 
-std::wstring MzIme::GetComputerString(LPCWSTR pszSettingName) {
+BOOL MzIme::GetComputerString(LPCWSTR pszSettingName, std::wstring& value) {
   HKEY hKey;
   WCHAR szValue[MAX_PATH * 2];
   LONG result = OpenComputerSettingKey(FALSE, &hKey);
@@ -237,10 +226,11 @@ std::wstring MzIme::GetComputerString(LPCWSTR pszSettingName) {
       reinterpret_cast<LPBYTE>(szValue), &cbData);
     ::RegCloseKey(hKey);
     if (result == ERROR_SUCCESS) {
-      return std::wstring(szValue);
+      value = szValue;
+      return TRUE;
     }
   }
-  return std::wstring();
+  return FALSE;
 } // MzIme::GetComputerString
 
 BOOL MzIme::SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
@@ -320,7 +310,7 @@ BOOL MzIme::SetComputerDword(LPCWSTR pszSettingName, DWORD data) {
   return FALSE;
 } // MzIme::SetComputerData
 
-std::wstring MzIme::GetUserString(LPCWSTR pszSettingName) {
+BOOL MzIme::GetUserString(LPCWSTR pszSettingName, std::wstring& value) {
   HKEY hKey;
   WCHAR szValue[MAX_PATH * 2];
   LONG result = OpenUserSettingKey(FALSE, &hKey);
@@ -330,10 +320,11 @@ std::wstring MzIme::GetUserString(LPCWSTR pszSettingName) {
       reinterpret_cast<LPBYTE>(szValue), &cbData);
     ::RegCloseKey(hKey);
     if (result == ERROR_SUCCESS) {
-      return std::wstring(szValue);
+      value = szValue;
+      return TRUE;
     }
   }
-  return std::wstring();
+  return FALSE;
 } // MzIme::GetUserString
 
 BOOL MzIme::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
@@ -659,19 +650,6 @@ void MzIme::UnregisterClasses() {
   ::UnregisterClass(szCompStrClassName, m_hInst);
   ::UnregisterClass(szCandClassName, m_hInst);
   ::UnregisterClass(szStatusClassName, m_hInst);
-}
-
-VOID MzIme::Uninit(VOID) {
-  FOOTMARK();
-  UnregisterClasses();
-  if (m_hDictLock) {
-    ::CloseHandle(m_hDictLock);
-    m_hDictLock = NULL;
-  }
-  if (m_hBaseData) {
-    ::CloseHandle(m_hBaseData);
-    m_hBaseData = NULL;
-  }
 }
 
 HBITMAP MzIme::LoadBMP(LPCTSTR pszName) {

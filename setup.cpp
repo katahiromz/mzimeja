@@ -28,10 +28,17 @@ LPWSTR GetSystemImePathName(LPWSTR pszPath) {
   return pszPath;
 }
 
-LPWSTR GetDictPathName(LPWSTR pszPath) {
+LPWSTR GetBasicDictPathName(LPWSTR pszPath) {
   GetModuleFileName(NULL, pszPath, MAX_PATH);
   LPWSTR pch = wcsrchr(pszPath, L'\\');
   lstrcpyW(pch, L"\\res\\mzimeja.dic");
+  return pszPath;
+}
+
+LPWSTR GetNameDictPathName(LPWSTR pszPath) {
+  GetModuleFileName(NULL, pszPath, MAX_PATH);
+  LPWSTR pch = wcsrchr(pszPath, L'\\');
+  lstrcpyW(pch, L"\\res\\name.dic");
   return pszPath;
 }
 
@@ -161,17 +168,21 @@ INT DoSetRegistry2(VOID) {
       HKEY hkSoftware;
       result = CreateRegKey(hkCompany, L"mzimeja", &hkSoftware);
       if (result == ERROR_SUCCESS && hkSoftware) {
-        TCHAR szDictPath[MAX_PATH];
+        TCHAR szBasicDictPath[MAX_PATH];
+        TCHAR szNameDictPath[MAX_PATH];
         TCHAR szKanjiPath[MAX_PATH];
         TCHAR szRadicalPath[MAX_PATH];
         TCHAR szImePadPath[MAX_PATH];
 
-        GetDictPathName(szDictPath);
+        GetBasicDictPathName(szBasicDictPath);
+        GetNameDictPathName(szNameDictPath);
         GetKanjiDataPathName(szKanjiPath);
         GetRadicalDataPathName(szRadicalPath);
         GetImePadPathName(szImePadPath);
 
-        if (DoSetRegSz(hkSoftware, L"basic dictionary file", szDictPath) &&
+        if (
+          DoSetRegSz(hkSoftware, L"BasicDictPathName", szBasicDictPath) &&
+          DoSetRegSz(hkSoftware, L"NameDictPathName", szNameDictPath) &&
           DoSetRegSz(hkSoftware, L"kanji data file", szKanjiPath) &&
           DoSetRegSz(hkSoftware, L"radical data file", szRadicalPath) &&
           DoSetRegSz(hkSoftware, L"imepad file", szImePadPath))

@@ -337,11 +337,6 @@ struct MzConversionResult {
 
 typedef std::vector<std::wstring> WStrings;
 
-struct ImageBase {
-  DWORD   dwSignature;
-  DWORD   dwSharedDictDataSize;
-};
-
 enum Gyou {
   GYOU_A,
   GYOU_KA,
@@ -475,6 +470,29 @@ struct Lattice {
 };
 
 //////////////////////////////////////////////////////////////////////////////
+// dictionary
+
+class Dict {
+public:
+  Dict();
+  ~Dict();
+
+  BOOL Load(const wchar_t *file_name, const wchar_t *object_name);
+  void Unload();
+  BOOL IsLoaded() const;
+  DWORD GetSize() const;
+
+  wchar_t *Lock();
+  void Unlock(wchar_t *data);
+
+protected:
+  std::wstring m_strFileName;
+  std::wstring m_strObjectName;
+  HANDLE m_hMutex;
+  HANDLE m_hFileMapping;
+};
+
+//////////////////////////////////////////////////////////////////////////////
 // The IME
 
 class MzIme {
@@ -545,17 +563,17 @@ public:
   int CalcCost(const std::wstring& tags) const;
 
   // convert
-  void PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-  void PluralClauseConversion(const std::wstring& strHiragana,
+  BOOL PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
+  BOOL PluralClauseConversion(const std::wstring& strHiragana,
                               MzConversionResult& result);
-  void SingleClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-  void SingleClauseConversion(const std::wstring& strHiragana,
+  BOOL SingleClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
+  BOOL SingleClauseConversion(const std::wstring& strHiragana,
                               MzConversionClause& result);
   BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
 
   // computer settings
-  std::wstring GetComputerString(LPCWSTR pszSettingName);
+  BOOL GetComputerString(LPCWSTR pszSettingName, std::wstring& value);
   BOOL SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue);
   BOOL GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr);
   BOOL SetComputerDword(LPCWSTR pszSettingName, DWORD data);
@@ -563,7 +581,7 @@ public:
   BOOL SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 
   // user settings
-  std::wstring GetUserString(LPCWSTR pszSettingName);
+  BOOL GetUserString(LPCWSTR pszSettingName, std::wstring& value);
   BOOL SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue);
   BOOL GetUserDword(LPCWSTR pszSettingName, DWORD *ptr);
   BOOL SetUserDword(LPCWSTR pszSettingName, DWORD data);
@@ -571,19 +589,15 @@ public:
   BOOL SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 
 protected:
-  HANDLE          m_hDictLock;      // mutex for dictionary
-  HANDLE          m_hBaseData;      // file mapping
-  BOOL LoadBasicDictFile(std::vector<DictEntry>& entries);
-  BOOL DeployDictData(ImageBase *data, SECURITY_ATTRIBUTES *psa,
-                      const std::vector<DictEntry>& entries);
-
   // input context
   HIMC            m_hIMC;
   InputContext *  m_lpIMC;
 
-  HANDLE          m_hBasicDictData; // file mapping
-  ImageBase *LockImeBaseData();
-  void UnlockImeBaseData(ImageBase *data);
+  // dictionary
+  Dict            m_basic_dict;
+  Dict            m_name_dict;
+  BOOL LoadDict();
+  void UnloadDict();
 
   // registry
   LONG OpenRegKey(HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const;

@@ -71,9 +71,17 @@ IMEPAD_LIBS = \
 
 IMEPAD_FILE = imepad.exe
 
+
+DICT_COMPILE_OBJS = dict_compile$(DOTOBJ)
+DICT_COMPILE_LIBS = \
+	-lkernel32 \
+	-luser32 \
+
+DICT_COMPILE_FILE = dict_compile.exe
+
 #############################################################################
 
-all: $(IME_FILE) $(SETUP_FILE) $(IMEPAD_FILE)
+all: $(IME_FILE) $(SETUP_FILE) $(IMEPAD_FILE) $(DICT_COMPILE_FILE) make_dict
 
 $(IME_FILE): $(OBJS)
 	$(CXX) -mdll -o $(IME_FILE) $(CXXFLAGS) $(OBJS) $(LIBS) mzimeja.def
@@ -83,6 +91,13 @@ $(SETUP_FILE): $(SETUP_OBJS)
 
 $(IMEPAD_FILE): $(IMEPAD_OBJS)
 	$(CXX) -mwindows -o $(IMEPAD_FILE) $(CXXFLAGS) $(IMEPAD_OBJS) $(IMEPAD_LIBS)
+
+$(DICT_COMPILE_FILE): $(DICT_COMPILE_OBJS)
+	$(CXX) -mconsole -o $(DICT_COMPILE_FILE) $(CXXFLAGS) $(DICT_COMPILE_OBJS) $(DICT_COMPILE_LIBS)
+
+make_dict: $(DICT_COMPILE_FILE)
+	./$(DICT_COMPILE_FILE) res/mzimeja.dat res/mzimeja.dic
+	./$(DICT_COMPILE_FILE) res/name.dat res/name.dic
 
 cand_info$(DOTOBJ): cand_info.cpp
 	$(CXX) -c $(CXXFLAGS) -o cand_info$(DOTOBJ) cand_info.cpp
@@ -129,6 +144,9 @@ imepad$(DOTOBJ): imepad.cpp
 	$(CXX) -c $(CXXFLAGS) -o imepad$(DOTOBJ) imepad.cpp
 imepad_res$(DOTOBJ): imepad.rc
 	$(RC) $(RCFLAGS) -i imepad.rc -o imepad_res$(DOTOBJ)
+
+dict_compile$(DOTOBJ): dict_compile.cpp
+	$(CXX) -c $(CXXFLAGS) -o dict_compile$(DOTOBJ) dict_compile.cpp
 
 clean:
 	rm -f *$(DOTOBJ)
