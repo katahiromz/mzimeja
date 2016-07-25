@@ -158,6 +158,7 @@ struct LogCompStr {
   void SetClauseCompHiragana(DWORD iClause, std::wstring& str);
   void SetClauseCompHiragana(DWORD iClause, std::wstring& str, BOOL bRoman);
   void UpdateExtraClause(DWORD iClause, DWORD dwConversion);
+  void UpdateFromExtra(BOOL bRoman);
 
   // for debugging
   void AssertValid();

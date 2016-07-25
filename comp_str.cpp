@@ -338,6 +338,25 @@ void LogCompStr::UpdateCompStr() {
   comp_clause[count] = ich;
 }
 
+void LogCompStr::UpdateFromExtra(BOOL bRoman) {
+  UpdateCompStr();
+  extra.typing_clauses.resize(extra.hiragana_clauses.size());
+  if (bRoman) {
+    for (DWORD i = 0; i < GetClauseCount(); ++i) {
+      std::wstring& hira = extra.hiragana_clauses[i];
+      extra.typing_clauses[i] =
+        lcmap(hiragana_to_typing(hira), LCMAP_HALFWIDTH);
+    }
+  } else {
+    for (DWORD i = 0; i < GetClauseCount(); ++i) {
+      std::wstring& hira = extra.hiragana_clauses[i];
+      extra.typing_clauses[i] =
+        lcmap(hiragana_to_roman(hira), LCMAP_HALFWIDTH);
+    }
+  }
+  comp_attr.assign(comp_str.size(), ATTR_CONVERTED);
+}
+
 void LogCompStr::MakeHiragana() {
   FOOTMARK();
   SetClauseCompString(extra.iClause,

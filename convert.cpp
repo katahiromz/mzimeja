@@ -654,10 +654,6 @@ void MzConversionClause::sort() {
 void MzConversionResult::sort() {
   FOOTMARK();
 
-  for (size_t i = 0; i < clauses.size(); ++i) {
-    clauses[i].sort();
-  }
-
   for (size_t i = 1; i < clauses.size(); ++i) {
     for (size_t iCand1 = 0; iCand1 < clauses[i - 1].candidates.size(); ++iCand1) {
       for (size_t iCand2 = 0; iCand2 < clauses[i].candidates.size(); ++iCand2) {
@@ -2040,6 +2036,7 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
     if (!lattice.AddNodesForSingle(dict_data)) {
       lattice.AddComplement(0, pre.size(), pre.size());
     }
+    assert(lattice.chunks[0].size());
 
     // unlock the dictionary
     m_basic_dict.Unlock(dict_data);
@@ -2190,30 +2187,23 @@ void MzIme::MakeResultForSingle(MzConversionResult& result, Lattice& lattice) {
   }
 
   std::wstring hiragana = lattice.pre;
-  {
-    LatticeNode node;
-    node.pre = hiragana;
-    node.post = hiragana;
-    node.bunrui = HB_UNKNOWN;
-    node.cost = 10;
-    clause.add(&node);
-  }
 
-  {
-    std::wstring katakana;
-    katakana = lcmap(hiragana, LCMAP_FULLWIDTH | LCMAP_KATAKANA);
+  LatticeNode node;
+  node.pre = hiragana;
+  node.bunrui = HB_UNKNOWN;
+  node.cost = 10;
 
-    LatticeNode node;
-    node.pre = hiragana;
-    node.post = katakana;
-    node.bunrui = HB_UNKNOWN;
-    node.cost = 10;
-    clause.add(&node);
-  }
+  node.post = hiragana;
+  clause.add(&node);
+
+  node.post = lcmap(hiragana, LCMAP_FULLWIDTH | LCMAP_KATAKANA);
+  clause.add(&node);
 
   result.clauses.push_back(clause);
+  assert(result.clauses[0].candidates.size());
 
   result.sort();
+  assert(result.clauses[0].candidates.size());
 } // MzIme::MakeResultForSingle
 
 BOOL MzIme::ConvertMultiClause(
@@ -2385,39 +2375,52 @@ BOOL MzIme::StretchClauseLeft(
   DWORD iClause = comp.extra.iClause;
 
   std::wstring str1 = comp.extra.hiragana_clauses[iClause];
-  if (str1.empty()) return FALSE;
+  if (str1.size() <= 1) return FALSE;
 
   wchar_t ch = str1[str1.size() - 1];
   str1.resize(str1.size() - 1);
 
-  BOOL bSplitted = FALSE;
   std::wstring str2;
+  BOOL bSplitted = FALSE;
   if (iClause + 1 < comp.GetClauseCount()) {
     str2 = ch + comp.extra.hiragana_clauses[iClause + 1];
   } else {
-    bSplitted = TRUE;
     str2 += ch;
+    bSplitted = TRUE;
   }
 
   MzConversionResult result1, result2;
   if (!ConvertSingleClause(str1, result1)) {
     return FALSE;
   }
-
   if (!ConvertSingleClause(str2, result2)) {
     return FALSE;
   }
 
   if (bSplitted) {
-    comp.comp_clause.push_back((DWORD)comp.comp_str.size());
-    comp.extra.hiragana_clauses.push_back(L"");
-    comp.extra.typing_clauses.push_back(L"");
-    comp.extra.comp_str_clauses.push_back(L"");
+    std::wstring str;
+    comp.extra.hiragana_clauses.insert(
+      comp.extra.hiragana_clauses.begin() + iClause + 1, str);
+    comp.extra.comp_str_clauses.insert(
+      comp.extra.comp_str_clauses.begin() + iClause + 1, str);
   }
 
+  MzConversionClause& clause1 = result1.clauses[0];
   MzConversionClause& clause2 = result2.clauses[0];
-  comp.SetClauseCompString(iClause + 1, clause2.candidates[0].converted);
-  comp.SetClauseCompHiragana(iClause + 1, clause2.candidates[0].hiragana, bRoman);
+  comp.extra.hiragana_clauses[iClause] = str1;
+  comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
+  comp.extra.hiragana_clauses[iClause + 1] = str2;
+  comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].converted;
+  comp.UpdateFromExtra(bRoman);
+
+  {
+    LogCandList cand_list;
+    for (size_t i = 0; i < clause1.candidates.size(); ++i) {
+      MzConversionCandidate& cand = clause1.candidates[i];
+      cand_list.cand_strs.push_back(cand.converted);
+    }
+    cand.cand_lists[iClause] = cand_list;
+  }
   {
     LogCandList cand_list;
     for (size_t i = 0; i < clause2.candidates.size(); ++i) {
@@ -2427,20 +2430,9 @@ BOOL MzIme::StretchClauseLeft(
     cand.cand_lists[iClause + 1] = cand_list;
   }
 
-  MzConversionClause& clause1 = result1.clauses[0];
-  comp.SetClauseCompString(iClause, clause1.candidates[0].converted);
-  comp.SetClauseCompHiragana(iClause, clause1.candidates[0].hiragana, bRoman);
-  {
-    LogCandList cand_list;
-    for (size_t i = 0; i < clause1.candidates.size(); ++i) {
-      MzConversionCandidate& cand = clause1.candidates[i];
-      cand_list.cand_strs.push_back(cand.converted);
-    }
-    cand.cand_lists[iClause] = cand_list;
-  }
-
   cand.iClause = iClause;
   comp.extra.iClause = iClause;
+  comp.SetClauseAttr(iClause, ATTR_TARGET_CONVERTED);
 
   return TRUE;
 } // MzIme::StretchClauseLeft
@@ -2460,12 +2452,11 @@ BOOL MzIme::StretchClauseRight(
 
   wchar_t ch = str2[0];
   str1 += ch;
-
-  BOOL bJoined = FALSE;
-  if (str2.size() <= 1) {
-    bJoined = TRUE;
+  if (str2.size() == 1) {
+    str2.clear();
+  } else {
+    str2 = str2.substr(1);
   }
-  str2.resize(str2.size() - 1);
 
   MzConversionResult result1, result2;
   if (!ConvertSingleClause(str1, result1)) {
@@ -2476,27 +2467,24 @@ BOOL MzIme::StretchClauseRight(
     return FALSE;
   }
 
-  if (bJoined) {
-    comp.extra.hiragana_clauses.resize(iClause);
-    comp.extra.typing_clauses.resize(iClause);
-    comp.extra.comp_str_clauses.resize(iClause);
+  MzConversionClause& clause1 = result1.clauses[0];
+
+  if (str2.empty()) {
+    comp.extra.hiragana_clauses.erase(
+      comp.extra.hiragana_clauses.begin() + iClause + 1);
+    comp.extra.comp_str_clauses.erase(
+      comp.extra.comp_str_clauses.begin() + iClause + 1);
+    comp.extra.hiragana_clauses[iClause] = str1;
+    comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
   } else {
     MzConversionClause& clause2 = result2.clauses[0];
-    comp.SetClauseCompString(iClause + 1, clause2.candidates[0].converted);
-    comp.SetClauseCompHiragana(iClause + 1, clause2.candidates[0].hiragana, bRoman);
-    {
-      LogCandList cand_list;
-      for (size_t i = 0; i < clause2.candidates.size(); ++i) {
-        MzConversionCandidate& cand = clause2.candidates[i];
-        cand_list.cand_strs.push_back(cand.converted);
-      }
-      cand.cand_lists[iClause + 1] = cand_list;
-    }
+    comp.extra.hiragana_clauses[iClause] = str1;
+    comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
+    comp.extra.hiragana_clauses[iClause + 1] = str2;
+    comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].converted;
   }
+  comp.UpdateFromExtra(bRoman);
 
-  MzConversionClause& clause1 = result1.clauses[0];
-  comp.SetClauseCompString(iClause, clause1.candidates[0].converted);
-  comp.SetClauseCompHiragana(iClause, clause1.candidates[0].hiragana, bRoman);
   {
     LogCandList cand_list;
     for (size_t i = 0; i < clause1.candidates.size(); ++i) {
@@ -2505,9 +2493,19 @@ BOOL MzIme::StretchClauseRight(
     }
     cand.cand_lists[iClause] = cand_list;
   }
+  if (str2.size()) {
+    MzConversionClause& clause2 = result2.clauses[0];
+    LogCandList cand_list;
+    for (size_t i = 0; i < clause2.candidates.size(); ++i) {
+      MzConversionCandidate& cand = clause2.candidates[i];
+      cand_list.cand_strs.push_back(cand.converted);
+    }
+    cand.cand_lists[iClause + 1] = cand_list;
+  }
 
   cand.iClause = iClause;
   comp.extra.iClause = iClause;
+  comp.SetClauseAttr(iClause, ATTR_TARGET_CONVERTED);
 
   return TRUE;
 } // MzIme::StretchClauseRight
