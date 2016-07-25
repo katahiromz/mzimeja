@@ -457,11 +457,13 @@ struct MzConversionCandidate {
   std::wstring            converted;
   int                     cost;
   std::set<HinshiBunrui>  bunruis;
+  std::wstring            tags;
   void clear() {
     hiragana.clear();
     converted.clear();
     cost = 0;
     bunruis.clear();
+    tags.clear();
   }
 };
 

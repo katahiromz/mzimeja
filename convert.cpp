@@ -66,7 +66,10 @@ static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
 
 // 品詞の連結コスト
 static int
-HinshiConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2) {
+CandConnectCost(
+  const std::wstring& tags1, HinshiBunrui bunrui1,
+  const std::wstring& tags2, HinshiBunrui bunrui2)
+{
   if (bunrui2 == HB_PERIOD || bunrui2 == HB_COMMA) return 0;
   if (bunrui2 == HB_TAIL) return 0;
   if (bunrui1 == HB_SYMBOLS || bunrui2 == HB_SYMBOLS) return 0;
@@ -82,7 +85,16 @@ HinshiConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2) {
     break;
   case HB_MEISHI: // 名詞
     switch (bunrui2) {
-    case HB_MEISHI: case HB_SETTOUJI:
+    case HB_MEISHI:
+      if (tags1.find(L"[数詞]") != std::wstring::npos) {
+        if (tags2.find(L"[数詞]") != std::wstring::npos ||
+            tags2.find(L"[数単位]") != std::wstring::npos)
+        {
+          return 0;
+        }
+      }
+      return 10;
+    case HB_SETTOUJI:
       return 10;
     case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI:
       return 5;
@@ -106,18 +118,23 @@ HinshiConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2) {
   case HB_KATEI_JODOUSHI: case HB_MEIREI_JODOUSHI:
     assert(0);
     break;
+  case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI: case HB_KAHEN_DOUSHI:
+  case HB_SAHEN_DOUSHI: case HB_SETTOUJI:
+    switch (bunrui2) {
+    case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI: case HB_KAHEN_DOUSHI:
+    case HB_SAHEN_DOUSHI: case HB_SETTOUJI:
+      return 5;
+    }
+    break;
   case HB_RENTAISHI: case HB_FUKUSHI: case HB_SETSUZOKUSHI:
   case HB_KANDOUSHI: case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
   case HB_FUKU_JOSHI: case HB_SHUU_JOSHI: case HB_JODOUSHI:
-  case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI: case HB_KAHEN_DOUSHI:
-  case HB_SAHEN_DOUSHI: case HB_SETTOUJI: case HB_SETSUBIJI:
-  case HB_COMMA: case HB_PERIOD:
+  case HB_SETSUBIJI: case HB_COMMA: case HB_PERIOD:
   default:
     break;
   }
-
   return 0;
-} // HinshiConnectCost
+} // CandConnectCost
 
 // 品詞の連結可能性
 static BOOL
@@ -604,6 +621,7 @@ void MzConversionClause::add(const LatticeNode *node) {
       if (candidates[i].cost > node->cost)  {
         candidates[i].cost = node->cost;
         candidates[i].bunruis.insert(node->bunrui);
+        candidates[i].tags += node->tags;
       }
       matched = true;
       break;
@@ -616,6 +634,7 @@ void MzConversionClause::add(const LatticeNode *node) {
     cand.converted = node->post;
     cand.cost = node->cost;
     cand.bunruis.insert(node->bunrui);
+    cand.tags = node->tags;
     candidates.push_back(cand);
   }
 }
@@ -649,7 +668,7 @@ void MzConversionResult::sort() {
         std::set<HinshiBunrui>::iterator it2, end2 = cand2.bunruis.end();
         for (it1 = cand1.bunruis.begin(); it1 != end1; ++it1)  {
           for (it2 = cand2.bunruis.begin(); it2 != end2; ++it2)  {
-            int cost = HinshiConnectCost(*it1, *it2);
+            int cost = CandConnectCost(cand1.tags, *it1, cand2.tags, *it2);
             if (cost < min_cost) {
               min_cost = cost;
             }
