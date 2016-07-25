@@ -776,7 +776,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
 
   // delete char
   comp.AssertValid();
-  comp.DeleteChar(IsRomanMode(), bBackSpace);
+  comp.DeleteChar(bBackSpace, Conversion());
   comp.AssertValid();
 
   // if there is no composition, then

@@ -479,41 +479,20 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
     }
     break;
   case IMODE_FULL_ASCII:
-    if (is_hiragana(chTranslated)) {
-      // set comp str and get delta length
-      len = 1;
-      extra.comp_str_clauses[extra.iClause] += chTranslated;
-      // set hiragana
-      extra.hiragana_clauses[extra.iClause] +=
-        roman_to_hiragana(fullwidth_ascii_to_halfwidth(translated));
-      // set typing
-      if (chTyped == chTranslated) {
-        if (bRoman) {
-          extra.typing_clauses[extra.iClause] +=
-            hiragana_to_roman(fullwidth_ascii_to_halfwidth(translated));
-        } else {
-          extra.typing_clauses[extra.iClause] +=
-            hiragana_to_typing(translated);
-        }
-      } else {
-        extra.typing_clauses[extra.iClause] += typed;
-      }
-    } else {
-      // set comp str and get delta length
-      str = extra.comp_str_clauses[extra.iClause];
-      len = (int)str.size();
-      str += chTyped;
-      str = lcmap(str, LCMAP_FULLWIDTH);
-      extra.comp_str_clauses[extra.iClause] = str;
-      len = (int)str.size() - len;
-      // set hiragana
-      str = extra.hiragana_clauses[extra.iClause];
-      str += chTyped;
-      extra.hiragana_clauses[extra.iClause] =
-        roman_to_hiragana(fullwidth_ascii_to_halfwidth(str));
-      // set typing
-      extra.typing_clauses[extra.iClause] += chTyped;
-    }
+    // set comp str and get delta length
+    str = extra.comp_str_clauses[extra.iClause];
+    len = (int)str.size();
+    str += chTyped;
+    str = lcmap(str, LCMAP_FULLWIDTH);
+    extra.comp_str_clauses[extra.iClause] = str;
+    len = (int)str.size() - len;
+    // set hiragana
+    str = extra.hiragana_clauses[extra.iClause];
+    str += chTyped;
+    extra.hiragana_clauses[extra.iClause] =
+      roman_to_hiragana(fullwidth_ascii_to_halfwidth(str));
+    // set typing
+    extra.typing_clauses[extra.iClause] += chTyped;
     break;
   case IMODE_HALF_KANA:
     if (is_hiragana(chTranslated)) {
@@ -599,16 +578,10 @@ void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
     }
     break;
   case IMODE_FULL_ASCII:
-    translated = lcmap(translated, LCMAP_FULLWIDTH);
-    if (is_hiragana(chTranslated)) {
-      str.insert(dwIndexInClause, translated);
-      len = 1;
-    } else {
-      len = (int)str.size();
-      str.insert(dwIndexInClause, typed);
-      str = lcmap(str, LCMAP_FULLWIDTH);
-      len = (int)str.size() - len;
-    }
+    len = (int)str.size();
+    str.insert(dwIndexInClause, typed);
+    str = lcmap(str, LCMAP_FULLWIDTH);
+    len = (int)str.size() - len;
     break;
   case IMODE_HALF_KANA:
     translated = lcmap(translated, LCMAP_HALFWIDTH | LCMAP_KATAKANA);

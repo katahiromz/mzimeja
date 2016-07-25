@@ -1858,6 +1858,32 @@ WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1) {
   case MAKELONG(L'Ç”', L'ÅK'): return L'Ç’';
   case MAKELONG(L'Ç÷', L'ÅK'): return L'Çÿ';
   case MAKELONG(L'ÇŸ', L'ÅK'): return L'Ç€';
+  case MAKELONG(L'ÉJ', L'ÅJ'): return L'ÉK';
+  case MAKELONG(L'ÉL', L'ÅJ'): return L'ÉM';
+  case MAKELONG(L'ÉN', L'ÅJ'): return L'ÉO';
+  case MAKELONG(L'ÉP', L'ÅJ'): return L'ÉQ';
+  case MAKELONG(L'ÉR', L'ÅJ'): return L'ÉS';
+  case MAKELONG(L'ÉT', L'ÅJ'): return L'ÉU';
+  case MAKELONG(L'ÉV', L'ÅJ'): return L'ÉW';
+  case MAKELONG(L'ÉX', L'ÅJ'): return L'ÉY';
+  case MAKELONG(L'ÉZ', L'ÅJ'): return L'É[';
+  case MAKELONG(L'É\', L'ÅJ'): return L'É]';
+  case MAKELONG(L'É^', L'ÅJ'): return L'É_';
+  case MAKELONG(L'É`', L'ÅJ'): return L'Éa';
+  case MAKELONG(L'Éc', L'ÅJ'): return L'Éd';
+  case MAKELONG(L'Ée', L'ÅJ'): return L'Éf';
+  case MAKELONG(L'Ég', L'ÅJ'): return L'Éh';
+  case MAKELONG(L'Én', L'ÅJ'): return L'Éo';
+  case MAKELONG(L'Éq', L'ÅJ'): return L'Ér';
+  case MAKELONG(L'Ét', L'ÅJ'): return L'Éu';
+  case MAKELONG(L'Éw', L'ÅJ'): return L'Éx';
+  case MAKELONG(L'Éz', L'ÅJ'): return L'É{';
+  case MAKELONG(L'ÉE', L'ÅJ'): return L'Éî';
+  case MAKELONG(L'Én', L'ÅK'): return L'Ép';
+  case MAKELONG(L'Éq', L'ÅK'): return L'És';
+  case MAKELONG(L'Ét', L'ÅK'): return L'Év';
+  case MAKELONG(L'Éw', L'ÅK'): return L'Éy';
+  case MAKELONG(L'Éz', L'ÅK'): return L'É|';
   default:                     return 0;
   }
 }
