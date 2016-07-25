@@ -736,7 +736,7 @@ void Lattice::AddExtra() {
     DoFields(0, fields);
     return;
   }
-  if (pre == L"Ç∂Ç±Ç≠") {
+  if (pre == L"Ç∂Ç±Ç≠" || pre == L"ÇΩÇæÇ¢Ç‹") {
     SYSTEMTIME st;
     ::GetLocalTime(&st);
     WCHAR sz[32];
@@ -744,6 +744,13 @@ void Lattice::AddExtra() {
     WStrings fields(4);
     fields[0] = pre;
     fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
+
+    if (pre == L"ÇΩÇæÇ¢Ç‹") {
+      fields[2] = L"ÇΩÇæç°";
+      DoFields(0, fields);
+      fields[2] = L"ë¸ç°";
+      DoFields(0, fields);
+    }
 
     wsprintfW(sz, L"%uéû%uï™%uïb", st.wHour, st.wMinute, st.wSecond);
     fields[2] = sz;

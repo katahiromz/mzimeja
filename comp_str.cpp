@@ -519,11 +519,12 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
     if (is_hiragana(chTranslated)) {
       // set comp str and get delta length
       len = (int)translated.size();
-      extra.comp_str_clauses[extra.iClause] += translated;
+      extra.comp_str_clauses[extra.iClause] +=
+        lcmap(translated, LCMAP_KATAKANA | LCMAP_HALFWIDTH);
       // set hiragana
-      extra.hiragana_clauses[extra.iClause] += translated;
+      extra.hiragana_clauses[extra.iClause] += chTranslated;
       // set typing
-      if (bRoman) {
+      if (chTyped == chTranslated) {
         if (bRoman) {
           extra.typing_clauses[extra.iClause] +=
             hiragana_to_roman(fullwidth_ascii_to_halfwidth(translated));
@@ -539,13 +540,13 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
       // set comp str and get delta length
       str = extra.comp_str_clauses[extra.iClause];
       len = (int)str.size();
-      str += chTranslated;
+      str += chTyped;
       str = roman_to_halfwidth_katakana(str, str.size());
       len = (int)str.size() - len;
       // set hiragana
       extra.comp_str_clauses[extra.iClause] = str;
       str = extra.hiragana_clauses[extra.iClause];
-      str += chTranslated;
+      str += chTyped;
       str = roman_to_hiragana(str, str.size());
       extra.hiragana_clauses[extra.iClause] = str;
       // set typing
