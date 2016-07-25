@@ -55,7 +55,7 @@ HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
   }
   RepositionWindow(hwndStatus);
   ::ShowWindow(hwndStatus, SW_SHOWNOACTIVATE);
-  SetWindowLongPtr(hwndStatus, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
+  ::SetWindowLongPtr(hwndStatus, FIGWLP_SERVERWND, (LONG_PTR)hWnd);
   return hwndStatus;
 } // StatusWnd_Create
 
@@ -286,7 +286,7 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
       } else {
         dwConversion |= IME_CMODE_ROMAN;
       }
-      ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
+      ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
       break;
     default:
       break;

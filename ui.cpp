@@ -62,17 +62,25 @@ void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam) {
             CompWnd_Move(lpUIExtra, lpIMC);
           }
         }
+
+        DWORD bIsNonRoman = FALSE;
+        if (TheIME.GetUserDword(L"IsNonRoman", &bIsNonRoman)) {
+          if (bIsNonRoman) {
+            lpIMC->Conversion() &= ~IME_CMODE_ROMAN;
+          } else {
+            lpIMC->Conversion() |= IME_CMODE_ROMAN;
+          }
+        }
+
         lpIMC->UnlockCompStr();
         lpIMC->UnlockCandInfo();
         StatusWnd_Update(lpUIExtra);
         TheIME.UnlockIMC(hIMC);
       } else {
-        CandWnd_Hide(lpUIExtra);
-        CompWnd_Hide(lpUIExtra);
+        ShowUIWindows(hWnd, FALSE);
       }
     } else { // it is NULL input context.
-      CandWnd_Hide(lpUIExtra);
-      CompWnd_Hide(lpUIExtra);
+      ShowUIWindows(hWnd, FALSE);
     }
     UnlockUIExtra(hWnd);
   }
@@ -327,6 +335,15 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
   case IMN_SETCONVERSIONMODE:
     DebugPrintA("IMN_SETCONVERSIONMODE\n");
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      if (lpIMC->Conversion() & IME_CMODE_ROMAN) {
+        TheIME.SetUserDword(L"IsNonRoman", FALSE);
+      } else {
+        TheIME.SetUserDword(L"IsNonRoman", TRUE);
+      }
+      TheIME.UnlockIMC(hIMC);
+    }
     StatusWnd_Update(lpUIExtra);
     break;
 

@@ -102,12 +102,14 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     switch (dwValue) {
     case IMC_SETOPENSTATUS:
       DebugPrintA("IMC_SETOPENSTATUS\n");
-      if (dwIndex == 0) {
-        lpIMC = TheIME.LockIMC(hIMC);
-        if (lpIMC) {
+      lpIMC = TheIME.LockIMC(hIMC);
+      if (lpIMC) {
+        if (dwIndex == 0) { // close
           lpIMC->CancelText();
-          TheIME.UnlockIMC(hIMC);
+        } else {  // open
+          ;
         }
+        TheIME.UnlockIMC(hIMC);
       }
       TheIME.UpdateIndicIcon(hIMC);
       ret = TRUE;
@@ -274,7 +276,7 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
   FOOTMARK();
 
   if (fSelect) TheIME.UpdateIndicIcon(hIMC);
-  if (NULL != hIMC) {
+  if (hIMC != NULL) {
     InputContext *lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
       if (fSelect) {

@@ -330,11 +330,13 @@ BOOL MzIme::GetUserString(LPCWSTR pszSettingName, std::wstring& value) {
 BOOL MzIme::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
   HKEY hKey;
   LONG result = OpenUserSettingKey(TRUE, &hKey);
+  assert(result == ERROR_SUCCESS);
   if (result == ERROR_SUCCESS && hKey) {
     DWORD cbData = (::lstrlenW(pszValue) + 1) * sizeof(WCHAR);
     result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_SZ, 
       reinterpret_cast<const BYTE *>(pszValue), cbData);
     ::RegCloseKey(hKey);
+    assert(result == ERROR_SUCCESS);
     if (result == ERROR_SUCCESS) {
       return TRUE;
     }
@@ -360,10 +362,12 @@ BOOL MzIme::GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
 BOOL MzIme::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
   HKEY hKey;
   LONG result = OpenUserSettingKey(TRUE, &hKey);
+  assert(result == ERROR_SUCCESS);
   if (result == ERROR_SUCCESS && hKey) {
     result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_BINARY, 
       reinterpret_cast<const BYTE *>(ptr), size);
     ::RegCloseKey(hKey);
+    assert(result == ERROR_SUCCESS);
     if (result == ERROR_SUCCESS) {
       return TRUE;
     }
@@ -390,11 +394,13 @@ BOOL MzIme::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
   HKEY hKey;
   DWORD dwData = data;
   LONG result = OpenUserSettingKey(TRUE, &hKey);
+  assert(result == ERROR_SUCCESS);
   if (result == ERROR_SUCCESS && hKey) {
     DWORD size = sizeof(DWORD);
-    result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_BINARY, 
+    result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_DWORD, 
       reinterpret_cast<const BYTE *>(&dwData), size);
     ::RegCloseKey(hKey);
+    assert(result == ERROR_SUCCESS);
     if (result == ERROR_SUCCESS) {
       return TRUE;
     }

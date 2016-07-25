@@ -168,17 +168,21 @@ BOOL InputContext::IsRomanMode() const {
 void InputContext::Initialize() {
   FOOTMARK();
 
-  if (!HasLogFont()) {
-    lfFont.W.lfCharSet = SHIFTJIS_CHARSET;
-    lfFont.W.lfFaceName[0] = 0;
-    fdwInit |= INIT_LOGFONT;
-  }
+  lfFont.W.lfCharSet = SHIFTJIS_CHARSET;
+  lfFont.W.lfFaceName[0] = 0;
+  fdwInit |= INIT_LOGFONT;
 
-  if (!HasConversion()) {
-    fdwConversion =
-      IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE;
-    fdwInit |= INIT_CONVERSION;
+  fdwConversion = IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE |
+                  IME_CMODE_JAPANESE;
+  DWORD bIsNonRoman = FALSE;
+  if (TheIME.GetUserDword(L"IsNonRoman", &bIsNonRoman)) {
+    if (bIsNonRoman) {
+      fdwConversion &= ~IME_CMODE_ROMAN;
+    } else {
+      fdwConversion |= IME_CMODE_ROMAN;
+    }
   }
+  fdwInit |= INIT_CONVERSION;
 
   hCompStr = CompStr::ReCreate(hCompStr, NULL);
   hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
