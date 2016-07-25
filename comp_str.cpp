@@ -542,9 +542,9 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
       len = (int)str.size();
       str += chTyped;
       str = roman_to_halfwidth_katakana(str, str.size());
+      extra.comp_str_clauses[extra.iClause] = str;
       len = (int)str.size() - len;
       // set hiragana
-      extra.comp_str_clauses[extra.iClause] = str;
       str = extra.hiragana_clauses[extra.iClause];
       str += chTyped;
       str = roman_to_hiragana(str, str.size());
@@ -617,7 +617,7 @@ void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
       len = 1;
     } else {
       len = (int)str.size();
-      str.insert(dwIndexInClause, translated);
+      str.insert(dwIndexInClause, typed);
       str = roman_to_halfwidth_katakana(str);
       len = (int)str.size() - len;
     }
