@@ -72,7 +72,7 @@ IMEPAD_LIBS = \
 IMEPAD_FILE = imepad.exe
 
 
-DICT_COMPILE_OBJS = dict_compile$(DOTOBJ)
+DICT_COMPILE_OBJS = dict_compile$(DOTOBJ) dict_compile_res$(DOTOBJ)
 DICT_COMPILE_LIBS = \
 	-lkernel32 \
 	-luser32 \
@@ -147,6 +147,8 @@ imepad_res$(DOTOBJ): imepad.rc
 
 dict_compile$(DOTOBJ): dict_compile.cpp
 	$(CXX) -c $(CXXFLAGS) -o dict_compile$(DOTOBJ) dict_compile.cpp
+dict_compile_res$(DOTOBJ): dict_compile.rc
+	$(RC) $(RCFLAGS) -i dict_compile.rc -o dict_compile_res$(DOTOBJ)
 
 clean:
 	rm -f *$(DOTOBJ)

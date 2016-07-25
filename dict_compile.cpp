@@ -1,3 +1,6 @@
+// dict_compile.cpp --- dictionary compiler of MZ-IME Japanese Input
+/////////////////////////////////////////////////////////////////////////////
+
 #include "mzimeja.h"
 using namespace std;
 

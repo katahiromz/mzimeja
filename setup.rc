@@ -54,7 +54,7 @@ BEGIN
         BLOCK "041103A4"
         BEGIN
             VALUE "CompanyName", "片山博文MZ\0"
-            VALUE "FileDescription", "MZ-IME日本語入力セットアップ\0"
+            VALUE "FileDescription", "MZ-IME日本語入力 セットアップ\0"
             VALUE "FileVersion", "0.5\0"
             VALUE "LegalCopyright", "Copyright (C) 2016 片山博文MZ.\0"
             VALUE "ProductName", "MZ-IME日本語入力\0"
