@@ -859,6 +859,30 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
       --index;
       continue;
     }
+    if (pre[index] == L'ÅE') {
+      size_t saved = index;
+      do {
+        ++index;
+      } while (pre[index] == L'ÅE');
+
+      fields.resize(4);
+      fields[0] = pre.substr(saved, index - saved);
+      fields[1] = MAKEWORD(HB_SYMBOLS, 0);
+      switch (index - saved) {
+      case 2:
+        fields[2] += L'Åd';
+        break;
+      case 3:
+        fields[2] += L'Åc';
+        break;
+      default:
+        fields[2] = fields[0];
+        break;
+      }
+      DoFields(saved, fields);
+      --index;
+      continue;
+    }
     if (is_comma(pre[index])) {
       size_t saved = index;
       do {
@@ -884,6 +908,16 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
       fields[1] = MAKEWORD(HB_MEISHI, 0);
       fields[2] = fields[0];
       DoMeishi(saved, fields);
+
+      if (are_all_chars_numeric(fields[0])) {
+        fields[2] = convert_to_kansuuji(fields[0]);
+        DoMeishi(saved, fields);
+        fields[2] = convert_to_kansuuji_brief(fields[0]);
+        DoMeishi(saved, fields);
+        fields[2] = convert_to_kansuuji_formal(fields[0]);
+        DoMeishi(saved, fields);
+      }
+
       --index;
       continue;
     }

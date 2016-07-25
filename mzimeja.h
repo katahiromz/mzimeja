@@ -301,6 +301,14 @@ BOOL is_education_kanji(WCHAR ch);
 BOOL is_common_use_kanji(WCHAR ch);
 // is the character fullwidth ASCII?
 BOOL is_fullwidth_ascii(WCHAR ch);
+// are all the characters numeric?
+BOOL are_all_chars_numeric(const std::wstring& str);
+// convert to kansuuji (Kanji number)
+std::wstring convert_to_kansuuji_1(wchar_t ch, size_t digit_level);
+std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth);
+std::wstring convert_to_kansuuji(const std::wstring& str);
+std::wstring convert_to_kansuuji_brief(const std::wstring& str);
+std::wstring convert_to_kansuuji_formal(const std::wstring& str);
 // is the character a period?
 BOOL is_period(WCHAR ch);
 // is the character a comma?

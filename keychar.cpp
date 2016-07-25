@@ -1726,6 +1726,109 @@ BOOL is_fullwidth_ascii(WCHAR ch) {
   return (0xFF00 <= ch && ch <= 0xFFEF);
 }
 
+BOOL are_all_chars_numeric(const std::wstring& str) {
+  FOOTMARK();
+  for (size_t i = 0; i < str.size(); ++i) {
+    if (L'0' <= str[i] && str[i] <= L'9') {
+      ;
+    } else if (L'‚O' <= str[i] && str[i] <= L'‚X') {
+      ;
+    } else {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+static const wchar_t s_szKanjiDigits[] = L"Zκ“ρOlάZµ”ª‹γ";
+
+std::wstring convert_to_kansuuji_1(wchar_t ch, size_t digit_level) {
+  FOOTMARK();
+  static const wchar_t s_szKanjiDigitLevels[] = L" \•Sη";
+  std::wstring ret;
+  if (ch == L'0') return ret;
+  assert(ch - L'0' < 10);
+  ret += s_szKanjiDigits[ch - L'0'];
+  if (digit_level > 0) {
+    assert(digit_level < 4);
+    ret += s_szKanjiDigitLevels[digit_level];
+  }
+  return ret;
+}
+
+std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth) {
+  FOOTMARK();
+  assert(are_all_chars_numeric(halfwidth));
+  assert(halfwidth.size() <= 4);
+  const size_t length = halfwidth.size();
+  std::wstring ret;
+  size_t level = 0;
+  for (size_t i = length; i > 0;) {
+    --i;
+    ret = convert_to_kansuuji_1(halfwidth[i], level) + ret;
+    ++level;
+  }
+  return ret;
+}
+
+std::wstring convert_to_kansuuji(const std::wstring& str) {
+  FOOTMARK();
+  std::wstring halfwidth = lcmap(str, LCMAP_HALFWIDTH);
+  assert(are_all_chars_numeric(halfwidth));
+  if (halfwidth.size() >= 24) return halfwidth;
+  static const wchar_t s_szKanjiGroupLevels[] = L" –‰­’›‹΄";
+  std::wstring ret;
+  size_t iGroup = 0;
+  while (halfwidth.size()) {
+    std::wstring group;
+    if (halfwidth.size() >= 4) {
+      group = halfwidth.substr(halfwidth.size() - 4);
+    } else {
+      group = halfwidth;
+    }
+    group = convert_to_kansuuji_4(group);
+    if (group.size() && iGroup > 0) {
+      ret = group + s_szKanjiGroupLevels[iGroup] + ret;
+    } else {
+      ret = group + ret;
+    }
+    if (halfwidth.size() >= 4) {
+      halfwidth = halfwidth.substr(0, halfwidth.size() - 4);
+    } else {
+      break;
+    }
+    ++iGroup;
+  }
+  if (ret.empty()) ret = L"—λ";
+  unboost::replace_all(ret, L"κ\", L"\");
+  unboost::replace_all(ret, L"κ•S", L"•S");
+  unboost::replace_all(ret, L"κη", L"η");
+  return ret;
+}
+
+std::wstring convert_to_kansuuji_brief(const std::wstring& str) {
+  FOOTMARK();
+  std::wstring halfwidth = lcmap(str, LCMAP_HALFWIDTH);
+  assert(are_all_chars_numeric(halfwidth));
+  std::wstring ret;
+  for (size_t i = 0; i < halfwidth.size(); ++i) {
+    ret += s_szKanjiDigits[halfwidth[i] - L'0'];
+  }
+  return ret;
+}
+
+std::wstring convert_to_kansuuji_formal(const std::wstring& str) {
+  std::wstring ret = convert_to_kansuuji(str);
+  unboost::replace_all(ret, L"κ", L"λ");
+  unboost::replace_all(ret, L"“ρ", L"“σ");
+  unboost::replace_all(ret, L"O", L"Q");
+  unboost::replace_all(ret, L"ά", L"ή");
+  unboost::replace_all(ret, L"\", L"E");
+  unboost::replace_all(ret, L"η", L"ΐ");
+  unboost::replace_all(ret, L"–", L"δέ");
+  return ret;
+}
+
 WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1) {
   FOOTMARK();
   switch (MAKELONG(ch0, ch1)) {
