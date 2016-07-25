@@ -156,8 +156,8 @@ static std::wstring GetSettingString(LPCWSTR pszSettingName) {
     if (result == ERROR_SUCCESS) {
       return std::wstring(szValue);
     }
-    assert(0);
   }
+  assert(0);
   return std::wstring();
 } // GetSettingString
 
