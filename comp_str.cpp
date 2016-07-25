@@ -359,37 +359,42 @@ void LogCompStr::UpdateFromExtra(BOOL bRoman) {
 
 void LogCompStr::MakeHiragana() {
   FOOTMARK();
-  SetClauseCompString(extra.iClause,
-    lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_HIRAGANA));
+  std::wstring str =
+    lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_HIRAGANA);
+  SetClauseCompString(extra.iClause, str);
   dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeKatakana() {
   FOOTMARK();
-  SetClauseCompString(extra.iClause,
-    lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_KATAKANA));
+  std::wstring str =
+    lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_KATAKANA);
+  SetClauseCompString(extra.iClause, str);
   dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeHankaku() {
   FOOTMARK();
-  SetClauseCompString(extra.iClause,
-    lcmap(extra.hiragana_clauses[extra.iClause],
-          LCMAP_HALFWIDTH | LCMAP_KATAKANA));
+  std::wstring str = lcmap(
+    extra.hiragana_clauses[extra.iClause],
+    LCMAP_HALFWIDTH | LCMAP_KATAKANA);
+  SetClauseCompString(extra.iClause, str);
   dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeZenEisuu() {
   FOOTMARK();
-  SetClauseCompString(extra.iClause,
-    lcmap(extra.typing_clauses[extra.iClause], LCMAP_FULLWIDTH));
+  std::wstring str =
+    lcmap(extra.typing_clauses[extra.iClause], LCMAP_FULLWIDTH);
+  SetClauseCompString(extra.iClause, str);
   dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 
 void LogCompStr::MakeHanEisuu() {
   FOOTMARK();
-  SetClauseCompString(extra.iClause,
-    lcmap(extra.typing_clauses[extra.iClause], LCMAP_HALFWIDTH));
+  std::wstring str =
+    lcmap(extra.typing_clauses[extra.iClause], LCMAP_HALFWIDTH);
+  SetClauseCompString(extra.iClause, str);
   dwCursorPos = ClauseToCompChar(extra.iClause + 1);
 }
 

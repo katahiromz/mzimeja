@@ -95,7 +95,7 @@ $(IMEPAD_FILE): $(IMEPAD_OBJS)
 $(DICT_COMPILE_FILE): $(DICT_COMPILE_OBJS)
 	$(CXX) -mconsole -o $(DICT_COMPILE_FILE) $(CXXFLAGS) $(DICT_COMPILE_OBJS) $(DICT_COMPILE_LIBS)
 
-make_dict: $(DICT_COMPILE_FILE)
+make_dict: $(DICT_COMPILE_FILE) res/mzimeja.dat res/name.dat
 	./$(DICT_COMPILE_FILE) res/mzimeja.dat res/mzimeja.dic
 	./$(DICT_COMPILE_FILE) res/name.dat res/name.dic
 

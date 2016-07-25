@@ -66,9 +66,7 @@ static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
 
 // 品詞の連結コスト
 static int
-CandConnectCost(
-  const std::wstring& tags1, HinshiBunrui bunrui1,
-  const std::wstring& tags2, HinshiBunrui bunrui2)
+CandConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2)
 {
   if (bunrui2 == HB_PERIOD || bunrui2 == HB_COMMA) return 0;
   if (bunrui2 == HB_TAIL) return 0;
@@ -86,13 +84,6 @@ CandConnectCost(
   case HB_MEISHI: // 名詞
     switch (bunrui2) {
     case HB_MEISHI:
-      if (tags1.find(L"[数詞]") != std::wstring::npos) {
-        if (tags2.find(L"[数詞]") != std::wstring::npos ||
-            tags2.find(L"[数単位]") != std::wstring::npos)
-        {
-          return 0;
-        }
-      }
       return 10;
     case HB_SETTOUJI:
       return 10;
@@ -124,6 +115,8 @@ CandConnectCost(
     case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI: case HB_KAHEN_DOUSHI:
     case HB_SAHEN_DOUSHI: case HB_SETTOUJI:
       return 5;
+    default:
+      break;
     }
     break;
   case HB_RENTAISHI: case HB_FUKUSHI: case HB_SETSUZOKUSHI:
@@ -664,7 +657,7 @@ void MzConversionResult::sort() {
         std::set<HinshiBunrui>::iterator it2, end2 = cand2.bunruis.end();
         for (it1 = cand1.bunruis.begin(); it1 != end1; ++it1)  {
           for (it2 = cand2.bunruis.begin(); it2 != end2; ++it2)  {
-            int cost = CandConnectCost(cand1.tags, *it1, cand2.tags, *it2);
+            int cost = CandConnectCost(*it1, *it2);
             if (cost < min_cost) {
               min_cost = cost;
             }
