@@ -157,7 +157,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    100, "─\t│\t┌\t┐\t┘\t└\t├\t┬\t┤\t┴\t┼\t━\t┃\t┏\t┓\t┛\t┗\t┣\t┳\t┫\t┻\t╋\t┠\t┯\t┨\t┷\t┿\t┝\t┰\t┥\t┸\t╂"
+    100, "─│┌┐┘└├┬┤┴┼━┃┏┓┛┗┣┳┫┻╋┠┯┨┷┿┝┰┥┸╂"
     101, "()\t（）\t【】\t「」\t『』\t《》\t〈〉\t≪≫\t〔〕\t＜＞\t［］\t｛｝\t{}\t<>"
 END
 

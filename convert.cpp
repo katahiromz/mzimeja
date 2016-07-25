@@ -791,13 +791,13 @@ void Lattice::AddExtra() {
   }
   if (pre == L"‚¯‚¢‚¹‚ñ") {
     WStrings items;
-    unboost::split(items, TheIME.LoadSTR(100), unboost::is_any_of(L"\t"));
+    WCHAR *pch = TheIME.LoadSTR(100);
 
     WStrings fields(4);
     fields[0] = pre;
     fields[1].assign(1, MAKEWORD(HB_SYMBOLS, 0));
-    for (size_t i = 0; i < items.size(); ++i) {
-      fields[2] = items[i];
+    while (*pch) {
+      fields[2].assign(1, *pch++);
       DoFields(0, fields);
     }
     return;
