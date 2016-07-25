@@ -2216,13 +2216,13 @@ void MzIme::MakeResultForSingle(MzConversionResult& result, Lattice& lattice) {
   result.sort();
 } // MzIme::MakeResultForSingle
 
-BOOL MzIme::PluralClauseConversion(
+BOOL MzIme::ConvertMultiClause(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
   FOOTMARK();
   MzConversionResult result;
   std::wstring strHiragana = comp.extra.hiragana_clauses[comp.extra.iClause];
-  if (!PluralClauseConversion(strHiragana, result)) {
+  if (!ConvertMultiClause(strHiragana, result)) {
     return FALSE;
   }
 
@@ -2266,10 +2266,10 @@ BOOL MzIme::PluralClauseConversion(
   }
   cand.iClause = 0;
   return TRUE;
-} // MzIme::PluralClauseConversion
+} // MzIme::ConvertMultiClause
 
-BOOL MzIme::PluralClauseConversion(const std::wstring& strHiragana,
-                                   MzConversionResult& result)
+BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana,
+                               MzConversionResult& result)
 {
   FOOTMARK();
 
@@ -2316,9 +2316,9 @@ BOOL MzIme::PluralClauseConversion(const std::wstring& strHiragana,
 #endif
 
   return TRUE;
-} // MzIme::PluralClauseConversion
+} // MzIme::ConvertMultiClause
 
-BOOL MzIme::SingleClauseConversion(
+BOOL MzIme::ConvertSingleClause(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
   FOOTMARK();
@@ -2326,7 +2326,7 @@ BOOL MzIme::SingleClauseConversion(
 
   MzConversionResult result;
   std::wstring strHiragana = comp.extra.hiragana_clauses[iClause];
-  if (!SingleClauseConversion(strHiragana, result)) {
+  if (!ConvertSingleClause(strHiragana, result)) {
     return FALSE;
   }
 
@@ -2347,10 +2347,10 @@ BOOL MzIme::SingleClauseConversion(
   comp.extra.iClause = iClause;
 
   return TRUE;
-} // MzIme::SingleClauseConversion
+} // MzIme::ConvertSingleClause
 
-BOOL MzIme::SingleClauseConversion(const std::wstring& strHiragana,
-                                   MzConversionResult& result)
+BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana,
+                                MzConversionResult& result)
 {
   FOOTMARK();
   result.clear();
@@ -2375,7 +2375,7 @@ BOOL MzIme::SingleClauseConversion(const std::wstring& strHiragana,
   result.candidates.push_back(cand);
 #endif
   return TRUE;
-} // MzIme::SingleClauseConversion
+} // MzIme::ConvertSingleClause
 
 BOOL MzIme::StretchClauseLeft(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
@@ -2400,11 +2400,11 @@ BOOL MzIme::StretchClauseLeft(
   }
 
   MzConversionResult result1, result2;
-  if (!SingleClauseConversion(str1, result1)) {
+  if (!ConvertSingleClause(str1, result1)) {
     return FALSE;
   }
 
-  if (!SingleClauseConversion(str2, result2)) {
+  if (!ConvertSingleClause(str2, result2)) {
     return FALSE;
   }
 
@@ -2468,11 +2468,11 @@ BOOL MzIme::StretchClauseRight(
   str2.resize(str2.size() - 1);
 
   MzConversionResult result1, result2;
-  if (!SingleClauseConversion(str1, result1)) {
+  if (!ConvertSingleClause(str1, result1)) {
     return FALSE;
   }
 
-  if (str2.size() && !SingleClauseConversion(str2, result2)) {
+  if (str2.size() && !ConvertSingleClause(str2, result2)) {
     return FALSE;
   }
 

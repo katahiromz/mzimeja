@@ -577,12 +577,12 @@ public:
   int CalcCost(const std::wstring& tags) const;
 
   // convert
-  BOOL PluralClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-  BOOL PluralClauseConversion(const std::wstring& strHiragana,
-                              MzConversionResult& result);
-  BOOL SingleClauseConversion(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-  BOOL SingleClauseConversion(const std::wstring& strHiragana,
-                              MzConversionResult& result);
+  BOOL ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
+  BOOL ConvertMultiClause(const std::wstring& strHiragana,
+                          MzConversionResult& result);
+  BOOL ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
+  BOOL ConvertSingleClause(const std::wstring& strHiragana,
+                           MzConversionResult& result);
   BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
 

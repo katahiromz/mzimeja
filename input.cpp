@@ -492,7 +492,7 @@ BOOL InputContext::Convert(BOOL bShift) {
     } else {
       TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
       BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
-      TheIME.SingleClauseConversion(comp, cand, bRoman);
+      TheIME.ConvertSingleClause(comp, cand, bRoman);
     }
   } else {
     if (Conversion() & IME_CMODE_JAPANESE) {
@@ -502,7 +502,7 @@ BOOL InputContext::Convert(BOOL bShift) {
     }
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
     BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
-    TheIME.PluralClauseConversion(comp, cand, bRoman);
+    TheIME.ConvertMultiClause(comp, cand, bRoman);
   }
 
   // recreate candidate and generate message to change candidate
