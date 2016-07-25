@@ -335,7 +335,7 @@ BOOL ImePad::LoadKanjiData() {
   }
   char buf[256];
   wchar_t wbuf[256];
-  std::wstring kanji_file = GetSettingString(L"kanji data file");
+  std::wstring kanji_file = GetSettingString(L"KanjiDataFile");
   using namespace std;
   FILE *fp = _wfopen(kanji_file.c_str(), L"rb");
   if (fp) {
@@ -368,7 +368,7 @@ BOOL ImePad::LoadRadicalData() {
   }
   char buf[256];
   wchar_t wbuf[256];
-  std::wstring radical_file = GetSettingString(L"radical data file");
+  std::wstring radical_file = GetSettingString(L"RadicalDataFile");
   using namespace std;
   FILE *fp = _wfopen(radical_file.c_str(), L"rb");
   if (fp) {

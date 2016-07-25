@@ -183,9 +183,9 @@ INT DoSetRegistry2(VOID) {
         if (
           DoSetRegSz(hkSoftware, L"BasicDictPathName", szBasicDictPath) &&
           DoSetRegSz(hkSoftware, L"NameDictPathName", szNameDictPath) &&
-          DoSetRegSz(hkSoftware, L"kanji data file", szKanjiPath) &&
-          DoSetRegSz(hkSoftware, L"radical data file", szRadicalPath) &&
-          DoSetRegSz(hkSoftware, L"imepad file", szImePadPath))
+          DoSetRegSz(hkSoftware, L"KanjiDataFile", szKanjiPath) &&
+          DoSetRegSz(hkSoftware, L"RadicalDataFile", szRadicalPath) &&
+          DoSetRegSz(hkSoftware, L"ImePadFile", szImePadPath))
         {
           ret = TRUE;
         }
