@@ -11,11 +11,7 @@
 動作環境
 --------
 
- * 日本語 Windows 2000
- * 日本語 Windows XP
- * 日本語 Windows Vista
- * 日本語 Windows Server 2003
- * 日本語 Windows 7 
+ * 日本語 Windows 2000 / XP / Vista / Server 2003 / 7
 
 MZ-IMEの特徴
 ------------
