@@ -387,6 +387,7 @@ struct InputContext : public INPUTCONTEXT {
   void MakeHankaku();
   void MakeZenEisuu();
   void MakeHanEisuu();
+  BOOL ConvertCode();
 
   void GetLogObjects(LogCompStr& comp, LogCandInfo& cand);
 

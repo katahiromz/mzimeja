@@ -706,6 +706,37 @@ void InputContext::MakeHanEisuu() {
   TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
+BOOL InputContext::ConvertCode() {
+  // get logical data
+  LogCompStr comp;
+  LogCandInfo cand;
+  GetLogObjects(comp, cand);
+
+  // if there is no conposition, we cannot convert it
+  if (!comp.HasCompStr()) {
+    return FALSE;
+  }
+
+  // convert
+  if (!cand.HasCandInfo()) {
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+  }
+  TheIME.ConvertCode(comp, cand);
+
+  // recreate candidate and generate message to change candidate
+  hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
+  TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+
+  // recreate composition
+  hCompStr = CompStr::ReCreate(hCompStr, &comp);
+
+  // generate message to change composition
+  LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
+  TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+
+  return TRUE;
+}
+
 void InputContext::Escape() {
   FOOTMARK();
 

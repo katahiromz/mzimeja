@@ -2669,4 +2669,163 @@ BOOL MzIme::StretchClauseRight(
   return TRUE;
 } // MzIme::StretchClauseRight
 
+inline bool is_sjis_lead(BYTE ch) {
+  return (
+    ((0x81 <= ch) && (ch <= 0x9F)) ||
+    ((0xE0 <= ch) && (ch <= 0xEF))
+  );
+}
+
+inline bool is_sjis_trail(BYTE ch) {
+  return (
+    ((0x40 <= ch) && (ch <= 0x7E)) ||
+    ((0x80 <= ch) && (ch <= 0xFC))
+  );
+}
+
+inline bool is_jis_byte(BYTE ch) {
+  return ((0x21 <= ch) && (ch <= 0x7E));
+}
+
+inline bool is_jis_code(WORD w) {
+  BYTE ch0 = BYTE(w >> 8);
+  BYTE ch1 = BYTE(w);
+  return (is_jis_byte(ch0) && is_jis_byte(ch1));
+}
+
+inline WORD jis2sjis(BYTE c0, BYTE c1) {
+  if (c0 & 0x01) {
+    c0 >>= 1;
+    if (c0 < 0x2F) {
+      c0 += 0x71;
+    } else {
+      c0 -= 0x4F;
+    }
+    if (c1 > 0x5F) {
+      c1 += 0x20;
+    } else {
+      c1 += 0x1F;
+    }
+  } else {
+    c0 >>= 1;
+    if (c0 < 0x2F) {
+      c0 += 0x70;
+    } else {
+      c0 -= 0x50;
+    }
+    c1 += 0x7E;
+  }
+  WORD sjis_code = WORD((c0 << 8) | c1);
+  return sjis_code;
+} // jis2sjis
+
+inline WORD jis2sjis(WORD jis_code) {
+    BYTE c0 = BYTE(jis_code >> 8);
+    BYTE c1 = BYTE(jis_code);
+    return jis2sjis(c0, c1);
+}
+
+inline bool is_sjis_code(WORD w) {
+  return (
+    is_sjis_lead(BYTE(w >> 8)) && is_sjis_trail(BYTE(w))
+  );
+}
+
+BOOL MzIme::ConvertCode(const std::wstring& strTyping,
+                        MzConversionResult& result)
+{
+  result.clauses.clear();
+
+  MzConversionClause clause;
+  LatticeNode node;
+
+  node.pre = strTyping;
+  node.bunrui = HB_UNKNOWN;
+  node.cost = 0;
+
+  ULONG hex_code = wcstoul(strTyping.c_str(), NULL, 16);
+  WCHAR szUnicode[2];
+  szUnicode[0] = WCHAR(hex_code);
+  szUnicode[1] = 0;
+
+  // Unicode
+  node.post = szUnicode;
+  clause.add(&node);
+  node.cost++;
+
+  // Shift_JIS
+  CHAR szSJIS[8];
+  WORD wSJIS = WORD(hex_code);
+  if (is_sjis_code(wSJIS)) {
+    szSJIS[0] = HIBYTE(wSJIS);
+    szSJIS[1] = LOBYTE(wSJIS);
+    szSJIS[2] = 0;
+    ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
+    node.post = szUnicode;
+    node.cost++;
+    clause.add(&node);
+  }
+
+  // JIS
+  wSJIS = jis2sjis(WORD(hex_code));
+  if (is_sjis_code(wSJIS)) {
+    szSJIS[0] = HIBYTE(wSJIS);
+    szSJIS[1] = LOBYTE(wSJIS);
+    szSJIS[2] = 0;
+    ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
+    node.post = szUnicode;
+    node.cost++;
+    clause.add(&node);
+  }
+
+  result.clauses.push_back(clause);
+  return TRUE;
+} // MzIme::ConvertCode
+
+BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand) {
+  FOOTMARK();
+  MzConversionResult result;
+  std::wstring strTyping = comp.extra.typing_clauses[comp.extra.iClause];
+  if (!ConvertCode(strTyping, result)) {
+    return FALSE;
+  }
+
+  comp.comp_str.clear();
+  comp.extra.clear();
+  comp.comp_clause.resize(result.clauses.size() + 1);
+  for (size_t k = 0; k < result.clauses.size(); ++k) {
+    MzConversionClause& clause = result.clauses[k];
+    for (size_t i = 0; i < clause.candidates.size(); ++i) {
+      MzConversionCandidate& cand = clause.candidates[i];
+      comp.comp_clause[k] = (DWORD)comp.comp_str.size();
+      comp.extra.hiragana_clauses.push_back(cand.hiragana);
+      std::wstring typing;
+      typing = hiragana_to_typing(cand.hiragana);
+      comp.extra.typing_clauses.push_back(typing);
+      comp.comp_str += cand.converted;
+      break;
+    }
+  }
+  comp.comp_clause[result.clauses.size()] = (DWORD)comp.comp_str.size();
+  comp.comp_attr.assign(comp.comp_str.size(), ATTR_CONVERTED);
+  comp.extra.iClause = 0;
+  comp.SetClauseAttr(comp.extra.iClause, ATTR_TARGET_CONVERTED);
+  comp.dwCursorPos = (DWORD)comp.comp_str.size();
+  comp.dwDeltaStart = 0;
+
+  // setting cand
+  cand.clear();
+  for (size_t k = 0; k < result.clauses.size(); ++k) {
+    MzConversionClause& clause = result.clauses[k];
+    LogCandList cand_list;
+    for (size_t i = 0; i < clause.candidates.size(); ++i) {
+      MzConversionCandidate& cand = clause.candidates[i];
+      cand_list.cand_strs.push_back(cand.converted);
+    }
+    cand.cand_lists.push_back(cand_list);
+  }
+  cand.iClause = 0;
+  return TRUE;
+} // MzIme::ConvertCode
+
 //////////////////////////////////////////////////////////////////////////////

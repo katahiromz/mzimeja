@@ -595,6 +595,8 @@ public:
                            MzConversionResult& result);
   BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
+  BOOL ConvertCode(const std::wstring& strTyping, MzConversionResult& result);
+  BOOL ConvertCode(LogCompStr& comp, LogCandInfo& cand);
 
   // computer settings
   BOOL GetComputerString(LPCWSTR pszSettingName, std::wstring& value);

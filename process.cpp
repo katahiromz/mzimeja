@@ -189,6 +189,14 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     }
     break;
 
+  case VK_F5:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      lpIMC->ConvertCode();
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
   case VK_F6:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
@@ -445,6 +453,9 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
     }
     if (!ret) {
       // Neither Ctrl nor Shift key is down
+      if (vKey == VK_F5) {
+        ret = TRUE;
+      }
       if (fCompStr) {
         switch (vKey) {
         case VK_F6:     // make composition fullwidth Hiragana
