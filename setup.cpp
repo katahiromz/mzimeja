@@ -63,6 +63,20 @@ LPWSTR GetImePadPathName(LPWSTR pszPath) {
   return pszPath;
 }
 
+LPWSTR GetVerInfoPathName(LPWSTR pszPath) {
+  GetModuleFileName(NULL, pszPath, MAX_PATH);
+  LPWSTR pch = wcsrchr(pszPath, L'\\');
+  lstrcpyW(pch, L"\\verinfo.exe");
+  return pszPath;
+}
+
+LPWSTR GetReadMePathName(LPWSTR pszPath) {
+  GetModuleFileName(NULL, pszPath, MAX_PATH);
+  LPWSTR pch = wcsrchr(pszPath, L'\\');
+  lstrcpyW(pch, L"\\READMEJP.txt");
+  return pszPath;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // registry
 
@@ -173,19 +187,25 @@ INT DoSetRegistry2(VOID) {
         TCHAR szKanjiPath[MAX_PATH];
         TCHAR szRadicalPath[MAX_PATH];
         TCHAR szImePadPath[MAX_PATH];
+        TCHAR szVerInfoPath[MAX_PATH];
+        TCHAR szReadMePath[MAX_PATH];
 
         GetBasicDictPathName(szBasicDictPath);
         GetNameDictPathName(szNameDictPath);
         GetKanjiDataPathName(szKanjiPath);
         GetRadicalDataPathName(szRadicalPath);
         GetImePadPathName(szImePadPath);
+        GetVerInfoPathName(szVerInfoPath);
+        GetReadMePathName(szReadMePath);
 
         if (
           DoSetRegSz(hkSoftware, L"BasicDictPathName", szBasicDictPath) &&
           DoSetRegSz(hkSoftware, L"NameDictPathName", szNameDictPath) &&
           DoSetRegSz(hkSoftware, L"KanjiDataFile", szKanjiPath) &&
           DoSetRegSz(hkSoftware, L"RadicalDataFile", szRadicalPath) &&
-          DoSetRegSz(hkSoftware, L"ImePadFile", szImePadPath))
+          DoSetRegSz(hkSoftware, L"ImePadFile", szImePadPath) &&
+          DoSetRegSz(hkSoftware, L"VerInfoFile", szVerInfoPath) &&
+          DoSetRegSz(hkSoftware, L"ReadMeFile", szReadMePath))
         {
           ret = TRUE;
         }

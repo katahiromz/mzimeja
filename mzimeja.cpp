@@ -587,6 +587,7 @@ BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
   case IDM_RECONVERT:
     break;
   case IDM_ABOUT:
+    GenerateMessage(WM_IME_NOTIFY, IMN_PRIVATE, MAKELPARAM(0, 0xDEAD));
     break;
   case IDM_HIRAGANA:
     SetInputMode(hIMC, IMODE_FULL_HIRAGANA);

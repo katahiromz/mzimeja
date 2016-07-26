@@ -488,6 +488,15 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         ::ShellExecuteW(NULL, NULL, imepad_file.c_str(),
                         NULL, NULL, SW_SHOWNOACTIVATE);
       }
+      break;
+    }
+    if (HIWORD(lParam) == 0xDEAD) {
+      std::wstring verinfo_file;
+      if (TheIME.GetComputerString(L"VerInfoFile", verinfo_file)) {
+        ::ShellExecuteW(NULL, NULL, verinfo_file.c_str(),
+                        NULL, NULL, SW_SHOWNOACTIVATE);
+      }
+      break;
     }
     break;
 

@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imepad", "imepad.vcproj", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dict_compile", "dict_compile.vcproj", "{CF0CB025-0CD6-4469-824A-7B16084E8C16}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "verinfo", "verinfo.vcproj", "{CF0CB025-0CD6-4469-824B-7B16084E8B13}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,10 @@ Global
 		{CF0CB025-0CD6-4469-824A-7B16084E8C16}.Debug|Win32.Build.0 = Debug|Win32
 		{CF0CB025-0CD6-4469-824A-7B16084E8C16}.Release|Win32.ActiveCfg = Release|Win32
 		{CF0CB025-0CD6-4469-824A-7B16084E8C16}.Release|Win32.Build.0 = Release|Win32
+		{CF0CB025-0CD6-4469-824B-7B16084E8B13}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CF0CB025-0CD6-4469-824B-7B16084E8B13}.Debug|Win32.Build.0 = Debug|Win32
+		{CF0CB025-0CD6-4469-824B-7B16084E8B13}.Release|Win32.ActiveCfg = Release|Win32
+		{CF0CB025-0CD6-4469-824B-7B16084E8B13}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

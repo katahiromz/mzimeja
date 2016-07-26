@@ -35,12 +35,14 @@ Source: "projects\Debug\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
 Source: "projects\Debug\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "projects\Debug\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "projects\Debug\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "projects\Debug\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\READMEJP.txt"; Filename: "{app}\READMEJP.txt"
 Name: "{group}\LICENSE.txt"; Filename: "{app}\LICENSE.txt"
 Name: "{group}\MZ-IMEパッド"; Filename: "{app}\imepad.exe"
+Name: "{group}\バージョン情報"; Filename: "{app}\verinfo.exe"
 Name: "{group}\アンインストール"; Filename: "{uninstallexe}"
 
 [Run]

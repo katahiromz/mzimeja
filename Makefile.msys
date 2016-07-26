@@ -71,7 +71,6 @@ IMEPAD_LIBS = \
 
 IMEPAD_FILE = imepad.exe
 
-
 DICT_COMPILE_OBJS = dict_compile$(DOTOBJ) dict_compile_res$(DOTOBJ)
 DICT_COMPILE_LIBS = \
 	-lkernel32 \
@@ -79,9 +78,16 @@ DICT_COMPILE_LIBS = \
 
 DICT_COMPILE_FILE = dict_compile.exe
 
+VERINFO_OBJS = verinfo$(DOTOBJ) verinfo_res$(DOTOBJ)
+VERINFO_LIBS = \
+	-lkernel32 \
+	-luser32 \
+
+VERINFO_FILE = verinfo.exe
+
 #############################################################################
 
-all: $(IME_FILE) $(SETUP_FILE) $(IMEPAD_FILE) $(DICT_COMPILE_FILE) make_dict
+all: $(IME_FILE) $(SETUP_FILE) $(IMEPAD_FILE) $(DICT_COMPILE_FILE) $(VERINFO_FILE) make_dict
 
 $(IME_FILE): $(OBJS)
 	$(CXX) -mdll -o $(IME_FILE) $(CXXFLAGS) $(OBJS) $(LIBS) mzimeja.def
@@ -95,7 +101,10 @@ $(IMEPAD_FILE): $(IMEPAD_OBJS)
 $(DICT_COMPILE_FILE): $(DICT_COMPILE_OBJS)
 	$(CXX) -mconsole -o $(DICT_COMPILE_FILE) $(CXXFLAGS) $(DICT_COMPILE_OBJS) $(DICT_COMPILE_LIBS)
 
-make_dict: $(DICT_COMPILE_FILE) res/mzimeja.dat res/name.dat
+$(VERINFO_FILE): $(VERINFO_OBJS)
+	$(CXX) -mwindows -o $(VERINFO_FILE) $(CXXFLAGS) $(VERINFO_OBJS) $(VERINFO_LIBS)
+
+make_dict: $(VERINFO_FILE) res/mzimeja.dat res/name.dat
 	./$(DICT_COMPILE_FILE) res/mzimeja.dat res/mzimeja.dic
 	./$(DICT_COMPILE_FILE) res/name.dat res/name.dic
 
@@ -149,6 +158,11 @@ dict_compile$(DOTOBJ): dict_compile.cpp
 	$(CXX) -c $(CXXFLAGS) -o dict_compile$(DOTOBJ) dict_compile.cpp
 dict_compile_res$(DOTOBJ): dict_compile.rc
 	$(RC) $(RCFLAGS) -i dict_compile.rc -o dict_compile_res$(DOTOBJ)
+
+verinfo$(DOTOBJ): verinfo.cpp
+	$(CXX) -c $(CXXFLAGS) -o verinfo$(DOTOBJ) verinfo.cpp
+verinfo_res$(DOTOBJ): verinfo.rc
+	$(RC) $(RCFLAGS) -i verinfo.rc -o verinfo_res$(DOTOBJ)
 
 clean:
 	rm -f *$(DOTOBJ)

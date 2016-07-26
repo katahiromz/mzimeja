@@ -68,8 +68,13 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
     break;
 
   case IME_ESC_GETHELPFILENAME:
-    lstrcpyW((WCHAR *)lpData, TEXT("mzimeja.hlp"));
-    ret = TRUE;
+    {
+      std::wstring pathname;
+      if (TheIME.GetComputerString(L"ReadMeFile", pathname)) {
+        lstrcpyW((WCHAR *)lpData, pathname.c_str());
+        ret = TRUE;
+      }
+    }
     break;
 
   default:
@@ -303,23 +308,24 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
 struct MYMENUITEM {
   INT nCommandID;
   INT nStringID;
+  BOOL bDisabled;
 };
 static const MYMENUITEM top_menu_items[] = {
-  {IDM_HIRAGANA, IDM_HIRAGANA},
-  {IDM_FULL_KATAKANA, IDM_FULL_KATAKANA},
-  {IDM_FULL_ASCII, IDM_FULL_ASCII},
-  {IDM_HALF_KATAKANA, IDM_HALF_KATAKANA},
-  {IDM_HALF_ASCII, IDM_HALF_ASCII},
+  {IDM_HIRAGANA, IDM_HIRAGANA, FALSE},
+  {IDM_FULL_KATAKANA, IDM_FULL_KATAKANA, FALSE},
+  {IDM_FULL_ASCII, IDM_FULL_ASCII, FALSE},
+  {IDM_HALF_KATAKANA, IDM_HALF_KATAKANA, FALSE},
+  {IDM_HALF_ASCII, IDM_HALF_ASCII, FALSE},
   {-1, -1},
-  {IDM_ROMAN_INPUT, IDM_ROMAN_INPUT},
-  {IDM_KANA_INPUT, IDM_KANA_INPUT},
+  {IDM_ROMAN_INPUT, IDM_ROMAN_INPUT, FALSE},
+  {IDM_KANA_INPUT, IDM_KANA_INPUT, FALSE},
   {-1, -1},
-  {IDM_ADD_WORD, IDM_ADD_WORD},
-  {IDM_RECONVERT, IDM_RECONVERT},
-  {IDM_IME_PAD, IDM_IME_PAD},
+  {IDM_ADD_WORD, IDM_ADD_WORD, TRUE},
+  {IDM_RECONVERT, IDM_RECONVERT, TRUE},
+  {IDM_IME_PAD, IDM_IME_PAD, FALSE},
   {-1, -1},
-  {IDM_PROPERTY, IDM_PROPERTY},
-  {IDM_ABOUT, IDM_ABOUT},
+  {IDM_PROPERTY, IDM_PROPERTY, TRUE},
+  {IDM_ABOUT, IDM_ABOUT, FALSE},
 };
 
 DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
@@ -399,6 +405,9 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
         default:
           lpImeMenu[i].fType = 0;
           break;
+        }
+        if (item.bDisabled) {
+          lpImeMenu[i].fState |= MFS_GRAYED;
         }
         lpImeMenu[i].wID = item.nCommandID;
         lpImeMenu[i].hbmpChecked = 0;
