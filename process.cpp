@@ -90,10 +90,13 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     }
     break;
 
-  case VK_KANA:
+  case VK_OEM_COPY: case VK_OEM_FINISH: case VK_OEM_BACKTAB:
     if (bAlt) {
       SetRomanMode(hIMC, !IsRomanMode(hIMC));
       break;
+    }
+    if (!bOpen) {
+      ImmSetOpenStatus(hIMC, TRUE);
     }
     switch (imode) {
     case IMODE_FULL_HIRAGANA:
@@ -117,19 +120,6 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
       break;
     default:
       break;
-    }
-    break;
-
-  case VK_OEM_COPY:
-    if (!bOpen) {
-      ImmSetOpenStatus(hIMC, TRUE);
-    }
-    if (bAlt) {
-      SetRomanMode(hIMC, !IsRomanMode(hIMC));
-    } else if (bShift) {
-      SetInputMode(hIMC, IMODE_FULL_KATAKANA);
-    } else {
-      SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
     }
     break;
 
@@ -390,6 +380,8 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
     return FALSE;
   }
 
+  DebugPrintA("ImeProcessKey: vKey: %u\n", vKey);
+
   InputContext *lpIMC = TheIME.LockIMC(hIMC);
   BOOL fOpen = lpIMC->IsOpen();
   BOOL fAlt = (lpbKeyState[VK_MENU] & 0x80);
@@ -397,16 +389,15 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   BOOL fShift = (lpbKeyState[VK_SHIFT] & 0x80);
 
   switch (vKey) {
-  case VK_KANJI:
-  case VK_OEM_AUTO:
-  case VK_OEM_ENLW:
+  case VK_KANJI: case VK_OEM_AUTO: case VK_OEM_ENLW:
     if (!fShift && !fCtrl) ret = TRUE;
     break;
-  case VK_KANA:
+  case VK_OEM_COPY: case VK_OEM_FINISH: case VK_OEM_BACKTAB:
     ret = TRUE;
     break;
   default:
     if (lpIMC == NULL) return FALSE;
+    break;
   }
 
   if (!ret && fOpen) {
@@ -414,6 +405,11 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
     BOOL fCandInfo = lpIMC->HasCandInfo();
     if (fAlt) {
       // Alt key is down
+      switch (vKey) {
+      case VK_OEM_COPY: case VK_OEM_FINISH: case VK_OEM_BACKTAB:
+        ret = TRUE;
+        break;
+      }
     } else if (fCtrl) {
       // Ctrl key is down
       if (fCompStr) {
@@ -428,8 +424,8 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
     } else if (fShift) {
       // Shift key is down
       switch (vKey) {
-      case VK_LEFT: case VK_RIGHT:
-      case VK_SPACE:
+      case VK_LEFT: case VK_RIGHT: case VK_SPACE:
+      case VK_OEM_COPY: case VK_OEM_FINISH: case VK_OEM_BACKTAB:
         ret = TRUE;
         break;
       }
@@ -453,7 +449,8 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
       case VK_OEM_COMMA:
       case VK_OEM_1: case VK_OEM_2: case VK_OEM_3: case VK_OEM_4:
       case VK_OEM_5: case VK_OEM_6: case VK_OEM_7: case VK_OEM_8:
-      case VK_OEM_9: case VK_OEM_102: case VK_OEM_COPY:
+      case VK_OEM_9: case VK_OEM_102:
+      case VK_OEM_COPY: case VK_OEM_FINISH: case VK_OEM_BACKTAB:
         // OEM keys
         ret = TRUE;
         break;
@@ -516,28 +513,7 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
   if (hIMC) {
     if (!bKeyUp) {
       INPUT_MODE imode = GetInputMode(hIMC);
-      switch ((BYTE)uVKey) {
-      case VK_KANJI: case VK_OEM_AUTO: case VK_OEM_ENLW:
-        if (::ImmGetOpenStatus(hIMC)) {
-          SetInputMode(hIMC, IMODE_HALF_ASCII);
-        } else {
-          SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
-        }
-        break;
-      case VK_KANA:
-        ::ImmSetOpenStatus(hIMC, TRUE);
-        if (lpbKeyState[VK_MENU] & 0x80) {
-          SetRomanMode(hIMC, !IsRomanMode(hIMC));
-        } else if (lpbKeyState[VK_SHIFT] & 0x80) {
-          SetInputMode(hIMC, IMODE_FULL_KATAKANA);
-        } else {
-          SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
-        }
-        break;
-      default:
-        IMEKeyDownHandler(hIMC, uVKey, lpbKeyState, imode);
-        break;
-      }
+      IMEKeyDownHandler(hIMC, uVKey, lpbKeyState, imode);
     }
 
     if (TheIME.m_fOverflowKey) {
