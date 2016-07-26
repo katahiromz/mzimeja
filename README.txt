@@ -20,6 +20,10 @@ Table of Contents
   comp_str.cpp        | composition string of mzimeja
   config.cpp          | mzimeja configuration
   convert.cpp         | mzimeja kana kanji conversion
+  dict_compile.cpp    | dictionary compiler of MZ-IME Japanese Input
+  dict_compile.rc     | resource of dict_compile
+  imepad.cpp          | IME pad
+  imepad.rc           | resource of IME pad
   imm.cpp             | IME/IMM related
   immsec.cpp          | IMM security related
   input.cpp           | mzimeja input context and related
