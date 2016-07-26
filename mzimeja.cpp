@@ -749,7 +749,7 @@ void FreeUIExtra(HWND hwndServer) {
 
     WCHAR szMsgW[1024];
     szMsgW[0] = 0;
-    ::MultiByteToWideChar(CP_ACP, 0, szMsgA, -1, szMsgW, 1024);
+    ::MultiByteToWideChar(932, 0, szMsgA, -1, szMsgW, 1024);
 
     //OutputDebugString(szMsg);
     FILE *fp = fopen("C:\\mzimeja.log", "ab");
