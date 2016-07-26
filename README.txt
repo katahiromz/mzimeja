@@ -1,7 +1,7 @@
 What is this?
 -------------
 
-This is MZ-IME Japanese Input (mzimeja; under construction).
+This is MZ-IME Japanese Input (mzimeja).
 This program is a Japanese Input Method Editor (IME) for Windows 2000.
 
 Table of Contents
