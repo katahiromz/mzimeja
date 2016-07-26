@@ -4,5 +4,6 @@ ABSOLUTELY NO WARRANTY.
 Copyright (C) 2016 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>.
 ---
 (Japanese, Shift_JIS)
-このソフトは、フリーソフトウェアです。自己責任でご自由にお使い下さい。
+このソフトは、著作権フリーのフリーソフトウェアです。
+自己責任でご自由にお使い下さい。
 無保証。
