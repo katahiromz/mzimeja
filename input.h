@@ -275,7 +275,7 @@ struct LogCandInfo {
   void MoveEnd();
   void PageUp();
   void PageDown();
-  void SelectCand(UINT uCandIndex);
+  BOOL SelectCand(UINT uCandIndex);
 
   std::wstring GetString() const;
   std::wstring GetString(DWORD iCand) const;
@@ -362,7 +362,7 @@ struct InputContext : public INPUTCONTEXT {
   void UnlockGuideLine();
 
   // actions
-  void SelectCand(UINT uCandIndex);
+  BOOL SelectCand(UINT uCandIndex);
   void AddChar(WCHAR chTyped, WCHAR chTranslated);
   void Escape();
   void CancelText();

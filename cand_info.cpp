@@ -102,11 +102,13 @@ DWORD LogCandInfo::GetClauseCount() const {
   return DWORD(cand_lists.size());
 }
 
-void LogCandInfo::SelectCand(UINT uCandIndex) {
+BOOL LogCandInfo::SelectCand(UINT uCandIndex) {
   DWORD dwPageStart = cand_lists[iClause].dwPageStart;
   if (dwPageStart + uCandIndex < cand_lists[iClause].dwPageSize) {
     cand_lists[iClause].dwSelection = dwPageStart + uCandIndex;
+    return TRUE;
   }
+  return FALSE;
 }
 
 void LogCandInfo::MoveNext() {

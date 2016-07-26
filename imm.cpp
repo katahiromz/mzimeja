@@ -194,17 +194,8 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     DebugPrintA("NI_SELECTCANDIDATESTR\n");
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
-      if (dwIndex == 1 && lpIMC->HasCandInfo()) {
-        lpCandInfo = lpIMC->LockCandInfo();
-        if (lpCandInfo) {
-          lpCandList = lpCandInfo->GetList(0);
-          if (lpCandList->dwCount > dwValue) {
-            lpCandList->dwSelection = dwValue;
-            TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
-            ret = TRUE;
-          }
-          lpIMC->UnlockCandInfo();
-        }
+      if (dwIndex == 1) {
+        ret = lpIMC->SelectCand(dwValue);
       }
       TheIME.UnlockIMC(hIMC);
     }
