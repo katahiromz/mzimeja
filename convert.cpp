@@ -59,7 +59,7 @@ static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
     L"HB_SETSUBIJI",
     L"HB_PERIOD",
     L"HB_COMMA",
-    L"HB_SYMBOLS"
+    L"HB_SYMBOL"
   };
   return s_array[index];
 }
@@ -70,7 +70,7 @@ CandConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2)
 {
   if (bunrui2 == HB_PERIOD || bunrui2 == HB_COMMA) return 0;
   if (bunrui2 == HB_TAIL) return 0;
-  if (bunrui1 == HB_SYMBOLS || bunrui2 == HB_SYMBOLS) return 0;
+  if (bunrui1 == HB_SYMBOL || bunrui2 == HB_SYMBOL) return 0;
   if (bunrui1 == HB_UNKNOWN || bunrui2 == HB_UNKNOWN) return 0;
   switch (bunrui1) {
   case HB_HEAD:
@@ -134,7 +134,7 @@ static BOOL
 IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
   if (node2.bunrui == HB_PERIOD || node2.bunrui == HB_COMMA) return TRUE;
   if (node2.bunrui == HB_TAIL) return TRUE;
-  if (node1.bunrui == HB_SYMBOLS || node2.bunrui == HB_SYMBOLS) return TRUE;
+  if (node1.bunrui == HB_SYMBOL || node2.bunrui == HB_SYMBOL) return TRUE;
   if (node1.bunrui == HB_UNKNOWN || node2.bunrui == HB_UNKNOWN) return TRUE;
 
   switch (node1.bunrui) {
@@ -679,6 +679,7 @@ void MzConversionResult::sort() {
 int LatticeNode::CalcCost() const {
   int ret = 0;
   if (bunrui == HB_KANGO) ret += 200;
+  if (bunrui == HB_SYMBOL) ret += 50;
   if (tags.size() != 0) {
     if (HasTag(L"[非標準]")) ret += 100;
     if (HasTag(L"[不謹慎]")) ret += 50;
@@ -776,32 +777,6 @@ void Lattice::AddExtra() {
     DoFields(0, fields);
     return;
   }
-  if (pre == L"かっこ") {
-    WStrings items;
-    unboost::split(items, TheIME.LoadSTR(101), unboost::is_any_of(L"\t"));
-
-    WStrings fields(4);
-    fields[0] = pre;
-    fields[1].assign(1, MAKEWORD(HB_SYMBOLS, 0));
-    for (size_t i = 0; i < items.size(); ++i) {
-      fields[2] = items[i];
-      DoFields(0, fields);
-    }
-    return;
-  }
-  if (pre == L"けいせん") {
-    WStrings items;
-    WCHAR *pch = TheIME.LoadSTR(100);
-
-    WStrings fields(4);
-    fields[0] = pre;
-    fields[1].assign(1, MAKEWORD(HB_SYMBOLS, 0));
-    while (*pch) {
-      fields[2].assign(1, *pch++);
-      DoFields(0, fields);
-    }
-    return;
-  }
   if (pre == L"じぶん") {
     WCHAR sz[64];
     DWORD dwSize = _countof(sz);
@@ -814,7 +789,43 @@ void Lattice::AddExtra() {
     }
     return;
   }
-}
+  if (pre == L"かっこ") {
+    WStrings items;
+    unboost::split(items, TheIME.LoadSTR(100), unboost::is_any_of(L"\t"));
+
+    WStrings fields(4);
+    fields[0] = pre;
+    fields[1].assign(1, MAKEWORD(HB_SYMBOL, 0));
+    for (size_t i = 0; i < items.size(); ++i) {
+      fields[2] = items[i];
+      DoFields(0, fields);
+    }
+    return;
+  }
+  static const wchar_t *s_words[] = {
+    L"きごう", L"けいせん", L"けいさん", L"さんかく",
+    L"しかく", L"ずけい", L"まる", L"ほし", L"ひし",
+    L"てん", L"たんい", L"ふとうごう",
+    L"たて", L"たてひだり", L"たてみぎ", L"ひだりうえ",
+    L"ひだりした", L"ふとわく", L"ほそわく", L"まんなか",
+    L"みぎうえ", L"みぎした", L"よこ", L"よこうえ", L"よこした",
+    L"おなじ", L"やじるし", L"ぎりしゃ"
+  };
+  for (size_t i = 0; i < _countof(s_words); ++i) {
+    if (pre == s_words[i]) {
+      WStrings items;
+      WCHAR *pch = TheIME.LoadSTR(101 + i);
+      WStrings fields(4);
+      fields[0] = pre;
+      fields[1].assign(1, MAKEWORD(HB_SYMBOL, 0));
+      while (*pch) {
+        fields[2].assign(1, *pch++);
+        DoFields(0, fields);
+      }
+      return;
+    }
+  }
+} // Lattice::AddExtra
 
 BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
   FOOTMARK();
@@ -828,6 +839,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
   for (; index < length; ++index) {
     if (refs[index] == 0) continue;
 
+    // 。。。
     if (is_period(pre[index])) {
       size_t saved = index;
       do {
@@ -852,6 +864,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
       --index;
       continue;
     }
+    // ・・・
     if (pre[index] == L'・') {
       size_t saved = index;
       do {
@@ -860,7 +873,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
 
       fields.resize(4);
       fields[0] = pre.substr(saved, index - saved);
-      fields[1] = MAKEWORD(HB_SYMBOLS, 0);
+      fields[1] = MAKEWORD(HB_SYMBOL, 0);
       switch (index - saved) {
       case 2:
         fields[2] += L'‥';
@@ -876,6 +889,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
       --index;
       continue;
     }
+    // 、、、
     if (is_comma(pre[index])) {
       size_t saved = index;
       do {
@@ -890,6 +904,31 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
       --index;
       continue;
     }
+    // →
+    if ((pre[index] == '-' || pre[index] == '－') &&
+        (pre[index + 1] == '>' || pre[index + 1] == '＞'))
+    {
+      fields.resize(4);
+      fields[0] = pre.substr(index, 2);
+      fields[1] = MAKEWORD(HB_SYMBOL, 0);
+      fields[2] += L'→';
+      DoFields(index, fields);
+      ++index;
+      continue;
+    }
+    // ←
+    if ((pre[index] == '<' || pre[index] == '＜') &&
+        (pre[index + 1] == '-' || pre[index + 1] == '－'))
+    {
+      fields.resize(4);
+      fields[0] = pre.substr(index, 2);
+      fields[1] = MAKEWORD(HB_SYMBOL, 0);
+      fields[2] += L'←';
+      DoFields(index, fields);
+      ++index;
+      continue;
+    }
+    // other non-hiragana
     if (!is_hiragana(pre[index])) {
       size_t saved = index;
       do {
@@ -1893,7 +1932,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields) {
   case HB_MEISHI:
     DoMeishi(index, fields);
     break;
-  case HB_PERIOD: case HB_COMMA: case HB_SYMBOLS:
+  case HB_PERIOD: case HB_COMMA: case HB_SYMBOL:
   case HB_RENTAISHI: case HB_FUKUSHI:
   case HB_SETSUZOKUSHI: case HB_KANDOUSHI:
   case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
@@ -2097,7 +2136,7 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
         if (node1->HasTag(L"[数詞]")) {
           if (node2->HasTag(L"[数詞]") || node2->HasTag(L"[数単位]")) {
             ++len;
-            node2->cost = -1;
+            node2->cost -= 100;
           }
         }
         if (max_len < len) {
@@ -2112,13 +2151,13 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
           if (node1->HasTag(L"[数詞]")) {
             if (node2->HasTag(L"[数詞]") || node2->HasTag(L"[数単位]")) {
               ++len;
-              node2->cost = -1;
+              node2->cost -= 100;
             }
           } else {
             if (node2->HasTag(L"[数詞]")) {
               if (node3->HasTag(L"[数詞]") || node3->HasTag(L"[数単位]")) {
                 ++len;
-                node2->cost = -1;
+                node2->cost -= 100;
               }
             }
           }

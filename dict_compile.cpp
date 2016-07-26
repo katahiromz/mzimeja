@@ -133,6 +133,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
       else if (bunrui_str == L"副助詞")     entry.bunrui = HB_FUKU_JOSHI;
       else if (bunrui_str == L"終助詞")     entry.bunrui = HB_SHUU_JOSHI;
       else if (bunrui_str == L"カンマ")     entry.bunrui = HB_COMMA;
+      else if (bunrui_str == L"記号類")     entry.bunrui = HB_SYMBOL;
       else continue;
     } else if (bunrui_str.size() == 4) {
       if (bunrui_str == L"い形容詞")        entry.bunrui = HB_IKEIYOUSHI;

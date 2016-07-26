@@ -381,7 +381,7 @@ enum HinshiBunrui {
   HB_SETSUBIJI,         // 接尾辞
   HB_PERIOD,            // 句点（。）
   HB_COMMA,             // 読点（、）
-  HB_SYMBOLS            // 記号類
+  HB_SYMBOL             // 記号類
 }; // enum HinshiBunrui
 
 enum KatsuyouKei {
