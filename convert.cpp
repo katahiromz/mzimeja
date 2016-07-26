@@ -2070,7 +2070,6 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
     if (!lattice.AddNodesForSingle(dict_data)) {
       lattice.AddComplement(0, pre.size(), pre.size());
     }
-    assert(lattice.chunks[0].size());
 
     // unlock the dictionary
     m_basic_dict.Unlock(dict_data);
@@ -2103,7 +2102,20 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
       } else {
         for (size_t ib2 = 0; ib2 < node2->branches.size(); ++ib2) {
           LatticeNodePtr& node3 = node2->branches[ib2];
-          const size_t len = node2->pre.size() + node3->pre.size();
+          size_t len = node2->pre.size() + node3->pre.size();
+          if (node1->HasTag(L"[”ŽŒ]")) {
+            if (node2->HasTag(L"[”ŽŒ]") || node2->HasTag(L"[”’PˆÊ]")) {
+              ++len;
+              node2->cost = -1;
+            }
+          } else {
+            if (node2->HasTag(L"[”ŽŒ]")) {
+              if (node3->HasTag(L"[”ŽŒ]") || node3->HasTag(L"[”’PˆÊ]")) {
+                ++len;
+                node2->cost = -1;
+              }
+            }
+          }
           if (max_len < len) {
             max_len1 = node2->pre.size();
             max_len = len;
