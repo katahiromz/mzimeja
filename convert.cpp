@@ -2093,7 +2093,13 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
     for (size_t ib1 = 0; ib1 < node1->branches.size(); ++ib1) {
       LatticeNodePtr& node2 = node1->branches[ib1];
       if (node2->branches.empty()) {
-        const size_t len = node2->pre.size();
+        size_t len = node2->pre.size();
+        if (node1->HasTag(L"[”ŽŒ]")) {
+          if (node2->HasTag(L"[”ŽŒ]") || node2->HasTag(L"[”’PˆÊ]")) {
+            ++len;
+            node2->cost = -1;
+          }
+        }
         if (max_len < len) {
           max_len1 = node2->pre.size();
           max_len = len;
