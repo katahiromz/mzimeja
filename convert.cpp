@@ -908,8 +908,8 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
       continue;
     }
     // Å®
-    if ((pre[index] == '-' || pre[index] == 'Å|') &&
-        (pre[index + 1] == '>' || pre[index + 1] == 'ÅÑ'))
+    if ((pre[index] == L'-' || pre[index] == L'Å|') &&
+        (pre[index + 1] == L'>' || pre[index + 1] == L'ÅÑ'))
     {
       fields.resize(4);
       fields[0] = pre.substr(index, 2);
@@ -920,8 +920,8 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
       continue;
     }
     // Å©
-    if ((pre[index] == '<' || pre[index] == 'ÅÉ') &&
-        (pre[index + 1] == '-' || pre[index + 1] == 'Å|'))
+    if ((pre[index] == L'<' || pre[index] == L'ÅÉ') &&
+        (pre[index + 1] == L'-' || pre[index + 1] == L'Å|'))
     {
       fields.resize(4);
       fields[0] = pre.substr(index, 2);
