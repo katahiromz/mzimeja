@@ -443,7 +443,7 @@ struct Lattice {
   void CutUnlinkedNodes();
   size_t GetLastLinkedIndex() const;
 
-  void DoFields(size_t index, const WStrings& fields);
+  void DoFields(size_t index, const WStrings& fields, int cost = 0);
 
   void DoMeishi(size_t index, const WStrings& fields);
   void DoIkeiyoushi(size_t index, const WStrings& fields);

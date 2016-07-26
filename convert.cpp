@@ -809,7 +809,8 @@ void Lattice::AddExtra() {
     L"‚½‚Ä", L"‚½‚Ä‚Ð‚¾‚è", L"‚½‚Ä‚Ý‚¬", L"‚Ð‚¾‚è‚¤‚¦",
     L"‚Ð‚¾‚è‚µ‚½", L"‚Ó‚Æ‚í‚­", L"‚Ù‚»‚í‚­", L"‚Ü‚ñ‚È‚©",
     L"‚Ý‚¬‚¤‚¦", L"‚Ý‚¬‚µ‚½", L"‚æ‚±", L"‚æ‚±‚¤‚¦", L"‚æ‚±‚µ‚½",
-    L"‚¨‚È‚¶", L"‚â‚¶‚é‚µ", L"‚¬‚è‚µ‚á"
+    L"‚¨‚È‚¶", L"‚â‚¶‚é‚µ", L"‚¬‚è‚µ‚á",
+    L"‚¤‚¦", L"‚µ‚½", L"‚Ð‚¾‚è", L"‚Ý‚¬"
   };
   for (size_t i = 0; i < _countof(s_words); ++i) {
     if (pre == s_words[i]) {
@@ -818,9 +819,11 @@ void Lattice::AddExtra() {
       WStrings fields(4);
       fields[0] = pre;
       fields[1].assign(1, MAKEWORD(HB_SYMBOL, 0));
+      int cost = 0;
       while (*pch) {
         fields[2].assign(1, *pch++);
-        DoFields(0, fields);
+        DoFields(0, fields, cost);
+        ++cost;
       }
       return;
     }
@@ -1909,7 +1912,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
   }
 } // Lattice::DoMeishi
 
-void Lattice::DoFields(size_t index, const WStrings& fields) {
+void Lattice::DoFields(size_t index, const WStrings& fields, int cost/* = 0*/) {
   assert(fields.size() == 4);
   const size_t length = fields[0].size();
   if (index + length > pre.size()) {
@@ -1926,7 +1929,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields) {
   node.bunrui = (HinshiBunrui)LOBYTE(w);
   node.gyou = (Gyou)HIBYTE(w);
   node.tags = fields[3];
-  node.cost = node.CalcCost();
+  node.cost = node.CalcCost() + cost;
 
   switch (node.bunrui) {
   case HB_MEISHI:
