@@ -690,10 +690,35 @@ int LatticeNode::CalcCost() const {
   return ret;
 }
 
+bool LatticeNode::IsDoushi() const {
+  switch (bunrui) {
+  case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
+  case HB_KAHEN_DOUSHI: case HB_SAHEN_DOUSHI:
+    return true;
+  default:
+    break;
+  }
+  return false;
+}
+
+bool LatticeNode::IsJodoushi() const {
+  switch (bunrui) {
+  case HB_JODOUSHI:
+  case HB_MIZEN_JODOUSHI: case HB_RENYOU_JODOUSHI:
+  case HB_SHUUSHI_JODOUSHI: case HB_RENTAI_JODOUSHI:
+  case HB_KATEI_JODOUSHI: case HB_MEIREI_JODOUSHI:
+    return true;
+  default:
+    break;
+  }
+  return false;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Lattice
 
 void Lattice::AddExtra() {
+  FOOTMARK();
   if (pre == L"Ç´ÇÂÇ§") {
     SYSTEMTIME st;
     ::GetLocalTime(&st);
@@ -2137,6 +2162,17 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
       LatticeNodePtr& node2 = node1->branches[ib1];
       if (node2->branches.empty()) {
         size_t len = node2->pre.size();
+        // (doushi or jodoushi) + jodoushi
+        if ((node1->IsDoushi() || node1->IsJodoushi()) && node2->IsJodoushi()) {
+          ++len;
+          node2->cost -= 80;
+        }
+        // jodoushi + shuu joshi
+        if (node1->IsJodoushi() && node2->bunrui == HB_SHUU_JOSHI) {
+          ++len;
+          node2->cost -= 30;
+        }
+        // suushi + (suushi or number unit)
         if (node1->HasTag(L"[êîéå]")) {
           if (node2->HasTag(L"[êîéå]") || node2->HasTag(L"[êîíPà ]")) {
             ++len;
@@ -2152,6 +2188,27 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
         for (size_t ib2 = 0; ib2 < node2->branches.size(); ++ib2) {
           LatticeNodePtr& node3 = node2->branches[ib2];
           size_t len = node2->pre.size() + node3->pre.size();
+          // (doushi or jodoushi) + jodoushi
+          if ((node1->IsDoushi() || node1->IsJodoushi()) && node2->IsJodoushi()) {
+            ++len;
+            node2->cost -= 80;
+          } else {
+            if ((node2->IsDoushi() || node2->IsJodoushi()) && node3->IsJodoushi()) {
+              ++len;
+              node2->cost -= 80;
+            }
+          }
+          // jodoushu + shuu joshi
+          if (node1->IsJodoushi() && node2->bunrui == HB_SHUU_JOSHI) {
+            ++len;
+            node2->cost -= 30;
+          } else {
+            if (node2->IsJodoushi() && node3->bunrui == HB_SHUU_JOSHI) {
+              ++len;
+              node2->cost -= 30;
+            }
+          }
+          // suushi + (suushi or number unit)
           if (node1->HasTag(L"[êîéå]")) {
             if (node2->HasTag(L"[êîéå]") || node2->HasTag(L"[êîíPà ]")) {
               ++len;
@@ -2475,6 +2532,8 @@ BOOL MzIme::StretchClauseLeft(
   wchar_t ch = str1[str1.size() - 1];
   str1.resize(str1.size() - 1);
 
+  DebugPrintA("OK3\n");
+
   std::wstring str2;
   BOOL bSplitted = FALSE;
   if (iClause + 1 < comp.GetClauseCount()) {
@@ -2516,13 +2575,18 @@ BOOL MzIme::StretchClauseLeft(
     }
     cand.cand_lists[iClause] = cand_list;
   }
+
   {
     LogCandList cand_list;
     for (size_t i = 0; i < clause2.candidates.size(); ++i) {
       MzConversionCandidate& cand = clause2.candidates[i];
       cand_list.cand_strs.push_back(cand.converted);
     }
-    cand.cand_lists[iClause + 1] = cand_list;
+    if (bSplitted) {
+      cand.cand_lists.push_back(cand_list);
+    } else {
+      cand.cand_lists[iClause + 1] = cand_list;
+    }
   }
 
   cand.iClause = iClause;

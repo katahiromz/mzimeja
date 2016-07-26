@@ -422,6 +422,8 @@ struct LatticeNode {
     return tags.find(tag) != std::wstring::npos;
   }
   int CalcCost() const;
+  bool IsDoushi() const;
+  bool IsJodoushi() const;
 };
 typedef std::vector<LatticeNodePtr>   LatticeChunk;
 

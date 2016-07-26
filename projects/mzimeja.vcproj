@@ -140,7 +140,7 @@
 				AdditionalDependencies="advapi32.lib comctl32.lib imm32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).ime"
 				LinkIncremental="1"
-				ModuleDefinitionFile="mzimeja.def"
+				ModuleDefinitionFile="..\mzimeja.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
