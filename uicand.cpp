@@ -11,6 +11,65 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
+DWORD CandWnd_HitTest(HWND hWnd, POINT pt, InputContext *lpIMC) {
+  FOOTMARK();
+  DWORD ret = 0;
+  int height = 0;
+  HDC hDC = ::CreateCompatibleDC(NULL);
+  HFONT hOldFont = CheckNativeCharset(hDC);
+  CandInfo *lpCandInfo = lpIMC->LockCandInfo();
+  if (lpCandInfo) {
+    if (lpCandInfo->dwCount > 0) {
+      CANDINFOEXTRA *pExtra = lpCandInfo->GetExtra();
+      DWORD iList = 0;
+      if (pExtra) iList = pExtra->iClause;
+      CandList *lpCandList = lpCandInfo->GetList(iList);
+      DWORD i, end = lpCandList->GetPageEnd();
+      for (i = lpCandList->dwPageStart; i < end; ++i) {
+        WCHAR *psz = lpCandList->GetCandString(i);
+        SIZE siz;
+        ::GetTextExtentPoint32W(hDC, psz, ::lstrlenW(psz), &siz);
+        INT cy = siz.cy + CY_BORDER * 2;
+        if (height <= pt.y && pt.y < height + cy) {
+          ret = i;
+          break;
+        }
+        height += cy;
+      }
+    }
+    lpIMC->UnlockCandInfo();
+  }
+  if (hOldFont) {
+    ::DeleteObject(::SelectObject(hDC, hOldFont));
+  }
+  ::DeleteDC(hDC);
+  return ret;
+}
+
+void CandWnd_OnClick(HWND hWnd) {
+  POINT pt;
+  ::GetCursorPos(&pt);
+  ::ScreenToClient(hWnd, &pt);
+
+  DWORD dwSelection = 0xFFFFFFFF;
+  HWND hSvrWnd = (HWND)::GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
+  HIMC hIMC = (HIMC)::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+  if (hIMC) {
+    InputContext *lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      dwSelection = CandWnd_HitTest(hWnd, pt, lpIMC);
+      lpIMC->SelectCand(dwSelection);
+      TheIME.UnlockIMC(hIMC);
+    }
+  }
+
+  if (dwSelection != 0xFFFFFFFF) {
+    LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
+    TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+    TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+  }
+} // CandWnd_OnClick
+
 LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
   FOOTMARK();
@@ -22,15 +81,10 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     break;
 
   case WM_SETCURSOR:
-  case WM_MOUSEMOVE:
-  case WM_LBUTTONUP:
-  case WM_RBUTTONUP:
-    DragUI(hWnd, message, wParam, lParam);
-    if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
-        (HIWORD(lParam) != WM_RBUTTONDOWN))
-      return ::DefWindowProc(hWnd, message, wParam, lParam);
-    if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP))
-      ::SetWindowLong(hWnd, FIGWL_MOUSE, 0);
+    if (HIWORD(lParam) == WM_LBUTTONUP) {
+      CandWnd_OnClick(hWnd);
+    }
+    ::SetCursor(::LoadCursor(NULL, IDC_ARROW));
     break;
 
   case WM_MOVE:
@@ -55,8 +109,10 @@ BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt
   CandInfo *lpCandInfo = lpIMC->LockCandInfo();
   if (lpCandInfo) {
     if (lpCandInfo->dwCount > 0) ret = TRUE;
-    CANDINFOEXTRA *extra = lpCandInfo->GetExtra();
-    if (extra) iClause = extra->iClause;
+    CANDINFOEXTRA *pExtra = lpCandInfo->GetExtra();
+    if (pExtra) {
+      iClause = pExtra->iClause;
+    }
     lpIMC->UnlockCandInfo();
 
     if (ret) {
@@ -114,60 +170,62 @@ void CandWnd_Paint(HWND hCandWnd) {
   HIMC hIMC = (HIMC)::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
   if (hIMC) {
     InputContext *lpIMC = TheIME.LockIMC(hIMC);
-    HFONT hOldFont = CheckNativeCharset(hDC);
-    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
-    if (lpCandInfo) {
-      INT x1 = ::GetSystemMetrics(SM_CXEDGE);
-      INT x2 = ::GetSystemMetrics(SM_CXEDGE) + CX_HEADER + CX_BORDER * 2;
-      INT y = ::GetSystemMetrics(SM_CYEDGE);
-      CANDINFOEXTRA *extra = lpCandInfo->GetExtra();
-      DWORD iList = 0;
-      if (extra) iList = extra->iClause;
-      CandList *lpCandList = lpCandInfo->GetList(iList);
-      WCHAR sz[4];
-      DWORD i, k = 1, end = lpCandList->GetPageEnd();
-      for (i = lpCandList->dwPageStart; i < end; ++i, ++k) {
-        // get size of cand string
-        WCHAR *psz = lpCandList->GetCandString(i);
-        SIZE siz;
-        ::GetTextExtentPoint32W(hDC, psz, lstrlenW(psz), &siz);
+    if (lpIMC) {
+      HFONT hOldFont = CheckNativeCharset(hDC);
+      CandInfo *lpCandInfo = lpIMC->LockCandInfo();
+      if (lpCandInfo) {
+        INT x1 = ::GetSystemMetrics(SM_CXEDGE);
+        INT x2 = ::GetSystemMetrics(SM_CXEDGE) + CX_HEADER + CX_BORDER * 2;
+        INT y = ::GetSystemMetrics(SM_CYEDGE);
+        CANDINFOEXTRA *pExtra = lpCandInfo->GetExtra();
+        DWORD iList = 0;
+        if (pExtra) iList = pExtra->iClause;
+        CandList *lpCandList = lpCandInfo->GetList(iList);
+        WCHAR sz[4];
+        DWORD i, k = 1, end = lpCandList->GetPageEnd();
+        for (i = lpCandList->dwPageStart; i < end; ++i, ++k) {
+          // get size of cand string
+          WCHAR *psz = lpCandList->GetCandString(i);
+          SIZE siz;
+          ::GetTextExtentPoint32W(hDC, psz, lstrlenW(psz), &siz);
 
-        // draw header
-        RECT rcHeader;
-        ::SetRect(&rcHeader, x1, y + CY_BORDER,
-          x1 + CX_HEADER, y + siz.cy + CY_BORDER * 2);
-        ::DrawFrameControl(hDC, &rcHeader, DFC_BUTTON,
-                           DFCS_BUTTONPUSH | DFCS_ADJUSTRECT);
-        wsprintfW(sz, L"%u", k);
-        ::SetTextColor(hDC, ::GetSysColor(COLOR_BTNTEXT));
-        ::InflateRect(&rcHeader, -::GetSystemMetrics(SM_CXBORDER), 0);
-        ::DrawTextW(hDC, sz, -1, &rcHeader,
-          DT_SINGLELINE | DT_RIGHT | DT_VCENTER | DT_NOCLIP | DT_NOPREFIX);
+          // draw header
+          RECT rcHeader;
+          ::SetRect(&rcHeader, x1, y + CY_BORDER,
+            x1 + CX_HEADER, y + siz.cy + CY_BORDER * 2);
+          ::DrawFrameControl(hDC, &rcHeader, DFC_BUTTON,
+                             DFCS_BUTTONPUSH | DFCS_ADJUSTRECT);
+          wsprintfW(sz, L"%u", k);
+          ::SetTextColor(hDC, ::GetSysColor(COLOR_BTNTEXT));
+          ::InflateRect(&rcHeader, -::GetSystemMetrics(SM_CXBORDER), 0);
+          ::DrawTextW(hDC, sz, -1, &rcHeader,
+            DT_SINGLELINE | DT_RIGHT | DT_VCENTER | DT_NOCLIP | DT_NOPREFIX);
 
-        // draw text
-        RECT rcText;
-        ::SetRect(&rcText, x2, y + CY_BORDER,
-                  rc.right, y + siz.cy + CY_BORDER * 2);
-        ::InflateRect(&rcHeader, -CX_BORDER, -CY_BORDER);
-        if (lpCandList->dwSelection == i) {
-          ::SetTextColor(hDC, ::GetSysColor(COLOR_HIGHLIGHTTEXT));
-          ::FillRect(hDC, &rcText, (HBRUSH)(COLOR_HIGHLIGHT + 1));
-        } else {
-          ::SetTextColor(hDC, ::GetSysColor(COLOR_WINDOWTEXT));
-          ::FillRect(hDC, &rcText, (HBRUSH)(COLOR_WINDOW + 1));
+          // draw text
+          RECT rcText;
+          ::SetRect(&rcText, x2, y + CY_BORDER,
+                    rc.right, y + siz.cy + CY_BORDER * 2);
+          ::InflateRect(&rcHeader, -CX_BORDER, -CY_BORDER);
+          if (lpCandList->dwSelection == i) {
+            ::SetTextColor(hDC, ::GetSysColor(COLOR_HIGHLIGHTTEXT));
+            ::FillRect(hDC, &rcText, (HBRUSH)(COLOR_HIGHLIGHT + 1));
+          } else {
+            ::SetTextColor(hDC, ::GetSysColor(COLOR_WINDOWTEXT));
+            ::FillRect(hDC, &rcText, (HBRUSH)(COLOR_WINDOW + 1));
+          }
+          ::DrawTextW(hDC, psz, -1, &rcText,
+            DT_SINGLELINE | DT_LEFT | DT_VCENTER | DT_NOCLIP | DT_NOPREFIX);
+
+          // go to next line
+          y += siz.cy + CY_BORDER * 2;
         }
-        ::DrawTextW(hDC, psz, -1, &rcText,
-          DT_SINGLELINE | DT_LEFT | DT_VCENTER | DT_NOCLIP | DT_NOPREFIX);
-
-        // go to next line
-        y += siz.cy + CY_BORDER * 2;
+        lpIMC->UnlockCandInfo();
       }
-      lpIMC->UnlockCandInfo();
+      if (hOldFont) {
+        ::DeleteObject(SelectObject(hDC, hOldFont));
+      }
+      TheIME.UnlockIMC(hIMC);
     }
-    if (hOldFont) {
-      ::DeleteObject(SelectObject(hDC, hOldFont));
-    }
-    TheIME.UnlockIMC(hIMC);
   }
   ::EndPaint(hCandWnd, &ps);
 } // CandWnd_Paint
@@ -180,9 +238,9 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
   CandInfo *lpCandInfo = lpIMC->LockCandInfo();
   if (lpCandInfo) {
     if (lpCandInfo->dwCount > 0) {
-      CANDINFOEXTRA *extra = lpCandInfo->GetExtra();
+      CANDINFOEXTRA *pExtra = lpCandInfo->GetExtra();
       DWORD iList = 0;
-      if (extra) iList = extra->iClause;
+      if (pExtra) iList = pExtra->iClause;
       CandList *lpCandList = lpCandInfo->GetList(iList);
       DWORD i, end = lpCandList->GetPageEnd();
       for (i = lpCandList->dwPageStart; i < end; ++i) {

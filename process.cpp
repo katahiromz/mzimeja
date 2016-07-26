@@ -86,7 +86,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     if (bOpen) {
       SetInputMode(hIMC, IMODE_HALF_ASCII);
     } else {
-      SetInputMode(hIMC, IMODE_FULL_KATAKANA);
+      SetInputMode(hIMC, IMODE_FULL_HIRAGANA);
     }
     break;
 
