@@ -176,6 +176,19 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     }
     break;
 
+  case VK_NONCONVERT:
+    lpIMC = TheIME.LockIMC(hIMC);
+    if (lpIMC) {
+      if (lpIMC->HasCompStr()) {
+        lpIMC->MakeHiragana();
+      } else {
+        TheIME.GenerateMessage(WM_IME_KEYDOWN, VK_NONCONVERT, 1);
+        TheIME.GenerateMessage(WM_IME_KEYUP, VK_NONCONVERT, 0xC0000001);
+      }
+      TheIME.UnlockIMC(hIMC);
+    }
+    break;
+
   case VK_F6:
     lpIMC = TheIME.LockIMC(hIMC);
     if (lpIMC) {
