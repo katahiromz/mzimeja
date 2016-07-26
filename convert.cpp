@@ -679,7 +679,7 @@ void MzConversionResult::sort() {
 int LatticeNode::CalcCost() const {
   int ret = 0;
   if (bunrui == HB_KANGO) ret += 200;
-  if (bunrui == HB_SYMBOL) ret += 100;
+  if (bunrui == HB_SYMBOL) ret += 120;
   if (tags.size() != 0) {
     if (HasTag(L"[îÒïWèÄ]")) ret += 100;
     if (HasTag(L"[ïsãﬁêT]")) ret += 50;
