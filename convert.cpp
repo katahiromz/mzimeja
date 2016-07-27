@@ -2153,6 +2153,7 @@ void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
   FOOTMARK();
   result.clear();
 
+  // 2ï∂êﬂç≈í∑àÍívñ@ÅEâ¸
   const size_t length = lattice.pre.size();
   LatticeNodePtr node1 = lattice.head;
   LatticeNodePtr tail = lattice.chunks[length][0];
