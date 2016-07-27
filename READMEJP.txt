@@ -100,7 +100,7 @@ Windows 2000 の場合、次の手順でMZ-IMEをインストールできます。
     [半角／全角]            IMEのON/OFFを切り替え
     [スペース]              かな漢字変換
     [変換]                  かな漢字変換
-    [Esc]/[Escape]          元に戻る
+    [Esc]/[Escape]          元に戻す／キャンセルする
     [BkSp]/[BackSpace]      直前の文字を消す
     [Del]/[Delete]          直後の文字を消す
     [Enter]                 決定
