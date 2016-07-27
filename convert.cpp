@@ -5,8 +5,8 @@
 #include "mzimeja.h"
 
 const DWORD c_dwMilliseconds = 8000;
-const DWORD c_retry_count = 32;
 
+// hiragana table
 static const wchar_t s_hiragana_table[][5] = {    
   {L'あ', L'い', L'う', L'え', L'お'},   // GYOU_A
   {L'か', L'き', L'く', L'け', L'こ'},   // GYOU_KA
@@ -62,7 +62,7 @@ static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
     L"HB_SYMBOL"
   };
   return s_array[index];
-}
+} // BunruiToString
 
 // 品詞の連結コスト
 static int
@@ -2063,6 +2063,7 @@ void Lattice::Dump(int num) {
 
 BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
   FOOTMARK();
+  const DWORD c_retry_count = 32;
 
   if (!m_basic_dict.IsLoaded()) {
     return FALSE;
