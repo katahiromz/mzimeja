@@ -29,6 +29,7 @@ Table of Contents
   input.cpp           | mzimeja input context and related
   input.h             | mzimeja input context and related
   installer.iss       | Installer Settings for Inno Setup
+  installerd.iss      | Installer Settings (Debug Version) for Inno Setup
   kanji.dat           | mzimeja kanji data
   keychar.cpp         | mzimeja keys and characters
   Makefile.msys       | Makefile for MSYS
