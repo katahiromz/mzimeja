@@ -5,13 +5,13 @@
 これは何？
 ----------
 
-これは、「MZ-IME日本語入力」(mzimeja)です。
-このプログラムは、Windows 2000用の日本語入力システム（IME）です。
+これは、片山博文MZによる「MZ-IME日本語入力」(mzimeja)です。
+このプログラムは、Windowsで動作する日本語入力システム（IME）です。
 
 動作環境
 --------
 
- * 日本語 Windows 2000 / XP / Vista / Server 2003 / 7
+ * Windows 2000 / XP / Vista / Server 2003 / 7
 
 MZ-IMEの特徴
 ------------
