@@ -2314,7 +2314,7 @@ void MzIme::MakeResult(MzConvResult& result, const std::wstring& pre) {
   node.post = pre;
   node.cost = 0;
   node.bunrui = HB_MEISHI;
-  
+
   MzConvClause clause;
   clause.add(&node);
   node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_FULLWIDTH);
