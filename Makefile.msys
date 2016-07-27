@@ -87,7 +87,7 @@ VERINFO_FILE = verinfo.exe
 
 #############################################################################
 
-all: $(IME_FILE) $(SETUP_FILE) $(IMEPAD_FILE) $(DICT_COMPILE_FILE) $(VERINFO_FILE) make_dict
+all: $(IME_FILE) $(SETUP_FILE) $(IMEPAD_FILE) $(DICT_COMPILE_FILE) $(VERINFO_FILE) res/mzimeja.dic res/name.dic
 
 $(IME_FILE): $(OBJS)
 	$(CXX) -mdll -o $(IME_FILE) $(CXXFLAGS) $(OBJS) $(LIBS) mzimeja.def
@@ -104,8 +104,10 @@ $(DICT_COMPILE_FILE): $(DICT_COMPILE_OBJS)
 $(VERINFO_FILE): $(VERINFO_OBJS)
 	$(CXX) -mwindows -o $(VERINFO_FILE) $(CXXFLAGS) $(VERINFO_OBJS) $(VERINFO_LIBS)
 
-make_dict: $(VERINFO_FILE) res/mzimeja.dat res/name.dat
+res/mzimeja.dic: $(DICT_COMPILE_FILE) res/mzimeja.dat
 	./$(DICT_COMPILE_FILE) res/mzimeja.dat res/mzimeja.dic
+
+res/name.dic: $(DICT_COMPILE_FILE) res/name.dat
 	./$(DICT_COMPILE_FILE) res/name.dat res/name.dic
 
 cand_info$(DOTOBJ): cand_info.cpp
