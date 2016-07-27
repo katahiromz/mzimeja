@@ -21,9 +21,9 @@ Table of Contents
   config.cpp          | mzimeja configuration
   convert.cpp         | mzimeja kana kanji conversion
   dict_compile.cpp    | dictionary compiler of MZ-IME Japanese Input
-  dict_compile.rc     | resource of dict_compile
+  dict_compile.rc     | resource file of dict_compile
   imepad.cpp          | IME Pad (helps user input Kanji characters)
-  imepad.rc           | resource of IME Pad
+  imepad.rc           | resource file of IME Pad
   imm.cpp             | IME/IMM related
   immsec.cpp          | IMM security related
   input.cpp           | mzimeja input context and related
@@ -47,6 +47,8 @@ Table of Contents
   uicomp.cpp          | mzimeja composition window UI
   uiguide.cpp         | mzimeja guideline window UI
   uistate.cpp         | mzimeja status window UI
+  verinfo.cpp         | mzimeja version info program
+  verinfo.rc          | resource file of verinfo
   --------------------+---------------------------------------------------
 
 How To Build
