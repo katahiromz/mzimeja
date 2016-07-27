@@ -33,7 +33,7 @@ LANGUAGE LANG_JAPANESE, 0x1
 FONT 10, "ＭＳ Ｐゴシック"
 BEGIN
    CONTROL "", ico1, "STATIC", SS_ICON | WS_CHILD | WS_VISIBLE | WS_GROUP, 5, 5, 20, 20
-   CONTROL "MZ-IME日本語入力 0.6\nby 片山博文MZ\nPublic Domain Software (PDS)", 0, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 33, 5, 145, 30
+   CONTROL "MZ-IME日本語入力 0.7\nby 片山博文MZ\nPublic Domain Software (PDS)", 0, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 33, 5, 145, 30
    CONTROL "OK", IDOK, "BUTTON", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 5, 45, 60, 14
    CONTROL "ホームページへ移動(&M)", psh1, "BUTTON", BS_PUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 70, 45, 110, 14
 END
@@ -42,8 +42,8 @@ END
 // Version Info
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     0, 6, 0, 0
-PRODUCTVERSION  0, 6, 0, 0
+FILEVERSION     0, 7, 0, 0
+PRODUCTVERSION  0, 7, 0, 0
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 BEGIN
@@ -54,10 +54,10 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "片山博文MZ\0"
             VALUE "FileDescription", "MZ-IME日本語入力 バージョン情報\0"
-            VALUE "FileVersion", "0.6\0"
+            VALUE "FileVersion", "0.7\0"
             VALUE "LegalCopyright", "Copyright (C) 2016 片山博文MZ.\0"
             VALUE "ProductName", "MZ-IME日本語入力\0"
-            VALUE "ProductVersion", "0.6\0"
+            VALUE "ProductVersion", "0.7\0"
         END
     END
     BLOCK "VarFileInfo"
