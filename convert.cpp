@@ -605,9 +605,9 @@ BOOL Dict::IsLoaded() const {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// MzConversionResult, MzConversionClause etc.
+// MzConvResult, MzConvClause etc.
 
-void MzConversionClause::add(const LatticeNode *node) {
+void MzConvClause::add(const LatticeNode *node) {
   bool matched = false;
   for (size_t i = 0; i < candidates.size(); ++i) {
     if (candidates[i].converted == node->post) {
@@ -622,7 +622,7 @@ void MzConversionClause::add(const LatticeNode *node) {
   }
 
   if (!matched) {
-    MzConversionCandidate cand;
+    MzConvCandidate cand;
     cand.hiragana = node->pre;
     cand.converted = node->post;
     cand.cost = node->cost;
@@ -633,25 +633,25 @@ void MzConversionClause::add(const LatticeNode *node) {
 }
 
 static inline bool CandidateCompare(
-  const MzConversionCandidate& cand1, const MzConversionCandidate& cand2)
+  const MzConvCandidate& cand1, const MzConvCandidate& cand2)
 {
   FOOTMARK();
   return cand1.cost < cand2.cost;
 }
 
-void MzConversionClause::sort() {
+void MzConvClause::sort() {
   FOOTMARK();
   std::sort(candidates.begin(), candidates.end(), CandidateCompare);
 }
 
-void MzConversionResult::sort() {
+void MzConvResult::sort() {
   FOOTMARK();
 
   for (size_t i = 1; i < clauses.size(); ++i) {
     for (size_t iCand1 = 0; iCand1 < clauses[i - 1].candidates.size(); ++iCand1) {
       for (size_t iCand2 = 0; iCand2 < clauses[i].candidates.size(); ++iCand2) {
-        MzConversionCandidate& cand1 = clauses[i - 1].candidates[iCand1];
-        MzConversionCandidate& cand2 = clauses[i].candidates[iCand2];
+        MzConvCandidate& cand1 = clauses[i - 1].candidates[iCand1];
+        MzConvCandidate& cand2 = clauses[i].candidates[iCand2];
         int min_cost = 0x7FFF;
         std::set<HinshiBunrui>::iterator it1, end1 = cand1.bunruis.end();
         std::set<HinshiBunrui>::iterator it2, end2 = cand2.bunruis.end();
@@ -2149,7 +2149,7 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
   return FALSE; // failure
 } // MzIme::MakeLatticeForSingle
 
-void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
+void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
   FOOTMARK();
   result.clear();
 
@@ -2239,7 +2239,7 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
 
     // add clause
     if (node1->branches[kb1]->pre.size()) {
-      MzConversionClause clause;
+      MzConvClause clause;
       clause.add(node1->branches[kb1].get());
       result.clauses.push_back(clause);
     }
@@ -2252,7 +2252,7 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
   size_t index = 0, iClause = 0;
   while (index < length && iClause < result.clauses.size()) {
     const LatticeChunk& chunk = lattice.chunks[index];
-    MzConversionClause& clause = result.clauses[iClause];
+    MzConvClause& clause = result.clauses[iClause];
 
     std::wstring hiragana = clause.candidates[0].hiragana;
     const size_t size = hiragana.size();
@@ -2303,7 +2303,7 @@ void MzIme::MakeResult(MzConversionResult& result, Lattice& lattice) {
   result.sort();
 } // MzIme::MakeResult
 
-void MzIme::MakeResult(MzConversionResult& result, const std::wstring& pre) {
+void MzIme::MakeResult(MzConvResult& result, const std::wstring& pre) {
   FOOTMARK();
   result.clear();
 
@@ -2313,7 +2313,7 @@ void MzIme::MakeResult(MzConversionResult& result, const std::wstring& pre) {
   node.cost = 0;
   node.bunrui = HB_MEISHI;
   
-  MzConversionClause clause;
+  MzConvClause clause;
   clause.add(&node);
   node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_FULLWIDTH);
   clause.add(&node);
@@ -2321,14 +2321,14 @@ void MzIme::MakeResult(MzConversionResult& result, const std::wstring& pre) {
   result.clauses.push_back(clause);
 }
 
-void MzIme::MakeResultForSingle(MzConversionResult& result, Lattice& lattice) {
+void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
   FOOTMARK();
   result.clear();
 
   const size_t length = lattice.pre.size();
 
   // add other candidates
-  MzConversionClause clause;
+  MzConvClause clause;
   assert(lattice.chunks.size());
   const LatticeChunk& chunk = lattice.chunks[0];
   for (size_t i = 0; i < chunk.size(); ++i) {
@@ -2362,7 +2362,7 @@ BOOL MzIme::ConvertMultiClause(
   LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
   FOOTMARK();
-  MzConversionResult result;
+  MzConvResult result;
   std::wstring strHiragana = comp.extra.hiragana_clauses[comp.extra.iClause];
   if (!ConvertMultiClause(strHiragana, result)) {
     return FALSE;
@@ -2372,7 +2372,7 @@ BOOL MzIme::ConvertMultiClause(
 } // MzIme::ConvertMultiClause
 
 BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana,
-                               MzConversionResult& result)
+                               MzConvResult& result)
 {
   FOOTMARK();
 
@@ -2395,9 +2395,9 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana,
   WCHAR sz[64];
   result.clauses.clear();
   for (DWORD iClause = 0; iClause < 5; ++iClause) {
-    MzConversionClause clause;
+    MzConvClause clause;
     for (DWORD iCand = 0; iCand < 18; ++iCand) {
-      MzConversionCandidate cand;
+      MzConvCandidate cand;
       ::wsprintfW(sz, L"‚±‚¤‚Ù%u-%u", iClause, iCand);
       cand.hiragana = sz;
       ::wsprintfW(sz, L"Œó•â%u-%u", iClause, iCand);
@@ -2427,21 +2427,21 @@ BOOL MzIme::ConvertSingleClause(
   FOOTMARK();
   DWORD iClause = comp.extra.iClause;
 
-  MzConversionResult result;
+  MzConvResult result;
   std::wstring strHiragana = comp.extra.hiragana_clauses[iClause];
   if (!ConvertSingleClause(strHiragana, result)) {
     return FALSE;
   }
 
   result.clauses.resize(1);
-  MzConversionClause& clause = result.clauses[0];
+  MzConvClause& clause = result.clauses[0];
   comp.SetClauseCompString(iClause, clause.candidates[0].converted);
   comp.SetClauseCompHiragana(iClause, clause.candidates[0].hiragana, bRoman);
 
   // setting cand
   LogCandList cand_list;
   for (size_t i = 0; i < clause.candidates.size(); ++i) {
-    MzConversionCandidate& cand = clause.candidates[i];
+    MzConvCandidate& cand = clause.candidates[i];
     cand_list.cand_strs.push_back(cand.converted);
   }
   cand.cand_lists[iClause] = cand_list;
@@ -2453,7 +2453,7 @@ BOOL MzIme::ConvertSingleClause(
 } // MzIme::ConvertSingleClause
 
 BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana,
-                                MzConversionResult& result)
+                                MzConvResult& result)
 {
   FOOTMARK();
   result.clear();
@@ -2466,7 +2466,7 @@ BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana,
   MakeResultForSingle(result, lattice);
 #else
   // dummy sample
-  MzConversionCandidate cand;
+  MzConvCandidate cand;
   cand.hiragana = L"‚½‚ñ‚¢‚Â‚Ô‚ñ‚¹‚Â‚Ö‚ñ‚©‚ñ";
   cand.converted = L"’Pˆê•¶ß•ÏŠ·1";
   result.candidates.push_back(cand);
@@ -2504,7 +2504,7 @@ BOOL MzIme::StretchClauseLeft(
     bSplitted = TRUE;
   }
 
-  MzConversionResult result1, result2;
+  MzConvResult result1, result2;
   if (!ConvertSingleClause(str1, result1)) {
     return FALSE;
   }
@@ -2520,8 +2520,8 @@ BOOL MzIme::StretchClauseLeft(
       comp.extra.comp_str_clauses.begin() + iClause + 1, str);
   }
 
-  MzConversionClause& clause1 = result1.clauses[0];
-  MzConversionClause& clause2 = result2.clauses[0];
+  MzConvClause& clause1 = result1.clauses[0];
+  MzConvClause& clause2 = result2.clauses[0];
   comp.extra.hiragana_clauses[iClause] = str1;
   comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
   comp.extra.hiragana_clauses[iClause + 1] = str2;
@@ -2531,7 +2531,7 @@ BOOL MzIme::StretchClauseLeft(
   {
     LogCandList cand_list;
     for (size_t i = 0; i < clause1.candidates.size(); ++i) {
-      MzConversionCandidate& cand = clause1.candidates[i];
+      MzConvCandidate& cand = clause1.candidates[i];
       cand_list.cand_strs.push_back(cand.converted);
     }
     cand.cand_lists[iClause] = cand_list;
@@ -2540,7 +2540,7 @@ BOOL MzIme::StretchClauseLeft(
   {
     LogCandList cand_list;
     for (size_t i = 0; i < clause2.candidates.size(); ++i) {
-      MzConversionCandidate& cand = clause2.candidates[i];
+      MzConvCandidate& cand = clause2.candidates[i];
       cand_list.cand_strs.push_back(cand.converted);
     }
     if (bSplitted) {
@@ -2578,7 +2578,7 @@ BOOL MzIme::StretchClauseRight(
     str2 = str2.substr(1);
   }
 
-  MzConversionResult result1, result2;
+  MzConvResult result1, result2;
   if (!ConvertSingleClause(str1, result1)) {
     return FALSE;
   }
@@ -2587,7 +2587,7 @@ BOOL MzIme::StretchClauseRight(
     return FALSE;
   }
 
-  MzConversionClause& clause1 = result1.clauses[0];
+  MzConvClause& clause1 = result1.clauses[0];
 
   if (str2.empty()) {
     comp.extra.hiragana_clauses.erase(
@@ -2597,7 +2597,7 @@ BOOL MzIme::StretchClauseRight(
     comp.extra.hiragana_clauses[iClause] = str1;
     comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
   } else {
-    MzConversionClause& clause2 = result2.clauses[0];
+    MzConvClause& clause2 = result2.clauses[0];
     comp.extra.hiragana_clauses[iClause] = str1;
     comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
     comp.extra.hiragana_clauses[iClause + 1] = str2;
@@ -2608,16 +2608,16 @@ BOOL MzIme::StretchClauseRight(
   {
     LogCandList cand_list;
     for (size_t i = 0; i < clause1.candidates.size(); ++i) {
-      MzConversionCandidate& cand = clause1.candidates[i];
+      MzConvCandidate& cand = clause1.candidates[i];
       cand_list.cand_strs.push_back(cand.converted);
     }
     cand.cand_lists[iClause] = cand_list;
   }
   if (str2.size()) {
-    MzConversionClause& clause2 = result2.clauses[0];
+    MzConvClause& clause2 = result2.clauses[0];
     LogCandList cand_list;
     for (size_t i = 0; i < clause2.candidates.size(); ++i) {
-      MzConversionCandidate& cand = clause2.candidates[i];
+      MzConvCandidate& cand = clause2.candidates[i];
       cand_list.cand_strs.push_back(cand.converted);
     }
     cand.cand_lists[iClause + 1] = cand_list;
@@ -2693,11 +2693,11 @@ inline bool is_sjis_code(WORD w) {
 }
 
 BOOL MzIme::ConvertCode(const std::wstring& strTyping,
-                        MzConversionResult& result)
+                        MzConvResult& result)
 {
   result.clauses.clear();
 
-  MzConversionClause clause;
+  MzConvClause clause;
   LatticeNode node;
 
   node.pre = strTyping;
@@ -2745,7 +2745,7 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping,
 
 BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand) {
   FOOTMARK();
-  MzConversionResult result;
+  MzConvResult result;
   std::wstring strTyping = comp.extra.typing_clauses[comp.extra.iClause];
   if (!ConvertCode(strTyping, result)) {
     return FALSE;
@@ -2755,7 +2755,7 @@ BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand) {
 } // MzIme::ConvertCode
 
 BOOL MzIme::StoreResult(
-  const MzConversionResult& result, LogCompStr& comp, LogCandInfo& cand)
+  const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand)
 {
   comp.comp_str.clear();
   comp.extra.clear();
@@ -2763,9 +2763,9 @@ BOOL MzIme::StoreResult(
   // setting composition
   comp.comp_clause.resize(result.clauses.size() + 1);
   for (size_t k = 0; k < result.clauses.size(); ++k) {
-    const MzConversionClause& clause = result.clauses[k];
+    const MzConvClause& clause = result.clauses[k];
     for (size_t i = 0; i < clause.candidates.size(); ++i) {
-      const MzConversionCandidate& cand = clause.candidates[i];
+      const MzConvCandidate& cand = clause.candidates[i];
       comp.comp_clause[k] = (DWORD)comp.comp_str.size();
       comp.extra.hiragana_clauses.push_back(cand.hiragana);
       std::wstring typing;
@@ -2785,10 +2785,10 @@ BOOL MzIme::StoreResult(
   // setting cand
   cand.clear();
   for (size_t k = 0; k < result.clauses.size(); ++k) {
-    const MzConversionClause& clause = result.clauses[k];
+    const MzConvClause& clause = result.clauses[k];
     LogCandList cand_list;
     for (size_t i = 0; i < clause.candidates.size(); ++i) {
-      const MzConversionCandidate& cand = clause.candidates[i];
+      const MzConvCandidate& cand = clause.candidates[i];
       cand_list.cand_strs.push_back(cand.converted);
     }
     cand.cand_lists.push_back(cand_list);

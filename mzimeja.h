@@ -462,7 +462,7 @@ struct Lattice {
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct MzConversionCandidate {
+struct MzConvCandidate {
   std::wstring            hiragana;
   std::wstring            converted;
   int                     cost;
@@ -477,15 +477,15 @@ struct MzConversionCandidate {
   }
 };
 
-struct MzConversionClause {
-  std::vector<MzConversionCandidate> candidates;
+struct MzConvClause {
+  std::vector<MzConvCandidate> candidates;
   void clear() { candidates.clear(); }
   void sort();
   void add(const LatticeNode *node);
 };
 
-struct MzConversionResult {
-  std::vector<MzConversionClause> clauses;
+struct MzConvResult {
+  std::vector<MzConvClause> clauses;
   void clear() { clauses.clear(); }
   void sort();
 };
@@ -581,23 +581,23 @@ public:
   // make lattice
   BOOL MakeLattice(Lattice& lattice, const std::wstring& pre);
   BOOL MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre);
-  void MakeResult(MzConversionResult& result, Lattice& lattice);
-  void MakeResult(MzConversionResult& result, const std::wstring& pre);
-  void MakeResultForSingle(MzConversionResult& result, Lattice& lattice);
+  void MakeResult(MzConvResult& result, Lattice& lattice);
+  void MakeResult(MzConvResult& result, const std::wstring& pre);
+  void MakeResultForSingle(MzConvResult& result, Lattice& lattice);
   int CalcCost(const std::wstring& tags) const;
 
   // convert
   BOOL ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL ConvertMultiClause(const std::wstring& strHiragana,
-                          MzConversionResult& result);
+                          MzConvResult& result);
   BOOL ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL ConvertSingleClause(const std::wstring& strHiragana,
-                           MzConversionResult& result);
+                           MzConvResult& result);
   BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
   BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-  BOOL ConvertCode(const std::wstring& strTyping, MzConversionResult& result);
+  BOOL ConvertCode(const std::wstring& strTyping, MzConvResult& result);
   BOOL ConvertCode(LogCompStr& comp, LogCandInfo& cand);
-  BOOL StoreResult(const MzConversionResult& result, LogCompStr& comp, LogCandInfo& cand);
+  BOOL StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
 
   // computer settings
   BOOL GetComputerString(LPCWSTR pszSettingName, std::wstring& value);
