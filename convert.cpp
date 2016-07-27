@@ -2740,6 +2740,7 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping,
     clause.add(&node);
   }
 
+  // original
   node.post = strTyping;
   node.cost++;
   clause.add(&node);
