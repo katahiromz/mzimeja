@@ -26,6 +26,7 @@ static const wchar_t s_hiragana_table[][5] = {
   {L'‚ñ', 0, 0, 0, 0},                   // GYOU_NN
 };
 
+// convert the classification (bunrui) to string (for debugging)
 static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
   int index = int(bunrui) - int(HB_HEAD);
   static const wchar_t *s_array[] = {
@@ -719,7 +720,7 @@ bool LatticeNode::IsJodoushi() const {
 
 void Lattice::AddExtra() {
   FOOTMARK();
-  if (pre == L"‚«‚å‚¤") {
+  if (pre == L"‚«‚å‚¤") {   // today
     SYSTEMTIME st;
     ::GetLocalTime(&st);
     WCHAR sz[32];
@@ -741,7 +742,7 @@ void Lattice::AddExtra() {
     DoFields(0, fields);
     return;
   }
-  if (pre == L"‚±‚Æ‚µ") {
+  if (pre == L"‚±‚Æ‚µ") {   // this year
     SYSTEMTIME st;
     ::GetLocalTime(&st);
     WCHAR sz[32];
@@ -755,7 +756,7 @@ void Lattice::AddExtra() {
     DoFields(0, fields);
     return;
   }
-  if (pre == L"‚¶‚±‚­" || pre == L"‚½‚¾‚¢‚Ü") {
+  if (pre == L"‚¶‚±‚­" || pre == L"‚½‚¾‚¢‚Ü") {   // now time
     SYSTEMTIME st;
     ::GetLocalTime(&st);
     WCHAR sz[32];
@@ -802,7 +803,7 @@ void Lattice::AddExtra() {
     DoFields(0, fields);
     return;
   }
-  if (pre == L"‚¶‚Ô‚ñ") {
+  if (pre == L"‚¶‚Ô‚ñ") {   // myself
     WCHAR sz[64];
     DWORD dwSize = _countof(sz);
     if (::GetUserNameW(sz, &dwSize)) {
@@ -814,7 +815,7 @@ void Lattice::AddExtra() {
     }
     return;
   }
-  if (pre == L"‚©‚Á‚±") {
+  if (pre == L"‚©‚Á‚±") {   // kakko (parens, brackets, braces, ...)
     WStrings items;
     unboost::split(items, TheIME.LoadSTR(100), unboost::is_any_of(L"\t"));
 
@@ -827,6 +828,7 @@ void Lattice::AddExtra() {
     }
     return;
   }
+  // symbols
   static const wchar_t *s_words[] = {
     L"‚«‚²‚¤", L"‚¯‚¢‚¹‚ñ", L"‚¯‚¢‚³‚ñ", L"‚³‚ñ‚©‚­",
     L"‚µ‚©‚­", L"‚¸‚¯‚¢", L"‚Ü‚é", L"‚Ù‚µ", L"‚Ð‚µ",
@@ -860,6 +862,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
   const size_t length = pre.size();
   assert(length);
 
+  // separator
   std::wstring sep;
   sep += FIELD_SEP;
 
@@ -983,21 +986,25 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
       continue;
     }
 
+    // scan dictionary
     size_t count = ScanDict(records, dict_data, pre[index]);
     DebugPrintW(L"ScanDict(%c) count: %d\n", pre[index], count);
+
+    // store data for each record
     for (size_t k = 0; k < records.size(); ++k) {
       const std::wstring& record = records[k];
       unboost::split(fields, record, unboost::is_any_of(sep));
       DoFields(index, fields);
     }
 
+    // special cases
     switch (pre[index]) {
-    case L'‚±': case L'‚«': case L'‚­':
+    case L'‚±': case L'‚«': case L'‚­':   // KURU
       fields.resize(4);
       fields[1].push_back(MAKEWORD(HB_KAHEN_DOUSHI, GYOU_KA));
       DoKahenDoushi(index, fields);
       break;
-    case L'‚³': case L'‚µ': case L'‚¹': case L'‚·':
+    case L'‚³': case L'‚µ': case L'‚¹': case L'‚·':   // SURU
       fields.resize(4);
       fields[1].push_back(MAKEWORD(HB_SAHEN_DOUSHI, GYOU_SA));
       DoSahenDoushi(index, fields);
@@ -1010,6 +1017,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
   return TRUE;
 } // Lattice::AddNodes
 
+// for deleting the nodes of different size
 struct DeleteDifferentSizeNode {
   size_t m_size;
   DeleteDifferentSizeNode(size_t size) {
@@ -1026,15 +1034,19 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
   std::wstring sep;
   sep += FIELD_SEP;
 
+  // scan dictionary
   WStrings fields, records;
   size_t count = ScanDict(records, dict_data, pre[0]);
   DebugPrintW(L"ScanDict(%c) count: %d\n", pre[0], count);
+
+  // store data for each record
   for (size_t k = 0; k < records.size(); ++k) {
     const std::wstring& record = records[k];
     unboost::split(fields, record, unboost::is_any_of(sep));
     DoFields(0, fields);
   }
 
+  // delete the nodes of different size
   DeleteDifferentSizeNode del(pre.size());
   for (size_t i = 0; i < chunks[0].size(); ++i) {
     std::remove_if(chunks[0].begin(), chunks[0].end(), del);
@@ -1046,9 +1058,12 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
 void Lattice::UpdateRefs() {
   FOOTMARK();
   const size_t length = pre.size();
+
+  // initialize the reference counts
   refs.assign(length + 1, 0);
   refs[0] = 1;
 
+  // update the reference counts
   for (size_t index = 0; index < length; ++index) {
     if (refs[index] == 0) continue;
     LatticeChunk& chunk1 = chunks[index];
@@ -1109,6 +1124,7 @@ void Lattice::UpdateLinks() {
 
 void Lattice::UnlinkAllNodes() {
   FOOTMARK();
+  // clear the branch links and the linked counts
   const size_t length = pre.size();
   for (size_t index = 0; index < length; ++index) {
     LatticeChunk& chunk1 = chunks[index];
@@ -1122,7 +1138,7 @@ void Lattice::UnlinkAllNodes() {
 void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size) {
   FOOTMARK();
   const size_t length = pre.size();
-
+  // add the undefined words on failure of conversion
   WStrings fields(4);
   fields[1].assign(1, MAKEWORD(HB_UNKNOWN, 0));
   //fields[3].clear();
@@ -1165,7 +1181,7 @@ size_t Lattice::GetLastLinkedIndex() const {
       }
     }
   }
-  return 0;
+  return 0;   // not found
 } // Lattice::GetLastLinkedIndex
 
 void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
@@ -1173,13 +1189,17 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
   assert(fields.size() == 4);
   assert(fields[0].size());
   size_t length = fields[0].size();
+
+  // boundary check
   if (index + length > pre.size()) {
     return;
   }
+  // check text matching
   if (pre.substr(index, length) != fields[0]) {
     return;
   }
-  std::wstring str = pre.substr(index + fields[0].size());
+  // get the right substring
+  std::wstring str = pre.substr(index + length);
 
   LatticeNode node;
   node.bunrui = HB_IKEIYOUSHI;
@@ -1345,13 +1365,16 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
   assert(fields.size() == 4);
   assert(fields[0].size());
   size_t length = fields[0].size();
+  // boundary check
   if (index + length > pre.size()) {
     return;
   }
+  // check text matching
   if (pre.substr(index, length) != fields[0]) {
     return;
   }
-  std::wstring str = pre.substr(index + fields[0].size());
+  // get the right substring
+  std::wstring str = pre.substr(index + length);
 
   LatticeNode node;
   node.bunrui = HB_NAKEIYOUSHI;
@@ -1445,12 +1468,15 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
   assert(fields.size() == 4);
   assert(fields[0].size());
   size_t length = fields[0].size();
+  // boundary check
   if (index + length > pre.size()) {
     return;
   }
+  // check text matching
   if (pre.substr(index, length) != fields[0]) {
     return;
   }
+  // get the right substring
   std::wstring str = pre.substr(index + length);
   DebugPrintW(L"DoGodanDoushi: %s, %s\n", fields[0].c_str(), str.c_str());
 
@@ -1570,12 +1596,15 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
   assert(fields.size() == 4);
   assert(fields[0].size());
   size_t length = fields[0].size();
+  // boundary check
   if (index + length > pre.size()) {
     return;
   }
+  // check text matching
   if (pre.substr(index, length) != fields[0]) {
     return;
   }
+  // get the right substring
   std::wstring str = pre.substr(index + length);
 
   LatticeNode node;
@@ -1652,12 +1681,15 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
   assert(fields.size() == 4);
   assert(fields[0].size());
   size_t length = fields[0].size();
+  // boundary check
   if (index + length > pre.size()) {
     return;
   }
+  // check text matching
   if (pre.substr(index, length) != fields[0]) {
     return;
   }
+  // get the right substring
   std::wstring str = pre.substr(index + length);
 
   LatticeNode node;
@@ -1735,12 +1767,15 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
   assert(fields.size() == 4);
   assert(fields[0].size());
   size_t length = fields[0].size();
+  // boundary check
   if (index + length > pre.size()) {
     return;
   }
+  // check text matching
   if (pre.substr(index, length) != fields[0]) {
     return;
   }
+  // get the right substring
   std::wstring str = pre.substr(index + length);
 
   LatticeNode node;
@@ -1896,12 +1931,15 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
   assert(fields[0].size());
 
   size_t length = fields[0].size();
+  // boundary check
   if (index + length > pre.size()) {
     return;
   }
+  // check text matching
   if (pre.substr(index, length) != fields[0]) {
     return;
   }
+  // get the right substring
   std::wstring str = pre.substr(index + length);
 
   LatticeNode node;
@@ -1911,7 +1949,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
 
   if (pre.substr(index, length) == fields[0]) {
     if (node.HasTag(L"[“®A•¨]")) {
-      // animals or plants are written in katakana
+      // animals or plants can be written in katakana
       node.pre = fields[0];
       node.post = lcmap(fields[0], LCMAP_KATAKANA | LCMAP_FULLWIDTH);
       chunks[index].push_back(unboost::make_shared(node));
@@ -1930,6 +1968,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
     }
   }
 
+  // –¼ŽŒ{u‚Á‚Û‚¢v‚ÅŒ`—eŽŒ‚É
   if (str.size() >= 2 && str[0] == L'‚Á' && str[1] == L'‚Û') {
     WStrings new_fields = fields;
     new_fields[0] += L"‚Á‚Û";
@@ -1941,22 +1980,25 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
 void Lattice::DoFields(size_t index, const WStrings& fields, int cost/* = 0*/) {
   assert(fields.size() == 4);
   const size_t length = fields[0].size();
+  // boundary check
   if (index + length > pre.size()) {
     return;
   }
+  // check text matching
   if (pre.substr(index, length) != fields[0]) {
     return;
   }
   DebugPrintW(L"DoFields: %s\n", fields[0].c_str());
 
-  WORD w = fields[1][0];
-
+  // initialize the node
   LatticeNode node;
+  WORD w = fields[1][0];
   node.bunrui = (HinshiBunrui)LOBYTE(w);
   node.gyou = (Gyou)HIBYTE(w);
   node.tags = fields[3];
   node.cost = node.CalcCost() + cost;
 
+  // add new entries by node classification (BUNRUI)
   switch (node.bunrui) {
   case HB_MEISHI:
     DoMeishi(index, fields);
@@ -2065,6 +2107,7 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
   FOOTMARK();
   const DWORD c_retry_count = 32;
 
+  // failure if the dictionary not loaded
   if (!m_basic_dict.IsLoaded()) {
     return FALSE;
   }
@@ -2120,6 +2163,7 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
 BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
   FOOTMARK();
 
+  // failure if the dictionary not loaded
   if (!m_basic_dict.IsLoaded()) {
     return FALSE;
   }
@@ -2270,10 +2314,12 @@ void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
       node.bunrui = HB_UNKNOWN;
       node.cost = 10;
 
+      // add hiragana
       node.pre = hiragana;
       node.post = hiragana;
       clause.add(&node);
 
+      // add katakana
       std::wstring katakana;
       katakana = lcmap(hiragana, LCMAP_FULLWIDTH | LCMAP_KATAKANA);
       node.post = katakana;
@@ -2282,51 +2328,67 @@ void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
       LatticeNode node;
       node.bunrui = HB_UNKNOWN;
       node.cost = 10;
-
       node.pre = hiragana;
+
+      // add the lowercase and fullwidth
       node.post = lcmap(hiragana, LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
       clause.add(&node);
+
+      // add the uppercase and fullwidth
       node.post = lcmap(hiragana, LCMAP_UPPERCASE | LCMAP_FULLWIDTH);
       clause.add(&node);
+
+      // add the capital and fullwidth
       node.post = node.post[0] + lcmap(hiragana.substr(1), LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
       clause.add(&node);
+
+      // add the lowercase and halfwidth
       node.post = lcmap(hiragana, LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
       clause.add(&node);
+
+      // add the uppercase and halfwidth
       node.post = lcmap(hiragana, LCMAP_UPPERCASE | LCMAP_HALFWIDTH);
       clause.add(&node);
+
+      // add the capital and halfwidth
       node.post = node.post[0] + lcmap(hiragana.substr(1), LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
       clause.add(&node);
     }
 
+    // go to the next clause
     index += size;
     ++iClause;
   }
 
+  // sort by cost
   result.sort();
 } // MzIme::MakeResult
 
-void MzIme::MakeResult(MzConvResult& result, const std::wstring& pre) {
+void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
   FOOTMARK();
+  MzConvClause clause;
   result.clear();
 
+  // initialize the node
   LatticeNode node;
   node.pre = pre;
-  node.post = pre;
   node.cost = 0;
   node.bunrui = HB_MEISHI;
 
-  MzConvClause clause;
+  // hiragana
+  node.post = pre;
   clause.add(&node);
+
+  // katakana
   node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_FULLWIDTH);
   clause.add(&node);
 
   result.clauses.push_back(clause);
-}
+} // MzIme::MakeResultOnFailure
 
 void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
   FOOTMARK();
   result.clear();
-
   const size_t length = lattice.pre.size();
 
   // add other candidates
@@ -2340,22 +2402,26 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
     }
   }
 
+  // initialize the node
   std::wstring hiragana = lattice.pre;
-
   LatticeNode node;
   node.pre = hiragana;
   node.bunrui = HB_UNKNOWN;
   node.cost = 10;
 
+  // add hiragana
   node.post = hiragana;
   clause.add(&node);
 
+  // add katakana
   node.post = lcmap(hiragana, LCMAP_FULLWIDTH | LCMAP_KATAKANA);
   clause.add(&node);
 
+  // add the clause
   result.clauses.push_back(clause);
   assert(result.clauses[0].candidates.size());
 
+  // sort by cost
   result.sort();
   assert(result.clauses[0].candidates.size());
 } // MzIme::MakeResultForSingle
@@ -2369,7 +2435,6 @@ BOOL MzIme::ConvertMultiClause(
   if (!ConvertMultiClause(strHiragana, result)) {
     return FALSE;
   }
-
   return StoreResult(result, comp, cand);
 } // MzIme::ConvertMultiClause
 
@@ -2379,10 +2444,12 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana,
   FOOTMARK();
 
 #if 1
+  // failure if the dictionary not loaded
   if (!m_basic_dict.IsLoaded()) {
     return FALSE;
   }
 
+  // make lattice and make result
   Lattice lattice;
   std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
   if (MakeLattice(lattice, pre)) {
@@ -2390,7 +2457,7 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana,
     MakeResult(result, lattice);
   } else {
     lattice.AddExtra();
-    MakeResult(result, pre);
+    MakeResultOnFailure(result, pre);
   }
 #else
   // dummy sample
@@ -2429,12 +2496,14 @@ BOOL MzIme::ConvertSingleClause(
   FOOTMARK();
   DWORD iClause = comp.extra.iClause;
 
+  // convert
   MzConvResult result;
   std::wstring strHiragana = comp.extra.hiragana_clauses[iClause];
   if (!ConvertSingleClause(strHiragana, result)) {
     return FALSE;
   }
 
+  // setting composition
   result.clauses.resize(1);
   MzConvClause& clause = result.clauses[0];
   comp.SetClauseCompString(iClause, clause.candidates[0].converted);
@@ -2461,6 +2530,7 @@ BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana,
   result.clear();
 
 #if 1
+  // make lattice and make result
   Lattice lattice;
   std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
   MakeLatticeForSingle(lattice, pre);
@@ -2489,14 +2559,16 @@ BOOL MzIme::StretchClauseLeft(
 
   DWORD iClause = comp.extra.iClause;
 
+  // get the clause string
   std::wstring str1 = comp.extra.hiragana_clauses[iClause];
   if (str1.size() <= 1) return FALSE;
 
+  // get the last character of this clause
   wchar_t ch = str1[str1.size() - 1];
+  // shrink
   str1.resize(str1.size() - 1);
 
-  DebugPrintA("OK3\n");
-
+  // get the next clause string and add the character
   std::wstring str2;
   BOOL bSplitted = FALSE;
   if (iClause + 1 < comp.GetClauseCount()) {
@@ -2506,6 +2578,7 @@ BOOL MzIme::StretchClauseLeft(
     bSplitted = TRUE;
   }
 
+  // convert two clauses
   MzConvResult result1, result2;
   if (!ConvertSingleClause(str1, result1)) {
     return FALSE;
@@ -2514,6 +2587,7 @@ BOOL MzIme::StretchClauseLeft(
     return FALSE;
   }
 
+  // add one clause if the clause was splitted
   if (bSplitted) {
     std::wstring str;
     comp.extra.hiragana_clauses.insert(
@@ -2522,6 +2596,7 @@ BOOL MzIme::StretchClauseLeft(
       comp.extra.comp_str_clauses.begin() + iClause + 1, str);
   }
 
+  // seting composition
   MzConvClause& clause1 = result1.clauses[0];
   MzConvClause& clause2 = result2.clauses[0];
   comp.extra.hiragana_clauses[iClause] = str1;
@@ -2530,6 +2605,7 @@ BOOL MzIme::StretchClauseLeft(
   comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].converted;
   comp.UpdateFromExtra(bRoman);
 
+  // seting the candidate list
   {
     LogCandList cand_list;
     for (size_t i = 0; i < clause1.candidates.size(); ++i) {
@@ -2538,7 +2614,6 @@ BOOL MzIme::StretchClauseLeft(
     }
     cand.cand_lists[iClause] = cand_list;
   }
-
   {
     LogCandList cand_list;
     for (size_t i = 0; i < clause2.candidates.size(); ++i) {
@@ -2552,8 +2627,10 @@ BOOL MzIme::StretchClauseLeft(
     }
   }
 
+  // set the current clause
   cand.iClause = iClause;
   comp.extra.iClause = iClause;
+  // set the clause attributes
   comp.SetClauseAttr(iClause, ATTR_TARGET_CONVERTED);
 
   return TRUE;
@@ -2566,13 +2643,18 @@ BOOL MzIme::StretchClauseRight(
 
   DWORD iClause = comp.extra.iClause;
 
+  // get the current clause
   std::wstring str1 = comp.extra.hiragana_clauses[iClause];
+  // we cannot stretch right if the clause was the right end
   if (iClause == comp.GetClauseCount() - 1) return FALSE;
 
+  // get the next clause
   std::wstring str2 = comp.extra.hiragana_clauses[iClause + 1];
   if (str2.empty()) return FALSE;
 
+  // get the first character of the second clause
   wchar_t ch = str2[0];
+  // add the character to the first clause
   str1 += ch;
   if (str2.size() == 1) {
     str2.clear();
@@ -2580,18 +2662,20 @@ BOOL MzIme::StretchClauseRight(
     str2 = str2.substr(1);
   }
 
+  // convert
   MzConvResult result1, result2;
   if (!ConvertSingleClause(str1, result1)) {
     return FALSE;
   }
-
   if (str2.size() && !ConvertSingleClause(str2, result2)) {
     return FALSE;
   }
 
   MzConvClause& clause1 = result1.clauses[0];
 
+  // if the second clause was joined?
   if (str2.empty()) {
+    // delete the joined clause
     comp.extra.hiragana_clauses.erase(
       comp.extra.hiragana_clauses.begin() + iClause + 1);
     comp.extra.comp_str_clauses.erase(
@@ -2599,14 +2683,17 @@ BOOL MzIme::StretchClauseRight(
     comp.extra.hiragana_clauses[iClause] = str1;
     comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
   } else {
+    // seting two clauses
     MzConvClause& clause2 = result2.clauses[0];
     comp.extra.hiragana_clauses[iClause] = str1;
     comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
     comp.extra.hiragana_clauses[iClause + 1] = str2;
     comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].converted;
   }
+  // update composition by extra
   comp.UpdateFromExtra(bRoman);
 
+  // seting the candidate list
   {
     LogCandList cand_list;
     for (size_t i = 0; i < clause1.candidates.size(); ++i) {
@@ -2625,8 +2712,10 @@ BOOL MzIme::StretchClauseRight(
     cand.cand_lists[iClause + 1] = cand_list;
   }
 
+  // set the current clause
   cand.iClause = iClause;
   comp.extra.iClause = iClause;
+  // set the clause attributes
   comp.SetClauseAttr(iClause, ATTR_TARGET_CONVERTED);
 
   return TRUE;
@@ -2698,10 +2787,10 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping,
                         MzConvResult& result)
 {
   result.clauses.clear();
-
   MzConvClause clause;
-  LatticeNode node;
 
+  // initialize the node
+  LatticeNode node;
   node.pre = strTyping;
   node.bunrui = HB_UNKNOWN;
   node.cost = 0;
