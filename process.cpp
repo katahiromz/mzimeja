@@ -90,6 +90,12 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     }
     break;
 
+  case VK_OEM_ATTN:
+    if (bOpen && !bShift && !bCtrl) {
+      SetInputMode(hIMC, IMODE_HALF_ASCII);
+    }
+    break;
+
   case VK_OEM_COPY: case VK_OEM_FINISH: case VK_OEM_BACKTAB:
     if (bAlt) {
       SetRomanMode(hIMC, !IsRomanMode(hIMC));
@@ -416,6 +422,11 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
   case VK_OEM_COPY: case VK_OEM_FINISH: case VK_OEM_BACKTAB:
     ret = TRUE;
     break;
+  case VK_OEM_ATTN:
+    if (fOpen && !fCtrl && !fShift) {
+      ret = TRUE;
+    }
+    break;
   default:
     if (lpIMC == NULL) return FALSE;
     break;
@@ -475,6 +486,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
       case VK_OEM_5: case VK_OEM_6: case VK_OEM_7: case VK_OEM_8:
       case VK_OEM_9: case VK_OEM_102:
       case VK_OEM_COPY: case VK_OEM_FINISH: case VK_OEM_BACKTAB:
+      case VK_OEM_ATTN:
         // OEM keys
         ret = TRUE;
         break;
@@ -493,7 +505,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
         if (!fCtrl || fCompStr) ret = TRUE;
         break;
       case VK_BACK: case VK_DELETE: case VK_RETURN:
-      case VK_CAPITAL: case VK_CONVERT: case VK_NONCONVERT:
+      case VK_CONVERT: case VK_NONCONVERT:
         // special keys
         ret = TRUE;
         break;
