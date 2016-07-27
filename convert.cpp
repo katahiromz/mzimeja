@@ -2783,6 +2783,16 @@ inline bool is_sjis_code(WORD w) {
   );
 }
 
+inline WORD kuten_to_jis(const std::wstring& str) {
+  if (str.size() != 5) return 0;
+  std::wstring ku_bangou = str.substr(0, 3);
+  std::wstring ten_bangou = str.substr(3, 2);
+  WORD ku = WORD(wcstoul(ku_bangou.c_str(), NULL, 10));
+  WORD ten = WORD(wcstoul(ten_bangou.c_str(), NULL, 10));
+  WORD jis_code = (ku + 32) * 256 + ten + 32;
+  return jis_code;
+}
+
 BOOL MzIme::ConvertCode(const std::wstring& strTyping,
                         MzConvResult& result)
 {
@@ -2819,15 +2829,32 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping,
   }
 
   // JIS
-  wSJIS = jis2sjis(WORD(hex_code));
-  if (is_sjis_code(wSJIS)) {
-    szSJIS[0] = HIBYTE(wSJIS);
-    szSJIS[1] = LOBYTE(wSJIS);
-    szSJIS[2] = 0;
-    ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
-    node.post = szUnicode;
-    node.cost++;
-    clause.add(&node);
+  if (is_jis_code(WORD(hex_code))) {
+    wSJIS = jis2sjis(WORD(hex_code));
+    if (is_sjis_code(wSJIS)) {
+      szSJIS[0] = HIBYTE(wSJIS);
+      szSJIS[1] = LOBYTE(wSJIS);
+      szSJIS[2] = 0;
+      ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
+      node.post = szUnicode;
+      node.cost++;
+      clause.add(&node);
+    }
+  }
+
+  // KUTEN code
+  WORD wJIS = kuten_to_jis(strTyping);
+  if (is_jis_code(wJIS)) {
+    wSJIS = jis2sjis(wJIS);
+    if (is_sjis_code(wSJIS)) {
+      szSJIS[0] = HIBYTE(wSJIS);
+      szSJIS[1] = LOBYTE(wSJIS);
+      szSJIS[2] = 0;
+      ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
+      node.post = szUnicode;
+      node.cost++;
+      clause.add(&node);
+    }
   }
 
   // original
