@@ -2739,6 +2739,10 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping,
     clause.add(&node);
   }
 
+  node.post = strTyping;
+  node.cost++;
+  clause.add(&node);
+
   result.clauses.push_back(clause);
   return TRUE;
 } // MzIme::ConvertCode
