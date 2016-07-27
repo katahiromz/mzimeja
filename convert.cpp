@@ -2757,7 +2757,6 @@ BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand) {
   if (!ConvertCode(strTyping, result)) {
     return FALSE;
   }
-
   return StoreResult(result, comp, cand);
 } // MzIme::ConvertCode
 
