@@ -49,7 +49,7 @@ DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
   FOOTMARK_FORMAT("(%p, %S, %p, 0x%08lX, 0x%08X)\n",
     hIMC, lpSource, lpCandList, dwBufLen, uFlags);
 
-  FOOTMARK_RETURN_DWORD(0);
+  FOOTMARK_RETURN_LONG(0);
 }
 
 BOOL WINAPI ImeDestroy(UINT uForce) {
@@ -351,7 +351,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
       if (dwFlags & IGIMIF_RIGHTMENU)
         ret = _countof(top_menu_items);
     }
-    FOOTMARK_RETURN_DWORD(ret);
+    FOOTMARK_RETURN_LONG(ret);
   }
 
   if (lpImeParentMenu == NULL) {
@@ -435,7 +435,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
     }
   }
 
-  FOOTMARK_RETURN_DWORD(ret);
+  FOOTMARK_RETURN_LONG(ret);
 } // ImeGetImeMenuItems
 
 //////////////////////////////////////////////////////////////////////////////
