@@ -1,10 +1,10 @@
-// footmark.hpp --- footmark++ for C++ debugging
+// footmark.hpp --- footmark++ for C++ tracing
 // This file is public domain software (PDS).
 // NOTE: Footmark is not thread-safe. Don't use it in multithread function.
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef FOOTMARK_HPP_
-#define FOOTMARK_HPP_   6   // Version 6
+#define FOOTMARK_HPP_   7   // Version 7
 
 #ifndef __cplusplus
   #error This library (footmark++) needs C++. You lose.
@@ -31,8 +31,7 @@
   #include <vector>   // for std::vector
   #include <cassert>  // for assert
 
-  class FootmarkLocation {
-  public:
+  struct FootmarkLocation {
     const char *m_file;
     int         m_line;
     const char *m_func;
