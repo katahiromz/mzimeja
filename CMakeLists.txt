@@ -81,7 +81,7 @@ include_directories(.)
 
 add_definitions(-DUNICODE=1 -D_UNICODE=1)
 
-add_subdirectory(mzimeja)
+add_subdirectory(ime)
 add_subdirectory(imepad)
 add_subdirectory(setup)
 add_subdirectory(verinfo)
