@@ -165,7 +165,7 @@
   #endif
   #define FOOTMARK_RETURN_INT(retval) \
     do { \
-      assert(the_footmark.emit_true());
+      assert(the_footmark.emit_true()); \
       FootmarkStackType& stack = GetFootmarkStack(); \
       stack[stack.size() - 1].m_retval_type = FootmarkLocation::RETVAL_INT; \
       stack[stack.size() - 1].m_retval_int = (INT)(retval); \
@@ -173,7 +173,7 @@
     } while (0)
   #define FOOTMARK_RETURN_DWORD(retval) \
     do { \
-      assert(the_footmark.emit_true());
+      assert(the_footmark.emit_true()); \
       FootmarkStackType& stack = GetFootmarkStack(); \
       stack[stack.size() - 1].m_retval_type = FootmarkLocation::RETVAL_DWORD; \
       stack[stack.size() - 1].m_retval_dword = (DWORD)(retval); \
@@ -181,7 +181,7 @@
     } while (0)
   #define FOOTMARK_RETURN_LPARAM(retval) \
     do { \
-      assert(the_footmark.emit_true());
+      assert(the_footmark.emit_true()); \
       FootmarkStackType& stack = GetFootmarkStack(); \
       stack[stack.size() - 1].m_retval_type = FootmarkLocation::RETVAL_LPARAM; \
       stack[stack.size() - 1].m_retval_lparam = (LPARAM)(retval); \
@@ -189,7 +189,7 @@
     } while (0)
   #define FOOTMARK_RETURN_PTR(ptrtype,retval) \
     do { \
-      assert(the_footmark.emit_true());
+      assert(the_footmark.emit_true()); \
       FootmarkStackType& stack = GetFootmarkStack(); \
       stack[stack.size() - 1].m_retval_type = FootmarkLocation::RETVAL_PTR; \
       stack[stack.size() - 1].m_retval_ptr = (LPVOID)(retval); \
