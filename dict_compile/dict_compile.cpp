@@ -1,7 +1,8 @@
 // dict_compile.cpp --- dictionary compiler of MZ-IME Japanese Input
 /////////////////////////////////////////////////////////////////////////////
 
-#include "mzimeja.h"
+#include "../mzimeja.h"
+
 using namespace std;
 
 static const wchar_t s_hiragana_table[][5] = {    

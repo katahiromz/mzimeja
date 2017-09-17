@@ -1,9 +1,9 @@
-This software is public domain software (PDS).
+ï»¿This software is public domain software (PDS).
 This software is freeware. Use it freely at your own risk.
 ABSOLUTELY NO WARRANTY.
-Copyright (C) 2016 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>.
+Copyright (C) 2016-2017 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>.
 ---
-(Japanese, Shift_JIS)
-‚±‚Ìƒ\ƒtƒg‚ÍA’˜ìŒ ƒtƒŠ[‚ÌƒtƒŠ[ƒ\ƒtƒg‚Å‚·B
-©ŒÈÓ”C‚Å‚²©—R‚É‚¨g‚¢‰º‚³‚¢B
-–³•ÛØB
+(Japanese, UTF-8)
+ã“ã®ã‚½ãƒ•ãƒˆã¯ã€è‘—ä½œæ¨©ãƒ•ãƒªãƒ¼ã®ãƒ•ãƒªãƒ¼ã‚½ãƒ•ãƒˆã§ã™ã€‚
+è‡ªå·±è²¬ä»»ã§ã”è‡ªç”±ã«ãŠä½¿ã„ä¸‹ã•ã„ã€‚
+ç„¡ä¿è¨¼ã€‚

@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{2FCD745D-F3C2-4115-B537-D6AE6E066B82}
 AppName=MZ-IME日本語入力
-AppVerName=MZ-IME日本語入力 0.7
+AppVerName=MZ-IME日本語入力 0.8
 AppPublisher=片山博文MZ
 AppPublisherURL=http://katahiromz.web.fc2.com/
 AppSupportURL=http://katahiromz.web.fc2.com/
@@ -15,11 +15,11 @@ AppUpdatesURL=http://katahiromz.web.fc2.com/
 DefaultDirName={pf}\mzimeja
 DefaultGroupName=MZ-IME日本語入力
 OutputDir=.
-OutputBaseFilename=mzimeja-0.7-setup
+OutputBaseFilename=mzimeja-0.8-setup
 Compression=lzma
 SolidCompression=yes
-VersionInfoVersion=0.7
-VersionInfoTextVersion=0.7
+VersionInfoVersion=0.8
+VersionInfoTextVersion=0.8
 
 [Languages]
 Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
@@ -31,11 +31,19 @@ Source: "res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
-Source: "projects\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
-Source: "projects\Release\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "projects\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "projects\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "projects\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
+
+Source: "build\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
+
+; Source: "build\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
+; Source: "build\Release\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Source: "build\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Source: "build\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Source: "build\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

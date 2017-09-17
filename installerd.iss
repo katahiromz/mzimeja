@@ -31,11 +31,18 @@ Source: "res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
-Source: "projects\Debug\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
-Source: "projects\Debug\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "projects\Debug\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "projects\Debug\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "projects\Debug\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
+
+Source: "build\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
+
+; Source: "build\Debug\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
+; Source: "build\Debug\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Source: "build\Debug\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Source: "build\Debug\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Source: "build\Debug\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

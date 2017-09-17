@@ -9,7 +9,7 @@
 using namespace std;
 
 #define UNBOOST_USE_STRING_ALGORITHM
-#include "..\\unboost.hpp"
+#include "../unboost.hpp"
 
 enum HINSHI_BUNRUI {
   HB_START_NODE,        // 開始ノード

@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #define _CRT_SECURE_NO_WARNINGS   // use fopen
-#include "targetver.h"      // target Windows version
+#include "../targetver.h"       // target Windows version
 
 #define NOMINMAX
 #include <windows.h>

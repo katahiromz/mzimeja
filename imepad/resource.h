@@ -1,0 +1,3 @@
+#define IDM_IME_PAD 40016
+#define IDM_STROKES 40017
+#define IDM_RADICALS 40018
