@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef FOOTMARK_HPP_
-#define FOOTMARK_HPP_   4   // Version 4
+#define FOOTMARK_HPP_   5   // Version 5
 
 #ifndef __cplusplus
   #error This library (footmark++) needs C++. You lose.
@@ -39,8 +39,8 @@
     bool        m_flag;
     FootmarkLocation() :
       m_file(NULL), m_line(0), m_func(NULL), m_flag(false) {}
-    FootmarkLocation(const char *file, int line, const char *func) :
-      m_file(file), m_line(line), m_func(func), m_flag(true) { Enter(); }
+    FootmarkLocation(const char *file, int line, const char *func, bool new_line = true) :
+      m_file(file), m_line(line), m_func(func), m_flag(true) { Enter(new_line); }
     FootmarkLocation(const FootmarkLocation& location) :
       m_file(location.m_file), m_line(location.m_line),
       m_func(location.m_func), m_flag(false) {}
@@ -53,7 +53,7 @@
     }
     ~FootmarkLocation() { if (m_flag) { Leave(); } }
   protected:
-    void Enter();
+    void Enter(bool newline = true);
     void Leave();
   }; // struct FootmarkLocation
 
@@ -63,11 +63,17 @@
     return s_stack;
   }
 
-  inline void FootmarkLocation::Enter() {
+  inline void FootmarkLocation::Enter(bool newline/* = true*/) {
     GetFootmarkStack().push_back(*this);
-    FootmarkDebugPrint("%s %s (%u): entering %s\n",
-      std::string(GetFootmarkStack().size(), '>').c_str(),
-      m_file, m_line, m_func);
+    if (newline) {
+      FootmarkDebugPrint("%s %s (%u): entering %s\n",
+        std::string(GetFootmarkStack().size(), '>').c_str(),
+        m_file, m_line, m_func);
+    } else {
+      FootmarkDebugPrint("%s %s (%u): entering %s: ",
+        std::string(GetFootmarkStack().size(), '>').c_str(),
+        m_file, m_line, m_func);
+    }
   }
   inline void FootmarkLocation::Leave() {
     if (GetFootmarkStack().size()) {
@@ -109,6 +115,10 @@
   #define FOOTMARK_POINT() FootmarkDebugPrint("%s (%d): FOOTMARK_POINT()\n", \
                                               __FILE__, __LINE__)
   #define FOOTMARK_PRINT_CALL_STACK() FootmarkPrintCallStack(__FILE__, __LINE__)
+  #define FOOTMARK_FORMAT() \
+    FootmarkLocation \
+      object_for_debugging_##__LINE__(__FILE__, __LINE__, __func__, false); \
+    FootmarkDebugPrint
 #else   // def NDEBUG
   #define FOOTMARK()                  /*empty*/
   #define FOOTMARK_POINT()            /*empty*/
