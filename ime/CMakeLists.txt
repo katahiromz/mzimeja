@@ -15,6 +15,7 @@ add_library(mzimeja_ime SHARED
     uicomp.cpp
     uiguide.cpp
     uistate.cpp
+    mzimeja.def
     mzimeja_res.rc)
 target_link_libraries(mzimeja_ime kernel32 user32 gdi32 advapi32 comctl32 imm32)
 set_target_properties(mzimeja_ime PROPERTIES PREFIX "")
