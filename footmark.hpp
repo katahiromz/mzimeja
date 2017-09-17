@@ -32,12 +32,11 @@
   #include <cassert>  // for assert
 
   class FootmarkLocation {
-  protected:
+  public:
     const char *m_file;
     int         m_line;
     const char *m_func;
     bool        m_flag;
-  public:
     FootmarkLocation() :
       m_file(NULL), m_line(0), m_func(NULL), m_flag(false) {}
     FootmarkLocation(const char *file, int line, const char *func) :
