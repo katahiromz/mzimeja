@@ -54,4 +54,3 @@ extern "C" {
 #endif
 
 #endif  // _INDICML_
-
