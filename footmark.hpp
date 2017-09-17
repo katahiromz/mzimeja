@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef FOOTMARK_HPP_
-#define FOOTMARK_HPP_   9   // Version 9
+#define FOOTMARK_HPP_   10    // Version 10
 
 #ifndef __cplusplus
   #error This library (footmark++) needs C++. You lose.
@@ -67,6 +67,7 @@
       return *this;
     }
     ~FootmarkLocation() { if (m_flag) { Leave(); } }
+    bool emit_true() const { return true; }
   protected:
     void Enter(bool newline = true);
     void Leave();
@@ -145,29 +146,26 @@
 #ifndef NDEBUG
   #if (__cplusplus >= 201103L) // C++11
     #define FOOTMARK() \
-      FootmarkLocation \
-        object_for_debugging_##__LINE__(__FILE__, __LINE__, __func__);
+      FootmarkLocation the_footmark(__FILE__, __LINE__, __func__);
   #else // until C++11
     #define FOOTMARK() \
-      FootmarkLocation \
-        object_for_debugging_##__LINE__(__FILE__, __LINE__, __FUNCTION__);
+      FootmarkLocation the_footmark(__FILE__, __LINE__, __FUNCTION__);
   #endif
   #define FOOTMARK_POINT() FootmarkDebugPrint("%s (%d): FOOTMARK_POINT()\n", \
                                               __FILE__, __LINE__)
   #define FOOTMARK_PRINT_CALL_STACK() FootmarkPrintCallStack(__FILE__, __LINE__)
   #if (__cplusplus >= 201103L) // C++11
     #define FOOTMARK_FORMAT \
-      FootmarkLocation \
-        object_for_debugging_##__LINE__(__FILE__, __LINE__, __func__, false); \
+      FootmarkLocation the_footmark(__FILE__, __LINE__, __func__, false); \
       FootmarkDebugPrint
   #else
     #define FOOTMARK_FORMAT \
-      FootmarkLocation \
-        object_for_debugging_##__LINE__(__FILE__, __LINE__, __FUNCTION__, false); \
+      FootmarkLocation the_footmark(__FILE__, __LINE__, __FUNCTION__, false); \
       FootmarkDebugPrint
   #endif
   #define FOOTMARK_RETURN_INT(retval) \
     do { \
+      assert(the_footmark.emit_true());
       FootmarkStackType& stack = GetFootmarkStack(); \
       stack[stack.size() - 1].m_retval_type = FootmarkLocation::RETVAL_INT; \
       stack[stack.size() - 1].m_retval_int = (INT)(retval); \
@@ -175,6 +173,7 @@
     } while (0)
   #define FOOTMARK_RETURN_DWORD(retval) \
     do { \
+      assert(the_footmark.emit_true());
       FootmarkStackType& stack = GetFootmarkStack(); \
       stack[stack.size() - 1].m_retval_type = FootmarkLocation::RETVAL_DWORD; \
       stack[stack.size() - 1].m_retval_dword = (DWORD)(retval); \
@@ -182,6 +181,7 @@
     } while (0)
   #define FOOTMARK_RETURN_LPARAM(retval) \
     do { \
+      assert(the_footmark.emit_true());
       FootmarkStackType& stack = GetFootmarkStack(); \
       stack[stack.size() - 1].m_retval_type = FootmarkLocation::RETVAL_LPARAM; \
       stack[stack.size() - 1].m_retval_lparam = (LPARAM)(retval); \
@@ -189,6 +189,7 @@
     } while (0)
   #define FOOTMARK_RETURN_PTR(ptrtype,retval) \
     do { \
+      assert(the_footmark.emit_true());
       FootmarkStackType& stack = GetFootmarkStack(); \
       stack[stack.size() - 1].m_retval_type = FootmarkLocation::RETVAL_PTR; \
       stack[stack.size() - 1].m_retval_ptr = (LPVOID)(retval); \
