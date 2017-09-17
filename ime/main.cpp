@@ -526,8 +526,7 @@ HKL MzIme::GetHKL(VOID) {
 // Update the transrate key buffer
 BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
   BOOL ret = FALSE;
-  FOOTMARK();
-  DebugPrintA("(%u,%d,%d)\n",
+  FOOTMARK_FORMAT("(%u,%d,%d)\n",
     lpGeneMsg->message, lpGeneMsg->wParam, lpGeneMsg->lParam);
 
   if (m_lpCurTransKey)
@@ -553,7 +552,7 @@ BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
 }
 
 BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%u, 0x%08lX, 0x%08lX)\n", message, wParam, lParam);
   TRANSMSG genmsg;
   genmsg.message = message;
   genmsg.wParam = wParam;
@@ -805,7 +804,7 @@ void FreeUIExtra(HWND hwndServer) {
 // DLL entry point
 
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, 0x%08lX, %p)\n", hInstDLL, dwFunction, lpNot);
   static LPTOP_LEVEL_EXCEPTION_FILTER s_old_handler;
   switch (dwFunction) {
   case DLL_PROCESS_ATTACH:

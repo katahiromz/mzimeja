@@ -15,7 +15,7 @@ extern "C" {
 // A function which handles WM_IME_KEYDOWN
 BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
                        INPUT_MODE imode) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, 0x%08lX, %p, %u)\n", hIMC, wParam, lpbKeyState, (INT)imode);
   InputContext *lpIMC;
   BYTE vk = (BYTE)wParam;
 
@@ -400,7 +400,8 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
 BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
                           CONST LPBYTE lpbKeyState) {
   BOOL ret = FALSE;
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, %u, 0x%08lX, %p)\n",
+    hIMC, vKey, lKeyData, lpbKeyState);
 
   BOOL bKeyUp = (lKeyData & 0x80000000);
   if (bKeyUp) {
@@ -540,7 +541,8 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
                          LPTRANSMSGLIST lpTransBuf, UINT fuState, HIMC hIMC) {
   UINT ret = 0;
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%u, %u, %p, %p, %u, %p)\n",
+    uVKey, uScanCode, lpbKeyState, lpTransBuf, fuState, hIMC);
 
   TheIME.m_lpCurTransKey = lpTransBuf;
   TheIME.m_uNumTransKey = 0;

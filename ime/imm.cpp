@@ -10,7 +10,15 @@ extern "C" {
 
 BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
                        DWORD dwSystemInfoFlags) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("((0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX), %S, 0x%08lX)\n",
+    lpIMEInfo->dwPrivateDataSize,
+    lpIMEInfo->fdwProperty,
+    lpIMEInfo->fdwConversionCaps,
+    lpIMEInfo->fdwSentenceCaps,
+    lpIMEInfo->fdwUICaps,
+    lpIMEInfo->fdwSCSCaps,
+    lpIMEInfo->fdwSelectCaps,
+    lpszClassName, dwSystemInfoFlags);
 
   lpIMEInfo->dwPrivateDataSize = sizeof(UIEXTRA);
   lpIMEInfo->fdwProperty = IME_PROP_KBD_CHAR_FIRST |
@@ -38,20 +46,21 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
 DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
                                LPCANDIDATELIST lpCandList, DWORD dwBufLen,
                                UINT uFlags) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, %S, %p, 0x%08lX, 0x%08X)\n",
+    hIMC, lpSource, lpCandList, dwBufLen, uFlags);
 
   return 0;
 }
 
 BOOL WINAPI ImeDestroy(UINT uForce) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("(0x%08X)\n", uForce);
 
   return TRUE;
 }
 
 LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
   LRESULT ret = FALSE;
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, %u, %p)\n", hIMC, uSubFunc, lpData);
 
   switch (uSubFunc) {
   case IME_ESC_QUERY_SUPPORT:
@@ -86,7 +95,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
 }
 
 BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, %u)\n", hIMC, fFlag);
 
   TheIME.UpdateIndicIcon(hIMC);
 
@@ -99,7 +108,8 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
   CandInfo *lpCandInfo;
   CandList *lpCandList;
 
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, 0x%08lX, 0x%08lX, 0x%08lX)\n",
+    hIMC, dwAction, dwIndex, dwValue);
 
   switch (dwAction) {
   case NI_CONTEXTUPDATED:
@@ -269,7 +279,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
 }
 
 BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, %u)\n", hIMC, fSelect);
 
   if (fSelect) TheIME.UpdateIndicIcon(hIMC);
   if (hIMC != NULL) {
@@ -286,7 +296,8 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
 
 BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
                                     DWORD dwComp, LPVOID lpRead, DWORD dwRead) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, 0x%08lX, %p, 0x%08lX, %p, 0x%08lX)\n",
+    hIMC, dwIndex, lpComp, dwComp, lpRead, dwRead);
 
   switch (dwIndex) {
     case SCS_QUERYRECONVERTSTRING:
@@ -331,7 +342,8 @@ static const MYMENUITEM top_menu_items[] = {
 DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
                                 LPIMEMENUITEMINFO lpImeParentMenu,
                                 LPIMEMENUITEMINFO lpImeMenu, DWORD dwSize) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, 0x%08lX, 0x%08lX, %p, %p, 0x%08lX)\n",
+    hIMC, dwFlags, dwType, lpImeParentMenu, lpImeMenu, dwSize);
   INT ret = 0;
 
   if (lpImeMenu == NULL) {

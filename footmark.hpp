@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef FOOTMARK_HPP_
-#define FOOTMARK_HPP_   5   // Version 5
+#define FOOTMARK_HPP_   6   // Version 6
 
 #ifndef __cplusplus
   #error This library (footmark++) needs C++. You lose.
@@ -115,10 +115,17 @@
   #define FOOTMARK_POINT() FootmarkDebugPrint("%s (%d): FOOTMARK_POINT()\n", \
                                               __FILE__, __LINE__)
   #define FOOTMARK_PRINT_CALL_STACK() FootmarkPrintCallStack(__FILE__, __LINE__)
-  #define FOOTMARK_FORMAT \
-    FootmarkLocation \
-      object_for_debugging_##__LINE__(__FILE__, __LINE__, __func__, false); \
-    FootmarkDebugPrint
+  #if (__cplusplus >= 201103L) // C++11
+    #define FOOTMARK_FORMAT \
+      FootmarkLocation \
+        object_for_debugging_##__LINE__(__FILE__, __LINE__, __func__, false); \
+      FootmarkDebugPrint
+  #else
+    #define FOOTMARK_FORMAT \
+      FootmarkLocation \
+        object_for_debugging_##__LINE__(__FILE__, __LINE__, __FUNCTION__, false); \
+      FootmarkDebugPrint
+  #endif
 #else   // def NDEBUG
   #define FOOTMARK()                  /*empty*/
   #define FOOTMARK_POINT()            /*empty*/
@@ -129,5 +136,3 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #endif  // ndef FOOTMARK_HPP_
-
-///////////////////////////////////////////////////////////////////////////////
