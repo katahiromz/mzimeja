@@ -1,7 +1,7 @@
 // uicomp.cpp --- mzimeja composition window UI
 //////////////////////////////////////////////////////////////////////////////
 
-#include "mzimeja.h"
+#include "../mzimeja.h"
 
 #define UNDERLINE_HEIGHT  2
 #define CARET_WIDTH       2

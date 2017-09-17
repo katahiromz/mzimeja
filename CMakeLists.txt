@@ -77,8 +77,6 @@ endif()
 
 ##############################################################################
 
-include_directories(.)
-
 add_definitions(-DUNICODE=1 -D_UNICODE=1)
 
 add_subdirectory(ime)

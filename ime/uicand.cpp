@@ -1,7 +1,7 @@
 // uicand.cpp --- mzimeja candidate window UI
 //////////////////////////////////////////////////////////////////////////////
 
-#include "mzimeja.h"
+#include "../mzimeja.h"
 
 #define CX_HEADER 32
 #define CX_BORDER ::GetSystemMetrics(SM_CXBORDER)

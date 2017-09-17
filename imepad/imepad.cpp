@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #define _CRT_SECURE_NO_WARNINGS   // use fopen
-#include "targetver.h"   // target Windows version
+#include "../targetver.h"   // target Windows version
 
 #include <windows.h>
 #include <commctrl.h>
@@ -22,7 +22,7 @@
 
 #define UNBOOST_USE_STRING_ALGORITHM
 #define UNBOOST_USE_UNORDERED_MAP
-#include "unboost.hpp"
+#include "../unboost.hpp"
 
 #include "resource.h"
 
