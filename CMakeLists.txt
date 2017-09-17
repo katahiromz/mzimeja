@@ -47,16 +47,16 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # using Clang
     SET(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
 
+    # Use Unicode and Shift_JIS (Japanese codepage)
     SET(CMAKE_C_FLAGS "-municode -finput-charset=CP932 -fexec-charset=CP932")
     SET(CMAKE_CXX_FLAGS "-municode -finput-charset=CP932 -fexec-charset=CP932")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # using GCC
     SET(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
 
+    # Use Unicode and Shift_JIS (Japanese codepage)
     SET(CMAKE_C_FLAGS "-municode -finput-charset=CP932 -fexec-charset=CP932")
     SET(CMAKE_CXX_FLAGS "-municode -finput-charset=CP932 -fexec-charset=CP932")
-else()
-    # TODO: Unicode
 endif()
 
 # replace "/MD" with "/MT" (building without runtime DLLs)
