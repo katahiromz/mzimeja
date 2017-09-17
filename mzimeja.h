@@ -66,7 +66,7 @@
   #endif
 #endif
 
-#include "footmark.hpp"   // for FOOTMARK and FOOTMARK_PRINT_CALL_STACK
+#include "footmark.hpp"   // for footmark++
 
 //////////////////////////////////////////////////////////////////////////////
 
