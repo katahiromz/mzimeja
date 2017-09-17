@@ -88,7 +88,7 @@ add_subdirectory(verinfo)
 add_subdirectory(dict_compile)
 
 add_custom_target(make_dict COMMAND cmd /C make_dict.bat
-    DEPENDS dict_compile res/mzimeja.dat res/name.dat)
-add_dependencies(mzimeja_ime make_dict)
+    DEPENDS res/mzimeja.dat res/name.dat)
+add_dependencies(make_dict mzimeja_ime dict_compile)
 
 ##############################################################################
