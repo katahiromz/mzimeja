@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef FOOTMARK_HPP_
-#define FOOTMARK_HPP_   12    // Version 12
+#define FOOTMARK_HPP_   13    // Version 13
 
 #ifndef __cplusplus
   #error This library (footmark++) needs C++. You lose.
@@ -83,7 +83,6 @@
       return *this;
     }
     ~FootmarkLocation() { if (m_flag) { Leave(); } }
-    bool emit_true() const { return true; }
   protected:
     void Enter(bool newline = true);
     void Leave();
@@ -184,21 +183,18 @@
   #endif
   #define FOOTMARK_RETURN_INT(retval) \
     do { \
-      assert(the_footmark.emit_true()); \
       the_footmark.m_retval_type = FootmarkLocation::RETVAL_INT; \
       the_footmark.m_retval_int = (int)(retval); \
       return the_footmark.m_retval_int; \
     } while (0)
   #define FOOTMARK_RETURN_LONG(retval) \
     do { \
-      assert(the_footmark.emit_true()); \
       the_footmark.m_retval_type = FootmarkLocation::RETVAL_LONG; \
       the_footmark.m_retval_long = (long)(retval); \
       return the_footmark.m_retval_long; \
     } while (0)
   #define FOOTMARK_RETURN_PTR(ptrtype,retval) \
     do { \
-      assert(the_footmark.emit_true()); \
       the_footmark.m_retval_type = FootmarkLocation::RETVAL_PTR; \
       the_footmark.m_retval_ptr = (void *)(retval); \
       return (ptrtype)the_footmark.m_retval_ptr; \
@@ -206,7 +202,6 @@
   #ifdef _WIN32
     #define FOOTMARK_RETURN_LPARAM(retval) \
       do { \
-        assert(the_footmark.emit_true()); \
         the_footmark.m_retval_type = FootmarkLocation::RETVAL_LPARAM; \
         the_footmark.m_retval_lparam = (LPARAM)(retval); \
         return the_footmark.m_retval_lparam; \
