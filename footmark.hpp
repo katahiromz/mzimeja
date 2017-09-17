@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef FOOTMARK_HPP_
-#define FOOTMARK_HPP_   11    // Version 11
+#define FOOTMARK_HPP_   12    // Version 12
 
 #ifndef __cplusplus
   #error This library (footmark++) needs C++. You lose.
@@ -200,7 +200,7 @@
     do { \
       assert(the_footmark.emit_true()); \
       the_footmark.m_retval_type = FootmarkLocation::RETVAL_PTR; \
-      the_footmark.m_retval_ptr = (LPVOID)(retval); \
+      the_footmark.m_retval_ptr = (void *)(retval); \
       return (ptrtype)the_footmark.m_retval_ptr; \
     } while (0)
   #ifdef _WIN32
