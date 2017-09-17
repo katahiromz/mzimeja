@@ -118,7 +118,7 @@ void OnDestroy(HWND hWnd) {
 // IME UI server window procedure
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
-  FOOTMARK();
+  FOOTMARK_FORMAT("(%p, %u, 0x%08lX, 0x%08lX)\n", hWnd, message, wParam, lParam);
   InputContext *lpIMC;
   UIEXTRA *lpUIExtra;
   HGLOBAL hUIExtra;
@@ -133,7 +133,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
       DebugPrintA("Why hIMC is NULL?\n");
       DebugPrintA("hWnd: %x, message: %x, wParam: %x, lParam: %x\n",
         (LONG)hWnd, message, wParam, lParam);
-      return 0;
+      FOOTMARK_RETURN_INT(0);
     }
   }
 
@@ -287,10 +287,10 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     break;
 
   default:
-    return DefWindowProc(hWnd, message, wParam, lParam);
+    FOOTMARK_RETURN_LPARAM(DefWindowProc(hWnd, message, wParam, lParam));
   }
 
-  return lRet;
+  FOOTMARK_RETURN_LPARAM(lRet);
 }
 
 int GetCompFontHeight(UIEXTRA *lpUIExtra) {

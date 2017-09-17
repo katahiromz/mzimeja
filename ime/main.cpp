@@ -428,7 +428,7 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
   wcx.lpszClassName = szUIServerClassName;
   wcx.hbrBackground = NULL;
   wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
+  if (!RegisterClassEx(&wcx)) FOOTMARK_RETURN_INT(FALSE);
 
   // register class of composition window.
   wcx.cbSize = sizeof(WNDCLASSEX);
@@ -443,7 +443,7 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
   wcx.lpszClassName = szCompStrClassName;
   wcx.hbrBackground = NULL;
   wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
+  if (!RegisterClassEx(&wcx)) FOOTMARK_RETURN_INT(FALSE);
 
   // register class of candidate window.
   wcx.cbSize = sizeof(WNDCLASSEX);
@@ -458,7 +458,7 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
   wcx.lpszClassName = szCandClassName;
   wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
   wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
+  if (!RegisterClassEx(&wcx)) FOOTMARK_RETURN_INT(FALSE);
 
   // register class of status window.
   wcx.cbSize = sizeof(WNDCLASSEX);
@@ -473,7 +473,7 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
   wcx.lpszClassName = szStatusClassName;
   wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
   wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
+  if (!RegisterClassEx(&wcx)) FOOTMARK_RETURN_INT(FALSE);
 
   // register class of guideline window.
   wcx.cbSize = sizeof(WNDCLASSEX);
@@ -488,9 +488,9 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
   wcx.lpszClassName = szGuideClassName;
   wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
   wcx.hIconSm = NULL;
-  if (!RegisterClassEx(&wcx)) return FALSE;
+  if (!RegisterClassEx(&wcx)) FOOTMARK_RETURN_INT(FALSE);
 
-  return TRUE;
+  FOOTMARK_RETURN_INT(TRUE);
 #undef CS_MZIME
 } // MzIme::RegisterClasses
 
@@ -501,7 +501,7 @@ HKL MzIme::GetHKL(VOID) {
   // get list size and allocate buffer for list
   DWORD dwSize = ::GetKeyboardLayoutList(0, NULL);
   HKL *lphkl = (HKL *)::GlobalAlloc(GPTR, dwSize * sizeof(DWORD));
-  if (lphkl == NULL) return NULL;
+  if (lphkl == NULL) FOOTMARK_RETURN_PTR(HKL, NULL);
 
   // get the list of keyboard layouts
   ::GetKeyboardLayoutList(dwSize, lphkl);
@@ -520,7 +520,7 @@ HKL MzIme::GetHKL(VOID) {
 
   // free the list
   ::GlobalFree(lphkl);
-  return hKL;
+  FOOTMARK_RETURN_PTR(HKL, hKL);
 }
 
 // Update the transrate key buffer
@@ -530,7 +530,7 @@ BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
     lpGeneMsg->message, lpGeneMsg->wParam, lpGeneMsg->lParam);
 
   if (m_lpCurTransKey)
-    return GenerateMessageToTransKey(lpGeneMsg);
+    FOOTMARK_RETURN_INT(GenerateMessageToTransKey(lpGeneMsg));
 
   if (m_lpIMC == NULL) {
     FOOTMARK_PRINT_CALL_STACK();
@@ -548,7 +548,7 @@ BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
       }
     }
   }
-  return ret;
+  FOOTMARK_RETURN_INT(ret);
 }
 
 BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
@@ -557,7 +557,7 @@ BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
   genmsg.message = message;
   genmsg.wParam = wParam;
   genmsg.lParam = lParam;
-  return GenerateMessage(&genmsg);
+  FOOTMARK_RETURN_INT(GenerateMessage(&genmsg));
 }
 
 // Update the transrate key buffer
@@ -570,14 +570,14 @@ BOOL MzIme::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
   // check overflow
   if (m_uNumTransKey >= m_lpCurTransKey->uMsgCount) {
     m_fOverflowKey = TRUE;
-    return FALSE;
+    FOOTMARK_RETURN_INT(FALSE);
   }
 
   // put one message to TRANSMSG buffer
   LPTRANSMSG lpgmT0 = m_lpCurTransKey->TransMsg + (m_uNumTransKey - 1);
   *lpgmT0 = *lpGeneMsg;
 
-  return TRUE;
+  FOOTMARK_RETURN_INT(TRUE);
 }
 
 BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
@@ -621,9 +621,9 @@ BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
     GenerateMessage(WM_IME_NOTIFY, IMN_PRIVATE, MAKELPARAM(0, 0xFACE));
     break;
   default:
-    return FALSE;
+    FOOTMARK_RETURN_INT(FALSE);
   }
-  return TRUE;
+  FOOTMARK_RETURN_INT(TRUE);
 } // MzIme::DoCommand
 
 void MzIme::UpdateIndicIcon(HIMC hIMC) {
@@ -659,12 +659,10 @@ void MzIme::UnregisterClasses() {
 }
 
 HBITMAP MzIme::LoadBMP(LPCTSTR pszName) {
-  FOOTMARK();
   return ::LoadBitmap(m_hInst, pszName);
 }
 
 WCHAR *MzIme::LoadSTR(INT nID) {
-  FOOTMARK();
   static WCHAR sz[512];
   sz[0] = 0;
   ::LoadStringW(m_hInst, nID, sz, 512);
@@ -682,7 +680,7 @@ InputContext *MzIme::LockIMC(HIMC hIMC) {
   } else {
     DebugPrintA("MzIme::LockIMC: cannot lock: %p\n", hIMC);
   }
-  return context;
+  FOOTMARK_RETURN_PTR(InputContext *, context);
 }
 
 VOID MzIme::UnlockIMC(HIMC hIMC) {
@@ -705,7 +703,8 @@ extern "C" {
 
 HGLOBAL GetUIExtraFromServerWnd(HWND hwndServer) {
   FOOTMARK();
-  return (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE);
+  FOOTMARK_RETURN_PTR(HGLOBAL,
+    (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE));
 }
 
 void SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra) {
@@ -718,7 +717,7 @@ UIEXTRA *LockUIExtra(HWND hwndServer) {
   HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
   UIEXTRA *lpUIExtra = (UIEXTRA *)::GlobalLock(hUIExtra);
   assert(lpUIExtra);
-  return lpUIExtra;
+  FOOTMARK_RETURN_PTR(UIEXTRA *, lpUIExtra);
 }
 
 void UnlockUIExtra(HWND hwndServer) {
@@ -812,7 +811,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
     #ifndef NDEBUG
       s_old_handler = ::SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
     #endif
-    DebugPrintA("DLL_PROCESS_ATTACH: hInst is %p\n", TheIME.m_hInst);
+    DebugPrintA("DLL_PROCESS_ATTACH: hInst is %p\n", hInstDLL);
     TheIME.Init(hInstDLL);
     break;
 
@@ -832,7 +831,8 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
     DebugPrintA("DLL_THREAD_DETACH: hInst is %p\n", TheIME.m_hInst);
     break;
   }
-  return TRUE;
+
+  FOOTMARK_RETURN_INT(TRUE);
 } // DllMain
 
 //////////////////////////////////////////////////////////////////////////////

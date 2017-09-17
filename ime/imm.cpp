@@ -40,7 +40,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
     TheIME.m_bWinLogOn = TRUE;
   }
 
-  return TRUE;
+  FOOTMARK_RETURN_INT(TRUE);
 }
 
 DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
@@ -49,13 +49,13 @@ DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
   FOOTMARK_FORMAT("(%p, %S, %p, 0x%08lX, 0x%08X)\n",
     hIMC, lpSource, lpCandList, dwBufLen, uFlags);
 
-  return 0;
+  FOOTMARK_RETURN_DWORD(0);
 }
 
 BOOL WINAPI ImeDestroy(UINT uForce) {
   FOOTMARK_FORMAT("(0x%08X)\n", uForce);
 
-  return TRUE;
+  FOOTMARK_RETURN_INT(TRUE);
 }
 
 LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
@@ -91,7 +91,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
     break;
   }
 
-  return ret;
+  FOOTMARK_RETURN_LPARAM(ret);
 }
 
 BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
@@ -99,7 +99,7 @@ BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
 
   TheIME.UpdateIndicIcon(hIMC);
 
-  return TRUE;
+  FOOTMARK_RETURN_INT(TRUE);
 }
 
 BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
@@ -275,7 +275,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     break;
   }
 
-  return ret;
+  FOOTMARK_RETURN_INT(ret);
 }
 
 BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
@@ -291,7 +291,7 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
       TheIME.UnlockIMC(hIMC);
     }
   }
-  return TRUE;
+  FOOTMARK_RETURN_INT(TRUE);
 }
 
 BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
@@ -313,7 +313,7 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
       break;
   }
 
-  return FALSE;
+  FOOTMARK_RETURN_INT(FALSE);
 }
 
 struct MYMENUITEM {
@@ -344,14 +344,14 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
                                 LPIMEMENUITEMINFO lpImeMenu, DWORD dwSize) {
   FOOTMARK_FORMAT("(%p, 0x%08lX, 0x%08lX, %p, %p, 0x%08lX)\n",
     hIMC, dwFlags, dwType, lpImeParentMenu, lpImeMenu, dwSize);
-  INT ret = 0;
+  DWORD ret = 0;
 
   if (lpImeMenu == NULL) {
     if (lpImeParentMenu == NULL) {
       if (dwFlags & IGIMIF_RIGHTMENU)
         ret = _countof(top_menu_items);
     }
-    return ret;
+    FOOTMARK_RETURN_DWORD(ret);
   }
 
   if (lpImeParentMenu == NULL) {
@@ -435,7 +435,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
     }
   }
 
-  return ret;
+  FOOTMARK_RETURN_DWORD(ret);
 } // ImeGetImeMenuItems
 
 //////////////////////////////////////////////////////////////////////////////
