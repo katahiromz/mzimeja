@@ -26,13 +26,13 @@ typedef DWORD   HIMCC;
 typedef HKL FAR  *LPHKL;
 typedef UINT FAR *LPUINT;
 
-typedef struct tagCOMPOSITIONFORM {
+typedef struct tagCOMPOSITIONFORM { // 4+8+16==28
     DWORD dwStyle;
     POINT ptCurrentPos;
     RECT  rcArea;
 } COMPOSITIONFORM, *PCOMPOSITIONFORM, NEAR *NPCOMPOSITIONFORM, FAR *LPCOMPOSITIONFORM;
 
-typedef struct tagCANDIDATEFORM {
+typedef struct tagCANDIDATEFORM { // 4+4+8+16==32
     DWORD dwIndex;
     DWORD dwStyle;
     POINT ptCurrentPos;
@@ -764,26 +764,26 @@ typedef struct tagCANDIDATEINFO {
 } CANDIDATEINFO, *PCANDIDATEINFO, NEAR *NPCANDIDATEINFO, FAR *LPCANDIDATEINFO;
 
 typedef struct tagINPUTCONTEXT {
-    HWND                hWnd;
-    BOOL                fOpen;
-    POINT               ptStatusWndPos;
-    POINT               ptSoftKbdPos;
-    DWORD               fdwConversion;
-    DWORD               fdwSentence;
+    HWND                hWnd; // +0x0
+    BOOL                fOpen; // +0x4
+    POINT               ptStatusWndPos; // +0x8
+    POINT               ptSoftKbdPos; // +0x10
+    DWORD               fdwConversion; // +0x18
+    DWORD               fdwSentence; // +0x1C
     union   {
         LOGFONTA        A;
         LOGFONTW        W;
-    } lfFont;
-    COMPOSITIONFORM     cfCompForm;
-    CANDIDATEFORM       cfCandForm[4];
-    HIMCC               hCompStr;
-    HIMCC               hCandInfo;
-    HIMCC               hGuideLine;
-    HIMCC               hPrivate;
-    DWORD               dwNumMsgBuf;
-    HIMCC               hMsgBuf;
-    DWORD               fdwInit;
-    DWORD               dwReserve[3];
+    } lfFont; // +0x20
+    COMPOSITIONFORM     cfCompForm; // +0x7C
+    CANDIDATEFORM       cfCandForm[4]; // +0x98
+    HIMCC               hCompStr; //+0x118
+    HIMCC               hCandInfo; //+0x11C
+    HIMCC               hGuideLine; //+0x120
+    HIMCC               hPrivate; //+0x124
+    DWORD               dwNumMsgBuf; //+0x128
+    HIMCC               hMsgBuf; //+0x12C
+    DWORD               fdwInit; //+0x12C
+    DWORD               dwReserve[3]; //+
 } INPUTCONTEXT, *PINPUTCONTEXT, NEAR *NPINPUTCONTEXT, FAR *LPINPUTCONTEXT;
 
 typedef struct tagIMEINFO {
