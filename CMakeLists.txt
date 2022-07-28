@@ -4,10 +4,10 @@
 ##############################################################################
 
 # CMake minimum version
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 3.0)
 
-# project name and language
-project(mzimeja CXX)
+# project name and languages
+project(mzimeja CXX RC)
 
 # check build type
 if (NOT CMAKE_BUILD_TYPE)
@@ -34,12 +34,9 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 # Win32 or not?
-if (NOT CMAKE_HOST_WIN32)
+if (NOT WIN32)
     message(FATAL_ERROR "To build this project, use Win32 C++ compiler")
-endif(NOT CMAKE_HOST_WIN32)
-
-# enable Win32 resource compiler
-ENABLE_LANGUAGE(RC)
+endif(NOT WIN32)
 
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 SET(BUILD_SHARED_LIBRARIES OFF)
@@ -60,7 +57,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 # replace "/MD" with "/MT" (building without runtime DLLs)
-if(1)
+if(MSVC)
     set(CompilerFlags
         CMAKE_C_FLAGS
         CMAKE_C_FLAGS_DEBUG
