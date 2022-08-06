@@ -353,7 +353,7 @@ INT DoInstall(VOID) {
     ::MessageBoxW(NULL, szMsg, NULL, MB_ICONERROR);
     return 3;
   }
-
+  ShellExecuteW(NULL, NULL, L"control.exe", L"input.dll", NULL, SW_SHOWNORMAL);
   return 0;
 } // DoInstall
 
