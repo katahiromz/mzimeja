@@ -157,10 +157,10 @@ INT DoSetRegistry1(VOID) {
     HKEY hkLayouts;
     result = CreateRegKey(hKey, L"E0120411", &hkLayouts);
     if (result == ERROR_SUCCESS && hkLayouts) {
-      if (DoSetRegSz(hkLayouts, L"layout file", L"kbdjp.kbd") &&
-        DoSetRegSz(hkLayouts, L"layout text", DoLoadString(4)) &&
-        DoSetRegSz(hkLayouts, L"layout file", L"kbdjp.kbd") &&
-        DoSetRegSz(hkLayouts, L"IME file", L"mzimeja.ime"))
+      if (DoSetRegSz(hkLayouts, L"Layout File", L"kbdjp.kbd") &&
+        DoSetRegSz(hkLayouts, L"Layout Text", DoLoadString(4)) &&
+        DoSetRegSz(hkLayouts, L"Layout File", L"kbdjp.kbd") &&
+        DoSetRegSz(hkLayouts, L"IME File", L"mzimeja.ime"))
       {
         ret = TRUE;
       }
