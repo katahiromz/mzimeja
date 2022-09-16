@@ -157,8 +157,7 @@ static std::wstring GetSettingString(LPCWSTR pszSettingName) {
       return std::wstring(szValue);
     }
   }
-  assert(0);
-  return std::wstring();
+  return L"";
 } // GetSettingString
 
 // adjust window position
@@ -329,6 +328,38 @@ ImePad::~ImePad() {
 //////////////////////////////////////////////////////////////////////////////
 // loading res/kanji.dat and res/radical.dat
 
+LPWSTR GetKanjiDataPathName(LPWSTR pszPath) {
+  ::GetModuleFileName(NULL, pszPath, MAX_PATH);
+  LPWSTR pch = wcsrchr(pszPath, L'\\');
+  lstrcpyW(pch, L"\\res\\kanji.dat");
+  if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
+    lstrcpyW(pch, L"\\..\\res\\kanji.dat");
+    if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
+      lstrcpyW(pch, L"\\..\\..\\res\\kanji.dat");
+      if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
+        lstrcpyW(pch, L"\\..\\..\\..\\res\\kanji.dat");
+      }
+    }
+  }
+  return pszPath;
+}
+
+LPWSTR GetRadicalDataPathName(LPWSTR pszPath) {
+  GetModuleFileName(NULL, pszPath, MAX_PATH);
+  LPWSTR pch = wcsrchr(pszPath, L'\\');
+  lstrcpyW(pch, L"\\res\\radical.dat");
+  if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
+    lstrcpyW(pch, L"\\..\\res\\radical.dat");
+    if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
+      lstrcpyW(pch, L"\\..\\..\\res\\radical.dat");
+      if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
+        lstrcpyW(pch, L"\\..\\..\\..\\res\\radical.dat");
+      }
+    }
+  }
+  return pszPath;
+}
+
 BOOL ImePad::LoadKanjiData() {
   if (m_kanji_table.size()) {
     return TRUE;
@@ -338,6 +369,11 @@ BOOL ImePad::LoadKanjiData() {
   std::wstring kanji_file = GetSettingString(L"KanjiDataFile");
   using namespace std;
   FILE *fp = _wfopen(kanji_file.c_str(), L"rb");
+  if (!fp) {
+    WCHAR szPath[MAX_PATH];
+    GetKanjiDataPathName(szPath);
+    fp = _wfopen(szPath, L"rb");
+  }
   if (fp) {
     KANJI_ENTRY entry;
     while (fgets(buf, 256, fp) != NULL) {
@@ -371,6 +407,11 @@ BOOL ImePad::LoadRadicalData() {
   std::wstring radical_file = GetSettingString(L"RadicalDataFile");
   using namespace std;
   FILE *fp = _wfopen(radical_file.c_str(), L"rb");
+  if (!fp) {
+    WCHAR szPath[MAX_PATH];
+    GetRadicalDataPathName(szPath);
+    fp = _wfopen(szPath, L"rb");
+  }
   if (fp) {
     RADICAL_ENTRY entry;
     while (fgets(buf, 256, fp) != NULL) {
