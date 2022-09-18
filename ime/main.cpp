@@ -747,6 +747,14 @@ void FreeUIExtra(HWND hwndServer) {
     StringCchVPrintfA(szMsgA, _countof(szMsgA), lpszFormat, marker);
     va_end(marker);
 
+    INT cch = strlen(szMsgA);
+    if (cch > 0) {
+      if (szMsgA[cch - 1] == '\n') {
+        szMsgA[cch - 1] = 0;
+      }
+      StringCchCatA(szMsgA, _countof(szMsgA), "\r\n");
+    }
+
     WCHAR szMsgW[1024];
     szMsgW[0] = 0;
     ::MultiByteToWideChar(932, 0, szMsgA, -1, szMsgW, 1024);
@@ -770,6 +778,14 @@ void FreeUIExtra(HWND hwndServer) {
     va_start(marker, lpszFormat);
     StringCchVPrintfW(szMsg, _countof(szMsg), lpszFormat, marker);
     va_end(marker);
+
+    INT cch = wcslen(szMsg);
+    if (cch > 0) {
+      if (szMsg[cch - 1] == L'\n') {
+        szMsg[cch - 1] = 0;
+      }
+      StringCchCatW(szMsg, _countof(szMsg), L"\r\n");
+    }
 
     CHAR szLogFile[MAX_PATH];
     SHGetSpecialFolderPathA(NULL, szLogFile, CSIDL_DESKTOP, FALSE);
