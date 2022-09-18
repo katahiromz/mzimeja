@@ -3,6 +3,7 @@
 // (Japanese, Shift_JIS)
 
 #include "../mzimeja.h"
+#include <shlobj.h>
 #include "resource.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -750,8 +751,12 @@ void FreeUIExtra(HWND hwndServer) {
     szMsgW[0] = 0;
     ::MultiByteToWideChar(932, 0, szMsgA, -1, szMsgW, 1024);
 
+    CHAR szLogFile[MAX_PATH];
+    SHGetSpecialFolderPathA(NULL, szLogFile, CSIDL_DESKTOPDIRECTORY, FALSE);
+    lstrcatA(szLogFile, "\\mzimeja.log");
+
     //OutputDebugString(szMsg);
-    FILE *fp = fopen("C:\\mzimeja.log", "ab");
+    FILE *fp = fopen(szLogFile, "ab");
     if (fp) {
       int len = lstrlenW(szMsgW);
       if (len > 0 && szMsgW[len - 1] == L'\n') {
@@ -774,8 +779,12 @@ void FreeUIExtra(HWND hwndServer) {
     nCount = wvsprintfW(szMsg, lpszFormat, marker);
     va_end(marker);
 
+    CHAR szLogFile[MAX_PATH];
+    SHGetSpecialFolderPathA(NULL, szLogFile, CSIDL_DESKTOPDIRECTORY, FALSE);
+    lstrcatA(szLogFile, "\\mzimeja.log");
+
     //OutputDebugString(szMsg);
-    FILE *fp = fopen("C:\\mzimeja.log", "ab");
+    FILE *fp = fopen(szLogFile, "ab");
     if (fp) {
       int len = lstrlenW(szMsg);
       if (len > 0 && szMsg[len - 1] == L'\n') {
