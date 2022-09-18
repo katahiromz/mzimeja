@@ -38,11 +38,11 @@ Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 ; Source: "build\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; Source: "build\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
 
-Source: "build\Debug\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Debug\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Debug\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Debug\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Debug\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
