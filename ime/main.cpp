@@ -758,13 +758,7 @@ void FreeUIExtra(HWND hwndServer) {
     //OutputDebugString(szMsg);
     FILE *fp = fopen(szLogFile, "ab");
     if (fp) {
-      int len = lstrlenW(szMsgW);
-      if (len > 0 && szMsgW[len - 1] == L'\n') {
-        szMsgW[len - 1] = L'\r';
-        szMsgW[len] = L'\n';
-        ++len;
-        szMsgW[len] = L'\0';
-      }
+      INT len = lstrlenW(szMsgW);
       fwrite(szMsgW, len * sizeof(WCHAR), 1, fp);
       fclose(fp);
     }
@@ -786,13 +780,7 @@ void FreeUIExtra(HWND hwndServer) {
     //OutputDebugString(szMsg);
     FILE *fp = fopen(szLogFile, "ab");
     if (fp) {
-      int len = lstrlenW(szMsg);
-      if (len > 0 && szMsg[len - 1] == L'\n') {
-        szMsg[len - 1] = L'\r';
-        szMsg[len] = L'\n';
-        ++len;
-        szMsg[len] = L'\0';
-      }
+      INT len = lstrlenW(szMsgW);
       fwrite(szMsg, len * sizeof(WCHAR), 1, fp);
       fclose(fp);
     }
