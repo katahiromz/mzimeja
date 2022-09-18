@@ -161,7 +161,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // FOOTMARK* Macros
 
-#if defined(MZIMEJA_DEBUG_OUTPUT)
+#if defined(MZIMEJA_DEBUG_OUTPUT) && 0
   #if (__cplusplus >= 201103L) // C++11
     #define FOOTMARK() \
       FootmarkLocation the_footmark(__FILE__, __LINE__, __func__);
