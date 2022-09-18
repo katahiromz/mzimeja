@@ -737,7 +737,7 @@ void FreeUIExtra(HWND hwndServer) {
 //////////////////////////////////////////////////////////////////////////////
 // for debugging
 
-#ifndef NDEBUG
+#ifdef MZIMEJA_DEBUG_OUTPUT
   int DebugPrintA(const char *lpszFormat, ...) {
     int nCount;
     char szMsgA[1024];
@@ -752,7 +752,7 @@ void FreeUIExtra(HWND hwndServer) {
     ::MultiByteToWideChar(932, 0, szMsgA, -1, szMsgW, 1024);
 
     CHAR szLogFile[MAX_PATH];
-    SHGetSpecialFolderPathA(NULL, szLogFile, CSIDL_DESKTOPDIRECTORY, FALSE);
+    SHGetSpecialFolderPathA(NULL, szLogFile, CSIDL_DESKTOP, FALSE);
     lstrcatA(szLogFile, "\\mzimeja.log");
 
     //OutputDebugString(szMsg);
@@ -780,7 +780,7 @@ void FreeUIExtra(HWND hwndServer) {
     va_end(marker);
 
     CHAR szLogFile[MAX_PATH];
-    SHGetSpecialFolderPathA(NULL, szLogFile, CSIDL_DESKTOPDIRECTORY, FALSE);
+    SHGetSpecialFolderPathA(NULL, szLogFile, CSIDL_DESKTOP, FALSE);
     lstrcatA(szLogFile, "\\mzimeja.log");
 
     //OutputDebugString(szMsg);
@@ -798,28 +798,16 @@ void FreeUIExtra(HWND hwndServer) {
     }
     return nCount;
   }
-#endif  // ndef NDEBUG
-
-#ifndef NDEBUG
-  LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo) {
-    DebugPrintA("### Abnormal Status ###\n");
-    FOOTMARK_PRINT_CALL_STACK();
-    return EXCEPTION_EXECUTE_HANDLER;
-  }
-#endif
+#endif  // def MZIMEJA_DEBUG_OUTPUT
 
 //////////////////////////////////////////////////////////////////////////////
 // DLL entry point
 
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   FOOTMARK_FORMAT("(%p, 0x%08lX, %p)\n", hInstDLL, dwFunction, lpNot);
-  static LPTOP_LEVEL_EXCEPTION_FILTER s_old_handler;
   switch (dwFunction) {
   case DLL_PROCESS_ATTACH:
     ::DisableThreadLibraryCalls(hInstDLL);
-    #ifndef NDEBUG
-      s_old_handler = ::SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
-    #endif
     DebugPrintA("DLL_PROCESS_ATTACH: hInst is %p\n", hInstDLL);
     TheIME.Init(hInstDLL);
     break;
@@ -827,9 +815,6 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
   case DLL_PROCESS_DETACH:
     DebugPrintA("DLL_PROCESS_DETACH: hInst is %p\n", TheIME.m_hInst);
     TheIME.Uninit();
-    #ifndef NDEBUG
-      ::SetUnhandledExceptionFilter(s_old_handler);
-    #endif
     break;
 
   case DLL_THREAD_ATTACH:

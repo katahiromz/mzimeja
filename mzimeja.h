@@ -48,7 +48,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // for debugging
 
-#ifdef NDEBUG
+#ifndef MZIMEJA_DEBUG_OUTPUT
   #define DebugPrintA   (void)
   #define DebugPrintW   (void)
   #define DebugPrint    (void)

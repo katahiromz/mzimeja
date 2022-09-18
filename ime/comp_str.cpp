@@ -1161,7 +1161,6 @@ void LogCompStr::AssertValid() {
 
 void CompStr::Dump() {
   FOOTMARK();
-#ifndef NDEBUG
   DebugPrintA("dwSize: %08X\n", dwSize);
   DebugPrintA("dwCursorPos: %08X\n", dwCursorPos);
   DebugPrintA("dwDeltaStart: %08X\n", dwDeltaStart);
@@ -1237,11 +1236,9 @@ void CompStr::Dump() {
     DebugPrintA("%ls", str);
   }
   DebugPrintA("\n");
-#endif  // ndef NDEBUG
 } // CompStr::Dump
 
 void LogCompStr::Dump() {
-#ifndef NDEBUG
   DebugPrintA("### LogCompStr ###\n");
   DebugPrintA("+ dwCursorPos: %08X\n", dwCursorPos);
   DebugPrintA("+ dwDeltaStart: %08X\n", dwDeltaStart);
@@ -1302,7 +1299,6 @@ void LogCompStr::Dump() {
     DebugPrintA("%ls ", extra.typing_clauses[i].c_str());
   }
   DebugPrintA("\n");
-#endif  // ndef NDEBUG
 } // LogCompStr::Dump
 
 //////////////////////////////////////////////////////////////////////////////

@@ -61,6 +61,11 @@ endif()
 
 add_definitions(-DUNICODE=1 -D_UNICODE=1)
 
+option(MZIMEJA_DEBUG_OUTPUT "Enable debug output" OFF)
+if(MZIMEJA_DEBUG_OUTPUT)
+    add_definitions(-DMZIMEJA_DEBUG_OUTPUT)
+endif()
+
 add_subdirectory(ime)
 add_subdirectory(imepad)
 add_subdirectory(setup)

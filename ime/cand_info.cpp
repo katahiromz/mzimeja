@@ -154,7 +154,6 @@ DWORD LogCandInfo::GetTotalSize() const {
 }
 
 void LogCandInfo::Dump() {
-#ifndef NDEBUG
   DebugPrintA("LogCandInfo::Dump\n");
   for (size_t i = 0; i < cand_lists.size(); ++i) {
     DebugPrintA("### CandList %u ###\n", i);
@@ -169,7 +168,6 @@ void LogCandInfo::Dump() {
     DebugPrintA("\n");
     DebugPrintA("+ iClause: %u\n", iClause);
   }
-#endif
 } // LogCandInfo::Dump
 
 //////////////////////////////////////////////////////////////////////////////
@@ -319,7 +317,6 @@ CANDINFOEXTRA *CandInfo::GetExtra() {
 } // CandInfo::ReCreate
 
 void CandInfo::Dump() {
-#ifndef NDEBUG
   DebugPrintA("### CandInfo ###\n");
   DebugPrintA("+ dwSize: %u\n", dwSize);
   DebugPrintA("+ dwCount: %u\n", dwCount);
@@ -341,7 +338,6 @@ void CandInfo::Dump() {
     }
     DebugPrintA("\n");
   }
-#endif
 } // CandInfo::Dump
 
 //////////////////////////////////////////////////////////////////////////////

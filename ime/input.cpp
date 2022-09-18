@@ -168,42 +168,40 @@ BOOL InputContext::IsRomanMode() const {
 void InputContext::Initialize() {
   FOOTMARK();
 
-  #ifndef NDEBUG
-    DebugPrintA("### Initial status of INPUTCONTEXT ###\n");
-    DebugPrintA("hWnd: %p\n", hWnd);
-    DebugPrintA("fOpen: %d\n", fOpen);
-    DebugPrintA("ptStatusWndPos.x: %d\n", ptStatusWndPos.x);
-    DebugPrintA("ptStatusWndPos.y: %d\n", ptStatusWndPos.y);
-    DebugPrintA("ptSoftKbdPos.x: %d\n", ptSoftKbdPos.x);
-    DebugPrintA("ptSoftKbdPos.y: %d\n", ptSoftKbdPos.y);
-    DebugPrintA("fdwConversion: %08X\n", fdwConversion);
-    DebugPrintA("fdwSentence: %08X\n", fdwSentence);
-    DebugPrintA("lfFont.W.lfHeight: %d\n", lfFont.W.lfHeight);
-    DebugPrintA("lfFont.W.lfCharSet: %d\n", lfFont.W.lfCharSet);
-    DebugPrintW(L"lfFont.W.lfFaceName: %s\n", lfFont.W.lfFaceName);
-    DebugPrintA("cfCompForm.dwStyle: %08X\n", cfCompForm.dwStyle);
-    DebugPrintA("cfCompForm.ptCurrentPos.x: %d\n", cfCompForm.ptCurrentPos.x);
-    DebugPrintA("cfCompForm.ptCurrentPos.y: %d\n", cfCompForm.ptCurrentPos.y);
-    DebugPrintA("cfCompForm.rcArea.left: %d\n", cfCompForm.rcArea.left);
-    DebugPrintA("cfCompForm.rcArea.top: %d\n", cfCompForm.rcArea.top);
-    DebugPrintA("cfCompForm.rcArea.right: %d\n", cfCompForm.rcArea.right);
-    DebugPrintA("cfCompForm.rcArea.bottom: %d\n", cfCompForm.rcArea.bottom);
-    DebugPrintA("cfCandForm[0].dwIndex: %d\n", cfCandForm[0].dwIndex);
-    DebugPrintA("cfCandForm[0].dwStyle: %08X\n", cfCandForm[0].dwStyle);
-    DebugPrintA("cfCandForm[0].ptCurrentPos.x: %d\n", cfCandForm[0].ptCurrentPos.x);
-    DebugPrintA("cfCandForm[0].ptCurrentPos.y: %d\n", cfCandForm[0].ptCurrentPos.y);
-    DebugPrintA("cfCandForm[0].rcArea.left: %d\n", cfCandForm[0].rcArea.left);
-    DebugPrintA("cfCandForm[0].rcArea.top: %d\n", cfCandForm[0].rcArea.top);
-    DebugPrintA("cfCandForm[0].rcArea.right: %d\n", cfCandForm[0].rcArea.right);
-    DebugPrintA("cfCandForm[0].rcArea.bottom: %d\n", cfCandForm[0].rcArea.bottom);
-    DebugPrintA("hCompStr: %p\n", hCompStr);
-    DebugPrintA("hCandInfo: %p\n", hCandInfo);
-    DebugPrintA("hGuideLine: %p\n", hGuideLine);
-    DebugPrintA("hPrivate: %p\n", hPrivate);
-    DebugPrintA("dwNumMsgBuf: %d\n", dwNumMsgBuf);
-    DebugPrintA("hMsgBuf: %p\n", hMsgBuf);
-    DebugPrintA("fdwInit: %08X\n", fdwInit);
-  #endif
+  DebugPrintA("### Initial status of INPUTCONTEXT ###\n");
+  DebugPrintA("hWnd: %p\n", hWnd);
+  DebugPrintA("fOpen: %d\n", fOpen);
+  DebugPrintA("ptStatusWndPos.x: %d\n", ptStatusWndPos.x);
+  DebugPrintA("ptStatusWndPos.y: %d\n", ptStatusWndPos.y);
+  DebugPrintA("ptSoftKbdPos.x: %d\n", ptSoftKbdPos.x);
+  DebugPrintA("ptSoftKbdPos.y: %d\n", ptSoftKbdPos.y);
+  DebugPrintA("fdwConversion: %08X\n", fdwConversion);
+  DebugPrintA("fdwSentence: %08X\n", fdwSentence);
+  DebugPrintA("lfFont.W.lfHeight: %d\n", lfFont.W.lfHeight);
+  DebugPrintA("lfFont.W.lfCharSet: %d\n", lfFont.W.lfCharSet);
+  DebugPrintW(L"lfFont.W.lfFaceName: %s\n", lfFont.W.lfFaceName);
+  DebugPrintA("cfCompForm.dwStyle: %08X\n", cfCompForm.dwStyle);
+  DebugPrintA("cfCompForm.ptCurrentPos.x: %d\n", cfCompForm.ptCurrentPos.x);
+  DebugPrintA("cfCompForm.ptCurrentPos.y: %d\n", cfCompForm.ptCurrentPos.y);
+  DebugPrintA("cfCompForm.rcArea.left: %d\n", cfCompForm.rcArea.left);
+  DebugPrintA("cfCompForm.rcArea.top: %d\n", cfCompForm.rcArea.top);
+  DebugPrintA("cfCompForm.rcArea.right: %d\n", cfCompForm.rcArea.right);
+  DebugPrintA("cfCompForm.rcArea.bottom: %d\n", cfCompForm.rcArea.bottom);
+  DebugPrintA("cfCandForm[0].dwIndex: %d\n", cfCandForm[0].dwIndex);
+  DebugPrintA("cfCandForm[0].dwStyle: %08X\n", cfCandForm[0].dwStyle);
+  DebugPrintA("cfCandForm[0].ptCurrentPos.x: %d\n", cfCandForm[0].ptCurrentPos.x);
+  DebugPrintA("cfCandForm[0].ptCurrentPos.y: %d\n", cfCandForm[0].ptCurrentPos.y);
+  DebugPrintA("cfCandForm[0].rcArea.left: %d\n", cfCandForm[0].rcArea.left);
+  DebugPrintA("cfCandForm[0].rcArea.top: %d\n", cfCandForm[0].rcArea.top);
+  DebugPrintA("cfCandForm[0].rcArea.right: %d\n", cfCandForm[0].rcArea.right);
+  DebugPrintA("cfCandForm[0].rcArea.bottom: %d\n", cfCandForm[0].rcArea.bottom);
+  DebugPrintA("hCompStr: %p\n", hCompStr);
+  DebugPrintA("hCandInfo: %p\n", hCandInfo);
+  DebugPrintA("hGuideLine: %p\n", hGuideLine);
+  DebugPrintA("hPrivate: %p\n", hPrivate);
+  DebugPrintA("dwNumMsgBuf: %d\n", dwNumMsgBuf);
+  DebugPrintA("hMsgBuf: %p\n", hMsgBuf);
+  DebugPrintA("fdwInit: %08X\n", fdwInit);
 
   lfFont.W.lfCharSet = SHIFTJIS_CHARSET;
   lfFont.W.lfFaceName[0] = 0;
@@ -1106,7 +1104,6 @@ void InputContext::PageDown() {
 
 void InputContext::DumpCompStr() {
   FOOTMARK();
-#ifndef NDEBUG
   CompStr *pCompStr = LockCompStr();
   if (pCompStr) {
     pCompStr->Dump();
@@ -1114,12 +1111,10 @@ void InputContext::DumpCompStr() {
   } else {
     DebugPrintA("(no comp str)\n");
   }
-#endif
 } // InputContext::DumpCompStr
 
 void InputContext::DumpCandInfo() {
   FOOTMARK();
-#ifndef NDEBUG
   CandInfo *pCandInfo = LockCandInfo();
   if (pCandInfo) {
     pCandInfo->Dump();
@@ -1127,7 +1122,6 @@ void InputContext::DumpCandInfo() {
   } else {
     DebugPrintA("(no cand info)\n");
   }
-#endif
 } // InputContext::DumpCandInfo
 
 //////////////////////////////////////////////////////////////////////////////

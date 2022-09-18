@@ -2086,7 +2086,6 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost/* = 0*/) {
 } // Lattice::DoFields
 
 void Lattice::Dump(int num) {
-#ifndef NDEBUG
   const size_t length = pre.size();
   DebugPrintW(L"### Lattice::Dump(%d) ###\n", num);
   DebugPrintW(L"Lattice length: %d\n", int(length));
@@ -2098,7 +2097,6 @@ void Lattice::Dump(int num) {
     }
     DebugPrintW(L"\n");
   }
-#endif  // ndef NDEBUG
 } // Lattice::Dump
 
 //////////////////////////////////////////////////////////////////////////////
