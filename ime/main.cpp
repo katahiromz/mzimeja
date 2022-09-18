@@ -534,10 +534,6 @@ BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
   if (m_lpCurTransKey)
     FOOTMARK_RETURN_INT(GenerateMessageToTransKey(lpGeneMsg));
 
-  if (m_lpIMC == NULL) {
-    FOOTMARK_PRINT_CALL_STACK();
-  }
-
   if (m_lpIMC && ::IsWindow(m_lpIMC->hWnd)) {
     DWORD dwNewSize = sizeof(TRANSMSG) * (m_lpIMC->NumMsgBuf() + 1);
     m_lpIMC->hMsgBuf = ImmReSizeIMCC(m_lpIMC->hMsgBuf, dwNewSize);
