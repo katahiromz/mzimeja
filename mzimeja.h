@@ -54,8 +54,8 @@
   #define DebugPrint    (void)
 #else
   extern "C" {
-    int DebugPrintA(const char *lpszFormat, ...);
-    int DebugPrintW(const WCHAR *lpszFormat, ...);
+    void DebugPrintA(const char *lpszFormat, ...);
+    void DebugPrintW(const WCHAR *lpszFormat, ...);
   } // extern "C"
   #define DebugPrintA DebugPrintA
   #define DebugPrintW DebugPrintW

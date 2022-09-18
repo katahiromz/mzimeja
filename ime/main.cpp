@@ -4,6 +4,7 @@
 
 #include "../mzimeja.h"
 #include <shlobj.h>
+#include <strsafe.h>
 #include "resource.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -738,13 +739,12 @@ void FreeUIExtra(HWND hwndServer) {
 // for debugging
 
 #ifdef MZIMEJA_DEBUG_OUTPUT
-  int DebugPrintA(const char *lpszFormat, ...) {
-    int nCount;
+  void DebugPrintA(const char *lpszFormat, ...) {
     char szMsgA[1024];
 
     va_list marker;
     va_start(marker, lpszFormat);
-    nCount = wvsprintfA(szMsgA, lpszFormat, marker);
+    StringCchVPrintfA(szMsgA, _countof(szMsgA), lpszFormat, marker);
     va_end(marker);
 
     WCHAR szMsgW[1024];
@@ -753,7 +753,7 @@ void FreeUIExtra(HWND hwndServer) {
 
     CHAR szLogFile[MAX_PATH];
     SHGetSpecialFolderPathA(NULL, szLogFile, CSIDL_DESKTOP, FALSE);
-    lstrcatA(szLogFile, "\\mzimeja.log");
+    StringCchCatA(szLogFile, _countof(szLogFile), "\\mzimeja.log");
 
     //OutputDebugString(szMsg);
     FILE *fp = fopen(szLogFile, "ab");
@@ -762,29 +762,26 @@ void FreeUIExtra(HWND hwndServer) {
       fwrite(szMsgW, len * sizeof(WCHAR), 1, fp);
       fclose(fp);
     }
-    return nCount;
   }
-  int DebugPrintW(const WCHAR *lpszFormat, ...) {
-    int nCount;
+  void DebugPrintW(const WCHAR *lpszFormat, ...) {
     WCHAR szMsg[1024];
 
     va_list marker;
     va_start(marker, lpszFormat);
-    nCount = wvsprintfW(szMsg, lpszFormat, marker);
+    StringCchVPrintfW(szMsg, _countof(szMsg), lpszFormat, marker);
     va_end(marker);
 
     CHAR szLogFile[MAX_PATH];
     SHGetSpecialFolderPathA(NULL, szLogFile, CSIDL_DESKTOP, FALSE);
-    lstrcatA(szLogFile, "\\mzimeja.log");
+    StringCchCatA(szLogFile, _countof(szLogFile), "\\mzimeja.log");
 
     //OutputDebugString(szMsg);
     FILE *fp = fopen(szLogFile, "ab");
     if (fp) {
-      INT len = lstrlenW(szMsgW);
+      INT len = lstrlenW(szMsg);
       fwrite(szMsg, len * sizeof(WCHAR), 1, fp);
       fclose(fp);
     }
-    return nCount;
   }
 #endif  // def MZIMEJA_DEBUG_OUTPUT
 
