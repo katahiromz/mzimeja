@@ -53,10 +53,10 @@
   #define DebugPrintW   (void)
   #define DebugPrint    (void)
 #else
-  extern "C" {
-    void DebugPrintA(const char *lpszFormat, ...);
-    void DebugPrintW(const WCHAR *lpszFormat, ...);
-  } // extern "C"
+extern "C" {
+void DebugPrintA(const char *lpszFormat, ...);
+void DebugPrintW(const WCHAR *lpszFormat, ...);
+}   // extern "C"
   #define DebugPrintA DebugPrintA
   #define DebugPrintW DebugPrintW
   #ifdef UNICODE
@@ -128,46 +128,46 @@
 // additional GCS bits
 
 #define GCS_COMPALL                                                  \
-  (GCS_COMPSTR | GCS_COMPATTR | GCS_COMPREADSTR | GCS_COMPREADATTR | \
-   GCS_COMPCLAUSE | GCS_COMPREADCLAUSE)
+        (GCS_COMPSTR | GCS_COMPATTR | GCS_COMPREADSTR | GCS_COMPREADATTR | \
+         GCS_COMPCLAUSE | GCS_COMPREADCLAUSE)
 
 #define GCS_RESULTALL \
-  (GCS_RESULTSTR | GCS_RESULTREADSTR | GCS_RESULTCLAUSE | GCS_RESULTREADCLAUSE)
+        (GCS_RESULTSTR | GCS_RESULTREADSTR | GCS_RESULTCLAUSE | GCS_RESULTREADCLAUSE)
 
 //////////////////////////////////////////////////////////////////////////////
 // Structures
 
 // UICHILD
 struct UICHILD {
-  HWND hWnd;
-  POINT pt;
+    HWND hWnd;
+    POINT pt;
 };
 
 // UICHILD2
 struct UICHILD2 {
-  HWND hWnd;
-  RECT rc;
+    HWND hWnd;
+    RECT rc;
 };
 
 // UIEXTRA
 struct UIEXTRA {
-  HIMC      hIMC;
-  HWND      hwndStatus;
-  UICHILD   uiCand;
-  DWORD     dwCompStyle;
-  HFONT     hFont;
-  BOOL      bVertical;
-  HWND      hwndDefComp;
-  UICHILD2  uiComp[MAXCOMPWND];
-  HWND      hwndGuide;
+    HIMC hIMC;
+    HWND hwndStatus;
+    UICHILD uiCand;
+    DWORD dwCompStyle;
+    HFONT hFont;
+    BOOL bVertical;
+    HWND hwndDefComp;
+    UICHILD2 uiComp[MAXCOMPWND];
+    HWND hwndGuide;
 };
 
 // MZGUIDELINE
 struct MZGUIDELINE {
-  DWORD dwLevel;
-  DWORD dwIndex;
-  DWORD dwStrID;
-  DWORD dwPrivateID;
+    DWORD dwLevel;
+    DWORD dwIndex;
+    DWORD dwStrID;
+    DWORD dwPrivateID;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -324,170 +324,174 @@ WCHAR get_comma(void);
 typedef std::vector<std::wstring> WStrings;
 
 enum Gyou {
-  GYOU_A,
-  GYOU_KA,
-  GYOU_GA,
-  GYOU_SA,
-  GYOU_ZA,
-  GYOU_TA,
-  GYOU_DA,
-  GYOU_NA,
-  GYOU_HA,
-  GYOU_BA,
-  GYOU_PA,
-  GYOU_MA,
-  GYOU_YA,
-  GYOU_RA,
-  GYOU_WA,
-  GYOU_NN
+    GYOU_A,
+    GYOU_KA,
+    GYOU_GA,
+    GYOU_SA,
+    GYOU_ZA,
+    GYOU_TA,
+    GYOU_DA,
+    GYOU_NA,
+    GYOU_HA,
+    GYOU_BA,
+    GYOU_PA,
+    GYOU_MA,
+    GYOU_YA,
+    GYOU_RA,
+    GYOU_WA,
+    GYOU_NN
 };
 
 enum Dan {
-  DAN_A,
-  DAN_I,
-  DAN_U,
-  DAN_E,
-  DAN_O
+    DAN_A,
+    DAN_I,
+    DAN_U,
+    DAN_E,
+    DAN_O
 };
 
 enum HinshiBunrui {
-  HB_HEAD = 0x21,       // 最初のノード
-  HB_TAIL,              // 最後のノード
-  HB_UNKNOWN,           // 未知の品詞
-  HB_MEISHI,            // 名詞
-  HB_IKEIYOUSHI,        // い形容詞
-  HB_NAKEIYOUSHI,       // な形容詞
-  HB_RENTAISHI,         // 連体詞
-  HB_FUKUSHI,           // 副詞
-  HB_SETSUZOKUSHI,      // 接続詞
-  HB_KANDOUSHI,         // 感動詞
-  HB_KAKU_JOSHI,        // 格助詞
-  HB_SETSUZOKU_JOSHI,   // 接続助詞
-  HB_FUKU_JOSHI,        // 副助詞
-  HB_SHUU_JOSHI,        // 終助詞
-  HB_JODOUSHI,          // 助動詞
-  HB_MIZEN_JODOUSHI,    // 未然助動詞
-  HB_RENYOU_JODOUSHI,   // 連用助動詞
-  HB_SHUUSHI_JODOUSHI,  // 終止助動詞
-  HB_RENTAI_JODOUSHI,   // 連体助動詞
-  HB_KATEI_JODOUSHI,    // 仮定助動詞
-  HB_MEIREI_JODOUSHI,   // 命令助動詞
-  HB_GODAN_DOUSHI,      // 五段動詞
-  HB_ICHIDAN_DOUSHI,    // 一段動詞
-  HB_KAHEN_DOUSHI,      // カ変動詞
-  HB_SAHEN_DOUSHI,      // サ変動詞
-  HB_KANGO,             // 漢語
-  HB_SETTOUJI,          // 接頭辞
-  HB_SETSUBIJI,         // 接尾辞
-  HB_PERIOD,            // 句点（。）
-  HB_COMMA,             // 読点（、）
-  HB_SYMBOL             // 記号類
+    HB_HEAD = 0x21, // 最初のノード
+    HB_TAIL,        // 最後のノード
+    HB_UNKNOWN,     // 未知の品詞
+    HB_MEISHI,      // 名詞
+    HB_IKEIYOUSHI,  // い形容詞
+    HB_NAKEIYOUSHI, // な形容詞
+    HB_RENTAISHI,   // 連体詞
+    HB_FUKUSHI,     // 副詞
+    HB_SETSUZOKUSHI, // 接続詞
+    HB_KANDOUSHI,   // 感動詞
+    HB_KAKU_JOSHI,  // 格助詞
+    HB_SETSUZOKU_JOSHI, // 接続助詞
+    HB_FUKU_JOSHI,  // 副助詞
+    HB_SHUU_JOSHI,  // 終助詞
+    HB_JODOUSHI,    // 助動詞
+    HB_MIZEN_JODOUSHI, // 未然助動詞
+    HB_RENYOU_JODOUSHI, // 連用助動詞
+    HB_SHUUSHI_JODOUSHI, // 終止助動詞
+    HB_RENTAI_JODOUSHI, // 連体助動詞
+    HB_KATEI_JODOUSHI, // 仮定助動詞
+    HB_MEIREI_JODOUSHI, // 命令助動詞
+    HB_GODAN_DOUSHI, // 五段動詞
+    HB_ICHIDAN_DOUSHI, // 一段動詞
+    HB_KAHEN_DOUSHI, // カ変動詞
+    HB_SAHEN_DOUSHI, // サ変動詞
+    HB_KANGO,       // 漢語
+    HB_SETTOUJI,    // 接頭辞
+    HB_SETSUBIJI,   // 接尾辞
+    HB_PERIOD,      // 句点（。）
+    HB_COMMA,       // 読点（、）
+    HB_SYMBOL       // 記号類
 }; // enum HinshiBunrui
 
 enum KatsuyouKei {
-  MIZEN_KEI,            // 未然形
-  RENYOU_KEI,           // 連用形
-  SHUUSHI_KEI,          // 終止形
-  RENTAI_KEI,           // 連体形
-  KATEI_KEI,            // 仮定形
-  MEIREI_KEI            // 命令形
+    MIZEN_KEI,      // 未然形
+    RENYOU_KEI,     // 連用形
+    SHUUSHI_KEI,    // 終止形
+    RENTAI_KEI,     // 連体形
+    KATEI_KEI,      // 仮定形
+    MEIREI_KEI      // 命令形
 };
 
 struct DictEntry {
-  std::wstring  pre;
-  std::wstring  post;
-  HinshiBunrui  bunrui;
-  std::wstring  tags;
-  Gyou          gyou;
+    std::wstring pre;
+    std::wstring post;
+    HinshiBunrui bunrui;
+    std::wstring tags;
+    Gyou gyou;
 };
 
 struct LatticeNode;
 typedef unboost::shared_ptr<LatticeNode>  LatticeNodePtr;
 
 struct LatticeNode {
-  std::wstring                        pre;
-  std::wstring                        post;
-  std::wstring                        tags;
-  HinshiBunrui                        bunrui;
-  Gyou                                gyou;
-  KatsuyouKei                         katsuyou;
-  int                                 cost;
-  DWORD                               linked;
-  std::vector<LatticeNodePtr>         branches;
-  LatticeNode() {
-    cost = 0;
-    linked = 0;
-  }
-  bool HasTag(const wchar_t *tag) const {
-    return tags.find(tag) != std::wstring::npos;
-  }
-  int CalcCost() const;
-  bool IsDoushi() const;
-  bool IsJodoushi() const;
+    std::wstring pre;
+    std::wstring post;
+    std::wstring tags;
+    HinshiBunrui bunrui;
+    Gyou gyou;
+    KatsuyouKei katsuyou;
+    int cost;
+    DWORD linked;
+    std::vector<LatticeNodePtr>         branches;
+    LatticeNode() {
+        cost = 0;
+        linked = 0;
+    }
+    bool HasTag(const wchar_t *tag) const {
+        return tags.find(tag) != std::wstring::npos;
+    }
+    int CalcCost() const;
+    bool IsDoushi() const;
+    bool IsJodoushi() const;
 };
 typedef std::vector<LatticeNodePtr>   LatticeChunk;
 
 struct Lattice {
-  size_t                          index;
-  std::wstring                    pre;
-  LatticeNodePtr                  head;
-  std::vector<LatticeChunk>       chunks;
-  std::vector<DWORD>              refs;
-  // pre.size() + 1 == chunks.size().
-  // pre.size() + 1 == refs.size().
+    size_t index;
+    std::wstring pre;
+    LatticeNodePtr head;
+    std::vector<LatticeChunk>       chunks;
+    std::vector<DWORD>              refs;
+    // pre.size() + 1 == chunks.size().
+    // pre.size() + 1 == refs.size().
 
-  BOOL AddNodes(size_t index, const WCHAR *dict_data);
-  BOOL AddNodesForSingle(const WCHAR *dict_data);
-  void UpdateRefs();
-  void UnlinkAllNodes();
-  void UpdateLinks();
-  void AddComplement(size_t index, size_t min_size, size_t max_size);
-  void CutUnlinkedNodes();
-  size_t GetLastLinkedIndex() const;
+    BOOL AddNodes(size_t index, const WCHAR *dict_data);
+    BOOL AddNodesForSingle(const WCHAR *dict_data);
+    void UpdateRefs();
+    void UnlinkAllNodes();
+    void UpdateLinks();
+    void AddComplement(size_t index, size_t min_size, size_t max_size);
+    void CutUnlinkedNodes();
+    size_t GetLastLinkedIndex() const;
 
-  void DoFields(size_t index, const WStrings& fields, int cost = 0);
+    void DoFields(size_t index, const WStrings& fields, int cost = 0);
 
-  void DoMeishi(size_t index, const WStrings& fields);
-  void DoIkeiyoushi(size_t index, const WStrings& fields);
-  void DoNakeiyoushi(size_t index, const WStrings& fields);
-  void DoGodanDoushi(size_t index, const WStrings& fields);
-  void DoIchidanDoushi(size_t index, const WStrings& fields);
-  void DoKahenDoushi(size_t index, const WStrings& fields);
-  void DoSahenDoushi(size_t index, const WStrings& fields);
+    void DoMeishi(size_t index, const WStrings& fields);
+    void DoIkeiyoushi(size_t index, const WStrings& fields);
+    void DoNakeiyoushi(size_t index, const WStrings& fields);
+    void DoGodanDoushi(size_t index, const WStrings& fields);
+    void DoIchidanDoushi(size_t index, const WStrings& fields);
+    void DoKahenDoushi(size_t index, const WStrings& fields);
+    void DoSahenDoushi(size_t index, const WStrings& fields);
 
-  void Dump(int num = 0);
-  void Fix(const std::wstring& pre);
-  void AddExtra();
+    void Dump(int num = 0);
+    void Fix(const std::wstring& pre);
+    void AddExtra();
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
 struct MzConvCandidate {
-  std::wstring            hiragana;
-  std::wstring            converted;
-  int                     cost;
-  std::set<HinshiBunrui>  bunruis;
-  std::wstring            tags;
-  void clear() {
-    hiragana.clear();
-    converted.clear();
-    cost = 0;
-    bunruis.clear();
-    tags.clear();
-  }
+    std::wstring hiragana;
+    std::wstring converted;
+    int cost;
+    std::set<HinshiBunrui>  bunruis;
+    std::wstring tags;
+    void clear() {
+        hiragana.clear();
+        converted.clear();
+        cost = 0;
+        bunruis.clear();
+        tags.clear();
+    }
 };
 
 struct MzConvClause {
-  std::vector<MzConvCandidate> candidates;
-  void clear() { candidates.clear(); }
-  void sort();
-  void add(const LatticeNode *node);
+    std::vector<MzConvCandidate> candidates;
+    void clear() {
+        candidates.clear();
+    }
+    void sort();
+    void add(const LatticeNode *node);
 };
 
 struct MzConvResult {
-  std::vector<MzConvClause> clauses;
-  void clear() { clauses.clear(); }
-  void sort();
+    std::vector<MzConvClause> clauses;
+    void clear() {
+        clauses.clear();
+    }
+    void sort();
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -495,143 +499,143 @@ struct MzConvResult {
 
 class Dict {
 public:
-  Dict();
-  ~Dict();
+Dict();
+~Dict();
 
-  BOOL Load(const wchar_t *file_name, const wchar_t *object_name);
-  void Unload();
-  BOOL IsLoaded() const;
-  DWORD GetSize() const;
+BOOL Load(const wchar_t *file_name, const wchar_t *object_name);
+void Unload();
+BOOL IsLoaded() const;
+DWORD GetSize() const;
 
-  wchar_t *Lock();
-  void Unlock(wchar_t *data);
+wchar_t *Lock();
+void Unlock(wchar_t *data);
 
 protected:
-  std::wstring m_strFileName;
-  std::wstring m_strObjectName;
-  HANDLE m_hMutex;
-  HANDLE m_hFileMapping;
+std::wstring m_strFileName;
+std::wstring m_strObjectName;
+HANDLE m_hMutex;
+HANDLE m_hFileMapping;
 };
 
 //////////////////////////////////////////////////////////////////////////////
 // The IME
 
 class MzIme {
-public:
-  HINSTANCE       m_hInst;
-  HKL             m_hMyKL;
-  BOOL            m_bWinLogOn;
-  LPTRANSMSGLIST  m_lpCurTransKey;
-  UINT            m_uNumTransKey;
-  BOOL            m_fOverflowKey;
+    public:
+    HINSTANCE m_hInst;
+    HKL m_hMyKL;
+    BOOL m_bWinLogOn;
+    LPTRANSMSGLIST m_lpCurTransKey;
+    UINT m_uNumTransKey;
+    BOOL m_fOverflowKey;
 
 public:
-  // literal map
-  unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;
-  unboost::unordered_map<wchar_t,wchar_t>   m_consonant_map;
-  void MakeLiteralMaps();
+    // literal map
+    unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;
+    unboost::unordered_map<wchar_t,wchar_t>   m_consonant_map;
+    void MakeLiteralMaps();
 
 public:
-  MzIme();
+    MzIme();
 
-  // initialize the IME
-  BOOL Init(HINSTANCE hInstance);
+    // initialize the IME
+    BOOL Init(HINSTANCE hInstance);
 
-  // register classes
-  BOOL RegisterClasses(HINSTANCE hInstance);
-  void UnregisterClasses();
+    // register classes
+    BOOL RegisterClasses(HINSTANCE hInstance);
+    void UnregisterClasses();
 
-  // uninitialize
-  VOID Uninit(VOID);
+    // uninitialize
+    VOID Uninit(VOID);
 
-  // load a bitmap from resource
-  HBITMAP LoadBMP(LPCTSTR pszName);
-  HBITMAP LoadBMP(UINT nID) {
-    return LoadBMP(MAKEINTRESOURCE(nID));
-  }
+    // load a bitmap from resource
+    HBITMAP LoadBMP(LPCTSTR pszName);
+    HBITMAP LoadBMP(UINT nID) {
+        return LoadBMP(MAKEINTRESOURCE(nID));
+    }
 
-  // load a string from resource
-  WCHAR *LoadSTR(INT nID);
+    // load a string from resource
+    WCHAR *LoadSTR(INT nID);
 
-  // update the indicator icon
-  void UpdateIndicIcon(HIMC hIMC);
+    // update the indicator icon
+    void UpdateIndicIcon(HIMC hIMC);
 
-  // get the keyboard layout handle
-  HKL GetHKL(VOID);
+    // get the keyboard layout handle
+    HKL GetHKL(VOID);
 
-  // lock the input context
-  InputContext *LockIMC(HIMC hIMC);
-  // unlock the input context
-  VOID UnlockIMC(HIMC hIMC);
+    // lock the input context
+    InputContext *LockIMC(HIMC hIMC);
+    // unlock the input context
+    VOID UnlockIMC(HIMC hIMC);
 
-  // generate a message
-  BOOL GenerateMessage(LPTRANSMSG lpGeneMsg);
-  BOOL GenerateMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
-  BOOL GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg);
+    // generate a message
+    BOOL GenerateMessage(LPTRANSMSG lpGeneMsg);
+    BOOL GenerateMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
+    BOOL GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg);
 
-  // do command
-  BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
+    // do command
+    BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
 
-  // basic dictionary
-  BOOL LoadBasicDict();
-  BOOL IsBasicDictLoaded() const;
-  WCHAR *LockBasicDict();
-  void UnlockBasicDict(WCHAR *data);
+    // basic dictionary
+    BOOL LoadBasicDict();
+    BOOL IsBasicDictLoaded() const;
+    WCHAR *LockBasicDict();
+    void UnlockBasicDict(WCHAR *data);
 
-  // make lattice
-  BOOL MakeLattice(Lattice& lattice, const std::wstring& pre);
-  BOOL MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre);
-  void MakeResult(MzConvResult& result, Lattice& lattice);
-  void MakeResultOnFailure(MzConvResult& result, const std::wstring& pre);
-  void MakeResultForSingle(MzConvResult& result, Lattice& lattice);
-  int CalcCost(const std::wstring& tags) const;
+    // make lattice
+    BOOL MakeLattice(Lattice& lattice, const std::wstring& pre);
+    BOOL MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre);
+    void MakeResult(MzConvResult& result, Lattice& lattice);
+    void MakeResultOnFailure(MzConvResult& result, const std::wstring& pre);
+    void MakeResultForSingle(MzConvResult& result, Lattice& lattice);
+    int CalcCost(const std::wstring& tags) const;
 
-  // convert
-  BOOL ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-  BOOL ConvertMultiClause(const std::wstring& strHiragana,
-                          MzConvResult& result);
-  BOOL ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-  BOOL ConvertSingleClause(const std::wstring& strHiragana,
-                           MzConvResult& result);
-  BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-  BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-  BOOL ConvertCode(const std::wstring& strTyping, MzConvResult& result);
-  BOOL ConvertCode(LogCompStr& comp, LogCandInfo& cand);
-  BOOL StoreResult(
-    const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
+    // convert
+    BOOL ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
+    BOOL ConvertMultiClause(const std::wstring& strHiragana,
+                            MzConvResult& result);
+    BOOL ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
+    BOOL ConvertSingleClause(const std::wstring& strHiragana,
+                             MzConvResult& result);
+    BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
+    BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
+    BOOL ConvertCode(const std::wstring& strTyping, MzConvResult& result);
+    BOOL ConvertCode(LogCompStr& comp, LogCandInfo& cand);
+    BOOL StoreResult(
+            const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
 
-  // computer settings
-  BOOL GetComputerString(LPCWSTR pszSettingName, std::wstring& value);
-  BOOL SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue);
-  BOOL GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr);
-  BOOL SetComputerDword(LPCWSTR pszSettingName, DWORD data);
-  BOOL GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size);
-  BOOL SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
+    // computer settings
+    BOOL GetComputerString(LPCWSTR pszSettingName, std::wstring& value);
+    BOOL SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue);
+    BOOL GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr);
+    BOOL SetComputerDword(LPCWSTR pszSettingName, DWORD data);
+    BOOL GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size);
+    BOOL SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 
-  // user settings
-  BOOL GetUserString(LPCWSTR pszSettingName, std::wstring& value);
-  BOOL SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue);
-  BOOL GetUserDword(LPCWSTR pszSettingName, DWORD *ptr);
-  BOOL SetUserDword(LPCWSTR pszSettingName, DWORD data);
-  BOOL GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size);
-  BOOL SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
+    // user settings
+    BOOL GetUserString(LPCWSTR pszSettingName, std::wstring& value);
+    BOOL SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue);
+    BOOL GetUserDword(LPCWSTR pszSettingName, DWORD *ptr);
+    BOOL SetUserDword(LPCWSTR pszSettingName, DWORD data);
+    BOOL GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size);
+    BOOL SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 
 protected:
-  // input context
-  HIMC            m_hIMC;
-  InputContext *  m_lpIMC;
+    // input context
+    HIMC m_hIMC;
+    InputContext *  m_lpIMC;
 
-  // dictionary
-  Dict            m_basic_dict;
-  Dict            m_name_dict;
-  BOOL LoadDict();
-  void UnloadDict();
+    // dictionary
+    Dict m_basic_dict;
+    Dict m_name_dict;
+    BOOL LoadDict();
+    void UnloadDict();
 
-  // registry
-  LONG OpenRegKey(HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const;
-  LONG CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey);
-  LONG OpenComputerSettingKey(BOOL bWrite, HKEY *phKey);
-  LONG OpenUserSettingKey(BOOL bWrite, HKEY *phKey);
+    // registry
+    LONG OpenRegKey(HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const;
+    LONG CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey);
+    LONG OpenComputerSettingKey(BOOL bWrite, HKEY *phKey);
+    LONG OpenUserSettingKey(BOOL bWrite, HKEY *phKey);
 }; // class MzIme
 
 extern MzIme TheIME;

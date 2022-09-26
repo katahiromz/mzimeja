@@ -23,11 +23,11 @@ extern "C" {
 //      登録される文字列の読み。
 //    dwStyle
 //      登録される文字列のスタイル。次のような値が用意されています。
-//  
+//
 //      IME_REGWORD_STYLE_EUDC
 //        文字列は EUDC の範囲にある。
-//      IME_REGWORD_STYLE_USER_FIRST から IME_REGWORD_STYLE_USER_LAST 
-//        IME_REGWORD_STYLE_USER_FIRST から 
+//      IME_REGWORD_STYLE_USER_FIRST から IME_REGWORD_STYLE_USER_LAST
+//        IME_REGWORD_STYLE_USER_FIRST から
 //        IME_REGWORD_STYLE_USER_LAST の範囲は IME ISV の private
 //        style に使われる。IME ISV は自由に独自のスタイルを定義して
 //        よい。
@@ -39,9 +39,9 @@ extern "C" {
 //  (返り値)
 //    成功したならば、TRUE を。さもなくば FALSE を返す。
 BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
-  BOOL ret = FALSE;
-  FOOTMARK();
-  return ret;
+    BOOL ret = FALSE;
+    FOOTMARK();
+    return ret;
 }
 
 //  ImeUnregisterWord
@@ -64,9 +64,9 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 //  (返り値)
 //    成功したならば、TRUE を。さもなくば FALSE を返す。
 BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
-  BOOL ret = FALSE;
-  FOOTMARK();
-  return ret;
+    BOOL ret = FALSE;
+    FOOTMARK();
+    return ret;
 }
 
 //  ImeGetRegisterWordStyle
@@ -86,9 +86,9 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 //    ならば、このIMEですべての可能なスタイルを受け取るのに必要な配列の
 //    要素数になります。
 UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
-  UINT ret = 0;
-  FOOTMARK();
-  return ret;
+    UINT ret = 0;
+    FOOTMARK();
+    return ret;
 }
 
 //  ImeEnumRegisterWord
@@ -136,9 +136,9 @@ UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
 //    SKK辞書との相性は最悪では？
 UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
                                 DWORD dw, LPCTSTR lpStr, LPVOID lpData) {
-  UINT ret = 0;
-  FOOTMARK();
-  return ret;
+    UINT ret = 0;
+    FOOTMARK();
+    return ret;
 }
 
 //////////////////////////////////////////////////////////////////////////////

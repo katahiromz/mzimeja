@@ -12,20 +12,20 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
-  FOOTMARK();
-  if (ppsh->nPages < MAX_PAGES) {
-    PROPSHEETPAGE psp;
+    FOOTMARK();
+    if (ppsh->nPages < MAX_PAGES) {
+        PROPSHEETPAGE psp;
 
-    psp.dwSize = sizeof(psp);
-    psp.dwFlags = PSP_DEFAULT;
-    psp.hInstance = TheIME.m_hInst;
-    psp.pszTemplate = MAKEINTRESOURCE(id);
-    psp.pfnDlgProc = pfn;
-    psp.lParam = 0;
+        psp.dwSize = sizeof(psp);
+        psp.dwFlags = PSP_DEFAULT;
+        psp.hInstance = TheIME.m_hInst;
+        psp.pszTemplate = MAKEINTRESOURCE(id);
+        psp.pfnDlgProc = pfn;
+        psp.lParam = 0;
 
-    ppsh->phpage[ppsh->nPages] = CreatePropertySheetPage(&psp);
-    if (ppsh->phpage[ppsh->nPages]) ppsh->nPages++;
-  }
+        ppsh->phpage[ppsh->nPages] = CreatePropertySheetPage(&psp);
+        if (ppsh->phpage[ppsh->nPages]) ppsh->nPages++;
+    }
 } // AddPage
 
 //  ImeConfigure
@@ -69,371 +69,371 @@ void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
 //    }
 //  }
 BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
-  HPROPSHEETPAGE rPages[MAX_PAGES];
-  PROPSHEETHEADER psh;
-  FOOTMARK();
+    HPROPSHEETPAGE rPages[MAX_PAGES];
+    PROPSHEETHEADER psh;
+    FOOTMARK();
 
-  psh.dwSize = sizeof(psh);
-  psh.dwFlags = PSH_PROPTITLE;
-  psh.hwndParent = hWnd;
-  psh.hInstance = TheIME.m_hInst;
-  psh.pszCaption = MAKEINTRESOURCE(IDS_CONFIGNAME);
-  psh.nPages = 0;
-  psh.nStartPage = 0;
-  psh.phpage = rPages;
+    psh.dwSize = sizeof(psh);
+    psh.dwFlags = PSH_PROPTITLE;
+    psh.hwndParent = hWnd;
+    psh.hInstance = TheIME.m_hInst;
+    psh.pszCaption = MAKEINTRESOURCE(IDS_CONFIGNAME);
+    psh.nPages = 0;
+    psh.nStartPage = 0;
+    psh.phpage = rPages;
 
-  switch (dwMode) {
+    switch (dwMode) {
     case IME_CONFIG_GENERAL:
-      AddPage(&psh, DLG_GENERAL, GeneralDlgProc);
-      AddPage(&psh, DLG_REGISTERWORD, RegWordDlgProc);
-      AddPage(&psh, DLG_SELECTDICTIONARY, SelectDictionaryDlgProc);
-      AddPage(&psh, DLG_ABOUT, AboutDlgProc);
+        AddPage(&psh, DLG_GENERAL, GeneralDlgProc);
+        AddPage(&psh, DLG_REGISTERWORD, RegWordDlgProc);
+        AddPage(&psh, DLG_SELECTDICTIONARY, SelectDictionaryDlgProc);
+        AddPage(&psh, DLG_ABOUT, AboutDlgProc);
 #ifdef _DEBUG
-      AddPage(&psh, DLG_DEBUG, DebugOptionDlgProc);
+        AddPage(&psh, DLG_DEBUG, DebugOptionDlgProc);
 #endif
-      PropertySheet(&psh);
-      break;
+        PropertySheet(&psh);
+        break;
 
     case IME_CONFIG_REGISTERWORD:
-      AddPage(&psh, DLG_REGISTERWORD, RegWordDlgProc);
-      AddPage(&psh, DLG_ABOUT, AboutDlgProc);
-      PropertySheet(&psh);
-      break;
+        AddPage(&psh, DLG_REGISTERWORD, RegWordDlgProc);
+        AddPage(&psh, DLG_ABOUT, AboutDlgProc);
+        PropertySheet(&psh);
+        break;
 
     case IME_CONFIG_SELECTDICTIONARY:
-      AddPage(&psh, DLG_SELECTDICTIONARY, SelectDictionaryDlgProc);
-      AddPage(&psh, DLG_ABOUT, AboutDlgProc);
-      PropertySheet(&psh);
-      break;
+        AddPage(&psh, DLG_SELECTDICTIONARY, SelectDictionaryDlgProc);
+        AddPage(&psh, DLG_ABOUT, AboutDlgProc);
+        PropertySheet(&psh);
+        break;
 
     default:
-      break;
-  }
+        break;
+    }
 
-  return TRUE;
+    return TRUE;
 } // ImeConfigure
 
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
-  FOOTMARK();
-  NMHDR FAR *lpnm;
-  //LPPROPSHEETPAGE lpPropSheet =
-  //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
-  UINT nItem;
-  UINT i;
-  LRESULT dwIndex;
-  TCHAR szRead[128];
-  TCHAR szString[128];
-  LRESULT dwStyle;
+    FOOTMARK();
+    NMHDR FAR *lpnm;
+    //LPPROPSHEETPAGE lpPropSheet =
+    //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+    UINT nItem;
+    UINT i;
+    LRESULT dwIndex;
+    TCHAR szRead[128];
+    TCHAR szString[128];
+    LRESULT dwStyle;
 
-  switch (message) {
+    switch (message) {
     case WM_NOTIFY:
-      lpnm = (NMHDR FAR *)lParam;
-      switch (lpnm->code) {
+        lpnm = (NMHDR FAR *)lParam;
+        switch (lpnm->code) {
         case PSN_SETACTIVE:
-          break;
+            break;
 
         case PSN_KILLACTIVE:
-          break;
+            break;
 
         case PSN_APPLY:
 
-          if (!GetDlgItemText(hDlg, ID_WR_READING, szRead, _countof(szRead))) {
-            WCHAR *psz = TheIME.LoadSTR(IDS_NOREADING);
-            ::MessageBoxW(hDlg, psz, NULL, MB_OK);
-            return FALSE;
-          }
+            if (!GetDlgItemText(hDlg, ID_WR_READING, szRead, _countof(szRead))) {
+                WCHAR *psz = TheIME.LoadSTR(IDS_NOREADING);
+                ::MessageBoxW(hDlg, psz, NULL, MB_OK);
+                return FALSE;
+            }
 
-          if (!GetDlgItemText(hDlg, ID_WR_STRING, szString, _countof(szString))) {
-            WCHAR *psz = TheIME.LoadSTR(IDS_NOSTRING);
-            ::MessageBoxW(hDlg, psz, NULL, MB_OK);
-            return FALSE;
-          }
+            if (!GetDlgItemText(hDlg, ID_WR_STRING, szString, _countof(szString))) {
+                WCHAR *psz = TheIME.LoadSTR(IDS_NOSTRING);
+                ::MessageBoxW(hDlg, psz, NULL, MB_OK);
+                return FALSE;
+            }
 
-          dwIndex = SendDlgItemMessage(hDlg, ID_WR_STYLE, CB_GETCURSEL, 0, 0);
-          dwStyle =
-              SendDlgItemMessage(hDlg, ID_WR_STYLE, CB_GETITEMDATA, dwIndex, 0);
+            dwIndex = SendDlgItemMessage(hDlg, ID_WR_STYLE, CB_GETCURSEL, 0, 0);
+            dwStyle =
+                    SendDlgItemMessage(hDlg, ID_WR_STYLE, CB_GETITEMDATA, dwIndex, 0);
 
-          if (!ImeRegisterWord(szRead, (DWORD)dwStyle, szString)) {
-            WCHAR *psz = TheIME.LoadSTR(IDS_REGWORDRET);
-            ::MessageBoxW(hDlg, psz, NULL, MB_OK);
-          }
-          break;
+            if (!ImeRegisterWord(szRead, (DWORD)dwStyle, szString)) {
+                WCHAR *psz = TheIME.LoadSTR(IDS_REGWORDRET);
+                ::MessageBoxW(hDlg, psz, NULL, MB_OK);
+            }
+            break;
 
         case PSN_RESET:
-          break;
+            break;
 
         case PSN_HELP:
-          break;
+            break;
 
         default:
-          return FALSE;
-      }
-      break;
+            return FALSE;
+        }
+        break;
 
     case WM_INITDIALOG:
-      SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
-      //lpPropSheet = (LPPROPSHEETPAGE)lParam;
+        SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
+        //lpPropSheet = (LPPROPSHEETPAGE)lParam;
 
-      nItem = ImeGetRegisterWordStyle(0, NULL);
-      if (nItem) {
-        LPSTYLEBUF lpStyleBuf =
-            (LPSTYLEBUF)GlobalAlloc(GPTR, nItem * sizeof(STYLEBUF));
+        nItem = ImeGetRegisterWordStyle(0, NULL);
+        if (nItem) {
+            LPSTYLEBUF lpStyleBuf =
+                    (LPSTYLEBUF)GlobalAlloc(GPTR, nItem * sizeof(STYLEBUF));
 
-        if (!lpStyleBuf) {
-          WCHAR *psz = TheIME.LoadSTR(IDS_NOMEMORY);
-          ::MessageBoxW(hDlg, psz, NULL, MB_OK);
-          return TRUE;
+            if (!lpStyleBuf) {
+                WCHAR *psz = TheIME.LoadSTR(IDS_NOMEMORY);
+                ::MessageBoxW(hDlg, psz, NULL, MB_OK);
+                return TRUE;
+            }
+
+            ImeGetRegisterWordStyle(nItem, lpStyleBuf);
+
+            for (i = 0; i < nItem; i++) {
+                dwIndex = SendDlgItemMessage(hDlg, ID_WR_STYLE, CB_ADDSTRING, 0,
+                                             (LPARAM)lpStyleBuf->szDescription);
+                SendDlgItemMessage(hDlg, ID_WR_STYLE, CB_SETITEMDATA, dwIndex,
+                                   lpStyleBuf->dwStyle);
+                lpStyleBuf++;
+            }
+
+            GlobalFree(lpStyleBuf);
         }
-
-        ImeGetRegisterWordStyle(nItem, lpStyleBuf);
-
-        for (i = 0; i < nItem; i++) {
-          dwIndex = SendDlgItemMessage(hDlg, ID_WR_STYLE, CB_ADDSTRING, 0,
-                                       (LPARAM)lpStyleBuf->szDescription);
-          SendDlgItemMessage(hDlg, ID_WR_STYLE, CB_SETITEMDATA, dwIndex,
-                             lpStyleBuf->dwStyle);
-          lpStyleBuf++;
-        }
-
-        GlobalFree(lpStyleBuf);
-      }
-      break;
+        break;
 
     case WM_DESTROY:
-      break;
+        break;
 
     case WM_HELP:
-      break;
+        break;
 
-    case WM_CONTEXTMENU:  // right mouse click
-      break;
+    case WM_CONTEXTMENU: // right mouse click
+        break;
 
     case WM_COMMAND:
-      break;
+        break;
 
     default:
-      return FALSE;
-  }
-  return TRUE;
+        return FALSE;
+    }
+    return TRUE;
 } // RegWordDlgProc
 
 INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                          LPARAM lParam) {
-  NMHDR FAR *lpnm;
-  //LPPROPSHEETPAGE lpPropSheet =
-  //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
-  FOOTMARK();
+    NMHDR FAR *lpnm;
+    //LPPROPSHEETPAGE lpPropSheet =
+    //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+    FOOTMARK();
 
-  switch (message) {
+    switch (message) {
     case WM_NOTIFY:
-      lpnm = (NMHDR FAR *)lParam;
-      switch (lpnm->code) {
+        lpnm = (NMHDR FAR *)lParam;
+        switch (lpnm->code) {
         case PSN_SETACTIVE:
-          break;
+            break;
 
         case PSN_KILLACTIVE:
-          break;
+            break;
 
         case PSN_APPLY:
-          break;
+            break;
 
         case PSN_RESET:
-          break;
+            break;
 
         case PSN_HELP:
-          break;
+            break;
 
         default:
-          return FALSE;
-      }
-      break;
+            return FALSE;
+        }
+        break;
 
     case WM_INITDIALOG:
-      SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
-      //lpPropSheet = (LPPROPSHEETPAGE)lParam;
-      break;
+        SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
+        //lpPropSheet = (LPPROPSHEETPAGE)lParam;
+        break;
 
     case WM_DESTROY:
-      break;
+        break;
 
     case WM_HELP:
-      break;
+        break;
 
-    case WM_CONTEXTMENU:  // right mouse click
-      break;
+    case WM_CONTEXTMENU: // right mouse click
+        break;
 
     case WM_COMMAND:
-      break;
+        break;
 
     default:
-      return FALSE;
-  }
-  return TRUE;
+        return FALSE;
+    }
+    return TRUE;
 } // SelectDictionaryDlgProc
 
 INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                               LPARAM lParam) {
-  NMHDR FAR *lpnm;
-  //LPPROPSHEETPAGE lpPropSheet =
-  //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
-  FOOTMARK();
+    NMHDR FAR *lpnm;
+    //LPPROPSHEETPAGE lpPropSheet =
+    //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+    FOOTMARK();
 
-  switch (message) {
+    switch (message) {
     case WM_NOTIFY:
-      lpnm = (NMHDR FAR *)lParam;
-      switch (lpnm->code) {
+        lpnm = (NMHDR FAR *)lParam;
+        switch (lpnm->code) {
         case PSN_SETACTIVE:
-          break;
+            break;
 
         case PSN_KILLACTIVE:
-          break;
+            break;
 
         case PSN_APPLY:
-          break;
+            break;
 
         case PSN_RESET:
-          break;
+            break;
 
         case PSN_HELP:
-          break;
+            break;
 
         default:
-          return FALSE;
-      }
-      break;
+            return FALSE;
+        }
+        break;
 
     case WM_INITDIALOG:
-      SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
-      //lpPropSheet = (LPPROPSHEETPAGE)lParam;
-      break;
+        SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
+        //lpPropSheet = (LPPROPSHEETPAGE)lParam;
+        break;
 
     case WM_DESTROY:
-      break;
+        break;
 
     case WM_HELP:
-      break;
+        break;
 
-    case WM_CONTEXTMENU:  // right mouse click
-      break;
+    case WM_CONTEXTMENU: // right mouse click
+        break;
 
     case WM_COMMAND:
-      break;
+        break;
 
     default:
-      return FALSE;
-  }
-  return TRUE;
+        return FALSE;
+    }
+    return TRUE;
 } // AboutDlgProc
 
 INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
-  NMHDR FAR *lpnm;
-  //LPPROPSHEETPAGE lpPropSheet =
-  //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
-  FOOTMARK();
+    NMHDR FAR *lpnm;
+    //LPPROPSHEETPAGE lpPropSheet =
+    //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+    FOOTMARK();
 
-  switch (message) {
+    switch (message) {
     case WM_NOTIFY:
-      lpnm = (NMHDR FAR *)lParam;
-      switch (lpnm->code) {
+        lpnm = (NMHDR FAR *)lParam;
+        switch (lpnm->code) {
         case PSN_SETACTIVE:
-          break;
+            break;
 
         case PSN_KILLACTIVE:
-          break;
+            break;
 
         case PSN_APPLY:
-          break;
+            break;
 
         case PSN_RESET:
-          break;
+            break;
 
         case PSN_HELP:
-          break;
+            break;
 
         default:
-          return FALSE;
-      }
-      break;
+            return FALSE;
+        }
+        break;
 
     case WM_INITDIALOG:
-      SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
-      //lpPropSheet = (LPPROPSHEETPAGE)lParam;
-      break;
+        SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
+        //lpPropSheet = (LPPROPSHEETPAGE)lParam;
+        break;
 
     case WM_DESTROY:
-      break;
+        break;
 
     case WM_HELP:
-      break;
+        break;
 
-    case WM_CONTEXTMENU:  // right mouse click
-      break;
+    case WM_CONTEXTMENU: // right mouse click
+        break;
 
     case WM_COMMAND:
-      break;
+        break;
 
     default:
-      return FALSE;
-  }
-  return TRUE;
+        return FALSE;
+    }
+    return TRUE;
 } // GeneralDlgProc
 
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
-  //DWORD dwTemp;
-  //TCHAR szBuf[128];
-  NMHDR FAR *lpnm;
-  //LPPROPSHEETPAGE lpPropSheet =
-  //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
-  FOOTMARK();
+    //DWORD dwTemp;
+    //TCHAR szBuf[128];
+    NMHDR FAR *lpnm;
+    //LPPROPSHEETPAGE lpPropSheet =
+    //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
+    FOOTMARK();
 
-  switch (message) {
+    switch (message) {
     case WM_NOTIFY:
-      lpnm = (NMHDR FAR *)lParam;
-      switch (lpnm->code) {
+        lpnm = (NMHDR FAR *)lParam;
+        switch (lpnm->code) {
         case PSN_SETACTIVE:
-          break;
+            break;
 
         case PSN_KILLACTIVE:
-          break;
+            break;
 
         case PSN_APPLY:
-          break;
+            break;
 
         case PSN_RESET:
-          break;
+            break;
 
         case PSN_HELP:
-          break;
+            break;
 
         default:
-          return FALSE;
-      }
-      break;
+            return FALSE;
+        }
+        break;
 
     case WM_INITDIALOG:
-      SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
-      //lpPropSheet = (LPPROPSHEETPAGE)lParam;
-      break;
+        SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
+        //lpPropSheet = (LPPROPSHEETPAGE)lParam;
+        break;
 
     case WM_DESTROY:
-      break;
+        break;
 
     case WM_HELP:
-      break;
+        break;
 
-    case WM_CONTEXTMENU:  // right mouse click
-      break;
+    case WM_CONTEXTMENU: // right mouse click
+        break;
 
     case WM_COMMAND:
-      break;
+        break;
 
     default:
-      return FALSE;
-  }
-  return TRUE;
+        return FALSE;
+    }
+    return TRUE;
 } // DebugOptionDlgProc
 
 //////////////////////////////////////////////////////////////////////////////

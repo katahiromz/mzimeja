@@ -37,80 +37,86 @@
     #endif
   #endif
 
-  struct FootmarkLocation {
+struct FootmarkLocation {
     const char *m_file;
-    int         m_line;
+    int m_line;
     const char *m_func;
-    bool        m_entered;
+    bool m_entered;
     enum {
-      RETVAL_NONE,
-      RETVAL_INT,
-      RETVAL_LONG,
-      RETVAL_PTR
+        RETVAL_NONE,
+        RETVAL_INT,
+        RETVAL_LONG,
+        RETVAL_PTR
 #ifdef _WIN32
-      , RETVAL_LPARAM
+        , RETVAL_LPARAM
 #endif
     }           m_retval_type;
     union {
-      int       m_retval_int;
-      long      m_retval_long;
-      void *    m_retval_ptr;
+        int m_retval_int;
+        long m_retval_long;
+        void *    m_retval_ptr;
 #ifdef _WIN32
-      LPARAM    m_retval_lparam;
+        LPARAM m_retval_lparam;
 #endif
     };
 
     FootmarkLocation() : m_file(NULL), m_line(0), m_func(NULL),
-      m_entered(false), m_retval_type(RETVAL_NONE) { }
+        m_entered(false), m_retval_type(RETVAL_NONE) {
+    }
 
     FootmarkLocation(const char *file, int line, const char *func) :
-      m_file(file), m_line(line), m_func(func), m_entered(true),
-      m_retval_type(RETVAL_NONE) { Enter(); }
+        m_file(file), m_line(line), m_func(func), m_entered(true),
+        m_retval_type(RETVAL_NONE) {
+        Enter();
+    }
 
     FootmarkLocation(const FootmarkLocation& location) :
-      m_file(location.m_file), m_line(location.m_line),
-      m_func(location.m_func), m_entered(false),
-      m_retval_type(location.m_retval_type),
-      m_retval_ptr(location.m_retval_ptr) { }
-    FootmarkLocation& operator=(const FootmarkLocation& location) {
-      m_file = location.m_file;
-      m_line = location.m_line;
-      m_func = location.m_func;
-      m_entered = false;
-      m_retval_type = location.m_retval_type;
-      m_retval_ptr = location.m_retval_ptr;
-      return *this;
+        m_file(location.m_file), m_line(location.m_line),
+        m_func(location.m_func), m_entered(false),
+        m_retval_type(location.m_retval_type),
+        m_retval_ptr(location.m_retval_ptr) {
     }
-    ~FootmarkLocation() { if (m_entered) { Leave(); } }
-  protected:
+    FootmarkLocation& operator=(const FootmarkLocation& location) {
+        m_file = location.m_file;
+        m_line = location.m_line;
+        m_func = location.m_func;
+        m_entered = false;
+        m_retval_type = location.m_retval_type;
+        m_retval_ptr = location.m_retval_ptr;
+        return *this;
+    }
+    ~FootmarkLocation() {
+        if (m_entered) { Leave(); }
+    }
+protected:
     void Enter();
     void Leave();
-  }; // struct FootmarkLocation
+};   // struct FootmarkLocation
 
-  inline void FootmarkLocation::Enter() {
+inline void FootmarkLocation::Enter() {
     FootmarkDebugPrint("%s (%u): entering %s\n", m_file, m_line, m_func);
-  }
-  inline void FootmarkLocation::Leave() {
+}
+inline void FootmarkLocation::Leave() {
     switch (m_retval_type) {
     case RETVAL_NONE:
-      FootmarkDebugPrint("%s: leaving %s\n", m_file, m_func);
-      break;
+        FootmarkDebugPrint("%s: leaving %s\n", m_file, m_func);
+        break;
     case RETVAL_INT:
-      FootmarkDebugPrint("%s: leaving %s: returned %d\n", m_file, m_func, m_retval_int);
-      break;
+        FootmarkDebugPrint("%s: leaving %s: returned %d\n", m_file, m_func, m_retval_int);
+        break;
     case RETVAL_LONG:
-      FootmarkDebugPrint("%s: leaving %s: returned 0x%08lX\n", m_file, m_func, m_retval_long);
-      break;
+        FootmarkDebugPrint("%s: leaving %s: returned 0x%08lX\n", m_file, m_func, m_retval_long);
+        break;
     case RETVAL_PTR:
-      FootmarkDebugPrint("%s: leaving %s: returned %p\n", m_file, m_func, m_retval_ptr);
-      break;
+        FootmarkDebugPrint("%s: leaving %s: returned %p\n", m_file, m_func, m_retval_ptr);
+        break;
 #ifdef _WIN32
     case RETVAL_LPARAM:
-      FootmarkDebugPrint("%s: leaving %s: returned %p\n", m_file, m_func, m_retval_lparam);
-      break;
+        FootmarkDebugPrint("%s: leaving %s: returned %p\n", m_file, m_func, m_retval_lparam);
+        break;
 #endif
     }
-  }
+}
 #endif  // def MZIMEJA_DEBUG_OUTPUT
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,47 +125,43 @@
 #if defined(MZIMEJA_DEBUG_OUTPUT)
   #if (__cplusplus >= 201103L) // C++11
     #define FOOTMARK() \
-      FootmarkLocation the_footmark(__FILE__, __LINE__, __func__);
+        FootmarkLocation the_footmark(__FILE__, __LINE__, __func__);
   #else // until C++11
     #define FOOTMARK() \
-      FootmarkLocation the_footmark(__FILE__, __LINE__, __FUNCTION__);
+        FootmarkLocation the_footmark(__FILE__, __LINE__, __FUNCTION__);
   #endif
   #define FOOTMARK_POINT() FootmarkDebugPrint("%s (%d): FOOTMARK_POINT()\n", \
                                               __FILE__, __LINE__)
   #if (__cplusplus >= 201103L) // C++11
     #define FOOTMARK_FORMAT \
-      FootmarkLocation the_footmark(__FILE__, __LINE__, __func__); \
-      FootmarkDebugPrint
+        FootmarkLocation the_footmark(__FILE__, __LINE__, __func__); \
+        FootmarkDebugPrint
   #else
     #define FOOTMARK_FORMAT \
-      FootmarkLocation the_footmark(__FILE__, __LINE__, __FUNCTION__); \
-      FootmarkDebugPrint
+        FootmarkLocation the_footmark(__FILE__, __LINE__, __FUNCTION__); \
+        FootmarkDebugPrint
   #endif
-  #define FOOTMARK_RETURN_INT(retval) \
-    do { \
-      the_footmark.m_retval_type = FootmarkLocation::RETVAL_INT; \
-      the_footmark.m_retval_int = (int)(retval); \
-      return the_footmark.m_retval_int; \
-    } while (0)
-  #define FOOTMARK_RETURN_LONG(retval) \
-    do { \
-      the_footmark.m_retval_type = FootmarkLocation::RETVAL_LONG; \
-      the_footmark.m_retval_long = (long)(retval); \
-      return the_footmark.m_retval_long; \
-    } while (0)
-  #define FOOTMARK_RETURN_PTR(ptrtype,retval) \
-    do { \
-      the_footmark.m_retval_type = FootmarkLocation::RETVAL_PTR; \
-      the_footmark.m_retval_ptr = (void *)(retval); \
-      return (ptrtype)the_footmark.m_retval_ptr; \
-    } while (0)
+  #define FOOTMARK_RETURN_INT(retval) do { \
+        the_footmark.m_retval_type = FootmarkLocation::RETVAL_INT; \
+        the_footmark.m_retval_int = (int)(retval); \
+        return the_footmark.m_retval_int; \
+} while (0)
+  #define FOOTMARK_RETURN_LONG(retval) do { \
+        the_footmark.m_retval_type = FootmarkLocation::RETVAL_LONG; \
+        the_footmark.m_retval_long = (long)(retval); \
+        return the_footmark.m_retval_long; \
+} while (0)
+  #define FOOTMARK_RETURN_PTR(ptrtype,retval) do { \
+        the_footmark.m_retval_type = FootmarkLocation::RETVAL_PTR; \
+        the_footmark.m_retval_ptr = (void *)(retval); \
+        return (ptrtype)the_footmark.m_retval_ptr; \
+} while (0)
   #ifdef _WIN32
-    #define FOOTMARK_RETURN_LPARAM(retval) \
-      do { \
+    #define FOOTMARK_RETURN_LPARAM(retval) do { \
         the_footmark.m_retval_type = FootmarkLocation::RETVAL_LPARAM; \
         the_footmark.m_retval_lparam = (LPARAM)(retval); \
         return the_footmark.m_retval_lparam; \
-      } while (0)
+} while (0)
   #endif
 #else   // !def MZIMEJA_DEBUG_OUTPUT
   #define FOOTMARK()                          /*empty*/

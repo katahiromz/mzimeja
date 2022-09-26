@@ -12,38 +12,38 @@ extern "C" {
 // internal functions
 
 PSID MyCreateSid(VOID) {
-  PSID psid;
-  BOOL fResult;
-  SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_WORLD_SID_AUTHORITY;
+    PSID psid;
+    BOOL fResult;
+    SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_WORLD_SID_AUTHORITY;
 
-  // allocate and initialize an SID
-  fResult = AllocateAndInitializeSid(&SidAuthority, 1, SECURITY_WORLD_RID, 0, 0,
-                                     0, 0, 0, 0, 0, &psid);
-  if (!fResult) {
-    DebugPrintA("MyCreateSid:AllocateAndInitializeSid failed");
-    return NULL;
-  }
+    // allocate and initialize an SID
+    fResult = AllocateAndInitializeSid(&SidAuthority, 1, SECURITY_WORLD_RID, 0, 0,
+                                       0, 0, 0, 0, 0, &psid);
+    if (!fResult) {
+        DebugPrintA("MyCreateSid:AllocateAndInitializeSid failed");
+        return NULL;
+    }
 
-  if (!IsValidSid(psid)) {
-    DebugPrintA("MyCreateSid:AllocateAndInitializeSid returns bogus sid");
-    FreeSid(psid);
-    return NULL;
-  }
+    if (!IsValidSid(psid)) {
+        DebugPrintA("MyCreateSid:AllocateAndInitializeSid returns bogus sid");
+        FreeSid(psid);
+        return NULL;
+    }
 
-  return psid;
+    return psid;
 }
 
 POSVERSIONINFO GetVersionInfo(VOID) {
-  static BOOL fFirstCall = TRUE;
-  static OSVERSIONINFO os;
+    static BOOL fFirstCall = TRUE;
+    static OSVERSIONINFO os;
 
-  if (fFirstCall) {
-    os.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if (GetVersionEx(&os)) {
-      fFirstCall = FALSE;
+    if (fFirstCall) {
+        os.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+        if (GetVersionEx(&os)) {
+            fFirstCall = FALSE;
+        }
     }
-  }
-  return &os;
+    return &os;
 }
 
 // CreateSecurityAttributes()
@@ -64,111 +64,111 @@ POSVERSIONINFO GetVersionInfo(VOID) {
 //      FreeSecurityAttributes() should be called to free up the
 //      SECURITY_ATTRIBUTES allocated by this function.
 SECURITY_ATTRIBUTES *CreateSecurityAttributes(void) {
-  if (!IsNT()) return NULL;
+    if (!IsNT()) return NULL;
 
-  // create a sid for everyone access
-  PSID psid = MyCreateSid();
-  if (psid == NULL) {
-    return NULL;
-  }
+    // create a sid for everyone access
+    PSID psid = MyCreateSid();
+    if (psid == NULL) {
+        return NULL;
+    }
 
-  // allocate and initialize an access control list (ACL) that will
-  // contain the SID we've just created.
-  DWORD cbacl;
-  cbacl = sizeof(ACL) + (sizeof(ACCESS_ALLOWED_ACE) - sizeof(DWORD)) +
-          GetLengthSid(psid);
+    // allocate and initialize an access control list (ACL) that will
+    // contain the SID we've just created.
+    DWORD cbacl;
+    cbacl = sizeof(ACL) + (sizeof(ACCESS_ALLOWED_ACE) - sizeof(DWORD)) +
+            GetLengthSid(psid);
 
-  PACL pacl;
-  pacl = (PACL)MEMALLOC(cbacl);
-  if (pacl == NULL) {
-    DebugPrintA("CreateSecurityAttributes:LocalAlloc for ACL failed");
+    PACL pacl;
+    pacl = (PACL)MEMALLOC(cbacl);
+    if (pacl == NULL) {
+        DebugPrintA("CreateSecurityAttributes:LocalAlloc for ACL failed");
+        FreeSid(psid);
+        return NULL;
+    }
+
+    BOOL fResult = InitializeAcl(pacl, cbacl, ACL_REVISION);
+    if (!fResult) {
+        DebugPrintA("CreateSecurityAttributes:InitializeAcl failed");
+        FreeSid(psid);
+        MEMFREE(pacl);
+        return NULL;
+    }
+
+    //
+    // adds an access-allowed ACE for interactive users to the ACL
+    //
+    fResult = AddAccessAllowedAce(pacl, ACL_REVISION, GENERIC_ALL, psid);
+    if (!fResult) {
+        DebugPrintA("CreateSecurityAttributes:AddAccessAllowedAce failed");
+        MEMFREE(pacl);
+        FreeSid(psid);
+        return NULL;
+    }
+
+    // Those SIDs have been copied into the ACL. We don't need'em any more.
     FreeSid(psid);
-    return NULL;
-  }
 
-  BOOL fResult = InitializeAcl(pacl, cbacl, ACL_REVISION);
-  if (!fResult) {
-    DebugPrintA("CreateSecurityAttributes:InitializeAcl failed");
-    FreeSid(psid);
-    MEMFREE(pacl);
-    return NULL;
-  }
+    // Let's make sure that our ACL is valid.
+    if (!IsValidAcl(pacl)) {
+        DebugPrintA("CreateSecurityAttributes:IsValidAcl returns FALSE!");
+        MEMFREE(pacl);
+        return NULL;
+    }
 
-  //
-  // adds an access-allowed ACE for interactive users to the ACL
-  //
-  fResult = AddAccessAllowedAce(pacl, ACL_REVISION, GENERIC_ALL, psid);
-  if (!fResult) {
-    DebugPrintA("CreateSecurityAttributes:AddAccessAllowedAce failed");
-    MEMFREE(pacl);
-    FreeSid(psid);
-    return NULL;
-  }
+    // allocate security attribute
+    SECURITY_ATTRIBUTES *psa;
+    psa = (PSECURITY_ATTRIBUTES)MEMALLOC(sizeof(SECURITY_ATTRIBUTES));
+    if (psa == NULL) {
+        DebugPrintA("CreateSecurityAttributes:LocalAlloc for psa failed");
+        MEMFREE(pacl);
+        return NULL;
+    }
 
-  // Those SIDs have been copied into the ACL. We don't need'em any more.
-  FreeSid(psid);
+    // allocate and initialize a new security descriptor
+    PSECURITY_DESCRIPTOR psd;
+    psd = MEMALLOC(SECURITY_DESCRIPTOR_MIN_LENGTH);
+    if (psd == NULL) {
+        DebugPrintA("CreateSecurityAttributes:LocalAlloc for psd failed");
+        MEMFREE(pacl);
+        MEMFREE(psa);
+        return NULL;
+    }
 
-  // Let's make sure that our ACL is valid.
-  if (!IsValidAcl(pacl)) {
-    DebugPrintA("CreateSecurityAttributes:IsValidAcl returns FALSE!");
-    MEMFREE(pacl);
-    return NULL;
-  }
+    if (!InitializeSecurityDescriptor(psd, SECURITY_DESCRIPTOR_REVISION)) {
+        DebugPrint(
+                TEXT("CreateSecurityAttributes:InitializeSecurityDescriptor failed"));
+        MEMFREE(pacl);
+        MEMFREE(psa);
+        MEMFREE(psd);
+        return NULL;
+    }
 
-  // allocate security attribute
-  SECURITY_ATTRIBUTES *psa;
-  psa = (PSECURITY_ATTRIBUTES)MEMALLOC(sizeof(SECURITY_ATTRIBUTES));
-  if (psa == NULL) {
-    DebugPrintA("CreateSecurityAttributes:LocalAlloc for psa failed");
-    MEMFREE(pacl);
-    return NULL;
-  }
+    // The discretionary ACL is referenced by, not copied
+    // into, the security descriptor. We shouldn't free up ACL
+    // after the SetSecurityDescriptorDacl call.
+    fResult = SetSecurityDescriptorDacl(psd, TRUE, pacl, FALSE);
+    if (!fResult) {
+        DebugPrintA("CreateSecurityAttributes:SetSecurityDescriptorDacl failed");
+        MEMFREE(pacl);
+        MEMFREE(psa);
+        MEMFREE(psd);
+        return NULL;
+    }
 
-  // allocate and initialize a new security descriptor
-  PSECURITY_DESCRIPTOR psd;
-  psd = MEMALLOC(SECURITY_DESCRIPTOR_MIN_LENGTH);
-  if (psd == NULL) {
-    DebugPrintA("CreateSecurityAttributes:LocalAlloc for psd failed");
-    MEMFREE(pacl);
-    MEMFREE(psa);
-    return NULL;
-  }
+    if (!IsValidSecurityDescriptor(psd)) {
+        DebugPrintA("CreateSecurityAttributes:IsValidSecurityDescriptor failed!");
+        MEMFREE(pacl);
+        MEMFREE(psa);
+        MEMFREE(psd);
+        return NULL;
+    }
 
-  if (!InitializeSecurityDescriptor(psd, SECURITY_DESCRIPTOR_REVISION)) {
-    DebugPrint(
-        TEXT("CreateSecurityAttributes:InitializeSecurityDescriptor failed"));
-    MEMFREE(pacl);
-    MEMFREE(psa);
-    MEMFREE(psd);
-    return NULL;
-  }
+    // everything is done
+    psa->nLength = sizeof(SECURITY_ATTRIBUTES);
+    psa->lpSecurityDescriptor = psd;
+    psa->bInheritHandle = TRUE;
 
-  // The discretionary ACL is referenced by, not copied
-  // into, the security descriptor. We shouldn't free up ACL
-  // after the SetSecurityDescriptorDacl call.
-  fResult = SetSecurityDescriptorDacl(psd, TRUE, pacl, FALSE);
-  if (!fResult) {
-    DebugPrintA("CreateSecurityAttributes:SetSecurityDescriptorDacl failed");
-    MEMFREE(pacl);
-    MEMFREE(psa);
-    MEMFREE(psd);
-    return NULL;
-  }
-
-  if (!IsValidSecurityDescriptor(psd)) {
-    DebugPrintA("CreateSecurityAttributes:IsValidSecurityDescriptor failed!");
-    MEMFREE(pacl);
-    MEMFREE(psa);
-    MEMFREE(psd);
-    return NULL;
-  }
-
-  // everything is done
-  psa->nLength = sizeof(SECURITY_ATTRIBUTES);
-  psa->lpSecurityDescriptor = psd;
-  psa->bInheritHandle = TRUE;
-
-  return psa;
+    return psa;
 }
 
 // FreeSecurityAttributes()
@@ -177,22 +177,22 @@ SECURITY_ATTRIBUTES *CreateSecurityAttributes(void) {
 //      Frees the memory objects allocated by previous
 //      CreateSecurityAttributes() call.
 void FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa) {
-  if (psa == NULL) return;
+    if (psa == NULL) return;
 
-  BOOL fResult;
-  BOOL fDaclPresent;
-  BOOL fDaclDefaulted;
-  PACL pacl;
-  fResult = GetSecurityDescriptorDacl(psa->lpSecurityDescriptor, &fDaclPresent,
-                                      &pacl, &fDaclDefaulted);
-  if (fResult) {
-    if (pacl != NULL) MEMFREE(pacl);
-  } else {
-    DebugPrintA("FreeSecurityAttributes:GetSecurityDescriptorDacl failed");
-  }
+    BOOL fResult;
+    BOOL fDaclPresent;
+    BOOL fDaclDefaulted;
+    PACL pacl;
+    fResult = GetSecurityDescriptorDacl(psa->lpSecurityDescriptor, &fDaclPresent,
+                                        &pacl, &fDaclDefaulted);
+    if (fResult) {
+        if (pacl != NULL) MEMFREE(pacl);
+    } else {
+        DebugPrintA("FreeSecurityAttributes:GetSecurityDescriptorDacl failed");
+    }
 
-  MEMFREE(psa->lpSecurityDescriptor);
-  MEMFREE(psa);
+    MEMFREE(psa->lpSecurityDescriptor);
+    MEMFREE(psa);
 }
 
 // IsNT()
@@ -205,7 +205,7 @@ void FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa) {
 //      You need to modify the function if you call the function in
 //      multi-thread environment.
 BOOL IsNT(void) {
-  return GetVersionInfo()->dwPlatformId == VER_PLATFORM_WIN32_NT;
+    return GetVersionInfo()->dwPlatformId == VER_PLATFORM_WIN32_NT;
 }
 
 //////////////////////////////////////////////////////////////////////////////

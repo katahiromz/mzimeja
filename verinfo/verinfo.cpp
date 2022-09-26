@@ -16,16 +16,16 @@ HINSTANCE g_hInstance;
 //////////////////////////////////////////////////////////////////////////////
 
 LPCTSTR DoLoadString(INT nID) {
-  static WCHAR s_szBuf[1024];
-  s_szBuf[0] = 0;
-  LoadStringW(g_hInstance, nID, s_szBuf, 1024);
-  return s_szBuf[0] ? s_szBuf : L"Internal Error";
+    static WCHAR s_szBuf[1024];
+    s_szBuf[0] = 0;
+    LoadStringW(g_hInstance, nID, s_szBuf, 1024);
+    return s_szBuf[0] ? s_szBuf : L"Internal Error";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void OnPsh1(HWND hWnd) {
-  ::ShellExecute(hWnd, NULL, DoLoadString(2), NULL, NULL, SW_SHOWNORMAL);
+    ::ShellExecute(hWnd, NULL, DoLoadString(2), NULL, NULL, SW_SHOWNORMAL);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -33,51 +33,51 @@ void OnPsh1(HWND hWnd) {
 extern "C"
 INT_PTR CALLBACK
 DialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  switch (uMsg) {
-  case WM_INITDIALOG:
+    switch (uMsg) {
+    case WM_INITDIALOG:
     {
-      HICON hIcon = ::LoadIcon(g_hInstance, MAKEINTRESOURCE(1));
-      ::SendDlgItemMessage(hWnd, ico1, STM_SETICON, (WPARAM)hIcon, 0);
+        HICON hIcon = ::LoadIcon(g_hInstance, MAKEINTRESOURCE(1));
+        ::SendDlgItemMessage(hWnd, ico1, STM_SETICON, (WPARAM)hIcon, 0);
     }
-    return TRUE;
-  case WM_COMMAND:
-    switch (LOWORD(wParam)) {
-    case IDOK:
-      ::EndDialog(hWnd, IDOK);
-      break;
-    case IDCANCEL:
-      ::EndDialog(hWnd, IDCANCEL);
-      break;
-    case psh1:
-      OnPsh1(hWnd);
-      break;
+        return TRUE;
+    case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+        case IDOK:
+            ::EndDialog(hWnd, IDOK);
+            break;
+        case IDCANCEL:
+            ::EndDialog(hWnd, IDCANCEL);
+            break;
+        case psh1:
+            OnPsh1(hWnd);
+            break;
+        }
     }
-  }
-  return FALSE;
+    return FALSE;
 }
 //////////////////////////////////////////////////////////////////////////////
 
 extern "C"
 INT WINAPI
 wWinMain(
-  HINSTANCE hInstance,
-  HINSTANCE hPrevInstance,
-  LPWSTR    lpCmdLine,
-  INT       nCmdShow)
+        HINSTANCE hInstance,
+        HINSTANCE hPrevInstance,
+        LPWSTR lpCmdLine,
+        INT nCmdShow)
 {
-  g_hInstance = hInstance;
+    g_hInstance = hInstance;
 
-  LPCTSTR pszTitle = DoLoadString(1);
+    LPCTSTR pszTitle = DoLoadString(1);
 
-  HWND hWnd = ::FindWindow(WC_DIALOG, pszTitle);
-  if (hWnd) {
-    ::SetForegroundWindow(hWnd);
-    ::ShowWindow(hWnd, SW_SHOWNORMAL);
-  } else {
-    ::DialogBoxW(hInstance, MAKEINTRESOURCEW(1), NULL, DialogProc);
-  }
+    HWND hWnd = ::FindWindow(WC_DIALOG, pszTitle);
+    if (hWnd) {
+        ::SetForegroundWindow(hWnd);
+        ::ShowWindow(hWnd, SW_SHOWNORMAL);
+    } else {
+        ::DialogBoxW(hInstance, MAKEINTRESOURCEW(1), NULL, DialogProc);
+    }
 
-  return 0;
+    return 0;
 } // wWinMain
 
 //////////////////////////////////////////////////////////////////////////////
