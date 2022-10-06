@@ -7,6 +7,9 @@ mzimejaをWinXP/Win2k3で動かすには、WinXPサポートのあるVisual C++�
 
 MinGW+MSYS2でもビルドできますが、WinXPサポートがありません。RosBEや古い方のMinGWではビルドできません。
 
+ソースコードに一部Shift_JISを使用しているため、RosBEのg++でビルドしたいのであれば、変換プログラムが必要となります。
+RosBE 2.2.1には変換プログラムがないため、変換プログラムの追加が必要です。
+
 ## 日本語Visual Studioでmzimejaビルド
 
 プロジェクトの設定で「xp」が付いたツールキットを選んでビルドして下さい。
