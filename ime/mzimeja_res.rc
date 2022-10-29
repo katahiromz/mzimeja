@@ -98,8 +98,8 @@ END
 // Version Info
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION    0, 9, 2, 0
- PRODUCTVERSION 0, 9, 2, 0
+ FILEVERSION    0, 9, 3, 0
+ PRODUCTVERSION 0, 9, 3, 0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS VS_FF_DEBUG | VS_FF_PRERELEASE | VS_FF_PRIVATEBUILD
@@ -116,12 +116,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "片山博文MZ\0"
             VALUE "FileDescription", "MZ-IME日本語入力 0.0\0"
-            VALUE "FileVersion", "0.9.2\0"
+            VALUE "FileVersion", "0.9.3\0"
             VALUE "InternalName", "mzimeja\0"
             VALUE "LegalCopyright", "Copyright (C) 2016-2017 片山博文MZ.\0"
             VALUE "OriginalFilename", "mzimeja.ime\0"
             VALUE "ProductName", "MZ-IME日本語入力\0"
-            VALUE "ProductVersion", "0.9.2\0"
+            VALUE "ProductVersion", "0.9.3\0"
         END
     END
     BLOCK "VarFileInfo"
