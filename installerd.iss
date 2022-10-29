@@ -33,13 +33,13 @@ Source: "res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 
 ; Source: "build\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
-; Source: "build\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Source: "build\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; Source: "build\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; Source: "build\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; Source: "build\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 Source: "build\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Release\setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -53,7 +53,7 @@ Name: "{group}\バージョン情報"; Filename: "{app}\verinfo.exe"
 Name: "{group}\アンインストール"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\setup.exe"; Parameters: "/i"
+Filename: "{app}\ime_setup.exe"; Parameters: "/i"
 
 [UninstallRun]
-Filename: "{app}\setup.exe"; Parameters: "/u"
+Filename: "{app}\ime_setup.exe"; Parameters: "/u"

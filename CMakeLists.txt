@@ -68,7 +68,7 @@ endif()
 
 add_subdirectory(ime)
 add_subdirectory(imepad)
-add_subdirectory(setup)
+add_subdirectory(ime_setup)
 add_subdirectory(verinfo)
 add_subdirectory(dict_compile)
 
