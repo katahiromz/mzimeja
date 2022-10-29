@@ -150,7 +150,6 @@ static const WCHAR s_szKeyboardLayouts[] =
         L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts";
 
 INT DoSetRegistry1(VOID) {
-    /* Retired use of registry */
     BOOL ret = FALSE;
     HKEY hKey;
     LONG result = OpenRegKey(HKEY_LOCAL_MACHINE, s_szKeyboardLayouts, TRUE, &hKey);
@@ -158,9 +157,8 @@ INT DoSetRegistry1(VOID) {
         HKEY hkLayouts;
         result = CreateRegKey(hKey, L"E0120411", &hkLayouts);
         if (result == ERROR_SUCCESS && hkLayouts) {
-            if (DoSetRegSz(hkLayouts, L"Layout File", L"kbdjp.kbd") &&
+            if (DoSetRegSz(hkLayouts, L"Layout File", L"kbdjpn.kbd") &&
                 DoSetRegSz(hkLayouts, L"Layout Text", DoLoadString(4)) &&
-                DoSetRegSz(hkLayouts, L"Layout File", L"kbdjp.kbd") &&
                 DoSetRegSz(hkLayouts, L"IME File", L"mzimeja.ime"))
             {
                 ret = TRUE;
