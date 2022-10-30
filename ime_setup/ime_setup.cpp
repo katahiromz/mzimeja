@@ -6,6 +6,7 @@
 
 #define NOMINMAX
 #include <windows.h>
+#include <shlwapi.h>
 #include <dlgs.h>
 #include <cstdlib>    // for __argc, __wargv
 #include <cstring>    // for wcsrchr
@@ -15,11 +16,34 @@ HINSTANCE g_hInstance;
 
 //////////////////////////////////////////////////////////////////////////////
 
+LPWSTR FindLocalFile(LPWSTR pszPath, LPCWSTR pszFileName)
+{
+    ::GetModuleFileNameW(NULL, pszPath, MAX_PATH);
+    PathRemoveFileSpecW(pszPath);
+
+    for (INT i = 0; i < 5; ++i)
+    {
+        size_t ich = wcslen(pszPath);
+        {
+            PathAppendW(pszPath, pszFileName);
+            if (PathFileExistsW(pszPath))
+                return pszPath;
+        }
+        pszPath[ich] = 0;
+        {
+            PathAppendW(pszPath, L"mzimeja");
+            PathAppendW(pszPath, pszFileName);
+            if (PathFileExistsW(pszPath))
+                return pszPath;
+        }
+        pszPath[ich] = 0;
+        PathRemoveFileSpecW(pszPath);
+    }
+    return NULL;
+}
+
 LPWSTR GetSrcImePathName(LPWSTR pszPath) {
-    GetModuleFileName(NULL, pszPath, MAX_PATH);
-    LPWSTR pch = wcsrchr(pszPath, L'\\');
-    lstrcpyW(pch, L"\\mzimeja.ime");
-    return pszPath;
+    return FindLocalFile(pszPath, L"mzimeja.ime");
 }
 
 LPWSTR GetSystemImePathName(LPWSTR pszPath) {
@@ -29,52 +53,34 @@ LPWSTR GetSystemImePathName(LPWSTR pszPath) {
 }
 
 LPWSTR GetBasicDictPathName(LPWSTR pszPath) {
-    GetModuleFileName(NULL, pszPath, MAX_PATH);
-    LPWSTR pch = wcsrchr(pszPath, L'\\');
-    lstrcpyW(pch, L"\\res\\mzimeja.dic");
-    return pszPath;
+    return FindLocalFile(pszPath, L"res\\mzimeja.dic");
 }
 
 LPWSTR GetNameDictPathName(LPWSTR pszPath) {
-    GetModuleFileName(NULL, pszPath, MAX_PATH);
-    LPWSTR pch = wcsrchr(pszPath, L'\\');
-    lstrcpyW(pch, L"\\res\\name.dic");
-    return pszPath;
+    return FindLocalFile(pszPath, L"res\\name.dic");
 }
 
 LPWSTR GetKanjiDataPathName(LPWSTR pszPath) {
-    GetModuleFileName(NULL, pszPath, MAX_PATH);
-    LPWSTR pch = wcsrchr(pszPath, L'\\');
-    lstrcpyW(pch, L"\\res\\kanji.dat");
-    return pszPath;
+    return FindLocalFile(pszPath, L"res\\kanji.dat");
 }
 
 LPWSTR GetRadicalDataPathName(LPWSTR pszPath) {
-    GetModuleFileName(NULL, pszPath, MAX_PATH);
-    LPWSTR pch = wcsrchr(pszPath, L'\\');
-    lstrcpyW(pch, L"\\res\\radical.dat");
-    return pszPath;
+    return FindLocalFile(pszPath, L"res\\radical.dat");
 }
 
 LPWSTR GetImePadPathName(LPWSTR pszPath) {
-    GetModuleFileName(NULL, pszPath, MAX_PATH);
-    LPWSTR pch = wcsrchr(pszPath, L'\\');
-    lstrcpyW(pch, L"\\imepad.exe");
-    return pszPath;
+    return FindLocalFile(pszPath, L"imepad.exe");
 }
 
 LPWSTR GetVerInfoPathName(LPWSTR pszPath) {
-    GetModuleFileName(NULL, pszPath, MAX_PATH);
-    LPWSTR pch = wcsrchr(pszPath, L'\\');
-    lstrcpyW(pch, L"\\verinfo.exe");
-    return pszPath;
+    return FindLocalFile(pszPath, L"verinfo.exe");
 }
 
 LPWSTR GetReadMePathName(LPWSTR pszPath) {
-    GetModuleFileName(NULL, pszPath, MAX_PATH);
-    LPWSTR pch = wcsrchr(pszPath, L'\\');
-    lstrcpyW(pch, L"\\READMEJP.txt");
-    return pszPath;
+    LPWSTR ret = FindLocalFile(pszPath, L"mzimeja\\READMEJP.txt");
+    if (ret)
+        return ret;
+    return FindLocalFile(pszPath, L"READMEJP.txt");
 }
 
 //////////////////////////////////////////////////////////////////////////////
