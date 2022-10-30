@@ -6,6 +6,7 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include <shlwapi.h>
 #include <tchar.h>          // for Windows generic text
 
 #include <string>           // for std::string, std::wstring, ...
@@ -328,36 +329,38 @@ ImePad::~ImePad() {
 //////////////////////////////////////////////////////////////////////////////
 // loading res/kanji.dat and res/radical.dat
 
-LPWSTR GetKanjiDataPathName(LPWSTR pszPath) {
-    ::GetModuleFileName(NULL, pszPath, MAX_PATH);
-    LPWSTR pch = wcsrchr(pszPath, L'\\');
-    lstrcpyW(pch, L"\\res\\kanji.dat");
-    if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
-        lstrcpyW(pch, L"\\..\\res\\kanji.dat");
-        if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
-            lstrcpyW(pch, L"\\..\\..\\res\\kanji.dat");
-            if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
-                lstrcpyW(pch, L"\\..\\..\\..\\res\\kanji.dat");
-            }
+LPWSTR FindLocalFile(LPWSTR pszPath, LPCWSTR pszFileName)
+{
+    ::GetModuleFileNameW(NULL, pszPath, MAX_PATH);
+    PathRemoveFileSpecW(pszPath);
+
+    for (INT i = 0; i < 5; ++i)
+    {
+        size_t ich = wcslen(pszPath);
+        {
+            PathAppendW(pszPath, pszFileName);
+            if (PathFileExistsW(pszPath))
+                return pszPath;
         }
+        pszPath[ich] = 0;
+        {
+            PathAppendW(pszPath, L"mzimeja");
+            PathAppendW(pszPath, pszFileName);
+            if (PathFileExistsW(pszPath))
+                return pszPath;
+        }
+        pszPath[ich] = 0;
+        PathRemoveFileSpecW(pszPath);
     }
-    return pszPath;
+    return NULL;
+}
+
+LPWSTR GetKanjiDataPathName(LPWSTR pszPath) {
+    return FindLocalFile(pszPath, L"res\\kanji.dat");
 }
 
 LPWSTR GetRadicalDataPathName(LPWSTR pszPath) {
-    GetModuleFileName(NULL, pszPath, MAX_PATH);
-    LPWSTR pch = wcsrchr(pszPath, L'\\');
-    lstrcpyW(pch, L"\\res\\radical.dat");
-    if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
-        lstrcpyW(pch, L"\\..\\res\\radical.dat");
-        if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
-            lstrcpyW(pch, L"\\..\\..\\res\\radical.dat");
-            if (::GetFileAttributesW(pszPath) == INVALID_FILE_ATTRIBUTES) {
-                lstrcpyW(pch, L"\\..\\..\\..\\res\\radical.dat");
-            }
-        }
-    }
-    return pszPath;
+    return FindLocalFile(pszPath, L"res\\radical.dat");
 }
 
 BOOL ImePad::LoadKanjiData() {
