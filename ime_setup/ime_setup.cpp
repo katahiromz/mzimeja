@@ -327,6 +327,31 @@ INT DoUnsetRegistry2(VOID) {
     return (ret ? 0 : -1);
 } // DoUnsetRegistry2
 
+INT DoMakeMZIMEJADefault(VOID)
+{
+    HKEY hKey;
+    LONG error;
+    error = RegOpenKeyExW(HKEY_CURRENT_USER, L"Keyboard Layout\\Preload", 0,
+                          KEY_READ | KEY_WRITE, &hKey);
+    if (error != ERROR_SUCCESS) {
+        return -1;
+    }
+
+    WCHAR szValue[MAX_PATH];
+    for (DWORD dwIndex = 0; dwIndex < 10; ++dwIndex) {
+        DWORD cch = _countof(szValue);
+        error = RegEnumValueW(hKey, dwIndex, szValue, &cch, NULL, NULL, NULL, NULLL);
+        if (error)
+            break;
+        RegDeleteValueW(hKey, szValue);
+    }
+
+    error = RegSetValueExW(hKey, L"1", 0, REG_SZ, (LPBYTE)L"E0120411", (8 + 1) * sizeof(WCHAR));
+
+    RegCloseKey(hKey);
+    return (error ? -1 : 0);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 INT DoInstall(VOID) {
@@ -358,7 +383,9 @@ INT DoInstall(VOID) {
         ::MessageBoxW(NULL, szMsg, NULL, MB_ICONERROR);
         return 3;
     }
-    ShellExecuteW(NULL, NULL, L"control.exe", L"input.dll", NULL, SW_SHOWNORMAL);
+
+    DoMakeMZIMEJADefault();
+    //ShellExecuteW(NULL, NULL, L"control.exe", L"input.dll", NULL, SW_SHOWNORMAL);
     return 0;
 } // DoInstall
 

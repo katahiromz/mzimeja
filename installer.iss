@@ -20,6 +20,7 @@ Compression=lzma
 SolidCompression=yes
 VersionInfoVersion=0.9.3
 VersionInfoTextVersion=0.9.3
+AlwaysRestart=yes
 
 [Languages]
 Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
