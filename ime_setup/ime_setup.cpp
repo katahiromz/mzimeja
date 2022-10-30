@@ -340,7 +340,7 @@ INT DoMakeMZIMEJADefault(VOID)
     WCHAR szValue[MAX_PATH];
     for (DWORD dwIndex = 0; dwIndex < 10; ++dwIndex) {
         DWORD cch = _countof(szValue);
-        error = RegEnumValueW(hKey, dwIndex, szValue, &cch, NULL, NULL, NULL, NULLL);
+        error = RegEnumValueW(hKey, dwIndex, szValue, &cch, NULL, NULL, NULL, NULL);
         if (error)
             break;
         RegDeleteValueW(hKey, szValue);
