@@ -448,9 +448,7 @@ wWinMain(
     switch (__argc) {
     case 2:
         if (lstrcmpiW(__wargv[1], L"/i") == 0) {
-            if (::MessageBoxW(NULL, DoLoadString(9), NULL, MB_ICONINFORMATION | MB_YESNO) == IDYES) {
-                return DoInstall();
-            }
+            return DoInstall();
         }
         if (lstrcmpiW(__wargv[1], L"/u") == 0) {
             return DoUninstall();
