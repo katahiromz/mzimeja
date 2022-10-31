@@ -1049,7 +1049,8 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
     // delete the nodes of different size
     DeleteDifferentSizeNode del(pre.size());
     for (size_t i = 0; i < chunks[0].size(); ++i) {
-        std::remove_if(chunks[0].begin(), chunks[0].end(), del);
+        auto it = std::remove_if(chunks[0].begin(), chunks[0].end(), del);
+        chunks[0].erase(it, chunks[0].end());
     }
 
     return !chunks[0].empty();
@@ -1160,7 +1161,8 @@ void Lattice::CutUnlinkedNodes() {
     const size_t length = pre.size();
     for (size_t index = 0; index < length; ++index) {
         LatticeChunk& chunk1 = chunks[index];
-        std::remove_if(chunk1.begin(), chunk1.end(), IsNodeUnlinked);
+        auto it = std::remove_if(chunk1.begin(), chunk1.end(), IsNodeUnlinked);
+        chunk1.erase(it, chunk1.end());
     }
 } // Lattice::CutUnlinkedNodes
 
