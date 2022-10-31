@@ -10,33 +10,49 @@
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
-// Strings
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
 STRINGTABLE 
 BEGIN
-    1, "MZ-IME セットアップ"
-    2, "レジストリの設定に失敗しました(#1)。管理者権限でインストールをやり直して下さい。"
-    3, "ファイルのコピーに失敗しました。管理者権限でインストールをやり直して下さい。"
+    1, "MZ-IME Setup"
+    2, "Registry setup failed (#1)."
+    3, "Failed to copy files."
     4, "日本語 (MZ-IME)"
-    5, "IMEのインストールに失敗しました。エラーコード%dを作者にご連絡下さい。"
-    6, "レジストリの削除に失敗しました。"
-    7, "ファイルの削除に失敗しました。"
-    8, "レジストリの設定に失敗しました(#2)。管理者権限でインストールをやり直して下さい。"
+    5, "IME installation failed. Please contact the author with error code %d."
+    6, "Registry deletion failed."
+    7, "Failed to delete files."
+    8, "Registry setup failed (#2)."
 END
 
 /////////////////////////////////////////////////////////////////////////////
-// Dialog
 
-1 DIALOG 30, 28, 135, 63
-STYLE DS_MODALFRAME | DS_NOIDLEMSG | WS_POPUP | WS_VISIBLE | WS_CAPTION
-CAPTION "MZ-IMEセットアップ"
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+1 DIALOG 30, 28, 180, 63
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MZ-IME 日本語入力セットアップ"
 FONT 10, "ＭＳ Ｐゴシック"
 BEGIN
     CONTROL "インストール(&I)", rad1, "BUTTON", BS_AUTORADIOBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 10, 10, 85, 14
     CONTROL "アンインストール(&U)", rad2, "BUTTON", BS_AUTORADIOBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 10, 25, 85, 14
     CONTROL "OK", IDOK, "BUTTON", BS_DEFPUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 5, 45, 60, 14
     CONTROL "キャンセル", IDCANCEL, "BUTTON", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 70, 45, 60, 14
+END
+
+/////////////////////////////////////////////////////////////////////////////
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+1 DIALOG 30, 28, 180, 63
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MZ-IME Japanese Input Setup"
+FONT 9, "MS Shell Dlg"
+BEGIN
+    CONTROL "&Install", rad1, "BUTTON", BS_AUTORADIOBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 10, 10, 85, 14
+    CONTROL "&Uninstalll", rad2, "BUTTON", BS_AUTORADIOBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 10, 25, 85, 14
+    CONTROL "OK", IDOK, "BUTTON", BS_DEFPUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 5, 45, 60, 14
+    CONTROL "Cancel", IDCANCEL, "BUTTON", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 70, 45, 60, 14
 END
 
 /////////////////////////////////////////////////////////////////////////////
