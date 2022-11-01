@@ -1,7 +1,7 @@
 // regword.cpp --- registering words
 //////////////////////////////////////////////////////////////////////////////
 
-#include "../mzimeja.h"
+#include "mzimeja.h"
 
 #define FAKEWORD_NOUN IME_REGWORD_STYLE_USER_FIRST
 #define FAKEWORD_VERB (IME_REGWORD_STYLE_USER_FIRST + 1)

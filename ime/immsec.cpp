@@ -1,7 +1,7 @@
 // immsec.cpp --- IMM security related
 //////////////////////////////////////////////////////////////////////////////
 
-#include "../mzimeja.h"
+#include "mzimeja.h"
 
 #define MEMALLOC(x) LocalAlloc(LMEM_FIXED, x)
 #define MEMFREE(x) LocalFree(x)

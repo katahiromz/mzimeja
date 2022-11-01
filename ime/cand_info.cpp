@@ -1,7 +1,7 @@
 // cand_info.cpp --- candidate info of mzimeja
 //////////////////////////////////////////////////////////////////////////////
 
-#include "../mzimeja.h"
+#include "mzimeja.h"
 
 #define MAX_CANDLISTS   32
 #define CANDPAGE_SIZE       8

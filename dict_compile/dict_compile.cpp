@@ -1,7 +1,8 @@
 // dict_compile.cpp --- dictionary compiler of MZ-IME Japanese Input
 /////////////////////////////////////////////////////////////////////////////
+// WARNING: This file is Shift_JIS encoding for historical reason. Be careful.
 
-#include "../mzimeja.h"
+#include "mzimeja.h"
 
 using namespace std;
 

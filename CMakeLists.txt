@@ -59,19 +59,26 @@ endif()
 
 ##############################################################################
 
+# Unicode support
 add_definitions(-DUNICODE=1 -D_UNICODE=1)
 
+# Add include directories
+include_directories(include)
+
+# CMake option. See HowToBuild.txt.
 option(MZIMEJA_DEBUG_OUTPUT "Enable debug output" OFF)
 if(MZIMEJA_DEBUG_OUTPUT)
     add_definitions(-DMZIMEJA_DEBUG_OUTPUT)
 endif()
 
+# Sub-directories
 add_subdirectory(ime)
 add_subdirectory(imepad)
 add_subdirectory(ime_setup)
 add_subdirectory(verinfo)
 add_subdirectory(dict_compile)
 
+# Build the dictionary data
 add_custom_target(make_dict COMMAND cmd /C make_dict.bat
     DEPENDS res/mzimeja.dat res/name.dat)
 add_dependencies(make_dict dict_compile)

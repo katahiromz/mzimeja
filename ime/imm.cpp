@@ -1,7 +1,7 @@
 // imm.cpp --- IME/IMM related
 //////////////////////////////////////////////////////////////////////////////
 
-#include "../mzimeja.h"
+#include "mzimeja.h"
 #include "resource.h"
 
 extern "C" {

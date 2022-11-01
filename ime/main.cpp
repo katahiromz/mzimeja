@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // (Japanese, Shift_JIS)
 
-#include "../mzimeja.h"
+#include "mzimeja.h"
 #include <shlobj.h>
 #include <strsafe.h>
 #include "resource.h"

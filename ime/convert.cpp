@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // (Japanese, Shift_JIS)
 
-#include "../mzimeja.h"
+#include "mzimeja.h"
 
 const DWORD c_dwMilliseconds = 8000;
 
