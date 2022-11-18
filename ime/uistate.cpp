@@ -75,7 +75,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
     DeleteObject(hbr3DFace);
 
     // draw caption
-    HBRUSH hbrCaption = ::CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION));
+    HBRUSH hbrCaption = ::CreateSolidBrush(RGB(0, 32, 255));
     rc.right = rc.left + CX_MINICAPTION;
     ::FillRect(hDC, &rc, hbrCaption);
     ::DeleteObject(hbrCaption);

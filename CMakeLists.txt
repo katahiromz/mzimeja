@@ -66,7 +66,7 @@ add_definitions(-DUNICODE=1 -D_UNICODE=1)
 include_directories(include)
 
 # CMake option. See HowToBuild.txt.
-option(MZIMEJA_DEBUG_OUTPUT "Enable debug output" OFF)
+option(MZIMEJA_DEBUG_OUTPUT "Enable debug output" ON)
 if(MZIMEJA_DEBUG_OUTPUT)
     add_definitions(-DMZIMEJA_DEBUG_OUTPUT)
 endif()

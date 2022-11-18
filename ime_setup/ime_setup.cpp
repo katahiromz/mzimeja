@@ -338,12 +338,11 @@ INT DoMakeMZIMEJADefault(VOID)
     }
 
     WCHAR szValue[MAX_PATH];
-    for (DWORD dwIndex = 0; dwIndex < 10; ++dwIndex) {
-        DWORD cch = _countof(szValue);
-        error = RegEnumValueW(hKey, dwIndex, szValue, &cch, NULL, NULL, NULL, NULL);
-        if (error)
+    for (DWORD dwIndex = 1; dwIndex < 32; ++dwIndex) {
+        ::wsprintfW(szValue, L"%u", dwIndex);
+        error = RegDeleteValueW(hKey, szValue);
+        if (error != ERROR_SUCCESS)
             break;
-        RegDeleteValueW(hKey, szValue);
     }
 
     error = RegSetValueExW(hKey, L"1", 0, REG_SZ, (LPBYTE)L"E0120411", (8 + 1) * sizeof(WCHAR));
