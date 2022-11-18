@@ -494,7 +494,6 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
 } // MzIme::RegisterClasses
 
 HKL MzIme::GetHKL(VOID) {
-    FOOTMARK();
     HKL hKL = NULL;
 
     // get list size and allocate buffer for list
@@ -519,7 +518,6 @@ HKL MzIme::GetHKL(VOID) {
 
     // free the list
     ::GlobalFree(lphkl);
-    FOOTMARK_RETURN_PTR(HKL, hKL);
 }
 
 // Update the transrate key buffer

@@ -10,7 +10,7 @@ extern "C" {
 
 BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
                        DWORD dwSystemInfoFlags) {
-    FOOTMARK_FORMAT("((0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX), %S, 0x%08lX)\n",
+    FOOTMARK_FORMAT("((0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX), 0x%08lX)\n",
                     lpIMEInfo->dwPrivateDataSize,
                     lpIMEInfo->fdwProperty,
                     lpIMEInfo->fdwConversionCaps,
@@ -18,7 +18,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
                     lpIMEInfo->fdwUICaps,
                     lpIMEInfo->fdwSCSCaps,
                     lpIMEInfo->fdwSelectCaps,
-                    lpszClassName, dwSystemInfoFlags);
+                    dwSystemInfoFlags);
 
     lpIMEInfo->dwPrivateDataSize = sizeof(UIEXTRA);
     lpIMEInfo->fdwProperty = IME_PROP_KBD_CHAR_FIRST |
