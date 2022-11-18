@@ -94,25 +94,25 @@ protected:
 };   // struct FootmarkLocation
 
 inline void FootmarkLocation::Enter() {
-    FootmarkDebugPrint("%s (%u): entering %s\n", m_file, m_line, m_func);
+    FootmarkDebugPrint("%s (%u): %s: Enter\n", m_file, m_line, m_func);
 }
 inline void FootmarkLocation::Leave() {
     switch (m_retval_type) {
     case RETVAL_NONE:
-        FootmarkDebugPrint("%s: leaving %s\n", m_file, m_func);
+        FootmarkDebugPrint("%s: %s: Leave\n", m_file, m_func);
         break;
     case RETVAL_INT:
-        FootmarkDebugPrint("%s: leaving %s: returned %d\n", m_file, m_func, m_retval_int);
+        FootmarkDebugPrint("%s: %s: Leave: %d\n", m_file, m_func, m_retval_int);
         break;
     case RETVAL_LONG:
-        FootmarkDebugPrint("%s: leaving %s: returned 0x%08lX\n", m_file, m_func, m_retval_long);
+        FootmarkDebugPrint("%s: %s: Leave: 0x%08lX\n", m_file, m_func, m_retval_long);
         break;
     case RETVAL_PTR:
-        FootmarkDebugPrint("%s: leaving %s: returned %p\n", m_file, m_func, m_retval_ptr);
+        FootmarkDebugPrint("%s: %s: Leave: %p\n", m_file, m_func, m_retval_ptr);
         break;
 #ifdef _WIN32
     case RETVAL_LPARAM:
-        FootmarkDebugPrint("%s: leaving %s: returned %p\n", m_file, m_func, m_retval_lparam);
+        FootmarkDebugPrint("%s: %s: Leave: %p\n", m_file, m_func, m_retval_lparam);
         break;
 #endif
     }
