@@ -684,7 +684,7 @@ extern "C" {
 // UI extra related
 
 HGLOBAL GetUIExtraFromServerWnd(HWND hwndServer) {
-    return (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE));
+    return (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE);
 }
 
 void SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra) {
