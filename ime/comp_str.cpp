@@ -70,8 +70,8 @@ void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
 
 DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
     FOOTMARK();
-    assert(this);
-    assert(log);
+    ASSERT(this);
+    ASSERT(log);
 
     BYTE *pb = GetBytes();
     dwSignature = 0xDEADFACE;
@@ -98,7 +98,7 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
         pb += size;
     }
 
-    assert(log->GetTotalSize() == (DWORD)(pb - GetBytes()));
+    ASSERT(log->GetTotalSize() == (DWORD)(pb - GetBytes()));
     return (DWORD)(pb - GetBytes());
 } // COMPSTREXTRA::Store
 
@@ -1011,7 +1011,7 @@ DWORD CompStr::Store(const LogCompStr *log) {
 #undef ADD_BYTES
 #undef ADD_DWORDS
 #undef ADD_STRING
-    assert(DWORD(pb - GetBytes()) == total);
+    ASSERT(DWORD(pb - GetBytes()) == total);
 
     return DWORD(pb - GetBytes());
 } // CompStr::Store
@@ -1049,17 +1049,17 @@ void CompStr::GetLog(LogCompStr& log) {
         CompStr *lpCompStr = (CompStr *)::ImmLockIMCC(hNewCompStr);
         if (lpCompStr) {
             DWORD size = lpCompStr->Store(log);
-            assert(size == total);
+            ASSERT(size == total);
 
             ::ImmUnlockIMCC(hNewCompStr);
             hCompStr = hNewCompStr;
         } else {
             DebugPrintA("CompStr::ReCreate: failed #2");
-            assert(0);
+            ASSERT(0);
         }
     } else {
         DebugPrintA("CompStr::ReCreate: failed");
-        assert(0);
+        ASSERT(0);
     }
     return hCompStr;
 } // CompStr::ReCreate
@@ -1085,77 +1085,77 @@ void LogCompStr::AssertValid() {
         Dump();
         DebugPrintA("dwCursorPos: %u\n", dwCursorPos);
         DebugPrintA("GetCompCharCount(): %u\n", GetCompCharCount());
-        assert(0);
+        ASSERT(0);
     }
     if (comp_attr.size()) {
         if (comp_attr.size() != comp_str.size()) {
             Dump();
             DebugPrintA("comp_attr.size(): %u\n", (int)comp_attr.size());
             DebugPrintA("comp_str.size(): %u\n", (int)comp_str.size());
-            assert(0);
+            ASSERT(0);
         }
     }
     if (comp_clause.size()) {
         if (comp_clause[0] != 0) {
             Dump();
-            assert(0);
+            ASSERT(0);
         }
         if (comp_clause[comp_clause.size() - 1] != GetCompCharCount()) {
             Dump();
-            assert(0);
+            ASSERT(0);
         }
         if (extra.iClause > (DWORD)comp_clause.size()) {
             Dump();
             DebugPrintA("extra.iClause: %u\n", extra.iClause);
             DebugPrintA("comp_clause.size(): %u\n", (int)comp_clause.size());
-            assert(0);
+            ASSERT(0);
         }
         for (size_t i = 1; i < comp_clause.size(); ++i) {
             if (comp_clause[i] > GetCompCharCount()) {
                 Dump();
-                assert(0);
+                ASSERT(0);
             }
             if (comp_clause[i - 1] > comp_clause[i]) {
                 Dump();
-                assert(0);
+                ASSERT(0);
             }
         }
     }
     if (result_read_clause.size()) {
         if (result_read_clause[0] != 0) {
             Dump();
-            assert(0);
+            ASSERT(0);
         }
         for (size_t i = 1; i < result_read_clause.size(); ++i) {
             if (result_read_clause[i] > (DWORD)result_read_str.size()) {
                 Dump();
-                assert(0);
+                ASSERT(0);
             }
             if (result_read_clause[i - 1] > result_read_clause[i]) {
                 Dump();
-                assert(0);
+                ASSERT(0);
             }
         }
     }
     if (result_clause.size()) {
         if (result_clause[0] != 0) {
             Dump();
-            assert(0);
+            ASSERT(0);
         }
         for (size_t i = 1; i < result_clause.size(); ++i) {
             if (result_clause[i] > (DWORD)result_str.size()) {
                 Dump();
-                assert(0);
+                ASSERT(0);
             }
             if (result_clause[i - 1] > result_clause[i]) {
                 Dump();
-                assert(0);
+                ASSERT(0);
             }
         }
     }
     if (extra.hiragana_clauses.size() != extra.typing_clauses.size()) {
         Dump();
-        assert(0);
+        ASSERT(0);
     }
 } // LogCompStr::AssertValid
 

@@ -127,7 +127,7 @@ void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
         dwConversion &= ~(IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
         break;
     case IMODE_DISABLED:
-        assert(0);
+        ASSERT(0);
         break;
     }
     ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);

@@ -27,7 +27,6 @@
 #include <cstdlib>          // for C standard library
 #include <cstdio>           // for C standard I/O
 #include <cctype>           // for C character types
-#include <cassert>          // for assert
 #include <cstring>          // for C string
 
 #include <process.h>        // for _beginthreadex
@@ -55,13 +54,16 @@
   #define DebugPrintA   (void)
   #define DebugPrintW   (void)
   #define DebugPrint    (void)
+  #define ASSERT(exp)
 #else
 extern "C" {
 void DebugPrintA(const char *lpszFormat, ...);
 void DebugPrintW(const WCHAR *lpszFormat, ...);
+void DebugAssert(const char *file, int line, const char *exp);
 }   // extern "C"
   #define DebugPrintA DebugPrintA
   #define DebugPrintW DebugPrintW
+  #define ASSERT(exp) ((exp) ? 0 : DebugAssert(__FILE__, __LINE__, #exp))
   #ifdef UNICODE
     #define DebugPrint DebugPrintW
   #else

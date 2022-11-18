@@ -253,7 +253,7 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
         } else {
             FOOTMARK_POINT();
             lpCandInfo->Dump();
-            assert(0);
+            ASSERT(0);
         }
         lpIMC->UnlockCandInfo();
     }

@@ -1747,10 +1747,10 @@ std::wstring convert_to_kansuuji_1(wchar_t ch, size_t digit_level) {
     static const wchar_t s_szKanjiDigitLevels[] = L" \•Sç";
     std::wstring ret;
     if (ch == L'0') return ret;
-    assert(ch - L'0' < 10);
+    ASSERT(ch - L'0' < 10);
     ret += s_szKanjiDigits[ch - L'0'];
     if (digit_level > 0) {
-        assert(digit_level < 4);
+        ASSERT(digit_level < 4);
         ret += s_szKanjiDigitLevels[digit_level];
     }
     return ret;
@@ -1758,8 +1758,8 @@ std::wstring convert_to_kansuuji_1(wchar_t ch, size_t digit_level) {
 
 std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth) {
     FOOTMARK();
-    assert(are_all_chars_numeric(halfwidth));
-    assert(halfwidth.size() <= 4);
+    ASSERT(are_all_chars_numeric(halfwidth));
+    ASSERT(halfwidth.size() <= 4);
     const size_t length = halfwidth.size();
     std::wstring ret;
     size_t level = 0;
@@ -1774,7 +1774,7 @@ std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth) {
 std::wstring convert_to_kansuuji(const std::wstring& str) {
     FOOTMARK();
     std::wstring halfwidth = lcmap(str, LCMAP_HALFWIDTH);
-    assert(are_all_chars_numeric(halfwidth));
+    ASSERT(are_all_chars_numeric(halfwidth));
     if (halfwidth.size() >= 24) return halfwidth;
     static const wchar_t s_szKanjiGroupLevels[] = L" –œ‰­’›‹š´";
     std::wstring ret;
@@ -1809,7 +1809,7 @@ std::wstring convert_to_kansuuji(const std::wstring& str) {
 std::wstring convert_to_kansuuji_brief(const std::wstring& str) {
     FOOTMARK();
     std::wstring halfwidth = lcmap(str, LCMAP_HALFWIDTH);
-    assert(are_all_chars_numeric(halfwidth));
+    ASSERT(are_all_chars_numeric(halfwidth));
     std::wstring ret;
     for (size_t i = 0; i < halfwidth.size(); ++i) {
         ret += s_szKanjiDigits[halfwidth[i] - L'0'];

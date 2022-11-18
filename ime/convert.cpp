@@ -108,7 +108,7 @@ CandConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2)
     case HB_MIZEN_JODOUSHI: case HB_RENYOU_JODOUSHI:
     case HB_SHUUSHI_JODOUSHI: case HB_RENTAI_JODOUSHI:
     case HB_KATEI_JODOUSHI: case HB_MEIREI_JODOUSHI:
-        assert(0);
+        ASSERT(0);
         break;
     case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI: case HB_KAHEN_DOUSHI:
     case HB_SAHEN_DOUSHI: case HB_SETTOUJI:
@@ -342,7 +342,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
     case HB_MIZEN_JODOUSHI: case HB_RENYOU_JODOUSHI:
     case HB_SHUUSHI_JODOUSHI: case HB_RENTAI_JODOUSHI:
     case HB_KATEI_JODOUSHI: case HB_MEIREI_JODOUSHI:
-        assert(0);
+        ASSERT(0);
         break;
     case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
     case HB_KAHEN_DOUSHI: case HB_SAHEN_DOUSHI:
@@ -445,7 +445,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
 
 static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
     FOOTMARK();
-    assert(dict_data);
+    ASSERT(dict_data);
 
     WCHAR sz[3] = {RECORD_SEP, ch, 0};
     const WCHAR *pch1 = wcsstr(dict_data, sz);
@@ -462,13 +462,13 @@ static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
         pch2 = pch3;
     }
     pch3 = wcschr(pch2 + 1, RECORD_SEP);
-    assert(pch3);
+    ASSERT(pch3);
     str.assign(pch1 + 1, pch3);
 
     sz[0] = RECORD_SEP;
     sz[1] = 0;
     unboost::split(records, str, unboost::is_any_of(sz));
-    assert(records.size());
+    ASSERT(records.size());
     return records.size();
 } // ScanDict
 
@@ -523,7 +523,7 @@ BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
     m_strObjectName = object_name;
 
     SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes();
-    assert(psa);
+    ASSERT(psa);
 
     if (m_hMutex == NULL) {
         m_hMutex = ::CreateMutexW(psa, FALSE, m_strObjectName.c_str());
@@ -860,7 +860,7 @@ void Lattice::AddExtra() {
 BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
     FOOTMARK();
     const size_t length = pre.size();
-    assert(length);
+    ASSERT(length);
 
     // separator
     std::wstring sep;
@@ -1077,9 +1077,9 @@ void Lattice::UpdateRefs() {
 void Lattice::UpdateLinks() {
     FOOTMARK();
     const size_t length = pre.size();
-    assert(length);
-    assert(length + 1 == chunks.size());
-    assert(length + 1 == refs.size());
+    ASSERT(length);
+    ASSERT(length + 1 == chunks.size());
+    ASSERT(length + 1 == refs.size());
 
     UnlinkAllNodes();
 
@@ -1188,8 +1188,8 @@ size_t Lattice::GetLastLinkedIndex() const {
 
 void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
     FOOTMARK();
-    assert(fields.size() == 4);
-    assert(fields[0].size());
+    ASSERT(fields.size() == 4);
+    ASSERT(fields[0].size());
     size_t length = fields[0].size();
 
     // boundary check
@@ -1364,8 +1364,8 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
 
 void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
     FOOTMARK();
-    assert(fields.size() == 4);
-    assert(fields[0].size());
+    ASSERT(fields.size() == 4);
+    ASSERT(fields[0].size());
     size_t length = fields[0].size();
     // boundary check
     if (index + length > pre.size()) {
@@ -1467,8 +1467,8 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
 
 void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
     FOOTMARK();
-    assert(fields.size() == 4);
-    assert(fields[0].size());
+    ASSERT(fields.size() == 4);
+    ASSERT(fields[0].size());
     size_t length = fields[0].size();
     // boundary check
     if (index + length > pre.size()) {
@@ -1595,8 +1595,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
 
 void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
     FOOTMARK();
-    assert(fields.size() == 4);
-    assert(fields[0].size());
+    ASSERT(fields.size() == 4);
+    ASSERT(fields[0].size());
     size_t length = fields[0].size();
     // boundary check
     if (index + length > pre.size()) {
@@ -1680,8 +1680,8 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
 
 void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
     FOOTMARK();
-    assert(fields.size() == 4);
-    assert(fields[0].size());
+    ASSERT(fields.size() == 4);
+    ASSERT(fields[0].size());
     size_t length = fields[0].size();
     // boundary check
     if (index + length > pre.size()) {
@@ -1766,8 +1766,8 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
 
 void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
     FOOTMARK();
-    assert(fields.size() == 4);
-    assert(fields[0].size());
+    ASSERT(fields.size() == 4);
+    ASSERT(fields[0].size());
     size_t length = fields[0].size();
     // boundary check
     if (index + length > pre.size()) {
@@ -1929,8 +1929,8 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
 
 void Lattice::DoMeishi(size_t index, const WStrings& fields) {
     FOOTMARK();
-    assert(fields.size() == 4);
-    assert(fields[0].size());
+    ASSERT(fields.size() == 4);
+    ASSERT(fields[0].size());
 
     size_t length = fields[0].size();
     // boundary check
@@ -1980,7 +1980,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
 } // Lattice::DoMeishi
 
 void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) {
-    assert(fields.size() == 4);
+    ASSERT(fields.size() == 4);
     const size_t length = fields[0].size();
     // boundary check
     if (index + length > pre.size()) {
@@ -2113,7 +2113,7 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
     }
 
     // initialize lattice
-    assert(pre.size() != 0);
+    ASSERT(pre.size() != 0);
     const size_t length = pre.size();
     lattice.pre = pre;
     lattice.chunks.resize(length + 1);
@@ -2169,7 +2169,7 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
     }
 
     // initialize lattice
-    assert(pre.size() != 0);
+    ASSERT(pre.size() != 0);
     const size_t length = pre.size();
     lattice.pre = pre;
     lattice.chunks.resize(length + 1);
@@ -2393,7 +2393,7 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
 
     // add other candidates
     MzConvClause clause;
-    assert(lattice.chunks.size());
+    ASSERT(lattice.chunks.size());
     const LatticeChunk& chunk = lattice.chunks[0];
     for (size_t i = 0; i < chunk.size(); ++i) {
         if (chunk[i]->pre.size() == length) {
@@ -2419,11 +2419,11 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
 
     // add the clause
     result.clauses.push_back(clause);
-    assert(result.clauses[0].candidates.size());
+    ASSERT(result.clauses[0].candidates.size());
 
     // sort by cost
     result.sort();
-    assert(result.clauses[0].candidates.size());
+    ASSERT(result.clauses[0].candidates.size());
 } // MzIme::MakeResultForSingle
 
 BOOL MzIme::ConvertMultiClause(

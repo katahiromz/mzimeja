@@ -332,13 +332,13 @@ BOOL MzIme::GetUserString(LPCWSTR pszSettingName, std::wstring& value) {
 BOOL MzIme::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     HKEY hKey;
     LONG result = OpenUserSettingKey(TRUE, &hKey);
-    assert(result == ERROR_SUCCESS);
+    ASSERT(result == ERROR_SUCCESS);
     if (result == ERROR_SUCCESS && hKey) {
         DWORD cbData = (::lstrlenW(pszValue) + 1) * sizeof(WCHAR);
         result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_SZ,
                                   reinterpret_cast<const BYTE *>(pszValue), cbData);
         ::RegCloseKey(hKey);
-        assert(result == ERROR_SUCCESS);
+        ASSERT(result == ERROR_SUCCESS);
         if (result == ERROR_SUCCESS) {
             return TRUE;
         }
@@ -364,12 +364,12 @@ BOOL MzIme::GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
 BOOL MzIme::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     HKEY hKey;
     LONG result = OpenUserSettingKey(TRUE, &hKey);
-    assert(result == ERROR_SUCCESS);
+    ASSERT(result == ERROR_SUCCESS);
     if (result == ERROR_SUCCESS && hKey) {
         result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_BINARY,
                                   reinterpret_cast<const BYTE *>(ptr), size);
         ::RegCloseKey(hKey);
-        assert(result == ERROR_SUCCESS);
+        ASSERT(result == ERROR_SUCCESS);
         if (result == ERROR_SUCCESS) {
             return TRUE;
         }
@@ -396,13 +396,13 @@ BOOL MzIme::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
     HKEY hKey;
     DWORD dwData = data;
     LONG result = OpenUserSettingKey(TRUE, &hKey);
-    assert(result == ERROR_SUCCESS);
+    ASSERT(result == ERROR_SUCCESS);
     if (result == ERROR_SUCCESS && hKey) {
         DWORD size = sizeof(DWORD);
         result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_DWORD,
                                   reinterpret_cast<const BYTE *>(&dwData), size);
         ::RegCloseKey(hKey);
-        assert(result == ERROR_SUCCESS);
+        ASSERT(result == ERROR_SUCCESS);
         if (result == ERROR_SUCCESS) {
             return TRUE;
         }
@@ -714,7 +714,7 @@ UIEXTRA *LockUIExtra(HWND hwndServer) {
     FOOTMARK();
     HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
     UIEXTRA *lpUIExtra = (UIEXTRA *)::GlobalLock(hUIExtra);
-    assert(lpUIExtra);
+    ASSERT(lpUIExtra);
     FOOTMARK_RETURN_PTR(UIEXTRA *, lpUIExtra);
 }
 
@@ -765,6 +765,8 @@ void DebugPrintA(const char *lpszFormat, ...) {
         INT len = lstrlenW(szMsgW);
         fwrite(szMsgW, len * sizeof(WCHAR), 1, fp);
         fclose(fp);
+
+        OutputDebugStringW(szMsgW);
     }
 }
 void DebugPrintW(const WCHAR *lpszFormat, ...) {
@@ -787,13 +789,18 @@ void DebugPrintW(const WCHAR *lpszFormat, ...) {
     SHGetSpecialFolderPathA(NULL, szLogFile, CSIDL_DESKTOP, FALSE);
     StringCchCatA(szLogFile, _countof(szLogFile), "\\mzimeja.log");
 
-    //OutputDebugString(szMsg);
     FILE *fp = fopen(szLogFile, "ab");
     if (fp) {
         INT len = lstrlenW(szMsg);
         fwrite(szMsg, len * sizeof(WCHAR), 1, fp);
         fclose(fp);
+
+        OutputDebugStringW(szMsg);
     }
+}
+
+void DebugAssert(const char *file, int line, const char *exp) {
+    DebugPrintA("%s (%d): ASSERT(%s) failed\n", file, line, exp);
 }
 #endif  // def MZIMEJA_DEBUG_OUTPUT
 

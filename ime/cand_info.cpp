@@ -215,7 +215,7 @@ DWORD CandList::Store(const LogCandList *log) {
     }
 
     DebugPrintA("%u, %u\n", dwSize, DWORD(pb - GetBytes()));
-    assert(dwSize == DWORD(pb - GetBytes()));
+    ASSERT(dwSize == DWORD(pb - GetBytes()));
     return DWORD(pb - GetBytes());
 }
 
@@ -224,7 +224,7 @@ DWORD CandList::Store(const LogCandList *log) {
 
 CandList *CandInfo::GetList(DWORD i) {
     FOOTMARK();
-    assert(i < dwCount);
+    ASSERT(i < dwCount);
     return (CandList *)(GetBytes() + dwOffset[i]);
 }
 
@@ -272,7 +272,7 @@ DWORD CandInfo::Store(const LogCandInfo *log) {
     extra->iClause = log->iClause;
     pb += sizeof(CANDINFOEXTRA);
 
-    assert(dwSize == DWORD(pb - GetBytes()));
+    ASSERT(dwSize == DWORD(pb - GetBytes()));
     return DWORD(pb - GetBytes());
 }
 
@@ -301,17 +301,17 @@ CANDINFOEXTRA *CandInfo::GetExtra() {
         CandInfo *cand_info = (CandInfo *)::ImmLockIMCC(hNewCandInfo);
         if (cand_info) {
             DWORD cb = cand_info->Store(log);
-            assert(cb == total);
+            ASSERT(cb == total);
 
             ImmUnlockIMCC(hNewCandInfo);
             hCandInfo = hNewCandInfo;
         } else {
             DebugPrintA("CandInfo::ReCreate: failed #2");
-            assert(0);
+            ASSERT(0);
         }
     } else {
         DebugPrintA("CandInfo::ReCreate: failed");
-        assert(0);
+        ASSERT(0);
     }
     return hCandInfo;
 } // CandInfo::ReCreate
