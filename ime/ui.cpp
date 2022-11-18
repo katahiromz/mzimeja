@@ -128,16 +128,16 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     // DefWindowProc().
     if (hIMC == NULL) {
         if (IsImeMessage2(message)) {
-            DebugPrintA("Why hIMC is NULL?\n");
-            DebugPrintA("hWnd: %x, message: %x, wParam: %x, lParam: %x\n",
-                        (LONG)hWnd, message, wParam, lParam);
+            DPRINT("Why hIMC is NULL?\n");
+            DPRINT("hWnd: %x, message: %x, wParam: %x, lParam: %x\n",
+                   (LONG)hWnd, message, wParam, lParam);
             return 0;
         }
     }
 
     switch (message) {
     case WM_CREATE:
-        DebugPrintA("WM_CREATE\n");
+        DPRINT("WM_CREATE\n");
         // Allocate UI's extra memory block.
         hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
         lpUIExtra = (UIEXTRA *)GlobalLock(hUIExtra);
@@ -151,7 +151,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_SETCONTEXT:
-        DebugPrintA("WM_IME_SETCONTEXT\n");
+        DPRINT("WM_IME_SETCONTEXT\n");
         if (wParam) {
             OnImeSetContext(hWnd, hIMC, lParam);
         }
@@ -160,7 +160,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_STARTCOMPOSITION:
-        DebugPrintA("WM_IME_STARTCOMPOSITION\n");
+        DPRINT("WM_IME_STARTCOMPOSITION\n");
         // Start composition! Ready to display the composition string.
         lpUIExtra = LockUIExtra(hWnd);
         if (lpUIExtra) {
@@ -172,7 +172,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_COMPOSITION:
-        DebugPrintA("WM_IME_COMPOSITION\n");
+        DPRINT("WM_IME_COMPOSITION\n");
         // Update to display the composition string.
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
@@ -187,7 +187,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_ENDCOMPOSITION:
-        DebugPrintA("WM_IME_ENDCOMPOSITION\n");
+        DPRINT("WM_IME_ENDCOMPOSITION\n");
         // Finish to display the composition string.
         lpUIExtra = LockUIExtra(hWnd);
         if (lpUIExtra) {
@@ -197,11 +197,11 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_COMPOSITIONFULL:
-        DebugPrintA("WM_IME_COMPOSITIONFULL\n");
+        DPRINT("WM_IME_COMPOSITIONFULL\n");
         break;
 
     case WM_IME_SELECT:
-        DebugPrintA("WM_IME_SELECT\n");
+        DPRINT("WM_IME_SELECT\n");
         if (wParam) {
             lpUIExtra = LockUIExtra(hWnd);
             if (lpUIExtra) {
@@ -212,22 +212,22 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_CONTROL:
-        DebugPrintA("WM_IME_CONTROL\n");
+        DPRINT("WM_IME_CONTROL\n");
         lRet = ControlCommand(hIMC, hWnd, wParam, lParam);
         break;
 
     case WM_IME_NOTIFY:
-        DebugPrintA("WM_IME_NOTIFY\n");
+        DPRINT("WM_IME_NOTIFY\n");
         lRet = NotifyCommand(hIMC, hWnd, wParam, lParam);
         break;
 
     case WM_DESTROY:
-        DebugPrintA("WM_DESTROY\n");
+        DPRINT("WM_DESTROY\n");
         OnDestroy(hWnd);
         break;
 
     case WM_UI_STATEMOVE:
-        DebugPrintA("WM_UI_STATEMOVE\n");
+        DPRINT("WM_UI_STATEMOVE\n");
         // Set the position of the status window to UIExtra.
         // This message is sent by the status window.
         lpUIExtra = LockUIExtra(hWnd);
@@ -243,7 +243,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_UI_DEFCOMPMOVE:
-        DebugPrintA("WM_UI_DEFCOMPMOVE\n");
+        DPRINT("WM_UI_DEFCOMPMOVE\n");
         // Set the position of the composition window to UIExtra.
         // This message is sent by the composition window.
         lpUIExtra = LockUIExtra(hWnd);
@@ -259,7 +259,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_UI_CANDMOVE:
-        DebugPrintA("WM_UI_CANDMOVE\n");
+        DPRINT("WM_UI_CANDMOVE\n");
         // Set the position of the candidate window to UIExtra.
         // This message is sent by the candidate window.
         lpUIExtra = LockUIExtra(hWnd);
@@ -271,7 +271,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_UI_GUIDEMOVE:
-        DebugPrintA("WM_UI_GUIDEMOVE\n");
+        DPRINT("WM_UI_GUIDEMOVE\n");
         // Set the position of the status window to UIExtra.
         // This message is sent by the status window.
         lpUIExtra = LockUIExtra(hWnd);
@@ -313,7 +313,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
     switch (wParam) {
     case IMN_CLOSESTATUSWINDOW:
-        DebugPrintA("IMN_CLOSESTATUSWINDOW\n");
+        DPRINT("IMN_CLOSESTATUSWINDOW\n");
         if (::IsWindow(lpUIExtra->hwndStatus)) {
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
             POINT pt;
@@ -325,12 +325,12 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         break;
 
     case IMN_OPENSTATUSWINDOW:
-        DebugPrintA("IMN_OPENSTATUSWINDOW\n");
+        DPRINT("IMN_OPENSTATUSWINDOW\n");
         StatusWnd_Create(hWnd, lpUIExtra);
         break;
 
     case IMN_SETCONVERSIONMODE:
-        DebugPrintA("IMN_SETCONVERSIONMODE\n");
+        DPRINT("IMN_SETCONVERSIONMODE\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             if (lpIMC->Conversion() & IME_CMODE_ROMAN) {
@@ -344,11 +344,11 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         break;
 
     case IMN_SETSENTENCEMODE:
-        DebugPrintA("IMN_SETSENTENCEMODE\n");
+        DPRINT("IMN_SETSENTENCEMODE\n");
         break;
 
     case IMN_SETCOMPOSITIONFONT:
-        DebugPrintA("IMN_SETCOMPOSITIONFONT\n");
+        DPRINT("IMN_SETCOMPOSITIONFONT\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             lf = lpIMC->lfFont.W;
@@ -377,12 +377,12 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         break;
 
     case IMN_SETOPENSTATUS:
-        DebugPrintA("IMN_SETOPENSTATUS\n");
+        DPRINT("IMN_SETOPENSTATUS\n");
         StatusWnd_Update(lpUIExtra);
         break;
 
     case IMN_OPENCANDIDATE:
-        DebugPrintA("IMN_OPENCANDIDATE\n");
+        DPRINT("IMN_OPENCANDIDATE\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             CandWnd_Create(hWnd, lpUIExtra, lpIMC);
@@ -391,7 +391,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         break;
 
     case IMN_CHANGECANDIDATE:
-        DebugPrintA("IMN_CHANGECANDIDATE\n");
+        DPRINT("IMN_CHANGECANDIDATE\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             CandWnd_Resize(lpUIExtra, lpIMC);
@@ -401,12 +401,12 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         break;
 
     case IMN_CLOSECANDIDATE:
-        DebugPrintA("IMN_CLOSECANDIDATE\n");
+        DPRINT("IMN_CLOSECANDIDATE\n");
         CandWnd_Hide(lpUIExtra);
         break;
 
     case IMN_GUIDELINE:
-        DebugPrintA("IMN_GUIDELINE\n");
+        DPRINT("IMN_GUIDELINE\n");
         if (::ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0)) {
             if (!::IsWindow(lpUIExtra->hwndGuide)) {
                 HDC hdcIC;
@@ -445,7 +445,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         break;
 
     case IMN_SETCANDIDATEPOS:
-        DebugPrintA("IMN_SETCANDIDATEPOS\n");
+        DPRINT("IMN_SETCANDIDATEPOS\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
@@ -454,7 +454,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         break;
 
     case IMN_SETCOMPOSITIONWINDOW:
-        DebugPrintA("IMN_SETCOMPOSITIONWINDOW\n");
+        DPRINT("IMN_SETCOMPOSITIONWINDOW\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             CompWnd_Move(lpUIExtra, lpIMC);
@@ -464,7 +464,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         break;
 
     case IMN_SETSTATUSWINDOWPOS:
-        DebugPrintA("IMN_SETSTATUSWINDOWPOS\n");
+        DPRINT("IMN_SETSTATUSWINDOWPOS\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             POINT pt = lpIMC->ptStatusWndPos;
@@ -477,7 +477,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         break;
 
     case IMN_PRIVATE:
-        DebugPrintA("IMN_PRIVATE\n");
+        DPRINT("IMN_PRIVATE\n");
         if (HIWORD(lParam) == 0xFACE) {
             std::wstring imepad_file;
             if (TheIME.GetComputerString(L"ImePadFile", imepad_file)) {
@@ -518,7 +518,7 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
     if (lpUIExtra) {
         switch (wParam) {
         case IMC_GETCANDIDATEPOS:
-            DebugPrintA("IMC_GETCANDIDATEPOS\n");
+            DPRINT("IMC_GETCANDIDATEPOS\n");
             if (IsWindow(lpUIExtra->uiCand.hWnd)) {
                 *(LPCANDIDATEFORM)lParam = lpIMC->cfCandForm[0];
                 ret = 0;
@@ -526,13 +526,13 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
             break;
 
         case IMC_GETCOMPOSITIONWINDOW:
-            DebugPrintA("IMC_GETCOMPOSITIONWINDOW\n");
+            DPRINT("IMC_GETCOMPOSITIONWINDOW\n");
             *(LPCOMPOSITIONFORM)lParam = lpIMC->cfCompForm;
             ret = 0;
             break;
 
         case IMC_GETSTATUSWINDOWPOS:
-            DebugPrintA("IMC_GETSTATUSWINDOWPOS\n");
+            DPRINT("IMC_GETSTATUSWINDOWPOS\n");
             {
                 RECT rc;
                 ::GetWindowRect(lpUIExtra->hwndStatus, &rc);

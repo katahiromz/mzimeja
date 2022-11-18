@@ -291,7 +291,6 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
 
     // not initialized yet?
     if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
-        FOOTMARK_POINT();
         lpIMC->DumpCandInfo();
         if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
             lpUIExtra->uiCand.pt.x = pt.x;
@@ -310,67 +309,69 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
     }
 
     // has candidates?
-    if (lpIMC->HasCandInfo()) {
-        DWORD dwStyle = lpIMC->cfCandForm[0].dwStyle;
-        if (dwStyle == CFS_EXCLUDE) {
-            FOOTMARK_POINT();
-            lpIMC->DumpCandInfo();
-            // get work area and app window rect
-            RECT rcWork, rcAppWnd;
-            ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
-            ::GetWindowRect(lpIMC->hWnd, &rcAppWnd);
+    if (!lpIMC->HasCandInfo()) {
+        FOOTMARK_POINT();
+        lpIMC->DumpCandInfo();
+        return;
+    }
 
-            // get the specified position in screen coordinates
-            ::GetClientRect(lpUIExtra->uiCand.hWnd, &rc);
-            if (!lpUIExtra->bVertical) {
-                pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
-                pt.y = lpIMC->cfCandForm[0].rcArea.bottom;
-                ::ClientToScreen(lpIMC->hWnd, &pt);
-                if (pt.y + rc.bottom > rcWork.bottom) {
-                    pt.y = rcAppWnd.top + lpIMC->cfCandForm[0].rcArea.top - rc.bottom;
-                }
-            } else {
-                pt.x = lpIMC->cfCandForm[0].rcArea.left - rc.right;
-                pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
-                ::ClientToScreen(lpIMC->hWnd, &pt);
-                if (pt.x < 0) {
-                    pt.x = rcAppWnd.left + lpIMC->cfCandForm[0].rcArea.right;
-                }
-            }
+    DWORD dwStyle = lpIMC->cfCandForm[0].dwStyle;
+    if (dwStyle == CFS_EXCLUDE) {
+        // get work area and app window rect
+        RECT rcWork, rcAppWnd;
+        ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
+        ::GetWindowRect(lpIMC->hWnd, &rcAppWnd);
 
-            // move and show candidate window
-            HWND hwndCand = lpUIExtra->uiCand.hWnd;
-            if (::IsWindow(hwndCand)) {
-                ::GetWindowRect(hwndCand, &rc);
-                int cx, cy;
-                cx = rc.right - rc.left;
-                cy = rc.bottom - rc.top;
-                ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
-                ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
-                ::InvalidateRect(hwndCand, NULL, FALSE);
-            }
-            ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));
-        } else if (dwStyle == CFS_CANDIDATEPOS) {
-            FOOTMARK_POINT();
-            lpIMC->DumpCandInfo();
-            // get the specified position in screen coordinates
+        // get the specified position in screen coordinates
+        ::GetClientRect(lpUIExtra->uiCand.hWnd, &rc);
+        if (!lpUIExtra->bVertical) {
             pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
+            pt.y = lpIMC->cfCandForm[0].rcArea.bottom;
+            ::ClientToScreen(lpIMC->hWnd, &pt);
+            if (pt.y + rc.bottom > rcWork.bottom) {
+                pt.y = rcAppWnd.top + lpIMC->cfCandForm[0].rcArea.top - rc.bottom;
+            }
+        } else {
+            pt.x = lpIMC->cfCandForm[0].rcArea.left - rc.right;
             pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
             ::ClientToScreen(lpIMC->hWnd, &pt);
-
-            // move and show candidate window
-            HWND hwndCand = lpUIExtra->uiCand.hWnd;
-            if (::IsWindow(hwndCand)) {
-                ::GetWindowRect(hwndCand, &rc);
-                int cx, cy;
-                cx = rc.right - rc.left;
-                cy = rc.bottom - rc.top;
-                ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
-                ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
-                ::InvalidateRect(hwndCand, NULL, FALSE);
+            if (pt.x < 0) {
+                pt.x = rcAppWnd.left + lpIMC->cfCandForm[0].rcArea.right;
             }
-            ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));
         }
+
+        // move and show candidate window
+        HWND hwndCand = lpUIExtra->uiCand.hWnd;
+        if (::IsWindow(hwndCand)) {
+            ::GetWindowRect(hwndCand, &rc);
+            int cx, cy;
+            cx = rc.right - rc.left;
+            cy = rc.bottom - rc.top;
+            ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
+            ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
+            ::InvalidateRect(hwndCand, NULL, FALSE);
+        }
+        ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));
+    } else if (dwStyle == CFS_CANDIDATEPOS) {
+        // get the specified position in screen coordinates
+        pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
+        pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
+        ::ClientToScreen(lpIMC->hWnd, &pt);
+
+        // move and show candidate window
+        HWND hwndCand = lpUIExtra->uiCand.hWnd;
+        if (::IsWindow(hwndCand)) {
+            ::GetWindowRect(hwndCand, &rc);
+            int cx, cy;
+            cx = rc.right - rc.left;
+            cy = rc.bottom - rc.top;
+            ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
+            ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
+            ::InvalidateRect(hwndCand, NULL, FALSE);
+        }
+        ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));
+    } else {
+        DPRINT("dwStyle: 0x%08lX", dwStyle);
     }
 } // CandWnd_Move
 

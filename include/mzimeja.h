@@ -54,6 +54,7 @@
   #define DebugPrintA   (void)
   #define DebugPrintW   (void)
   #define DebugPrint    (void)
+  #define DPRINT(fmt, ...)
   #define ASSERT(exp)
 #else
 extern "C" {
@@ -63,6 +64,7 @@ void DebugAssert(const char *file, int line, const char *exp);
 }   // extern "C"
   #define DebugPrintA DebugPrintA
   #define DebugPrintW DebugPrintW
+  #define DPRINT(fmt, ...) DebugPrintA("%s (%d): " fmt, ##__VA_ARGS__)
   #define ASSERT(exp) ((exp) ? 0 : DebugAssert(__FILE__, __LINE__, #exp))
   #ifdef UNICODE
     #define DebugPrint DebugPrintW
