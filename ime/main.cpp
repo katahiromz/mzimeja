@@ -497,17 +497,20 @@ HKL MzIme::GetHKL(VOID) {
     HKL hKL = NULL;
 
     // get list size and allocate buffer for list
-    DWORD dwSize = ::GetKeyboardLayoutList(0, NULL);
-    HKL *lphkl = (HKL *)::GlobalAlloc(GPTR, dwSize * sizeof(DWORD));
-    if (lphkl == NULL) FOOTMARK_RETURN_PTR(HKL, NULL);
+    DWORD dwCount = ::GetKeyboardLayoutList(0, NULL);
+    HKL* pHKLs = (HKL*)new(std::nothrow) HKL[dwCount];
+    if (pHKLs  == NULL) {
+        ASSERT(0);
+        return NULL;
+    }
 
     // get the list of keyboard layouts
-    ::GetKeyboardLayoutList(dwSize, lphkl);
+    ::GetKeyboardLayoutList(dwCount, pHKLs);
 
     // find hKL from the list
     TCHAR szFile[32];
-    for (DWORD dwi = 0; dwi < dwSize; dwi++) {
-        HKL hKLTemp = *(lphkl + dwi);
+    for (DWORD dwi = 0; dwi < dwCount; dwi++) {
+        HKL hKLTemp = pHKLs[dwi];
         ::ImmGetIMEFileName(hKLTemp, szFile, _countof(szFile));
 
         if (::lstrcmp(szFile, szImeFileName) == 0) {
@@ -517,7 +520,8 @@ HKL MzIme::GetHKL(VOID) {
     }
 
     // free the list
-    ::GlobalFree(lphkl);
+    delete[] pHKLs;
+    return hKL;
 }
 
 // Update the transrate key buffer
