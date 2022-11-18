@@ -412,7 +412,6 @@ BOOL MzIme::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
 BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
 #define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
     WNDCLASSEX wcx;
-    FOOTMARK();
 
     // register class of UI server window.
     wcx.cbSize = sizeof(WNDCLASSEX);
@@ -427,7 +426,10 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
     wcx.lpszClassName = szUIServerClassName;
     wcx.hbrBackground = NULL;
     wcx.hIconSm = NULL;
-    if (!RegisterClassEx(&wcx)) FOOTMARK_RETURN_INT(FALSE);
+    if (!RegisterClassEx(&wcx)) {
+        ASSERT(0);
+        return FALSE;
+    }
 
     // register class of composition window.
     wcx.cbSize = sizeof(WNDCLASSEX);
@@ -442,7 +444,10 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
     wcx.lpszClassName = szCompStrClassName;
     wcx.hbrBackground = NULL;
     wcx.hIconSm = NULL;
-    if (!RegisterClassEx(&wcx)) FOOTMARK_RETURN_INT(FALSE);
+    if (!RegisterClassEx(&wcx)) {
+        ASSERT(0);
+        return FALSE;
+    }
 
     // register class of candidate window.
     wcx.cbSize = sizeof(WNDCLASSEX);
@@ -457,7 +462,10 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
     wcx.lpszClassName = szCandClassName;
     wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
     wcx.hIconSm = NULL;
-    if (!RegisterClassEx(&wcx)) FOOTMARK_RETURN_INT(FALSE);
+    if (!RegisterClassEx(&wcx)) {
+        ASSERT(0);
+        return FALSE;
+    }
 
     // register class of status window.
     wcx.cbSize = sizeof(WNDCLASSEX);
@@ -472,7 +480,10 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
     wcx.lpszClassName = szStatusClassName;
     wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
     wcx.hIconSm = NULL;
-    if (!RegisterClassEx(&wcx)) FOOTMARK_RETURN_INT(FALSE);
+    if (!RegisterClassEx(&wcx)) {
+        ASSERT(0);
+        return FALSE;
+    }
 
     // register class of guideline window.
     wcx.cbSize = sizeof(WNDCLASSEX);
@@ -487,9 +498,12 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
     wcx.lpszClassName = szGuideClassName;
     wcx.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
     wcx.hIconSm = NULL;
-    if (!RegisterClassEx(&wcx)) FOOTMARK_RETURN_INT(FALSE);
+    if (!RegisterClassEx(&wcx)) {
+        ASSERT(0);
+        return FALSE;
+    }
 
-    FOOTMARK_RETURN_INT(TRUE);
+    return TRUE;
 #undef CS_MZIME
 } // MzIme::RegisterClasses
 
