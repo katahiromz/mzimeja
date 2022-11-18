@@ -666,6 +666,8 @@ InputContext *MzIme::LockIMC(HIMC hIMC) {
         m_hIMC = hIMC;
         m_lpIMC = context;
     }
+    ASSERT(context);
+    return context;
 }
 
 VOID MzIme::UnlockIMC(HIMC hIMC) {
