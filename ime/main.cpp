@@ -745,9 +745,9 @@ void DebugPrintA(const char *lpszFormat, ...) {
         INT len = lstrlenW(szMsgW);
         fwrite(szMsgW, len * sizeof(WCHAR), 1, fp);
         fclose(fp);
-
-        OutputDebugStringW(szMsgW);
     }
+
+    OutputDebugStringW(szMsgW);
 }
 void DebugPrintW(const WCHAR *lpszFormat, ...) {
     WCHAR szMsg[1024];
@@ -774,9 +774,9 @@ void DebugPrintW(const WCHAR *lpszFormat, ...) {
         INT len = lstrlenW(szMsg);
         fwrite(szMsg, len * sizeof(WCHAR), 1, fp);
         fclose(fp);
-
-        OutputDebugStringW(szMsg);
     }
+
+    OutputDebugStringW(szMsg);
 }
 
 void DebugAssert(const char *file, int line, const char *exp) {
