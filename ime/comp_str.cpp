@@ -7,7 +7,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 DWORD LogCompStrExtra::GetTotalSize() const {
-    FOOTMARK();
     DWORD total = sizeof(COMPSTREXTRA);
     for (size_t i = 0; i < hiragana_clauses.size(); ++i) {
         total += (hiragana_clauses[i].size() + 1) * sizeof(WCHAR);
@@ -19,7 +18,6 @@ DWORD LogCompStrExtra::GetTotalSize() const {
 }
 
 void LogCompStrExtra::clear() {
-    FOOTMARK();
     iClause = 0;
     hiragana_clauses.clear();
     typing_clauses.clear();
@@ -28,7 +26,6 @@ void LogCompStrExtra::clear() {
 //////////////////////////////////////////////////////////////////////////////
 
 WCHAR *COMPSTREXTRA::GetHiraganaClauses(DWORD& dwCount) {
-    FOOTMARK();
     dwCount = dwHiraganaClauseCount;
     if (dwCount) {
         return (WCHAR *)(GetBytes() + dwHiraganaClauseOffset);
@@ -37,7 +34,6 @@ WCHAR *COMPSTREXTRA::GetHiraganaClauses(DWORD& dwCount) {
 }
 
 WCHAR *COMPSTREXTRA::GetTypingClauses(DWORD& dwCount) {
-    FOOTMARK();
     dwCount = dwTypingClauseCount;
     if (dwCount) {
         return (WCHAR *)(GetBytes() + dwTypingClauseOffset);
@@ -46,7 +42,6 @@ WCHAR *COMPSTREXTRA::GetTypingClauses(DWORD& dwCount) {
 }
 
 void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
-    FOOTMARK();
     log.clear();
     log.iClause = iClause;
 
@@ -69,7 +64,6 @@ void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
 } // COMPSTREXTRA::GetLog
 
 DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
-    FOOTMARK();
     ASSERT(this);
     ASSERT(log);
 
@@ -105,7 +99,6 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
 //////////////////////////////////////////////////////////////////////////////
 
 void LogCompStr::clear() {
-    FOOTMARK();
     clear_read();
     clear_comp();
     clear_result();
@@ -134,14 +127,12 @@ void LogCompStr::fix() {
 } // LogCompStr::fix
 
 void LogCompStr::clear_read() {
-    FOOTMARK();
     comp_read_attr.clear();
     comp_read_clause.clear();
     comp_read_str.clear();
 }
 
 void LogCompStr::clear_comp() {
-    FOOTMARK();
     dwCursorPos = 0;
     dwDeltaStart = 0;
     comp_attr.clear();
@@ -150,7 +141,6 @@ void LogCompStr::clear_comp() {
 }
 
 void LogCompStr::clear_result() {
-    FOOTMARK();
     result_read_clause.clear();
     result_read_str.clear();
     result_clause.clear();
@@ -158,13 +148,11 @@ void LogCompStr::clear_result() {
 }
 
 DWORD LogCompStr::GetClauseCount() const {
-    FOOTMARK();
     if (comp_clause.size() < 2) return 0;
     return (DWORD)(comp_clause.size() - 1);
 }
 
 DWORD LogCompStr::GetTotalSize() const {
-    FOOTMARK();
     size_t total = sizeof(COMPOSITIONSTRING);
     total += comp_read_attr.size() * sizeof(BYTE);
     total += comp_read_clause.size() * sizeof(DWORD);
@@ -181,7 +169,6 @@ DWORD LogCompStr::GetTotalSize() const {
 }
 
 BOOL LogCompStr::IsBeingConverted() {
-    FOOTMARK();
     for (size_t i = 0; i < comp_attr.size(); ++i) {
         if (comp_attr[i] != ATTR_INPUT) return TRUE;
     }
@@ -194,7 +181,6 @@ BOOL LogCompStr::HasCompStr() const {
 
 BOOL LogCompStr::CompCharInClause(
         DWORD iCompChar, DWORD iClause, BOOL bExcludeEnd /* = FALSE */) const {
-    FOOTMARK();
     if (bExcludeEnd) {
         return (iClause < GetClauseCount() &&
                 comp_clause[iClause] <= iCompChar &&
@@ -207,7 +193,6 @@ BOOL LogCompStr::CompCharInClause(
 }
 
 BYTE LogCompStr::GetClauseAttr(DWORD dwClauseIndex) const {
-    FOOTMARK();
     BYTE ret = ATTR_INPUT;
     if (dwClauseIndex < GetClauseCount()) {
         DWORD ich = ClauseToCompChar(dwClauseIndex);
@@ -217,7 +202,6 @@ BYTE LogCompStr::GetClauseAttr(DWORD dwClauseIndex) const {
 }
 
 void LogCompStr::SetClauseAttr(DWORD dwClauseIndex, BYTE attr) {
-    FOOTMARK();
     if (dwClauseIndex < GetClauseCount()) {
         DWORD ich0 = comp_clause[dwClauseIndex];
         DWORD ich1 = comp_clause[dwClauseIndex + 1];
@@ -230,22 +214,18 @@ void LogCompStr::SetClauseAttr(DWORD dwClauseIndex, BYTE attr) {
 }
 
 BOOL LogCompStr::IsClauseConverted() const {
-    FOOTMARK();
     return IsClauseConverted(extra.iClause);
 }
 
 BOOL LogCompStr::IsClauseConverted(DWORD dwClauseIndex) const {
-    FOOTMARK();
     return GetClauseAttr(dwClauseIndex) != ATTR_INPUT;
 }
 
 BOOL LogCompStr::HasClauseSelected() const {
-    FOOTMARK();
     return IsClauseConverted(extra.iClause);
 }
 
 BYTE LogCompStr::GetCompCharAttr(DWORD ich) const {
-    FOOTMARK();
     BYTE ret = ATTR_INPUT;
     if (ich < (DWORD)comp_attr.size()) {
         ret = comp_attr[ich];
@@ -254,18 +234,15 @@ BYTE LogCompStr::GetCompCharAttr(DWORD ich) const {
 }
 
 DWORD LogCompStr::GetCompCharCount() const {
-    FOOTMARK();
     return (DWORD)comp_str.size();
 }
 
 DWORD LogCompStr::ClauseToCompChar(DWORD dwClauseIndex) const {
-    FOOTMARK();
     if (dwClauseIndex >= GetClauseCount()) return GetCompCharCount();
     return comp_clause[dwClauseIndex];
 }
 
 DWORD LogCompStr::CompCharToClause(DWORD iCompChar) const {
-    FOOTMARK();
     DWORD dwClauseIndex = 0;
     const DWORD cClause = GetClauseCount();
     for (DWORD iClause = 0; iClause <= cClause; ++iClause) {
@@ -279,7 +256,6 @@ DWORD LogCompStr::CompCharToClause(DWORD iCompChar) const {
 }
 
 std::wstring LogCompStr::GetClauseCompString(DWORD dwClauseIndex) const {
-    FOOTMARK();
     std::wstring ret;
     if (dwClauseIndex + 1 <= GetClauseCount()) {
         DWORD ich0 = comp_clause[dwClauseIndex];
@@ -290,13 +266,11 @@ std::wstring LogCompStr::GetClauseCompString(DWORD dwClauseIndex) const {
 }
 
 void LogCompStr::MergeAt(std::vector<std::wstring>& strs, DWORD istr) {
-    FOOTMARK();
     strs[istr - 1] += strs[istr];
     strs.erase(strs.begin() + istr);
 }
 
 WCHAR LogCompStr::PrevCharInClause() const {
-    FOOTMARK();
     if (dwCursorPos > 0) {
         if (CompCharInClause(dwCursorPos - 1, extra.iClause)) {
             return comp_str[dwCursorPos - 1];
@@ -306,7 +280,6 @@ WCHAR LogCompStr::PrevCharInClause() const {
 }
 
 void LogCompStr::UpdateExtraClause(DWORD iClause, DWORD dwConversion) {
-    FOOTMARK();
     // fix extra info
     BOOL bRoman = (dwConversion & IME_CMODE_ROMAN);
     std::wstring str = extra.comp_str_clauses[iClause];
@@ -324,7 +297,6 @@ void LogCompStr::UpdateExtraClause(DWORD iClause, DWORD dwConversion) {
 } // LogCompStr::UpdateExtraClause
 
 void LogCompStr::UpdateCompStr() {
-    FOOTMARK();
     std::wstring str;
     size_t ich = 0;
     size_t count = extra.comp_str_clauses.size();
@@ -358,7 +330,6 @@ void LogCompStr::UpdateFromExtra(BOOL bRoman) {
 }
 
 void LogCompStr::MakeHiragana() {
-    FOOTMARK();
     std::wstring str =
             lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_HIRAGANA);
     SetClauseCompString(extra.iClause, str);
@@ -366,7 +337,6 @@ void LogCompStr::MakeHiragana() {
 }
 
 void LogCompStr::MakeKatakana() {
-    FOOTMARK();
     std::wstring str =
             lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_KATAKANA);
     SetClauseCompString(extra.iClause, str);
@@ -374,7 +344,6 @@ void LogCompStr::MakeKatakana() {
 }
 
 void LogCompStr::MakeHankaku() {
-    FOOTMARK();
     std::wstring str = lcmap(
             extra.hiragana_clauses[extra.iClause],
             LCMAP_HALFWIDTH | LCMAP_KATAKANA);
@@ -383,7 +352,6 @@ void LogCompStr::MakeHankaku() {
 }
 
 void LogCompStr::MakeZenEisuu() {
-    FOOTMARK();
     std::wstring str =
             lcmap(extra.typing_clauses[extra.iClause], LCMAP_FULLWIDTH);
     SetClauseCompString(extra.iClause, str);
@@ -391,7 +359,6 @@ void LogCompStr::MakeZenEisuu() {
 }
 
 void LogCompStr::MakeHanEisuu() {
-    FOOTMARK();
     std::wstring str =
             lcmap(extra.typing_clauses[extra.iClause], LCMAP_HALFWIDTH);
     SetClauseCompString(extra.iClause, str);
@@ -399,7 +366,6 @@ void LogCompStr::MakeHanEisuu() {
 }
 
 void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
-    FOOTMARK();
     BOOL bRoman = (dwConv & IME_CMODE_ROMAN);
     std::wstring str, typed, translated;
     typed += chTyped;
@@ -546,7 +512,6 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 } // LogCompStr::AddCharToEnd
 
 void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
-    FOOTMARK();
     std::wstring typed, translated;
     typed += chTyped;
     translated += chTranslated;
@@ -612,7 +577,6 @@ void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 
 void
 LogCompStr::AddDakuonChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
-    FOOTMARK();
     DWORD dwIndexInClause = dwCursorPos - ClauseToCompChar(extra.iClause);
     std::wstring str = extra.comp_str_clauses[extra.iClause];
     if (dwIndexInClause - 1 < str.size()) {
@@ -624,7 +588,6 @@ LogCompStr::AddDakuonChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 }
 
 void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
-    FOOTMARK();
     size_t size0 = comp_str.size();
     WCHAR ch = PrevCharInClause();
     if (ch) ch = dakuon_shori(ch, chTranslated);
@@ -649,7 +612,6 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 } // LogCompStr::AddChar
 
 void LogCompStr::DeleteChar(BOOL bBackSpace /* = FALSE*/, DWORD dwConv) {
-    FOOTMARK();
     // is the current clause being converted?
     if (IsClauseConverted()) { // being converted
         // set hiragana string to current clause
@@ -687,7 +649,6 @@ void LogCompStr::DeleteChar(BOOL bBackSpace /* = FALSE*/, DWORD dwConv) {
 } // LogCompStr::DeleteChar
 
 void LogCompStr::RevertText() {
-    FOOTMARK();
     // reset composition
     if (extra.iClause < GetClauseCount()) {
         // merge adjacent not converted clauses
@@ -736,8 +697,6 @@ void LogCompStr::RevertText() {
 } // LogCompStr::RevertText
 
 void LogCompStr::MakeResult() {
-    FOOTMARK();
-
     // setting result_read_clause and result_read_str
     result_read_str.clear();
     const size_t count = extra.hiragana_clauses.size();
@@ -758,7 +717,6 @@ void LogCompStr::MakeResult() {
 }
 
 BOOL LogCompStr::MoveLeft() {
-    FOOTMARK();
     // is the current clause being converted?
     if (IsClauseConverted()) { // being converted
         // untarget
@@ -800,7 +758,6 @@ BOOL LogCompStr::MoveLeft() {
 } // LogCompStr::MoveLeft
 
 BOOL LogCompStr::MoveRight() {
-    FOOTMARK();
     // is the current clause being converted?
     if (IsClauseConverted()) { // being converted
         // untarget
@@ -841,7 +798,6 @@ BOOL LogCompStr::MoveRight() {
 } // LogCompStr::MoveRight
 
 BOOL LogCompStr::MoveHome() {
-    FOOTMARK();
     // is the current clause being converted?
     if (IsClauseConverted()) { // being converted
         // untarget
@@ -861,7 +817,6 @@ BOOL LogCompStr::MoveHome() {
 } // LogCompStr::MoveHome
 
 BOOL LogCompStr::MoveEnd() {
-    FOOTMARK();
     // is the current clause being converted?
     if (IsClauseConverted()) { // being converted
         // untarget
@@ -885,7 +840,6 @@ DWORD LogCompStr::GetClauseCompStrLen(DWORD dwClauseIndex) const {
 }
 
 void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
-    FOOTMARK();
     if (iClause < GetClauseCount()) {
         // fix comp_attr
         std::wstring old_str = extra.comp_str_clauses[iClause];
@@ -914,7 +868,6 @@ void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
 } // LogCompStr::SetClauseCompString
 
 void LogCompStr::SetClauseCompHiragana(DWORD iClause, std::wstring& str) {
-    FOOTMARK();
     if (iClause < GetClauseCount()) {
         extra.hiragana_clauses[iClause] = str;
     }
@@ -923,7 +876,6 @@ void LogCompStr::SetClauseCompHiragana(DWORD iClause, std::wstring& str) {
 void LogCompStr::SetClauseCompHiragana(
         DWORD iClause, std::wstring& str, BOOL bRoman)
 {
-    FOOTMARK();
     if (iClause < GetClauseCount()) {
         if (bRoman) {
             extra.typing_clauses[iClause] =
@@ -1017,7 +969,6 @@ DWORD CompStr::Store(const LogCompStr *log) {
 } // CompStr::Store
 
 void CompStr::GetLog(LogCompStr& log) {
-    FOOTMARK();
     log.dwCursorPos = dwCursorPos;
     log.dwDeltaStart = dwDeltaStart;
     log.comp_read_attr.assign(GetCompReadAttr(), GetCompReadAttr() + dwCompReadAttrLen);
@@ -1160,7 +1111,6 @@ void LogCompStr::AssertValid() {
 } // LogCompStr::AssertValid
 
 void CompStr::Dump() {
-    FOOTMARK();
     DebugPrintA("dwSize: %08X\n", dwSize);
     DebugPrintA("dwCursorPos: %08X\n", dwCursorPos);
     DebugPrintA("dwDeltaStart: %08X\n", dwDeltaStart);

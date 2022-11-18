@@ -1135,7 +1135,6 @@ static KEYVALUE kana2type_table[] = {
 //////////////////////////////////////////////////////////////////////////////
 
 std::wstring hiragana_to_roman(std::wstring hiragana) {
-    FOOTMARK();
     std::wstring roman;
     bool found;
     for (size_t k = 0; k < hiragana.size(); ) {
@@ -1184,7 +1183,6 @@ std::wstring hiragana_to_roman(std::wstring hiragana) {
 } // hiragana_to_roman
 
 std::wstring roman_to_hiragana(std::wstring roman) {
-    FOOTMARK();
     std::wstring hiragana, str;
     for (size_t k = 0; k < roman.size(); ) {
         bool found = false;
@@ -1240,7 +1238,6 @@ std::wstring roman_to_hiragana(std::wstring roman) {
 } // roman_to_hiragana
 
 std::wstring roman_to_katakana(std::wstring roman) {
-    FOOTMARK();
     std::wstring katakana, str;
     for (size_t k = 0; k < roman.size(); ) {
         bool found = false;
@@ -1296,7 +1293,6 @@ std::wstring roman_to_katakana(std::wstring roman) {
 } // roman_to_katakana
 
 std::wstring roman_to_halfwidth_katakana(std::wstring roman) {
-    FOOTMARK();
     std::wstring katakana, str;
     //DebugPrintW(L"roman_to_halfwidth_katakana(%s)\n", roman.c_str());
     for (size_t k = 0; k < roman.size(); ) {
@@ -1473,7 +1469,6 @@ std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget) {
 } // roman_to_katakana
 
 std::wstring roman_to_halfwidth_katakana(std::wstring roman, size_t ichTarget) {
-    FOOTMARK();
     //DebugPrintW(L"roman_to_halfwidth_katakana(%s,%d)\n", roman.c_str(), (int)ichTarget);
     std::wstring str, key, value, extra;
     size_t key_len = 0;
@@ -1534,7 +1529,6 @@ std::wstring roman_to_halfwidth_katakana(std::wstring roman, size_t ichTarget) {
 } // roman_to_halfwidth_katakana
 
 std::wstring hiragana_to_typing(std::wstring hiragana) {
-    FOOTMARK();
     std::wstring typing;
     for (size_t k = 0; k < hiragana.size(); ) {
         bool found = false;
@@ -1554,7 +1548,6 @@ std::wstring hiragana_to_typing(std::wstring hiragana) {
 } // hiragana_to_typing
 
 WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift) {
-    FOOTMARK();
     switch (vk) {
     case VK_A:          return L'Çø';
     case VK_B:          return L'Ç±';
@@ -1609,7 +1602,6 @@ WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift) {
 } // vkey_to_hiragana
 
 WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock) {
-    FOOTMARK();
     if (VK_A <= vk && vk <= VK_Z) {
         if (!bShift == !bCapsLock) {
             return vk + (L'a' - VK_A);
@@ -1727,7 +1719,6 @@ BOOL is_fullwidth_ascii(WCHAR ch) {
 }
 
 BOOL are_all_chars_numeric(const std::wstring& str) {
-    FOOTMARK();
     for (size_t i = 0; i < str.size(); ++i) {
         if (L'0' <= str[i] && str[i] <= L'9') {
             ;
@@ -1743,7 +1734,6 @@ BOOL are_all_chars_numeric(const std::wstring& str) {
 static const wchar_t s_szKanjiDigits[] = L"ÅZàÍìÒéOélå‹òZéµî™ã„";
 
 std::wstring convert_to_kansuuji_1(wchar_t ch, size_t digit_level) {
-    FOOTMARK();
     static const wchar_t s_szKanjiDigitLevels[] = L" è\ïSêÁ";
     std::wstring ret;
     if (ch == L'0') return ret;
@@ -1757,7 +1747,6 @@ std::wstring convert_to_kansuuji_1(wchar_t ch, size_t digit_level) {
 }
 
 std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth) {
-    FOOTMARK();
     ASSERT(are_all_chars_numeric(halfwidth));
     ASSERT(halfwidth.size() <= 4);
     const size_t length = halfwidth.size();
@@ -1772,7 +1761,6 @@ std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth) {
 }
 
 std::wstring convert_to_kansuuji(const std::wstring& str) {
-    FOOTMARK();
     std::wstring halfwidth = lcmap(str, LCMAP_HALFWIDTH);
     ASSERT(are_all_chars_numeric(halfwidth));
     if (halfwidth.size() >= 24) return halfwidth;
@@ -1807,7 +1795,6 @@ std::wstring convert_to_kansuuji(const std::wstring& str) {
 }
 
 std::wstring convert_to_kansuuji_brief(const std::wstring& str) {
-    FOOTMARK();
     std::wstring halfwidth = lcmap(str, LCMAP_HALFWIDTH);
     ASSERT(are_all_chars_numeric(halfwidth));
     std::wstring ret;
@@ -1830,7 +1817,6 @@ std::wstring convert_to_kansuuji_formal(const std::wstring& str) {
 }
 
 WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1) {
-    FOOTMARK();
     switch (MAKELONG(ch0, ch1)) {
     case MAKELONG(L'Ç©', L'ÅJ'): return L'Ç™';
     case MAKELONG(L'Ç´', L'ÅJ'): return L'Ç¨';

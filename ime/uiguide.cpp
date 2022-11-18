@@ -9,7 +9,6 @@ extern "C" {
 
 LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                      LPARAM lParam) {
-    FOOTMARK();
     PAINTSTRUCT ps;
     HWND hUIWnd;
     HDC hDC;
@@ -71,7 +70,6 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 }
 
 DWORD PASCAL CheckPushedGuide(HWND hGuideWnd, LPPOINT lppt) {
-    FOOTMARK();
     POINT pt;
     RECT rc;
 
@@ -92,7 +90,6 @@ DWORD PASCAL CheckPushedGuide(HWND hGuideWnd, LPPOINT lppt) {
 
 void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
                     DWORD dwPushedGuide) {
-    FOOTMARK();
     HIMC hIMC;
     HDC hMemDC;
     HBITMAP hbmpOld;
@@ -183,7 +180,6 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
 
 void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
                      LPARAM lParam) {
-    FOOTMARK();
     POINT pt;
     HDC hDC;
     DWORD dwMouse;
@@ -272,7 +268,6 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
 }
 
 void GuideWnd_Update(UIEXTRA *lpUIExtra) {
-    FOOTMARK();
     if (::IsWindow(lpUIExtra->hwndGuide)) {
         ::SendMessage(lpUIExtra->hwndGuide, WM_UI_UPDATE, 0, 0);
     }

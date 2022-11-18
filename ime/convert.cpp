@@ -444,7 +444,6 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
 } // IsNodeConnectable
 
 static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
-    FOOTMARK();
     ASSERT(dict_data);
 
     WCHAR sz[3] = {RECORD_SEP, ch, 0};
@@ -473,7 +472,6 @@ static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
 } // ScanDict
 
 void MzIme::MakeLiteralMaps() {
-    FOOTMARK();
     if (m_consonant_map.size()) {
         return;
     }
@@ -636,18 +634,14 @@ void MzConvClause::add(const LatticeNode *node) {
 static inline bool CandidateCompare(
         const MzConvCandidate& cand1, const MzConvCandidate& cand2)
 {
-    FOOTMARK();
     return cand1.cost < cand2.cost;
 }
 
 void MzConvClause::sort() {
-    FOOTMARK();
     std::sort(candidates.begin(), candidates.end(), CandidateCompare);
 }
 
 void MzConvResult::sort() {
-    FOOTMARK();
-
     for (size_t i = 1; i < clauses.size(); ++i) {
         for (size_t iCand1 = 0; iCand1 < clauses[i - 1].candidates.size(); ++iCand1) {
             for (size_t iCand2 = 0; iCand2 < clauses[i].candidates.size(); ++iCand2) {
@@ -719,7 +713,6 @@ bool LatticeNode::IsJodoushi() const {
 // Lattice
 
 void Lattice::AddExtra() {
-    FOOTMARK();
     if (pre == L"Ç´ÇÂÇ§") { // today
         SYSTEMTIME st;
         ::GetLocalTime(&st);
@@ -858,7 +851,6 @@ void Lattice::AddExtra() {
 } // Lattice::AddExtra
 
 BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
-    FOOTMARK();
     const size_t length = pre.size();
     ASSERT(length);
 
@@ -1029,8 +1021,6 @@ struct DeleteDifferentSizeNode {
 };
 
 BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
-    FOOTMARK();
-
     std::wstring sep;
     sep += FIELD_SEP;
 
@@ -1057,7 +1047,6 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
 }
 
 void Lattice::UpdateRefs() {
-    FOOTMARK();
     const size_t length = pre.size();
 
     // initialize the reference counts
@@ -1075,7 +1064,6 @@ void Lattice::UpdateRefs() {
 } // Lattice::UpdateRefs
 
 void Lattice::UpdateLinks() {
-    FOOTMARK();
     const size_t length = pre.size();
     ASSERT(length);
     ASSERT(length + 1 == chunks.size());
@@ -1124,7 +1112,6 @@ void Lattice::UpdateLinks() {
 } // Lattice::UpdateLinks
 
 void Lattice::UnlinkAllNodes() {
-    FOOTMARK();
     // clear the branch links and the linked counts
     const size_t length = pre.size();
     for (size_t index = 0; index < length; ++index) {
@@ -1137,7 +1124,6 @@ void Lattice::UnlinkAllNodes() {
 } // Lattice::UnlinkAllNodes
 
 void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size) {
-    FOOTMARK();
     const size_t length = pre.size();
     // add the undefined words on failure of conversion
     WStrings fields(4);
@@ -1152,12 +1138,10 @@ void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size) {
 } // Lattice::AddComplement
 
 static inline bool IsNodeUnlinked(const LatticeNodePtr& node) {
-    FOOTMARK();
     return node->linked == 0;
 }
 
 void Lattice::CutUnlinkedNodes() {
-    FOOTMARK();
     const size_t length = pre.size();
     for (size_t index = 0; index < length; ++index) {
         LatticeChunk& chunk1 = chunks[index];
@@ -1167,7 +1151,6 @@ void Lattice::CutUnlinkedNodes() {
 } // Lattice::CutUnlinkedNodes
 
 size_t Lattice::GetLastLinkedIndex() const {
-    FOOTMARK();
     // is the last node linked?
     const size_t length = pre.size();
     if (chunks[length][0]->linked) {
@@ -1187,7 +1170,6 @@ size_t Lattice::GetLastLinkedIndex() const {
 } // Lattice::GetLastLinkedIndex
 
 void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
-    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1363,7 +1345,6 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoIkeiyoushi
 
 void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
-    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1466,7 +1447,6 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoNakeiyoushi
 
 void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
-    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1594,7 +1574,6 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoGodanDoushi
 
 void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
-    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1679,7 +1658,6 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoIchidanDoushi
 
 void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
-    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1765,7 +1743,6 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoKahenDoushi
 
 void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
-    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1928,7 +1905,6 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoSahenDoushi
 
 void Lattice::DoMeishi(size_t index, const WStrings& fields) {
-    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
 
@@ -2104,7 +2080,6 @@ void Lattice::Dump(int num) {
 //////////////////////////////////////////////////////////////////////////////
 
 BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
-    FOOTMARK();
     const DWORD c_retry_count = 32;
 
     // failure if the dictionary not loaded
@@ -2161,8 +2136,6 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
 } // MzIme::MakeLattice
 
 BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
-    FOOTMARK();
-
     // failure if the dictionary not loaded
     if (!m_basic_dict.IsLoaded()) {
         return FALSE;
@@ -2195,7 +2168,6 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
 } // MzIme::MakeLatticeForSingle
 
 void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
-    FOOTMARK();
     result.clear();
 
     // 2ï∂êﬂç≈í∑àÍívñ@ÅEâ¸
@@ -2365,7 +2337,6 @@ void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
 } // MzIme::MakeResult
 
 void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
-    FOOTMARK();
     MzConvClause clause;
     result.clear();
 
@@ -2387,7 +2358,6 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
 } // MzIme::MakeResultOnFailure
 
 void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
-    FOOTMARK();
     result.clear();
     const size_t length = lattice.pre.size();
 
@@ -2429,7 +2399,6 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
 BOOL MzIme::ConvertMultiClause(
         LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
-    FOOTMARK();
     MzConvResult result;
     std::wstring strHiragana = comp.extra.hiragana_clauses[comp.extra.iClause];
     if (!ConvertMultiClause(strHiragana, result)) {
@@ -2441,8 +2410,6 @@ BOOL MzIme::ConvertMultiClause(
 BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana,
                                MzConvResult& result)
 {
-    FOOTMARK();
-
 #if 1
     // failure if the dictionary not loaded
     if (!m_basic_dict.IsLoaded()) {
@@ -2493,7 +2460,6 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana,
 BOOL MzIme::ConvertSingleClause(
         LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
-    FOOTMARK();
     DWORD iClause = comp.extra.iClause;
 
     // convert
@@ -2526,7 +2492,6 @@ BOOL MzIme::ConvertSingleClause(
 BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana,
                                 MzConvResult& result)
 {
-    FOOTMARK();
     result.clear();
 
 #if 1
@@ -2555,8 +2520,6 @@ BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana,
 BOOL MzIme::StretchClauseLeft(
         LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
-    FOOTMARK();
-
     DWORD iClause = comp.extra.iClause;
 
     // get the clause string
@@ -2639,8 +2602,6 @@ BOOL MzIme::StretchClauseLeft(
 BOOL MzIme::StretchClauseRight(
         LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
-    FOOTMARK();
-
     DWORD iClause = comp.extra.iClause;
 
     // get the current clause
@@ -2867,7 +2828,6 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping,
 } // MzIme::ConvertCode
 
 BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand) {
-    FOOTMARK();
     MzConvResult result;
     std::wstring strTyping = comp.extra.typing_clauses[comp.extra.iClause];
     if (!ConvertCode(strTyping, result)) {

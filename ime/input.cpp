@@ -8,7 +8,6 @@
 // input modes
 
 BOOL IsInputModeOpen(INPUT_MODE imode) {
-    FOOTMARK();
     switch (imode) {
     case IMODE_FULL_HIRAGANA:
     case IMODE_FULL_KATAKANA:
@@ -23,7 +22,6 @@ BOOL IsInputModeOpen(INPUT_MODE imode) {
 }
 
 INPUT_MODE InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
-    FOOTMARK();
     if (bOpen) {
         if (dwConversion & IME_CMODE_FULLSHAPE) {
             if (dwConversion & IME_CMODE_JAPANESE) {
@@ -48,7 +46,6 @@ INPUT_MODE InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
 }
 
 UINT CommandFromInputMode(INPUT_MODE imode) {
-    FOOTMARK();
     switch (imode) {
     case IMODE_FULL_HIRAGANA:
         return IDM_HIRAGANA;
@@ -66,7 +63,6 @@ UINT CommandFromInputMode(INPUT_MODE imode) {
 }
 
 INPUT_MODE GetInputMode(HIMC hIMC) {
-    FOOTMARK();
     if (hIMC) {
         DWORD dwConversion, dwSentence;
         ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
@@ -77,7 +73,6 @@ INPUT_MODE GetInputMode(HIMC hIMC) {
 }
 
 INPUT_MODE NextInputMode(INPUT_MODE imode) {
-    FOOTMARK();
     switch (imode) {
     case IMODE_FULL_HIRAGANA:
         return IMODE_FULL_KATAKANA;
@@ -96,7 +91,6 @@ INPUT_MODE NextInputMode(INPUT_MODE imode) {
 }
 
 void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
-    FOOTMARK();
     if (imode == IMODE_DISABLED) {
         return;
     }
@@ -134,14 +128,12 @@ void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
 }
 
 BOOL IsRomanMode(HIMC hIMC) {
-    FOOTMARK();
     DWORD dwConversion, dwSentence;
     ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
     return (dwConversion & IME_CMODE_ROMAN);
 }
 
 void SetRomanMode(HIMC hIMC, BOOL bRoman) {
-    FOOTMARK();
     DWORD dwConversion, dwSentence;
     ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
     if (bRoman) {
@@ -156,18 +148,14 @@ void SetRomanMode(HIMC hIMC, BOOL bRoman) {
 // input context
 
 INPUT_MODE InputContext::GetInputMode() const {
-    FOOTMARK();
     return InputModeFromConversionMode(fOpen, Conversion());
 }
 
 BOOL InputContext::IsRomanMode() const {
-    FOOTMARK();
     return Conversion() & IME_CMODE_ROMAN;
 }
 
 void InputContext::Initialize() {
-    FOOTMARK();
-
     DebugPrintA("### Initial status of INPUTCONTEXT ###\n");
     DebugPrintA("hWnd: %p\n", hWnd);
     DebugPrintA("fOpen: %d\n", fOpen);
@@ -224,7 +212,6 @@ void InputContext::Initialize() {
 }
 
 BOOL InputContext::HasCandInfo() {
-    FOOTMARK();
     BOOL fRet = FALSE;
 
     if (ImmGetIMCCSize(hCandInfo) < sizeof(CANDIDATEINFO)) return FALSE;
@@ -238,7 +225,6 @@ BOOL InputContext::HasCandInfo() {
 }
 
 BOOL InputContext::HasCompStr() {
-    FOOTMARK();
     if (ImmGetIMCCSize(hCompStr) <= sizeof(COMPOSITIONSTRING)) return FALSE;
 
     CompStr *pCompStr = LockCompStr();
@@ -249,7 +235,6 @@ BOOL InputContext::HasCompStr() {
 }
 
 CandInfo *InputContext::LockCandInfo() {
-    FOOTMARK();
     DebugPrintA("InputContext::LockCandInfo: locking %p\n", hCandInfo);
     CandInfo *info = (CandInfo *)::ImmLockIMCC(hCandInfo);
     if (info) {
@@ -261,7 +246,6 @@ CandInfo *InputContext::LockCandInfo() {
 }
 
 void InputContext::UnlockCandInfo() {
-    FOOTMARK();
     DebugPrintA("InputContext::UnlockCandInfo: unlocking %p\n", hCandInfo);
     BOOL b = ::ImmUnlockIMCC(hCandInfo);
     if (b) {
@@ -272,7 +256,6 @@ void InputContext::UnlockCandInfo() {
 }
 
 CompStr *InputContext::LockCompStr() {
-    FOOTMARK();
     DebugPrintA("InputContext::LockCompStr: locking %p\n", hCompStr);
     CompStr *comp_str = (CompStr *)::ImmLockIMCC(hCompStr);
     if (comp_str) {
@@ -284,7 +267,6 @@ CompStr *InputContext::LockCompStr() {
 }
 
 void InputContext::UnlockCompStr() {
-    FOOTMARK();
     DebugPrintA("InputContext::UnlockCompStr: unlocking %p\n", hCompStr);
     BOOL b = ::ImmUnlockIMCC(hCompStr);
     if (b) {
@@ -295,7 +277,6 @@ void InputContext::UnlockCompStr() {
 }
 
 LPTRANSMSG InputContext::LockMsgBuf() {
-    FOOTMARK();
     DebugPrintA("InputContext::LockMsgBuf: locking %p\n", hMsgBuf);
     LPTRANSMSG lpTransMsg = (LPTRANSMSG) ::ImmLockIMCC(hMsgBuf);
     if (lpTransMsg) {
@@ -307,7 +288,6 @@ LPTRANSMSG InputContext::LockMsgBuf() {
 }
 
 void InputContext::UnlockMsgBuf() {
-    FOOTMARK();
     DebugPrintA("InputContext::UnlockMsgBuf: unlocking %p\n", hMsgBuf);
     BOOL b = ::ImmUnlockIMCC(hMsgBuf);
     if (b) {
@@ -326,7 +306,6 @@ const DWORD& InputContext::NumMsgBuf() const {
 }
 
 void InputContext::MakeGuideLine(DWORD dwID) {
-    FOOTMARK();
     DWORD dwSize =
             sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(TCHAR)) * 2 * sizeof(TCHAR);
     WCHAR *lpStr;
@@ -359,7 +338,6 @@ void InputContext::MakeGuideLine(DWORD dwID) {
 }
 
 LPGUIDELINE InputContext::LockGuideLine() {
-    FOOTMARK();
     DebugPrintA("InputContext::LockGuideLine: locking %p\n", hGuideLine);
     LPGUIDELINE guideline = (LPGUIDELINE) ::ImmLockIMCC(hGuideLine);
     if (guideline) {
@@ -371,7 +349,6 @@ LPGUIDELINE InputContext::LockGuideLine() {
 }
 
 void InputContext::UnlockGuideLine() {
-    FOOTMARK();
     DebugPrintA("InputContext::UnlockGuideLine: unlocking %p\n", hGuideLine);
     BOOL b = ::ImmUnlockIMCC(hGuideLine);
     if (b) {
@@ -396,8 +373,6 @@ void InputContext::GetLogObjects(LogCompStr& comp, LogCandInfo& cand) {
 } // InputContext::GetLogObjects
 
 BOOL InputContext::SelectCand(UINT uCandIndex) {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     LogCandInfo cand;
@@ -425,8 +400,6 @@ BOOL InputContext::SelectCand(UINT uCandIndex) {
 } // InputContext::SelectCand
 
 void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
@@ -512,8 +485,6 @@ BOOL InputContext::CloseCandidate(BOOL bClearCandInfo /* = TRUE*/) {
 }
 
 BOOL InputContext::Convert(BOOL bShift) {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     LogCandInfo cand;
@@ -566,8 +537,6 @@ BOOL InputContext::Convert(BOOL bShift) {
 } // InputContext::Convert
 
 void InputContext::MakeResult() {
-    FOOTMARK();
-
     // close candidate
     CloseCandidate();
 
@@ -593,8 +562,6 @@ void InputContext::MakeResult() {
 } // InputContext::MakeResult
 
 void InputContext::MakeHiragana() {
-    FOOTMARK();
-
     // close candidate
     CloseCandidate();
 
@@ -626,8 +593,6 @@ void InputContext::MakeHiragana() {
 }
 
 void InputContext::MakeKatakana() {
-    FOOTMARK();
-
     // close candidate
     CloseCandidate();
 
@@ -659,8 +624,6 @@ void InputContext::MakeKatakana() {
 }
 
 void InputContext::MakeHankaku() {
-    FOOTMARK();
-
     // close candidate
     CloseCandidate();
 
@@ -692,8 +655,6 @@ void InputContext::MakeHankaku() {
 }
 
 void InputContext::MakeZenEisuu() {
-    FOOTMARK();
-
     // close candidate
     CloseCandidate();
 
@@ -719,8 +680,6 @@ void InputContext::MakeZenEisuu() {
 }
 
 void InputContext::MakeHanEisuu() {
-    FOOTMARK();
-
     // close candidate
     CloseCandidate();
 
@@ -777,8 +736,6 @@ BOOL InputContext::ConvertCode() {
 }
 
 void InputContext::Escape() {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
@@ -796,8 +753,6 @@ void InputContext::Escape() {
 } // InputContext::Escape
 
 void InputContext::CancelText() {
-    FOOTMARK();
-
     // close candidate
     CloseCandidate();
 
@@ -810,8 +765,6 @@ void InputContext::CancelText() {
 } // InputContext::CancelText
 
 void InputContext::RevertText() {
-    FOOTMARK();
-
     // close candidate
     CloseCandidate(FALSE);
 
@@ -841,8 +794,6 @@ void InputContext::RevertText() {
 } // InputContext::RevertText
 
 void InputContext::DeleteChar(BOOL bBackSpace) {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
@@ -879,8 +830,6 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
 } // InputContext::DeleteChar
 
 void InputContext::MoveLeft(BOOL bShift) {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     LogCandInfo cand;
@@ -917,8 +866,6 @@ void InputContext::MoveLeft(BOOL bShift) {
 } // InputContext::MoveLeft
 
 void InputContext::MoveRight(BOOL bShift) {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     LogCandInfo cand;
@@ -955,7 +902,6 @@ void InputContext::MoveRight(BOOL bShift) {
 } // InputContext::MoveRight
 
 void InputContext::MoveUp() {
-    FOOTMARK();
     if (!HasCandInfo()) return;
 
     // get logical data
@@ -979,7 +925,6 @@ void InputContext::MoveUp() {
 }
 
 void InputContext::MoveDown() {
-    FOOTMARK();
     if (!HasCandInfo()) return;
 
     // get logical data
@@ -1003,8 +948,6 @@ void InputContext::MoveDown() {
 }
 
 void InputContext::MoveHome() {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     LogCandInfo cand;
@@ -1032,8 +975,6 @@ void InputContext::MoveHome() {
 } // InputContext::MoveHome
 
 void InputContext::MoveEnd() {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     LogCandInfo cand;
@@ -1061,8 +1002,6 @@ void InputContext::MoveEnd() {
 } // InputContext::MoveEnd
 
 void InputContext::PageUp() {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     LogCandInfo cand;
@@ -1084,8 +1023,6 @@ void InputContext::PageUp() {
 } // InputContext::PageUp
 
 void InputContext::PageDown() {
-    FOOTMARK();
-
     // get logical data
     LogCompStr comp;
     LogCandInfo cand;
@@ -1107,7 +1044,6 @@ void InputContext::PageDown() {
 } // InputContext::PageDown
 
 void InputContext::DumpCompStr() {
-    FOOTMARK();
     CompStr *pCompStr = LockCompStr();
     if (pCompStr) {
         pCompStr->Dump();
@@ -1118,7 +1054,6 @@ void InputContext::DumpCompStr() {
 } // InputContext::DumpCompStr
 
 void InputContext::DumpCandInfo() {
-    FOOTMARK();
     CandInfo *pCandInfo = LockCandInfo();
     if (pCandInfo) {
         pCandInfo->Dump();

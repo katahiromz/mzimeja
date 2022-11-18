@@ -10,7 +10,6 @@
 // LogCandList
 
 void LogCandList::clear() {
-    FOOTMARK();
     dwStyle = IME_CAND_READ;
     dwSelection = 0;
     dwPageStart = 0;
@@ -19,7 +18,6 @@ void LogCandList::clear() {
 }
 
 DWORD LogCandList::GetTotalSize() const {
-    FOOTMARK();
     DWORD total = sizeof(CANDIDATELIST);
     total += DWORD(cand_strs.size() * sizeof(DWORD));
     for (size_t iCand = 0; iCand < cand_strs.size(); ++iCand) {
@@ -89,7 +87,6 @@ std::wstring LogCandList::GetString() const {
 // LogCandInfo
 
 void LogCandInfo::clear() {
-    FOOTMARK();
     cand_lists.clear();
     iClause = 0;
 }
@@ -144,7 +141,6 @@ std::wstring LogCandInfo::GetString(DWORD iCand) const {
 }
 
 DWORD LogCandInfo::GetTotalSize() const {
-    FOOTMARK();
     DWORD total = sizeof(CANDIDATEINFO);
     for (size_t i = 0; i < cand_lists.size(); ++i) {
         total += cand_lists[i].GetTotalSize();
@@ -180,7 +176,6 @@ DWORD CandList::GetPageEnd() const {
 }
 
 void CandList::GetLog(LogCandList& log) {
-    FOOTMARK();
     log.dwStyle = dwStyle;
     log.dwSelection = dwSelection;
     log.dwPageStart = dwPageStart;
@@ -192,8 +187,6 @@ void CandList::GetLog(LogCandList& log) {
 }
 
 DWORD CandList::Store(const LogCandList *log) {
-    FOOTMARK();
-
     dwSize = log->GetTotalSize();
     dwStyle = log->dwStyle;
     dwCount = DWORD(log->cand_strs.size());
@@ -223,13 +216,11 @@ DWORD CandList::Store(const LogCandList *log) {
 // CandInfo
 
 CandList *CandInfo::GetList(DWORD i) {
-    FOOTMARK();
     ASSERT(i < dwCount);
     return (CandList *)(GetBytes() + dwOffset[i]);
 }
 
 void CandInfo::GetLog(LogCandInfo& log) {
-    FOOTMARK();
     log.clear();
 
     LogCandList cand;
@@ -248,7 +239,6 @@ void CandInfo::GetLog(LogCandInfo& log) {
 }
 
 DWORD CandInfo::Store(const LogCandInfo *log) {
-    FOOTMARK();
     dwSize = log->GetTotalSize();
     dwCount = (DWORD)log->cand_lists.size();
     if (MAX_CANDLISTS < dwCount) {
@@ -283,6 +273,8 @@ CANDINFOEXTRA *CandInfo::GetExtra() {
         CANDINFOEXTRA *extra = (CANDINFOEXTRA *)pb;
         if (extra->dwSignature == 0xDEADFACE) {
             return extra;
+        } else {
+            ASSERT(0);
         }
     }
     return NULL;

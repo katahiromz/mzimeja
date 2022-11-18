@@ -47,7 +47,6 @@ HFONT CheckNativeCharset(HDC hDC) {
 
 // adjust window position
 void RepositionWindow(HWND hWnd) {
-    FOOTMARK();
     RECT rc, rcWorkArea;
     ::GetWindowRect(hWnd, &rc);
     ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, FALSE);
@@ -130,7 +129,6 @@ void MzIme::UnloadDict() {
 }
 
 BOOL MzIme::Init(HINSTANCE hInstance) {
-    FOOTMARK();
     m_hInst = hInstance;
     //::InitCommonControls();
 
@@ -144,7 +142,6 @@ BOOL MzIme::Init(HINSTANCE hInstance) {
 } // MzIme::Init
 
 VOID MzIme::Uninit(VOID) {
-    FOOTMARK();
     UnregisterClasses();
     UnloadDict();
 }
@@ -560,26 +557,23 @@ BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
 
 // Update the transrate key buffer
 BOOL MzIme::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
-    FOOTMARK();
-
     // increment the number
     ++m_uNumTransKey;
 
     // check overflow
     if (m_uNumTransKey >= m_lpCurTransKey->uMsgCount) {
         m_fOverflowKey = TRUE;
-        FOOTMARK_RETURN_INT(FALSE);
+        return FALSE;
     }
 
     // put one message to TRANSMSG buffer
     LPTRANSMSG lpgmT0 = m_lpCurTransKey->TransMsg + (m_uNumTransKey - 1);
     *lpgmT0 = *lpGeneMsg;
 
-    FOOTMARK_RETURN_INT(TRUE);
+    return TRUE;
 }
 
 BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
-    FOOTMARK();
     switch (dwCommand) {
     case IDM_RECONVERT:
         break;
@@ -619,13 +613,12 @@ BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
         GenerateMessage(WM_IME_NOTIFY, IMN_PRIVATE, MAKELPARAM(0, 0xFACE));
         break;
     default:
-        FOOTMARK_RETURN_INT(FALSE);
+        return FALSE;
     }
-    FOOTMARK_RETURN_INT(TRUE);
+    return TRUE;
 } // MzIme::DoCommand
 
 void MzIme::UpdateIndicIcon(HIMC hIMC) {
-    FOOTMARK();
     if (m_hMyKL == NULL) {
         m_hMyKL = GetHKL();
         if (m_hMyKL == NULL) return;
@@ -668,24 +661,15 @@ WCHAR *MzIme::LoadSTR(INT nID) {
 }
 
 InputContext *MzIme::LockIMC(HIMC hIMC) {
-    FOOTMARK();
-    DebugPrintA("MzIme::LockIMC: locking: %p\n", hIMC);
     InputContext *context = (InputContext *)::ImmLockIMC(hIMC);
     if (context) {
         m_hIMC = hIMC;
         m_lpIMC = context;
-        DebugPrintA("MzIme::LockIMC: locked: %p\n", hIMC);
-    } else {
-        DebugPrintA("MzIme::LockIMC: cannot lock: %p\n", hIMC);
     }
-    FOOTMARK_RETURN_PTR(InputContext *, context);
 }
 
 VOID MzIme::UnlockIMC(HIMC hIMC) {
-    FOOTMARK();
-    DebugPrintA("MzIme::UnlockIMC: unlocking: %p\n", hIMC);
     ::ImmUnlockIMC(hIMC);
-    DebugPrintA("MzIme::UnlockIMC: unlocked: %p\n", hIMC);
     if (::ImmGetIMCLockCount(hIMC) == 0) {
         m_hIMC = NULL;
         m_lpIMC = NULL;
@@ -700,32 +684,26 @@ extern "C" {
 // UI extra related
 
 HGLOBAL GetUIExtraFromServerWnd(HWND hwndServer) {
-    FOOTMARK();
-    FOOTMARK_RETURN_PTR(HGLOBAL,
-                        (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE));
+    return (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE));
 }
 
 void SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra) {
-    FOOTMARK();
     SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
 }
 
 UIEXTRA *LockUIExtra(HWND hwndServer) {
-    FOOTMARK();
     HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
     UIEXTRA *lpUIExtra = (UIEXTRA *)::GlobalLock(hUIExtra);
     ASSERT(lpUIExtra);
-    FOOTMARK_RETURN_PTR(UIEXTRA *, lpUIExtra);
+    return lpUIExtra;
 }
 
 void UnlockUIExtra(HWND hwndServer) {
-    FOOTMARK();
     HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
     ::GlobalUnlock(hUIExtra);
 }
 
 void FreeUIExtra(HWND hwndServer) {
-    FOOTMARK();
     HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
     ::GlobalFree(hUIExtra);
     SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)NULL);

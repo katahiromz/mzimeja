@@ -12,7 +12,6 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
-    FOOTMARK();
     if (ppsh->nPages < MAX_PAGES) {
         PROPSHEETPAGE psp;
 
@@ -115,7 +114,6 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
 
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
-    FOOTMARK();
     NMHDR FAR *lpnm;
     //LPPROPSHEETPAGE lpPropSheet =
     //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
@@ -223,7 +221,6 @@ INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
     NMHDR FAR *lpnm;
     //LPPROPSHEETPAGE lpPropSheet =
     //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
-    FOOTMARK();
 
     switch (message) {
     case WM_NOTIFY:
@@ -277,7 +274,6 @@ INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
     NMHDR FAR *lpnm;
     //LPPROPSHEETPAGE lpPropSheet =
     //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
-    FOOTMARK();
 
     switch (message) {
     case WM_NOTIFY:
@@ -331,7 +327,6 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
     NMHDR FAR *lpnm;
     //LPPROPSHEETPAGE lpPropSheet =
     //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
-    FOOTMARK();
 
     switch (message) {
     case WM_NOTIFY:
@@ -387,7 +382,6 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
     NMHDR FAR *lpnm;
     //LPPROPSHEETPAGE lpPropSheet =
     //    (LPPROPSHEETPAGE)(GetWindowLongPtr(hDlg, DWLP_USER));
-    FOOTMARK();
 
     switch (message) {
     case WM_NOTIFY:

@@ -12,7 +12,6 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 DWORD CandWnd_HitTest(HWND hWnd, POINT pt, InputContext *lpIMC) {
-    FOOTMARK();
     DWORD ret = 0;
     int height = 0;
     HDC hDC = ::CreateCompatibleDC(NULL);
@@ -72,7 +71,6 @@ void CandWnd_OnClick(HWND hWnd) {
 
 LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
-    FOOTMARK();
     HWND hUIWnd;
 
     switch (message) {
@@ -101,8 +99,6 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 } // CandWnd_WindowProc
 
 BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt) {
-    FOOTMARK();
-
     BOOL ret = FALSE;
 
     DWORD iClause = 0;
@@ -126,7 +122,6 @@ BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt
 
 BOOL GetCandPosFromCompForm(InputContext *lpIMC, UIEXTRA *lpUIExtra,
                             LPPOINT lppt) {
-    FOOTMARK();
     if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, lppt)) {
         ::ScreenToClient(lpIMC->hWnd, lppt);
         return TRUE;
@@ -135,7 +130,6 @@ BOOL GetCandPosFromCompForm(InputContext *lpIMC, UIEXTRA *lpUIExtra,
 } // GetCandPosFromCompForm
 
 void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
-    FOOTMARK();
     POINT pt;
 
     if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
@@ -156,7 +150,6 @@ void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 } // CandWnd_Create
 
 void CandWnd_Paint(HWND hCandWnd) {
-    FOOTMARK();
     RECT rc;
     ::GetClientRect(hCandWnd, &rc);
 
@@ -231,7 +224,6 @@ void CandWnd_Paint(HWND hCandWnd) {
 } // CandWnd_Paint
 
 SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
-    FOOTMARK();
     int width1 = 0, height = 0;
     HDC hDC = ::CreateCompatibleDC(NULL);
     HFONT hOldFont = CheckNativeCharset(hDC);
@@ -268,7 +260,6 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 } // CandWnd_CalcSize
 
 void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
-    FOOTMARK();
     if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
         SIZE siz = CandWnd_CalcSize(lpUIExtra, lpIMC);
         siz.cx += 4 * GetSystemMetrics(SM_CXEDGE);
@@ -282,7 +273,6 @@ void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 } // CandWnd_Resize
 
 void CandWnd_Hide(UIEXTRA *lpUIExtra) {
-    FOOTMARK();
     RECT rc;
 
     if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
@@ -296,7 +286,6 @@ void CandWnd_Hide(UIEXTRA *lpUIExtra) {
 
 void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
                   BOOL fForceComp) {
-    FOOTMARK();
     RECT rc;
     POINT pt;
 

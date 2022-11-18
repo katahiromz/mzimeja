@@ -53,7 +53,6 @@ static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
 //////////////////////////////////////////////////////////////////////////////
 
 void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
-    FOOTMARK();
     RECT rc;
     POINT pt;
 
@@ -93,7 +92,6 @@ void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
                             DWORD iClause, LPPOINT ppt)
 {
-    FOOTMARK();
     HWND hCompWnd;
 
     // is it vertical?
@@ -190,8 +188,6 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
 
 // calc the position of composition windows and move them
 void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
-    FOOTMARK();
-
     lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
 
     HFONT hFont = NULL;
@@ -395,8 +391,6 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 
 void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
                      DWORD ich, DWORD cch, CompStr *lpCompStr, BOOL fVert) {
-    FOOTMARK();
-
     if (cch == 0) return;
 
     // attribute
@@ -546,8 +540,6 @@ void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompSt
 }
 
 void CompWnd_Paint(HWND hCompWnd) {
-    FOOTMARK();
-
     PAINTSTRUCT ps;
     HDC hDC = ::BeginPaint(hCompWnd, &ps);
 
@@ -576,8 +568,6 @@ void CompWnd_Paint(HWND hCompWnd) {
 } // CompWnd_Paint
 
 void CompWnd_Hide(UIEXTRA *lpUIExtra) {
-    FOOTMARK();
-
     RECT rc;
     HWND hwndDef = lpUIExtra->hwndDefComp;
     if (::IsWindow(hwndDef)) {
@@ -596,7 +586,6 @@ void CompWnd_Hide(UIEXTRA *lpUIExtra) {
 } // CompWnd_Hide
 
 void CompWnd_SetFont(UIEXTRA *lpUIExtra) {
-    FOOTMARK();
     for (int i = 0; i < MAXCOMPWND; i++) {
         HWND hwnd = lpUIExtra->uiComp[i].hWnd;
         if (::IsWindow(hwnd)) {
@@ -607,7 +596,6 @@ void CompWnd_SetFont(UIEXTRA *lpUIExtra) {
 
 LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
-    FOOTMARK();
     HWND hUIWnd;
 
     switch (message) {

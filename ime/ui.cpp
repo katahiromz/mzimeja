@@ -9,7 +9,6 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
-    FOOTMARK();
     int nsw = (fFlag ? SW_SHOWNOACTIVATE : SW_HIDE);
 
     UIEXTRA *lpUIExtra = LockUIExtra(hwndServer);
@@ -118,7 +117,6 @@ void OnDestroy(HWND hWnd) {
 // IME UI server window procedure
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
-    FOOTMARK_FORMAT("(%p, %u, 0x%08lX, 0x%08lX)\n", hWnd, message, wParam, lParam);
     InputContext *lpIMC;
     UIEXTRA *lpUIExtra;
     HGLOBAL hUIExtra;
@@ -133,7 +131,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             DebugPrintA("Why hIMC is NULL?\n");
             DebugPrintA("hWnd: %x, message: %x, wParam: %x, lParam: %x\n",
                         (LONG)hWnd, message, wParam, lParam);
-            FOOTMARK_RETURN_INT(0);
+            return 0;
         }
     }
 
@@ -287,14 +285,13 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     default:
-        FOOTMARK_RETURN_LPARAM(DefWindowProc(hWnd, message, wParam, lParam));
+        return DefWindowProc(hWnd, message, wParam, lParam);
     }
 
-    FOOTMARK_RETURN_LPARAM(lRet);
+    return lRet;
 }
 
 int GetCompFontHeight(UIEXTRA *lpUIExtra) {
-    FOOTMARK();
     HDC hIC = CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL);
     HFONT hOldFont = NULL;
     if (lpUIExtra->hFont) hOldFont = (HFONT)SelectObject(hIC, lpUIExtra->hFont);
@@ -307,7 +304,6 @@ int GetCompFontHeight(UIEXTRA *lpUIExtra) {
 
 // Handle WM_IME_NOTIFY messages
 LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
-    FOOTMARK();
     LONG ret = 0;
     RECT rc;
     LOGFONT lf;
@@ -513,7 +509,6 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
 // Handle WM_IME_CONTROL messages
 LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
-    FOOTMARK();
     LONG ret = 1;
 
     InputContext *lpIMC = TheIME.LockIMC(hIMC);
@@ -557,7 +552,6 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
 // When draging the child window, this function draws the border
 void DrawUIBorder(LPRECT lprc) {
-    FOOTMARK();
     HDC hDC;
     int sbx, sby;
 
@@ -578,7 +572,6 @@ void DrawUIBorder(LPRECT lprc) {
 
 // Handling mouse messages for the child windows
 void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-    FOOTMARK();
     POINT pt;
     static POINT ptdif;
     static RECT drc;
@@ -636,7 +629,6 @@ void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
 // Any UI window should not pass the IME messages to DefWindowProc
 BOOL IsImeMessage(UINT message) {
-    FOOTMARK();
     switch (message) {
     case WM_IME_STARTCOMPOSITION:
     case WM_IME_ENDCOMPOSITION:
@@ -653,7 +645,6 @@ BOOL IsImeMessage(UINT message) {
 }
 
 BOOL IsImeMessage2(UINT message) {
-    FOOTMARK();
     switch (message) {
     case WM_IME_STARTCOMPOSITION:
     case WM_IME_ENDCOMPOSITION:
