@@ -989,7 +989,6 @@ void CompStr::GetLog(LogCompStr& log) {
 }
 
 /*static*/ HIMCC CompStr::ReCreate(HIMCC hCompStr, const LogCompStr *log) {
-    FOOTMARK();
     LogCompStr log_comp_str;
     if (log == NULL) {
         log = &log_comp_str;

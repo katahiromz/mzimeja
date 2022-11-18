@@ -279,7 +279,6 @@ CANDINFOEXTRA *CandInfo::GetExtra() {
 }
 
 /*static*/ HIMCC CandInfo::ReCreate(HIMCC hCandInfo, const LogCandInfo *log) {
-    FOOTMARK();
     LogCandInfo log_cand_info;
     if (log == NULL) {
         log = &log_cand_info;
