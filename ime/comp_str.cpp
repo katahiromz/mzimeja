@@ -1034,15 +1034,11 @@ COMPSTREXTRA *CompStr::GetExtra() {
 void LogCompStr::AssertValid() {
     if (dwCursorPos > GetCompCharCount()) {
         Dump();
-        DebugPrintA("dwCursorPos: %u\n", dwCursorPos);
-        DebugPrintA("GetCompCharCount(): %u\n", GetCompCharCount());
         ASSERT(0);
     }
     if (comp_attr.size()) {
         if (comp_attr.size() != comp_str.size()) {
             Dump();
-            DebugPrintA("comp_attr.size(): %u\n", (int)comp_attr.size());
-            DebugPrintA("comp_str.size(): %u\n", (int)comp_str.size());
             ASSERT(0);
         }
     }
@@ -1057,8 +1053,6 @@ void LogCompStr::AssertValid() {
         }
         if (extra.iClause > (DWORD)comp_clause.size()) {
             Dump();
-            DebugPrintA("extra.iClause: %u\n", extra.iClause);
-            DebugPrintA("comp_clause.size(): %u\n", (int)comp_clause.size());
             ASSERT(0);
         }
         for (size_t i = 1; i < comp_clause.size(); ++i) {

@@ -1108,7 +1108,6 @@ void Lattice::UpdateLinks() {
             }
         }
     }
-    DebugPrintA("num_links: %d\n", (int)num_links);
 } // Lattice::UpdateLinks
 
 void Lattice::UnlinkAllNodes() {

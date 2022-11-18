@@ -440,6 +440,7 @@ struct InputContext : public INPUTCONTEXT {
     // for debugging
     void DumpCandInfo();
     void DumpCompStr();
+    void Dump();
 
 private:
     // never be implemented

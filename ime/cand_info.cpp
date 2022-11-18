@@ -161,7 +161,6 @@ void LogCandInfo::Dump() {
         for (size_t k = 0; k < cand_lists[i].cand_strs.size(); ++k) {
             DebugPrintA("%ls ", cand_lists[i].cand_strs[k].c_str());
         }
-        DebugPrintA("\n");
         DebugPrintA("+ iClause: %u\n", iClause);
     }
 } // LogCandInfo::Dump
@@ -207,7 +206,6 @@ DWORD CandList::Store(const LogCandList *log) {
         pb += cb;
     }
 
-    DebugPrintA("%u, %u\n", dwSize, DWORD(pb - GetBytes()));
     ASSERT(dwSize == DWORD(pb - GetBytes()));
     return DWORD(pb - GetBytes());
 }
@@ -298,11 +296,9 @@ CANDINFOEXTRA *CandInfo::GetExtra() {
             ImmUnlockIMCC(hNewCandInfo);
             hCandInfo = hNewCandInfo;
         } else {
-            DebugPrintA("CandInfo::ReCreate: failed #2");
             ASSERT(0);
         }
     } else {
-        DebugPrintA("CandInfo::ReCreate: failed");
         ASSERT(0);
     }
     return hCandInfo;
