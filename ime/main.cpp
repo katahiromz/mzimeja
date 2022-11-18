@@ -808,21 +808,17 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
     switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
         ::DisableThreadLibraryCalls(hInstDLL);
-        DPRINT("DLL_PROCESS_ATTACH: hInst is %p\n", hInstDLL);
         TheIME.Init(hInstDLL);
         break;
 
     case DLL_PROCESS_DETACH:
-        DPRINT("DLL_PROCESS_DETACH: hInst is %p\n", TheIME.m_hInst);
         TheIME.Uninit();
         break;
 
     case DLL_THREAD_ATTACH:
-        DPRINT("DLL_THREAD_ATTACH: hInst is %p\n", TheIME.m_hInst);
         break;
 
     case DLL_THREAD_DETACH:
-        DPRINT("DLL_THREAD_DETACH: hInst is %p\n", TheIME.m_hInst);
         break;
     }
 
