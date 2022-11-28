@@ -683,8 +683,9 @@ void MzConvResult::sort() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// LatticeNode
+// LatticeNode - ラティス（lattice）のノード。
 
+// コストを計算。
 int LatticeNode::CalcCost() const {
     int ret = 0;
     if (bunrui == HB_KANGO) ret += 200;
@@ -699,6 +700,7 @@ int LatticeNode::CalcCost() const {
     return ret;
 }
 
+// 動詞か？
 bool LatticeNode::IsDoushi() const {
     switch (bunrui) {
     case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
@@ -710,6 +712,7 @@ bool LatticeNode::IsDoushi() const {
     return false;
 }
 
+// 助動詞か？
 bool LatticeNode::IsJodoushi() const {
     switch (bunrui) {
     case HB_JODOUSHI:
@@ -724,8 +727,9 @@ bool LatticeNode::IsJodoushi() const {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Lattice
+// Lattice - ラティス
 
+// 追加情報。
 void Lattice::AddExtra() {
     if (pre == L"きょう") { // today
         SYSTEMTIME st;
@@ -864,6 +868,7 @@ void Lattice::AddExtra() {
     }
 } // Lattice::AddExtra
 
+// 辞書からノードを追加する。
 BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
     const size_t length = pre.size();
     ASSERT(length);
@@ -876,7 +881,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
     for (; index < length; ++index) {
         if (refs[index] == 0) continue;
 
-        // 。。。
+        // periods (。。。)
         if (is_period(pre[index])) {
             size_t saved = index;
             do {
@@ -901,7 +906,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
             --index;
             continue;
         }
-        // ・・・
+        // center dots (・・・)
         if (pre[index] == L'・') {
             size_t saved = index;
             do {
@@ -926,7 +931,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
             --index;
             continue;
         }
-        // 、、、
+        // commas (、、、)
         if (is_comma(pre[index])) {
             size_t saved = index;
             do {
@@ -941,7 +946,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
             --index;
             continue;
         }
-        // →
+        // arrow right (→)
         if ((pre[index] == L'-' || pre[index] == L'－' || pre[index] == L'ー') &&
             (pre[index + 1] == L'>' || pre[index + 1] == L'＞'))
         {
@@ -953,7 +958,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
             ++index;
             continue;
         }
-        // ←
+        // arrow left (←)
         if ((pre[index] == L'<' || pre[index] == L'＜') &&
             (pre[index + 1] == L'-' || pre[index + 1] == L'－' ||
              pre[index + 1] == L'ー'))
@@ -967,7 +972,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
             continue;
         }
         // other non-hiragana
-        if (!is_hiragana(pre[index])) {
+        if (!is_hiragana(pre[index])) { // ひらがなではない？
             size_t saved = index;
             do {
                 ++index;
@@ -979,6 +984,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
             fields[2] = fields[0];
             DoMeishi(saved, fields);
 
+            // 全部が数字なら特殊な変換を行う。
             if (are_all_chars_numeric(fields[0])) {
                 fields[2] = convert_to_kansuuji(fields[0]);
                 DoMeishi(saved, fields);
@@ -1006,11 +1012,13 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
         // special cases
         switch (pre[index]) {
         case L'こ': case L'き': case L'く': // KURU
+            // カ変動詞。
             fields.resize(4);
             fields[1].push_back(MAKEWORD(HB_KAHEN_DOUSHI, GYOU_KA));
             DoKahenDoushi(index, fields);
             break;
         case L'さ': case L'し': case L'せ': case L'す': // SURU
+            // サ変動詞。
             fields.resize(4);
             fields[1].push_back(MAKEWORD(HB_SAHEN_DOUSHI, GYOU_SA));
             DoSahenDoushi(index, fields);
@@ -1034,11 +1042,12 @@ struct DeleteDifferentSizeNode {
     }
 };
 
+// 単一文節変換用のノード群を追加する。
 BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
     std::wstring sep;
     sep += FIELD_SEP;
 
-    // scan dictionary
+    // 辞書をスキャンする。
     WStrings fields, records;
     size_t count = ScanDict(records, dict_data, pre[0]);
     DebugPrintW(L"ScanDict(%c) count: %d\n", pre[0], count);
@@ -1060,6 +1069,7 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
     return !chunks[0].empty();
 }
 
+// 参照を更新する。
 void Lattice::UpdateRefs() {
     const size_t length = pre.size();
 
@@ -1077,13 +1087,14 @@ void Lattice::UpdateRefs() {
     }
 } // Lattice::UpdateRefs
 
+// リンクを更新する。
 void Lattice::UpdateLinks() {
     const size_t length = pre.size();
     ASSERT(length);
     ASSERT(length + 1 == chunks.size());
     ASSERT(length + 1 == refs.size());
 
-    UnlinkAllNodes();
+    UnlinkAllNodes(); // すべてのノードのリンクを解除する。
 
     // add head and link to head
     {
@@ -1182,6 +1193,7 @@ size_t Lattice::GetLastLinkedIndex() const {
     return 0; // not found
 } // Lattice::GetLastLinkedIndex
 
+// イ形容詞を変換する。
 void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
@@ -1357,6 +1369,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
     }
 } // Lattice::DoIkeiyoushi
 
+// ナ形容詞を変換する。
 void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
@@ -1459,6 +1472,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
     }
 } // Lattice::DoNakeiyoushi
 
+// 五段動詞を変換する。
 void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
@@ -1586,6 +1600,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
     }
 } // Lattice::DoGodanDoushi
 
+// 一段動詞を変換する。
 void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
@@ -1670,6 +1685,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
     } while(0);
 } // Lattice::DoIchidanDoushi
 
+// カ変動詞を変換する。
 void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
@@ -1755,6 +1771,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
     } while(0);
 } // Lattice::DoKahenDoushi
 
+// サ変動詞を変換する。
 void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
@@ -2076,6 +2093,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
     }
 } // Lattice::DoFields
 
+// ラティスをダンプする。
 void Lattice::Dump(int num) {
     const size_t length = pre.size();
     DebugPrintW(L"### Lattice::Dump(%d) ###\n", num);
@@ -2092,6 +2110,7 @@ void Lattice::Dump(int num) {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// ラティスを作成する。
 BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
     const DWORD c_retry_count = 32;
 
@@ -2148,6 +2167,7 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
     return FALSE; // failure
 } // MzIme::MakeLattice
 
+// 単一文節変換において、ラティスを作成する。
 BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
     // failure if the dictionary not loaded
     if (!m_basic_dict.IsLoaded()) {
@@ -2180,6 +2200,7 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
     return FALSE; // failure
 } // MzIme::MakeLatticeForSingle
 
+// 変換結果を生成する。
 void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
     result.clear();
 
@@ -2349,6 +2370,7 @@ void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
     result.sort();
 } // MzIme::MakeResult
 
+// 変換に失敗したときの結果を作成する。
 void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
     MzConvClause clause;
     result.clear();
@@ -2370,6 +2392,7 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
     result.clauses.push_back(clause);
 } // MzIme::MakeResultOnFailure
 
+// 単一文節変換の結果を作成する。
 void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
     result.clear();
     const size_t length = lattice.pre.size();
@@ -2409,8 +2432,8 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
     ASSERT(result.clauses[0].candidates.size());
 } // MzIme::MakeResultForSingle
 
-BOOL MzIme::ConvertMultiClause(
-        LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
+// 複数文節を変換する。
+BOOL MzIme::ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
     MzConvResult result;
     std::wstring strHiragana = comp.extra.hiragana_clauses[comp.extra.iClause];
@@ -2420,8 +2443,8 @@ BOOL MzIme::ConvertMultiClause(
     return StoreResult(result, comp, cand);
 } // MzIme::ConvertMultiClause
 
-BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana,
-                               MzConvResult& result)
+// 複数文節を変換する。
+BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& result)
 {
 #if 1
     // failure if the dictionary not loaded
@@ -2470,8 +2493,8 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana,
     return TRUE;
 } // MzIme::ConvertMultiClause
 
-BOOL MzIme::ConvertSingleClause(
-        LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
+// 単一文節を変換する。
+BOOL MzIme::ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
     DWORD iClause = comp.extra.iClause;
 
@@ -2502,8 +2525,8 @@ BOOL MzIme::ConvertSingleClause(
     return TRUE;
 } // MzIme::ConvertSingleClause
 
-BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana,
-                                MzConvResult& result)
+// 単一文節を変換する。
+BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana, MzConvResult& result)
 {
     result.clear();
 
@@ -2530,8 +2553,8 @@ BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana,
     return TRUE;
 } // MzIme::ConvertSingleClause
 
-BOOL MzIme::StretchClauseLeft(
-        LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
+// 文節を左に伸縮する。
+BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
     DWORD iClause = comp.extra.iClause;
 
@@ -2612,8 +2635,8 @@ BOOL MzIme::StretchClauseLeft(
     return TRUE;
 } // MzIme::StretchClauseLeft
 
-BOOL MzIme::StretchClauseRight(
-        LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
+// 文節を右に伸縮する。
+BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
     DWORD iClause = comp.extra.iClause;
 
@@ -2695,6 +2718,7 @@ BOOL MzIme::StretchClauseRight(
     return TRUE;
 } // MzIme::StretchClauseRight
 
+// Shift_JISのマルチバイト文字の1バイト目か？
 inline bool is_sjis_lead(BYTE ch) {
     return (
                    ((0x81 <= ch) && (ch <= 0x9F)) ||
@@ -2702,6 +2726,7 @@ inline bool is_sjis_lead(BYTE ch) {
                    );
 }
 
+// Shift_JISのマルチバイト文字の2バイト目か？
 inline bool is_sjis_trail(BYTE ch) {
     return (
                    ((0x40 <= ch) && (ch <= 0x7E)) ||
@@ -2709,16 +2734,19 @@ inline bool is_sjis_trail(BYTE ch) {
                    );
 }
 
+// JISバイトか？
 inline bool is_jis_byte(BYTE ch) {
     return ((0x21 <= ch) && (ch <= 0x7E));
 }
 
+// JISコードか？
 inline bool is_jis_code(WORD w) {
     BYTE ch0 = BYTE(w >> 8);
     BYTE ch1 = BYTE(w);
     return (is_jis_byte(ch0) && is_jis_byte(ch1));
 }
 
+// JISコードをShift_JISに変換する。
 inline WORD jis2sjis(BYTE c0, BYTE c1) {
     if (c0 & 0x01) {
         c0 >>= 1;
@@ -2745,18 +2773,21 @@ inline WORD jis2sjis(BYTE c0, BYTE c1) {
     return sjis_code;
 } // jis2sjis
 
+// JISコードをShift_JISコードに変換する。
 inline WORD jis2sjis(WORD jis_code) {
     BYTE c0 = BYTE(jis_code >> 8);
     BYTE c1 = BYTE(jis_code);
     return jis2sjis(c0, c1);
 }
 
+// Shift_JISコードか？
 inline bool is_sjis_code(WORD w) {
     return (
                    is_sjis_lead(BYTE(w >> 8)) && is_sjis_trail(BYTE(w))
                    );
 }
 
+// 区点からJISコードに変換。
 inline WORD kuten_to_jis(const std::wstring& str) {
     if (str.size() != 5) return 0;
     std::wstring ku_bangou = str.substr(0, 3);
@@ -2767,6 +2798,7 @@ inline WORD kuten_to_jis(const std::wstring& str) {
     return jis_code;
 }
 
+// コード変換。
 BOOL MzIme::ConvertCode(const std::wstring& strTyping,
                         MzConvResult& result)
 {
@@ -2840,6 +2872,7 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping,
     return TRUE;
 } // MzIme::ConvertCode
 
+// コード変換。
 BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand) {
     MzConvResult result;
     std::wstring strTyping = comp.extra.typing_clauses[comp.extra.iClause];
@@ -2849,6 +2882,7 @@ BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand) {
     return StoreResult(result, comp, cand);
 } // MzIme::ConvertCode
 
+// 結果を格納する。
 BOOL MzIme::StoreResult(
         const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand)
 {
