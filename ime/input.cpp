@@ -167,7 +167,7 @@ BOOL InputContext::IsRomanMode() const {
     return Conversion() & IME_CMODE_ROMAN;
 }
 
-// 情報のダンプ。
+// 入力コンテキスト情報のダンプ。
 void InputContext::Dump() {
     DebugPrintA("### INPUTCONTEXT ###\n");
     DebugPrintA("hWnd: %p\n", hWnd);
@@ -226,6 +226,7 @@ void InputContext::Initialize() {
     }
     fdwInit |= INIT_CONVERSION;
 
+    // 未確定文字列と候補情報の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, NULL);
     hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
 }
@@ -385,7 +386,7 @@ BOOL InputContext::SelectCand(UINT uCandIndex) {
             hCompStr = CompStr::ReCreate(hCompStr, &comp);
             hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-            // update composition
+            // 未確定文字列のメッセージを生成。
             TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL);
 
             // update candidate
@@ -398,12 +399,11 @@ BOOL InputContext::SelectCand(UINT uCandIndex) {
 
 // 文字を追加。
 void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
-    // get logical data
     LogCompStr comp;
-    CompStr *lpCompStr = LockCompStr();
+    CompStr *lpCompStr = LockCompStr(); // 未確定文字列をロック。
     if (lpCompStr) {
-        lpCompStr->GetLog(comp);
-        UnlockCompStr();
+        lpCompStr->GetLog(comp); // 未確定文字列の論理データを取得。
+        UnlockCompStr(); // 未確定文字列のロックを解除。
     }
 
     // if the current clause is converted,
@@ -421,7 +421,7 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
         }
     }
 
-    // add a character
+    // １文字を追加。
     comp.AssertValid();
     if ((Conversion() & IME_CMODE_JAPANESE) && !::IsCharAlphaW(chTyped)) {
         if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
@@ -435,10 +435,11 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
     // 未確定文字列の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    if (bHasResult) {
+    // 未確定文字列のメッセージを生成。
+    if (bHasResult) { // 結果がある？
         LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
         TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
-    } else {
+    } else { // 結果がない？
         LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
         TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
     }
@@ -448,36 +449,38 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
 BOOL InputContext::OpenCandidate() {
     BOOL ret = FALSE;
     LogCompStr comp;
-    CompStr *lpCompStr = LockCompStr();
-    if (lpCompStr) {
-        lpCompStr->GetLog(comp);
-        UnlockCompStr();
+    CompStr *lpCompStr = LockCompStr(); // 未確定文字列をロック。
+    if (!lpCompStr)
+        return ret;
 
-        LogCandInfo cand;
-        CandInfo *lpCandInfo = LockCandInfo();
-        if (lpCandInfo) {
-            lpCandInfo->GetLog(cand);
-            UnlockCandInfo();
+    lpCompStr->GetLog(comp); // 未確定文字列の論理データを取得。
+    UnlockCompStr(); // 未確定文字列のロックを解除。
 
-            // generate message to open candidate
-            TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
-            // reset candidates
-            hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
-            // generate message to change candidate
-            TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+    LogCandInfo cand;
+    CandInfo *lpCandInfo = LockCandInfo(); // 候補情報をロック。
+    if (lpCandInfo) {
+        lpCandInfo->GetLog(cand); // 候補情報の論理データを取得。
+        UnlockCandInfo(); // 候補情報のロックを解除。
 
-            ret = TRUE;
-        }
+        // 候補を開くメッセージを生成。
+        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+        // 候補情報を再作成。
+        hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
+        // 候補情報の変更メッセージを生成。
+        TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
+
+        ret = TRUE; // 成功。
     }
     return ret;
 }
 
 // 候補ウィンドウを閉じる。
 BOOL InputContext::CloseCandidate(BOOL bClearCandInfo /* = TRUE*/) {
-    if (HasCandInfo()) {
-        if (bClearCandInfo) {
-            hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
+    if (HasCandInfo()) { // 候補情報があるか？
+        if (bClearCandInfo) { // 候補をクリアするか？
+            hCandInfo = CandInfo::ReCreate(hCandInfo, NULL); // 候補情報の再作成。
         }
+        // 候補を閉じるメッセージを生成。
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
         return TRUE;
     }
@@ -486,19 +489,19 @@ BOOL InputContext::CloseCandidate(BOOL bClearCandInfo /* = TRUE*/) {
 
 // 変換。
 BOOL InputContext::Convert(BOOL bShift) {
-    // get logical data
+    // 未確定文字列と候補情報の論理データを取得。
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // if there is no conposition, we cannot convert it
+    // 未確定文字列がなければ変換できない。
     if (!comp.HasCompStr()) {
         return FALSE;
     }
 
-    // convert
-    if (cand.HasCandInfo()) {
-        if (comp.IsClauseConverted()) {
+    // 変換。
+    if (cand.HasCandInfo()) { // 候補情報があるか？
+        if (comp.IsClauseConverted()) { // 文節が変換されているか？
             LogCandList& cand_list = cand.cand_lists[comp.extra.iClause];
             if (bShift) {
                 cand_list.MovePrev();
@@ -508,29 +511,33 @@ BOOL InputContext::Convert(BOOL bShift) {
             std::wstring str = cand_list.cand_strs[cand_list.dwSelection];
             comp.SetClauseCompString(comp.extra.iClause, str);
         } else {
+            // 候補を開くメッセージを生成。
             TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+
             BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
             TheIME.ConvertSingleClause(comp, cand, bRoman);
         }
-    } else {
+    } else { // 候補情報がない。
         if (Conversion() & IME_CMODE_JAPANESE) {
             if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
                 comp.AddChar(L'n', L'n', Conversion());
             }
         }
+        // 候補を開くメッセージを生成。
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
+
         BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
         TheIME.ConvertMultiClause(comp, cand, bRoman);
     }
 
-    // recreate candidate and generate message to change candidate
+    // 候補情報を再作成。
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
+    // 候補の変更メッセージを生成。
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
-    // recreate composition
+    // 未確定文字列の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
-
-    // generate message to change composition
+    // 未確定文字列のメッセージを生成。
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 
@@ -539,10 +546,10 @@ BOOL InputContext::Convert(BOOL bShift) {
 
 // 変換結果を作成。
 void InputContext::MakeResult() {
-    // close candidate
+    // 候補を閉じる。
     CloseCandidate();
 
-    // get logical data
+    // 未確定文字列の論理データを取得。
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -550,7 +557,7 @@ void InputContext::MakeResult() {
         UnlockCompStr();
     }
 
-    // set result
+    // 結果を作成。
     comp.AssertValid();
     comp.MakeResult();
     comp.AssertValid();
@@ -558,17 +565,18 @@ void InputContext::MakeResult() {
     // 未確定文字列の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // generate messages to set composition
+    // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_RESULTALL);
+    // 未確定文字列の確定メッセージを生成。
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::MakeResult
 
 // 未確定文字列をひらがなにする。
 void InputContext::MakeHiragana() {
-    // close candidate
+    // 候補を閉じる。
     CloseCandidate();
 
-    // get logical data
+    // 未確定文字列の論理データを取得。
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -835,7 +843,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
         // 未確定文字列の再作成。
         hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-        // update composition
+        // 未確定文字列のメッセージを生成。
         LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
         TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
     }
@@ -870,7 +878,7 @@ void InputContext::MoveLeft(BOOL bShift) {
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // update composition
+    // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
     // update candidate
     if (bCandChanged) {
@@ -907,7 +915,7 @@ void InputContext::MoveRight(BOOL bShift) {
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // update composition
+    // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
     // update candidate
     if (bCandChanged) {
@@ -933,7 +941,7 @@ void InputContext::MoveUp() {
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // update composition
+    // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
     // update candidate
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
@@ -957,7 +965,7 @@ void InputContext::MoveDown() {
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // update composition
+    // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
     // update candidate
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
@@ -983,7 +991,7 @@ void InputContext::MoveHome() {
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // update composition
+    // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
     if (cand.HasCandInfo()) {
         // update candidate
@@ -1011,7 +1019,7 @@ void InputContext::MoveEnd() {
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // update composition
+    // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
     if (cand.HasCandInfo() && comp.IsClauseConverted()) {
         // update candidate
@@ -1035,7 +1043,7 @@ void InputContext::PageUp() {
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // update composition
+    // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
     // update candidate
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
