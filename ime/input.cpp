@@ -1,4 +1,5 @@
 // input.cpp --- mzimeja input context and related
+// 入力コンテキスト関連。
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -7,6 +8,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // input modes
 
+// 入力モードから変換モードが開かれているかどうかを返す。
 BOOL IsInputModeOpen(INPUT_MODE imode) {
     switch (imode) {
     case IMODE_FULL_HIRAGANA:
@@ -21,6 +23,7 @@ BOOL IsInputModeOpen(INPUT_MODE imode) {
     }
 }
 
+// IME変換モードから入力モードを返す。
 INPUT_MODE InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
     if (bOpen) {
         if (dwConversion & IME_CMODE_FULLSHAPE) {
@@ -45,6 +48,7 @@ INPUT_MODE InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
     }
 }
 
+// 入力モードからコマンドIDを返す。
 UINT CommandFromInputMode(INPUT_MODE imode) {
     switch (imode) {
     case IMODE_FULL_HIRAGANA:
@@ -62,6 +66,7 @@ UINT CommandFromInputMode(INPUT_MODE imode) {
     }
 }
 
+// 入力モードを取得する。
 INPUT_MODE GetInputMode(HIMC hIMC) {
     if (hIMC) {
         DWORD dwConversion, dwSentence;
@@ -72,6 +77,7 @@ INPUT_MODE GetInputMode(HIMC hIMC) {
     return IMODE_DISABLED;
 }
 
+// 次の入力モード。
 INPUT_MODE NextInputMode(INPUT_MODE imode) {
     switch (imode) {
     case IMODE_FULL_HIRAGANA:
@@ -90,6 +96,7 @@ INPUT_MODE NextInputMode(INPUT_MODE imode) {
     }
 }
 
+// 入力モードを設定。
 void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
     if (imode == IMODE_DISABLED) {
         return;
@@ -127,12 +134,14 @@ void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
     ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
 }
 
+// ローマ字入力モードか？
 BOOL IsRomanMode(HIMC hIMC) {
     DWORD dwConversion, dwSentence;
     ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
     return (dwConversion & IME_CMODE_ROMAN);
 }
 
+// ローマ字入力モードを設定する。
 void SetRomanMode(HIMC hIMC, BOOL bRoman) {
     DWORD dwConversion, dwSentence;
     ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
@@ -147,14 +156,17 @@ void SetRomanMode(HIMC hIMC, BOOL bRoman) {
 //////////////////////////////////////////////////////////////////////////////
 // input context
 
+// 入力コンテキストから入力モードを取得。
 INPUT_MODE InputContext::GetInputMode() const {
     return InputModeFromConversionMode(fOpen, Conversion());
 }
 
+// 入力コンテキストからローマ字入力モードを取得。
 BOOL InputContext::IsRomanMode() const {
     return Conversion() & IME_CMODE_ROMAN;
 }
 
+// 情報のダンプ。
 void InputContext::Dump() {
     DebugPrintA("### INPUTCONTEXT ###\n");
     DebugPrintA("hWnd: %p\n", hWnd);
@@ -192,6 +204,7 @@ void InputContext::Dump() {
     DebugPrintA("fdwInit: %08X\n", fdwInit);
 }
 
+// 入力コンテキストの初期化。
 void InputContext::Initialize() {
     FOOTMARK();
     Dump();
@@ -216,6 +229,7 @@ void InputContext::Initialize() {
     hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
 }
 
+// 候補情報があるか？
 BOOL InputContext::HasCandInfo() {
     BOOL fRet = FALSE;
 
@@ -229,6 +243,7 @@ BOOL InputContext::HasCandInfo() {
     return fRet;
 }
 
+// 未確定文字列があるか？
 BOOL InputContext::HasCompStr() {
     if (ImmGetIMCCSize(hCompStr) <= sizeof(COMPOSITIONSTRING)) return FALSE;
 
@@ -238,44 +253,53 @@ BOOL InputContext::HasCompStr() {
     return ret;
 }
 
+// 候補情報をロック。
 CandInfo *InputContext::LockCandInfo() {
     CandInfo *info = (CandInfo *)::ImmLockIMCC(hCandInfo);
     ASSERT(info);
     return info;
 }
 
+// 候補情報のロックを解除。
 void InputContext::UnlockCandInfo() {
     ::ImmUnlockIMCC(hCandInfo);
 }
 
+// 未確定文字列をロック。
 CompStr *InputContext::LockCompStr() {
     CompStr *comp_str = (CompStr *)::ImmLockIMCC(hCompStr);
     ASSERT(comp_str);
     return comp_str;
 }
 
+// 未確定文字列のロックを解除。
 void InputContext::UnlockCompStr() {
     ::ImmUnlockIMCC(hCompStr);
 }
 
+// メッセージバッファをロック。
 LPTRANSMSG InputContext::LockMsgBuf() {
     LPTRANSMSG lpTransMsg = (LPTRANSMSG) ::ImmLockIMCC(hMsgBuf);
     ASSERT(lpTransMsg);
     return lpTransMsg;
 }
 
+// メッセージバッファのロックを解除。
 void InputContext::UnlockMsgBuf() {
     ::ImmUnlockIMCC(hMsgBuf);
 }
 
+// メッセージバッファの要素の個数。
 DWORD& InputContext::NumMsgBuf() {
     return dwNumMsgBuf;
 }
 
+// メッセージバッファの要素の個数。
 const DWORD& InputContext::NumMsgBuf() const {
     return dwNumMsgBuf;
 }
 
+// ガイドラインを作成。
 void InputContext::MakeGuideLine(DWORD dwID) {
     DWORD dwSize =
             sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(TCHAR)) * 2 * sizeof(TCHAR);
@@ -308,16 +332,19 @@ void InputContext::MakeGuideLine(DWORD dwID) {
     UnlockGuideLine();
 }
 
+// ガイドラインをロック。
 LPGUIDELINE InputContext::LockGuideLine() {
     LPGUIDELINE guideline = (LPGUIDELINE) ::ImmLockIMCC(hGuideLine);
     ASSERT(guideline);
     return guideline;
 }
 
+// ガイドラインのロックを解除。
 void InputContext::UnlockGuideLine() {
     ::ImmUnlockIMCC(hGuideLine);
 }
 
+// 論理オブジェクトを取得する。
 void InputContext::GetLogObjects(LogCompStr& comp, LogCandInfo& cand) {
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -332,6 +359,7 @@ void InputContext::GetLogObjects(LogCompStr& comp, LogCandInfo& cand) {
     }
 } // InputContext::GetLogObjects
 
+// 候補を選択する。
 BOOL InputContext::SelectCand(UINT uCandIndex) {
     // get logical data
     LogCompStr comp;
@@ -359,6 +387,7 @@ BOOL InputContext::SelectCand(UINT uCandIndex) {
     return FALSE;
 } // InputContext::SelectCand
 
+// 文字を追加。
 void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
     // get logical data
     LogCompStr comp;
@@ -406,6 +435,7 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
     }
 } // InputContext::AddChar
 
+// 候補ウィンドウを開く。
 BOOL InputContext::OpenCandidate() {
     BOOL ret = FALSE;
     LogCompStr comp;
@@ -433,6 +463,7 @@ BOOL InputContext::OpenCandidate() {
     return ret;
 }
 
+// 候補ウィンドウを閉じる。
 BOOL InputContext::CloseCandidate(BOOL bClearCandInfo /* = TRUE*/) {
     if (HasCandInfo()) {
         if (bClearCandInfo) {
@@ -444,6 +475,7 @@ BOOL InputContext::CloseCandidate(BOOL bClearCandInfo /* = TRUE*/) {
     return FALSE;
 }
 
+// 変換。
 BOOL InputContext::Convert(BOOL bShift) {
     // get logical data
     LogCompStr comp;
@@ -496,6 +528,7 @@ BOOL InputContext::Convert(BOOL bShift) {
     return TRUE;
 } // InputContext::Convert
 
+// 変換結果を作成。
 void InputContext::MakeResult() {
     // close candidate
     CloseCandidate();
@@ -521,6 +554,7 @@ void InputContext::MakeResult() {
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::MakeResult
 
+// 未確定文字列をひらがなにする。
 void InputContext::MakeHiragana() {
     // close candidate
     CloseCandidate();
@@ -552,6 +586,7 @@ void InputContext::MakeHiragana() {
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
+// 未確定文字列をカタカナにする。
 void InputContext::MakeKatakana() {
     // close candidate
     CloseCandidate();
@@ -583,6 +618,7 @@ void InputContext::MakeKatakana() {
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
+// 未確定文字列を半角にする。
 void InputContext::MakeHankaku() {
     // close candidate
     CloseCandidate();
@@ -614,6 +650,7 @@ void InputContext::MakeHankaku() {
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
+// 未確定文字列を全角英数にする。
 void InputContext::MakeZenEisuu() {
     // close candidate
     CloseCandidate();
@@ -639,6 +676,7 @@ void InputContext::MakeZenEisuu() {
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
+// 未確定文字列を半角英数にする。
 void InputContext::MakeHanEisuu() {
     // close candidate
     CloseCandidate();
@@ -664,6 +702,7 @@ void InputContext::MakeHanEisuu() {
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
+// コード入力を変換する。
 BOOL InputContext::ConvertCode() {
     // get logical data
     LogCompStr comp;
@@ -695,6 +734,7 @@ BOOL InputContext::ConvertCode() {
     return TRUE;
 }
 
+// キーボードのEscキーを処理する。
 void InputContext::Escape() {
     // get logical data
     LogCompStr comp;
@@ -712,6 +752,7 @@ void InputContext::Escape() {
     }
 } // InputContext::Escape
 
+// 変換をキャンセルする。
 void InputContext::CancelText() {
     // close candidate
     CloseCandidate();
@@ -724,6 +765,7 @@ void InputContext::CancelText() {
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::CancelText
 
+// 再変換する。
 void InputContext::RevertText() {
     // close candidate
     CloseCandidate(FALSE);
@@ -753,6 +795,7 @@ void InputContext::RevertText() {
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 } // InputContext::RevertText
 
+// 文字を削除する。
 void InputContext::DeleteChar(BOOL bBackSpace) {
     // get logical data
     LogCompStr comp;
@@ -789,6 +832,7 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
     }
 } // InputContext::DeleteChar
 
+// 左に移動する。
 void InputContext::MoveLeft(BOOL bShift) {
     // get logical data
     LogCompStr comp;
@@ -825,6 +869,7 @@ void InputContext::MoveLeft(BOOL bShift) {
     }
 } // InputContext::MoveLeft
 
+// 右に移動する。
 void InputContext::MoveRight(BOOL bShift) {
     // get logical data
     LogCompStr comp;
@@ -861,6 +906,7 @@ void InputContext::MoveRight(BOOL bShift) {
     }
 } // InputContext::MoveRight
 
+// 上に移動する。
 void InputContext::MoveUp() {
     if (!HasCandInfo()) return;
 
@@ -884,6 +930,7 @@ void InputContext::MoveUp() {
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 }
 
+// 下に移動する。
 void InputContext::MoveDown() {
     if (!HasCandInfo()) return;
 
@@ -907,6 +954,7 @@ void InputContext::MoveDown() {
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 }
 
+// キーボードのHomeキーの処理。
 void InputContext::MoveHome() {
     // get logical data
     LogCompStr comp;
@@ -934,6 +982,7 @@ void InputContext::MoveHome() {
     }
 } // InputContext::MoveHome
 
+// キーボードのEndキーの処理。
 void InputContext::MoveEnd() {
     // get logical data
     LogCompStr comp;
@@ -961,6 +1010,7 @@ void InputContext::MoveEnd() {
     }
 } // InputContext::MoveEnd
 
+// キーボードのPageUpキーの処理。
 void InputContext::PageUp() {
     // get logical data
     LogCompStr comp;
@@ -982,6 +1032,7 @@ void InputContext::PageUp() {
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 } // InputContext::PageUp
 
+// キーボードのPageDownキーの処理。
 void InputContext::PageDown() {
     // get logical data
     LogCompStr comp;
@@ -1003,6 +1054,7 @@ void InputContext::PageDown() {
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 } // InputContext::PageDown
 
+// 未確定文字列の情報をダンプする。
 void InputContext::DumpCompStr() {
     CompStr *pCompStr = LockCompStr();
     if (pCompStr) {
@@ -1013,6 +1065,7 @@ void InputContext::DumpCompStr() {
     }
 } // InputContext::DumpCompStr
 
+// 候補情報をダンプする。
 void InputContext::DumpCandInfo() {
     CandInfo *pCandInfo = LockCandInfo();
     if (pCandInfo) {

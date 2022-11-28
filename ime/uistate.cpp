@@ -1,15 +1,18 @@
 // uistate.cpp --- mzimeja status window UI
+// IME状態ウィンドウ。
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
 #include "resource.h"
 
+// 寸法（ピクセル単位）。
 #define CX_MINICAPTION 10
 #define CX_BUTTON 24
 #define CY_BUTTON 24
 #define CX_BTNEDGE 2
 #define CY_BTNEDGE 2
 
+// 当たり判定の結果。
 enum STATUS_WND_HITTEST {
     SWHT_NONE,
     SWHT_CAPTION,
@@ -24,7 +27,8 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// create status window
+// Create status window.
+// IME状態ウィンドウを作成する。
 HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
     const DWORD style = WS_DISABLED | WS_POPUP;
     const DWORD exstyle = WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
@@ -58,7 +62,8 @@ HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
     return hwndStatus;
 } // StatusWnd_Create
 
-// draw status window
+// Draw status window.
+// IME状態ウィンドウを描画する。
 void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
     RECT rc;
     HBITMAP hbmStatus;
@@ -209,6 +214,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
     if (lpIMC) TheIME.UnlockIMC(hIMC);
 } // StatusWnd_Paint
 
+// IME状態ウィンドウの当たり判定。
 STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
     ::ScreenToClient(hWnd, &pt);
     RECT rc;
@@ -238,6 +244,7 @@ STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
     return SWHT_NONE;
 } // StatusWnd_HitTest
 
+// IME状態ウィンドウの位置を更新。
 void StatusWnd_Update(UIEXTRA *lpUIExtra) {
     HWND hwndStatus = lpUIExtra->hwndStatus;
     if (::IsWindow(hwndStatus)) {
@@ -252,6 +259,7 @@ void StatusWnd_Update(UIEXTRA *lpUIExtra) {
     }
 } // StatusWnd_Update
 
+// IME状態ウィンドウのボタンを押したときの動作。
 void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
     HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
     HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
@@ -264,6 +272,7 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
         INPUT_MODE imode;
         switch (hittest) {
         case SWHT_BUTTON_1:
+            // 変換モードを切り替える。
             if (bOpen) {
                 SetInputMode(hIMC, IMODE_HALF_ASCII);
             } else {
@@ -271,11 +280,13 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
             }
             break;
         case SWHT_BUTTON_2:
+            // 入力モードを切り替える。
             imode = InputModeFromConversionMode(bOpen, dwConversion);
             imode = NextInputMode(imode);
             SetInputMode(hIMC, imode);
             break;
         case SWHT_BUTTON_3:
+            // ローマ字入力モードを切り替える。
             if (dwConversion & IME_CMODE_ROMAN) {
                 dwConversion &= ~IME_CMODE_ROMAN;
             } else {
@@ -289,9 +300,10 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
     }
 }
 
+// IME状態ウィンドウ上でマウスが移動している。
 void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
     static POINT prev = {-1, -1};
-    if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
+    if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) { // キャプションをドラッグしている。
         if (bDown && ::GetCapture() == hWnd) {
             if (prev.x != -1 && prev.y != -1) {
                 RECT rc;
@@ -302,7 +314,7 @@ void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
                              TRUE);
             }
             prev = pt;
-        } else {
+        } else { // それ以外。
             prev.x = -1;
             prev.y = -1;
             ::ReleaseCapture();
@@ -311,89 +323,104 @@ void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
     }
 }
 
+// IME状態ウィンドウで左ボタンを押された／離された。
 void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
-    STATUS_WND_HITTEST hittest = StatusWnd_HitTest(hWnd, pt);
+    STATUS_WND_HITTEST hittest = StatusWnd_HitTest(hWnd, pt); // 当たり判定を行う。
     switch (hittest) {
-    case SWHT_CAPTION:
+    case SWHT_CAPTION: // キャプション上。
         break;
-    case SWHT_BUTTON_1:
+    case SWHT_BUTTON_1: // ボタン1。
         if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_1) {
+            // 再描画。
             HDC hDC = ::GetDC(hWnd);
             StatusWnd_Paint(hWnd, hDC, (bDown ? 1 : 0));
             ::ReleaseDC(hWnd, hDC);
         }
         break;
-    case SWHT_BUTTON_2:
+    case SWHT_BUTTON_2: // ボタン2。
         if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_2) {
+            // 再描画。
             HDC hDC = ::GetDC(hWnd);
             StatusWnd_Paint(hWnd, hDC, (bDown ? 2 : 0));
             ::ReleaseDC(hWnd, hDC);
         }
         break;
-    case SWHT_BUTTON_3:
+    case SWHT_BUTTON_3: // ボタン3。
         if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_3) {
+            // 再描画。
             HDC hDC = ::GetDC(hWnd);
             StatusWnd_Paint(hWnd, hDC, (bDown ? 3 : 0));
             ::ReleaseDC(hWnd, hDC);
         }
         break;
-    case SWHT_NONE:
+    case SWHT_NONE: // それ以外。
     {
+        // 再描画。
         HDC hDC = ::GetDC(hWnd);
         StatusWnd_Paint(hWnd, hDC, 0);
         ::ReleaseDC(hWnd, hDC);
     }
     break;
     }
-    if (bDown) {
-        ::SetCapture(hWnd);
-        ::SetWindowLong(hWnd, FIGWL_MOUSE, hittest);
-    } else {
-        ::ReleaseCapture();
-        if (hittest == SWHT_CAPTION) {
-            RepositionWindow(hWnd);
-        } else {
-            StatusWnd_OnButton(hWnd, hittest);
-            ::SetWindowLong(hWnd, FIGWL_MOUSE, SWHT_NONE);
+    if (bDown) { // 押された。
+        ::SetCapture(hWnd); // ドラッグを開始するため、キャプチャーをセットする。
+        ::SetWindowLong(hWnd, FIGWL_MOUSE, hittest); // 押された位置を覚えておく。
+    } else { // 離された。
+        ::ReleaseCapture(); // キャプチャーを解放し、ドラッグを終了する。
+        if (hittest == SWHT_CAPTION) { // キャプション上であれば
+            RepositionWindow(hWnd); // 位置を補正する。
+        } else { // さもなければ
+            StatusWnd_OnButton(hWnd, hittest); // ボタンのアクションを発動する。
+            ::SetWindowLong(hWnd, FIGWL_MOUSE, SWHT_NONE); // 押された位置をクリアする。
         }
     }
 } // StatusWnd_OnLButton
 
+// IME状態ウィンドウを右クリックされた。
 static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
-    HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
-    HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
-    if (hIMC == NULL) return FALSE;
-
-    HMENU hMenu = ::LoadMenu(TheIME.m_hInst, TEXT("STATUSRMENU"));
-    if (hMenu) {
-        HMENU hSubMenu = ::GetSubMenu(hMenu, 0);
-        TPMPARAMS params;
-        params.cbSize = sizeof(params);
-        ::GetWindowRect(hWnd, &params.rcExclude);
-        HWND hwndFore = ::GetForegroundWindow();
-        ::SetForegroundWindow(hWnd);
-
-        UINT uCheck = CommandFromInputMode(GetInputMode(hIMC));
-        ::CheckMenuRadioItem(hSubMenu, IDM_HIRAGANA, IDM_HALF_ASCII, uCheck, MF_BYCOMMAND);
-
-        if (IsRomanMode(hIMC)) {
-            ::CheckMenuRadioItem(hSubMenu, IDM_ROMAN_INPUT, IDM_KANA_INPUT,
-                                 IDM_ROMAN_INPUT, MF_BYCOMMAND);
-        } else {
-            ::CheckMenuRadioItem(hSubMenu, IDM_ROMAN_INPUT, IDM_KANA_INPUT,
-                                 IDM_KANA_INPUT, MF_BYCOMMAND);
-        }
-
-        UINT nCommand = ::TrackPopupMenuEx(hSubMenu, TPM_RETURNCMD | TPM_NONOTIFY,
-                                           pt.x, pt.y, hWnd, &params);
-        TheIME.DoCommand(hIMC, nCommand);
-        ::PostMessage(hWnd, WM_NULL, 0, 0);
-        ::DestroyMenu(hMenu);
-        ::SetForegroundWindow(hwndFore);
+    HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND); // IME UIサーバーウィンドウ。
+    HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC); // IMC。
+    if (hIMC == NULL) {
+        ASSERT(0);
+        return FALSE;
     }
+
+    HMENU hMenu = ::LoadMenu(TheIME.m_hInst, TEXT("STATUSRMENU")); // メニューをリソースから読み込む。
+    if (hMenu == NULL) {
+        ASSERT(0);
+        return FALSE;
+    }
+
+    HMENU hSubMenu = ::GetSubMenu(hMenu, 0); // インデックス0の子メニューを取得。
+
+    TPMPARAMS params = { sizeof(params); };
+    ::GetWindowRect(hWnd, &params.rcExclude);
+
+    HWND hwndFore = ::GetForegroundWindow(); // 最前面ウィンドウを覚えておく。
+    ::SetForegroundWindow(hWnd); // TrackPopupMenuExのバグを回避。
+
+    // メニューの入力モードにラジオマークを付ける。
+    UINT uCheck = CommandFromInputMode(GetInputMode(hIMC));
+    ::CheckMenuRadioItem(hSubMenu, IDM_HIRAGANA, IDM_HALF_ASCII, uCheck, MF_BYCOMMAND);
+    if (IsRomanMode(hIMC)) {
+        ::CheckMenuRadioItem(hSubMenu, IDM_ROMAN_INPUT, IDM_KANA_INPUT,
+                             IDM_ROMAN_INPUT, MF_BYCOMMAND);
+    } else {
+        ::CheckMenuRadioItem(hSubMenu, IDM_ROMAN_INPUT, IDM_KANA_INPUT,
+                             IDM_KANA_INPUT, MF_BYCOMMAND);
+    }
+
+    // メニューを表示して選択されるのを待つ。選択されたらコマンドIDを返す。
+    UINT nCommand = ::TrackPopupMenuEx(hSubMenu, TPM_RETURNCMD | TPM_NONOTIFY,
+                                       pt.x, pt.y, hWnd, &params);
+    TheIME.DoCommand(hIMC, nCommand); // コマンド発動。
+    ::PostMessage(hWnd, WM_NULL, 0, 0); // TrackPopupMenuExのバグ回避。
+    ::DestroyMenu(hMenu); // メニューを破棄する。
+    ::SetForegroundWindow(hwndFore); // 最前面ウィンドウを戻す。
     return TRUE;
 } // StatusWnd_OnRClick
 
+// IME状態ウィンドウのウィンドウプロシージャ。
 LRESULT CALLBACK
 StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     PAINTSTRUCT ps;
@@ -403,39 +430,40 @@ StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     POINT pt;
 
     switch (message) {
-    case WM_CREATE:
+    case WM_CREATE: // ウィンドウ作成時。
+        // ビットマップを読み込み、セットする。
         hbm = TheIME.LoadBMP(TEXT("MODESBMP"));
         SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbm);
         break;
 
-    case WM_PAINT:
+    case WM_PAINT: // 描画時。
         hDC = ::BeginPaint(hWnd, &ps);
         StatusWnd_Paint(hWnd, hDC, 0);
         ::EndPaint(hWnd, &ps);
         break;
 
-    case WM_DESTROY:
+    case WM_DESTROY: // ウィンドウ破棄時。
         hbm = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
         ::DeleteObject(hbm);
         break;
 
-    case WM_UI_UPDATE:
+    case WM_UI_UPDATE: // UI更新時。
         ::InvalidateRect(hWnd, NULL, FALSE);
         break;
 
-    case WM_LBUTTONUP:
+    case WM_LBUTTONUP: // 左ボタン解放時。
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
         StatusWnd_OnLButton(hWnd, pt, FALSE);
         break;
 
-    case WM_LBUTTONDOWN:
+    case WM_LBUTTONDOWN: // 左ボタンが押された時。
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
         StatusWnd_OnLButton(hWnd, pt, TRUE);
         break;
 
-    case WM_MOUSEMOVE:
+    case WM_MOUSEMOVE: // マウス移動時。特にドラッグ時。
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
         if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
@@ -443,18 +471,19 @@ StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
         }
         break;
 
-    case WM_RBUTTONUP:
+    case WM_RBUTTONUP: // 右ボタン解放時。
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
         break;
 
-    case WM_RBUTTONDOWN:
+    case WM_RBUTTONDOWN: // 右ボタンが押された時。
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
         break;
 
-    case WM_SETCURSOR:
+    case WM_SETCURSOR: // マウスカーソル設定時。
         // This message comes even from the disabled window.
+        // このメッセージは無効なウィンドウでも来る。
         ::GetCursorPos(&pt);
         switch (HIWORD(lParam)) {
         case WM_MOUSEMOVE:
@@ -477,13 +506,13 @@ StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
         ::SetCursor(::LoadCursor(NULL, IDC_ARROW));
         break;
 
-    case WM_MOVE:
+    case WM_MOVE: // ウィンドウ移動時。
         hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
         if (::IsWindow(hwndServer))
-            SendMessage(hwndServer, WM_UI_STATEMOVE, wParam, lParam);
+            SendMessage(hwndServer, WM_UI_STATEMOVE, wParam, lParam); // UIサーバーに送る。
         break;
 
-    default:
+    default: // その他のメッセージ。
         if (!IsImeMessage(message))
             return ::DefWindowProc(hWnd, message, wParam, lParam);
         break;

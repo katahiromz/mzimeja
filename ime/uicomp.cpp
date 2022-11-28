@@ -1,8 +1,10 @@
 // uicomp.cpp --- mzimeja composition window UI
+// 未確定文字列ウィンドウ。
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
 
+// 寸法。
 #define UNDERLINE_HEIGHT  2
 #define CARET_WIDTH       2
 
@@ -12,7 +14,8 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// count how may the char can be arranged in DX
+// Count how may the char can be arranged in DX.
+// ピクセル位置dxの左に何文字あるか？
 static int NumCharInDX(HDC hDC, const WCHAR *psz, int dx) {
     int ret = 0;
     if (*psz) {
@@ -24,14 +27,15 @@ static int NumCharInDX(HDC hDC, const WCHAR *psz, int dx) {
                 break;
             }
             ich++;
-            ::GetTextExtentPointW(hDC, psz, ich, &siz);
+            ::GetTextExtentPointW(hDC, psz, ich, &siz); // 文字列のピクセル幅を取得。
             width = siz.cx;
         }
     }
     return ret;
 }
 
-// count how may the char can be arranged in DY
+// Count how may the char can be arranged in DY.
+// ピクセル位置dyの上に何文字あるか？
 static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
     int ret = 0;
     if (*psz) {
@@ -43,7 +47,7 @@ static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
                 break;
             }
             ich++;
-            ::GetTextExtentPointW(hDC, psz, ich, &siz);
+            ::GetTextExtentPointW(hDC, psz, ich, &siz); // 文字列のピクセル高さを取得。
             height = siz.cy;
         }
     }
@@ -52,6 +56,7 @@ static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// 未確定文字列ウィンドウの作成時。
 void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     RECT rc;
     POINT pt;
@@ -389,24 +394,25 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     }
 } // CompWnd_Move
 
+// 未確定文字列の一行を描画する。
 void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
                      DWORD ich, DWORD cch, CompStr *lpCompStr, BOOL fVert) {
-    if (cch == 0) return;
+    if (cch == 0) return; // 文字列の長さがゼロなら終了。
 
-    // attribute
+    // Attribute. 属性。
     BYTE *lpattr = lpCompStr->GetCompAttr();
 
-    // get clause info
+    // Get clause info. 節情報を取得。
     DWORD *pdw = lpCompStr->GetCompClause();
     DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
     std::set<DWORD> clauses(pdw, pdwEnd);
 
-    // get client rect and fill white
+    // Get client rect and fill white. クライアント領域を取得し、白で塗りつぶす。
     RECT rc;
     ::GetClientRect(hCompWnd, &rc);
     ::FillRect(hDC, &rc, (HBRUSH)GetStockObject(WHITE_BRUSH));
 
-    // starting position
+    // Starting position. 開始位置。
     int x, y;
     if (fVert) {
         x = rc.right - UNDERLINE_HEIGHT;
@@ -415,10 +421,10 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
         x = y = 0;
     }
 
-    // set opaque mode
+    // Set opaque mode. 文字列描画において不透明モードにする。
     ::SetBkMode(hDC, OPAQUE);
 
-    // is it end?
+    // Is it end? 終わりか？
     SIZE siz;
     const WCHAR *lpEnd = &pch[cch];
     while (pch < lpEnd) {
@@ -499,15 +505,15 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
             x += siz.cx;
     }
 
-    // draw caret at last if any
-    if (lpCompStr->dwCursorPos == ich) {
-        ::SelectObject(hDC, ::GetStockObject(BLACK_PEN));
-        if (fVert) {
+    // Draw caret at last if any. キャレットを描画する（もしあれば）。
+    if (lpCompStr->dwCursorPos == ich) { // 現在の位置か？
+        ::SelectObject(hDC, ::GetStockObject(BLACK_PEN)); // 黒いペンで。
+        if (fVert) { // 縦書きか？
             ::MoveToEx(hDC, x, y, NULL);
             ::LineTo(hDC, x + siz.cy, y);
             ::MoveToEx(hDC, x, y + 1, NULL);
             ::LineTo(hDC, x + siz.cy, y + 1);
-        } else {
+        } else { // 横書き。
             ::MoveToEx(hDC, x, y, NULL);
             ::LineTo(hDC, x, y + siz.cy);
             ::MoveToEx(hDC, x + 1, y, NULL);
@@ -516,12 +522,13 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
     }
 }
 
+// 未確定文字列を描画する。
 void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompStr) {
     // get comp string
     std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
     const WCHAR *pch = str.c_str();
 
-    // is it vertical?
+    // Is it vertical? 縦書きか？
     BOOL fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
 
     if (lpIMC->cfCompForm.dwStyle) {
@@ -539,34 +546,39 @@ void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompSt
     }
 }
 
+// 未確定文字列ウィンドウの再描画時。
 void CompWnd_Paint(HWND hCompWnd) {
     PAINTSTRUCT ps;
-    HDC hDC = ::BeginPaint(hCompWnd, &ps);
+    HDC hDC = ::BeginPaint(hCompWnd, &ps); // 描画を開始。
 
     HFONT hOldFont = NULL;
-    HFONT hFont = (HFONT) ::GetWindowLongPtr(hCompWnd, FIGWLP_FONT);
-    if (hFont) hOldFont = (HFONT) ::SelectObject(hDC, hFont);
+    HFONT hFont = (HFONT) ::GetWindowLongPtr(hCompWnd, FIGWLP_FONT); // フォント。
+    if (hFont) hOldFont = (HFONT) ::SelectObject(hDC, hFont); // フォントを選択。
 
-    HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hCompWnd, FIGWLP_SERVERWND);
+    HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hCompWnd, FIGWLP_SERVERWND); // UIサーバー。
+    ASSERT(hSvrWnd != NULL);
 
-    HIMC hIMC = (HIMC) ::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+    HIMC hIMC = (HIMC) ::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMC。
+    ASSERT(hIMC != NULL);
     if (hIMC) {
-        InputContext *lpIMC = TheIME.LockIMC(hIMC);
+        InputContext *lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロック。
+        ASSERT(lpIMC != NULL);
         if (lpIMC) {
-            CompStr *lpCompStr = lpIMC->LockCompStr();
+            CompStr *lpCompStr = lpIMC->LockCompStr(); // 未確定文字列をロック。
             if (lpCompStr) {
-                if (lpCompStr->dwCompStrLen > 0) {
-                    CompWnd_Draw(hCompWnd, hDC, lpIMC, lpCompStr);
+                if (lpCompStr->dwCompStrLen > 0) { // 文字列があれば
+                    CompWnd_Draw(hCompWnd, hDC, lpIMC, lpCompStr); // 描画する。
                 }
-                lpIMC->UnlockCompStr();
+                lpIMC->UnlockCompStr(); // 未確定文字列のロックを解除。
             }
-            TheIME.UnlockIMC(hIMC);
+            TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
     }
-    if (hFont && hOldFont) ::SelectObject(hDC, hOldFont);
-    ::EndPaint(hCompWnd, &ps);
+    if (hFont && hOldFont) ::SelectObject(hDC, hOldFont); // フォントの選択を解除。
+    ::EndPaint(hCompWnd, &ps); // 描画を終了。
 } // CompWnd_Paint
 
+// 未確定文字列ウィンドウを隠す。
 void CompWnd_Hide(UIEXTRA *lpUIExtra) {
     RECT rc;
     HWND hwndDef = lpUIExtra->hwndDefComp;
@@ -585,6 +597,7 @@ void CompWnd_Hide(UIEXTRA *lpUIExtra) {
     }
 } // CompWnd_Hide
 
+// 未確定文字列ウィンドウのフォントを設定する。
 void CompWnd_SetFont(UIEXTRA *lpUIExtra) {
     for (int i = 0; i < MAXCOMPWND; i++) {
         HWND hwnd = lpUIExtra->uiComp[i].hWnd;
@@ -594,34 +607,35 @@ void CompWnd_SetFont(UIEXTRA *lpUIExtra) {
     }
 }
 
+// 未確定文字列ウィンドウのウィンドウプロシージャ。
 LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
     HWND hUIWnd;
 
     switch (message) {
-    case WM_PAINT:
+    case WM_PAINT: // 描画時。
         CompWnd_Paint(hWnd);
         break;
 
-    case WM_SETCURSOR:
-    case WM_MOUSEMOVE:
-    case WM_LBUTTONUP:
-    case WM_RBUTTONUP:
+    case WM_SETCURSOR: // マウスカーソル設定時。
+    case WM_MOUSEMOVE: // マウス移動時。
+    case WM_LBUTTONUP: // 左ボタン解放時。
+    case WM_RBUTTONUP: // 右ボタン解放時。
         DragUI(hWnd, message, wParam, lParam);
         if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
             (HIWORD(lParam) != WM_RBUTTONDOWN))
             return DefWindowProc(hWnd, message, wParam, lParam);
         if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP))
-            SetWindowLong(hWnd, FIGWL_MOUSE, 0);
+            SetWindowLong(hWnd, FIGWL_MOUSE, 0); // 状態を元に戻す。
         break;
 
-    case WM_MOVE:
+    case WM_MOVE: // ウィンドウ移動じ。
         hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
         if (IsWindow(hUIWnd))
-            SendMessage(hUIWnd, WM_UI_DEFCOMPMOVE, wParam, lParam);
+            SendMessage(hUIWnd, WM_UI_DEFCOMPMOVE, wParam, lParam); // サーバーに知らせる。
         break;
 
-    default:
+    default: // その他のメッセージ。
         if (!IsImeMessage(message))
             return DefWindowProc(hWnd, message, wParam, lParam);
         break;

@@ -1,4 +1,5 @@
 // ui.cpp --- mzimeja UI server
+// UIサーバーウィンドウ。
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -8,6 +9,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// 指定されているUIウィンドウを表示する／非表示にする。
 void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
     int nsw = (fFlag ? SW_SHOWNOACTIVATE : SW_HIDE);
 
@@ -115,6 +117,7 @@ void OnDestroy(HWND hWnd) {
 }
 
 // IME UI server window procedure
+// IME UIサーバーウィンドウのウィンドウプロシージャ。
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
     InputContext *lpIMC;
@@ -136,7 +139,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     }
 
     switch (message) {
-    case WM_CREATE:
+    case WM_CREATE: // ウィンドウ作成時。
         DPRINT("WM_CREATE\n");
         // Allocate UI's extra memory block.
         hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
@@ -150,7 +153,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         SetUIExtraToServerWnd(hWnd, hUIExtra);
         break;
 
-    case WM_IME_SETCONTEXT:
+    case WM_IME_SETCONTEXT: // IMEコンテキスト設定時。
         DPRINT("WM_IME_SETCONTEXT\n");
         if (wParam) {
             OnImeSetContext(hWnd, hIMC, lParam);
@@ -159,86 +162,88 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         //    ShowUIWindows(hWnd, FALSE);
         break;
 
-    case WM_IME_STARTCOMPOSITION:
+    case WM_IME_STARTCOMPOSITION: // IME変換開始時。
         DPRINT("WM_IME_STARTCOMPOSITION\n");
         // Start composition! Ready to display the composition string.
-        lpUIExtra = LockUIExtra(hWnd);
+        lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
         if (lpUIExtra) {
             lpIMC = TheIME.LockIMC(hIMC);
-            CompWnd_Create(hWnd, lpUIExtra, lpIMC);
+            CompWnd_Create(hWnd, lpUIExtra, lpIMC); // 未確定文字列ウィンドウを作成。
             TheIME.UnlockIMC(hIMC);
-            UnlockUIExtra(hWnd);
+            UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
         }
         break;
 
-    case WM_IME_COMPOSITION:
+    case WM_IME_COMPOSITION: // IME変換時。
         DPRINT("WM_IME_COMPOSITION\n");
         // Update to display the composition string.
-        lpIMC = TheIME.LockIMC(hIMC);
+        lpIMC = TheIME.LockIMC(hIMC)
         if (lpIMC) {
-            lpUIExtra = LockUIExtra(hWnd);
+            lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
             if (lpUIExtra) {
-                CompWnd_Move(lpUIExtra, lpIMC);
-                CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
-                UnlockUIExtra(hWnd);
+                CompWnd_Move(lpUIExtra, lpIMC); // 未確定文字列を移動。
+                CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE); // 候補ウィンドウを移動。
+                UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
             }
             TheIME.UnlockIMC(hIMC);
         }
         break;
 
-    case WM_IME_ENDCOMPOSITION:
+    case WM_IME_ENDCOMPOSITION: // IME変換終了時。
         DPRINT("WM_IME_ENDCOMPOSITION\n");
         // Finish to display the composition string.
-        lpUIExtra = LockUIExtra(hWnd);
+        lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
         if (lpUIExtra) {
-            CompWnd_Hide(lpUIExtra);
-            UnlockUIExtra(hWnd);
+            CompWnd_Hide(lpUIExtra); // 未確定文字列を隠す。
+            UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
         }
         break;
 
-    case WM_IME_COMPOSITIONFULL:
+    case WM_IME_COMPOSITIONFULL: // 変換文字列がいっぱい。
         DPRINT("WM_IME_COMPOSITIONFULL\n");
         break;
 
-    case WM_IME_SELECT:
+    case WM_IME_SELECT: // IME選択時。
         DPRINT("WM_IME_SELECT\n");
         if (wParam) {
-            lpUIExtra = LockUIExtra(hWnd);
+            lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
             if (lpUIExtra) {
-                lpUIExtra->hIMC = hIMC;
-                UnlockUIExtra(hWnd);
+                lpUIExtra->hIMC = hIMC; // hIMCをセット。
+                UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
             }
         }
         break;
 
-    case WM_IME_CONTROL:
+    case WM_IME_CONTROL: // IME制御時。
         DPRINT("WM_IME_CONTROL\n");
         lRet = ControlCommand(hIMC, hWnd, wParam, lParam);
         break;
 
-    case WM_IME_NOTIFY:
+    case WM_IME_NOTIFY: // IME通知時。
         DPRINT("WM_IME_NOTIFY\n");
         lRet = NotifyCommand(hIMC, hWnd, wParam, lParam);
         break;
 
-    case WM_DESTROY:
+    case WM_DESTROY: // ウィンドウ破棄時。
         DPRINT("WM_DESTROY\n");
         OnDestroy(hWnd);
         break;
 
-    case WM_UI_STATEMOVE:
+    case WM_UI_STATEMOVE: // IME状態ウィンドウが移動。
         DPRINT("WM_UI_STATEMOVE\n");
         // Set the position of the status window to UIExtra.
         // This message is sent by the status window.
-        lpUIExtra = LockUIExtra(hWnd);
+        lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
         if (lpUIExtra) {
+            // 位置を取得し、
             RECT rc;
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
+            // 覚えておく。
             POINT pt;
             pt.x = (short)LOWORD(lParam);
             pt.y = (short)HIWORD(lParam);
             TheIME.SetUserData(L"ptStatusWindow", &pt, sizeof(pt));
-            UnlockUIExtra(hWnd);
+            UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
         }
         break;
 
@@ -270,12 +275,13 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         }
         break;
 
-    case WM_UI_GUIDEMOVE:
+    case WM_UI_GUIDEMOVE: // ガイドラインウィンドウが移動した。
         DPRINT("WM_UI_GUIDEMOVE\n");
         // Set the position of the status window to UIExtra.
         // This message is sent by the status window.
         lpUIExtra = LockUIExtra(hWnd);
         if (lpUIExtra) {
+            // 位置を覚えておく。
             POINT pt;
             pt.x = (short)LOWORD(lParam);
             pt.y = (short)HIWORD(lParam);
@@ -284,7 +290,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         }
         break;
 
-    default:
+    default: // その他のメッセージ。
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
 
@@ -627,7 +633,8 @@ void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     }
 }
 
-// Any UI window should not pass the IME messages to DefWindowProc
+// IMEメッセージか（その１）？
+// Any UI window should not pass the IME messages to DefWindowProc.
 BOOL IsImeMessage(UINT message) {
     switch (message) {
     case WM_IME_STARTCOMPOSITION:
@@ -644,6 +651,7 @@ BOOL IsImeMessage(UINT message) {
     return FALSE;
 }
 
+// IMEメッセージか（その２）？
 BOOL IsImeMessage2(UINT message) {
     switch (message) {
     case WM_IME_STARTCOMPOSITION:

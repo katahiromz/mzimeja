@@ -1,8 +1,10 @@
 // uicand.cpp --- mzimeja candidate window UI
+// 候補ウィンドウ。
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
 
+// 寸法。
 #define CX_HEADER 32
 #define CX_BORDER ::GetSystemMetrics(SM_CXBORDER)
 #define CY_BORDER ::GetSystemMetrics(SM_CYBORDER)
@@ -11,15 +13,18 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// 候補ウィンドウの当たり判定。
 DWORD CandWnd_HitTest(HWND hWnd, POINT pt, InputContext *lpIMC) {
     DWORD ret = 0;
     int height = 0;
     HDC hDC = ::CreateCompatibleDC(NULL);
+    ASSERT(hDC != NULL);
     HFONT hOldFont = CheckNativeCharset(hDC);
-    CandInfo *lpCandInfo = lpIMC->LockCandInfo();
+    CandInfo *lpCandInfo = lpIMC->LockCandInfo(); // 候補情報をロックする。
+    ASSERT(lpCandInfo != NULL);
     if (lpCandInfo) {
-        if (lpCandInfo->dwCount > 0) {
-            CANDINFOEXTRA *pExtra = lpCandInfo->GetExtra();
+        if (lpCandInfo->dwCount > 0) { // 候補があれば
+            CANDINFOEXTRA *pExtra = lpCandInfo->GetExtra(); // 余剰情報を取得。
             DWORD iList = 0;
             if (pExtra) iList = pExtra->iClause;
             CandList *lpCandList = lpCandInfo->GetList(iList);
@@ -284,12 +289,13 @@ void CandWnd_Hide(UIEXTRA *lpUIExtra) {
     }
 } // CandWnd_Hide
 
+// 候補ウィンドウの移動時。
 void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
                   BOOL fForceComp) {
     RECT rc;
     POINT pt;
 
-    // not initialized yet?
+    // Not initialized yet? 初期化されてないか？
     if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
         lpIMC->DumpCandInfo();
         if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
@@ -308,7 +314,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
         return;
     }
 
-    // has candidates?
+    // Has any candidates? 候補があるか？
     if (!lpIMC->HasCandInfo()) {
         FOOTMARK_POINT();
         lpIMC->DumpCandInfo();

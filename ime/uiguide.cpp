@@ -7,6 +7,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// ガイドラインウィンドウのウィンドウプロシージャ。
 LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                      LPARAM lParam) {
     PAINTSTRUCT ps;
@@ -16,52 +17,53 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     RECT rc;
 
     switch (message) {
-    case WM_UI_HIDE:
+    case WM_UI_HIDE: // UIを隠したい時。
         ShowWindow(hWnd, SW_HIDE);
         break;
 
-    case WM_UI_UPDATE:
+    case WM_UI_UPDATE: // UIを更新する時。
         InvalidateRect(hWnd, NULL, FALSE);
         break;
 
-    case WM_PAINT:
+    case WM_PAINT: // 描画時。
         hDC = BeginPaint(hWnd, &ps);
         GuideWnd_Paint(hWnd, hDC, NULL, 0);
         EndPaint(hWnd, &ps);
         break;
 
-    case WM_MOUSEMOVE:
-    case WM_SETCURSOR:
-    case WM_LBUTTONUP:
-    case WM_RBUTTONUP:
-        GuideWnd_Button(hWnd, message, wParam, lParam);
+    case WM_MOUSEMOVE: // マウス移動時。
+    case WM_SETCURSOR: // カーソル設定時。
+    case WM_LBUTTONUP: // 左ボタン解放時。
+    case WM_RBUTTONUP: // 右ボタン解放時。
+        GuideWnd_Button(hWnd, message, wParam, lParam); // マウスアクション。
         if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
             (HIWORD(lParam) != WM_RBUTTONDOWN))
             return DefWindowProc(hWnd, message, wParam, lParam);
         if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
+            // 状態を戻す。
             SetWindowLong(hWnd, FIGWL_MOUSE, 0);
             SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0);
         }
         break;
 
-    case WM_MOVE:
+    case WM_MOVE: // ウィンドウ移動時。
         hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
         if (IsWindow(hUIWnd))
-            SendMessage(hUIWnd, WM_UI_GUIDEMOVE, wParam, lParam);
+            SendMessage(hUIWnd, WM_UI_GUIDEMOVE, wParam, lParam); // UIサーバーに送る。
         break;
 
-    case WM_CREATE:
-        hbmpGuide = TheIME.LoadBMP(TEXT("CLOSEBMP"));
+    case WM_CREATE: // ウィンドウ作成時。
+        hbmpGuide = TheIME.LoadBMP(TEXT("CLOSEBMP")); // ビットマップを読み込み、保存する。
         SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbmpGuide);
         GetClientRect(hWnd, &rc);
         break;
 
-    case WM_DESTROY:
+    case WM_DESTROY: // ウィンドウ破棄時。
         hbmpGuide = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP);
-        DeleteObject(hbmpGuide);
+        DeleteObject(hbmpGuide); // ビットマップを破棄する。
         break;
 
-    default:
+    default: // それ以外のメッセージ。
         if (!IsImeMessage(message))
             return DefWindowProc(hWnd, message, wParam, lParam);
         break;
@@ -178,6 +180,7 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
     }
 }
 
+// ガイドラインウィンドウのマウスアクション。
 void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
                      LPARAM lParam) {
     POINT pt;
@@ -251,7 +254,7 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
         }
         hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND);
 
-        hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
+        hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMC。
         if (hIMC) {
             GetCursorPos(&pt);
             dwPushedGuide = GetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS);
@@ -267,7 +270,9 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
     ReleaseDC(hGuideWnd, hDC);
 }
 
+// ガイドラインの更新。
 void GuideWnd_Update(UIEXTRA *lpUIExtra) {
+    // ガイドラインウィンドウに更新メッセージを送る。
     if (::IsWindow(lpUIExtra->hwndGuide)) {
         ::SendMessage(lpUIExtra->hwndGuide, WM_UI_UPDATE, 0, 0);
     }

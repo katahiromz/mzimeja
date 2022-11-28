@@ -8,6 +8,8 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// ImeInquire - IMEの問合せ時に呼び出される関数。
+// IMEのプロパティやUIサーバー名を格納する。
 BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
                        DWORD dwSystemInfoFlags) {
     FOOTMARK_FORMAT("((0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX), 0x%08lX)\n",
@@ -52,12 +54,14 @@ DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
     FOOTMARK_RETURN_LONG(0);
 }
 
+// IME破棄。
 BOOL WINAPI ImeDestroy(UINT uForce) {
     FOOTMARK_FORMAT("(0x%08X)\n", uForce);
 
     FOOTMARK_RETURN_INT(TRUE);
 }
 
+// IME拡張機能。
 LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
     LRESULT ret = FALSE;
     FOOTMARK_FORMAT("(%p, %u, %p)\n", hIMC, uSubFunc, lpData);
@@ -102,6 +106,7 @@ BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
     FOOTMARK_RETURN_INT(TRUE);
 }
 
+// IMEに通知。
 BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     InputContext *lpIMC;
     BOOL ret = FALSE;
@@ -278,6 +283,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     FOOTMARK_RETURN_INT(ret);
 }
 
+// IME選択。
 BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
     FOOTMARK_FORMAT("(%p, %u)\n", hIMC, fSelect);
 
@@ -294,6 +300,7 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
     FOOTMARK_RETURN_INT(TRUE);
 }
 
+// 未確定文字列をセット。
 BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
                                     DWORD dwComp, LPVOID lpRead, DWORD dwRead) {
     FOOTMARK_FORMAT("(%p, 0x%08lX, %p, 0x%08lX, %p, 0x%08lX)\n",
@@ -316,6 +323,7 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
     FOOTMARK_RETURN_INT(FALSE);
 }
 
+// メニュー情報。
 struct MYMENUITEM {
     INT nCommandID;
     INT nStringID;
@@ -339,6 +347,7 @@ static const MYMENUITEM top_menu_items[] = {
     {IDM_ABOUT, IDM_ABOUT, FALSE},
 };
 
+// IMEメニュー項目を取得。
 DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
                                 LPIMEMENUITEMINFO lpImeParentMenu,
                                 LPIMEMENUITEMINFO lpImeMenu, DWORD dwSize) {

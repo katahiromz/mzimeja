@@ -9,13 +9,15 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-// the window classes for mzimeja UI windows
+// The window classes for mzimeja UI windows.
+// mzimejaで使われるウィンドウクラスの名前。
 const WCHAR szUIServerClassName[] = L"MZIMEUI";
 const WCHAR szCompStrClassName[]  = L"MZIMECompStr";
 const WCHAR szCandClassName[]     = L"MZIMECand";
 const WCHAR szStatusClassName[]   = L"MZIMEStatus";
 const WCHAR szGuideClassName[]    = L"MZIMEGuide";
 
+// ガイドラインのテーブル。
 const MZGUIDELINE glTable[] = {
     {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},
     {GL_LEVEL_WARNING, GL_ID_TYPINGERROR, IDS_GL_TYPINGERROR, 0},
@@ -23,7 +25,8 @@ const MZGUIDELINE glTable[] = {
      IDS_GL_TESTGUIDELINEPRIVATE}
 };
 
-// filename of the IME
+// The filename of the IME.
+// IMEのファイル名。
 const WCHAR szImeFileName[] = L"mzimeja.ime";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -700,6 +703,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 // UI extra related
+// 余剰情報。
 
 HGLOBAL GetUIExtraFromServerWnd(HWND hwndServer) {
     return (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE);
@@ -728,7 +732,8 @@ void FreeUIExtra(HWND hwndServer) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// for debugging
+// For debugging.
+// デバッグ用。
 
 #ifdef MZIMEJA_DEBUG_OUTPUT
 void DebugPrintA(const char *lpszFormat, ...) {
@@ -803,21 +808,22 @@ void DebugAssert(const char *file, int line, const char *exp) {
 //////////////////////////////////////////////////////////////////////////////
 // DLL entry point
 
+// IMEはDLLファイルの一種であるから、IMEが読み込まれたら、エントリーポイントの
+// DllMainが呼び出されるはず。
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
     FOOTMARK_FORMAT("(%p, 0x%08lX, %p)\n", hInstDLL, dwFunction, lpNot);
+
     switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
         ::DisableThreadLibraryCalls(hInstDLL);
-        TheIME.Init(hInstDLL);
+        TheIME.Init(hInstDLL); // 初期化。
         break;
 
     case DLL_PROCESS_DETACH:
-        TheIME.Uninit();
+        TheIME.Uninit(); // 逆初期化。
         break;
 
     case DLL_THREAD_ATTACH:
-        break;
-
     case DLL_THREAD_DETACH:
         break;
     }
