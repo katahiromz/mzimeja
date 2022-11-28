@@ -524,7 +524,7 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
 
 // 未確定文字列を描画する。
 void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompStr) {
-    // get comp string
+    // 未確定文字列を取得。
     std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
     const WCHAR *pch = str.c_str();
 
@@ -580,29 +580,25 @@ void CompWnd_Paint(HWND hCompWnd) {
 
 // 未確定文字列ウィンドウを隠す。
 void CompWnd_Hide(UIEXTRA *lpUIExtra) {
-    RECT rc;
-    HWND hwndDef = lpUIExtra->hwndDefComp;
+    HWND hwndDef = lpUIExtra->hwndDefComp; // 既定のウィンドウ。
     if (::IsWindow(hwndDef)) {
-        if (!lpUIExtra->dwCompStyle) {
-            ::GetWindowRect(hwndDef, &rc);
-        }
-        ::ShowWindow(hwndDef, SW_HIDE);
+        ::ShowWindow(hwndDef, SW_HIDE); // 隠す。
     }
 
-    for (int i = 0; i < MAXCOMPWND; i++) {
+    for (int i = 0; i < MAXCOMPWND; i++) { // 他の複数のウィンドウ。
         HWND hwnd = lpUIExtra->uiComp[i].hWnd;
         if (::IsWindow(hwnd)) {
-            ::ShowWindow(hwnd, SW_HIDE);
+            ::ShowWindow(hwnd, SW_HIDE); // 隠す。
         }
     }
 } // CompWnd_Hide
 
 // 未確定文字列ウィンドウのフォントを設定する。
 void CompWnd_SetFont(UIEXTRA *lpUIExtra) {
-    for (int i = 0; i < MAXCOMPWND; i++) {
-        HWND hwnd = lpUIExtra->uiComp[i].hWnd;
+    for (int i = 0; i < MAXCOMPWND; i++) { // 既定以外のウィンドウ。
+        HWND hwnd = lpUIExtra->uiComp[i].hWnd; // ウィンドウハンドル。
         if (::IsWindow(hwnd)) {
-            ::SetWindowLongPtr(hwnd, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont);
+            ::SetWindowLongPtr(hwnd, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont); // フォント指定。
         }
     }
 }

@@ -90,94 +90,102 @@ DWORD PASCAL CheckPushedGuide(HWND hGuideWnd, LPPOINT lppt) {
     return 0;
 }
 
+// ガイドラインの描画時。
 void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
                     DWORD dwPushedGuide) {
-    HIMC hIMC;
-    HDC hMemDC;
     HBITMAP hbmpOld;
-    HWND hSvrWnd;
     HANDLE hGLStr;
     WCHAR *lpGLStr;
     DWORD dwLevel;
     DWORD dwSize;
 
-    hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND);
+    HWND hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND); // UIサーバー。
 
-    hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
-    if (hIMC) {
-        HBITMAP hbmpGuide;
-        HBRUSH hOldBrush, hBrush;
-        int nCyCap = GetSystemMetrics(SM_CYSMCAPTION);
-        RECT rc;
-
-        hMemDC = CreateCompatibleDC(hDC);
-
-        // Paint Caption.
-        hBrush = CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION));
-        hOldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-        GetClientRect(hGuideWnd, &rc);
-        // rc.top = rc.left = 0;
-        // rc.right = BTX*3;
-        rc.bottom = nCyCap;
-        FillRect(hDC, &rc, hBrush);
-        SelectObject(hDC, hOldBrush);
-        DeleteObject(hBrush);
-
-        // Paint CloseButton.
-        hbmpGuide = (HBITMAP)GetWindowLongPtr(hGuideWnd, FIGWLP_CLOSEBMP);
-        hbmpOld = (HBITMAP)SelectObject(hMemDC, hbmpGuide);
-
-        if (!(dwPushedGuide & PUSHED_STATUS_CLOSE))
-            BitBlt(hDC, rc.right - STCLBT_DX - 2, STCLBT_Y, STCLBT_DX, STCLBT_DY,
-                   hMemDC, 0, 0, SRCCOPY);
-        else
-            BitBlt(hDC, rc.right - STCLBT_DX - 2, STCLBT_Y, STCLBT_DX, STCLBT_DY,
-                   hMemDC, STCLBT_DX, 0, SRCCOPY);
-
-        dwLevel = ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0);
-        if (dwLevel) {
-            dwSize = ImmGetGuideLine(hIMC, GGL_STRING, NULL, 0) + 1;
-            if ((dwSize > 1) && (hGLStr = GlobalAlloc(GHND, dwSize))) {
-                lpGLStr = (LPTSTR)GlobalLock(hGLStr);
-                if (lpGLStr) {
-                    COLORREF rgb = 0;
-                    HBRUSH hbrLGR = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
-                    HBRUSH hbr;
-
-                    hbr = (HBRUSH)SelectObject(hDC, hbrLGR);
-                    GetClientRect(hGuideWnd, &rc);
-                    PatBlt(hDC, 0, nCyCap, rc.right, rc.bottom - nCyCap, PATCOPY);
-                    SelectObject(hDC, hbr);
-
-                    switch (dwLevel) {
-                    case GL_LEVEL_FATAL:
-                    case GL_LEVEL_ERROR:
-                        rgb = RGB(255, 0, 0);
-                        break;
-                    case GL_LEVEL_WARNING:
-                        rgb = RGB(0, 0, 255);
-                        break;
-                    case GL_LEVEL_INFORMATION:
-                    default:
-                        rgb = RGB(0, 0, 0);
-                        break;
-                    }
-
-                    dwSize = ImmGetGuideLine(hIMC, GGL_STRING, lpGLStr, dwSize);
-                    if (dwSize) {
-                        SetTextColor(hDC, rgb);
-                        SetBkMode(hDC, TRANSPARENT);
-                        TextOut(hDC, 0, nCyCap, lpGLStr, dwSize);
-                    }
-                    GlobalUnlock(hGLStr);
-                }
-                GlobalFree(hGLStr);
-            }
-        }
-
-        SelectObject(hMemDC, hbmpOld);
-        DeleteDC(hMemDC);
+    HIMC hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMC。
+    if (hIMC == NULL) {
+        ASSERT(0);
+        return;
     }
+
+    HBITMAP hbmpGuide;
+    HBRUSH hOldBrush, hBrush;
+    int nCyCap = GetSystemMetrics(SM_CYSMCAPTION); // 小さいキャプションのタテ寸法。
+
+    HDC hMemDC = CreateCompatibleDC(hDC); // メモリーDCを作成。
+
+    // キャプションを描画する。
+    hBrush = CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION)); // ブラシを作成。
+    hOldBrush = (HBRUSH)SelectObject(hDC, hBrush); // ブラシ選択。
+    RECT rc;
+    GetClientRect(hGuideWnd, &rc); // クライアント領域を取得。
+    // rc.top = rc.left = 0;
+    // rc.right = BTX*3;
+    rc.bottom = nCyCap; // キャプションの領域にする。
+    FillRect(hDC, &rc, hBrush); // 塗りつぶす。
+    SelectObject(hDC, hOldBrush); // ブラシ選択を解除。
+    DeleteObject(hBrush); // ブラシを破棄。
+
+    // 閉じるボタンのビットマップを取得。
+    hbmpGuide = (HBITMAP)GetWindowLongPtr(hGuideWnd, FIGWLP_CLOSEBMP);
+    hbmpOld = (HBITMAP)SelectObject(hMemDC, hbmpGuide); // ビットマップを選択。
+
+    // 状態に応じてビットマップで描画。
+    if (!(dwPushedGuide & PUSHED_STATUS_CLOSE))
+        BitBlt(hDC, rc.right - STCLBT_DX - 2, STCLBT_Y, STCLBT_DX, STCLBT_DY,
+               hMemDC, 0, 0, SRCCOPY);
+    else
+        BitBlt(hDC, rc.right - STCLBT_DX - 2, STCLBT_Y, STCLBT_DX, STCLBT_DY,
+               hMemDC, STCLBT_DX, 0, SRCCOPY);
+
+    // ガイドラインのレベルを取得。
+    dwLevel = ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0);
+    if (dwLevel) {
+        // ガイドラインの文字列のサイズを取得。
+        dwSize = ImmGetGuideLine(hIMC, GGL_STRING, NULL, 0) + 1;
+        // 文字列に対するメモリー割り当て。
+        if ((dwSize > 1) && (hGLStr = GlobalAlloc(GHND, dwSize))) {
+            lpGLStr = (LPTSTR)GlobalLock(hGLStr); // メモリーをロック。
+            if (lpGLStr) {
+                COLORREF rgb = 0;
+                HBRUSH hbrLGR = (HBRUSH)GetStockObject(LTGRAY_BRUSH); // ブラシを取得。
+                HBRUSH hbr;
+
+                hbr = (HBRUSH)SelectObject(hDC, hbrLGR); // ブラシ選択。
+                GetClientRect(hGuideWnd, &rc); // クライアント領域を取得。
+                // ブラシで塗りつぶし。
+                PatBlt(hDC, 0, nCyCap, rc.right, rc.bottom - nCyCap, PATCOPY);
+                SelectObject(hDC, hbr); // ブラシ選択を解除。
+
+                // レベルに応じて色を変える。
+                switch (dwLevel) {
+                case GL_LEVEL_FATAL:
+                case GL_LEVEL_ERROR:
+                    rgb = RGB(255, 0, 0);
+                    break;
+                case GL_LEVEL_WARNING:
+                    rgb = RGB(0, 0, 255);
+                    break;
+                case GL_LEVEL_INFORMATION:
+                default:
+                    rgb = RGB(0, 0, 0);
+                    break;
+                }
+
+                // 確保したメモリーを使ってガイドライン文字列を取得。
+                dwSize = ImmGetGuideLine(hIMC, GGL_STRING, lpGLStr, dwSize);
+                if (dwSize) {
+                    SetTextColor(hDC, rgb); // テキスト色を指定。
+                    SetBkMode(hDC, TRANSPARENT); // 背景透明。
+                    TextOut(hDC, 0, nCyCap, lpGLStr, dwSize); // 文字列描画。
+                }
+                GlobalUnlock(hGLStr); // 文字列メモリーのロックを解除。
+            }
+            GlobalFree(hGLStr); // 解放。
+        }
+    }
+
+    SelectObject(hMemDC, hbmpOld); // ビットマップ選択を解除。
+    DeleteDC(hMemDC); // メモリーDCを破棄。
 }
 
 // ガイドラインウィンドウのマウスアクション。
@@ -195,31 +203,32 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
     static RECT rc;
     static DWORD dwCurrentPushedGuide;
 
-    hDC = GetDC(hGuideWnd);
+    hDC = GetDC(hGuideWnd); // DCを取得。
     switch (message) {
-    case WM_SETCURSOR:
+    case WM_SETCURSOR: // カーソル形状の設定時。
         if (HIWORD(lParam) == WM_LBUTTONDOWN ||
-            HIWORD(lParam) == WM_RBUTTONDOWN) {
-            GetCursorPos(&pt);
-            SetCapture(hGuideWnd);
-            GetWindowRect(hGuideWnd, &drc);
+            HIWORD(lParam) == WM_RBUTTONDOWN) { // 左ボタンか右ボタンが押された時。
+            GetCursorPos(&pt); // カーソル位置を取得。
+            SetCapture(hGuideWnd); // キャプチャーをセットしてドラッグを開始。
+            GetWindowRect(hGuideWnd, &drc); // ウィンドウの位置とサイズを取得。
+            // ウィンドウ位置とクリック位置の差を取得。
             ptdif.x = pt.x - drc.left;
             ptdif.y = pt.y - drc.top;
             rc = drc;
             rc.right -= rc.left;
             rc.bottom -= rc.top;
-            SetWindowLong(hGuideWnd, FIGWL_MOUSE, FIM_CAPUTURED);
-            SetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS,
-                          dwPushedGuide = CheckPushedGuide(hGuideWnd, &pt));
-            GuideWnd_Paint(hGuideWnd, hDC, &pt, dwPushedGuide);
-            dwCurrentPushedGuide = dwPushedGuide;
+            SetWindowLong(hGuideWnd, FIGWL_MOUSE, FIM_CAPUTURED); // キャプチャ状態を保存。
+            dwPushedGuide = CheckPushedGuide(hGuideWnd, &pt);
+            SetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS, dwPushedGuide); // 押された状態を保存。
+            GuideWnd_Paint(hGuideWnd, hDC, &pt, dwPushedGuide); // 再描画。
+            dwCurrentPushedGuide = dwPushedGuide; // 押された状態を覚える。
         }
         break;
 
     case WM_MOUSEMOVE:
-        dwMouse = GetWindowLong(hGuideWnd, FIGWL_MOUSE);
-        if (!(dwPushedGuide = GetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS))) {
-            if (dwMouse & FIM_MOVED) {
+        dwMouse = GetWindowLong(hGuideWnd, FIGWL_MOUSE); // 状態を取得。
+        if (!(dwPushedGuide = GetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS))) { // 押された状態がなければ
+            if (dwMouse & FIM_MOVED) { // 移動した？
                 DrawUIBorder(&drc);
                 GetCursorPos(&pt);
                 drc.left = pt.x - ptdif.x;
@@ -232,7 +241,7 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
                 SetWindowLong(hGuideWnd, FIGWL_MOUSE, dwMouse | FIM_MOVED);
             }
         } else {
-            GetCursorPos(&pt);
+            GetCursorPos(&pt); // マウスカーソル位置を取得。
             dwTemp = CheckPushedGuide(hGuideWnd, &pt);
             if ((dwTemp ^ dwCurrentPushedGuide) & dwPushedGuide)
                 GuideWnd_Paint(hGuideWnd, hDC, &pt, dwPushedGuide & dwTemp);
@@ -240,34 +249,37 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
         }
         break;
 
-    case WM_LBUTTONUP:
-    case WM_RBUTTONUP:
-        dwMouse = GetWindowLong(hGuideWnd, FIGWL_MOUSE);
-        if (dwMouse & FIM_CAPUTURED) {
-            ReleaseCapture();
-            if (dwMouse & FIM_MOVED) {
-                DrawUIBorder(&drc);
-                GetCursorPos(&pt);
+    case WM_LBUTTONUP: // 左ボタン解放時。
+    case WM_RBUTTONUP: // 右ボタン解放時。
+        dwMouse = GetWindowLong(hGuideWnd, FIGWL_MOUSE); // マウス状態を取得。
+        if (dwMouse & FIM_CAPUTURED) { // キャプチャしている？
+            ReleaseCapture(); // キャプチャを解放。
+            if (dwMouse & FIM_MOVED) { // 移動した？
+                DrawUIBorder(&drc); // ボーダーを再描画。
+                GetCursorPos(&pt); // マウスカーソル位置を取得。
+                // マウス位置に移動。
                 MoveWindow(hGuideWnd, pt.x - ptdif.x, pt.y - ptdif.y, rc.right,
                            rc.bottom, TRUE);
             }
         }
+
+        // UIサーバーを取得。
         hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND);
 
         hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMC。
         if (hIMC) {
-            GetCursorPos(&pt);
-            dwPushedGuide = GetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS);
+            GetCursorPos(&pt); // マウス位置を取得。
+            dwPushedGuide = GetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS); // 押された状態を取得。
             dwPushedGuide &= CheckPushedGuide(hGuideWnd, &pt);
             if (!dwPushedGuide) {
             } else if (dwPushedGuide == PUSHED_STATUS_CLOSE) {
                 PostMessage(hGuideWnd, WM_UI_HIDE, 0, 0);
             }
         }
-        GuideWnd_Paint(hGuideWnd, hDC, NULL, 0);
+        GuideWnd_Paint(hGuideWnd, hDC, NULL, 0); // 再描画。
         break;
     }
-    ReleaseDC(hGuideWnd, hDC);
+    ReleaseDC(hGuideWnd, hDC); // DCを解放。
 }
 
 // ガイドラインの更新。
