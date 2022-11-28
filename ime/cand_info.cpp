@@ -9,7 +9,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // LogCandList - 候補リストの論理データ。
 
-// 情報のクリア。
+// 候補情報のクリア。
 void LogCandList::clear() {
     dwStyle = IME_CAND_READ;
     dwSelection = 0;
@@ -18,7 +18,7 @@ void LogCandList::clear() {
     cand_strs.clear();
 }
 
-// 物理データの合計サイズを計算。
+// 候補リストの物理データの合計サイズを計算。
 DWORD LogCandList::GetTotalSize() const {
     DWORD total = sizeof(CANDIDATELIST);
     total += DWORD(cand_strs.size() * sizeof(DWORD));
@@ -249,18 +249,18 @@ CandList *CandInfo::GetList(DWORD i) {
 
 // 候補情報の物理データから論理データへ。
 void CandInfo::GetLog(LogCandInfo& log) {
-    log.clear();
+    log.clear(); // 論理データをクリア。
 
-    LogCandList cand;
+    LogCandList cand; // 候補リストの論理データ。
     for (DWORD iList = 0; iList < dwCount; ++iList) {
         CandList *pList = GetList(iList);
-        pList->GetLog(cand);
-        log.cand_lists.push_back(cand);
+        pList->GetLog(cand); // 候補リストの論理データを取得。
+        log.cand_lists.push_back(cand); // 論理データに候補リストを追加。
     }
 
-    CANDINFOEXTRA *extra = GetExtra();
+    CANDINFOEXTRA *extra = GetExtra(); // 余剰情報を取得。
     if (extra && extra->dwSignature == 0xDEADFACE) {
-        log.iClause = extra->iClause;
+        log.iClause = extra->iClause; // 現在の文節のインデックス。
     } else {
         log.iClause = 0;
     }
