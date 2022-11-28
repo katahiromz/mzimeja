@@ -1,6 +1,9 @@
 // mzimeja.cpp --- MZ-IME Japanese Input (mzimeja)
+// メイン。
 //////////////////////////////////////////////////////////////////////////////
 // (Japanese, Shift_JIS)
+// NOTE: This file uses Japanese cp932 encoding. To compile this on g++,
+//       please add options: -finput-charset=CP932 -fexec-charset=CP932
 
 #include "mzimeja.h"
 #include <shlobj.h>
@@ -17,6 +20,7 @@ const WCHAR szCandClassName[]     = L"MZIMECand";
 const WCHAR szStatusClassName[]   = L"MZIMEStatus";
 const WCHAR szGuideClassName[]    = L"MZIMEGuide";
 
+// The table of guideline.
 // ガイドラインのテーブル。
 const MZGUIDELINE glTable[] = {
     {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},
@@ -25,12 +29,12 @@ const MZGUIDELINE glTable[] = {
      IDS_GL_TESTGUIDELINEPRIVATE}
 };
 
-// The filename of the IME.
-// IMEのファイル名。
+// The filename of the IME. IMEのファイル名。
 const WCHAR szImeFileName[] = L"mzimeja.ime";
 
 //////////////////////////////////////////////////////////////////////////////
 
+// IME用のフォントを作成し、選択。
 HFONT CheckNativeCharset(HDC hDC) {
     HFONT hOldFont = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
 
@@ -48,7 +52,8 @@ HFONT CheckNativeCharset(HDC hDC) {
     return hOldFont;
 } // CheckNativeCharset
 
-// adjust window position
+// Adjust window position.
+// ウィンドウ位置を画面内に補正。
 void RepositionWindow(HWND hWnd) {
     RECT rc, rcWorkArea;
     ::GetWindowRect(hWnd, &rc);
@@ -79,6 +84,7 @@ void RepositionWindow(HWND hWnd) {
 
 MzIme TheIME;
 
+// mzimejaのコンストラクタ。
 MzIme::MzIme() {
     m_hInst = NULL;
     m_hMyKL = NULL;
@@ -93,6 +99,7 @@ MzIme::MzIme() {
     m_lpIMC = NULL;
 }
 
+// mzimejaの辞書を読み込む。
 BOOL MzIme::LoadDict() {
     BOOL ret = TRUE;
     DWORD dw;
@@ -126,11 +133,13 @@ BOOL MzIme::LoadDict() {
     return ret;
 }
 
+// mzimejaの辞書をアンロードする。
 void MzIme::UnloadDict() {
     m_basic_dict.Unload();
     m_name_dict.Unload();
 }
 
+// mzimejaを初期化。
 BOOL MzIme::Init(HINSTANCE hInstance) {
     m_hInst = hInstance;
     //::InitCommonControls();
@@ -144,14 +153,16 @@ BOOL MzIme::Init(HINSTANCE hInstance) {
     return RegisterClasses(m_hInst);
 } // MzIme::Init
 
+// mzimejaを逆初期化。
 VOID MzIme::Uninit(VOID) {
     UnregisterClasses();
     UnloadDict();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// registry
+// registry - レジストリ関連。
 
+// レジストリキーを開く。
 LONG MzIme::OpenRegKey(
         HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const
 {
@@ -164,6 +175,7 @@ LONG MzIme::OpenRegKey(
     return result;
 } // MzIme::OpenRegKey
 
+// レジストリキーを作成。
 LONG MzIme::CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey) {
     LONG result;
     DWORD dwDisposition;
@@ -183,6 +195,7 @@ LONG MzIme::CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey) {
 static const WCHAR s_szRegKey[] =
         L"SOFTWARE\\Katayama Hirofumi MZ\\mzimeja";
 
+// マシン側のレジストリを開く。
 LONG MzIme::OpenComputerSettingKey(BOOL bWrite, HKEY *phKey) {
     LONG result;
     if (bWrite) {
@@ -193,6 +206,7 @@ LONG MzIme::OpenComputerSettingKey(BOOL bWrite, HKEY *phKey) {
     return result;
 }
 
+// ユーザー側のレジストリを開く。
 LONG MzIme::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
     LONG result;
     if (bWrite) {
@@ -218,6 +232,7 @@ LONG MzIme::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
     return result;
 }
 
+// コンピュータ側のレジストリ文字列を取得する。
 BOOL MzIme::GetComputerString(LPCWSTR pszSettingName, std::wstring& value) {
     HKEY hKey;
     WCHAR szValue[MAX_PATH * 2];
@@ -235,6 +250,7 @@ BOOL MzIme::GetComputerString(LPCWSTR pszSettingName, std::wstring& value) {
     return FALSE;
 } // MzIme::GetComputerString
 
+// コンピュータ側のレジストリ文字列を設定する。
 BOOL MzIme::SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     HKEY hKey;
     LONG result = OpenComputerSettingKey(TRUE, &hKey);
@@ -250,6 +266,7 @@ BOOL MzIme::SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     return FALSE;
 } // MzIme::SetComputerString
 
+// コンピュータ側のレジストリデータを取得する。
 BOOL
 MzIme::GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     HKEY hKey;
@@ -266,6 +283,7 @@ MzIme::GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     return FALSE;
 } // MzIme::GetComputerData
 
+// コンピュータ側のレジストリデータを設定する。
 BOOL
 MzIme::SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     HKEY hKey;
@@ -281,6 +299,7 @@ MzIme::SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     return FALSE;
 } // MzIme::SetComputerData
 
+// コンピュータ側のレジストリDWORDデータを取得する。
 BOOL MzIme::GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr) {
     HKEY hKey;
     LONG result = OpenComputerSettingKey(FALSE, &hKey);
@@ -296,6 +315,7 @@ BOOL MzIme::GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr) {
     return FALSE;
 } // MzIme::GetComputerData
 
+// コンピュータ側のレジストリDWORDデータを設定する。
 BOOL MzIme::SetComputerDword(LPCWSTR pszSettingName, DWORD data) {
     HKEY hKey;
     DWORD dwData = data;
@@ -312,6 +332,7 @@ BOOL MzIme::SetComputerDword(LPCWSTR pszSettingName, DWORD data) {
     return FALSE;
 } // MzIme::SetComputerData
 
+// ユーザー側のレジストリ文字列データを取得する。
 BOOL MzIme::GetUserString(LPCWSTR pszSettingName, std::wstring& value) {
     HKEY hKey;
     WCHAR szValue[MAX_PATH * 2];
@@ -329,6 +350,7 @@ BOOL MzIme::GetUserString(LPCWSTR pszSettingName, std::wstring& value) {
     return FALSE;
 } // MzIme::GetUserString
 
+// ユーザー側のレジストリ文字列データを設定する。
 BOOL MzIme::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     HKEY hKey;
     LONG result = OpenUserSettingKey(TRUE, &hKey);
@@ -346,6 +368,7 @@ BOOL MzIme::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     return FALSE;
 } // MzIme::SetUserString
 
+// ユーザー側のレジストリデータを取得する。
 BOOL MzIme::GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     HKEY hKey;
     LONG result = OpenUserSettingKey(FALSE, &hKey);
@@ -361,6 +384,7 @@ BOOL MzIme::GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     return FALSE;
 } // MzIme::GetUserData
 
+// ユーザー側のレジストリデータを設定する。
 BOOL MzIme::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     HKEY hKey;
     LONG result = OpenUserSettingKey(TRUE, &hKey);
@@ -377,6 +401,7 @@ BOOL MzIme::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     return FALSE;
 } // MzIme::SetUserData
 
+// ユーザー側のレジストリDWORDデータを取得する。
 BOOL MzIme::GetUserDword(LPCWSTR pszSettingName, DWORD *ptr) {
     HKEY hKey;
     LONG result = OpenUserSettingKey(FALSE, &hKey);
@@ -392,6 +417,7 @@ BOOL MzIme::GetUserDword(LPCWSTR pszSettingName, DWORD *ptr) {
     return FALSE;
 } // MzIme::GetUserData
 
+// ユーザー側のレジストリDWORDデータを設定する。
 BOOL MzIme::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
     HKEY hKey;
     DWORD dwData = data;

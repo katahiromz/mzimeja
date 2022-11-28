@@ -2,6 +2,8 @@
 // ‚©‚ÈŠ¿š•ÏŠ·B
 //////////////////////////////////////////////////////////////////////////////
 // (Japanese, Shift_JIS)
+// NOTE: This file uses Japanese cp932 encoding. To compile this on g++,
+//       please add options: -finput-charset=CP932 -fexec-charset=CP932
 
 #include "mzimeja.h"
 

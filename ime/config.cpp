@@ -1,4 +1,5 @@
 // config.cpp --- mzimeja configuration
+// mzimejaの設定。
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -11,6 +12,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// ページをプロパティシートに追加。
 void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
     if (ppsh->nPages < MAX_PAGES) {
         PROPSHEETPAGE psp;
