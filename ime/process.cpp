@@ -13,7 +13,8 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// A function which handles WM_IME_KEYDOWN
+// A function which handles WM_IME_KEYDOWN.
+// WM_IME_KEYDOWNを処理する関数。
 BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
                        INPUT_MODE imode) {
     FOOTMARK_FORMAT("(%p, 0x%08lX, %p, %u)\n", hIMC, wParam, lpbKeyState, (INT)imode);
@@ -37,7 +38,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     BOOL bCapsLock = lpbKeyState[VK_CAPITAL] & 0x80;
     BOOL bRoman = IsRomanMode(hIMC);
 
-    // Is Ctrl down?
+    // Is Ctrl down? Ctrlキーが押されているか？
     if (bCtrl) {
         if (bOpen) {
             if (vk == VK_SPACE) {
@@ -53,13 +54,13 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
         return FALSE;
     }
 
-    // get translated char
+    // Get translated char. 可能なら文字をひらがなにする。
     WCHAR chTranslated = 0;
     if (!bRoman) {
         chTranslated = vkey_to_hiragana(vk, bShift);
     }
 
-    // get typed character
+    // Get typed character. 可能ならキー入力を文字にする。
     WCHAR chTyped;
     if (vk == VK_PACKET) {
         chTyped = chTranslated = HIWORD(wParam);
@@ -67,15 +68,18 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
         chTyped = typing_key_to_char(vk, bShift, bCapsLock);
     }
 
-    if (chTranslated || chTyped) {
-        lpIMC = TheIME.LockIMC(hIMC);
+    if (chTranslated || chTyped) { // 入力キーを変換できたら
+        lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロック。
+        ASSERT(lpIMC != NULL);
         if (lpIMC) {
+            // 候補情報があり、候補の選択であれば、候補を選択。
+            // さもなければ文字を追加。
             if (lpIMC->HasCandInfo() && L'1' <= chTyped && chTyped <= L'9') {
                 lpIMC->SelectCand(chTyped - L'1');
             } else {
                 lpIMC->AddChar(chTyped, chTranslated);
             }
-            TheIME.UnlockIMC(hIMC);
+            TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
         return TRUE;
     }

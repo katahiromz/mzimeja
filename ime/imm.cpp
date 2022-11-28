@@ -9,7 +9,7 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // ImeInquire - IMEの問合せ時に呼び出される関数。
-// IMEのプロパティやUIサーバー名を格納する。
+// IMEのプロパティやUIサーバーのウィンドウクラス名を格納する。
 BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
                        DWORD dwSystemInfoFlags) {
     FOOTMARK_FORMAT("((0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX), 0x%08lX)\n",
@@ -45,6 +45,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
     FOOTMARK_RETURN_INT(TRUE);
 }
 
+// 変換リスト。
 DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
                                LPCANDIDATELIST lpCandList, DWORD dwBufLen,
                                UINT uFlags) {
@@ -98,6 +99,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
     FOOTMARK_RETURN_LPARAM(ret);
 }
 
+// IMEのアクティブコンテキストを設定。
 BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
     FOOTMARK_FORMAT("(%p, %u)\n", hIMC, fFlag);
 
@@ -300,7 +302,7 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
     FOOTMARK_RETURN_INT(TRUE);
 }
 
-// 未確定文字列をセット。
+// 未確定文字列を設定。
 BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
                                     DWORD dwComp, LPVOID lpRead, DWORD dwRead) {
     FOOTMARK_FORMAT("(%p, 0x%08lX, %p, 0x%08lX, %p, 0x%08lX)\n",

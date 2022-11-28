@@ -412,11 +412,13 @@ BOOL MzIme::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// mzimejaのウィンドウクラスを登録する。
 BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
 #define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
     WNDCLASSEX wcx;
 
-    // register class of UI server window.
+    // Register the UI server window.
+    // UIサーバーウィンドウを登録。
     wcx.cbSize = sizeof(WNDCLASSEX);
     wcx.style = CS_MZIME;
     wcx.lpfnWndProc = MZIMEWndProc;
@@ -434,7 +436,8 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
         return FALSE;
     }
 
-    // register class of composition window.
+    // Register the composition window.
+    // 未確定文字列ウィンドウを登録。
     wcx.cbSize = sizeof(WNDCLASSEX);
     wcx.style = CS_MZIME;
     wcx.lpfnWndProc = CompWnd_WindowProc;
@@ -452,7 +455,8 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
         return FALSE;
     }
 
-    // register class of candidate window.
+    // Register the candidate window.
+    // 候補ウィンドウを登録。
     wcx.cbSize = sizeof(WNDCLASSEX);
     wcx.style = CS_MZIME;
     wcx.lpfnWndProc = CandWnd_WindowProc;
@@ -470,7 +474,8 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
         return FALSE;
     }
 
-    // register class of status window.
+    // Register the status window.
+    // 状態ウィンドウを登録。
     wcx.cbSize = sizeof(WNDCLASSEX);
     wcx.style = CS_MZIME;
     wcx.lpfnWndProc = StatusWnd_WindowProc;
@@ -488,7 +493,8 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
         return FALSE;
     }
 
-    // register class of guideline window.
+    // Register the guideline window.
+    // ガイドラインウィンドウを登録。
     wcx.cbSize = sizeof(WNDCLASSEX);
     wcx.style = CS_MZIME;
     wcx.lpfnWndProc = GuideWnd_WindowProc;
@@ -510,6 +516,7 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
 #undef CS_MZIME
 } // MzIme::RegisterClasses
 
+// キーボードレイアウトリストから自分のHKLを取得する。
 HKL MzIme::GetHKL(VOID) {
     HKL hKL = NULL;
 
@@ -530,7 +537,7 @@ HKL MzIme::GetHKL(VOID) {
         HKL hKLTemp = pHKLs[dwi];
         ::ImmGetIMEFileName(hKLTemp, szFile, _countof(szFile));
 
-        if (::lstrcmp(szFile, szImeFileName) == 0) {
+        if (::lstrcmp(szFile, szImeFileName) == 0) { // IMEファイル名が一致した？
             hKL = hKLTemp;
             break;
         }
@@ -541,7 +548,8 @@ HKL MzIme::GetHKL(VOID) {
     return hKL;
 }
 
-// Update the transrate key buffer
+// Update the translate key buffer.
+// メッセージを生成する。
 BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
     BOOL ret = FALSE;
     FOOTMARK_FORMAT("(%u,%d,%d)\n",
@@ -565,6 +573,7 @@ BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
     FOOTMARK_RETURN_INT(ret);
 }
 
+// メッセージを生成する。
 BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
     FOOTMARK_FORMAT("(%u, 0x%08lX, 0x%08lX)\n", message, wParam, lParam);
     TRANSMSG genmsg;
@@ -574,7 +583,7 @@ BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
     FOOTMARK_RETURN_INT(GenerateMessage(&genmsg));
 }
 
-// Update the transrate key buffer
+// Update the translate key buffer.
 BOOL MzIme::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
     // increment the number
     ++m_uNumTransKey;
@@ -592,6 +601,7 @@ BOOL MzIme::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
     return TRUE;
 }
 
+// mzimejaのコマンドを実行する。
 BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
     switch (dwCommand) {
     case IDM_RECONVERT:
@@ -637,6 +647,7 @@ BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
     return TRUE;
 } // MzIme::DoCommand
 
+// インジケーターのアイコンを更新。
 void MzIme::UpdateIndicIcon(HIMC hIMC) {
     if (m_hMyKL == NULL) {
         m_hMyKL = GetHKL();
@@ -661,6 +672,7 @@ void MzIme::UpdateIndicIcon(HIMC hIMC) {
     }
 }
 
+// ウィンドウクラスの登録を解除。
 void MzIme::UnregisterClasses() {
     ::UnregisterClass(szUIServerClassName, m_hInst);
     ::UnregisterClass(szCompStrClassName, m_hInst);
@@ -668,10 +680,12 @@ void MzIme::UnregisterClasses() {
     ::UnregisterClass(szStatusClassName, m_hInst);
 }
 
+// ビットマップをリソースから読み込む。
 HBITMAP MzIme::LoadBMP(LPCTSTR pszName) {
     return ::LoadBitmap(m_hInst, pszName);
 }
 
+// 文字列をリソースから読み込む。
 WCHAR *MzIme::LoadSTR(INT nID) {
     static WCHAR sz[512];
     sz[0] = 0;
@@ -679,6 +693,7 @@ WCHAR *MzIme::LoadSTR(INT nID) {
     return sz;
 }
 
+// 入力コンテキストをロックする。
 InputContext *MzIme::LockIMC(HIMC hIMC) {
     InputContext *context = (InputContext *)::ImmLockIMC(hIMC);
     if (context) {
@@ -689,6 +704,7 @@ InputContext *MzIme::LockIMC(HIMC hIMC) {
     return context;
 }
 
+// 入力コンテキストのロックを解除。
 VOID MzIme::UnlockIMC(HIMC hIMC) {
     ::ImmUnlockIMC(hIMC);
     if (::ImmGetIMCLockCount(hIMC) == 0) {
