@@ -922,6 +922,7 @@ void LogCompStr::SetClauseCompHiragana(
 
 //////////////////////////////////////////////////////////////////////////////
 
+// 未確定文字列の論理データから物理データを格納する。
 DWORD CompStr::Store(const LogCompStr *log) {
     const DWORD total = log->GetTotalSize();
 
@@ -1002,6 +1003,7 @@ DWORD CompStr::Store(const LogCompStr *log) {
     return DWORD(pb - GetBytes());
 } // CompStr::Store
 
+// 未確定文字列の論理データを取得する。
 void CompStr::GetLog(LogCompStr& log) {
     log.dwCursorPos = dwCursorPos;
     log.dwDeltaStart = dwDeltaStart;
@@ -1022,6 +1024,7 @@ void CompStr::GetLog(LogCompStr& log) {
     }
 }
 
+// 論理データから未確定文字列を再作成する。
 /*static*/ HIMCC CompStr::ReCreate(HIMCC hCompStr, const LogCompStr *log) {
     LogCompStr log_comp_str;
     if (log == NULL) {
@@ -1048,7 +1051,7 @@ void CompStr::GetLog(LogCompStr& log) {
     return hCompStr;
 } // CompStr::ReCreate
 
-// extension
+// 未確定文字列の余剰情報を取得する。
 COMPSTREXTRA *CompStr::GetExtra() {
     if (dwPrivateSize > sizeof(COMPSTREXTRA)) {
         BYTE *pb = GetBytes();

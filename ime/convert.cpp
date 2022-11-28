@@ -9,7 +9,8 @@
 
 const DWORD c_dwMilliseconds = 8000;
 
-// hiragana table
+// The hiragana table.
+// ひらがな表。
 static const wchar_t s_hiragana_table[][5] = {
     {L'あ', L'い', L'う', L'え', L'お'}, // GYOU_A
     {L'か', L'き', L'く', L'け', L'こ'}, // GYOU_KA
@@ -29,7 +30,8 @@ static const wchar_t s_hiragana_table[][5] = {
     {L'ん', 0, 0, 0, 0},             // GYOU_NN
 };
 
-// convert the classification (bunrui) to string (for debugging)
+// Convert the classification (bunrui) to string (for debugging).
+// 品詞分類を文字列に変換する（デバッグ用）。
 static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
     int index = int(bunrui) - int(HB_HEAD);
     static const wchar_t *s_array[] = {
@@ -68,7 +70,7 @@ static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
     return s_array[index];
 } // BunruiToString
 
-// 品詞の連結コスト
+// 品詞の連結コスト。
 static int
 CandConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2)
 {
@@ -133,7 +135,7 @@ CandConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2)
     return 0;
 } // CandConnectCost
 
-// 品詞の連結可能性
+// 品詞の連結可能性。
 static BOOL
 IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
     if (node2.bunrui == HB_PERIOD || node2.bunrui == HB_COMMA) return TRUE;
@@ -446,9 +448,11 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
     return TRUE;
 } // IsNodeConnectable
 
+// 辞書データをスキャンする。
 static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
     ASSERT(dict_data);
 
+    // レコード区切りとWCHAR文字の組み合わせを検索する。
     WCHAR sz[3] = {RECORD_SEP, ch, 0};
     const WCHAR *pch1 = wcsstr(dict_data, sz);
     if (pch1 == NULL) {
@@ -492,17 +496,20 @@ void MzIme::MakeLiteralMaps() {
 } // MzIme::MakeLiteralMaps
 
 //////////////////////////////////////////////////////////////////////////////
-// Dict (dictionary)
+// Dict (dictionary) - 辞書データ。
 
+// 辞書データのコンストラクタ。
 Dict::Dict() {
     m_hMutex = NULL;
     m_hFileMapping = NULL;
 }
 
+// 辞書データのデストラクタ。
 Dict::~Dict() {
     Unload();
 }
 
+// 辞書データファイルのサイズを取得する。
 DWORD Dict::GetSize() const {
     DWORD ret = 0;
     WIN32_FIND_DATAW find;
@@ -515,10 +522,10 @@ DWORD Dict::GetSize() const {
     return ret;
 }
 
+// 辞書を読み込む。
 BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
-    if (IsLoaded()) {
-        return TRUE;
-    }
+    if (IsLoaded())
+        return TRUE; // すでに読み込み済み。
 
     m_strFileName = file_name;
     m_strObjectName = object_name;
@@ -535,7 +542,7 @@ BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
         return FALSE;
     }
 
-    // get file size
+    // ファイルサイズを取得。
     DWORD cbSize = GetSize();
     if (cbSize == 0) return FALSE;
 
@@ -573,6 +580,7 @@ BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
     return ret;
 } // Dict::Load
 
+// 辞書をアンロードする。
 void Dict::Unload() {
     if (m_hMutex) {
         if (m_hFileMapping) {
@@ -590,6 +598,7 @@ void Dict::Unload() {
     }
 }
 
+// 辞書をロックして情報の取得を開始。
 wchar_t *Dict::Lock() {
     if (m_hFileMapping == NULL) return NULL;
     DWORD cbSize = GetSize();
@@ -598,10 +607,12 @@ wchar_t *Dict::Lock() {
     return reinterpret_cast<wchar_t *>(pv);
 }
 
+// 辞書のロックを解除して、情報の取得を終了。
 void Dict::Unlock(wchar_t *data) {
     ::UnmapViewOfFile(data);
 }
 
+// 辞書は読み込まれたか？
 BOOL Dict::IsLoaded() const {
     return (m_hMutex != NULL && m_hFileMapping != NULL);
 }
