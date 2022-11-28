@@ -1919,7 +1919,7 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
     return szBuf;
 }
 
-// ‘SŠpASCII‚©‚ç”¼Šp‚Ö‚Ì•¶š—ñ•ÏŠ·B
+// ‘SŠp‰p”‚©‚ç”¼Šp‚Ö‚Ì•¶š—ñ•ÏŠ·B
 std::wstring fullwidth_ascii_to_halfwidth(const std::wstring& str) {
     std::wstring ret;
     const size_t count = str.size();

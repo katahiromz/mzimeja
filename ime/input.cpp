@@ -584,7 +584,7 @@ void InputContext::MakeHiragana() {
         UnlockCompStr();
     }
 
-    // update composition
+    // 未確定文字列の更新。
     comp.AssertValid();
     if (Conversion() & IME_CMODE_JAPANESE) {
         if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
@@ -592,23 +592,23 @@ void InputContext::MakeHiragana() {
         }
     }
     comp.AssertValid();
-    comp.MakeHiragana();
+    comp.MakeHiragana(); // ひらがなにする。
     comp.AssertValid();
 
     // 未確定文字列の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // generate messages to update composition
+    // 未確定文字列のメッセージを生成。
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
 // 未確定文字列をカタカナにする。
 void InputContext::MakeKatakana() {
-    // close candidate
+    // 候補を閉じる。
     CloseCandidate();
 
-    // get logical data
+    // 未確定文字列の論理データを取得。
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -616,7 +616,7 @@ void InputContext::MakeKatakana() {
         UnlockCompStr();
     }
 
-    // update composition
+    // 未確定文字列の更新。
     comp.AssertValid();
     if (Conversion() & IME_CMODE_JAPANESE) {
         if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
@@ -624,23 +624,23 @@ void InputContext::MakeKatakana() {
         }
     }
     comp.AssertValid();
-    comp.MakeKatakana();
+    comp.MakeKatakana(); // カタカナにする。
     comp.AssertValid();
 
     // 未確定文字列の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // generate messages to update composition
+    // 未確定文字列のメッセージを生成。
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
 // 未確定文字列を半角にする。
 void InputContext::MakeHankaku() {
-    // close candidate
+    // 候補を閉じる。
     CloseCandidate();
 
-    // get logical data
+    // 未確定文字列の論理データを取得。
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -648,7 +648,7 @@ void InputContext::MakeHankaku() {
         UnlockCompStr();
     }
 
-    // update composition
+    // 未確定文字列の更新。
     comp.AssertValid();
     if (Conversion() & IME_CMODE_JAPANESE) {
         if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
@@ -656,23 +656,23 @@ void InputContext::MakeHankaku() {
         }
     }
     comp.AssertValid();
-    comp.MakeHankaku();
+    comp.MakeHankaku(); // 半角にする。
     comp.AssertValid();
 
     // 未確定文字列の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // generate messages to update composition
+    // 未確定文字列のメッセージを生成。
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
 // 未確定文字列を全角英数にする。
 void InputContext::MakeZenEisuu() {
-    // close candidate
+    // 候補を閉じる。
     CloseCandidate();
 
-    // get logical data
+    // 未確定文字列の論理データを取得。
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -680,25 +680,25 @@ void InputContext::MakeZenEisuu() {
         UnlockCompStr();
     }
 
-    // update composition
+    // 未確定文字列を更新。
     comp.AssertValid();
-    comp.MakeZenEisuu();
+    comp.MakeZenEisuu(); // 全角英数にする。
     comp.AssertValid();
 
     // 未確定文字列の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // generate messages to update composition
+    // 未確定文字列のメッセージを生成。
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
 // 未確定文字列を半角英数にする。
 void InputContext::MakeHanEisuu() {
-    // close candidate
+    // 候補を閉じる。
     CloseCandidate();
 
-    // get logical data
+    // 未確定文字列の論理データを取得。
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -706,35 +706,36 @@ void InputContext::MakeHanEisuu() {
         UnlockCompStr();
     }
 
-    // update composition
+    // 未確定文字列を更新。
     comp.AssertValid();
-    comp.MakeHanEisuu();
+    comp.MakeHanEisuu(); // 半角英数にする。
     comp.AssertValid();
 
     // 未確定文字列の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // generate messages to update composition
+    // 未確定文字列のメッセージを生成。
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
 // コード入力を変換する。
 BOOL InputContext::ConvertCode() {
-    // get logical data
+    // 未確定文字列と候補情報の論理データを取得。
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // if there is no conposition, we cannot convert it
-    if (!comp.HasCompStr()) {
+    // 未確定文字列がなければ変換できない。
+    if (!comp.HasCompStr())
         return FALSE;
-    }
 
-    // convert
+    // 候補情報がなければ候補を開く。
     if (!cand.HasCandInfo()) {
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
     }
+
+    // コード変換する。
     TheIME.ConvertCode(comp, cand);
 
     // 候補情報の再作成。
@@ -744,7 +745,7 @@ BOOL InputContext::ConvertCode() {
     // 未確定文字列の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // generate message to change composition
+    // 未確定文字列のメッセージを生成。
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 
@@ -753,7 +754,7 @@ BOOL InputContext::ConvertCode() {
 
 // キーボードのEscキーを処理する。
 void InputContext::Escape() {
-    // get logical data
+    // 未確定文字列の論理データを取得。
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -761,33 +762,33 @@ void InputContext::Escape() {
         UnlockCompStr();
     }
 
-    // if the current clause is converted,
-    if (comp.IsClauseConverted()) {
-        RevertText();
+    if (comp.IsClauseConverted()) { // 現在の文節が変換済みなら
+        RevertText(); // ひらがなに戻す。
     } else {
-        CancelText();
+        CancelText(); // 変換をキャンセルする。
     }
 } // InputContext::Escape
 
 // 変換をキャンセルする。
 void InputContext::CancelText() {
-    // close candidate
+    // 候補を閉じる。
     CloseCandidate();
 
-    // reset composition
+    // 未確定文字列をリセットする。
     hCompStr = CompStr::ReCreate(hCompStr, NULL);
 
-    // generate messages to end composition
+    // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
+    // 未確定文字列の終了メッセージを生成。
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::CancelText
 
 // 再変換する。
 void InputContext::RevertText() {
-    // close candidate
+    // 候補を閉じる。
     CloseCandidate(FALSE);
 
-    // get logical data
+    // 未確定文字列の論理データを取得。
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -795,12 +796,12 @@ void InputContext::RevertText() {
         UnlockCompStr();
     }
 
-    // return if no comp str
+    // 未確定文字列がなければ終了。
     if (!comp.HasCompStr()) {
         return;
     }
 
-    // reset composition of selected clause
+    // 文節をひらがなに戻す。
     comp.AssertValid();
     comp.RevertText();
     comp.AssertValid();
@@ -808,13 +809,14 @@ void InputContext::RevertText() {
     // 未確定文字列の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
+    // 未確定文字列のメッセージを生成。
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 } // InputContext::RevertText
 
 // 文字を削除する。
 void InputContext::DeleteChar(BOOL bBackSpace) {
-    // get logical data
+    // 未確定文字列の論理データを取得。
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -822,22 +824,22 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
         UnlockCompStr();
     }
 
-    // delete char
+    // 文字を削除。
     comp.AssertValid();
     comp.DeleteChar(bBackSpace, Conversion());
     comp.AssertValid();
 
-    // if there is no composition, then
-    if (comp.comp_str.empty()) {
-        // close candidate if any
+    if (comp.comp_str.empty()) { // 未確定文字列が空であれば
+        // 候補を閉じる。
         CloseCandidate();
 
-        // clear composition
+        // 未確定文字列をリセット。
         hCompStr = CompStr::ReCreate(hCompStr, NULL);
 
-        // generate messages to end composition
+        // 未確定文字列のメッセージを生成。
         LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
         TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
+        // 未確定文字列の終了メッセージを生成。
         TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
     } else {
         // 未確定文字列の再作成。
@@ -857,19 +859,18 @@ void InputContext::MoveLeft(BOOL bShift) {
     GetLogObjects(comp, cand);
 
     BOOL bCandChanged = FALSE;
-    if (bShift) {
-        if (cand.HasCandInfo()) {
+    if (bShift) { // Shiftキーが押されているか？
+        if (cand.HasCandInfo()) { // 候補があるか？
             BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
-            if (!TheIME.StretchClauseLeft(comp, cand, bRoman)) {
+            if (!TheIME.StretchClauseLeft(comp, cand, bRoman)) { // 文節を伸縮する。
                 return;
             }
-            bCandChanged = TRUE;
+            bCandChanged = TRUE; // 候補が変更された。
         }
     } else {
-        // move left
-        if (comp.MoveLeft()) {
-            cand.iClause = comp.extra.iClause;
-            bCandChanged = TRUE;
+        if (comp.MoveLeft()) { // 左に移動。
+            cand.iClause = comp.extra.iClause; // 文節を取得。
+            bCandChanged = TRUE; // 候補が変更された。
         }
         cand.Dump();
     }
@@ -880,7 +881,7 @@ void InputContext::MoveLeft(BOOL bShift) {
 
     // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
-    // update candidate
+    // 候補の変更メッセージを生成。
     if (bCandChanged) {
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
     }
@@ -894,19 +895,19 @@ void InputContext::MoveRight(BOOL bShift) {
     GetLogObjects(comp, cand);
 
     BOOL bCandChanged = FALSE;
-    if (bShift) {
-        if (cand.HasCandInfo()) {
+    if (bShift) { // Shiftキーが押されているか？
+        if (cand.HasCandInfo()) { // 候補があるか？
             BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
-            if (!TheIME.StretchClauseRight(comp, cand, bRoman)) {
+            if (!TheIME.StretchClauseRight(comp, cand, bRoman)) { // 文節を右に伸縮。
                 return;
             }
-            bCandChanged = TRUE;
+            bCandChanged = TRUE; // 候補が変更された。
         }
     } else {
         // move right
-        if (comp.MoveRight()) {
-            cand.iClause = comp.extra.iClause;
-            bCandChanged = TRUE;
+        if (comp.MoveRight()) { // 右に移動。
+            cand.iClause = comp.extra.iClause; // 文節を取得。
+            bCandChanged = TRUE; // 候補が変更された。
         }
         cand.Dump();
     }
@@ -917,7 +918,7 @@ void InputContext::MoveRight(BOOL bShift) {
 
     // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
-    // update candidate
+    // 候補の変更メッセージを生成。
     if (bCandChanged) {
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
     }
@@ -925,15 +926,16 @@ void InputContext::MoveRight(BOOL bShift) {
 
 // 上に移動する。
 void InputContext::MoveUp() {
-    if (!HasCandInfo()) return;
+    if (!HasCandInfo()) return; // 候補があるか？
 
     // 未確定文字列と候補情報の論理データを取得。
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // candidate up
+    // 一つ前に移動。
     cand.MovePrev();
+    // 文節の未確定文字列の設定。
     std::wstring str = cand.GetString();
     comp.SetClauseCompString(cand.iClause, str);
 
@@ -943,22 +945,23 @@ void InputContext::MoveUp() {
 
     // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
-    // update candidate
+    // 候補の変更メッセージを生成。
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 }
 
 // 下に移動する。
 void InputContext::MoveDown() {
-    if (!HasCandInfo()) return;
+    if (!HasCandInfo()) return; // 候補があるか？
 
     // 未確定文字列と候補情報の論理データを取得。
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // candidate down
+    // 一つ次へ移動。
     cand.MoveNext();
     std::wstring str = cand.GetString();
+    // 文節の未確定文字列の設定。
     comp.SetClauseCompString(cand.iClause, str);
 
     // 未確定文字列と候補情報の再作成。
@@ -967,7 +970,7 @@ void InputContext::MoveDown() {
 
     // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
-    // update candidate
+    // 候補の変更メッセージを生成。
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 }
 
@@ -978,12 +981,12 @@ void InputContext::MoveHome() {
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // move to head
+    // 先頭に移動。
     comp.AssertValid();
-    if (cand.HasCandInfo()) {
-        cand.MoveHome();
+    if (cand.HasCandInfo()) { // 候補があるか？
+        cand.MoveHome(); // 最初の候補に移動。
     } else {
-        comp.MoveHome();
+        comp.MoveHome(); // 未確定文字列の最初に移動。
     }
     comp.AssertValid();
 
@@ -994,7 +997,7 @@ void InputContext::MoveHome() {
     // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
     if (cand.HasCandInfo()) {
-        // update candidate
+        // 候補の変更メッセージを生成。
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
     }
 } // InputContext::MoveHome
@@ -1006,12 +1009,12 @@ void InputContext::MoveEnd() {
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // move to tail
+    // 末尾に移動。
     comp.AssertValid();
-    if (cand.HasCandInfo()) {
-        cand.MoveEnd();
+    if (cand.HasCandInfo()) { // 候補があるか？
+        cand.MoveEnd(); // 最後の候補に移動。
     } else {
-        comp.MoveEnd();
+        comp.MoveEnd(); // 未確定文字列の最後に移動。
     }
     comp.AssertValid();
 
@@ -1022,7 +1025,7 @@ void InputContext::MoveEnd() {
     // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
     if (cand.HasCandInfo() && comp.IsClauseConverted()) {
-        // update candidate
+        // 候補の変更メッセージを生成。
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
     }
 } // InputContext::MoveEnd
@@ -1034,8 +1037,9 @@ void InputContext::PageUp() {
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // go to previous page
+    // 一つ前のページに移動。
     cand.PageUp();
+    // 文節の未確定文字列を設定。
     std::wstring str = cand.GetString();
     comp.SetClauseCompString(cand.iClause, str);
 
@@ -1045,7 +1049,7 @@ void InputContext::PageUp() {
 
     // 未確定文字列のメッセージを生成。
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
-    // update candidate
+    // 候補の変更メッセージを生成。
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 } // InputContext::PageUp
 
@@ -1057,8 +1061,10 @@ void InputContext::PageDown() {
     GetLogObjects(comp, cand);
 
     cand.PageDown(); // 次の位置へ。
+
+    // 文節の文字列を指定。
     std::wstring str = cand.GetString();
-    comp.SetClauseCompString(cand.iClause, str); // 文節の文字列を指定。
+    comp.SetClauseCompString(cand.iClause, str);
 
     // 未確定文字列と候補情報の再作成。
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
