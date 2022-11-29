@@ -6,7 +6,8 @@
 
 using namespace std;
 
-static const wchar_t s_hiragana_table[][5] = {    
+static const wchar_t s_hiragana_table[][5] = {
+  // DAN_A, DAN_I, DAN_U, DAN_E, DAN_O
   {L'あ', L'い', L'う', L'え', L'お'},   // GYOU_A
   {L'か', L'き', L'く', L'け', L'こ'},   // GYOU_KA
   {L'が', L'ぎ', L'ぐ', L'げ', L'ご'},   // GYOU_GA
@@ -25,8 +26,8 @@ static const wchar_t s_hiragana_table[][5] = {
   {L'ん', 0, 0, 0, 0},                   // GYOU_NN
 };
 
-unboost::unordered_map<wchar_t,wchar_t>   g_vowel_map;
-unboost::unordered_map<wchar_t,wchar_t>   g_consonant_map;
+unboost::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
+unboost::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
 
 void MakeLiteralMaps() {
   if (g_consonant_map.size()) {
@@ -49,6 +50,7 @@ inline bool entry_compare_pre(const DictEntry& e1, const DictEntry& e2) {
   return (e1.pre < e2.pre);
 }
 
+// 全角カタカナか？
 inline BOOL is_fullwidth_katakana(WCHAR ch) {
   if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
   switch (ch) {
@@ -60,6 +62,7 @@ inline BOOL is_fullwidth_katakana(WCHAR ch) {
   }
 }
 
+// 文字列の文字種を変換する。
 std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
   WCHAR szBuf[1024];
   const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
@@ -68,6 +71,7 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
   return szBuf;
 }
 
+// 辞書データファイルを読み込む。
 BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
   FILE *fp = _wfopen(fname, L"rb");
   if (fp == NULL) {
@@ -243,9 +247,8 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
   return TRUE;  // success
 } // LoadDictDataFile
 
-BOOL CreateDictFile(
-  const wchar_t *fname,
-  const std::vector<DictEntry>& entries)
+// コンパイル済みの辞書ファイルを作成する。
+BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
 {
   // calculate the total size
   size_t size = 0;
@@ -305,13 +308,14 @@ BOOL CreateDictFile(
 
   BOOL ret = FALSE;
 
+  // コンパイル済みの辞書ファイルを作成する。
   HANDLE hFile = ::CreateFileW(fname, GENERIC_WRITE, FILE_SHARE_READ,
     NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH,
     NULL);
   if (hFile != INVALID_HANDLE_VALUE) {
     DWORD dwWritten;
-    ret = WriteFile(hFile, pv, size, &dwWritten, NULL);
-    CloseHandle(hFile);
+    ret = WriteFile(hFile, pv, size, &dwWritten, NULL); // 書き込む。
+    CloseHandle(hFile); // ファイルを閉じる。
   }
 
   free(pv);

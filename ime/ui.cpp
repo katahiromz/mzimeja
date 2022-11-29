@@ -315,7 +315,7 @@ int GetCompFontHeight(UIEXTRA *lpUIExtra) {
     return siz.cy; // これが高さ。
 }
 
-// Handle WM_IME_NOTIFY messages
+// WM_IME_NOTIFY メッセージを処理する。
 LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
     LONG ret = 0;
     RECT rc;
@@ -460,39 +460,41 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         }
         break;
 
-    case IMN_SETCANDIDATEPOS:
+    case IMN_SETCANDIDATEPOS: // 候補の位置がセットされる。
         DPRINT("IMN_SETCANDIDATEPOS\n");
-        lpIMC = TheIME.LockIMC(hIMC);
+        lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
-            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
-            TheIME.UnlockIMC(hIMC);
+            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE); // 候補ウィンドウを移動。
+            TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
         break;
 
-    case IMN_SETCOMPOSITIONWINDOW:
+    case IMN_SETCOMPOSITIONWINDOW: // 未確定文字列ウィンドウがセットされる。
         DPRINT("IMN_SETCOMPOSITIONWINDOW\n");
-        lpIMC = TheIME.LockIMC(hIMC);
+        lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
-            CompWnd_Move(lpUIExtra, lpIMC);
-            CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE);
-            TheIME.UnlockIMC(hIMC);
+            CompWnd_Move(lpUIExtra, lpIMC); // 未確定文字列ウィンドウを移動。
+            CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE); // 候補ウィンドウも移動。
+            TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
         break;
 
-    case IMN_SETSTATUSWINDOWPOS:
+    case IMN_SETSTATUSWINDOWPOS: // 状態ウィンドウの位置がセットされる。
         DPRINT("IMN_SETSTATUSWINDOWPOS\n");
-        lpIMC = TheIME.LockIMC(hIMC);
+        lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
-            POINT pt = lpIMC->ptStatusWndPos;
+            // 位置をセットする。幅と高さはそのまま。
             RECT rc;
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
+            POINT pt = lpIMC->ptStatusWndPos;
             ::MoveWindow(lpUIExtra->hwndStatus, pt.x, pt.y,
                          rc.right - rc.left, rc.bottom - rc.top, TRUE);
-            TheIME.UnlockIMC(hIMC);
+
+            TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
         break;
 
-    case IMN_PRIVATE:
+    case IMN_PRIVATE: // プライベートな通知。
         DPRINT("IMN_PRIVATE\n");
         if (HIWORD(lParam) == 0xFACE) {
             std::wstring imepad_file;
@@ -521,69 +523,67 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
     return ret;
 }
 
-//#define lpcfCandForm ((LPCANDIDATEFORM)lParam)
-
-// Handle WM_IME_CONTROL messages
+// WM_IME_CONTROL メッセージを処理する。
 LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
     LONG ret = 1;
 
-    InputContext *lpIMC = TheIME.LockIMC(hIMC);
+    InputContext *lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
     if (NULL == lpIMC) return ret;
 
-    UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
+    UIEXTRA *lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロックする。
     if (lpUIExtra) {
         switch (wParam) {
-        case IMC_GETCANDIDATEPOS:
+        case IMC_GETCANDIDATEPOS: // 候補の位置が取得される。
             DPRINT("IMC_GETCANDIDATEPOS\n");
-            if (IsWindow(lpUIExtra->uiCand.hWnd)) {
-                *(LPCANDIDATEFORM)lParam = lpIMC->cfCandForm[0];
+            if (IsWindow(lpUIExtra->uiCand.hWnd)) { // 候補ウィンドウが生きていれば
+                *(LPCANDIDATEFORM)lParam = lpIMC->cfCandForm[0]; // 入力コンテキストから取得。
                 ret = 0;
             }
             break;
 
-        case IMC_GETCOMPOSITIONWINDOW:
+        case IMC_GETCOMPOSITIONWINDOW: // 未確定文字列の構造体を取得。
             DPRINT("IMC_GETCOMPOSITIONWINDOW\n");
-            *(LPCOMPOSITIONFORM)lParam = lpIMC->cfCompForm;
+            *(LPCOMPOSITIONFORM)lParam = lpIMC->cfCompForm; // 入力コンテキストから取得。
             ret = 0;
             break;
 
-        case IMC_GETSTATUSWINDOWPOS:
+        case IMC_GETSTATUSWINDOWPOS: // 状態ウィンドウの位置が取得される。
             DPRINT("IMC_GETSTATUSWINDOWPOS\n");
             {
                 RECT rc;
                 ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
-                ret = MAKELONG(rc.left, rc.top);
+                ret = MAKELONG(rc.left, rc.top); // 位置を返す。
             }
             break;
 
         default:
             break;
         }
-        UnlockUIExtra(hWnd);
+
+        UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
     }
-    TheIME.UnlockIMC(hIMC);
+
+    TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
 
     return ret;
 }
 
-// When draging the child window, this function draws the border
+// 子ウィンドウがドラッグされていれば、この関数はボーダーを描画する。
 void DrawUIBorder(LPRECT lprc) {
-    HDC hDC;
-    int sbx, sby;
+    HDC hDC = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL); // DCを作成。
+    SelectObject(hDC, GetStockObject(GRAY_BRUSH)); // ブラシを選択。これでPatBltで塗りつぶす。
 
-    hDC = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
-    SelectObject(hDC, GetStockObject(GRAY_BRUSH));
-    sbx = GetSystemMetrics(SM_CXBORDER);
-    sby = GetSystemMetrics(SM_CYBORDER);
-    PatBlt(hDC, lprc->left, lprc->top, lprc->right - lprc->left - sbx, sby,
-           PATINVERT);
-    PatBlt(hDC, lprc->right - sbx, lprc->top, sbx, lprc->bottom - lprc->top - sby,
-           PATINVERT);
-    PatBlt(hDC, lprc->right, lprc->bottom - sby,
-           -(lprc->right - lprc->left - sbx), sby, PATINVERT);
-    PatBlt(hDC, lprc->left, lprc->bottom, sbx, -(lprc->bottom - lprc->top - sby),
-           PATINVERT);
-    DeleteDC(hDC);
+    // ボーダー幅と高さ。
+    INT sbx = GetSystemMetrics(SM_CXBORDER);
+    INT sby = GetSystemMetrics(SM_CYBORDER);
+
+    // 塗りつぶす。
+    PatBlt(hDC, lprc->left, lprc->top, lprc->right - lprc->left - sbx, sby, PATINVERT);
+    PatBlt(hDC, lprc->right - sbx, lprc->top, sbx, lprc->bottom - lprc->top - sby, PATINVERT);
+    PatBlt(hDC, lprc->right, lprc->bottom - sby, -(lprc->right - lprc->left - sbx), sby, PATINVERT);
+    PatBlt(hDC, lprc->left, lprc->bottom, sbx, -(lprc->bottom - lprc->top - sby), PATINVERT);
+
+    DeleteDC(hDC); // DCを破棄。
 }
 
 // Handling mouse messages for the child windows
