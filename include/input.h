@@ -13,7 +13,7 @@
 #include <vector>
 
 //////////////////////////////////////////////////////////////////////////////
-// input modes
+// 入力モード。
 
 enum INPUT_MODE {
     IMODE_FULL_HIRAGANA, // fullwidth hiragana
@@ -34,20 +34,25 @@ void        SetRomanMode(HIMC hIMC, BOOL bRoman);
 UINT        CommandFromInputMode(INPUT_MODE imode);
 
 //////////////////////////////////////////////////////////////////////////////
-// composition info
+// 未確定文字列。
 
 struct LogCandInfo;
 
-// logical comp info extra
+// The logical comp info extra.
+// 未確定文字列の余剰情報の論理データ。
 struct LogCompStrExtra {
-    // selected composition clause index
+    // The selected composition clause index.
+    // 選択中の文節のインデックス。
     // assert(iClause <= GetClauseCount());
     DWORD iClause;
-    // hiragana clause strings
+    // The hiragana clause strings.
+    // ひらがな文節文字列。
     std::vector<std::wstring>   hiragana_clauses;
-    // typing clause strings
+    // The typing clause strings.
+    // 入力文節文字列。
     std::vector<std::wstring>   typing_clauses;
-    // composition clause strings
+    // The composition clause strings.
+    // 未確定文字列の文節文字列。
     std::vector<std::wstring>   comp_str_clauses;
 
     LogCompStrExtra() {
@@ -57,29 +62,24 @@ struct LogCompStrExtra {
     DWORD GetTotalSize() const;
 }; // struct LogCompStrExtra
 
-// physical comp info extar
+// 未確定文字列の余剰情報の物理データ。
 struct COMPSTREXTRA {
-    DWORD dwSignature;
-    DWORD iClause;
-    DWORD dwHiraganaClauseCount;
-    DWORD dwHiraganaClauseOffset;
-    DWORD dwTypingClauseCount;
-    DWORD dwTypingClauseOffset;
+    DWORD dwSignature;              // 確認のため。
+    DWORD iClause;                  // 現在の文節のインデックス。
+    DWORD dwHiraganaClauseCount;    // ひらがな文節の個数。
+    DWORD dwHiraganaClauseOffset;   // ひらがな文節のオフセット。
+    DWORD dwTypingClauseCount;      // 入力文節の個数。
+    DWORD dwTypingClauseOffset;     // 入力文節のオフセット。
 
-    BYTE *GetBytes() {
-        return (LPBYTE) this;
-    }
+    BYTE *GetBytes() { return (LPBYTE) this; }  // バイト列の取得。
+    WCHAR *GetHiraganaClauses(DWORD& dwCount);  // ひらがな文節の取得。
+    WCHAR *GetTypingClauses(DWORD& dwCount);    // 入力文節の取得。
 
-    WCHAR *GetHiraganaClauses(DWORD& dwCount);
-    WCHAR *GetTypingClauses(DWORD& dwCount);
-
-    // physical to logical
-    void GetLog(LogCompStrExtra& log);
-    // physical from logical
-    DWORD Store(const LogCompStrExtra *log);
+    void GetLog(LogCompStrExtra& log);          // 物理データから論理データへ。
+    DWORD Store(const LogCompStrExtra *log);    // 論理データから物理データへ。
 }; // struct COMPSTREXTRA
 
-// logical composition info
+// 未確定文字列の論理データ。
 struct LogCompStr {
     // composition character index of the current position
     DWORD dwCursorPos;

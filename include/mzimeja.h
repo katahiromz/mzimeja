@@ -48,7 +48,8 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-// for debugging
+// For debugging.
+// デバッグ用。
 
 #ifndef MZIMEJA_DEBUG_OUTPUT
   #define DebugPrintA   (void)
@@ -77,18 +78,20 @@ void DebugAssert(const char *file, int line, const char *exp);
 
 //////////////////////////////////////////////////////////////////////////////
 
-// separator
+// The separators.
+// 辞書の区切り。
 #define RECORD_SEP   L'\uFFFD'
 #define FIELD_SEP    L'\uFFFC'
 
-// for limit of MZ-IME
+// For limit of MZ-IME.
+// MZ-IMEの制限。
 #define MAXCOMPWND  10  // maximum number of composition windows
 #define MAXGLCHAR   32  // maximum number of guideline characters
 
-// special messages
+// Special messages.
+// 特別なメッセージ。
 #define WM_UI_UPDATE      (WM_USER + 500)
 #define WM_UI_HIDE        (WM_USER + 501)
-
 #define WM_UI_STATEMOVE   (WM_USER + 601)
 #define WM_UI_DEFCOMPMOVE (WM_USER + 602)
 #define WM_UI_CANDMOVE    (WM_USER + 603)
@@ -97,11 +100,13 @@ void DebugAssert(const char *file, int line, const char *exp);
 // Escape Functions
 #define IME_ESC_PRI_GETDWORDTEST (IME_ESC_PRIVATE_FIRST + 0)
 
-// special style
+// Special style.
+// 特別なウィンドウスタイル。
 #define WS_COMPDEFAULT    (WS_DISABLED | WS_POPUP)
 #define WS_COMPNODEFAULT  (WS_DISABLED | WS_POPUP)
 
-// ID of guideline table
+// The IDs of guideline entry.
+// ガイドラインエントリーのID。
 #define MYGL_NODICTIONARY   0
 #define MYGL_TYPINGERROR    1
 #define MYGL_TESTGUIDELINE  2
@@ -118,14 +123,16 @@ void DebugAssert(const char *file, int line, const char *exp);
 #define FIGWLP_CHILDWND         (FIGWL_PUSHSTATUS + sizeof(LONG))
 #define UIEXTRASIZE             (FIGWLP_CHILDWND + sizeof(LONG_PTR))
 
-// The flags of FIGWL_MOUSE
+// The flags of FIGWL_MOUSE.
+// FIGWL_MOUSEのフラグ。
 #define FIM_CAPUTURED 0x01
 #define FIM_MOVED 0x02
 
-// The flags of the close button
+// The flags of the close button.
+// 閉じるボタンのフラグ。
 #define PUSHED_STATUS_CLOSE 0x08
 
-// Statue Close Button
+// Statue Close Button.
 #define STCLBT_X  (BTX * 2 + 3)
 #define STCLBT_Y  1
 #define STCLBT_DX 12
@@ -178,13 +185,15 @@ struct MZGUIDELINE {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-// externs
 
-extern const WCHAR szUIServerClassName[];
-extern const WCHAR szCompStrClassName[];
-extern const WCHAR szCandClassName[];
-extern const WCHAR szStatusClassName[];
-extern const WCHAR szGuideClassName[];
+// ウィンドウクラス名。
+extern const WCHAR szUIServerClassName[];   // UIサーバー。
+extern const WCHAR szCompStrClassName[];    // 未確定文字列。
+extern const WCHAR szCandClassName[];       // 候補ウィンドウ。
+extern const WCHAR szStatusClassName[];     // 状態ウィンドウ。
+extern const WCHAR szGuideClassName[];      // ガイドラインウィンドウ。
+
+// ガイドラインテーブル。
 extern const MZGUIDELINE glTable[];
 
 //////////////////////////////////////////////////////////////////////////////
@@ -330,67 +339,71 @@ WCHAR get_comma(void);
 
 typedef std::vector<std::wstring> WStrings;
 
+// 行。
 enum Gyou {
-    GYOU_A,
-    GYOU_KA,
-    GYOU_GA,
-    GYOU_SA,
-    GYOU_ZA,
-    GYOU_TA,
-    GYOU_DA,
-    GYOU_NA,
-    GYOU_HA,
-    GYOU_BA,
-    GYOU_PA,
-    GYOU_MA,
-    GYOU_YA,
-    GYOU_RA,
-    GYOU_WA,
-    GYOU_NN
+    GYOU_A,     // あ行。
+    GYOU_KA,    // か行。
+    GYOU_GA,    // が行。
+    GYOU_SA,    // さ行。
+    GYOU_ZA,    // ざ行。
+    GYOU_TA,    // た行。
+    GYOU_DA,    // だ行。
+    GYOU_NA,    // な行。
+    GYOU_HA,    // は行。
+    GYOU_BA,    // ば行。
+    GYOU_PA,    // ぱ行。
+    GYOU_MA,    // ま行。
+    GYOU_YA,    // や行。
+    GYOU_RA,    // ら行。
+    GYOU_WA,    // わ行。
+    GYOU_NN     // ん行。
 };
 
+// 段。
 enum Dan {
-    DAN_A,
-    DAN_I,
-    DAN_U,
-    DAN_E,
-    DAN_O
+    DAN_A,      // あ段。
+    DAN_I,      // い段。
+    DAN_U,      // う段。
+    DAN_E,      // え段。
+    DAN_O       // お段。
 };
 
+// 品詞分類。
 enum HinshiBunrui {
-    HB_HEAD = 0x21, // 最初のノード
-    HB_TAIL,        // 最後のノード
-    HB_UNKNOWN,     // 未知の品詞
-    HB_MEISHI,      // 名詞
-    HB_IKEIYOUSHI,  // い形容詞
-    HB_NAKEIYOUSHI, // な形容詞
-    HB_RENTAISHI,   // 連体詞
-    HB_FUKUSHI,     // 副詞
-    HB_SETSUZOKUSHI, // 接続詞
-    HB_KANDOUSHI,   // 感動詞
-    HB_KAKU_JOSHI,  // 格助詞
-    HB_SETSUZOKU_JOSHI, // 接続助詞
-    HB_FUKU_JOSHI,  // 副助詞
-    HB_SHUU_JOSHI,  // 終助詞
-    HB_JODOUSHI,    // 助動詞
-    HB_MIZEN_JODOUSHI, // 未然助動詞
-    HB_RENYOU_JODOUSHI, // 連用助動詞
-    HB_SHUUSHI_JODOUSHI, // 終止助動詞
-    HB_RENTAI_JODOUSHI, // 連体助動詞
-    HB_KATEI_JODOUSHI, // 仮定助動詞
-    HB_MEIREI_JODOUSHI, // 命令助動詞
-    HB_GODAN_DOUSHI, // 五段動詞
-    HB_ICHIDAN_DOUSHI, // 一段動詞
-    HB_KAHEN_DOUSHI, // カ変動詞
-    HB_SAHEN_DOUSHI, // サ変動詞
-    HB_KANGO,       // 漢語
-    HB_SETTOUJI,    // 接頭辞
-    HB_SETSUBIJI,   // 接尾辞
-    HB_PERIOD,      // 句点（。）
-    HB_COMMA,       // 読点（、）
-    HB_SYMBOL       // 記号類
+    HB_HEAD = 0x21,         // 最初のノード
+    HB_TAIL,                // 最後のノード
+    HB_UNKNOWN,             // 未知の品詞
+    HB_MEISHI,              // 名詞
+    HB_IKEIYOUSHI,          // い形容詞
+    HB_NAKEIYOUSHI,         // な形容詞
+    HB_RENTAISHI,           // 連体詞
+    HB_FUKUSHI,             // 副詞
+    HB_SETSUZOKUSHI,        // 接続詞
+    HB_KANDOUSHI,           // 感動詞
+    HB_KAKU_JOSHI,          // 格助詞
+    HB_SETSUZOKU_JOSHI,     // 接続助詞
+    HB_FUKU_JOSHI,          // 副助詞
+    HB_SHUU_JOSHI,          // 終助詞
+    HB_JODOUSHI,            // 助動詞
+    HB_MIZEN_JODOUSHI,      // 未然助動詞
+    HB_RENYOU_JODOUSHI,     // 連用助動詞
+    HB_SHUUSHI_JODOUSHI,    // 終止助動詞
+    HB_RENTAI_JODOUSHI,     // 連体助動詞
+    HB_KATEI_JODOUSHI,      // 仮定助動詞
+    HB_MEIREI_JODOUSHI,     // 命令助動詞
+    HB_GODAN_DOUSHI,        // 五段動詞
+    HB_ICHIDAN_DOUSHI,      // 一段動詞
+    HB_KAHEN_DOUSHI,        // カ変動詞
+    HB_SAHEN_DOUSHI,        // サ変動詞
+    HB_KANGO,               // 漢語
+    HB_SETTOUJI,            // 接頭辞
+    HB_SETSUBIJI,           // 接尾辞
+    HB_PERIOD,              // 句点（。）
+    HB_COMMA,               // 読点（、）
+    HB_SYMBOL               // 記号類
 }; // enum HinshiBunrui
 
+// 動詞活用形。
 enum KatsuyouKei {
     MIZEN_KEI,      // 未然形
     RENYOU_KEI,     // 連用形
@@ -400,6 +413,7 @@ enum KatsuyouKei {
     MEIREI_KEI      // 命令形
 };
 
+// 辞書の項目。
 struct DictEntry {
     std::wstring pre;
     std::wstring post;
@@ -411,6 +425,7 @@ struct DictEntry {
 struct LatticeNode;
 typedef unboost::shared_ptr<LatticeNode>  LatticeNodePtr;
 
+// ラティス（lattice）ノード。
 struct LatticeNode {
     std::wstring pre;
     std::wstring post;
@@ -434,6 +449,7 @@ struct LatticeNode {
 };
 typedef std::vector<LatticeNodePtr>   LatticeChunk;
 
+// ラティス。
 struct Lattice {
     size_t index;
     std::wstring pre;
@@ -506,22 +522,22 @@ struct MzConvResult {
 
 class Dict {
 public:
-Dict();
-~Dict();
+    Dict();
+    ~Dict();
 
-BOOL Load(const wchar_t *file_name, const wchar_t *object_name);
-void Unload();
-BOOL IsLoaded() const;
-DWORD GetSize() const;
+    BOOL Load(const wchar_t *file_name, const wchar_t *object_name);
+    void Unload();
+    BOOL IsLoaded() const;
+    DWORD GetSize() const;
 
-wchar_t *Lock();
-void Unlock(wchar_t *data);
+    wchar_t *Lock();
+    void Unlock(wchar_t *data);
 
 protected:
-std::wstring m_strFileName;
-std::wstring m_strObjectName;
-HANDLE m_hMutex;
-HANDLE m_hFileMapping;
+    std::wstring m_strFileName;
+    std::wstring m_strObjectName;
+    HANDLE m_hMutex;
+    HANDLE m_hFileMapping;
 };
 
 //////////////////////////////////////////////////////////////////////////////
