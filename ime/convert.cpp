@@ -9,7 +9,6 @@
 
 const DWORD c_dwMilliseconds = 8000;
 
-// The hiragana table.
 // ひらがな表。
 static const wchar_t s_hiragana_table[][5] = {
     {L'あ', L'い', L'う', L'え', L'お'}, // GYOU_A
@@ -30,7 +29,6 @@ static const wchar_t s_hiragana_table[][5] = {
     {L'ん', 0, 0, 0, 0},             // GYOU_NN
 };
 
-// Convert the classification (bunrui) to string (for debugging).
 // 品詞分類を文字列に変換する（デバッグ用）。
 static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
     int index = int(bunrui) - int(HB_HEAD);
@@ -484,8 +482,7 @@ void MzIme::MakeLiteralMaps() {
     }
     m_consonant_map.clear();
     m_vowel_map.clear();
-    const size_t count = _countof(s_hiragana_table);
-    for (size_t i = 0; i < count; ++i) {
+    for (size_t i = 0; i < _countof(s_hiragana_table); ++i) {
         for (size_t k = 0; k < 5; ++k) {
             m_consonant_map[s_hiragana_table[i][k]] = s_hiragana_table[i][0];
         }
@@ -2799,29 +2796,29 @@ inline WORD kuten_to_jis(const std::wstring& str) {
 }
 
 // コード変換。
-BOOL MzIme::ConvertCode(const std::wstring& strTyping,
-                        MzConvResult& result)
+BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
 {
     result.clauses.clear();
     MzConvClause clause;
 
-    // initialize the node
+    // ノードを初期化。
     LatticeNode node;
     node.pre = strTyping;
     node.bunrui = HB_UNKNOWN;
     node.cost = 0;
 
+    // 16進を読み込み。
     ULONG hex_code = wcstoul(strTyping.c_str(), NULL, 16);
     WCHAR szUnicode[2];
     szUnicode[0] = WCHAR(hex_code);
     szUnicode[1] = 0;
 
-    // Unicode
+    // Unicodeのノードを文節に追加。
     node.post = szUnicode;
     clause.add(&node);
     node.cost++;
 
-    // Shift_JIS
+    // Shift_JISコードのノードを文節に追加。
     CHAR szSJIS[8];
     WORD wSJIS = WORD(hex_code);
     if (is_sjis_code(wSJIS)) {
@@ -2834,7 +2831,7 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping,
         clause.add(&node);
     }
 
-    // JIS
+    // JISコードのノードを文節に追加。
     if (is_jis_code(WORD(hex_code))) {
         wSJIS = jis2sjis(WORD(hex_code));
         if (is_sjis_code(wSJIS)) {
@@ -2848,7 +2845,7 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping,
         }
     }
 
-    // KUTEN code
+    // 区点コードのノードを文節に追加。
     WORD wJIS = kuten_to_jis(strTyping);
     if (is_jis_code(wJIS)) {
         wSJIS = jis2sjis(wJIS);
@@ -2863,7 +2860,7 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping,
         }
     }
 
-    // original
+    // 元の入力文字列のノードを文節に追加。
     node.post = strTyping;
     node.cost++;
     clause.add(&node);
@@ -2883,8 +2880,7 @@ BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand) {
 } // MzIme::ConvertCode
 
 // 結果を格納する。
-BOOL MzIme::StoreResult(
-        const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand)
+BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand)
 {
     comp.comp_str.clear();
     comp.extra.clear();

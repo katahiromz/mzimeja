@@ -415,11 +415,11 @@ enum KatsuyouKei {
 
 // 辞書の項目。
 struct DictEntry {
-    std::wstring pre;
-    std::wstring post;
-    HinshiBunrui bunrui;
-    std::wstring tags;
-    Gyou gyou;
+    std::wstring pre;       // 変換前。
+    std::wstring post;      // 変換後。
+    HinshiBunrui bunrui;    // 品詞分類。
+    std::wstring tags;      // タグ。
+    Gyou gyou;              // 活用の行。
 };
 
 struct LatticeNode;
@@ -427,35 +427,37 @@ typedef unboost::shared_ptr<LatticeNode>  LatticeNodePtr;
 
 // ラティス（lattice）ノード。
 struct LatticeNode {
-    std::wstring pre;
-    std::wstring post;
-    std::wstring tags;
-    HinshiBunrui bunrui;
-    Gyou gyou;
-    KatsuyouKei katsuyou;
-    int cost;
-    DWORD linked;
-    std::vector<LatticeNodePtr>         branches;
+    std::wstring pre;                       // 変換前。
+    std::wstring post;                      // 変換後。
+    std::wstring tags;                      // タグ。
+    HinshiBunrui bunrui;                    // 分類。
+    Gyou gyou;                              // 活用の行。
+    KatsuyouKei katsuyou;                   // 動詞活用形。
+    int cost;                               // コスト。
+    DWORD linked;                           // リンク先。
+    std::vector<LatticeNodePtr> branches;   // 枝分かれ。
     LatticeNode() {
         cost = 0;
         linked = 0;
     }
+    int CalcCost() const;       // コストを計算。
+    bool IsDoushi() const;      // 動詞か？
+    bool IsJodoushi() const;    // 助動詞か？
+
+    // 指定したタグがあるか？
     bool HasTag(const wchar_t *tag) const {
         return tags.find(tag) != std::wstring::npos;
     }
-    int CalcCost() const;
-    bool IsDoushi() const;
-    bool IsJodoushi() const;
 };
 typedef std::vector<LatticeNodePtr>   LatticeChunk;
 
 // ラティス。
 struct Lattice {
-    size_t index;
-    std::wstring pre;
-    LatticeNodePtr head;
-    std::vector<LatticeChunk>       chunks;
-    std::vector<DWORD>              refs;
+    size_t                          index;  // インデックス。
+    std::wstring                    pre;    // 変換前。
+    LatticeNodePtr                  head;   // 先頭ノード。
+    std::vector<LatticeChunk>       chunks; // チャンク。
+    std::vector<DWORD>              refs;   // 参照。
     // pre.size() + 1 == chunks.size().
     // pre.size() + 1 == refs.size().
 
@@ -485,12 +487,14 @@ struct Lattice {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// 変換候補。
 struct MzConvCandidate {
-    std::wstring hiragana;
-    std::wstring converted;
-    int cost;
-    std::set<HinshiBunrui>  bunruis;
-    std::wstring tags;
+    std::wstring hiragana;              // ひらがな。
+    std::wstring converted;             // 変換後。
+    int cost;                           // コスト。
+    std::set<HinshiBunrui>  bunruis;    // 品詞分類集合。
+    std::wstring tags;                  // タグ。
+
     void clear() {
         hiragana.clear();
         converted.clear();
@@ -500,48 +504,52 @@ struct MzConvCandidate {
     }
 };
 
+// 変換文節。
 struct MzConvClause {
-    std::vector<MzConvCandidate> candidates;
+    std::vector<MzConvCandidate> candidates;    // 候補群。
+    void sort();                                // ソートする。
+    void add(const LatticeNode *node);          // ノードを追加する。
+
     void clear() {
         candidates.clear();
     }
-    void sort();
-    void add(const LatticeNode *node);
 };
 
+// 変換結果。
 struct MzConvResult {
-    std::vector<MzConvClause> clauses;
-    void clear() {
-        clauses.clear();
-    }
-    void sort();
+    std::vector<MzConvClause> clauses;      // 文節群。
+    void sort();                            // ソートする。
+    void clear() { clauses.clear(); }       // クリアする。
 };
 
 //////////////////////////////////////////////////////////////////////////////
-// dictionary
+// dictionary - 辞書
 
 class Dict {
 public:
     Dict();
     ~Dict();
 
+    // 辞書を読み込む。
     BOOL Load(const wchar_t *file_name, const wchar_t *object_name);
+    // 辞書をアンロードする。
     void Unload();
-    BOOL IsLoaded() const;
-    DWORD GetSize() const;
 
-    wchar_t *Lock();
-    void Unlock(wchar_t *data);
+    BOOL IsLoaded() const;  // 読み込み済みか？
+    DWORD GetSize() const;  // サイズを取得する。
+
+    wchar_t *Lock();            // ロックして読み込みを開始する。
+    void Unlock(wchar_t *data); // ロックを解除して読み込みを終了する。
 
 protected:
-    std::wstring m_strFileName;
-    std::wstring m_strObjectName;
-    HANDLE m_hMutex;
-    HANDLE m_hFileMapping;
+    std::wstring m_strFileName;     // ファイル名。
+    std::wstring m_strObjectName;   // 複数の辞書を使うので、オブジェクト名で区別する。
+    HANDLE m_hMutex;                // 排他制御用。
+    HANDLE m_hFileMapping;          // ファイルマッピング。
 };
 
 //////////////////////////////////////////////////////////////////////////////
-// The IME
+// MZ-IME
 
 class MzIme {
     public:
@@ -554,30 +562,25 @@ class MzIme {
 
 public:
     // literal map
-    unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;
-    unboost::unordered_map<wchar_t,wchar_t>   m_consonant_map;
+    unboost::unordered_map<wchar_t,wchar_t>   m_vowel_map;      // 母音写像。
+    unboost::unordered_map<wchar_t,wchar_t>   m_consonant_map;  // 子音写像。
     void MakeLiteralMaps();
 
 public:
     MzIme();
 
-    // initialize the IME
+    // 初期化。
     BOOL Init(HINSTANCE hInstance);
-
-    // register classes
+    // ウィンドウクラスの登録。
     BOOL RegisterClasses(HINSTANCE hInstance);
     void UnregisterClasses();
-
-    // uninitialize
+    // 逆初期化。
     VOID Uninit(VOID);
 
-    // load a bitmap from resource
+    // リソースからビットマップを読み込む。
     HBITMAP LoadBMP(LPCTSTR pszName);
-    HBITMAP LoadBMP(UINT nID) {
-        return LoadBMP(MAKEINTRESOURCE(nID));
-    }
-
-    // load a string from resource
+    HBITMAP LoadBMP(UINT nID) { return LoadBMP(MAKEINTRESOURCE(nID)); }
+    // リソースから文字列を読み込む。
     WCHAR *LoadSTR(INT nID);
 
     // update the indicator icon
