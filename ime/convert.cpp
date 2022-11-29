@@ -2032,10 +2032,10 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
         chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
         refs[index + length]++;
         break;
-    case HB_IKEIYOUSHI:
+    case HB_IKEIYOUSHI: // い形容詞。
         DoIkeiyoushi(index, fields);
         break;
-    case HB_NAKEIYOUSHI:
+    case HB_NAKEIYOUSHI: // な形容詞。
         DoNakeiyoushi(index, fields);
         break;
     case HB_MIZEN_JODOUSHI:
@@ -2124,29 +2124,30 @@ void Lattice::Dump(int num) {
 BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
     const DWORD c_retry_count = 32;
 
-    // failure if the dictionary not loaded
-    if (!m_basic_dict.IsLoaded()) {
+    // 基本辞書が読み込まれていなければ失敗。
+    if (!m_basic_dict.IsLoaded())
         return FALSE;
-    }
 
-    // initialize lattice
     ASSERT(pre.size() != 0);
     const size_t length = pre.size();
-    lattice.pre = pre;
+
+    // ラティスを初期化。
+    lattice.pre = pre; // 変換前の文字列。
     lattice.chunks.resize(length + 1);
     lattice.refs.assign(length + 1, 0);
     lattice.refs[0] = 1;
 
-    // lock the dictionary
-    WCHAR *dict_data = m_basic_dict.Lock();
+    WCHAR *dict_data = m_basic_dict.Lock(); // 基本辞書をロック。
     size_t count = 0;
     if (dict_data) {
-        // add nodes
+        // ノードを追加。
         lattice.AddNodes(0, dict_data);
-        // dump
+
+        // ダンプ。
         lattice.Dump(1);
+
         // repeat until linked to tail
-        for (;; ) {
+        for (;;) {
             // link and cut not linked
             lattice.UpdateLinks();
             lattice.CutUnlinkedNodes();
@@ -2165,16 +2166,16 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
             ++count;
             if (count >= c_retry_count) break;
         }
-        // unlock the dictionary
-        m_basic_dict.Unlock(dict_data);
-        if (count < c_retry_count) {
-            return TRUE; // success
-        }
+
+        m_basic_dict.Unlock(dict_data); // 基本辞書のロックを解除。
+
+        if (count < c_retry_count)
+            return TRUE; // 成功。
     }
 
-    // dump
+    // ダンプ。
     lattice.Dump(4);
-    return FALSE; // failure
+    return FALSE; // 失敗。
 } // MzIme::MakeLattice
 
 // 単一文節変換において、ラティスを作成する。
@@ -2184,37 +2185,36 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
         return FALSE;
     }
 
-    // initialize lattice
     ASSERT(pre.size() != 0);
     const size_t length = pre.size();
+
+    // ラティスを初期化。
     lattice.pre = pre;
     lattice.chunks.resize(length + 1);
     lattice.refs.assign(length + 1, 0);
     lattice.refs[0] = 1;
 
-    // lock the dictionary
-    WCHAR *dict_data = m_basic_dict.Lock();
+    WCHAR *dict_data = m_basic_dict.Lock(); // 基本辞書をロックする。
     if (dict_data) {
-        // add nodes
+        // ノード群を追加。
         if (!lattice.AddNodesForSingle(dict_data)) {
             lattice.AddComplement(0, pre.size(), pre.size());
         }
 
-        // unlock the dictionary
-        m_basic_dict.Unlock(dict_data);
+        m_basic_dict.Unlock(dict_data); // 基本辞書のロックを解除。
         return TRUE; // success
     }
 
-    // dump
+    // ダンプ。
     lattice.Dump(4);
-    return FALSE; // failure
+    return FALSE; // 失敗。
 } // MzIme::MakeLatticeForSingle
 
 // 変換結果を生成する。
 void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
-    result.clear();
+    result.clear(); // 結果をクリア。
 
-    // 2文節最長一致法・改
+    // 2文節最長一致法・改。
     const size_t length = lattice.pre.size();
     LatticeNodePtr node1 = lattice.head;
     LatticeNodePtr tail = lattice.chunks[length][0];
@@ -2376,35 +2376,36 @@ void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
         ++iClause;
     }
 
-    // sort by cost
+    // コストによりソートする。
     result.sort();
 } // MzIme::MakeResult
 
 // 変換に失敗したときの結果を作成する。
 void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
-    MzConvClause clause;
-    result.clear();
+    MzConvClause clause; // 文節。
+    result.clear(); // 結果をクリア。
 
-    // initialize the node
+    // ノードを初期化。
     LatticeNode node;
-    node.pre = pre;
-    node.cost = 0;
-    node.bunrui = HB_MEISHI;
+    node.pre = pre; // 変換前の文字列。
+    node.cost = 0; // コストはゼロ。
+    node.bunrui = HB_MEISHI; // 名詞。
 
-    // hiragana
-    node.post = pre;
+    // 文節にひらがなを追加。
+    node.post = pre; // 変換後の文字列。
     clause.add(&node);
 
-    // katakana
-    node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_FULLWIDTH);
+    // 文節にカタカナを追加。
+    node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_FULLWIDTH); // 変換後の文字列。
     clause.add(&node);
 
+    // 結果に文節を追加。
     result.clauses.push_back(clause);
 } // MzIme::MakeResultOnFailure
 
 // 単一文節変換の結果を作成する。
 void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
-    result.clear();
+    result.clear(); // 結果をクリア。
     const size_t length = lattice.pre.size();
 
     // add other candidates
@@ -2418,26 +2419,26 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
         }
     }
 
-    // initialize the node
-    std::wstring hiragana = lattice.pre;
+    // ノードを初期化する。
+    std::wstring hiragana = lattice.pre; // 変換前の文字列。
     LatticeNode node;
     node.pre = hiragana;
     node.bunrui = HB_UNKNOWN;
-    node.cost = 10;
+    node.cost = 10; // コストは10。
 
-    // add hiragana
-    node.post = hiragana;
+    // 文節にひらがなを追加。
+    node.post = hiragana; // 変換後の文字列。
     clause.add(&node);
 
-    // add katakana
-    node.post = lcmap(hiragana, LCMAP_FULLWIDTH | LCMAP_KATAKANA);
+    // 文節にカタカナを追加。
+    node.post = lcmap(hiragana, LCMAP_FULLWIDTH | LCMAP_KATAKANA); // 変換後の文字列。
     clause.add(&node);
 
-    // add the clause
+    // 結果に文節を追加。
     result.clauses.push_back(clause);
     ASSERT(result.clauses[0].candidates.size());
 
-    // sort by cost
+    // コストによりソートする。
     result.sort();
     ASSERT(result.clauses[0].candidates.size());
 } // MzIme::MakeResultForSingle
@@ -2730,18 +2731,12 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 
 // Shift_JISのマルチバイト文字の1バイト目か？
 inline bool is_sjis_lead(BYTE ch) {
-    return (
-                   ((0x81 <= ch) && (ch <= 0x9F)) ||
-                   ((0xE0 <= ch) && (ch <= 0xEF))
-                   );
+    return (((0x81 <= ch) && (ch <= 0x9F)) || ((0xE0 <= ch) && (ch <= 0xEF)));
 }
 
 // Shift_JISのマルチバイト文字の2バイト目か？
 inline bool is_sjis_trail(BYTE ch) {
-    return (
-                   ((0x40 <= ch) && (ch <= 0x7E)) ||
-                   ((0x80 <= ch) && (ch <= 0xFC))
-                   );
+    return (((0x40 <= ch) && (ch <= 0x7E)) || ((0x80 <= ch) && (ch <= 0xFC)));
 }
 
 // JISバイトか？
@@ -2792,9 +2787,7 @@ inline WORD jis2sjis(WORD jis_code) {
 
 // Shift_JISコードか？
 inline bool is_sjis_code(WORD w) {
-    return (
-                   is_sjis_lead(BYTE(w >> 8)) && is_sjis_trail(BYTE(w))
-                   );
+    return is_sjis_lead(BYTE(w >> 8)) && is_sjis_trail(BYTE(w));
 }
 
 // 区点からJISコードに変換。
