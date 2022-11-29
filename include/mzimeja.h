@@ -57,12 +57,15 @@
   #define DebugPrint    (void)
   #define DPRINT(fmt, ...)
   #define ASSERT(exp)
+  #define TRACE_ON()
+  #define TRACE_OFF()
 #else
-extern "C" {
-void DebugPrintA(const char *lpszFormat, ...);
-void DebugPrintW(const WCHAR *lpszFormat, ...);
-void DebugAssert(const char *file, int line, const char *exp);
-}   // extern "C"
+  extern "C" {
+    extern BOOL g_bTrace;
+    void DebugPrintA(const char *lpszFormat, ...);
+    void DebugPrintW(const WCHAR *lpszFormat, ...);
+    void DebugAssert(const char *file, int line, const char *exp);
+  } // extern "C"
   #define DebugPrintA DebugPrintA
   #define DebugPrintW DebugPrintW
   #define DPRINT(fmt, ...) DebugPrintA("%s (%d): " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
@@ -72,6 +75,8 @@ void DebugAssert(const char *file, int line, const char *exp);
   #else
     #define DebugPrint DebugPrintA
   #endif
+  #define TRACE_ON()    do { g_bTrace = TRUE; } while (0)
+  #define TRACE_OFF()   do { g_bTrace = FALSE; } while (0)
 #endif
 
 #include "footmark.hpp"   // for footmark++

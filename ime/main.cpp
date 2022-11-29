@@ -778,8 +778,15 @@ void FreeUIExtra(HWND hwndServer) {
 // デバッグ用。
 
 #ifdef MZIMEJA_DEBUG_OUTPUT
+
+BOOL g_bTrace = TRUE;   // この変数がFALSEのときはデバッグ出力しない。
+
+// printf関数と同じ文法でデバッグ出力を行う関数。
 void DebugPrintA(const char *lpszFormat, ...) {
     char szMsgA[1024];
+
+    if (!g_bTrace)
+        return;
 
     va_list marker;
     va_start(marker, lpszFormat);
@@ -812,8 +819,13 @@ void DebugPrintA(const char *lpszFormat, ...) {
 
     OutputDebugStringW(szMsgW);
 }
+
+// wprintf関数と同じ文法でデバッグ出力を行う関数。
 void DebugPrintW(const WCHAR *lpszFormat, ...) {
     WCHAR szMsg[1024];
+
+    if (!g_bTrace)
+        return;
 
     va_list marker;
     va_start(marker, lpszFormat);
@@ -842,6 +854,7 @@ void DebugPrintW(const WCHAR *lpszFormat, ...) {
     OutputDebugStringW(szMsg);
 }
 
+// ASSERT失敗時に呼び出される関数。
 void DebugAssert(const char *file, int line, const char *exp) {
     DebugPrintA("%s (%d): ASSERT(%s) failed\n", file, line, exp);
 }
