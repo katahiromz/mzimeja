@@ -297,15 +297,22 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     return lRet;
 }
 
+// フォントの高さを取得する。
 int GetCompFontHeight(UIEXTRA *lpUIExtra) {
-    HDC hIC = CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL);
+    HDC hIC = CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL); // DCを作成する（情報のみ）。
     HFONT hOldFont = NULL;
+
+    // フォントがあればフォントを選択。
     if (lpUIExtra->hFont) hOldFont = (HFONT)SelectObject(hIC, lpUIExtra->hFont);
+
+    // サイズを取得。
     SIZE siz;
     GetTextExtentPoint(hIC, TEXT("A"), 1, &siz);
-    if (hOldFont) SelectObject(hIC, hOldFont);
-    DeleteDC(hIC);
-    return siz.cy;
+
+    if (hOldFont) SelectObject(hIC, hOldFont); // フォントの選択を解除する。
+
+    DeleteDC(hIC); // DCを破棄する。
+    return siz.cy; // これが高さ。
 }
 
 // Handle WM_IME_NOTIFY messages
@@ -315,100 +322,103 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
     LOGFONT lf;
     InputContext *lpIMC;
 
-    UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
+    UIEXTRA *lpUIExtra = LockUIExtra(hWnd); // 余剰情報。
 
     switch (wParam) {
-    case IMN_CLOSESTATUSWINDOW:
+    case IMN_CLOSESTATUSWINDOW: // 状態ウィンドウを閉じる。
         DPRINT("IMN_CLOSESTATUSWINDOW\n");
-        if (::IsWindow(lpUIExtra->hwndStatus)) {
+        if (::IsWindow(lpUIExtra->hwndStatus)) { // 状態ウィンドウが生きている？
+            // 位置を保存。
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
             POINT pt;
             pt.x = rc.left;
             pt.y = rc.top;
             TheIME.SetUserData(L"ptStatusWindow", &pt, sizeof(pt));
-            ::ShowWindow(lpUIExtra->hwndStatus, SW_HIDE);
+
+            ::ShowWindow(lpUIExtra->hwndStatus, SW_HIDE); // 実際には破棄されるのではなく隠される。
         }
         break;
 
-    case IMN_OPENSTATUSWINDOW:
+    case IMN_OPENSTATUSWINDOW: // 状態ウィンドウが開かれる。
         DPRINT("IMN_OPENSTATUSWINDOW\n");
-        StatusWnd_Create(hWnd, lpUIExtra);
+        StatusWnd_Create(hWnd, lpUIExtra); // 状態ウィンドウを作成する。
         break;
 
-    case IMN_SETCONVERSIONMODE:
+    case IMN_SETCONVERSIONMODE: // 変換モードがセットされる。
         DPRINT("IMN_SETCONVERSIONMODE\n");
-        lpIMC = TheIME.LockIMC(hIMC);
+        lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
+            // ローマ字モードを保存。
             if (lpIMC->Conversion() & IME_CMODE_ROMAN) {
                 TheIME.SetUserDword(L"IsNonRoman", FALSE);
             } else {
                 TheIME.SetUserDword(L"IsNonRoman", TRUE);
             }
-            TheIME.UnlockIMC(hIMC);
+            TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
-        StatusWnd_Update(lpUIExtra);
+        StatusWnd_Update(lpUIExtra); // 余剰情報を更新。
         break;
 
     case IMN_SETSENTENCEMODE:
         DPRINT("IMN_SETSENTENCEMODE\n");
         break;
 
-    case IMN_SETCOMPOSITIONFONT:
+    case IMN_SETCOMPOSITIONFONT: // 未確定文字列のフォントがセットされる。
         DPRINT("IMN_SETCOMPOSITIONFONT\n");
-        lpIMC = TheIME.LockIMC(hIMC);
+        lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
-            lf = lpIMC->lfFont.W;
-            if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont);
+            lf = lpIMC->lfFont.W; // 論理フォント。
+            if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont); // すでにあれば破棄。
 
-            if (lf.lfEscapement == 2700)
-                lpUIExtra->bVertical = TRUE;
+            // フォントの向き。
+            if (lf.lfEscapement == 2700) // 270度。
+                lpUIExtra->bVertical = TRUE; // 縦書き。
             else {
                 lf.lfEscapement = 0;
-                lpUIExtra->bVertical = FALSE;
+                lpUIExtra->bVertical = FALSE; // 横書き。
             }
 
-            // if current font can't display Japanese characters,
-            // try to find Japanese font
+            // 現在のフォントが日本語でなければ別の日本語フォントを探す。
             if (lf.lfCharSet != SHIFTJIS_CHARSET) {
                 lf.lfCharSet = SHIFTJIS_CHARSET;
                 lf.lfFaceName[0] = 0;
             }
 
-            lpUIExtra->hFont = CreateFontIndirect(&lf);
-            CompWnd_SetFont(lpUIExtra);
-            CompWnd_Move(lpUIExtra, lpIMC);
+            lpUIExtra->hFont = CreateFontIndirect(&lf); // 論理フォントからフォントを作成。
+            CompWnd_SetFont(lpUIExtra); // フォントを余剰情報にセット。
+            CompWnd_Move(lpUIExtra, lpIMC); // 状態ウィンドウを移動。
 
-            TheIME.UnlockIMC(hIMC);
+            TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除
         }
         break;
 
-    case IMN_SETOPENSTATUS:
+    case IMN_SETOPENSTATUS: // IMEのON/OFFを切り替え。
         DPRINT("IMN_SETOPENSTATUS\n");
-        StatusWnd_Update(lpUIExtra);
+        StatusWnd_Update(lpUIExtra); // 状態ウィンドウを更新する。
         break;
 
-    case IMN_OPENCANDIDATE:
+    case IMN_OPENCANDIDATE: // 候補が開かれる。
         DPRINT("IMN_OPENCANDIDATE\n");
-        lpIMC = TheIME.LockIMC(hIMC);
+        lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
-            CandWnd_Create(hWnd, lpUIExtra, lpIMC);
-            TheIME.UnlockIMC(hIMC);
+            CandWnd_Create(hWnd, lpUIExtra, lpIMC); // 候補ウィンドウを作成。
+            TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
         break;
 
-    case IMN_CHANGECANDIDATE:
+    case IMN_CHANGECANDIDATE: // 候補が変更される。
         DPRINT("IMN_CHANGECANDIDATE\n");
-        lpIMC = TheIME.LockIMC(hIMC);
+        lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
-            CandWnd_Resize(lpUIExtra, lpIMC);
-            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
-            TheIME.UnlockIMC(hIMC);
+            CandWnd_Resize(lpUIExtra, lpIMC); // 候補ウィンドウのサイズを変更。
+            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE); // 候補ウィンドウを移動。
+            TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
         break;
 
-    case IMN_CLOSECANDIDATE:
+    case IMN_CLOSECANDIDATE: // 候補が閉じられる。
         DPRINT("IMN_CLOSECANDIDATE\n");
-        CandWnd_Hide(lpUIExtra);
+        CandWnd_Hide(lpUIExtra); // 候補ウィンドウを隠す。
         break;
 
     case IMN_GUIDELINE:

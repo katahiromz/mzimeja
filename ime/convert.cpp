@@ -2814,12 +2814,12 @@ inline bool is_sjis_code(WORD w) {
 
 // 区点からJISコードに変換。
 inline WORD kuten_to_jis(const std::wstring& str) {
-    if (str.size() != 5) return 0;
-    std::wstring ku_bangou = str.substr(0, 3);
-    std::wstring ten_bangou = str.substr(3, 2);
-    WORD ku = WORD(wcstoul(ku_bangou.c_str(), NULL, 10));
-    WORD ten = WORD(wcstoul(ten_bangou.c_str(), NULL, 10));
-    WORD jis_code = (ku + 32) * 256 + ten + 32;
+    if (str.size() != 5) return 0; // 五文字でなければ区点コードではない。
+    std::wstring ku_bangou = str.substr(0, 3); // 区番号。
+    std::wstring ten_bangou = str.substr(3, 2); // 点番号。
+    WORD ku = WORD(wcstoul(ku_bangou.c_str(), NULL, 10)); // 区番号を10進数として解釈。
+    WORD ten = WORD(wcstoul(ten_bangou.c_str(), NULL, 10)); // 点番号を10進数として解釈。
+    WORD jis_code = (ku + 32) * 256 + ten + 32; // 区と点によりJISコードを計算。
     return jis_code;
 }
 
