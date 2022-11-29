@@ -16,12 +16,12 @@
 // 入力モード。
 
 enum INPUT_MODE {
-    IMODE_FULL_HIRAGANA, // fullwidth hiragana
-    IMODE_FULL_KATAKANA, // fullwidth katakana
-    IMODE_FULL_ASCII, // fullwidth ASCII
-    IMODE_HALF_KANA, // halfwidth katakana
-    IMODE_HALF_ASCII, // halfwidth ASCII
-    IMODE_DISABLED // the IME is disabled
+    IMODE_FULL_HIRAGANA,    // 全角ひらがな。
+    IMODE_FULL_KATAKANA,    // 全角カタカナ。
+    IMODE_FULL_ASCII,       // 全角英数。
+    IMODE_HALF_KANA,        // 半角カナ。
+    IMODE_HALF_ASCII,       // 半角英数。
+    IMODE_DISABLED          // IMEが無効。
 };
 
 BOOL        IsInputModeOpen(INPUT_MODE imode);
@@ -38,20 +38,15 @@ UINT        CommandFromInputMode(INPUT_MODE imode);
 
 struct LogCandInfo;
 
-// The logical comp info extra.
 // 未確定文字列の余剰情報の論理データ。
 struct LogCompStrExtra {
-    // The selected composition clause index.
     // 選択中の文節のインデックス。
     // assert(iClause <= GetClauseCount());
     DWORD iClause;
-    // The hiragana clause strings.
     // ひらがな文節文字列。
     std::vector<std::wstring>   hiragana_clauses;
-    // The typing clause strings.
     // 入力文節文字列。
     std::vector<std::wstring>   typing_clauses;
-    // The composition clause strings.
     // 未確定文字列の文節文字列。
     std::vector<std::wstring>   comp_str_clauses;
 
@@ -81,45 +76,33 @@ struct COMPSTREXTRA {
 
 // 未確定文字列の論理データ。
 struct LogCompStr {
-    // composition character index of the current position
-    DWORD dwCursorPos;
-    // index of first changed composition character
-    DWORD dwDeltaStart;
-    // we don't use this member: comp_read_attr
-    std::vector<BYTE>   comp_read_attr;
-    // we don't use this member: comp_read_clause
-    std::vector<DWORD>  comp_read_clause;
-    // composition reading string
-    std::wstring comp_read_str;
-    // composition attributes (per composition character)
-    std::vector<BYTE>   comp_attr;
-    // mapping from composition clause index to composition character index
-    std::vector<DWORD>  comp_clause;
-    // composition string
-    std::wstring comp_str;
-    // mapping from result reading clause index to result reading character index
-    std::vector<DWORD>  result_read_clause;
-    // result reading string
-    std::wstring result_read_str;
-    // mapping from result clause index to result character index
-    std::vector<DWORD>  result_clause;
-    // result string
-    std::wstring result_str;
-    // extra information
-    LogCompStrExtra extra;
+    DWORD dwCursorPos;                      // 現在位置の文字のインデックス。
+    DWORD dwDeltaStart;                     // 最初に変更された文字のインデックス。
+    std::vector<BYTE>   comp_read_attr;     // we don't use this member: comp_read_attr
+    std::vector<DWORD>  comp_read_clause;   // we don't use this member: comp_read_clause
+    std::wstring comp_read_str;             // 読み文字列。
+    std::vector<BYTE>   comp_attr;          // 文字属性。
+    std::vector<DWORD>  comp_clause;        // 未確定文字列の文節インデックスから未確定文字列の文字インデックスへの写像。
+    std::wstring comp_str;                  // 未確定文字列。
+    std::vector<DWORD>  result_read_clause; // 結果読み文節インデックスから結果文字インデックスへの写像。
+    std::wstring result_read_str;           // 結果読み文字列。
+    std::vector<DWORD>  result_clause;      // 結果文節インデックスから結果文字インデックスへの写像。
+    std::wstring result_str;                // 結果文字列。
+    LogCompStrExtra extra;                  // 余剰情報。
 
     LogCompStr() {
         clear();
     }
+
+    // クリア。
     void clear();
     void clear_read();
     void clear_comp();
     void clear_result();
-    void clear_extra() {
-        extra.clear();
-    }
-    void fix();
-    DWORD GetTotalSize() const;
+    void clear_extra() { extra.clear(); }
+
+    void fix(); // 補正。
+    DWORD GetTotalSize() const; // 物理データの合計サイズ。
 
     BOOL IsBeingConverted();
     DWORD GetClauseCount() const;
@@ -140,7 +123,7 @@ struct LogCompStr {
     DWORD CompCharToClause(DWORD iCompChar) const;
     BOOL HasCompStr() const;
 
-    // conversion of composition
+    // 未確定文字列の文字種変換。
     void MakeHiragana();
     void MakeKatakana();
     void MakeHankaku();
@@ -168,7 +151,7 @@ struct LogCompStr {
     void UpdateExtraClause(DWORD iClause, DWORD dwConversion);
     void UpdateFromExtra(BOOL bRoman);
 
-    // for debugging
+    // デバッグ用。
     void AssertValid();
     void Dump();
 
@@ -182,7 +165,7 @@ inline void SetClause(DWORD *lpdw, DWORD num) {
     *(lpdw + 1) = num;
 }
 
-// physical composition info
+// 未確定文字列の物理データ。
 struct CompStr : public COMPOSITIONSTRING {
     static HIMCC ReCreate(HIMCC hCompStr, const LogCompStr *log = NULL);
 
@@ -236,7 +219,7 @@ private:
 }; // struct CompStr
 
 //////////////////////////////////////////////////////////////////////////////
-// candidate info
+// 候補情報。
 
 // private data of CANDIDATEINFO
 struct CANDINFOEXTRA {
@@ -244,7 +227,7 @@ struct CANDINFOEXTRA {
     DWORD iClause; // index of selected clause
 };
 
-// logical candidate list
+// 候補リストの論理データ。
 struct LogCandList {
     DWORD dwStyle;
     DWORD dwSelection;
@@ -270,7 +253,7 @@ struct LogCandList {
     std::wstring GetString(DWORD iCand) const;
 };
 
-// logical candidate info
+// 候補情報の論理データ。
 struct LogCandInfo {
     std::vector<LogCandList>  cand_lists;
     DWORD iClause;
@@ -297,17 +280,11 @@ struct LogCandInfo {
     void Dump();
 }; // struct LogCandInfo
 
-// physical candidate list
+// 候補リストの物理データ。
 struct CandList : public CANDIDATELIST {
-    BYTE *GetBytes()             {
-        return (BYTE *)this;
-    }
-    WCHAR *GetCandString(DWORD i) {
-        return LPTSTR(GetBytes() + dwOffset[i]);
-    }
-    WCHAR *GetCurString()         {
-        return GetCandString(dwSelection);
-    }
+    BYTE *GetBytes()                { return (BYTE *)this; }
+    WCHAR *GetCandString(DWORD i)   { return LPTSTR(GetBytes() + dwOffset[i]); }
+    WCHAR *GetCurString()           { return GetCandString(dwSelection); }
     DWORD  GetPageEnd() const;
     void GetLog(LogCandList& log);
     DWORD Store(const LogCandList *log);
@@ -319,15 +296,13 @@ private:
     CandList& operator=(const CandList&);
 }; // struct CandList
 
-// logical candidate info
+// 候補情報の物理データ。
 struct CandInfo : public CANDIDATEINFO {
     static HIMCC ReCreate(HIMCC hCandInfo, const LogCandInfo *log = NULL);
     void GetLog(LogCandInfo& log);
     DWORD Store(const LogCandInfo *log);
 
-    BYTE *GetBytes()           {
-        return (BYTE *)this;
-    }
+    BYTE *GetBytes() { return (BYTE *)this; }
     CandList *GetList(DWORD i);
     CANDINFOEXTRA *GetExtra();
 
@@ -341,68 +316,44 @@ private:
 }; // struct CandInfo
 
 //////////////////////////////////////////////////////////////////////////////
-// input context
+// 入力コンテキスト。
 
 struct InputContext : public INPUTCONTEXT {
     void Initialize();
 
-    // get status information
-    BOOL& IsOpen()       {
-        return fOpen;
-    }
-    const BOOL& IsOpen() const {
-        return fOpen;
-    }
-    DWORD& Conversion()       {
-        return fdwConversion;
-    }
-    const DWORD& Conversion() const {
-        return fdwConversion;
-    }
-    DWORD& Sentence()       {
-        return fdwSentence;
-    }
-    const DWORD& Sentence() const {
-        return fdwSentence;
-    }
+    // 状態を取得・設定する。
+    BOOL& IsOpen()                  { return fOpen; }
+    const BOOL& IsOpen() const      { return fOpen; }
+    DWORD& Conversion()             { return fdwConversion; }
+    const DWORD& Conversion() const { return fdwConversion; }
+    DWORD& Sentence()               { return fdwSentence; }
+    const DWORD& Sentence() const   { return fdwSentence; }
+    BOOL HasStatusWndPos() const    { return (fdwInit & INIT_STATUSWNDPOS); }
+    BOOL HasConversion() const      { return (fdwInit & INIT_CONVERSION); }
+    BOOL HasSentence() const        { return (fdwInit & INIT_SENTENCE); }
+    BOOL HasLogFont() const         { return (fdwInit & INIT_LOGFONT); }
+    BOOL HasCompForm() const        { return (fdwInit & INIT_COMPFORM); }
+    BOOL HasSoftKbdPos() const      { return (fdwInit & INIT_SOFTKBDPOS); }
     INPUT_MODE GetInputMode() const;
     BOOL IsRomanMode() const;
-    BOOL HasStatusWndPos() const {
-        return (fdwInit & INIT_STATUSWNDPOS);
-    }
-    BOOL HasConversion() const {
-        return (fdwInit & INIT_CONVERSION);
-    }
-    BOOL HasSentence() const {
-        return (fdwInit & INIT_SENTENCE);
-    }
-    BOOL HasLogFont() const {
-        return (fdwInit & INIT_LOGFONT);
-    }
-    BOOL HasCompForm() const {
-        return (fdwInit & INIT_COMPFORM);
-    }
-    BOOL HasSoftKbdPos() const {
-        return (fdwInit & INIT_SOFTKBDPOS);
-    }
 
-    // candidate info
+    // 候補情報。
     BOOL HasCandInfo();
     CandInfo *LockCandInfo();
     void UnlockCandInfo();
 
-    // composition info
+    // 未確定文字列。
     BOOL HasCompStr();
     CompStr *LockCompStr();
     void UnlockCompStr();
 
-    // message buffer
+    // メッセージバッファ。
     LPTRANSMSG LockMsgBuf();
     void UnlockMsgBuf();
     DWORD& NumMsgBuf();
     const DWORD& NumMsgBuf() const;
 
-    // guideline
+    // ガイドライン。
     void MakeGuideLine(DWORD dwID);
     LPGUIDELINE LockGuideLine();
     void UnlockGuideLine();
@@ -435,9 +386,10 @@ struct InputContext : public INPUTCONTEXT {
     void MakeHanEisuu();
     BOOL ConvertCode();
 
+    // 論理データを取得。
     void GetLogObjects(LogCompStr& comp, LogCandInfo& cand);
 
-    // for debugging
+    // デバッグ用。
     void DumpCandInfo();
     void DumpCompStr();
     void Dump();
