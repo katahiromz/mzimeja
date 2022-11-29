@@ -451,25 +451,29 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
 static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
     ASSERT(dict_data);
 
-    // レコード区切りとWCHAR文字の組み合わせを検索する。
+    // レコード区切りと文字chの組み合わせを検索する。
+    // これで文字chで始まる単語を検索できる。
     WCHAR sz[3] = {RECORD_SEP, ch, 0};
     const WCHAR *pch1 = wcsstr(dict_data, sz);
-    if (pch1 == NULL) {
+    if (pch1 == NULL)
         return FALSE;
-    }
 
-    std::wstring str;
-    const WCHAR *pch2 = pch1;
+    const WCHAR *pch2 = pch1; // 現在の位置。
     const WCHAR *pch3;
-    for (;; ) {
+    for (;;) {
+        // 現在の位置の次のレコード区切りと文字chの組み合わせを検索する。
         pch3 = wcsstr(pch2 + 1, sz);
-        if (pch3 == NULL) break;
-        pch2 = pch3;
+        if (pch3 == NULL) break; // なければループ終わり。
+        pch2 = pch3; // 現在の位置を更新。
     }
-    pch3 = wcschr(pch2 + 1, RECORD_SEP);
+    pch3 = wcschr(pch2 + 1, RECORD_SEP); // 現在の位置の次のレコード区切りを検索する。
     ASSERT(pch3);
+
+    // 最初に発見したレコード区切りから最後のレコード区切りまでの文字列を取得する。
+    std::wstring str;
     str.assign(pch1 + 1, pch3);
 
+    // レコード区切りで分割してレコードを取得する。
     sz[0] = RECORD_SEP;
     sz[1] = 0;
     unboost::split(records, str, unboost::is_any_of(sz));
@@ -479,12 +483,13 @@ static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
 
 // 子音の写像と母音の写像を作成する。
 void MzIme::MakeLiteralMaps() {
-    if (m_consonant_map.size()) {
-        return;
-    }
+    if (m_consonant_map.size())
+        return; // 初期化済み。
     // 以下の２つの写像を初期化する。
+    //
     // - ひらがな１文字から子音への写像。
     // - ひらがな１文字から母音への写像。
+    //
     // これらは品詞の活用で使用される。
     m_consonant_map.clear();
     m_vowel_map.clear();
@@ -525,15 +530,15 @@ DWORD Dict::GetSize() const {
 
 // 辞書を読み込む。
 BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
-    if (IsLoaded())
-        return TRUE; // すでに読み込み済み。
+    if (IsLoaded()) return TRUE; // すでに読み込み済み。
 
     m_strFileName = file_name;
     m_strObjectName = object_name;
 
-    SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes();
+    SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes(); // セキュリティ属性を作成。
     ASSERT(psa);
 
+    // ミューテックス (排他制御を行うオブジェクト) を作成。
     if (m_hMutex == NULL) {
         m_hMutex = ::CreateMutexW(psa, FALSE, m_strObjectName.c_str());
     }
@@ -548,19 +553,19 @@ BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
     if (cbSize == 0) return FALSE;
 
     BOOL ret = FALSE;
-    DWORD wait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds);
+    DWORD wait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds); // 排他制御を待つ。
     if (wait == WAIT_OBJECT_0) {
-        // create a file mapping
+        // ファイルマッピングを作成する。
         m_hFileMapping = ::CreateFileMappingW(
                 INVALID_HANDLE_VALUE, psa, PAGE_READWRITE,
                 0, cbSize, (m_strObjectName + L"FileMapping").c_str());
-        if (m_hFileMapping != NULL) {
-            // file mapping was created
+        if (m_hFileMapping) {
+            // ファイルマッピングが作成された。
             if (::GetLastError() == ERROR_ALREADY_EXISTS) {
-                // already exists
+                // ファイルマッピングがすでに存在する。
                 ret = TRUE;
             } else {
-                // newly created, load from file
+                // 新しく作成された。ファイルを読み込む。
                 FILE *fp = _wfopen(m_strFileName.c_str(), L"rb");
                 if (fp) {
                     wchar_t *pch = Lock();
@@ -572,6 +577,7 @@ BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
                 }
             }
         }
+        // 排他制御を解放。
         ::ReleaseMutex(m_hMutex);
     }
 
@@ -585,15 +591,18 @@ BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
 void Dict::Unload() {
     if (m_hMutex) {
         if (m_hFileMapping) {
-            DWORD wait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds);
+            DWORD wait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds); // 排他制御を待つ。
             if (wait == WAIT_OBJECT_0) {
+                // ファイルマッピングを閉じる。
                 if (m_hFileMapping) {
                     ::CloseHandle(m_hFileMapping);
                     m_hFileMapping = NULL;
                 }
+                // 排他制御を解放。
                 ::ReleaseMutex(m_hMutex);
             }
         }
+        // ミューテックスを閉じる。
         ::CloseHandle(m_hMutex);
         m_hMutex = NULL;
     }
@@ -621,6 +630,7 @@ BOOL Dict::IsLoaded() const {
 //////////////////////////////////////////////////////////////////////////////
 // MzConvResult, MzConvClause etc.
 
+// 文節にノードを追加する。
 void MzConvClause::add(const LatticeNode *node) {
     bool matched = false;
     for (size_t i = 0; i < candidates.size(); ++i) {
@@ -646,16 +656,17 @@ void MzConvClause::add(const LatticeNode *node) {
     }
 }
 
-static inline bool CandidateCompare(
-        const MzConvCandidate& cand1, const MzConvCandidate& cand2)
-{
+static inline bool
+CandidateCompare(const MzConvCandidate& cand1, const MzConvCandidate& cand2) {
     return cand1.cost < cand2.cost;
 }
 
+// コストで候補をソートする。
 void MzConvClause::sort() {
     std::sort(candidates.begin(), candidates.end(), CandidateCompare);
 }
 
+// コストで結果をソートする。
 void MzConvResult::sort() {
     for (size_t i = 1; i < clauses.size(); ++i) {
         for (size_t iCand1 = 0; iCand1 < clauses[i - 1].candidates.size(); ++iCand1) {
@@ -751,6 +762,14 @@ void Lattice::AddExtra() {
         DoFields(0, fields);
 
         wsprintfW(sz, L"%02u/%02u/%04u", st.wMonth, st.wDay, st.wYear);
+        fields[2] = sz;
+        DoFields(0, fields);
+
+        wsprintfW(sz, L"%04u-%02u-%02u", st.wYear, st.wMonth, st.wDay);
+        fields[2] = sz;
+        DoFields(0, fields);
+
+        wsprintfW(sz, L"%02u-%02u-%04u", st.wMonth, st.wDay, st.wYear);
         fields[2] = sz;
         DoFields(0, fields);
         return;
@@ -1118,6 +1137,7 @@ void Lattice::UpdateLinks() {
         }
         head = unboost::make_shared<LatticeNode>(node);
     }
+
     // add tail
     {
         LatticeNode node;
@@ -1175,6 +1195,7 @@ static inline bool IsNodeUnlinked(const LatticeNodePtr& node) {
     return node->linked == 0;
 }
 
+// リンクされていないノードを削除。
 void Lattice::CutUnlinkedNodes() {
     const size_t length = pre.size();
     for (size_t index = 0; index < length; ++index) {
@@ -1184,6 +1205,7 @@ void Lattice::CutUnlinkedNodes() {
     }
 } // Lattice::CutUnlinkedNodes
 
+// 最後にリンクされたインデックスを取得する。
 size_t Lattice::GetLastLinkedIndex() const {
     // is the last node linked?
     const size_t length = pre.size();
