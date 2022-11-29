@@ -9,8 +9,9 @@
 
 const DWORD c_dwMilliseconds = 8000;
 
-// ひらがな表。
+// ひらがな表。品詞の活用で使用される。
 static const wchar_t s_hiragana_table[][5] = {
+    // DAN_A, DAN_I, DAN_U, DAN_E, DAN_O
     {L'あ', L'い', L'う', L'え', L'お'}, // GYOU_A
     {L'か', L'き', L'く', L'け', L'こ'}, // GYOU_KA
     {L'が', L'ぎ', L'ぐ', L'げ', L'ご'}, // GYOU_GA
@@ -476,18 +477,21 @@ static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
     return records.size();
 } // ScanDict
 
+// 子音の写像と母音の写像を作成する。
 void MzIme::MakeLiteralMaps() {
     if (m_consonant_map.size()) {
         return;
     }
+    // 以下の２つの写像を初期化する。
+    // - ひらがな１文字から子音への写像。
+    // - ひらがな１文字から母音への写像。
+    // これらは品詞の活用で使用される。
     m_consonant_map.clear();
     m_vowel_map.clear();
-    for (size_t i = 0; i < _countof(s_hiragana_table); ++i) {
-        for (size_t k = 0; k < 5; ++k) {
-            m_consonant_map[s_hiragana_table[i][k]] = s_hiragana_table[i][0];
-        }
-        for (size_t k = 0; k < 5; ++k) {
-            m_vowel_map[s_hiragana_table[i][k]] = s_hiragana_table[0][k];
+    for (size_t iGyou = 0; iGyou < _countof(s_hiragana_table); ++iGyou) {
+        for (INT iDan = DAN_A; iDan <= DAN_O; ++iDan) {
+            m_consonant_map[s_hiragana_table[iGyou][iDan]] = s_hiragana_table[iGyou][DAN_A];
+            m_vowel_map[s_hiragana_table[iGyou][iDan]] = s_hiragana_table[GYOU_A][iDan];
         }
     }
 } // MzIme::MakeLiteralMaps
@@ -728,7 +732,8 @@ bool LatticeNode::IsJodoushi() const {
 
 // 追加情報。
 void Lattice::AddExtra() {
-    if (pre == L"きょう") { // today
+    // 今日（today）
+    if (pre == L"きょう") {
         SYSTEMTIME st;
         ::GetLocalTime(&st);
         WCHAR sz[32];
@@ -750,7 +755,9 @@ void Lattice::AddExtra() {
         DoFields(0, fields);
         return;
     }
-    if (pre == L"ことし") { // this year
+
+    // 今年（this year）
+    if (pre == L"ことし") {
         SYSTEMTIME st;
         ::GetLocalTime(&st);
         WCHAR sz[32];
@@ -764,7 +771,9 @@ void Lattice::AddExtra() {
         DoFields(0, fields);
         return;
     }
-    if (pre == L"じこく" || pre == L"ただいま") { // now time
+
+    // 現在の時刻（current time）
+    if (pre == L"じこく" || pre == L"ただいま") {
         SYSTEMTIME st;
         ::GetLocalTime(&st);
         WCHAR sz[32];
@@ -811,6 +820,7 @@ void Lattice::AddExtra() {
         DoFields(0, fields);
         return;
     }
+
     if (pre == L"じぶん") { // myself
         WCHAR sz[64];
         DWORD dwSize = _countof(sz);
@@ -823,7 +833,9 @@ void Lattice::AddExtra() {
         }
         return;
     }
-    if (pre == L"かっこ") { // kakko (parens, brackets, braces, ...)
+
+    // カッコ (parens, brackets, braces, ...)
+    if (pre == L"かっこ") {
         WStrings items;
         unboost::split(items, TheIME.LoadSTR(100), unboost::is_any_of(L"\t"));
 
@@ -836,7 +848,8 @@ void Lattice::AddExtra() {
         }
         return;
     }
-    // symbols
+
+    // 記号（symbols）
     static const wchar_t *s_words[] = {
         L"きごう", L"けいせん", L"けいさん", L"さんかく",
         L"しかく", L"ずけい", L"まる", L"ほし", L"ひし",

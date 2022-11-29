@@ -583,30 +583,25 @@ public:
     // リソースから文字列を読み込む。
     WCHAR *LoadSTR(INT nID);
 
-    // update the indicator icon
-    void UpdateIndicIcon(HIMC hIMC);
+    void UpdateIndicIcon(HIMC hIMC);    // インジケーターアイコンを更新する。
 
-    // get the keyboard layout handle
-    HKL GetHKL(VOID);
+    HKL GetHKL(VOID);                   // キーボードレイアウトのハンドルを取得する。
 
-    // lock the input context
-    InputContext *LockIMC(HIMC hIMC);
-    // unlock the input context
-    VOID UnlockIMC(HIMC hIMC);
+    InputContext *LockIMC(HIMC hIMC);   // 入力コンテキストをロックする。
+    VOID UnlockIMC(HIMC hIMC);          // 入力コンテキストのロックを解除する。
 
-    // generate a message
+    // メッセージの生成。
     BOOL GenerateMessage(LPTRANSMSG lpGeneMsg);
     BOOL GenerateMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
     BOOL GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg);
 
-    // do command
-    BOOL DoCommand(HIMC hIMC, DWORD dwCommand);
+    BOOL DoCommand(HIMC hIMC, DWORD dwCommand);     // コマンドを実行する。
 
-    // basic dictionary
-    BOOL LoadBasicDict();
-    BOOL IsBasicDictLoaded() const;
-    WCHAR *LockBasicDict();
-    void UnlockBasicDict(WCHAR *data);
+    // 基本辞書。
+    BOOL LoadBasicDict();                   // 基本辞書を読み込む。
+    BOOL IsBasicDictLoaded() const;         // 基本辞書が読み込まれたか？
+    WCHAR *LockBasicDict();                 // 基本辞書をロックする。
+    void UnlockBasicDict(WCHAR *data);      // 基本辞書のロックを解除する。
 
     // make lattice
     BOOL MakeLattice(Lattice& lattice, const std::wstring& pre);
@@ -630,7 +625,7 @@ public:
     BOOL StoreResult(
             const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
 
-    // computer settings
+    // コンピュータ側の設定。
     BOOL GetComputerString(LPCWSTR pszSettingName, std::wstring& value);
     BOOL SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue);
     BOOL GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr);
@@ -638,7 +633,7 @@ public:
     BOOL GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size);
     BOOL SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 
-    // user settings
+    // ユーザー側の設定。
     BOOL GetUserString(LPCWSTR pszSettingName, std::wstring& value);
     BOOL SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue);
     BOOL GetUserDword(LPCWSTR pszSettingName, DWORD *ptr);
