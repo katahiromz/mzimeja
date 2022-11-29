@@ -24,11 +24,11 @@ static const wchar_t s_hiragana_table[][5] = {
     {L'ば', L'び', L'ぶ', L'べ', L'ぼ'}, // GYOU_BA
     {L'ぱ', L'ぴ', L'ぷ', L'ぺ', L'ぽ'}, // GYOU_PA
     {L'ま', L'み', L'む', L'め', L'も'}, // GYOU_MA
-    {L'や', 0, L'ゆ', 0, L'よ'},     // GYOU_YA
+    {L'や',     0, L'ゆ',     0, L'よ'}, // GYOU_YA
     {L'ら', L'り', L'る', L'れ', L'ろ'}, // GYOU_RA
-    {L'わ', 0, 0, 0, L'を'},         // GYOU_WA
-    {L'ん', 0, 0, 0, 0},             // GYOU_NN
-};
+    {L'わ',     0,     0,     0, L'を'}, // GYOU_WA
+    {L'ん',     0,     0,     0,     0}, // GYOU_NN
+}; // ※ s_hiragana_table[GYOU_DA][DAN_U] のように使用する。
 
 // 品詞分類を文字列に変換する（デバッグ用）。
 static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
@@ -2822,14 +2822,14 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
 
     // 16進を読み込み。
     ULONG hex_code = wcstoul(strTyping.c_str(), NULL, 16);
+
+    // Unicodeのノードを文節に追加。
     WCHAR szUnicode[2];
     szUnicode[0] = WCHAR(hex_code);
     szUnicode[1] = 0;
-
-    // Unicodeのノードを文節に追加。
-    node.post = szUnicode;
+    node.post = szUnicode; // 変換後の文字列。
     clause.add(&node);
-    node.cost++;
+    node.cost++; // コストを１つ加算。
 
     // Shift_JISコードのノードを文節に追加。
     CHAR szSJIS[8];
@@ -2839,8 +2839,8 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
         szSJIS[1] = LOBYTE(wSJIS);
         szSJIS[2] = 0;
         ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
-        node.post = szUnicode;
-        node.cost++;
+        node.post = szUnicode; // 変換後の文字列。
+        node.cost++; // コストを１つ加算。
         clause.add(&node);
     }
 
@@ -2852,8 +2852,8 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
             szSJIS[1] = LOBYTE(wSJIS);
             szSJIS[2] = 0;
             ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
-            node.post = szUnicode;
-            node.cost++;
+            node.post = szUnicode; // 変換後の文字列。
+            node.cost++; // コストを１つ加算。
             clause.add(&node);
         }
     }
@@ -2867,15 +2867,15 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
             szSJIS[1] = LOBYTE(wSJIS);
             szSJIS[2] = 0;
             ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
-            node.post = szUnicode;
-            node.cost++;
+            node.post = szUnicode; // 変換後の文字列。
+            node.cost++; // コストを１つ加算。
             clause.add(&node);
         }
     }
 
     // 元の入力文字列のノードを文節に追加。
-    node.post = strTyping;
-    node.cost++;
+    node.post = strTyping; // 変換後の文字列。
+    node.cost++; // コストを１つ加算。
     clause.add(&node);
 
     result.clauses.push_back(clause);
