@@ -252,9 +252,9 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         lpUIExtra = LockUIExtra(hWnd);
         if (lpUIExtra) {
             if (!lpUIExtra->dwCompStyle) {
-                POINT pt;
-                pt.x = (short)LOWORD(lParam);
-                pt.y = (short)HIWORD(lParam);
+                RECT rc;
+                ::GetWindowRect(lpUIExtra->hwndDefComp, &rc);
+                POINT pt = { rc.left, rc.top };
                 TheIME.SetUserData(L"ptDefComp", &pt, sizeof(pt));
             }
             UnlockUIExtra(hWnd);

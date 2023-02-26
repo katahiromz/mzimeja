@@ -628,7 +628,7 @@ LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     case WM_MOVE: // ウィンドウ移動じ。
         hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
         if (IsWindow(hUIWnd))
-            SendMessage(hUIWnd, WM_UI_DEFCOMPMOVE, wParam, lParam); // サーバーに知らせる。
+            SendMessage(hUIWnd, WM_UI_DEFCOMPMOVE, 0, 0); // サーバーに知らせる。
         break;
 
     default: // その他のメッセージ。
