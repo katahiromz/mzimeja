@@ -529,7 +529,7 @@ StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     case WM_MOVE: // ウィンドウ移動時。
         hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
         if (::IsWindow(hwndServer))
-            SendMessage(hwndServer, WM_UI_STATEMOVE, wParam, lParam); // UIサーバーに送る。
+            SendMessage(hwndServer, WM_UI_STATEMOVE, 0, 0); // UIサーバーに送る。
         break;
 
     default: // その他のメッセージ。

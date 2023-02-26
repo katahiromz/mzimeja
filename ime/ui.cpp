@@ -239,9 +239,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             RECT rc;
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
             // 覚えておく。
-            POINT pt;
-            pt.x = (short)LOWORD(lParam);
-            pt.y = (short)HIWORD(lParam);
+            POINT pt = { rc.left, rc.top };
             TheIME.SetUserData(L"ptStatusWindow", &pt, sizeof(pt));
             UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
         }
