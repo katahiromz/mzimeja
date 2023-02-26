@@ -177,7 +177,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     case WM_IME_COMPOSITION: // IME変換時。
         DPRINT("WM_IME_COMPOSITION\n");
         // Update to display the composition string.
-        lpIMC = TheIME.LockIMC(hIMC)
+        lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
             if (lpUIExtra) {

@@ -413,7 +413,7 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
 
     HMENU hSubMenu = ::GetSubMenu(hMenu, 0); // インデックス0の子メニューを取得。
 
-    TPMPARAMS params = { sizeof(params); };
+    TPMPARAMS params = { sizeof(params) };
     ::GetWindowRect(hWnd, &params.rcExclude);
 
     HWND hwndFore = ::GetForegroundWindow(); // 最前面ウィンドウを覚えておく。
