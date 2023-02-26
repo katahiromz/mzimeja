@@ -156,12 +156,6 @@
 //////////////////////////////////////////////////////////////////////////////
 // Structures
 
-// UICHILD
-struct UICHILD {
-    HWND hWnd;
-    POINT pt;
-};
-
 // UICHILD2
 struct UICHILD2 {
     HWND hWnd;
@@ -172,7 +166,8 @@ struct UICHILD2 {
 struct UIEXTRA {
     HIMC hIMC;
     HWND hwndStatus;
-    UICHILD uiCand;
+    HWND hwndCand;
+    POINT ptCand;
     DWORD dwCompStyle;
     HFONT hFont;
     BOOL bVertical;

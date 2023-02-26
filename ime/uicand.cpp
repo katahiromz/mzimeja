@@ -138,20 +138,20 @@ void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     POINT pt;
 
     if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
-        lpUIExtra->uiCand.pt.x = pt.x;
-        lpUIExtra->uiCand.pt.y = pt.y;
+        lpUIExtra->ptCand.x = pt.x;
+        lpUIExtra->ptCand.y = pt.y;
     }
 
-    if (!::IsWindow(lpUIExtra->uiCand.hWnd)) {
-        lpUIExtra->uiCand.hWnd =
+    if (!::IsWindow(lpUIExtra->hwndCand)) {
+        lpUIExtra->hwndCand =
                 ::CreateWindowEx(WS_EX_WINDOWEDGE, szCandClassName, NULL,
                                  WS_COMPDEFAULT | WS_DLGFRAME,
-                                 lpUIExtra->uiCand.pt.x, lpUIExtra->uiCand.pt.y,
+                                 lpUIExtra->ptCand.x, lpUIExtra->ptCand.y,
                                  1, 1, hUIWnd, NULL, TheIME.m_hInst, NULL);
     }
 
-    ::SetWindowLongPtr(lpUIExtra->uiCand.hWnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
-    ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
+    ::SetWindowLongPtr(lpUIExtra->hwndCand, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
+    ::ShowWindow(lpUIExtra->hwndCand, SW_HIDE);
 } // CandWnd_Create
 
 void CandWnd_Paint(HWND hCandWnd) {
@@ -265,14 +265,14 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 } // CandWnd_CalcSize
 
 void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
-    if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
+    if (::IsWindow(lpUIExtra->hwndCand)) {
         SIZE siz = CandWnd_CalcSize(lpUIExtra, lpIMC);
         siz.cx += 4 * GetSystemMetrics(SM_CXEDGE);
         siz.cy += 4 * GetSystemMetrics(SM_CYEDGE);
 
         RECT rc;
-        ::GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
-        ::MoveWindow(lpUIExtra->uiCand.hWnd, rc.left, rc.top,
+        ::GetWindowRect(lpUIExtra->hwndCand, &rc);
+        ::MoveWindow(lpUIExtra->hwndCand, rc.left, rc.top,
                      siz.cx, siz.cy, TRUE);
     }
 } // CandWnd_Resize
@@ -280,12 +280,12 @@ void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 void CandWnd_Hide(UIEXTRA *lpUIExtra) {
     RECT rc;
 
-    if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
-        ::GetWindowRect(lpUIExtra->uiCand.hWnd, (LPRECT)&rc);
-        lpUIExtra->uiCand.pt.x = rc.left;
-        lpUIExtra->uiCand.pt.y = rc.top;
-        ::MoveWindow(lpUIExtra->uiCand.hWnd, -1, -1, 0, 0, TRUE);
-        ::ShowWindow(lpUIExtra->uiCand.hWnd, SW_HIDE);
+    if (::IsWindow(lpUIExtra->hwndCand)) {
+        ::GetWindowRect(lpUIExtra->hwndCand, (LPRECT)&rc);
+        lpUIExtra->ptCand.x = rc.left;
+        lpUIExtra->ptCand.y = rc.top;
+        ::MoveWindow(lpUIExtra->hwndCand, -1, -1, 0, 0, TRUE);
+        ::ShowWindow(lpUIExtra->hwndCand, SW_HIDE);
     }
 } // CandWnd_Hide
 
@@ -299,9 +299,9 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
     if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
         lpIMC->DumpCandInfo();
         if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
-            lpUIExtra->uiCand.pt.x = pt.x;
-            lpUIExtra->uiCand.pt.y = pt.y;
-            HWND hwndCand = lpUIExtra->uiCand.hWnd;
+            lpUIExtra->ptCand.x = pt.x;
+            lpUIExtra->ptCand.y = pt.y;
+            HWND hwndCand = lpUIExtra->hwndCand;
             ::GetWindowRect(hwndCand, &rc);
             int cx, cy;
             cx = rc.right - rc.left;
@@ -329,7 +329,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
         ::GetWindowRect(lpIMC->hWnd, &rcAppWnd);
 
         // get the specified position in screen coordinates
-        ::GetClientRect(lpUIExtra->uiCand.hWnd, &rc);
+        ::GetClientRect(lpUIExtra->hwndCand, &rc);
         if (!lpUIExtra->bVertical) {
             pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
             pt.y = lpIMC->cfCandForm[0].rcArea.bottom;
@@ -347,7 +347,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
         }
 
         // move and show candidate window
-        HWND hwndCand = lpUIExtra->uiCand.hWnd;
+        HWND hwndCand = lpUIExtra->hwndCand;
         if (::IsWindow(hwndCand)) {
             ::GetWindowRect(hwndCand, &rc);
             int cx, cy;
@@ -365,7 +365,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
         ::ClientToScreen(lpIMC->hWnd, &pt);
 
         // move and show candidate window
-        HWND hwndCand = lpUIExtra->uiCand.hWnd;
+        HWND hwndCand = lpUIExtra->hwndCand;
         if (::IsWindow(hwndCand)) {
             ::GetWindowRect(hwndCand, &rc);
             int cx, cy;

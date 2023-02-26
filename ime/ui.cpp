@@ -18,8 +18,8 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
         if (IsWindow(lpUIExtra->hwndStatus)) {
             ::ShowWindow(lpUIExtra->hwndStatus, nsw);
         }
-        if (IsWindow(lpUIExtra->uiCand.hWnd)) {
-            ::ShowWindow(lpUIExtra->uiCand.hWnd, nsw);
+        if (IsWindow(lpUIExtra->hwndCand)) {
+            ::ShowWindow(lpUIExtra->hwndCand, nsw);
         }
         if (IsWindow(lpUIExtra->hwndDefComp)) {
             ::ShowWindow(lpUIExtra->hwndDefComp, nsw);
@@ -43,7 +43,7 @@ void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam) {
             if (lpIMC) {
                 CompStr *lpCompStr = lpIMC->LockCompStr();
                 CandInfo *lpCandInfo = lpIMC->LockCandInfo();
-                if (::IsWindow(lpUIExtra->uiCand.hWnd)) {
+                if (::IsWindow(lpUIExtra->hwndCand)) {
                     CandWnd_Hide(lpUIExtra);
                 }
                 if (lParam & ISC_SHOWUICANDIDATEWINDOW) {
@@ -93,8 +93,8 @@ void OnDestroy(HWND hWnd) {
         if (::IsWindow(lpUIExtra->hwndStatus))
             ::DestroyWindow(lpUIExtra->hwndStatus);
 
-        if (::IsWindow(lpUIExtra->uiCand.hWnd))
-            ::DestroyWindow(lpUIExtra->uiCand.hWnd);
+        if (::IsWindow(lpUIExtra->hwndCand))
+            ::DestroyWindow(lpUIExtra->hwndCand);
 
         if (::IsWindow(lpUIExtra->hwndDefComp))
             ::DestroyWindow(lpUIExtra->hwndDefComp);
@@ -145,8 +145,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
         lpUIExtra = (UIEXTRA *)GlobalLock(hUIExtra);
         if (lpUIExtra) {
-            lpUIExtra->uiCand.pt.x = -1;
-            lpUIExtra->uiCand.pt.y = -1;
+            lpUIExtra->ptCand.x = -1;
+            lpUIExtra->ptCand.y = -1;
             lpUIExtra->hFont = NULL;
             GlobalUnlock(hUIExtra);
         }
@@ -269,10 +269,10 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         if (lpUIExtra) {
             // 位置を取得。
             RECT rc;
-            ::GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
+            ::GetWindowRect(lpUIExtra->hwndCand, &rc);
             // 位置を覚えておく。
             POINT pt = { rc.left, rc.top };
-            lpUIExtra->uiCand.pt = pt;
+            lpUIExtra->ptCand = pt;
             UnlockUIExtra(hWnd);
         }
         break;
@@ -538,7 +538,7 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         switch (wParam) {
         case IMC_GETCANDIDATEPOS: // 候補の位置が取得される。
             DPRINT("IMC_GETCANDIDATEPOS\n");
-            if (IsWindow(lpUIExtra->uiCand.hWnd)) { // 候補ウィンドウが生きていれば
+            if (IsWindow(lpUIExtra->hwndCand)) { // 候補ウィンドウが生きていれば
                 *(LPCANDIDATEFORM)lParam = lpIMC->cfCandForm[0]; // 入力コンテキストから取得。
                 ret = 0;
             }
