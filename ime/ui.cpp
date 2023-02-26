@@ -267,8 +267,10 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         // This message is sent by the candidate window.
         lpUIExtra = LockUIExtra(hWnd);
         if (lpUIExtra) {
+            // 位置を取得。
             RECT rc;
-            GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
+            ::GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
+            // 位置を覚えておく。
             POINT pt = { rc.left, rc.top };
             lpUIExtra->uiCand.pt = pt;
             UnlockUIExtra(hWnd);
@@ -283,7 +285,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         if (lpUIExtra) {
             // 位置を取得。
             RECT rc;
-            GetWindowRect(lpUIExtra->hwndGuide, &rc);
+            ::GetWindowRect(lpUIExtra->hwndGuide, &rc);
             // 位置を覚えておく。
             POINT pt = { rc.left, rc.top };
             TheIME.SetUserData(L"ptGuide", &pt, sizeof(pt));
