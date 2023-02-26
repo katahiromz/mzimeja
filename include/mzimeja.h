@@ -69,7 +69,7 @@
   #define DebugPrintA DebugPrintA
   #define DebugPrintW DebugPrintW
   #define DPRINT(fmt, ...) DebugPrintA("%s (%d): " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
-  #define ASSERT(exp) ((exp) ? 0 : DebugAssert(__FILE__, __LINE__, #exp))
+  #define ASSERT(exp) ((exp) ? (void)0 : DebugAssert(__FILE__, __LINE__, #exp))
   #ifdef UNICODE
     #define DebugPrint DebugPrintW
   #else
