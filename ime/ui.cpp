@@ -267,8 +267,10 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         // This message is sent by the candidate window.
         lpUIExtra = LockUIExtra(hWnd);
         if (lpUIExtra) {
-            lpUIExtra->uiCand.pt.x = (short)LOWORD(lParam);
-            lpUIExtra->uiCand.pt.y = (short)HIWORD(lParam);
+            RECT rc;
+            GetWindowRect(lpUIExtra->uiCand.hWnd, &rc);
+            POINT pt = { rc.left, rc.top };
+            lpUIExtra->uiCand.pt = pt;
             UnlockUIExtra(hWnd);
         }
         break;

@@ -92,7 +92,7 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 
     case WM_MOVE:
         hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
-        if (::IsWindow(hUIWnd)) ::SendMessage(hUIWnd, WM_UI_CANDMOVE, wParam, lParam);
+        if (::IsWindow(hUIWnd)) ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
         break;
 
     default:
@@ -309,7 +309,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
-            ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELONG(pt.x, pt.y));
+            ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
         }
         return;
     }
@@ -357,7 +357,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
         }
-        ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));
+        ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
     } else if (dwStyle == CFS_CANDIDATEPOS) {
         // get the specified position in screen coordinates
         pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
@@ -375,7 +375,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
         }
-        ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, MAKELPARAM(pt.x, pt.y));
+        ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
     } else {
         DPRINT("dwStyle: 0x%08lX", dwStyle);
     }
