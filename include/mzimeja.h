@@ -156,12 +156,6 @@
 //////////////////////////////////////////////////////////////////////////////
 // Structures
 
-// UICHILD2
-struct UICHILD2 {
-    HWND hWnd;
-    RECT rc;
-};
-
 // UIEXTRA
 struct UIEXTRA {
     HIMC hIMC;
@@ -172,7 +166,8 @@ struct UIEXTRA {
     HFONT hFont;
     BOOL bVertical;
     HWND hwndDefComp;
-    UICHILD2 uiComp[MAXCOMPWND];
+    HWND hwndComp[MAXCOMPWND];
+    RECT rcComp[MAXCOMPWND];
     HWND hwndGuide;
 };
 

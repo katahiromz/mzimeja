@@ -63,13 +63,13 @@ void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 
     lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
     for (int i = 0; i < MAXCOMPWND; i++) {
-        HWND hwnd = lpUIExtra->uiComp[i].hWnd;
+        HWND hwnd = lpUIExtra->hwndComp[i];
         if (!::IsWindow(hwnd)) {
             hwnd = ::CreateWindowEx(0, szCompStrClassName, NULL, WS_COMPNODEFAULT,
                                     0, 0, 1, 1, hUIWnd, NULL, TheIME.m_hInst, NULL);
-            lpUIExtra->uiComp[i].hWnd = hwnd;
+            lpUIExtra->hwndComp[i] = hwnd;
         }
-        ::SetRectEmpty(&lpUIExtra->uiComp[i].rc);
+        ::SetRectEmpty(&lpUIExtra->rcComp[i]);
         ::SetWindowLongPtr(hwnd, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont);
         ::SetWindowLongPtr(hwnd, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
         ::ShowWindow(hwnd, SW_HIDE);
@@ -119,7 +119,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
     DWORD dwClauseIndex = 0;
     for (int i = 0; i < MAXCOMPWND; i++) {
         if (lpIMC->cfCompForm.dwStyle) {
-            hCompWnd = lpUIExtra->uiComp[i].hWnd;
+            hCompWnd = lpUIExtra->hwndComp[i];
         } else {
             hCompWnd = lpUIExtra->hwndDefComp;
         }
@@ -245,7 +245,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
             // the composition windows that are given the compostion string
             // will be moved and shown.
             for (int i = 0; i < MAXCOMPWND; i++) {
-                HWND hwnd = lpUIExtra->uiComp[i].hWnd;
+                HWND hwnd = lpUIExtra->hwndComp[i];
                 if (::IsWindow(hwnd)) {
                     HDC hDC = ::GetDC(hwnd);
                     hFont = (HFONT) ::GetWindowLongPtr(hwnd, FIGWLP_FONT);
@@ -258,12 +258,12 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
                     if (num) {
                         ::GetTextExtentPoint32W(hDC, pch, num, &siz);
 
-                        lpUIExtra->uiComp[i].rc.left = curx;
-                        lpUIExtra->uiComp[i].rc.top = cury;
+                        lpUIExtra->rcComp[i].left = curx;
+                        lpUIExtra->rcComp[i].top = cury;
                         siz.cx += CARET_WIDTH;
                         siz.cy += UNDERLINE_HEIGHT;
-                        lpUIExtra->uiComp[i].rc.right = siz.cx;
-                        lpUIExtra->uiComp[i].rc.bottom = siz.cy;
+                        lpUIExtra->rcComp[i].right = siz.cx;
+                        lpUIExtra->rcComp[i].bottom = siz.cy;
                         ::SetWindowLong(hwnd, FIGWL_COMPSTARTSTR, LONG(pch - psz));
                         ::SetWindowLong(hwnd, FIGWL_COMPSTARTNUM, num);
                         ::MoveWindow(hwnd, curx, cury, siz.cx, siz.cy, TRUE);
@@ -276,7 +276,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
                             ++iClause;
                         }
                     } else {
-                        ::SetRectEmpty(&lpUIExtra->uiComp[i].rc);
+                        ::SetRectEmpty(&lpUIExtra->rcComp[i]);
                         ::SetWindowLong(hwnd, FIGWL_COMPSTARTSTR, 0);
                         ::SetWindowLong(hwnd, FIGWL_COMPSTARTNUM, 0);
                         ::ShowWindow(hwnd, SW_HIDE);
@@ -296,7 +296,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
             int curx = ptSrc.x, cury = ptSrc.y;
 
             for (int i = 0; i < MAXCOMPWND; i++) {
-                HWND hwnd = lpUIExtra->uiComp[i].hWnd;
+                HWND hwnd = lpUIExtra->hwndComp[i];
                 if (::IsWindow(hwnd)) {
                     HDC hDC = ::GetDC(hwnd);
                     hFont = (HFONT) ::GetWindowLongPtr(hwnd, FIGWLP_FONT);
@@ -308,12 +308,12 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
                     if (num) {
                         ::GetTextExtentPoint32W(hDC, pch, num, &siz);
 
-                        lpUIExtra->uiComp[i].rc.left = curx - siz.cy;
-                        lpUIExtra->uiComp[i].rc.top = cury;
+                        lpUIExtra->rcComp[i].left = curx - siz.cy;
+                        lpUIExtra->rcComp[i].top = cury;
                         siz.cy += UNDERLINE_HEIGHT;
                         siz.cx += CARET_WIDTH;
-                        lpUIExtra->uiComp[i].rc.right = siz.cy;
-                        lpUIExtra->uiComp[i].rc.bottom = siz.cx;
+                        lpUIExtra->rcComp[i].right = siz.cy;
+                        lpUIExtra->rcComp[i].bottom = siz.cx;
                         ::SetWindowLong(hwnd, FIGWL_COMPSTARTSTR, LONG(pch - psz));
                         ::SetWindowLong(hwnd, FIGWL_COMPSTARTNUM, num);
                         ::MoveWindow(hwnd, curx, cury, siz.cy, siz.cx, TRUE);
@@ -326,7 +326,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
                             ++iClause;
                         }
                     } else {
-                        ::SetRectEmpty(&lpUIExtra->uiComp[i].rc);
+                        ::SetRectEmpty(&lpUIExtra->rcComp[i]);
                         ::SetWindowLong(hwnd, FIGWL_COMPSTARTSTR, 0);
                         ::SetWindowLong(hwnd, FIGWL_COMPSTARTNUM, 0);
                         ::ShowWindow(hwnd, SW_HIDE);
@@ -351,7 +351,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 
             // hide all non-default comp windows
             for (int i = 0; i < MAXCOMPWND; i++) {
-                HWND hwnd = lpUIExtra->uiComp[i].hWnd;
+                HWND hwnd = lpUIExtra->hwndComp[i];
                 if (::IsWindow(hwnd)) {
                     ::ShowWindow(hwnd, SW_HIDE);
                 }
@@ -586,7 +586,7 @@ void CompWnd_Hide(UIEXTRA *lpUIExtra) {
     }
 
     for (int i = 0; i < MAXCOMPWND; i++) { // 他の複数のウィンドウ。
-        HWND hwnd = lpUIExtra->uiComp[i].hWnd;
+        HWND hwnd = lpUIExtra->hwndComp[i];
         if (::IsWindow(hwnd)) {
             ::ShowWindow(hwnd, SW_HIDE); // 隠す。
         }
@@ -596,7 +596,7 @@ void CompWnd_Hide(UIEXTRA *lpUIExtra) {
 // 未確定文字列ウィンドウのフォントを設定する。
 void CompWnd_SetFont(UIEXTRA *lpUIExtra) {
     for (int i = 0; i < MAXCOMPWND; i++) { // 既定以外のウィンドウ。
-        HWND hwnd = lpUIExtra->uiComp[i].hWnd; // ウィンドウハンドル。
+        HWND hwnd = lpUIExtra->hwndComp[i]; // ウィンドウハンドル。
         if (::IsWindow(hwnd)) {
             ::SetWindowLongPtr(hwnd, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont); // フォント指定。
         }

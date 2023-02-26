@@ -100,8 +100,8 @@ void OnDestroy(HWND hWnd) {
             ::DestroyWindow(lpUIExtra->hwndDefComp);
 
         for (INT i = 0; i < MAXCOMPWND; i++) {
-            if (::IsWindow(lpUIExtra->uiComp[i].hWnd))
-                ::DestroyWindow(lpUIExtra->uiComp[i].hWnd);
+            if (::IsWindow(lpUIExtra->hwndComp[i]))
+                ::DestroyWindow(lpUIExtra->hwndComp[i]);
         }
 
         if (::IsWindow(lpUIExtra->hwndGuide))
