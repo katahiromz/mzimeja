@@ -49,7 +49,7 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     case WM_MOVE: // ウィンドウ移動時。
         hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
         if (IsWindow(hUIWnd))
-            SendMessage(hUIWnd, WM_UI_GUIDEMOVE, wParam, lParam); // UIサーバーに送る。
+            SendMessage(hUIWnd, WM_UI_GUIDEMOVE, 0, 0); // UIサーバーに送る。
         break;
 
     case WM_CREATE: // ウィンドウ作成時。

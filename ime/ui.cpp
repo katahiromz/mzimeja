@@ -279,10 +279,11 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         // This message is sent by the status window.
         lpUIExtra = LockUIExtra(hWnd);
         if (lpUIExtra) {
+            // 位置を取得。
+            RECT rc;
+            GetWindowRect(lpUIExtra->hwndGuide, &rc);
             // 位置を覚えておく。
-            POINT pt;
-            pt.x = (short)LOWORD(lParam);
-            pt.y = (short)HIWORD(lParam);
+            POINT pt = { rc.left, rc.top };
             TheIME.SetUserData(L"ptGuide", &pt, sizeof(pt));
             UnlockUIExtra(hWnd);
         }
