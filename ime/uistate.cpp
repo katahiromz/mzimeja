@@ -264,8 +264,10 @@ void StatusWnd_Update(UIEXTRA *lpUIExtra) {
         if (TheIME.GetUserData(L"ptStatusWindow", &pt, sizeof(pt))) {
             RECT rc;
             ::GetWindowRect(hwndStatus, &rc);
-            ::MoveWindow(hwndStatus, pt.x, pt.y,
-                         rc.right - rc.left, rc.bottom - rc.top, TRUE);
+            if (pt.x != rc.left || pt.y != rc.top) {
+                ::MoveWindow(hwndStatus, pt.x, pt.y,
+                             rc.right - rc.left, rc.bottom - rc.top, TRUE);
+            }
         }
         ::SendMessage(hwndStatus, WM_UI_UPDATE, 0, 0);
     }
