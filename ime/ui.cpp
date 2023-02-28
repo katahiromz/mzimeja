@@ -621,7 +621,7 @@ void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
             DrawUIBorder(&drc);
         } else if (dwT & FIM_CAPUTURED) {
             DrawUIBorder(&drc);
-            SetWindowLongPtr(hWnd, FIGWL_MOUSE, dwT | FIM_MOVED);
+            ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, dwT | FIM_MOVED);
         }
         break;
 

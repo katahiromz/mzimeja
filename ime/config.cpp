@@ -172,7 +172,7 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
         break;
 
     case WM_INITDIALOG:
-        SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
+        ::SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
         //lpPropSheet = (LPPROPSHEETPAGE)lParam;
 
         nItem = ImeGetRegisterWordStyle(0, NULL);
@@ -249,7 +249,7 @@ INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
         break;
 
     case WM_INITDIALOG:
-        SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
+        ::SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
         //lpPropSheet = (LPPROPSHEETPAGE)lParam;
         break;
 
@@ -302,7 +302,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
         break;
 
     case WM_INITDIALOG:
-        SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
+        ::SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
         //lpPropSheet = (LPPROPSHEETPAGE)lParam;
         break;
 
@@ -355,7 +355,7 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
         break;
 
     case WM_INITDIALOG:
-        SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
+        ::SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
         //lpPropSheet = (LPPROPSHEETPAGE)lParam;
         break;
 
@@ -410,7 +410,7 @@ INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
         break;
 
     case WM_INITDIALOG:
-        SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
+        ::SetWindowLongPtr(hDlg, DWLP_USER, (LONG_PTR)lParam);
         //lpPropSheet = (LPPROPSHEETPAGE)lParam;
         break;
 

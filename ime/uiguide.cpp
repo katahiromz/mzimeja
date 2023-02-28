@@ -41,8 +41,8 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
             return DefWindowProc(hWnd, message, wParam, lParam);
         if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
             // 状態を戻す。
-            SetWindowLongPtr(hWnd, FIGWL_MOUSE, 0);
-            SetWindowLongPtr(hWnd, FIGWL_PUSHSTATUS, 0);
+            ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, 0);
+            ::SetWindowLongPtr(hWnd, FIGWL_PUSHSTATUS, 0);
         }
         break;
 
@@ -54,7 +54,7 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 
     case WM_CREATE: // ウィンドウ作成時。
         hbmpGuide = TheIME.LoadBMP(TEXT("CLOSEBMP")); // ビットマップを読み込み、保存する。
-        SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbmpGuide);
+        ::SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbmpGuide);
         GetClientRect(hWnd, &rc);
         break;
 
@@ -217,9 +217,9 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
             rc = drc;
             rc.right -= rc.left;
             rc.bottom -= rc.top;
-            SetWindowLongPtr(hGuideWnd, FIGWL_MOUSE, FIM_CAPUTURED); // キャプチャ状態を保存。
+            ::SetWindowLongPtr(hGuideWnd, FIGWL_MOUSE, FIM_CAPUTURED); // キャプチャ状態を保存。
             dwPushedGuide = CheckPushedGuide(hGuideWnd, &pt);
-            SetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS, dwPushedGuide); // 押された状態を保存。
+            ::SetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS, dwPushedGuide); // 押された状態を保存。
             GuideWnd_Paint(hGuideWnd, hDC, &pt, dwPushedGuide); // 再描画。
             dwCurrentPushedGuide = dwPushedGuide; // 押された状態を覚える。
         }
@@ -238,7 +238,7 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
                 DrawUIBorder(&drc);
             } else if (dwMouse & FIM_CAPUTURED) {
                 DrawUIBorder(&drc);
-                SetWindowLongPtr(hGuideWnd, FIGWL_MOUSE, dwMouse | FIM_MOVED);
+                ::SetWindowLongPtr(hGuideWnd, FIGWL_MOUSE, dwMouse | FIM_MOVED);
             }
         } else {
             GetCursorPos(&pt); // マウスカーソル位置を取得。

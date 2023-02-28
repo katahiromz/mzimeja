@@ -622,7 +622,7 @@ LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
             (HIWORD(lParam) != WM_RBUTTONDOWN))
             return DefWindowProc(hWnd, message, wParam, lParam);
         if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP))
-            SetWindowLongPtr(hWnd, FIGWL_MOUSE, 0); // 状態を元に戻す。
+            ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, 0); // 状態を元に戻す。
         break;
 
     case WM_MOVE: // ウィンドウ移動じ。

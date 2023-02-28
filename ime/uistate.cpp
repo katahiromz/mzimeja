@@ -455,7 +455,7 @@ StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     case WM_CREATE: // ウィンドウ作成時。
         // ビットマップを読み込み、セットする。
         hbm = TheIME.LoadBMP(TEXT("MODESBMP"));
-        SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbm);
+        ::SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbm);
         break;
 
     case WM_PAINT: // 描画時。

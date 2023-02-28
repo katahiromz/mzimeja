@@ -752,7 +752,7 @@ HGLOBAL GetUIExtraFromServerWnd(HWND hwndServer) {
 }
 
 void SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra) {
-    SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
+    ::SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
 }
 
 UIEXTRA *LockUIExtra(HWND hwndServer) {
@@ -770,7 +770,7 @@ void UnlockUIExtra(HWND hwndServer) {
 void FreeUIExtra(HWND hwndServer) {
     HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
     ::GlobalFree(hUIExtra);
-    SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
+    ::SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
 }
 
 //////////////////////////////////////////////////////////////////////////////
