@@ -89,7 +89,7 @@ void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
                 hUIWnd, NULL, TheIME.m_hInst, NULL);
         lpUIExtra->hwndDefComp = hwndDef;
     }
-    ::SetWindowLong(hwndDef, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont);
+    ::SetWindowLongPtr(hwndDef, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont);
     ::SetWindowLongPtr(hwndDef, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
     ::ShowWindow(hwndDef, SW_HIDE);
 }
@@ -137,7 +137,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
             x = y = 0;
         }
 
-        DWORD cch = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTNUM);
+        DWORD cch = (DWORD)::GetWindowLongPtr(hCompWnd, FIGWL_COMPSTARTNUM);
         DebugPrintA("ich: %d, cch: %d, dwClauseIndex: %d\n", ich, cch, dwClauseIndex);
 
         HDC hDC = ::GetDC(hCompWnd);
@@ -264,8 +264,8 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
                         siz.cy += UNDERLINE_HEIGHT;
                         lpUIExtra->rcComp[i].right = siz.cx;
                         lpUIExtra->rcComp[i].bottom = siz.cy;
-                        ::SetWindowLong(hwnd, FIGWL_COMPSTARTSTR, LONG(pch - psz));
-                        ::SetWindowLong(hwnd, FIGWL_COMPSTARTNUM, num);
+                        ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTSTR, LONG(pch - psz));
+                        ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTNUM, num);
                         ::MoveWindow(hwnd, curx, cury, siz.cx, siz.cy, TRUE);
                         ::ShowWindow(hwnd, SW_SHOWNOACTIVATE);
 
@@ -277,8 +277,8 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
                         }
                     } else {
                         ::SetRectEmpty(&lpUIExtra->rcComp[i]);
-                        ::SetWindowLong(hwnd, FIGWL_COMPSTARTSTR, 0);
-                        ::SetWindowLong(hwnd, FIGWL_COMPSTARTNUM, 0);
+                        ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTSTR, 0);
+                        ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTNUM, 0);
                         ::ShowWindow(hwnd, SW_HIDE);
                     }
                     ::InvalidateRect(hwnd, NULL, FALSE);
@@ -314,8 +314,8 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
                         siz.cx += CARET_WIDTH;
                         lpUIExtra->rcComp[i].right = siz.cy;
                         lpUIExtra->rcComp[i].bottom = siz.cx;
-                        ::SetWindowLong(hwnd, FIGWL_COMPSTARTSTR, LONG(pch - psz));
-                        ::SetWindowLong(hwnd, FIGWL_COMPSTARTNUM, num);
+                        ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTSTR, LONG(pch - psz));
+                        ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTNUM, num);
                         ::MoveWindow(hwnd, curx, cury, siz.cy, siz.cx, TRUE);
                         ::ShowWindow(hwnd, SW_SHOWNOACTIVATE);
 
@@ -327,8 +327,8 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
                         }
                     } else {
                         ::SetRectEmpty(&lpUIExtra->rcComp[i]);
-                        ::SetWindowLong(hwnd, FIGWL_COMPSTARTSTR, 0);
-                        ::SetWindowLong(hwnd, FIGWL_COMPSTARTNUM, 0);
+                        ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTSTR, 0);
+                        ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTNUM, 0);
                         ::ShowWindow(hwnd, SW_HIDE);
                     }
                     ::InvalidateRect(hwnd, NULL, FALSE);
@@ -346,8 +346,8 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     } else { // style is CFS_DEFAULT
         HWND hwndDef = lpUIExtra->hwndDefComp;
         if (::IsWindow(hwndDef)) {
-            ::SetWindowLong(hwndDef, FIGWL_COMPSTARTSTR, 0);
-            ::SetWindowLong(hwndDef, FIGWL_COMPSTARTNUM, 0);
+            ::SetWindowLongPtr(hwndDef, FIGWL_COMPSTARTSTR, 0);
+            ::SetWindowLongPtr(hwndDef, FIGWL_COMPSTARTNUM, 0);
 
             // hide all non-default comp windows
             for (int i = 0; i < MAXCOMPWND; i++) {
@@ -534,8 +534,8 @@ void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompSt
     if (lpIMC->cfCompForm.dwStyle) {
         ::SetBkMode(hDC, OPAQUE);
 
-        DWORD ich = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTSTR);
-        DWORD cch = ::GetWindowLong(hCompWnd, FIGWL_COMPSTARTNUM);
+        DWORD ich = (DWORD)::GetWindowLongPtr(hCompWnd, FIGWL_COMPSTARTSTR);
+        DWORD cch = (DWORD)::GetWindowLongPtr(hCompWnd, FIGWL_COMPSTARTNUM);
         if (cch && ich + cch <= DWORD(::lstrlenW(pch))) {
             pch += ich;
             DrawTextOneLine(hCompWnd, hDC, pch, ich, cch, lpCompStr, fVert);
@@ -622,7 +622,7 @@ LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
             (HIWORD(lParam) != WM_RBUTTONDOWN))
             return DefWindowProc(hWnd, message, wParam, lParam);
         if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP))
-            SetWindowLong(hWnd, FIGWL_MOUSE, 0); // 状態を元に戻す。
+            SetWindowLongPtr(hWnd, FIGWL_MOUSE, 0); // 状態を元に戻す。
         break;
 
     case WM_MOVE: // ウィンドウ移動じ。

@@ -11,10 +11,10 @@
 DWORD LogCompStrExtra::GetTotalSize() const {
     DWORD total = sizeof(COMPSTREXTRA);
     for (size_t i = 0; i < hiragana_clauses.size(); ++i) {
-        total += (hiragana_clauses[i].size() + 1) * sizeof(WCHAR);
+        total += DWORD((hiragana_clauses[i].size() + 1) * sizeof(WCHAR));
     }
     for (size_t i = 0; i < typing_clauses.size(); ++i) {
-        total += (typing_clauses[i].size() + 1) * sizeof(WCHAR);
+        total += DWORD((typing_clauses[i].size() + 1) * sizeof(WCHAR));
     }
     return total;
 }
@@ -85,7 +85,7 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
     dwHiraganaClauseOffset = (DWORD)(pb - GetBytes());
     dwHiraganaClauseCount = 0;
     for (size_t i = 0; i < log->hiragana_clauses.size(); ++i) {
-        size = (log->hiragana_clauses[i].size() + 1) * sizeof(WCHAR);
+        size = DWORD((log->hiragana_clauses[i].size() + 1) * sizeof(WCHAR));
         memcpy(pb, &log->hiragana_clauses[i][0], size);
         ++dwHiraganaClauseCount;
         pb += size;
@@ -94,7 +94,7 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
     dwTypingClauseOffset = (DWORD)(pb - GetBytes());
     dwTypingClauseCount = 0;
     for (size_t i = 0; i < log->typing_clauses.size(); ++i) {
-        size = (log->typing_clauses[i].size() + 1) * sizeof(WCHAR);
+        size = DWORD((log->typing_clauses[i].size() + 1) * sizeof(WCHAR));
         memcpy(pb, &log->typing_clauses[i][0], size);
         ++dwTypingClauseCount;
         pb += size;
@@ -123,7 +123,7 @@ void LogCompStr::fix() {
     if (count >= 1) {
         std::wstring str;
         for (size_t i = 0; i < count - 1; ++i) {
-            str = GetClauseCompString(i);
+            str = GetClauseCompString(DWORD(i));
             extra.comp_str_clauses.push_back(str);
         }
     } else {
@@ -181,7 +181,7 @@ DWORD LogCompStr::GetTotalSize() const {
     total += result_clause.size() * sizeof(DWORD);
     total += result_str.size() * sizeof(WCHAR);
     total += extra.GetTotalSize();
-    return total;
+    return (DWORD)total;
 }
 
 // 変換中か？
@@ -334,12 +334,12 @@ void LogCompStr::UpdateCompStr() {
     size_t count = extra.comp_str_clauses.size();
     comp_clause.resize(count + 1);
     for (size_t i = 0; i < count; ++i) {
-        comp_clause[i] = ich;
+        comp_clause[i] = (DWORD)ich;
         str += extra.comp_str_clauses[i];
         ich += extra.comp_str_clauses[i].size();
     }
     comp_str = str;
-    comp_clause[count] = ich;
+    comp_clause[count] = (DWORD)ich;
 }
 
 // 余剰情報から未確定文字列を更新する。
@@ -958,43 +958,43 @@ DWORD CompStr::Store(const LogCompStr *log) {
     }
 
     dwCompReadAttrOffset = DWORD(pb - GetBytes());
-    dwCompReadAttrLen = log->comp_read_attr.size() * sizeof(BYTE);
+    dwCompReadAttrLen = DWORD(log->comp_read_attr.size() * sizeof(BYTE));
     ADD_BYTES(comp_read_attr);
 
     dwCompReadClauseOffset = DWORD(pb - GetBytes());
-    dwCompReadClauseLen = log->comp_read_clause.size() * sizeof(DWORD);
+    dwCompReadClauseLen = DWORD(log->comp_read_clause.size() * sizeof(DWORD));
     ADD_DWORDS(comp_read_clause);
 
     dwCompReadStrOffset = DWORD(pb - GetBytes());
-    dwCompReadStrLen = log->comp_read_str.size();
+    dwCompReadStrLen = DWORD(log->comp_read_str.size());
     ADD_STRING(comp_read_str);
 
     dwCompAttrOffset = DWORD(pb - GetBytes());
-    dwCompAttrLen = log->comp_attr.size() * sizeof(BYTE);
+    dwCompAttrLen = DWORD(log->comp_attr.size() * sizeof(BYTE));
     ADD_BYTES(comp_attr);
 
     dwCompClauseOffset = DWORD(pb - GetBytes());
-    dwCompClauseLen = log->comp_clause.size() * sizeof(DWORD);
+    dwCompClauseLen = DWORD(log->comp_clause.size() * sizeof(DWORD));
     ADD_DWORDS(comp_clause);
 
     dwCompStrOffset = DWORD(pb - GetBytes());
-    dwCompStrLen = log->comp_str.size();
+    dwCompStrLen = DWORD(log->comp_str.size());
     ADD_STRING(comp_str);
 
     dwResultReadClauseOffset = DWORD(pb - GetBytes());
-    dwResultReadClauseLen = log->result_read_clause.size() * sizeof(DWORD);
+    dwResultReadClauseLen = DWORD(log->result_read_clause.size() * sizeof(DWORD));
     ADD_DWORDS(result_read_clause);
 
     dwResultReadStrOffset = DWORD(pb - GetBytes());
-    dwResultReadStrLen = log->result_read_str.size();
+    dwResultReadStrLen = DWORD(log->result_read_str.size());
     ADD_STRING(result_read_str);
 
     dwResultClauseOffset = DWORD(pb - GetBytes());
-    dwResultClauseLen = log->result_clause.size() * sizeof(DWORD);
+    dwResultClauseLen = DWORD(log->result_clause.size() * sizeof(DWORD));
     ADD_DWORDS(result_clause);
 
     dwResultStrOffset = DWORD(pb - GetBytes());
-    dwResultStrLen = log->result_str.size();
+    dwResultStrLen = DWORD(log->result_str.size());
     ADD_STRING(result_str);
 
     COMPSTREXTRA *pExtra = (COMPSTREXTRA *)pb;

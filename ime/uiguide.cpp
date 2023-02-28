@@ -41,8 +41,8 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
             return DefWindowProc(hWnd, message, wParam, lParam);
         if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
             // 状態を戻す。
-            SetWindowLong(hWnd, FIGWL_MOUSE, 0);
-            SetWindowLong(hWnd, FIGWL_PUSHSTATUS, 0);
+            SetWindowLongPtr(hWnd, FIGWL_MOUSE, 0);
+            SetWindowLongPtr(hWnd, FIGWL_PUSHSTATUS, 0);
         }
         break;
 
@@ -217,17 +217,17 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
             rc = drc;
             rc.right -= rc.left;
             rc.bottom -= rc.top;
-            SetWindowLong(hGuideWnd, FIGWL_MOUSE, FIM_CAPUTURED); // キャプチャ状態を保存。
+            SetWindowLongPtr(hGuideWnd, FIGWL_MOUSE, FIM_CAPUTURED); // キャプチャ状態を保存。
             dwPushedGuide = CheckPushedGuide(hGuideWnd, &pt);
-            SetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS, dwPushedGuide); // 押された状態を保存。
+            SetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS, dwPushedGuide); // 押された状態を保存。
             GuideWnd_Paint(hGuideWnd, hDC, &pt, dwPushedGuide); // 再描画。
             dwCurrentPushedGuide = dwPushedGuide; // 押された状態を覚える。
         }
         break;
 
     case WM_MOUSEMOVE:
-        dwMouse = GetWindowLong(hGuideWnd, FIGWL_MOUSE); // 状態を取得。
-        if (!(dwPushedGuide = GetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS))) { // 押された状態がなければ
+        dwMouse = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_MOUSE); // 状態を取得。
+        if (!(dwPushedGuide = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS))) { // 押された状態がなければ
             if (dwMouse & FIM_MOVED) { // 移動した？
                 DrawUIBorder(&drc);
                 GetCursorPos(&pt);
@@ -238,7 +238,7 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
                 DrawUIBorder(&drc);
             } else if (dwMouse & FIM_CAPUTURED) {
                 DrawUIBorder(&drc);
-                SetWindowLong(hGuideWnd, FIGWL_MOUSE, dwMouse | FIM_MOVED);
+                SetWindowLongPtr(hGuideWnd, FIGWL_MOUSE, dwMouse | FIM_MOVED);
             }
         } else {
             GetCursorPos(&pt); // マウスカーソル位置を取得。
@@ -251,7 +251,7 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
 
     case WM_LBUTTONUP: // 左ボタン解放時。
     case WM_RBUTTONUP: // 右ボタン解放時。
-        dwMouse = GetWindowLong(hGuideWnd, FIGWL_MOUSE); // マウス状態を取得。
+        dwMouse = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_MOUSE); // マウス状態を取得。
         if (dwMouse & FIM_CAPUTURED) { // キャプチャしている？
             ReleaseCapture(); // キャプチャを解放。
             if (dwMouse & FIM_MOVED) { // 移動した？
@@ -269,7 +269,7 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
         hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMC。
         if (hIMC) {
             GetCursorPos(&pt); // マウス位置を取得。
-            dwPushedGuide = GetWindowLong(hGuideWnd, FIGWL_PUSHSTATUS); // 押された状態を取得。
+            dwPushedGuide = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS); // 押された状態を取得。
             dwPushedGuide &= CheckPushedGuide(hGuideWnd, &pt);
             if (!dwPushedGuide) {
             } else if (dwPushedGuide == PUSHED_STATUS_CLOSE) {

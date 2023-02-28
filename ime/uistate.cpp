@@ -324,7 +324,7 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
 // IME状態ウィンドウ上でマウスが移動している。
 void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
     static POINT prev = {-1, -1}; // 一つ前の位置。
-    if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) { // キャプションをドラッグしている。
+    if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) { // キャプションをドラッグしている。
         if (bDown && ::GetCapture() == hWnd) { // ドラッグ中か？
             if (prev.x != -1 && prev.y != -1) { // 一つ前の位置があるか？
                 // ウィンドウの位置をずらす。
@@ -340,7 +340,7 @@ void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
             prev.x = -1;
             prev.y = -1;
             ::ReleaseCapture();
-            ::SetWindowLong(hWnd, FIGWL_MOUSE, SWHT_NONE);
+            ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, SWHT_NONE);
         }
     }
 }
@@ -352,7 +352,7 @@ void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
     case SWHT_CAPTION: // キャプション上。
         break;
     case SWHT_BUTTON_1: // ボタン1。
-        if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_1) {
+        if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_1) {
             // 再描画。
             HDC hDC = ::GetDC(hWnd);
             StatusWnd_Paint(hWnd, hDC, (bDown ? 1 : 0));
@@ -360,7 +360,7 @@ void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
         }
         break;
     case SWHT_BUTTON_2: // ボタン2。
-        if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_2) {
+        if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_2) {
             // 再描画。
             HDC hDC = ::GetDC(hWnd);
             StatusWnd_Paint(hWnd, hDC, (bDown ? 2 : 0));
@@ -368,7 +368,7 @@ void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
         }
         break;
     case SWHT_BUTTON_3: // ボタン3。
-        if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_3) {
+        if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_3) {
             // 再描画。
             HDC hDC = ::GetDC(hWnd);
             StatusWnd_Paint(hWnd, hDC, (bDown ? 3 : 0));
@@ -386,14 +386,14 @@ void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
     }
     if (bDown) { // 押された。
         ::SetCapture(hWnd); // ドラッグを開始するため、キャプチャーをセットする。
-        ::SetWindowLong(hWnd, FIGWL_MOUSE, hittest); // 押された位置を覚えておく。
+        ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, hittest); // 押された位置を覚えておく。
     } else { // 離された。
         ::ReleaseCapture(); // キャプチャーを解放し、ドラッグを終了する。
         if (hittest == SWHT_CAPTION) { // キャプション上であれば
             RepositionWindow(hWnd); // 位置を補正する。
         } else { // さもなければ
             StatusWnd_OnButton(hWnd, hittest); // ボタンのアクションを発動する。
-            ::SetWindowLong(hWnd, FIGWL_MOUSE, SWHT_NONE); // 押された位置をクリアする。
+            ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, SWHT_NONE); // 押された位置をクリアする。
         }
     }
 } // StatusWnd_OnLButton
@@ -488,7 +488,7 @@ StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     case WM_MOUSEMOVE: // マウス移動時。特にドラッグ時。
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
-        if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
+        if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
             StatusWnd_OnMouseMove(hWnd, pt, ::GetAsyncKeyState(VK_LBUTTON) < 0);
         }
         break;
@@ -509,7 +509,7 @@ StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
         ::GetCursorPos(&pt);
         switch (HIWORD(lParam)) {
         case WM_MOUSEMOVE: // マウス移動時。
-            if (::GetWindowLong(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
+            if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
                 StatusWnd_OnMouseMove(hWnd, pt, ::GetAsyncKeyState(VK_LBUTTON) < 0);
             }
             break;

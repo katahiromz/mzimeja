@@ -454,7 +454,7 @@ wWinMain(
         }
         break;
     default:
-        ret = ::DialogBoxW(hInstance, MAKEINTRESOURCEW(1), NULL, DialogProc);
+        ret = (INT)::DialogBoxW(hInstance, MAKEINTRESOURCEW(1), NULL, DialogProc);
         switch (ret) {
         case rad1:
             return DoInstall();

@@ -581,7 +581,7 @@ BOOL ImePad::CreateRadicalImageList() {
         HBITMAP hbm = Create24BppBitmap(hDC, 24, 24);
         HGDIOBJ hbmOld = ::SelectObject(hDC, hbm);
         {
-            ::BitBlt(hDC, 0, 0, 24, 24, hDC2, i * 24, 0, SRCCOPY);
+            ::BitBlt(hDC, 0, 0, 24, 24, hDC2, INT(i * 24), 0, SRCCOPY);
         }
         ::SelectObject(hDC, hbmOld);
         ImageList_Add(m_himlRadical, hbm, NULL);
@@ -733,7 +733,7 @@ void ImePad::OnLV1StrokesChanged(HWND hWnd) {
     ::SendMessage(m_hListView, WM_VSCROLL, MAKEWPARAM(SB_TOP, 0), 0);
     ListView_DeleteAllItems(m_hListView);
 
-    INT i = SendMessage(m_hListBox1, LB_GETCURSEL, 0, 0);
+    INT i = (INT)SendMessage(m_hListBox1, LB_GETCURSEL, 0, 0);
     if (i == LB_ERR) {
         OnSize(m_hWnd);
         return;
@@ -765,7 +765,7 @@ void ImePad::OnLV2StrokesChanged(HWND hWnd) {
     ::SendMessage(m_hListView, WM_VSCROLL, MAKEWPARAM(SB_TOP, 0), 0);
     ListView_DeleteAllItems(m_hListView);
 
-    INT i = SendMessage(m_hListBox2, LB_GETCURSEL, 0, 0);
+    INT i = (INT)SendMessage(m_hListBox2, LB_GETCURSEL, 0, 0);
     if (i == LB_ERR) {
         OnSize(m_hWnd);
         return;

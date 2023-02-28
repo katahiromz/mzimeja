@@ -570,7 +570,7 @@ BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
                 if (fp) {
                     wchar_t *pch = Lock();
                     if (pch) {
-                        ret = fread(pch, cbSize, 1, fp);
+                        ret = (BOOL)fread(pch, cbSize, 1, fp);
                         Unlock(pch);
                     }
                     fclose(fp);
@@ -882,7 +882,7 @@ void Lattice::AddExtra() {
     for (size_t i = 0; i < _countof(s_words); ++i) {
         if (pre == s_words[i]) {
             WStrings items;
-            WCHAR *pch = TheIME.LoadSTR(101 + i);
+            WCHAR *pch = TheIME.LoadSTR(101 + INT(i));
             WStrings fields(4);
             fields[0] = pre;
             fields[1].assign(1, MAKEWORD(HB_SYMBOL, 0));

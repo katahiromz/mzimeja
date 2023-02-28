@@ -132,8 +132,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     if (hIMC == NULL) {
         if (IsImeMessage2(message)) {
             DPRINT("Why hIMC is NULL?\n");
-            DPRINT("hWnd: %x, message: %x, wParam: %x, lParam: %x\n",
-                   (LONG)hWnd, message, wParam, lParam);
+            DPRINT("hWnd: %p, message: 0x%x, wParam: %x, lParam: %x\n",
+                   hWnd, message, wParam, lParam);
             return 0;
         }
     }
@@ -605,12 +605,12 @@ void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
             rc = drc;
             rc.right -= rc.left;
             rc.bottom -= rc.top;
-            SetWindowLong(hWnd, FIGWL_MOUSE, FIM_CAPUTURED);
+            ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, FIM_CAPUTURED);
         }
         break;
 
     case WM_MOUSEMOVE:
-        dwT = GetWindowLong(hWnd, FIGWL_MOUSE);
+        dwT = (DWORD)::GetWindowLongPtr(hWnd, FIGWL_MOUSE);
         if (dwT & FIM_MOVED) {
             DrawUIBorder(&drc);
             GetCursorPos(&pt);
@@ -621,13 +621,13 @@ void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
             DrawUIBorder(&drc);
         } else if (dwT & FIM_CAPUTURED) {
             DrawUIBorder(&drc);
-            SetWindowLong(hWnd, FIGWL_MOUSE, dwT | FIM_MOVED);
+            SetWindowLongPtr(hWnd, FIGWL_MOUSE, dwT | FIM_MOVED);
         }
         break;
 
     case WM_LBUTTONUP:
     case WM_RBUTTONUP:
-        dwT = GetWindowLong(hWnd, FIGWL_MOUSE);
+        dwT = (DWORD)::GetWindowLongPtr(hWnd, FIGWL_MOUSE);
 
         if (dwT & FIM_CAPUTURED) {
             ReleaseCapture();

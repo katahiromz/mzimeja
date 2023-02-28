@@ -265,7 +265,7 @@ BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
   }
   size += 1;  // \0
   size *= sizeof(WCHAR);
-  printf("size: %d\n", size);
+  printf("size: %d\n", (INT)size);
 
   void *pv = malloc(size);
   if (pv == NULL) {
@@ -314,7 +314,7 @@ BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
     NULL);
   if (hFile != INVALID_HANDLE_VALUE) {
     DWORD dwWritten;
-    ret = WriteFile(hFile, pv, size, &dwWritten, NULL); // 書き込む。
+    ret = WriteFile(hFile, pv, DWORD(size), &dwWritten, NULL); // 書き込む。
     CloseHandle(hFile); // ファイルを閉じる。
   }
 
