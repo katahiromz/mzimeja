@@ -230,7 +230,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_UI_STATEMOVE: // IME状態ウィンドウが移動。
-        DPRINT("WM_UI_STATEMOVE\n");
         // Set the position of the status window to UIExtra.
         // This message is sent by the status window.
         lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
@@ -246,7 +245,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_UI_DEFCOMPMOVE:
-        DPRINT("WM_UI_DEFCOMPMOVE\n");
         // Set the position of the composition window to UIExtra.
         // This message is sent by the composition window.
         lpUIExtra = LockUIExtra(hWnd);
@@ -262,7 +260,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_UI_CANDMOVE:
-        DPRINT("WM_UI_CANDMOVE\n");
         // Set the position of the candidate window to UIExtra.
         // This message is sent by the candidate window.
         lpUIExtra = LockUIExtra(hWnd);
@@ -278,7 +275,6 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_UI_GUIDEMOVE: // ガイドラインウィンドウが移動した。
-        DPRINT("WM_UI_GUIDEMOVE\n");
         // Set the position of the status window to UIExtra.
         // This message is sent by the status window.
         lpUIExtra = LockUIExtra(hWnd);
