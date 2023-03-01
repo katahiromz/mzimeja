@@ -21,8 +21,7 @@
 
 #include <string>           // for std::string, std::wstring, ...
 #include <vector>           // for std::vector
-#include <set>              // for std::set
-#include <map>              // for std::map
+#include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
 #include <algorithm>        // for std::sort
 
@@ -332,7 +331,7 @@ struct MzConvCandidate {
     std::wstring hiragana;              // ひらがな。
     std::wstring converted;             // 変換後。
     int cost;                           // コスト。
-    std::set<HinshiBunrui>  bunruis;    // 品詞分類集合。
+    std::unordered_set<HinshiBunrui>  bunruis;    // 品詞分類集合。
     std::wstring tags;                  // タグ。
 
     void clear() {

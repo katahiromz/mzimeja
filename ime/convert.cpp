@@ -674,8 +674,8 @@ void MzConvResult::sort() {
                 MzConvCandidate& cand1 = clauses[i - 1].candidates[iCand1];
                 MzConvCandidate& cand2 = clauses[i].candidates[iCand2];
                 int min_cost = 0x7FFF;
-                std::set<HinshiBunrui>::iterator it1, end1 = cand1.bunruis.end();
-                std::set<HinshiBunrui>::iterator it2, end2 = cand2.bunruis.end();
+                std::unordered_set<HinshiBunrui>::iterator it1, end1 = cand1.bunruis.end();
+                std::unordered_set<HinshiBunrui>::iterator it2, end2 = cand2.bunruis.end();
                 for (it1 = cand1.bunruis.begin(); it1 != end1; ++it1)  {
                     for (it2 = cand2.bunruis.begin(); it2 != end2; ++it2)  {
                         int cost = CandConnectCost(*it1, *it2);

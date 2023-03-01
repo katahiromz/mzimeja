@@ -113,7 +113,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
     // get clause info
     DWORD *pdw = lpCompStr->GetCompClause();
     DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
-    std::set<DWORD> clauses(pdw, pdwEnd);
+    std::unordered_set<DWORD> clauses(pdw, pdwEnd);
 
     DWORD ich = 0;
     DWORD dwClauseIndex = 0;
@@ -235,7 +235,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
         // clause info
         DWORD *pdw = lpCompStr->GetCompClause();
         DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
-        std::set<DWORD> clauses(pdw, pdwEnd);
+        std::unordered_set<DWORD> clauses(pdw, pdwEnd);
 
         if (!lpUIExtra->bVertical) { // not vertical font
             int dx = rcSrc.right - ptSrc.x;
@@ -405,7 +405,7 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
     // Get clause info. 節情報を取得。
     DWORD *pdw = lpCompStr->GetCompClause();
     DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
-    std::set<DWORD> clauses(pdw, pdwEnd);
+    std::unordered_set<DWORD> clauses(pdw, pdwEnd);
 
     // Get client rect and fill white. クライアント領域を取得し、白で塗りつぶす。
     RECT rc;
