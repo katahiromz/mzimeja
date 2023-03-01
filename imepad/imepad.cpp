@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #define _CRT_SECURE_NO_WARNINGS   // use fopen
-#include "targetver.h"   // target Windows version
+#include "../targetver.h"   // target Windows version
 
 #include <windows.h>
 #include <commctrl.h>
@@ -13,6 +13,7 @@
 #include <vector>           // for std::vector
 #include <set>              // for std::set
 #include <map>              // for std::map
+#include <unordered_map>    // for std::unordered_map
 #include <algorithm>        // for std::sort
 
 #include <cstdlib>          // for C standard library
@@ -21,9 +22,7 @@
 #include <cassert>          // for assert
 #include <cstring>          // for C string
 
-#define UNBOOST_USE_STRING_ALGORITHM
-#define UNBOOST_USE_UNORDERED_MAP
-#include "unboost.hpp"
+#include "../str.hpp"       // for str_*
 
 #include "resource.h"
 
@@ -67,12 +66,12 @@ protected:
 HWND m_hWnd;
 
 // data
-std::vector<KANJI_ENTRY>                          m_kanji_table;
-unboost::unordered_map<WORD, std::vector<WORD> >  m_kanji_stroke_map;
-std::vector<RADICAL_ENTRY>                        m_radical_table;
-unboost::unordered_map<WORD, std::vector<WORD> >  m_radical_stroke_map;
-unboost::unordered_map<WORD, WORD>                m_radical_id_map;
-unboost::unordered_map<WORD, std::vector<WORD> >  m_radical2_to_kanji_map;
+std::vector<KANJI_ENTRY>                      m_kanji_table;
+std::unordered_map<WORD, std::vector<WORD> >  m_kanji_stroke_map;
+std::vector<RADICAL_ENTRY>                    m_radical_table;
+std::unordered_map<WORD, std::vector<WORD> >  m_radical_stroke_map;
+std::unordered_map<WORD, WORD>                m_radical_id_map;
+std::unordered_map<WORD, std::vector<WORD> >  m_radical2_to_kanji_map;
 BOOL LoadKanjiData();
 BOOL LoadRadicalData();
 BOOL LoadKanjiAndRadical();
@@ -383,9 +382,9 @@ BOOL ImePad::LoadKanjiData() {
             if (buf[0] == ';') continue;
             ::MultiByteToWideChar(CP_UTF8, 0, buf, -1, wbuf, 256);
             std::wstring str = wbuf;
-            unboost::trim_right_if(str, unboost::is_any_of(L"\r\n"));
+            str_trim_right(str, L"\r\n");
             std::vector<std::wstring> vec;
-            unboost::split(vec, str, unboost::is_any_of(L"\t"));
+            str_split(vec, str, L"\t");
             entry.kanji_id = _wtoi(vec[0].c_str());
             entry.kanji_char = vec[1][0];
             entry.radical_id2 = _wtoi(vec[2].c_str());
@@ -421,9 +420,9 @@ BOOL ImePad::LoadRadicalData() {
             if (buf[0] == ';') continue;
             ::MultiByteToWideChar(CP_UTF8, 0, buf, -1, wbuf, 256);
             std::wstring str = wbuf;
-            unboost::trim_right_if(str, unboost::is_any_of(L"\r\n"));
+            str_trim_right(str, L"\r\n");
             std::vector<std::wstring> vec;
-            unboost::split(vec, str, unboost::is_any_of(L"\t"));
+            str_split(vec, str, L"\t");
             entry.radical_id = _wtoi(vec[0].c_str());
             entry.radical_id2 = _wtoi(vec[1].c_str());
             entry.strokes = _wtoi(vec[3].c_str());

@@ -1821,9 +1821,9 @@ std::wstring convert_to_kansuuji(const std::wstring& str) {
         ++iGroup;
     }
     if (ret.empty()) ret = L"—λ";
-    unboost::replace_all(ret, L"κ\", L"\");
-    unboost::replace_all(ret, L"κ•S", L"•S");
-    unboost::replace_all(ret, L"κη", L"η");
+    str_replace_all(ret, L"κ\", L"\");
+    str_replace_all(ret, L"κ•S", L"•S");
+    str_replace_all(ret, L"κη", L"η");
     return ret;
 }
 
@@ -1841,13 +1841,13 @@ std::wstring convert_to_kansuuji_brief(const std::wstring& str) {
 // Ώ”•Ο·i‚»‚Μ‚TjB
 std::wstring convert_to_kansuuji_formal(const std::wstring& str) {
     std::wstring ret = convert_to_kansuuji(str);
-    unboost::replace_all(ret, L"κ", L"λ");
-    unboost::replace_all(ret, L"“ρ", L"“σ");
-    unboost::replace_all(ret, L"O", L"Q");
-    unboost::replace_all(ret, L"ά", L"ή");
-    unboost::replace_all(ret, L"\", L"E");
-    unboost::replace_all(ret, L"η", L"ΐ");
-    unboost::replace_all(ret, L"–", L"δέ");
+    str_replace_all(ret, L"κ", L"λ");
+    str_replace_all(ret, L"“ρ", L"“σ");
+    str_replace_all(ret, L"O", L"Q");
+    str_replace_all(ret, L"ά", L"ή");
+    str_replace_all(ret, L"\", L"E");
+    str_replace_all(ret, L"η", L"ΐ");
+    str_replace_all(ret, L"–", L"δέ");
     return ret;
 }
 

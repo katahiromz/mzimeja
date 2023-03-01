@@ -476,7 +476,7 @@ static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
     // レコード区切りで分割してレコードを取得する。
     sz[0] = RECORD_SEP;
     sz[1] = 0;
-    unboost::split(records, str, unboost::is_any_of(sz));
+    str_split(records, str, sz);
     ASSERT(records.size());
     return records.size();
 } // ScanDict
@@ -856,7 +856,7 @@ void Lattice::AddExtra() {
     // カッコ (parens, brackets, braces, ...)
     if (pre == L"かっこ") {
         WStrings items;
-        unboost::split(items, TheIME.LoadSTR(100), unboost::is_any_of(L"\t"));
+        str_split(items, TheIME.LoadSTR(100), std::wstring(L"\t"));
 
         WStrings fields(4);
         fields[0] = pre;
@@ -1034,7 +1034,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
         // store data for each record
         for (size_t k = 0; k < records.size(); ++k) {
             const std::wstring& record = records[k];
-            unboost::split(fields, record, unboost::is_any_of(sep));
+            str_split(fields, record, std::wstring(sep));
             DoFields(index, fields);
         }
 
@@ -1084,7 +1084,7 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
     // store data for each record
     for (size_t k = 0; k < records.size(); ++k) {
         const std::wstring& record = records[k];
-        unboost::split(fields, record, unboost::is_any_of(sep));
+        str_split(fields, record, std::wstring(sep));
         DoFields(0, fields);
     }
 
@@ -1135,7 +1135,7 @@ void Lattice::UpdateLinks() {
             chunk1[k]->linked = 1;
             node.branches.push_back(chunk1[k]);
         }
-        head = unboost::make_shared<LatticeNode>(node);
+        head = std::make_shared<LatticeNode>(node);
     }
 
     // add tail
@@ -1143,7 +1143,7 @@ void Lattice::UpdateLinks() {
         LatticeNode node;
         node.bunrui = HB_TAIL;
         chunks[length].clear();
-        chunks[length].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[length].push_back(std::make_shared<LatticeNode>(node));
     }
 
     // add links and branches
@@ -1253,7 +1253,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
         node.katsuyou = MIZEN_KEI;
         node.pre = fields[0] + L"かろ";
         node.post = fields[2] + L"かろ";
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
 
@@ -1263,21 +1263,21 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str.substr(0, 2) != L"かっ") break;
         node.pre = fields[0] + L"かっ";
         node.post = fields[2] + L"かっ";
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'く') break;
         node.pre = fields[0] + L'く';
         node.post = fields[2] + L'く';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'う') break;
         node.pre = fields[0] + L'う';
         node.post = fields[2] + L'う';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
     do {
@@ -1308,14 +1308,14 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
             }
             node.pre = str;
             if (str.empty() || str.substr(0, addition.size()) != addition) break;
-            chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+            chunks[index].push_back(std::make_shared<LatticeNode>(node));
             refs[index + fields[0].size() + addition.size()]++;
             break;
         case L'い':
             if (str.empty() || str.substr(0, 2) != L"ゅう") break;
             node.pre = fields[0] + L"ゅう";
             node.post = fields[2] + L"ゅう";
-            chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+            chunks[index].push_back(std::make_shared<LatticeNode>(node));
             refs[index + fields[0].size() + 2]++;
         default:
             break;
@@ -1328,7 +1328,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str[0] != L'い') break;
         node.pre = fields[0] + L'い';
         node.post = fields[2] + L'い';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1338,14 +1338,14 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str[0] != L'い') break;
         node.pre = fields[0] + L'い';
         node.post = fields[2] + L'い';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'き') break;
         node.pre = fields[0] + L'き';
         node.post = fields[2] + L'き';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1355,7 +1355,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
         node.katsuyou = KATEI_KEI;
         node.pre = fields[0] + L"けれ";
         node.post = fields[2] + L"けれ";
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
 
@@ -1365,21 +1365,21 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str[0] != L'さ') break;
         node.pre = fields[0] + L'さ';
         node.post = fields[2] + L'さ';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'み') break;
         node.pre = fields[0] + L'み';
         node.post = fields[2] + L'み';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'め') break;
         node.pre = fields[0] + L'め';
         node.post = fields[2] + L'目';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1428,7 +1428,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
         node.katsuyou = MIZEN_KEI;
         node.pre = fields[0] + L"だろ";
         node.post = fields[2] + L"だろ";
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
 
@@ -1438,21 +1438,21 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str.substr(0, 2) != L"だっ") break;
         node.pre = fields[0] + L"だっ";
         node.post = fields[2] + L"だっ";
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'で') break;
         node.pre = fields[0] + L'で';
         node.post = fields[2] + L'で';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'に') break;
         node.pre = fields[0] + L'に';
         node.post = fields[2] + L'に';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1462,7 +1462,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
         node.katsuyou = SHUUSHI_KEI;
         node.pre = fields[0] + L'だ';
         node.post = fields[2] + L'だ';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1472,7 +1472,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
         node.katsuyou = RENTAI_KEI;
         node.pre = fields[0] + L'な';
         node.post = fields[2] + L'な';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1482,7 +1482,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
         node.katsuyou = KATEI_KEI;
         node.pre = fields[0] + L"なら";
         node.post = fields[2] + L"なら";
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
 
@@ -1492,7 +1492,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str[0] != L'さ') break;
         node.pre = fields[0] + L'さ';
         node.post = fields[2] + L'さ';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1544,14 +1544,14 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
             if (str.empty() || str[0] != L'わ') break;
             node.pre = fields[0] + L'わ';
             node.post = fields[2] + L'わ';
-            chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+            chunks[index].push_back(std::make_shared<LatticeNode>(node));
             refs[index + fields[0].size() + 1]++;
         } else {
             wchar_t ch = s_hiragana_table[node.gyou][DAN_A];
             if (str.empty() || str[0] != ch) break;
             node.pre = fields[0] + ch;
             node.post = fields[2] + ch;
-            chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+            chunks[index].push_back(std::make_shared<LatticeNode>(node));
             refs[index + fields[0].size() + 1]++;
         }
     } while(0);
@@ -1563,7 +1563,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str[0] != ch) break;
         node.pre = fields[0] + ch;
         node.post = fields[2] + ch;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
     do {
@@ -1577,7 +1577,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str[0] != ch) break;
         node.pre = fields[0] + ch;
         node.post = fields[2] + ch;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1589,10 +1589,10 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
         node.katsuyou = SHUUSHI_KEI;
         node.pre = fields[0] + ch;
         node.post = fields[2] + ch;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
         node.katsuyou = RENTAI_KEI;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1604,10 +1604,10 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
         node.katsuyou = KATEI_KEI;
         node.pre = fields[0] + ch;
         node.post = fields[2] + ch;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
         node.katsuyou = MEIREI_KEI;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1618,7 +1618,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str[0] != ch) break;
         node.pre = fields[0] + ch;
         node.post = fields[2] + ch;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1659,10 +1659,10 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
         node.katsuyou = MIZEN_KEI;
         node.pre = fields[0];
         node.post = fields[2];
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size()]++;
         node.katsuyou = RENYOU_KEI;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size()]++;
     } while(0);
 
@@ -1673,10 +1673,10 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
         node.katsuyou = SHUUSHI_KEI;
         node.pre = fields[0] + L'る';
         node.post = fields[2] + L'る';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
         node.katsuyou = RENTAI_KEI;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1686,7 +1686,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
         node.katsuyou = KATEI_KEI;
         node.pre = fields[0] + L'れ';
         node.post = fields[2] + L'れ';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1696,14 +1696,14 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str[0] != L'ろ') break;
         node.pre = fields[0] + L'ろ';
         node.post = fields[2] + L'ろ';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'よ') break;
         node.pre = fields[0] + L'よ';
         node.post = fields[2] + L'よ';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1712,7 +1712,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
     do {
         node.pre = fields[0];
         node.post = fields[2];
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size()]++;
     } while(0);
 } // Lattice::DoIchidanDoushi
@@ -1744,7 +1744,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
         node.katsuyou = MIZEN_KEI;
         node.pre = fields[0] + L'こ';
         node.post = fields[2] + L'来';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1754,7 +1754,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
         node.katsuyou = RENYOU_KEI;
         node.pre = fields[0] + L'き';
         node.post = fields[2] + L'来';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1765,10 +1765,10 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
         node.katsuyou = SHUUSHI_KEI;
         node.pre = fields[0] + L"くる";
         node.post = fields[2] + L"来る";
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
         node.katsuyou = RENYOU_KEI;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
 
@@ -1778,7 +1778,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
         node.katsuyou = KATEI_KEI;
         node.pre = fields[0] + L"くれ";
         node.post = fields[2] + L"来れ";
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
 
@@ -1788,7 +1788,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
         node.katsuyou = MEIREI_KEI;
         node.pre = fields[0] + L"こい";
         node.post = fields[2] + L"来い";
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
 
@@ -1798,7 +1798,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
         if (str.empty() || str[0] != L'き') break;
         node.pre = fields[0] + L'き';
         node.post = fields[2] + L'来';
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 } // Lattice::DoKahenDoushi
@@ -1839,7 +1839,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
             node.pre = fields[0] + L'さ';
             node.post = fields[2] + L'さ';
         }
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
     do {
@@ -1852,7 +1852,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
             node.pre = fields[0] + L'し';
             node.post = fields[2] + L'し';
         }
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
     do {
@@ -1865,7 +1865,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
             node.pre = fields[0] + L'せ';
             node.post = fields[2] + L'せ';
         }
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1881,7 +1881,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
             node.pre = fields[0] + L'し';
             node.post = fields[2] + L'し';
         }
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1898,11 +1898,11 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
             node.post = fields[2] + L"する";
         }
         node.katsuyou = SHUUSHI_KEI;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
 
         node.katsuyou = RENYOU_KEI;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
     do {
@@ -1916,7 +1916,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
             node.post = fields[2] + L'す';
         }
         node.katsuyou = SHUUSHI_KEI;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
@@ -1932,7 +1932,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
             node.post = fields[2] + L"すれ";
         }
         node.katsuyou = KATEI_KEI;
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
 
@@ -1948,7 +1948,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
             node.pre = fields[0] + L"しろ";
             node.post = fields[2] + L"しろ";
         }
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
     do {
@@ -1961,7 +1961,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
             node.pre = fields[0] + L"せよ";
             node.post = fields[2] + L"せよ";
         }
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
 } // Lattice::DoSahenDoushi
@@ -1992,18 +1992,18 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
             // animals or plants can be written in katakana
             node.pre = fields[0];
             node.post = lcmap(fields[0], LCMAP_KATAKANA | LCMAP_FULLWIDTH);
-            chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+            chunks[index].push_back(std::make_shared<LatticeNode>(node));
             refs[index + length]++;
 
             node.cost += 30;
             node.pre = fields[0];
             node.post = fields[2];
-            chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+            chunks[index].push_back(std::make_shared<LatticeNode>(node));
             refs[index + length]++;
         } else {
             node.pre = fields[0];
             node.post = fields[2];
-            chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+            chunks[index].push_back(std::make_shared<LatticeNode>(node));
             refs[index + length]++;
         }
     }
@@ -2051,7 +2051,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
     case HB_KANGO: case HB_SETTOUJI: case HB_SETSUBIJI:
         node.pre = fields[0];
         node.post = fields[2];
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + length]++;
         break;
     case HB_IKEIYOUSHI: // い形容詞。
@@ -2065,7 +2065,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
         node.katsuyou = MIZEN_KEI;
         node.pre = fields[0];
         node.post = fields[2];
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + length]++;
         break;
     case HB_RENYOU_JODOUSHI:
@@ -2073,7 +2073,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
         node.katsuyou = RENYOU_KEI;
         node.pre = fields[0];
         node.post = fields[2];
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + length]++;
         break;
     case HB_SHUUSHI_JODOUSHI:
@@ -2081,7 +2081,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
         node.katsuyou = SHUUSHI_KEI;
         node.pre = fields[0];
         node.post = fields[2];
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + length]++;
         break;
     case HB_RENTAI_JODOUSHI:
@@ -2089,7 +2089,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
         node.katsuyou = RENTAI_KEI;
         node.pre = fields[0];
         node.post = fields[2];
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + length]++;
         break;
     case HB_KATEI_JODOUSHI:
@@ -2097,7 +2097,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
         node.katsuyou = KATEI_KEI;
         node.pre = fields[0];
         node.post = fields[2];
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + length]++;
         break;
     case HB_MEIREI_JODOUSHI:
@@ -2105,7 +2105,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
         node.katsuyou = MEIREI_KEI;
         node.pre = fields[0];
         node.post = fields[2];
-        chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + length]++;
         break;
     case HB_GODAN_DOUSHI:

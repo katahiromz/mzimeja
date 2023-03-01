@@ -2,9 +2,11 @@
 /////////////////////////////////////////////////////////////////////////////
 // WARNING: This file is Shift_JIS encoding for historical reason. Be careful.
 
-#include "mzimeja.h"
-
-using namespace std;
+#define _CRT_SECURE_NO_WARNINGS
+#include "../dict.hpp"
+#include "../str.hpp"
+#include <algorithm>
+#include <cassert>
 
 static const wchar_t s_hiragana_table[][5] = {
   // DAN_A, DAN_I, DAN_U, DAN_E, DAN_O
@@ -26,8 +28,8 @@ static const wchar_t s_hiragana_table[][5] = {
   {L'ん', 0, 0, 0, 0},                   // GYOU_NN
 };
 
-unboost::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
-unboost::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
+std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
+std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
 
 void MakeLiteralMaps() {
   if (g_consonant_map.size()) {
@@ -91,9 +93,9 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
     std::wstring str = wbuf;
 
     // split to fields
-    unboost::trim_right_if(str, unboost::is_any_of(L"\r\n"));
+    str_trim_right(str, L"\r\n");
     WStrings fields;
-    unboost::split(fields, str, unboost::is_any_of(L"\t"));
+    str_split(fields, str, L"\t");
 
     // is it an invalid line?
     if (fields.empty() || fields[0].empty()) {
