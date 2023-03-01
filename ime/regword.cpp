@@ -1,5 +1,5 @@
 // regword.cpp --- registering words
-// �����o�^�B
+// 辞書登録。
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -12,33 +12,33 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 //  ImeRegisterWord
-//  ImeRegisterWord �֐��͌��݂�IME�̎����ɕ������o�^���܂��B
+//  ImeRegisterWord 関数は現在のIMEの辞書に文字列を登録します。
 //  BOOL WINAPI
 //    ImeRegisterWord(
 //    LPCTSTR lpszReading,
 //    DWORD dwStyle,
 //    LPCTSTR lpszString
 //  )
-//  (�p�����[�^)
+//  (パラメータ)
 //    lpszReading
-//      �o�^����镶����̓ǂ݁B
+//      登録される文字列の読み。
 //    dwStyle
-//      �o�^����镶����̃X�^�C���B���̂悤�Ȓl���p�ӂ���Ă��܂��B
+//      登録される文字列のスタイル。次のような値が用意されています。
 //
 //      IME_REGWORD_STYLE_EUDC
-//        ������� EUDC �͈̔͂ɂ���B
-//      IME_REGWORD_STYLE_USER_FIRST ���� IME_REGWORD_STYLE_USER_LAST
-//        IME_REGWORD_STYLE_USER_FIRST ����
-//        IME_REGWORD_STYLE_USER_LAST �͈̔͂� IME ISV �� private
-//        style �Ɏg����BIME ISV �͎��R�ɓƎ��̃X�^�C�����`����
-//        �悢�B
-//        �Ⴆ�΁A
+//        文字列は EUDC の範囲にある。
+//      IME_REGWORD_STYLE_USER_FIRST から IME_REGWORD_STYLE_USER_LAST
+//        IME_REGWORD_STYLE_USER_FIRST から
+//        IME_REGWORD_STYLE_USER_LAST の範囲は IME ISV の private
+//        style に使われる。IME ISV は自由に独自のスタイルを定義して
+//        よい。
+//        例えば、
 //          #define MSIME_NOUN  (IME_REGWORD_STYLE_USER_FIRST)
 //          #define MSIME_VERB  (IME_REGWORD_STYLE_USER_FIRST+1)
 //    lpszString
-//      �o�^����镶����B
-//  (�Ԃ�l)
-//    ���������Ȃ�΁ATRUE ���B�����Ȃ��� FALSE ��Ԃ��B
+//      登録される文字列。
+//  (返り値)
+//    成功したならば、TRUE を。さもなくば FALSE を返す。
 BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     BOOL ret = FALSE;
     FOOTMARK();
@@ -46,24 +46,24 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 }
 
 //  ImeUnregisterWord
-//  ImeUnregisterWord �͌��݂�IME�̎�������o�^����Ă��镶������폜����
-//  ���B
+//  ImeUnregisterWord は現在のIMEの辞書から登録されている文字列を削除しま
+//  す。
 //  BOOL WINAPI
 //    ImeUnregisterWord(
 //    LPCTSTR lpszReading,
 //    DWORD dwStyle,
 //    LPCTSTR lpszString
 //  )
-//  (�p�����[�^)
+//  (パラメータ)
 //    lpszReading
-//      �o�^����Ă��镶����̓ǂ݁B
+//      登録されている文字列の読み。
 //    dwStyle
-//      �o�^����Ă��镶����̃X�^�C���BdwStyle �̒��g�ɂ��Ă�
-//      ImeRegisterWord �̐������Q�Ƃ̂��ƁB
+//      登録されている文字列のスタイル。dwStyle の中身については
+//      ImeRegisterWord の説明を参照のこと。
 //    lpszString
-//      �폜����镶����B
-//  (�Ԃ�l)
-//    ���������Ȃ�΁ATRUE ���B�����Ȃ��� FALSE ��Ԃ��B
+//      削除される文字列。
+//  (返り値)
+//    成功したならば、TRUE を。さもなくば FALSE を返す。
 BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     BOOL ret = FALSE;
     FOOTMARK();
@@ -71,21 +71,21 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 }
 
 //  ImeGetRegisterWordStyle
-//  ImeGetRegisterWordStyle �͌��݂�IME�ŗ��p�\�ȃX�^�C���𓾂܂��B
+//  ImeGetRegisterWordStyle は現在のIMEで利用可能なスタイルを得ます。
 //  UINT WINAPI
 //    ImeGetRegisterWordStyle(
 //    UINT nItem,
 //    LPSTYLEBUF lpStyleBuf
 //  )
-//  (�p�����[�^)
+//  (パラメータ)
 //    nItem
-//      �o�b�t�@�ɕۑ��\�ȃX�^�C���̍ő吔�B
+//      バッファに保存可能なスタイルの最大数。
 //    lpStyleBuf
-//      ���������ׂ��o�b�t�@�B
-//  (�Ԃ�l)
-//    �o�b�t�@�ɃR�s�[���ꂽ�X�^�C���̐����Ԃ�l�ł��B�����AnItems ����
-//    �Ȃ�΁A����IME�ł��ׂẲ\�ȃX�^�C�����󂯎��̂ɕK�v�Ȕz���
-//    �v�f���ɂȂ�܂��B
+//      満たされるべきバッファ。
+//  (返り値)
+//    バッファにコピーされたスタイルの数が返り値です。もし、nItems が零
+//    ならば、このIMEですべての可能なスタイルを受け取るのに必要な配列の
+//    要素数になります。
 UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
     UINT ret = 0;
     FOOTMARK();
@@ -93,8 +93,8 @@ UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
 }
 
 //  ImeEnumRegisterWord
-//  ImeEnumRegisterWord �͓��肳�ꂽ�ǂ݁A�X�^�C���A�o�^���ꂽ������f�[�^
-//  �ł����ēo�^����Ă��镶����̏���񋓂��܂��B
+//  ImeEnumRegisterWord は特定された読み、スタイル、登録された文字列データ
+//  でもって登録されている文字列の情報を列挙します。
 //  UINT WINAPI
 //    ImeEnumRegisterWord(
 //    hKL,
@@ -104,37 +104,37 @@ UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
 //    LPCTSTR lpszString,
 //    LPVOID lpData
 //  )
-//  (�p�����[�^)
+//  (パラメータ)
 //    hKL
 //      Input language handle.
 //    lpfnEnumProc
-//      callback �֐��̃A�h���X�B
+//      callback 関数のアドレス。
 //    lpszReading
-//      �񋓂����ǂ݂���肵�܂��BNULL�Ȃ�΁AdwStyle �y�� lpszString
-//      �p�����[�^�Ɉ�v����S�Ẳ\�ȓǂ݂�񋓂��܂��B
+//      列挙される読みを特定します。NULLならば、dwStyle 及び lpszString
+//      パラメータに一致する全ての可能な読みを列挙します。
 //    dwStyle
-//      �񋓂����X�^�C������肵�܂��BNULL�Ȃ�΁AlpszReading �y��
-//      lpszString �p�����[�^�Ɉ�v����S�Ẳ\�ȃX�^�C����񋓂���
-//      ���B
+//      列挙されるスタイルを特定します。NULLならば、lpszReading 及び
+//      lpszString パラメータに一致する全ての可能なスタイルを列挙しま
+//      す。
 //    lpszString
-//      �񋓂���镶�������肵�܂��BNULL�Ȃ�΁AImeEnumRegisterWord
-//      �� lpszReading �y�� dwStyle �p�����[�^����v����S�Ă̕������
-//      �񋓂��܂��B
+//      列挙される文字列を特定します。NULLならば、ImeEnumRegisterWord
+//      は lpszReading 及び dwStyle パラメータが一致する全ての文字列を
+//      列挙します。
 //    lpData
-//      �A�v���P�[�V���������p�ӂ����f�[�^�̃A�h���X
-//  (�Ԃ�l)
-//    �����Ȃ�΁Acallback function �ɍŌ�ɕԂ��ꂽ�l���Ԃ�l�ɂȂ�܂��B
-//    �A�v���P�[�V�����ɂ���Ă��̈Ӗ��͌��߂��܂��B
-//  (�R�����g)
-//    �S�Ẵp�����[�^�� NULL ��������AIME �����̑S�Ă̓o�^����Ă���
-//    �������񋓂��܂��B�i�������j
-//    �������̓p�����[�^�̂Q��NULL�������ꍇ�ɂ́A�c�����R�ڂ̃p�����[
-//    �^�ɓK������o�^����Ă��镶�����S�ė񋓂��܂��B
-//  (�l�I�ȃR�����g)
-//    �����̍\�������Ȃ肤�܂����߂Ă��Ȃ��ƁA����Ȃ��Ƃ����ꂽ��d��
-//    �Ă���Ă��Ȃ��Ȃ�܂��B�������͖ܘ_�t�������\�ł���A�Ƃ���
-//    �͍̂Œ�����݂����ł��B
-//    SKK�����Ƃ̑����͍ň��ł́H
+//      アプリケーション側が用意したデータのアドレス
+//  (返り値)
+//    成功ならば、callback function に最後に返された値が返り値になります。
+//    アプリケーションによってその意味は決められます。
+//  (コメント)
+//    全てのパラメータが NULL だったら、IME 辞書の全ての登録されている
+//    文字列を列挙します。（うげげ）
+//    もじ入力パラメータの２つがNULLだった場合には、残った３つ目のパラメー
+//    タに適合する登録されている文字列を全て列挙します。
+//  (個人的なコメント)
+//    辞書の構造をかなりうまく決めていないと、こんなことをされたら重く
+//    てやってられなくなります。正引きは勿論逆引きも可能である、という
+//    のは最低条件みたいです。
+//    SKK辞書との相性は最悪では？
 UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
                                 DWORD dw, LPCTSTR lpStr, LPVOID lpData) {
     UINT ret = 0;

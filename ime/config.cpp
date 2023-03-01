@@ -1,5 +1,5 @@
 // config.cpp --- mzimeja configuration
-// mzimeja‚ÌÝ’èB
+// mzimejaã®è¨­å®šã€‚
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -12,7 +12,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// ƒy[ƒW‚ðƒvƒƒpƒeƒBƒV[ƒg‚É’Ç‰ÁB
+// ãƒšãƒ¼ã‚¸ã‚’ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚·ãƒ¼ãƒˆã«è¿½åŠ ã€‚
 void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
     if (ppsh->nPages < MAX_PAGES) {
         PROPSHEETPAGE psp;
@@ -30,8 +30,8 @@ void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
 } // AddPage
 
 //  ImeConfigure
-//    ImeConfigure ŠÖ”‚Í IME ‚É‘Î‚µ‚Ä•â‘«“I‚Èî•ñ‚ð—v‹‚·‚é‚½‚ß‚ÉŽg‚¤
-//    Dialog Box ‚ð’ñ‹Ÿ‚·‚éH
+//    ImeConfigure é–¢æ•°ã¯ IME ã«å¯¾ã—ã¦è£œè¶³çš„ãªæƒ…å ±ã‚’è¦æ±‚ã™ã‚‹ãŸã‚ã«ä½¿ã†
+//    Dialog Box ã‚’æä¾›ã™ã‚‹ï¼Ÿ
 //  BOOL
 //    ImeConfigure(
 //    HKL hKL,
@@ -41,23 +41,23 @@ void PASCAL AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
 //    )
 //  Parameters
 //    hKL
-//      ‚±‚Ì IME ‚Ì“ü—ÍŒ¾Œê‚Ìƒnƒ“ƒhƒ‹B
+//      ã“ã® IME ã®å…¥åŠ›è¨€èªžã®ãƒãƒ³ãƒ‰ãƒ«ã€‚
 //    hWnd
-//      e Window ‚Ìƒnƒ“ƒhƒ‹B
+//      è¦ª Window ã®ãƒãƒ³ãƒ‰ãƒ«ã€‚
 //    dwMode
-//      Dialog ‚Ìƒ‚[ƒhBˆÈ‰º‚Ì‚æ‚¤‚Èƒtƒ‰ƒO‚ª—^‚¦‚ç‚ê‚éB
-//      IME_CONFIG_GENERAL      ˆê”Ê configuration ‚Ì‚½‚ß‚Ì Dialog
-//      IME_CONFIG_REGWORD      ’PŒê“o˜^‚Ì‚½‚ß‚Ì Dialog
-//      IME_CONFIG_SELECTDICTIONARY IME Ž«‘‘I‘ð‚Ì‚½‚ß‚Ì Dialog
+//      Dialog ã®ãƒ¢ãƒ¼ãƒ‰ã€‚ä»¥ä¸‹ã®ã‚ˆã†ãªãƒ•ãƒ©ã‚°ãŒä¸Žãˆã‚‰ã‚Œã‚‹ã€‚
+//      IME_CONFIG_GENERAL      ä¸€èˆ¬ configuration ã®ãŸã‚ã® Dialog
+//      IME_CONFIG_REGWORD      å˜èªžç™»éŒ²ã®ãŸã‚ã® Dialog
+//      IME_CONFIG_SELECTDICTIONARY IME è¾žæ›¸é¸æŠžã®ãŸã‚ã® Dialog
 //    lpData
-//      VOID Œ^‚Ìƒ|ƒCƒ“ƒ^B‚à‚µ dwMode == IME_CONFIG_REGISTERWORD ‚È‚çA
-//      REGISTERWORD \‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^‚Æ‚È‚éB‚³‚à‚È‚­‚Î–³Ž‹‚³‚ê‚éB
-//      initial string ‚ª—^‚¦‚ç‚ê‚È‚©‚Á‚½‚çAIME_CONFIG_REGISTER ƒ‚[ƒh
-//      ‚Å‚ ‚Á‚Ä‚àANULL ‚Å‚ ‚Á‚Ä‚©‚Ü‚í‚È‚¢B
+//      VOID åž‹ã®ãƒã‚¤ãƒ³ã‚¿ã€‚ã‚‚ã— dwMode == IME_CONFIG_REGISTERWORD ãªã‚‰ã€
+//      REGISTERWORD æ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã¨ãªã‚‹ã€‚ã•ã‚‚ãªãã°ç„¡è¦–ã•ã‚Œã‚‹ã€‚
+//      initial string ãŒä¸Žãˆã‚‰ã‚Œãªã‹ã£ãŸã‚‰ã€IME_CONFIG_REGISTER ãƒ¢ãƒ¼ãƒ‰
+//      ã§ã‚ã£ã¦ã‚‚ã€NULL ã§ã‚ã£ã¦ã‹ã¾ã‚ãªã„ã€‚
 //    Return Values
-//      ‚±‚ÌŠÖ”‚ª¬Œ÷‚µ‚½‚çATRUEB‚³‚à‚È‚­‚Î FALSEB
+//      ã“ã®é–¢æ•°ãŒæˆåŠŸã—ãŸã‚‰ã€TRUEã€‚ã•ã‚‚ãªãã° FALSEã€‚
 //  Comments
-//    IME ‚ÍŽŸ‚Ì‚æ‚¤‚È‹[Ž—ƒR[ƒh‚Å‚à‚Á‚Ä lpData ‚ðƒ`ƒFƒbƒN‚·‚éB
+//    IME ã¯æ¬¡ã®ã‚ˆã†ãªæ“¬ä¼¼ã‚³ãƒ¼ãƒ‰ã§ã‚‚ã£ã¦ lpData ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ã€‚
 //
 //  if (dwmode != IME_CONFIG_REGISTERWORD){
 //    // Does original execution

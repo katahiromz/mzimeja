@@ -1,10 +1,10 @@
 // uicomp.cpp --- mzimeja composition window UI
-// –¢Šm’è•¶š—ñƒEƒBƒ“ƒhƒEB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
 
-// ¡–@B
+// å¯¸æ³•ã€‚
 #define UNDERLINE_HEIGHT  2
 #define CARET_WIDTH       2
 
@@ -15,7 +15,7 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // Count how may the char can be arranged in DX.
-// ƒsƒNƒZƒ‹ˆÊ’udx‚Ì¶‚É‰½•¶š‚ ‚é‚©H
+// ãƒ”ã‚¯ã‚»ãƒ«ä½ç½®dxã®å·¦ã«ä½•æ–‡å­—ã‚ã‚‹ã‹ï¼Ÿ
 static int NumCharInDX(HDC hDC, const WCHAR *psz, int dx) {
     int ret = 0;
     if (*psz) {
@@ -27,7 +27,7 @@ static int NumCharInDX(HDC hDC, const WCHAR *psz, int dx) {
                 break;
             }
             ich++;
-            ::GetTextExtentPointW(hDC, psz, ich, &siz); // •¶š—ñ‚ÌƒsƒNƒZƒ‹•‚ğæ“¾B
+            ::GetTextExtentPointW(hDC, psz, ich, &siz); // æ–‡å­—åˆ—ã®ãƒ”ã‚¯ã‚»ãƒ«å¹…ã‚’å–å¾—ã€‚
             width = siz.cx;
         }
     }
@@ -35,7 +35,7 @@ static int NumCharInDX(HDC hDC, const WCHAR *psz, int dx) {
 }
 
 // Count how may the char can be arranged in DY.
-// ƒsƒNƒZƒ‹ˆÊ’udy‚Ìã‚É‰½•¶š‚ ‚é‚©H
+// ãƒ”ã‚¯ã‚»ãƒ«ä½ç½®dyã®ä¸Šã«ä½•æ–‡å­—ã‚ã‚‹ã‹ï¼Ÿ
 static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
     int ret = 0;
     if (*psz) {
@@ -47,7 +47,7 @@ static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
                 break;
             }
             ich++;
-            ::GetTextExtentPointW(hDC, psz, ich, &siz); // •¶š—ñ‚ÌƒsƒNƒZƒ‹‚‚³‚ğæ“¾B
+            ::GetTextExtentPointW(hDC, psz, ich, &siz); // æ–‡å­—åˆ—ã®ãƒ”ã‚¯ã‚»ãƒ«é«˜ã•ã‚’å–å¾—ã€‚
             height = siz.cy;
         }
     }
@@ -56,7 +56,7 @@ static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// –¢Šm’è•¶š—ñƒEƒBƒ“ƒhƒE‚Ìì¬B
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½œæˆæ™‚ã€‚
 void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     RECT rc;
     POINT pt;
@@ -394,25 +394,25 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     }
 } // CompWnd_Move
 
-// –¢Šm’è•¶š—ñ‚Ìˆês‚ğ•`‰æ‚·‚éB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã®ä¸€è¡Œã‚’æç”»ã™ã‚‹ã€‚
 void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
                      DWORD ich, DWORD cch, CompStr *lpCompStr, BOOL fVert) {
-    if (cch == 0) return; // •¶š—ñ‚Ì’·‚³‚ªƒ[ƒ‚È‚çI—¹B
+    if (cch == 0) return; // æ–‡å­—åˆ—ã®é•·ã•ãŒã‚¼ãƒ­ãªã‚‰çµ‚äº†ã€‚
 
-    // Attribute. ‘®«B
+    // Attribute. å±æ€§ã€‚
     BYTE *lpattr = lpCompStr->GetCompAttr();
 
-    // Get clause info. ßî•ñ‚ğæ“¾B
+    // Get clause info. ç¯€æƒ…å ±ã‚’å–å¾—ã€‚
     DWORD *pdw = lpCompStr->GetCompClause();
     DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
     std::set<DWORD> clauses(pdw, pdwEnd);
 
-    // Get client rect and fill white. ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ğæ“¾‚µA”’‚Å“h‚è‚Â‚Ô‚·B
+    // Get client rect and fill white. ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã‚’å–å¾—ã—ã€ç™½ã§å¡—ã‚Šã¤ã¶ã™ã€‚
     RECT rc;
     ::GetClientRect(hCompWnd, &rc);
     ::FillRect(hDC, &rc, (HBRUSH)GetStockObject(WHITE_BRUSH));
 
-    // Starting position. ŠJnˆÊ’uB
+    // Starting position. é–‹å§‹ä½ç½®ã€‚
     int x, y;
     if (fVert) {
         x = rc.right - UNDERLINE_HEIGHT;
@@ -421,10 +421,10 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
         x = y = 0;
     }
 
-    // Set opaque mode. •¶š—ñ•`‰æ‚É‚¨‚¢‚Ä•s“§–¾ƒ‚[ƒh‚É‚·‚éB
+    // Set opaque mode. æ–‡å­—åˆ—æç”»ã«ãŠã„ã¦ä¸é€æ˜ãƒ¢ãƒ¼ãƒ‰ã«ã™ã‚‹ã€‚
     ::SetBkMode(hDC, OPAQUE);
 
-    // Is it end? I‚í‚è‚©H
+    // Is it end? çµ‚ã‚ã‚Šã‹ï¼Ÿ
     SIZE siz;
     const WCHAR *lpEnd = &pch[cch];
     while (pch < lpEnd) {
@@ -505,15 +505,15 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
             x += siz.cx;
     }
 
-    // Draw caret at last if any. ƒLƒƒƒŒƒbƒg‚ğ•`‰æ‚·‚éi‚à‚µ‚ ‚ê‚ÎjB
-    if (lpCompStr->dwCursorPos == ich) { // Œ»İ‚ÌˆÊ’u‚©H
-        ::SelectObject(hDC, ::GetStockObject(BLACK_PEN)); // •‚¢ƒyƒ“‚ÅB
-        if (fVert) { // c‘‚«‚©H
+    // Draw caret at last if any. ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã‚’æç”»ã™ã‚‹ï¼ˆã‚‚ã—ã‚ã‚Œã°ï¼‰ã€‚
+    if (lpCompStr->dwCursorPos == ich) { // ç¾åœ¨ã®ä½ç½®ã‹ï¼Ÿ
+        ::SelectObject(hDC, ::GetStockObject(BLACK_PEN)); // é»’ã„ãƒšãƒ³ã§ã€‚
+        if (fVert) { // ç¸¦æ›¸ãã‹ï¼Ÿ
             ::MoveToEx(hDC, x, y, NULL);
             ::LineTo(hDC, x + siz.cy, y);
             ::MoveToEx(hDC, x, y + 1, NULL);
             ::LineTo(hDC, x + siz.cy, y + 1);
-        } else { // ‰¡‘‚«B
+        } else { // æ¨ªæ›¸ãã€‚
             ::MoveToEx(hDC, x, y, NULL);
             ::LineTo(hDC, x, y + siz.cy);
             ::MoveToEx(hDC, x + 1, y, NULL);
@@ -522,13 +522,13 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
     }
 }
 
-// –¢Šm’è•¶š—ñ‚ğ•`‰æ‚·‚éB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚’æç”»ã™ã‚‹ã€‚
 void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompStr) {
-    // –¢Šm’è•¶š—ñ‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’å–å¾—ã€‚
     std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
     const WCHAR *pch = str.c_str();
 
-    // Is it vertical? c‘‚«‚©H
+    // Is it vertical? ç¸¦æ›¸ãã‹ï¼Ÿ
     BOOL fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
 
     if (lpIMC->cfCompForm.dwStyle) {
@@ -546,92 +546,92 @@ void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompSt
     }
 }
 
-// –¢Šm’è•¶š—ñƒEƒBƒ“ƒhƒE‚ÌÄ•`‰æB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å†æç”»æ™‚ã€‚
 void CompWnd_Paint(HWND hCompWnd) {
     PAINTSTRUCT ps;
-    HDC hDC = ::BeginPaint(hCompWnd, &ps); // •`‰æ‚ğŠJnB
+    HDC hDC = ::BeginPaint(hCompWnd, &ps); // æç”»ã‚’é–‹å§‹ã€‚
 
     HFONT hOldFont = NULL;
-    HFONT hFont = (HFONT) ::GetWindowLongPtr(hCompWnd, FIGWLP_FONT); // ƒtƒHƒ“ƒgB
-    if (hFont) hOldFont = (HFONT) ::SelectObject(hDC, hFont); // ƒtƒHƒ“ƒg‚ğ‘I‘ğB
+    HFONT hFont = (HFONT) ::GetWindowLongPtr(hCompWnd, FIGWLP_FONT); // ãƒ•ã‚©ãƒ³ãƒˆã€‚
+    if (hFont) hOldFont = (HFONT) ::SelectObject(hDC, hFont); // ãƒ•ã‚©ãƒ³ãƒˆã‚’é¸æŠã€‚
 
-    HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hCompWnd, FIGWLP_SERVERWND); // UIƒT[ƒo[B
+    HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hCompWnd, FIGWLP_SERVERWND); // UIã‚µãƒ¼ãƒãƒ¼ã€‚
     ASSERT(hSvrWnd != NULL);
 
-    HIMC hIMC = (HIMC) ::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMCB
+    HIMC hIMC = (HIMC) ::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMCã€‚
     ASSERT(hIMC != NULL);
     if (hIMC) {
-        InputContext *lpIMC = TheIME.LockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒNB
+        InputContext *lpIMC = TheIME.LockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã€‚
         ASSERT(lpIMC != NULL);
         if (lpIMC) {
-            CompStr *lpCompStr = lpIMC->LockCompStr(); // –¢Šm’è•¶š—ñ‚ğƒƒbƒNB
+            CompStr *lpCompStr = lpIMC->LockCompStr(); // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ãƒ­ãƒƒã‚¯ã€‚
             if (lpCompStr) {
-                if (lpCompStr->dwCompStrLen > 0) { // •¶š—ñ‚ª‚ ‚ê‚Î
-                    CompWnd_Draw(hCompWnd, hDC, lpIMC, lpCompStr); // •`‰æ‚·‚éB
+                if (lpCompStr->dwCompStrLen > 0) { // æ–‡å­—åˆ—ãŒã‚ã‚Œã°
+                    CompWnd_Draw(hCompWnd, hDC, lpIMC, lpCompStr); // æç”»ã™ã‚‹ã€‚
                 }
-                lpIMC->UnlockCompStr(); // –¢Šm’è•¶š—ñ‚ÌƒƒbƒN‚ğ‰ğœB
+                lpIMC->UnlockCompStr(); // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
             }
-            TheIME.UnlockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœB
+            TheIME.UnlockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
         }
     }
-    if (hFont && hOldFont) ::SelectObject(hDC, hOldFont); // ƒtƒHƒ“ƒg‚Ì‘I‘ğ‚ğ‰ğœB
-    ::EndPaint(hCompWnd, &ps); // •`‰æ‚ğI—¹B
+    if (hFont && hOldFont) ::SelectObject(hDC, hOldFont); // ãƒ•ã‚©ãƒ³ãƒˆã®é¸æŠã‚’è§£é™¤ã€‚
+    ::EndPaint(hCompWnd, &ps); // æç”»ã‚’çµ‚äº†ã€‚
 } // CompWnd_Paint
 
-// –¢Šm’è•¶š—ñƒEƒBƒ“ƒhƒE‚ğ‰B‚·B
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’éš ã™ã€‚
 void CompWnd_Hide(UIEXTRA *lpUIExtra) {
-    HWND hwndDef = lpUIExtra->hwndDefComp; // Šù’è‚ÌƒEƒBƒ“ƒhƒEB
+    HWND hwndDef = lpUIExtra->hwndDefComp; // æ—¢å®šã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
     if (::IsWindow(hwndDef)) {
-        ::ShowWindow(hwndDef, SW_HIDE); // ‰B‚·B
+        ::ShowWindow(hwndDef, SW_HIDE); // éš ã™ã€‚
     }
 
-    for (int i = 0; i < MAXCOMPWND; i++) { // ‘¼‚Ì•¡”‚ÌƒEƒBƒ“ƒhƒEB
+    for (int i = 0; i < MAXCOMPWND; i++) { // ä»–ã®è¤‡æ•°ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
         HWND hwnd = lpUIExtra->hwndComp[i];
         if (::IsWindow(hwnd)) {
-            ::ShowWindow(hwnd, SW_HIDE); // ‰B‚·B
+            ::ShowWindow(hwnd, SW_HIDE); // éš ã™ã€‚
         }
     }
 } // CompWnd_Hide
 
-// –¢Šm’è•¶š—ñƒEƒBƒ“ƒhƒE‚ÌƒtƒHƒ“ƒg‚ğİ’è‚·‚éB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹ã€‚
 void CompWnd_SetFont(UIEXTRA *lpUIExtra) {
-    for (int i = 0; i < MAXCOMPWND; i++) { // Šù’èˆÈŠO‚ÌƒEƒBƒ“ƒhƒEB
-        HWND hwnd = lpUIExtra->hwndComp[i]; // ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹B
+    for (int i = 0; i < MAXCOMPWND; i++) { // æ—¢å®šä»¥å¤–ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
+        HWND hwnd = lpUIExtra->hwndComp[i]; // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«ã€‚
         if (::IsWindow(hwnd)) {
-            ::SetWindowLongPtr(hwnd, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont); // ƒtƒHƒ“ƒgw’èB
+            ::SetWindowLongPtr(hwnd, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont); // ãƒ•ã‚©ãƒ³ãƒˆæŒ‡å®šã€‚
         }
     }
 }
 
-// –¢Šm’è•¶š—ñƒEƒBƒ“ƒhƒE‚ÌƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã€‚
 LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                     LPARAM lParam) {
     HWND hUIWnd;
 
     switch (message) {
-    case WM_PAINT: // •`‰æB
+    case WM_PAINT: // æç”»æ™‚ã€‚
         CompWnd_Paint(hWnd);
         break;
 
-    case WM_SETCURSOR: // ƒ}ƒEƒXƒJ[ƒ\ƒ‹İ’èB
-    case WM_MOUSEMOVE: // ƒ}ƒEƒXˆÚ“®B
-    case WM_LBUTTONUP: // ¶ƒ{ƒ^ƒ“‰ğ•úB
-    case WM_RBUTTONUP: // ‰Eƒ{ƒ^ƒ“‰ğ•úB
+    case WM_SETCURSOR: // ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«è¨­å®šæ™‚ã€‚
+    case WM_MOUSEMOVE: // ãƒã‚¦ã‚¹ç§»å‹•æ™‚ã€‚
+    case WM_LBUTTONUP: // å·¦ãƒœã‚¿ãƒ³è§£æ”¾æ™‚ã€‚
+    case WM_RBUTTONUP: // å³ãƒœã‚¿ãƒ³è§£æ”¾æ™‚ã€‚
         DragUI(hWnd, message, wParam, lParam);
         if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
             (HIWORD(lParam) != WM_RBUTTONDOWN))
             return DefWindowProc(hWnd, message, wParam, lParam);
         if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP))
-            ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, 0); // ó‘Ô‚ğŒ³‚É–ß‚·B
+            ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, 0); // çŠ¶æ…‹ã‚’å…ƒã«æˆ»ã™ã€‚
         break;
 
-    case WM_MOVE: // ƒEƒBƒ“ƒhƒEˆÚ“®‚¶B
+    case WM_MOVE: // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç§»å‹•ã˜ã€‚
         hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
         if (IsWindow(hUIWnd))
-            SendMessage(hUIWnd, WM_UI_DEFCOMPMOVE, 0, 0); // ƒT[ƒo[‚É’m‚ç‚¹‚éB
+            SendMessage(hUIWnd, WM_UI_DEFCOMPMOVE, 0, 0); // ã‚µãƒ¼ãƒãƒ¼ã«çŸ¥ã‚‰ã›ã‚‹ã€‚
         break;
 
-    default: // ‚»‚Ì‘¼‚ÌƒƒbƒZ[ƒWB
+    default: // ãã®ä»–ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€‚
         if (!IsImeMessage(message))
             return DefWindowProc(hWnd, message, wParam, lParam);
         break;

@@ -1,5 +1,5 @@
 // cand_info.cpp --- candidate info of mzimeja
-// Œó•âî•ñB
+// å€™è£œæƒ…å ±ã€‚
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -8,9 +8,9 @@
 #define CANDPAGE_SIZE   8
 
 //////////////////////////////////////////////////////////////////////////////
-// LogCandList - Œó•âƒŠƒXƒg‚Ì˜_—ƒf[ƒ^B
+// LogCandList - å€™è£œãƒªã‚¹ãƒˆã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 
-// Œó•âî•ñ‚ÌƒNƒŠƒAB
+// å€™è£œæƒ…å ±ã®ã‚¯ãƒªã‚¢ã€‚
 void LogCandList::clear() {
     dwStyle = IME_CAND_READ;
     dwSelection = 0;
@@ -19,7 +19,7 @@ void LogCandList::clear() {
     cand_strs.clear();
 }
 
-// Œó•âƒŠƒXƒg‚Ì•¨—ƒf[ƒ^‚Ì‡ŒvƒTƒCƒY‚ğŒvZB
+// å€™è£œãƒªã‚¹ãƒˆã®ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã®åˆè¨ˆã‚µã‚¤ã‚ºã‚’è¨ˆç®—ã€‚
 DWORD LogCandList::GetTotalSize() const {
     DWORD total = sizeof(CANDIDATELIST);
     total += DWORD(cand_strs.size() * sizeof(DWORD));
@@ -29,12 +29,12 @@ DWORD LogCandList::GetTotalSize() const {
     return total;
 }
 
-// Œó•â‚ÌŒÂ”B
+// å€™è£œã®å€‹æ•°ã€‚
 DWORD LogCandList::GetCandCount() const {
     return (DWORD)cand_strs.size();
 }
 
-// Ÿ‚ÌŒó•âƒŠƒXƒg‚ÖB
+// æ¬¡ã®å€™è£œãƒªã‚¹ãƒˆã¸ã€‚
 void LogCandList::MoveNext() {
     ++dwSelection;
     if (dwSelection >= GetCandCount()) {
@@ -43,7 +43,7 @@ void LogCandList::MoveNext() {
     dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
-// ‘O‚ÌŒó•âƒŠƒXƒg‚ÖB
+// å‰ã®å€™è£œãƒªã‚¹ãƒˆã¸ã€‚
 void LogCandList::MovePrev() {
     if (dwSelection > 0) {
         --dwSelection;
@@ -53,7 +53,7 @@ void LogCandList::MovePrev() {
     dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
-// ƒL[ƒ{[ƒh‚ÌPageUpƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®PageUpã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void LogCandList::PageUp() {
     if (dwPageStart >= dwPageSize) {
         dwSelection -= dwPageSize;
@@ -63,7 +63,7 @@ void LogCandList::PageUp() {
     dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
-// ƒL[ƒ{[ƒh‚ÌPageDownƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®PageDownã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void LogCandList::PageDown() {
     if (dwPageStart + dwPageSize < GetCandCount()) {
         dwSelection += dwPageSize;
@@ -73,48 +73,48 @@ void LogCandList::PageDown() {
     dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
-// ƒL[ƒ{[ƒh‚ÌHomeƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®Homeã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void LogCandList::MoveHome() {
     dwSelection = 0;
     dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
-// ƒL[ƒ{[ƒh‚ÌEndƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®Endã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void LogCandList::MoveEnd() {
     dwSelection = GetCandCount() - 1;
     dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
-// Œó•â‚Ì•¶š—ñ‚ğæ“¾‚·‚éB
+// å€™è£œã®æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ã€‚
 std::wstring LogCandList::GetString(DWORD iCand) const {
     return cand_strs[iCand];
 }
 
-// Œó•â‚Ì•¶š—ñ‚ğæ“¾‚·‚éB
+// å€™è£œã®æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ã€‚
 std::wstring LogCandList::GetString() const {
     return GetString(dwSelection);
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// LogCandInfo - Œó•âî•ñ‚Ì˜_—ƒf[ƒ^B
+// LogCandInfo - å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 
-// ƒNƒŠƒAB
+// ã‚¯ãƒªã‚¢ã€‚
 void LogCandInfo::clear() {
     cand_lists.clear();
     iClause = 0;
 }
 
-// Œó•âî•ñ‚ª‚ ‚é‚©H
+// å€™è£œæƒ…å ±ãŒã‚ã‚‹ã‹ï¼Ÿ
 BOOL LogCandInfo::HasCandInfo() const {
     return cand_lists.size() > 0;
 }
 
-// ß‚ÌŒÂ”B
+// ç¯€ã®å€‹æ•°ã€‚
 DWORD LogCandInfo::GetClauseCount() const {
     return DWORD(cand_lists.size());
 }
 
-// Œó•â‚ğ‘I‘ğ‚·‚éB
+// å€™è£œã‚’é¸æŠã™ã‚‹ã€‚
 BOOL LogCandInfo::SelectCand(UINT uCandIndex) {
     DWORD dwPageStart = cand_lists[iClause].dwPageStart;
     if (dwPageStart + uCandIndex < cand_lists[iClause].dwPageSize) {
@@ -124,47 +124,47 @@ BOOL LogCandInfo::SelectCand(UINT uCandIndex) {
     return FALSE;
 }
 
-// Ÿ‚ÌŒó•â‚ÖˆÚ“®B
+// æ¬¡ã®å€™è£œã¸ç§»å‹•ã€‚
 void LogCandInfo::MoveNext() {
     cand_lists[iClause].MoveNext();
 }
 
-// ‘O‚ÌŒó•â‚ÖˆÚ“®B
+// å‰ã®å€™è£œã¸ç§»å‹•ã€‚
 void LogCandInfo::MovePrev() {
     cand_lists[iClause].MovePrev();
 }
 
-// ƒL[ƒ{[ƒh‚ÌHomeƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®Homeã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void LogCandInfo::MoveHome() {
     cand_lists[iClause].MoveHome();
 }
 
-// ƒL[ƒ{[ƒh‚ÌEndƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®Endã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void LogCandInfo::MoveEnd() {
     cand_lists[iClause].MoveEnd();
 }
 
-// ƒL[ƒ{[ƒh‚ÌPageUpƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®PageUpã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void LogCandInfo::PageUp() {
     cand_lists[iClause].PageUp();
 }
 
-// ƒL[ƒ{[ƒh‚ÌPageDownƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®PageDownã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void LogCandInfo::PageDown() {
     cand_lists[iClause].PageDown();
 }
 
-// Œó•â€–Ú‚Ì•¶š—ñB
+// å€™è£œé …ç›®ã®æ–‡å­—åˆ—ã€‚
 std::wstring LogCandInfo::GetString() const {
     return cand_lists[iClause].GetString(cand_lists[iClause].dwSelection);
 }
 
-// Œó•â€–Ú‚Ì•¶š—ñB
+// å€™è£œé …ç›®ã®æ–‡å­—åˆ—ã€‚
 std::wstring LogCandInfo::GetString(DWORD iCand) const {
     return cand_lists[iClause].GetString(iCand);
 }
 
-// Œó•âî•ñ‚Ì•¨—ƒf[ƒ^‚Ì‡ŒvƒTƒCƒY‚ğŒvZ‚·‚éB
+// å€™è£œæƒ…å ±ã®ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã®åˆè¨ˆã‚µã‚¤ã‚ºã‚’è¨ˆç®—ã™ã‚‹ã€‚
 DWORD LogCandInfo::GetTotalSize() const {
     DWORD total = sizeof(CANDIDATEINFO);
     for (size_t i = 0; i < cand_lists.size(); ++i) {
@@ -174,7 +174,7 @@ DWORD LogCandInfo::GetTotalSize() const {
     return total;
 }
 
-// Œó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğƒ_ƒ“ƒvB
+// å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ€ãƒ³ãƒ—ã€‚
 void LogCandInfo::Dump() {
     DebugPrintA("LogCandInfo::Dump\n");
     for (size_t i = 0; i < cand_lists.size(); ++i) {
@@ -192,16 +192,16 @@ void LogCandInfo::Dump() {
 } // LogCandInfo::Dump
 
 //////////////////////////////////////////////////////////////////////////////
-// CandList - Œó•âƒŠƒXƒg‚Ì•¨—ƒf[ƒ^B
+// CandList - å€™è£œãƒªã‚¹ãƒˆã®ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 
-// ÅŒã‚Ìƒy[ƒW‚ğæ“¾‚·‚éB
+// æœ€å¾Œã®ãƒšãƒ¼ã‚¸ã‚’å–å¾—ã™ã‚‹ã€‚
 DWORD CandList::GetPageEnd() const {
     DWORD dw = dwPageStart + dwPageSize;
     if (dw > dwCount) dw = dwCount;
     return dw;
 }
 
-// •¨—ƒf[ƒ^‚©‚ç˜_—ƒf[ƒ^‚ÖB
+// ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰è«–ç†ãƒ‡ãƒ¼ã‚¿ã¸ã€‚
 void CandList::GetLog(LogCandList& log) {
     log.dwStyle = dwStyle;
     log.dwSelection = dwSelection;
@@ -213,7 +213,7 @@ void CandList::GetLog(LogCandList& log) {
     }
 }
 
-// ˜_—ƒf[ƒ^‚©‚ç•¨—ƒf[ƒ^‚ÖB
+// è«–ç†ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã¸ã€‚
 DWORD CandList::Store(const LogCandList *log) {
     dwSize = log->GetTotalSize();
     dwStyle = log->dwStyle;
@@ -240,34 +240,34 @@ DWORD CandList::Store(const LogCandList *log) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// CandInfo - Œó•âî•ñB
+// CandInfo - å€™è£œæƒ…å ±ã€‚
 
-// Œó•âƒŠƒXƒg‚Ì•¨—ƒf[ƒ^‚ğQÆ‚·‚éB
+// å€™è£œãƒªã‚¹ãƒˆã®ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã‚’å‚ç…§ã™ã‚‹ã€‚
 CandList *CandInfo::GetList(DWORD i) {
     ASSERT(i < dwCount);
     return (CandList *)(GetBytes() + dwOffset[i]);
 }
 
-// Œó•âî•ñ‚Ì•¨—ƒf[ƒ^‚©‚ç˜_—ƒf[ƒ^‚ÖB
+// å€™è£œæƒ…å ±ã®ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰è«–ç†ãƒ‡ãƒ¼ã‚¿ã¸ã€‚
 void CandInfo::GetLog(LogCandInfo& log) {
-    log.clear(); // ˜_—ƒf[ƒ^‚ğƒNƒŠƒAB
+    log.clear(); // è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¯ãƒªã‚¢ã€‚
 
-    LogCandList cand; // Œó•âƒŠƒXƒg‚Ì˜_—ƒf[ƒ^B
+    LogCandList cand; // å€™è£œãƒªã‚¹ãƒˆã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã€‚
     for (DWORD iList = 0; iList < dwCount; ++iList) {
         CandList *pList = GetList(iList);
-        pList->GetLog(cand); // Œó•âƒŠƒXƒg‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
-        log.cand_lists.push_back(cand); // ˜_—ƒf[ƒ^‚ÉŒó•âƒŠƒXƒg‚ğ’Ç‰ÁB
+        pList->GetLog(cand); // å€™è£œãƒªã‚¹ãƒˆã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
+        log.cand_lists.push_back(cand); // è«–ç†ãƒ‡ãƒ¼ã‚¿ã«å€™è£œãƒªã‚¹ãƒˆã‚’è¿½åŠ ã€‚
     }
 
-    CANDINFOEXTRA *extra = GetExtra(); // —]èî•ñ‚ğæ“¾B
+    CANDINFOEXTRA *extra = GetExtra(); // ä½™å‰°æƒ…å ±ã‚’å–å¾—ã€‚
     if (extra && extra->dwSignature == 0xDEADFACE) {
-        log.iClause = extra->iClause; // Œ»İ‚Ì•¶ß‚ÌƒCƒ“ƒfƒbƒNƒXB
+        log.iClause = extra->iClause; // ç¾åœ¨ã®æ–‡ç¯€ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚
     } else {
         log.iClause = 0;
     }
 }
 
-// Œó•âî•ñ‚Ì˜_—ƒf[ƒ^‚©‚ç•¨—ƒf[ƒ^‚ÖB
+// å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã¸ã€‚
 DWORD CandInfo::Store(const LogCandInfo *log) {
     dwSize = log->GetTotalSize();
     dwCount = (DWORD)log->cand_lists.size();
@@ -296,7 +296,7 @@ DWORD CandInfo::Store(const LogCandInfo *log) {
     return DWORD(pb - GetBytes());
 }
 
-// Œó•âî•ñ‚Ì—]èî•ñ‚ğæ“¾‚·‚éB
+// å€™è£œæƒ…å ±ã®ä½™å‰°æƒ…å ±ã‚’å–å¾—ã™ã‚‹ã€‚
 CANDINFOEXTRA *CandInfo::GetExtra() {
     if (dwPrivateSize >= sizeof(CANDINFOEXTRA)) {
         BYTE *pb = GetBytes();
@@ -311,7 +311,7 @@ CANDINFOEXTRA *CandInfo::GetExtra() {
     return NULL;
 }
 
-// Œó•âî•ñ‚ğÄì¬‚·‚éB
+// å€™è£œæƒ…å ±ã‚’å†ä½œæˆã™ã‚‹ã€‚
 /*static*/ HIMCC CandInfo::ReCreate(HIMCC hCandInfo, const LogCandInfo *log) {
     LogCandInfo log_cand_info;
     if (log == NULL) {
@@ -337,7 +337,7 @@ CANDINFOEXTRA *CandInfo::GetExtra() {
     return hCandInfo;
 } // CandInfo::ReCreate
 
-// Œó•âî•ñ‚ğƒ_ƒ“ƒv‚·‚éB
+// å€™è£œæƒ…å ±ã‚’ãƒ€ãƒ³ãƒ—ã™ã‚‹ã€‚
 void CandInfo::Dump() {
     DebugPrintA("### CandInfo ###\n");
     DebugPrintA("+ dwSize: %u\n", dwSize);

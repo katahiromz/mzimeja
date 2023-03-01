@@ -1,5 +1,5 @@
 // ui.cpp --- mzimeja UI server
-// UIƒT[ƒo[ƒEƒBƒ“ƒhƒEB
+// UIã‚µãƒ¼ãƒãƒ¼ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -9,7 +9,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// w’è‚³‚ê‚Ä‚¢‚éUIƒEƒBƒ“ƒhƒE‚ğ•\¦‚·‚é^”ñ•\¦‚É‚·‚éB
+// æŒ‡å®šã•ã‚Œã¦ã„ã‚‹UIã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’è¡¨ç¤ºã™ã‚‹ï¼éè¡¨ç¤ºã«ã™ã‚‹ã€‚
 void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
     int nsw = (fFlag ? SW_SHOWNOACTIVATE : SW_HIDE);
 
@@ -117,7 +117,7 @@ void OnDestroy(HWND hWnd) {
 }
 
 // IME UI server window procedure
-// IME UIƒT[ƒo[ƒEƒBƒ“ƒhƒE‚ÌƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒB
+// IME UIã‚µãƒ¼ãƒãƒ¼ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã€‚
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                               LPARAM lParam) {
     InputContext *lpIMC;
@@ -139,7 +139,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     }
 
     switch (message) {
-    case WM_CREATE: // ƒEƒBƒ“ƒhƒEì¬B
+    case WM_CREATE: // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½œæˆæ™‚ã€‚
         DPRINT("WM_CREATE\n");
         // Allocate UI's extra memory block.
         hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
@@ -153,7 +153,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         SetUIExtraToServerWnd(hWnd, hUIExtra);
         break;
 
-    case WM_IME_SETCONTEXT: // IMEƒRƒ“ƒeƒLƒXƒgİ’èB
+    case WM_IME_SETCONTEXT: // IMEã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆè¨­å®šæ™‚ã€‚
         DPRINT("WM_IME_SETCONTEXT\n");
         if (wParam) {
             OnImeSetContext(hWnd, hIMC, lParam);
@@ -162,85 +162,85 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         //    ShowUIWindows(hWnd, FALSE);
         break;
 
-    case WM_IME_STARTCOMPOSITION: // IME•ÏŠ·ŠJnB
+    case WM_IME_STARTCOMPOSITION: // IMEå¤‰æ›é–‹å§‹æ™‚ã€‚
         DPRINT("WM_IME_STARTCOMPOSITION\n");
         // Start composition! Ready to display the composition string.
-        lpUIExtra = LockUIExtra(hWnd); // —]èî•ñ‚ğƒƒbƒNB
+        lpUIExtra = LockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã€‚
         if (lpUIExtra) {
             lpIMC = TheIME.LockIMC(hIMC);
-            CompWnd_Create(hWnd, lpUIExtra, lpIMC); // –¢Šm’è•¶š—ñƒEƒBƒ“ƒhƒE‚ğì¬B
+            CompWnd_Create(hWnd, lpUIExtra, lpIMC); // æœªç¢ºå®šæ–‡å­—åˆ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½œæˆã€‚
             TheIME.UnlockIMC(hIMC);
-            UnlockUIExtra(hWnd); // —]èî•ñ‚ÌƒƒbƒN‚ğ‰ğœB
+            UnlockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
         }
         break;
 
-    case WM_IME_COMPOSITION: // IME•ÏŠ·B
+    case WM_IME_COMPOSITION: // IMEå¤‰æ›æ™‚ã€‚
         DPRINT("WM_IME_COMPOSITION\n");
         // Update to display the composition string.
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
-            lpUIExtra = LockUIExtra(hWnd); // —]èî•ñ‚ğƒƒbƒNB
+            lpUIExtra = LockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã€‚
             if (lpUIExtra) {
-                CompWnd_Move(lpUIExtra, lpIMC); // –¢Šm’è•¶š—ñ‚ğˆÚ“®B
-                CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE); // Œó•âƒEƒBƒ“ƒhƒE‚ğˆÚ“®B
-                UnlockUIExtra(hWnd); // —]èî•ñ‚ÌƒƒbƒN‚ğ‰ğœB
+                CompWnd_Move(lpUIExtra, lpIMC); // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ç§»å‹•ã€‚
+                CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE); // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç§»å‹•ã€‚
+                UnlockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
             }
             TheIME.UnlockIMC(hIMC);
         }
         break;
 
-    case WM_IME_ENDCOMPOSITION: // IME•ÏŠ·I—¹B
+    case WM_IME_ENDCOMPOSITION: // IMEå¤‰æ›çµ‚äº†æ™‚ã€‚
         DPRINT("WM_IME_ENDCOMPOSITION\n");
         // Finish to display the composition string.
-        lpUIExtra = LockUIExtra(hWnd); // —]èî•ñ‚ğƒƒbƒNB
+        lpUIExtra = LockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã€‚
         if (lpUIExtra) {
-            CompWnd_Hide(lpUIExtra); // –¢Šm’è•¶š—ñ‚ğ‰B‚·B
-            UnlockUIExtra(hWnd); // —]èî•ñ‚ÌƒƒbƒN‚ğ‰ğœB
+            CompWnd_Hide(lpUIExtra); // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’éš ã™ã€‚
+            UnlockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
         }
         break;
 
-    case WM_IME_COMPOSITIONFULL: // •ÏŠ·•¶š—ñ‚ª‚¢‚Á‚Ï‚¢B
+    case WM_IME_COMPOSITIONFULL: // å¤‰æ›æ–‡å­—åˆ—ãŒã„ã£ã±ã„ã€‚
         DPRINT("WM_IME_COMPOSITIONFULL\n");
         break;
 
-    case WM_IME_SELECT: // IME‘I‘ğB
+    case WM_IME_SELECT: // IMEé¸æŠæ™‚ã€‚
         DPRINT("WM_IME_SELECT\n");
         if (wParam) {
-            lpUIExtra = LockUIExtra(hWnd); // —]èî•ñ‚ğƒƒbƒNB
+            lpUIExtra = LockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã€‚
             if (lpUIExtra) {
-                lpUIExtra->hIMC = hIMC; // hIMC‚ğƒZƒbƒgB
-                UnlockUIExtra(hWnd); // —]èî•ñ‚ÌƒƒbƒN‚ğ‰ğœB
+                lpUIExtra->hIMC = hIMC; // hIMCã‚’ã‚»ãƒƒãƒˆã€‚
+                UnlockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
             }
         }
         break;
 
-    case WM_IME_CONTROL: // IME§ŒäB
+    case WM_IME_CONTROL: // IMEåˆ¶å¾¡æ™‚ã€‚
         DPRINT("WM_IME_CONTROL\n");
         lRet = ControlCommand(hIMC, hWnd, wParam, lParam);
         break;
 
-    case WM_IME_NOTIFY: // IME’Ê’mB
+    case WM_IME_NOTIFY: // IMEé€šçŸ¥æ™‚ã€‚
         DPRINT("WM_IME_NOTIFY\n");
         lRet = NotifyCommand(hIMC, hWnd, wParam, lParam);
         break;
 
-    case WM_DESTROY: // ƒEƒBƒ“ƒhƒE”jŠüB
+    case WM_DESTROY: // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç ´æ£„æ™‚ã€‚
         DPRINT("WM_DESTROY\n");
         OnDestroy(hWnd);
         break;
 
-    case WM_UI_STATEMOVE: // IMEó‘ÔƒEƒBƒ“ƒhƒE‚ªˆÚ“®B
+    case WM_UI_STATEMOVE: // IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒç§»å‹•ã€‚
         // Set the position of the status window to UIExtra.
         // This message is sent by the status window.
-        lpUIExtra = LockUIExtra(hWnd); // —]èî•ñ‚ğƒƒbƒNB
+        lpUIExtra = LockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã€‚
         if (lpUIExtra) {
-            // ˆÊ’u‚ğæ“¾‚µA
+            // ä½ç½®ã‚’å–å¾—ã—ã€
             RECT rc;
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
-            // Šo‚¦‚Ä‚¨‚­B
+            // è¦šãˆã¦ãŠãã€‚
             POINT pt = { rc.left, rc.top };
             TheIME.SetUserData(L"ptStatusWindow", &pt, sizeof(pt));
-            UnlockUIExtra(hWnd); // —]èî•ñ‚ÌƒƒbƒN‚ğ‰ğœB
+            UnlockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
         }
         break;
 
@@ -264,160 +264,160 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         // This message is sent by the candidate window.
         lpUIExtra = LockUIExtra(hWnd);
         if (lpUIExtra) {
-            // ˆÊ’u‚ğæ“¾B
+            // ä½ç½®ã‚’å–å¾—ã€‚
             RECT rc;
             ::GetWindowRect(lpUIExtra->hwndCand, &rc);
-            // ˆÊ’u‚ğŠo‚¦‚Ä‚¨‚­B
+            // ä½ç½®ã‚’è¦šãˆã¦ãŠãã€‚
             POINT pt = { rc.left, rc.top };
             lpUIExtra->ptCand = pt;
             UnlockUIExtra(hWnd);
         }
         break;
 
-    case WM_UI_GUIDEMOVE: // ƒKƒCƒhƒ‰ƒCƒ“ƒEƒBƒ“ƒhƒE‚ªˆÚ“®‚µ‚½B
+    case WM_UI_GUIDEMOVE: // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒç§»å‹•ã—ãŸã€‚
         // Set the position of the status window to UIExtra.
         // This message is sent by the status window.
         lpUIExtra = LockUIExtra(hWnd);
         if (lpUIExtra) {
-            // ˆÊ’u‚ğæ“¾B
+            // ä½ç½®ã‚’å–å¾—ã€‚
             RECT rc;
             ::GetWindowRect(lpUIExtra->hwndGuide, &rc);
-            // ˆÊ’u‚ğŠo‚¦‚Ä‚¨‚­B
+            // ä½ç½®ã‚’è¦šãˆã¦ãŠãã€‚
             POINT pt = { rc.left, rc.top };
             TheIME.SetUserData(L"ptGuide", &pt, sizeof(pt));
             UnlockUIExtra(hWnd);
         }
         break;
 
-    default: // ‚»‚Ì‘¼‚ÌƒƒbƒZ[ƒWB
+    default: // ãã®ä»–ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€‚
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
 
     return lRet;
 }
 
-// ƒtƒHƒ“ƒg‚Ì‚‚³‚ğæ“¾‚·‚éB
+// ãƒ•ã‚©ãƒ³ãƒˆã®é«˜ã•ã‚’å–å¾—ã™ã‚‹ã€‚
 int GetCompFontHeight(UIEXTRA *lpUIExtra) {
-    HDC hIC = CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL); // DC‚ğì¬‚·‚éiî•ñ‚Ì‚İjB
+    HDC hIC = CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL); // DCã‚’ä½œæˆã™ã‚‹ï¼ˆæƒ…å ±ã®ã¿ï¼‰ã€‚
     HFONT hOldFont = NULL;
 
-    // ƒtƒHƒ“ƒg‚ª‚ ‚ê‚ÎƒtƒHƒ“ƒg‚ğ‘I‘ğB
+    // ãƒ•ã‚©ãƒ³ãƒˆãŒã‚ã‚Œã°ãƒ•ã‚©ãƒ³ãƒˆã‚’é¸æŠã€‚
     if (lpUIExtra->hFont) hOldFont = (HFONT)SelectObject(hIC, lpUIExtra->hFont);
 
-    // ƒTƒCƒY‚ğæ“¾B
+    // ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
     SIZE siz;
     GetTextExtentPoint(hIC, TEXT("A"), 1, &siz);
 
-    if (hOldFont) SelectObject(hIC, hOldFont); // ƒtƒHƒ“ƒg‚Ì‘I‘ğ‚ğ‰ğœ‚·‚éB
+    if (hOldFont) SelectObject(hIC, hOldFont); // ãƒ•ã‚©ãƒ³ãƒˆã®é¸æŠã‚’è§£é™¤ã™ã‚‹ã€‚
 
-    DeleteDC(hIC); // DC‚ğ”jŠü‚·‚éB
-    return siz.cy; // ‚±‚ê‚ª‚‚³B
+    DeleteDC(hIC); // DCã‚’ç ´æ£„ã™ã‚‹ã€‚
+    return siz.cy; // ã“ã‚ŒãŒé«˜ã•ã€‚
 }
 
-// WM_IME_NOTIFY ƒƒbƒZ[ƒW‚ğˆ—‚·‚éB
+// WM_IME_NOTIFY ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã™ã‚‹ã€‚
 LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
     LONG ret = 0;
     RECT rc;
     LOGFONT lf;
     InputContext *lpIMC;
 
-    UIEXTRA *lpUIExtra = LockUIExtra(hWnd); // —]èî•ñB
+    UIEXTRA *lpUIExtra = LockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã€‚
 
     switch (wParam) {
-    case IMN_CLOSESTATUSWINDOW: // ó‘ÔƒEƒBƒ“ƒhƒE‚ğ•Â‚¶‚éB
+    case IMN_CLOSESTATUSWINDOW: // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‰ã˜ã‚‹ã€‚
         DPRINT("IMN_CLOSESTATUSWINDOW\n");
-        if (::IsWindow(lpUIExtra->hwndStatus)) { // ó‘ÔƒEƒBƒ“ƒhƒE‚ª¶‚«‚Ä‚¢‚éH
-            // ˆÊ’u‚ğ•Û‘¶B
+        if (::IsWindow(lpUIExtra->hwndStatus)) { // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒç”Ÿãã¦ã„ã‚‹ï¼Ÿ
+            // ä½ç½®ã‚’ä¿å­˜ã€‚
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
             POINT pt;
             pt.x = rc.left;
             pt.y = rc.top;
             TheIME.SetUserData(L"ptStatusWindow", &pt, sizeof(pt));
 
-            ::ShowWindow(lpUIExtra->hwndStatus, SW_HIDE); // ÀÛ‚É‚Í”jŠü‚³‚ê‚é‚Ì‚Å‚Í‚È‚­‰B‚³‚ê‚éB
+            ::ShowWindow(lpUIExtra->hwndStatus, SW_HIDE); // å®Ÿéš›ã«ã¯ç ´æ£„ã•ã‚Œã‚‹ã®ã§ã¯ãªãéš ã•ã‚Œã‚‹ã€‚
         }
         break;
 
-    case IMN_OPENSTATUSWINDOW: // ó‘ÔƒEƒBƒ“ƒhƒE‚ªŠJ‚©‚ê‚éB
+    case IMN_OPENSTATUSWINDOW: // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒé–‹ã‹ã‚Œã‚‹ã€‚
         DPRINT("IMN_OPENSTATUSWINDOW\n");
-        StatusWnd_Create(hWnd, lpUIExtra); // ó‘ÔƒEƒBƒ“ƒhƒE‚ğì¬‚·‚éB
+        StatusWnd_Create(hWnd, lpUIExtra); // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½œæˆã™ã‚‹ã€‚
         break;
 
-    case IMN_SETCONVERSIONMODE: // •ÏŠ·ƒ‚[ƒh‚ªƒZƒbƒg‚³‚ê‚éB
+    case IMN_SETCONVERSIONMODE: // å¤‰æ›ãƒ¢ãƒ¼ãƒ‰ãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹ã€‚
         DPRINT("IMN_SETCONVERSIONMODE\n");
-        lpIMC = TheIME.LockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
+        lpIMC = TheIME.LockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
         if (lpIMC) {
-            // ƒ[ƒ}šƒ‚[ƒh‚ğ•Û‘¶B
+            // ãƒ­ãƒ¼ãƒå­—ãƒ¢ãƒ¼ãƒ‰ã‚’ä¿å­˜ã€‚
             if (lpIMC->Conversion() & IME_CMODE_ROMAN) {
                 TheIME.SetUserDword(L"IsNonRoman", FALSE);
             } else {
                 TheIME.SetUserDword(L"IsNonRoman", TRUE);
             }
-            TheIME.UnlockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœB
+            TheIME.UnlockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
         }
-        StatusWnd_Update(lpUIExtra); // —]èî•ñ‚ğXVB
+        StatusWnd_Update(lpUIExtra); // ä½™å‰°æƒ…å ±ã‚’æ›´æ–°ã€‚
         break;
 
     case IMN_SETSENTENCEMODE:
         DPRINT("IMN_SETSENTENCEMODE\n");
         break;
 
-    case IMN_SETCOMPOSITIONFONT: // –¢Šm’è•¶š—ñ‚ÌƒtƒHƒ“ƒg‚ªƒZƒbƒg‚³‚ê‚éB
+    case IMN_SETCOMPOSITIONFONT: // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ•ã‚©ãƒ³ãƒˆãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹ã€‚
         DPRINT("IMN_SETCOMPOSITIONFONT\n");
-        lpIMC = TheIME.LockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
+        lpIMC = TheIME.LockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
         if (lpIMC) {
-            lf = lpIMC->lfFont.W; // ˜_—ƒtƒHƒ“ƒgB
-            if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont); // ‚·‚Å‚É‚ ‚ê‚Î”jŠüB
+            lf = lpIMC->lfFont.W; // è«–ç†ãƒ•ã‚©ãƒ³ãƒˆã€‚
+            if (lpUIExtra->hFont) DeleteObject(lpUIExtra->hFont); // ã™ã§ã«ã‚ã‚Œã°ç ´æ£„ã€‚
 
-            // ƒtƒHƒ“ƒg‚ÌŒü‚«B
-            if (lf.lfEscapement == 2700) // 270“xB
-                lpUIExtra->bVertical = TRUE; // c‘‚«B
+            // ãƒ•ã‚©ãƒ³ãƒˆã®å‘ãã€‚
+            if (lf.lfEscapement == 2700) // 270åº¦ã€‚
+                lpUIExtra->bVertical = TRUE; // ç¸¦æ›¸ãã€‚
             else {
                 lf.lfEscapement = 0;
-                lpUIExtra->bVertical = FALSE; // ‰¡‘‚«B
+                lpUIExtra->bVertical = FALSE; // æ¨ªæ›¸ãã€‚
             }
 
-            // Œ»İ‚ÌƒtƒHƒ“ƒg‚ª“ú–{Œê‚Å‚È‚¯‚ê‚Î•Ê‚Ì“ú–{ŒêƒtƒHƒ“ƒg‚ğ’T‚·B
+            // ç¾åœ¨ã®ãƒ•ã‚©ãƒ³ãƒˆãŒæ—¥æœ¬èªã§ãªã‘ã‚Œã°åˆ¥ã®æ—¥æœ¬èªãƒ•ã‚©ãƒ³ãƒˆã‚’æ¢ã™ã€‚
             if (lf.lfCharSet != SHIFTJIS_CHARSET) {
                 lf.lfCharSet = SHIFTJIS_CHARSET;
                 lf.lfFaceName[0] = 0;
             }
 
-            lpUIExtra->hFont = CreateFontIndirect(&lf); // ˜_—ƒtƒHƒ“ƒg‚©‚çƒtƒHƒ“ƒg‚ğì¬B
-            CompWnd_SetFont(lpUIExtra); // ƒtƒHƒ“ƒg‚ğ—]èî•ñ‚ÉƒZƒbƒgB
-            CompWnd_Move(lpUIExtra, lpIMC); // ó‘ÔƒEƒBƒ“ƒhƒE‚ğˆÚ“®B
+            lpUIExtra->hFont = CreateFontIndirect(&lf); // è«–ç†ãƒ•ã‚©ãƒ³ãƒˆã‹ã‚‰ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½œæˆã€‚
+            CompWnd_SetFont(lpUIExtra); // ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½™å‰°æƒ…å ±ã«ã‚»ãƒƒãƒˆã€‚
+            CompWnd_Move(lpUIExtra, lpIMC); // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç§»å‹•ã€‚
 
-            TheIME.UnlockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœ
+            TheIME.UnlockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤
         }
         break;
 
-    case IMN_SETOPENSTATUS: // IME‚ÌON/OFF‚ğØ‚è‘Ö‚¦B
+    case IMN_SETOPENSTATUS: // IMEã®ON/OFFã‚’åˆ‡ã‚Šæ›¿ãˆã€‚
         DPRINT("IMN_SETOPENSTATUS\n");
-        StatusWnd_Update(lpUIExtra); // ó‘ÔƒEƒBƒ“ƒhƒE‚ğXV‚·‚éB
+        StatusWnd_Update(lpUIExtra); // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æ›´æ–°ã™ã‚‹ã€‚
         break;
 
-    case IMN_OPENCANDIDATE: // Œó•â‚ªŠJ‚©‚ê‚éB
+    case IMN_OPENCANDIDATE: // å€™è£œãŒé–‹ã‹ã‚Œã‚‹ã€‚
         DPRINT("IMN_OPENCANDIDATE\n");
-        lpIMC = TheIME.LockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
+        lpIMC = TheIME.LockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
         if (lpIMC) {
-            CandWnd_Create(hWnd, lpUIExtra, lpIMC); // Œó•âƒEƒBƒ“ƒhƒE‚ğì¬B
-            TheIME.UnlockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœB
+            CandWnd_Create(hWnd, lpUIExtra, lpIMC); // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½œæˆã€‚
+            TheIME.UnlockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
         }
         break;
 
-    case IMN_CHANGECANDIDATE: // Œó•â‚ª•ÏX‚³‚ê‚éB
+    case IMN_CHANGECANDIDATE: // å€™è£œãŒå¤‰æ›´ã•ã‚Œã‚‹ã€‚
         DPRINT("IMN_CHANGECANDIDATE\n");
-        lpIMC = TheIME.LockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
+        lpIMC = TheIME.LockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
         if (lpIMC) {
-            CandWnd_Resize(lpUIExtra, lpIMC); // Œó•âƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY‚ğ•ÏXB
-            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE); // Œó•âƒEƒBƒ“ƒhƒE‚ğˆÚ“®B
-            TheIME.UnlockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœB
+            CandWnd_Resize(lpUIExtra, lpIMC); // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã€‚
+            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE); // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç§»å‹•ã€‚
+            TheIME.UnlockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
         }
         break;
 
-    case IMN_CLOSECANDIDATE: // Œó•â‚ª•Â‚¶‚ç‚ê‚éB
+    case IMN_CLOSECANDIDATE: // å€™è£œãŒé–‰ã˜ã‚‰ã‚Œã‚‹ã€‚
         DPRINT("IMN_CLOSECANDIDATE\n");
-        CandWnd_Hide(lpUIExtra); // Œó•âƒEƒBƒ“ƒhƒE‚ğ‰B‚·B
+        CandWnd_Hide(lpUIExtra); // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’éš ã™ã€‚
         break;
 
     case IMN_GUIDELINE:
@@ -459,41 +459,41 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         }
         break;
 
-    case IMN_SETCANDIDATEPOS: // Œó•â‚ÌˆÊ’u‚ªƒZƒbƒg‚³‚ê‚éB
+    case IMN_SETCANDIDATEPOS: // å€™è£œã®ä½ç½®ãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹ã€‚
         DPRINT("IMN_SETCANDIDATEPOS\n");
-        lpIMC = TheIME.LockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
+        lpIMC = TheIME.LockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
         if (lpIMC) {
-            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE); // Œó•âƒEƒBƒ“ƒhƒE‚ğˆÚ“®B
-            TheIME.UnlockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœB
+            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE); // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç§»å‹•ã€‚
+            TheIME.UnlockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
         }
         break;
 
-    case IMN_SETCOMPOSITIONWINDOW: // –¢Šm’è•¶š—ñƒEƒBƒ“ƒhƒE‚ªƒZƒbƒg‚³‚ê‚éB
+    case IMN_SETCOMPOSITIONWINDOW: // æœªç¢ºå®šæ–‡å­—åˆ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹ã€‚
         DPRINT("IMN_SETCOMPOSITIONWINDOW\n");
-        lpIMC = TheIME.LockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
+        lpIMC = TheIME.LockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
         if (lpIMC) {
-            CompWnd_Move(lpUIExtra, lpIMC); // –¢Šm’è•¶š—ñƒEƒBƒ“ƒhƒE‚ğˆÚ“®B
-            CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE); // Œó•âƒEƒBƒ“ƒhƒE‚àˆÚ“®B
-            TheIME.UnlockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœB
+            CompWnd_Move(lpUIExtra, lpIMC); // æœªç¢ºå®šæ–‡å­—åˆ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç§»å‹•ã€‚
+            CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE); // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚‚ç§»å‹•ã€‚
+            TheIME.UnlockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
         }
         break;
 
-    case IMN_SETSTATUSWINDOWPOS: // ó‘ÔƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ªƒZƒbƒg‚³‚ê‚éB
+    case IMN_SETSTATUSWINDOWPOS: // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹ã€‚
         DPRINT("IMN_SETSTATUSWINDOWPOS\n");
-        lpIMC = TheIME.LockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
+        lpIMC = TheIME.LockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
         if (lpIMC) {
-            // ˆÊ’u‚ğƒZƒbƒg‚·‚éB•‚Æ‚‚³‚Í‚»‚Ì‚Ü‚ÜB
+            // ä½ç½®ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã€‚å¹…ã¨é«˜ã•ã¯ãã®ã¾ã¾ã€‚
             RECT rc;
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
             POINT pt = lpIMC->ptStatusWndPos;
             ::MoveWindow(lpUIExtra->hwndStatus, pt.x, pt.y,
                          rc.right - rc.left, rc.bottom - rc.top, TRUE);
 
-            TheIME.UnlockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœB
+            TheIME.UnlockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
         }
         break;
 
-    case IMN_PRIVATE: // ƒvƒ‰ƒCƒx[ƒg‚È’Ê’mB
+    case IMN_PRIVATE: // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãªé€šçŸ¥ã€‚
         DPRINT("IMN_PRIVATE\n");
         if (HIWORD(lParam) == 0xFACE) {
             std::wstring imepad_file;
@@ -522,36 +522,36 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
     return ret;
 }
 
-// WM_IME_CONTROL ƒƒbƒZ[ƒW‚ğˆ—‚·‚éB
+// WM_IME_CONTROL ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã™ã‚‹ã€‚
 LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
     LONG ret = 1;
 
-    InputContext *lpIMC = TheIME.LockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
+    InputContext *lpIMC = TheIME.LockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
     if (NULL == lpIMC) return ret;
 
-    UIEXTRA *lpUIExtra = LockUIExtra(hWnd); // —]èî•ñ‚ğƒƒbƒN‚·‚éB
+    UIEXTRA *lpUIExtra = LockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
     if (lpUIExtra) {
         switch (wParam) {
-        case IMC_GETCANDIDATEPOS: // Œó•â‚ÌˆÊ’u‚ªæ“¾‚³‚ê‚éB
+        case IMC_GETCANDIDATEPOS: // å€™è£œã®ä½ç½®ãŒå–å¾—ã•ã‚Œã‚‹ã€‚
             DPRINT("IMC_GETCANDIDATEPOS\n");
-            if (IsWindow(lpUIExtra->hwndCand)) { // Œó•âƒEƒBƒ“ƒhƒE‚ª¶‚«‚Ä‚¢‚ê‚Î
-                *(LPCANDIDATEFORM)lParam = lpIMC->cfCandForm[0]; // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚©‚çæ“¾B
+            if (IsWindow(lpUIExtra->hwndCand)) { // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒç”Ÿãã¦ã„ã‚Œã°
+                *(LPCANDIDATEFORM)lParam = lpIMC->cfCandForm[0]; // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‹ã‚‰å–å¾—ã€‚
                 ret = 0;
             }
             break;
 
-        case IMC_GETCOMPOSITIONWINDOW: // –¢Šm’è•¶š—ñ‚Ì\‘¢‘Ì‚ğæ“¾B
+        case IMC_GETCOMPOSITIONWINDOW: // æœªç¢ºå®šæ–‡å­—åˆ—ã®æ§‹é€ ä½“ã‚’å–å¾—ã€‚
             DPRINT("IMC_GETCOMPOSITIONWINDOW\n");
-            *(LPCOMPOSITIONFORM)lParam = lpIMC->cfCompForm; // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚©‚çæ“¾B
+            *(LPCOMPOSITIONFORM)lParam = lpIMC->cfCompForm; // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‹ã‚‰å–å¾—ã€‚
             ret = 0;
             break;
 
-        case IMC_GETSTATUSWINDOWPOS: // ó‘ÔƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ªæ“¾‚³‚ê‚éB
+        case IMC_GETSTATUSWINDOWPOS: // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ãŒå–å¾—ã•ã‚Œã‚‹ã€‚
             DPRINT("IMC_GETSTATUSWINDOWPOS\n");
             {
                 RECT rc;
                 ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
-                ret = MAKELONG(rc.left, rc.top); // ˆÊ’u‚ğ•Ô‚·B
+                ret = MAKELONG(rc.left, rc.top); // ä½ç½®ã‚’è¿”ã™ã€‚
             }
             break;
 
@@ -559,30 +559,30 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
             break;
         }
 
-        UnlockUIExtra(hWnd); // —]èî•ñ‚ÌƒƒbƒN‚ğ‰ğœB
+        UnlockUIExtra(hWnd); // ä½™å‰°æƒ…å ±ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
     }
 
-    TheIME.UnlockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœB
+    TheIME.UnlockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
 
     return ret;
 }
 
-// qƒEƒBƒ“ƒhƒE‚ªƒhƒ‰ƒbƒO‚³‚ê‚Ä‚¢‚ê‚ÎA‚±‚ÌŠÖ”‚Íƒ{[ƒ_[‚ğ•`‰æ‚·‚éB
+// å­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒãƒ‰ãƒ©ãƒƒã‚°ã•ã‚Œã¦ã„ã‚Œã°ã€ã“ã®é–¢æ•°ã¯ãƒœãƒ¼ãƒ€ãƒ¼ã‚’æç”»ã™ã‚‹ã€‚
 void DrawUIBorder(LPRECT lprc) {
-    HDC hDC = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL); // DC‚ğì¬B
-    SelectObject(hDC, GetStockObject(GRAY_BRUSH)); // ƒuƒ‰ƒV‚ğ‘I‘ğB‚±‚ê‚ÅPatBlt‚Å“h‚è‚Â‚Ô‚·B
+    HDC hDC = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL); // DCã‚’ä½œæˆã€‚
+    SelectObject(hDC, GetStockObject(GRAY_BRUSH)); // ãƒ–ãƒ©ã‚·ã‚’é¸æŠã€‚ã“ã‚Œã§PatBltã§å¡—ã‚Šã¤ã¶ã™ã€‚
 
-    // ƒ{[ƒ_[•‚Æ‚‚³B
+    // ãƒœãƒ¼ãƒ€ãƒ¼å¹…ã¨é«˜ã•ã€‚
     INT sbx = GetSystemMetrics(SM_CXBORDER);
     INT sby = GetSystemMetrics(SM_CYBORDER);
 
-    // “h‚è‚Â‚Ô‚·B
+    // å¡—ã‚Šã¤ã¶ã™ã€‚
     PatBlt(hDC, lprc->left, lprc->top, lprc->right - lprc->left - sbx, sby, PATINVERT);
     PatBlt(hDC, lprc->right - sbx, lprc->top, sbx, lprc->bottom - lprc->top - sby, PATINVERT);
     PatBlt(hDC, lprc->right, lprc->bottom - sby, -(lprc->right - lprc->left - sbx), sby, PATINVERT);
     PatBlt(hDC, lprc->left, lprc->bottom, sbx, -(lprc->bottom - lprc->top - sby), PATINVERT);
 
-    DeleteDC(hDC); // DC‚ğ”jŠüB
+    DeleteDC(hDC); // DCã‚’ç ´æ£„ã€‚
 }
 
 // Handling mouse messages for the child windows
@@ -642,7 +642,7 @@ void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     }
 }
 
-// IMEƒƒbƒZ[ƒW‚©i‚»‚Ì‚PjH
+// IMEãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‹ï¼ˆãã®ï¼‘ï¼‰ï¼Ÿ
 // Any UI window should not pass the IME messages to DefWindowProc.
 BOOL IsImeMessage(UINT message) {
     switch (message) {
@@ -660,7 +660,7 @@ BOOL IsImeMessage(UINT message) {
     return FALSE;
 }
 
-// IMEƒƒbƒZ[ƒW‚©i‚»‚Ì‚QjH
+// IMEãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‹ï¼ˆãã®ï¼’ï¼‰ï¼Ÿ
 BOOL IsImeMessage2(UINT message) {
     switch (message) {
     case WM_IME_STARTCOMPOSITION:

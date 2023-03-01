@@ -8,8 +8,8 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// ImeInquire - IME�̖⍇�����ɌĂяo�����֐��B
-// IME�̃v���p�e�B��UI�T�[�o�[�̃E�B���h�E�N���X�����i�[����B
+// ImeInquire - IMEの問合せ時に呼び出される関数。
+// IMEのプロパティやUIサーバーのウィンドウクラス名を格納する。
 BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
                        DWORD dwSystemInfoFlags) {
     FOOTMARK_FORMAT("((0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX), 0x%08lX)\n",
@@ -45,7 +45,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
     FOOTMARK_RETURN_INT(TRUE);
 }
 
-// �ϊ����X�g�B
+// 変換リスト。
 DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
                                LPCANDIDATELIST lpCandList, DWORD dwBufLen,
                                UINT uFlags) {
@@ -55,14 +55,14 @@ DWORD WINAPI ImeConversionList(HIMC hIMC, LPCTSTR lpSource,
     FOOTMARK_RETURN_LONG(0);
 }
 
-// IME�j���B
+// IME破棄。
 BOOL WINAPI ImeDestroy(UINT uForce) {
     FOOTMARK_FORMAT("(0x%08X)\n", uForce);
 
     FOOTMARK_RETURN_INT(TRUE);
 }
 
-// IME�g���@�\�B
+// IME拡張機能。
 LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
     LRESULT ret = FALSE;
     FOOTMARK_FORMAT("(%p, %u, %p)\n", hIMC, uSubFunc, lpData);
@@ -99,7 +99,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
     FOOTMARK_RETURN_LPARAM(ret);
 }
 
-// IME�̃A�N�e�B�u�R���e�L�X�g��ݒ�B
+// IMEのアクティブコンテキストを設定。
 BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
     FOOTMARK_FORMAT("(%p, %u)\n", hIMC, fFlag);
 
@@ -108,7 +108,7 @@ BOOL WINAPI ImeSetActiveContext(HIMC hIMC, BOOL fFlag) {
     FOOTMARK_RETURN_INT(TRUE);
 }
 
-// IME�ɒʒm�B
+// IMEに通知。
 BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     InputContext *lpIMC;
     BOOL ret = FALSE;
@@ -285,7 +285,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
     FOOTMARK_RETURN_INT(ret);
 }
 
-// IME�I���B
+// IME選択。
 BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
     FOOTMARK_FORMAT("(%p, %u)\n", hIMC, fSelect);
 
@@ -302,7 +302,7 @@ BOOL WINAPI ImeSelect(HIMC hIMC, BOOL fSelect) {
     FOOTMARK_RETURN_INT(TRUE);
 }
 
-// ���m�蕶�����ݒ�B
+// 未確定文字列を設定。
 BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
                                     DWORD dwComp, LPVOID lpRead, DWORD dwRead) {
     FOOTMARK_FORMAT("(%p, 0x%08lX, %p, 0x%08lX, %p, 0x%08lX)\n",
@@ -325,7 +325,7 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
     FOOTMARK_RETURN_INT(FALSE);
 }
 
-// ���j���[���B
+// メニュー情報。
 struct MYMENUITEM {
     INT nCommandID;
     INT nStringID;
@@ -349,7 +349,7 @@ static const MYMENUITEM top_menu_items[] = {
     {IDM_ABOUT, IDM_ABOUT, FALSE},
 };
 
-// IME���j���[���ڂ��擾�B
+// IMEメニュー項目を取得。
 DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
                                 LPIMEMENUITEMINFO lpImeParentMenu,
                                 LPIMEMENUITEMINFO lpImeMenu, DWORD dwSize) {

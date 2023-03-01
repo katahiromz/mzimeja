@@ -7,7 +7,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// ƒKƒCƒhƒ‰ƒCƒ“ƒEƒBƒ“ƒhƒE‚ÌƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒB
+// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã€‚
 LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
                                      LPARAM lParam) {
     PAINTSTRUCT ps;
@@ -17,53 +17,53 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     RECT rc;
 
     switch (message) {
-    case WM_UI_HIDE: // UI‚ð‰B‚µ‚½‚¢ŽžB
+    case WM_UI_HIDE: // UIã‚’éš ã—ãŸã„æ™‚ã€‚
         ShowWindow(hWnd, SW_HIDE);
         break;
 
-    case WM_UI_UPDATE: // UI‚ðXV‚·‚éŽžB
+    case WM_UI_UPDATE: // UIã‚’æ›´æ–°ã™ã‚‹æ™‚ã€‚
         InvalidateRect(hWnd, NULL, FALSE);
         break;
 
-    case WM_PAINT: // •`‰æŽžB
+    case WM_PAINT: // æç”»æ™‚ã€‚
         hDC = BeginPaint(hWnd, &ps);
         GuideWnd_Paint(hWnd, hDC, NULL, 0);
         EndPaint(hWnd, &ps);
         break;
 
-    case WM_MOUSEMOVE: // ƒ}ƒEƒXˆÚ“®ŽžB
-    case WM_SETCURSOR: // ƒJ[ƒ\ƒ‹Ý’èŽžB
-    case WM_LBUTTONUP: // ¶ƒ{ƒ^ƒ“‰ð•úŽžB
-    case WM_RBUTTONUP: // ‰Eƒ{ƒ^ƒ“‰ð•úŽžB
-        GuideWnd_Button(hWnd, message, wParam, lParam); // ƒ}ƒEƒXƒAƒNƒVƒ‡ƒ“B
+    case WM_MOUSEMOVE: // ãƒžã‚¦ã‚¹ç§»å‹•æ™‚ã€‚
+    case WM_SETCURSOR: // ã‚«ãƒ¼ã‚½ãƒ«è¨­å®šæ™‚ã€‚
+    case WM_LBUTTONUP: // å·¦ãƒœã‚¿ãƒ³è§£æ”¾æ™‚ã€‚
+    case WM_RBUTTONUP: // å³ãƒœã‚¿ãƒ³è§£æ”¾æ™‚ã€‚
+        GuideWnd_Button(hWnd, message, wParam, lParam); // ãƒžã‚¦ã‚¹ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã€‚
         if ((message == WM_SETCURSOR) && (HIWORD(lParam) != WM_LBUTTONDOWN) &&
             (HIWORD(lParam) != WM_RBUTTONDOWN))
             return DefWindowProc(hWnd, message, wParam, lParam);
         if ((message == WM_LBUTTONUP) || (message == WM_RBUTTONUP)) {
-            // ó‘Ô‚ð–ß‚·B
+            // çŠ¶æ…‹ã‚’æˆ»ã™ã€‚
             ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, 0);
             ::SetWindowLongPtr(hWnd, FIGWL_PUSHSTATUS, 0);
         }
         break;
 
-    case WM_MOVE: // ƒEƒBƒ“ƒhƒEˆÚ“®ŽžB
+    case WM_MOVE: // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç§»å‹•æ™‚ã€‚
         hUIWnd = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
         if (IsWindow(hUIWnd))
-            SendMessage(hUIWnd, WM_UI_GUIDEMOVE, 0, 0); // UIƒT[ƒo[‚É‘—‚éB
+            SendMessage(hUIWnd, WM_UI_GUIDEMOVE, 0, 0); // UIã‚µãƒ¼ãƒãƒ¼ã«é€ã‚‹ã€‚
         break;
 
-    case WM_CREATE: // ƒEƒBƒ“ƒhƒEì¬ŽžB
-        hbmpGuide = TheIME.LoadBMP(TEXT("CLOSEBMP")); // ƒrƒbƒgƒ}ƒbƒv‚ð“Ç‚Ýž‚ÝA•Û‘¶‚·‚éB
+    case WM_CREATE: // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½œæˆæ™‚ã€‚
+        hbmpGuide = TheIME.LoadBMP(TEXT("CLOSEBMP")); // ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—ã‚’èª­ã¿è¾¼ã¿ã€ä¿å­˜ã™ã‚‹ã€‚
         ::SetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP, (LONG_PTR)hbmpGuide);
         GetClientRect(hWnd, &rc);
         break;
 
-    case WM_DESTROY: // ƒEƒBƒ“ƒhƒE”jŠüŽžB
+    case WM_DESTROY: // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç ´æ£„æ™‚ã€‚
         hbmpGuide = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_CLOSEBMP);
-        DeleteObject(hbmpGuide); // ƒrƒbƒgƒ}ƒbƒv‚ð”jŠü‚·‚éB
+        DeleteObject(hbmpGuide); // ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—ã‚’ç ´æ£„ã™ã‚‹ã€‚
         break;
 
-    default: // ‚»‚êˆÈŠO‚ÌƒƒbƒZ[ƒWB
+    default: // ãã‚Œä»¥å¤–ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€‚
         if (!IsImeMessage(message))
             return DefWindowProc(hWnd, message, wParam, lParam);
         break;
@@ -90,7 +90,7 @@ DWORD PASCAL CheckPushedGuide(HWND hGuideWnd, LPPOINT lppt) {
     return 0;
 }
 
-// ƒKƒCƒhƒ‰ƒCƒ“‚Ì•`‰æŽžB
+// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®æç”»æ™‚ã€‚
 void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
                     DWORD dwPushedGuide) {
     HBITMAP hbmpOld;
@@ -99,9 +99,9 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
     DWORD dwLevel;
     DWORD dwSize;
 
-    HWND hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND); // UIƒT[ƒo[B
+    HWND hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND); // UIã‚µãƒ¼ãƒãƒ¼ã€‚
 
-    HIMC hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMCB
+    HIMC hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMCã€‚
     if (hIMC == NULL) {
         ASSERT(0);
         return;
@@ -109,27 +109,27 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
 
     HBITMAP hbmpGuide;
     HBRUSH hOldBrush, hBrush;
-    int nCyCap = GetSystemMetrics(SM_CYSMCAPTION); // ¬‚³‚¢ƒLƒƒƒvƒVƒ‡ƒ“‚Ìƒ^ƒe¡–@B
+    int nCyCap = GetSystemMetrics(SM_CYSMCAPTION); // å°ã•ã„ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³ã®ã‚¿ãƒ†å¯¸æ³•ã€‚
 
-    HDC hMemDC = CreateCompatibleDC(hDC); // ƒƒ‚ƒŠ[DC‚ðì¬B
+    HDC hMemDC = CreateCompatibleDC(hDC); // ãƒ¡ãƒ¢ãƒªãƒ¼DCã‚’ä½œæˆã€‚
 
-    // ƒLƒƒƒvƒVƒ‡ƒ“‚ð•`‰æ‚·‚éB
-    hBrush = CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION)); // ƒuƒ‰ƒV‚ðì¬B
-    hOldBrush = (HBRUSH)SelectObject(hDC, hBrush); // ƒuƒ‰ƒV‘I‘ðB
+    // ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³ã‚’æç”»ã™ã‚‹ã€‚
+    hBrush = CreateSolidBrush(GetSysColor(COLOR_ACTIVECAPTION)); // ãƒ–ãƒ©ã‚·ã‚’ä½œæˆã€‚
+    hOldBrush = (HBRUSH)SelectObject(hDC, hBrush); // ãƒ–ãƒ©ã‚·é¸æŠžã€‚
     RECT rc;
-    GetClientRect(hGuideWnd, &rc); // ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ðŽæ“¾B
+    GetClientRect(hGuideWnd, &rc); // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã‚’å–å¾—ã€‚
     // rc.top = rc.left = 0;
     // rc.right = BTX*3;
-    rc.bottom = nCyCap; // ƒLƒƒƒvƒVƒ‡ƒ“‚Ì—Ìˆæ‚É‚·‚éB
-    FillRect(hDC, &rc, hBrush); // “h‚è‚Â‚Ô‚·B
-    SelectObject(hDC, hOldBrush); // ƒuƒ‰ƒV‘I‘ð‚ð‰ðœB
-    DeleteObject(hBrush); // ƒuƒ‰ƒV‚ð”jŠüB
+    rc.bottom = nCyCap; // ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³ã®é ˜åŸŸã«ã™ã‚‹ã€‚
+    FillRect(hDC, &rc, hBrush); // å¡—ã‚Šã¤ã¶ã™ã€‚
+    SelectObject(hDC, hOldBrush); // ãƒ–ãƒ©ã‚·é¸æŠžã‚’è§£é™¤ã€‚
+    DeleteObject(hBrush); // ãƒ–ãƒ©ã‚·ã‚’ç ´æ£„ã€‚
 
-    // •Â‚¶‚éƒ{ƒ^ƒ“‚Ìƒrƒbƒgƒ}ƒbƒv‚ðŽæ“¾B
+    // é–‰ã˜ã‚‹ãƒœã‚¿ãƒ³ã®ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—ã‚’å–å¾—ã€‚
     hbmpGuide = (HBITMAP)GetWindowLongPtr(hGuideWnd, FIGWLP_CLOSEBMP);
-    hbmpOld = (HBITMAP)SelectObject(hMemDC, hbmpGuide); // ƒrƒbƒgƒ}ƒbƒv‚ð‘I‘ðB
+    hbmpOld = (HBITMAP)SelectObject(hMemDC, hbmpGuide); // ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—ã‚’é¸æŠžã€‚
 
-    // ó‘Ô‚É‰ž‚¶‚Äƒrƒbƒgƒ}ƒbƒv‚Å•`‰æB
+    // çŠ¶æ…‹ã«å¿œã˜ã¦ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—ã§æç”»ã€‚
     if (!(dwPushedGuide & PUSHED_STATUS_CLOSE))
         BitBlt(hDC, rc.right - STCLBT_DX - 2, STCLBT_Y, STCLBT_DX, STCLBT_DY,
                hMemDC, 0, 0, SRCCOPY);
@@ -137,26 +137,26 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
         BitBlt(hDC, rc.right - STCLBT_DX - 2, STCLBT_Y, STCLBT_DX, STCLBT_DY,
                hMemDC, STCLBT_DX, 0, SRCCOPY);
 
-    // ƒKƒCƒhƒ‰ƒCƒ“‚ÌƒŒƒxƒ‹‚ðŽæ“¾B
+    // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®ãƒ¬ãƒ™ãƒ«ã‚’å–å¾—ã€‚
     dwLevel = ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0);
     if (dwLevel) {
-        // ƒKƒCƒhƒ‰ƒCƒ“‚Ì•¶Žš—ñ‚ÌƒTƒCƒY‚ðŽæ“¾B
+        // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®æ–‡å­—åˆ—ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
         dwSize = ImmGetGuideLine(hIMC, GGL_STRING, NULL, 0) + 1;
-        // •¶Žš—ñ‚É‘Î‚·‚éƒƒ‚ƒŠ[Š„‚è“–‚ÄB
+        // æ–‡å­—åˆ—ã«å¯¾ã™ã‚‹ãƒ¡ãƒ¢ãƒªãƒ¼å‰²ã‚Šå½“ã¦ã€‚
         if ((dwSize > 1) && (hGLStr = GlobalAlloc(GHND, dwSize))) {
-            lpGLStr = (LPTSTR)GlobalLock(hGLStr); // ƒƒ‚ƒŠ[‚ðƒƒbƒNB
+            lpGLStr = (LPTSTR)GlobalLock(hGLStr); // ãƒ¡ãƒ¢ãƒªãƒ¼ã‚’ãƒ­ãƒƒã‚¯ã€‚
             if (lpGLStr) {
                 COLORREF rgb = 0;
-                HBRUSH hbrLGR = (HBRUSH)GetStockObject(LTGRAY_BRUSH); // ƒuƒ‰ƒV‚ðŽæ“¾B
+                HBRUSH hbrLGR = (HBRUSH)GetStockObject(LTGRAY_BRUSH); // ãƒ–ãƒ©ã‚·ã‚’å–å¾—ã€‚
                 HBRUSH hbr;
 
-                hbr = (HBRUSH)SelectObject(hDC, hbrLGR); // ƒuƒ‰ƒV‘I‘ðB
-                GetClientRect(hGuideWnd, &rc); // ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ðŽæ“¾B
-                // ƒuƒ‰ƒV‚Å“h‚è‚Â‚Ô‚µB
+                hbr = (HBRUSH)SelectObject(hDC, hbrLGR); // ãƒ–ãƒ©ã‚·é¸æŠžã€‚
+                GetClientRect(hGuideWnd, &rc); // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã‚’å–å¾—ã€‚
+                // ãƒ–ãƒ©ã‚·ã§å¡—ã‚Šã¤ã¶ã—ã€‚
                 PatBlt(hDC, 0, nCyCap, rc.right, rc.bottom - nCyCap, PATCOPY);
-                SelectObject(hDC, hbr); // ƒuƒ‰ƒV‘I‘ð‚ð‰ðœB
+                SelectObject(hDC, hbr); // ãƒ–ãƒ©ã‚·é¸æŠžã‚’è§£é™¤ã€‚
 
-                // ƒŒƒxƒ‹‚É‰ž‚¶‚ÄF‚ð•Ï‚¦‚éB
+                // ãƒ¬ãƒ™ãƒ«ã«å¿œã˜ã¦è‰²ã‚’å¤‰ãˆã‚‹ã€‚
                 switch (dwLevel) {
                 case GL_LEVEL_FATAL:
                 case GL_LEVEL_ERROR:
@@ -171,24 +171,24 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
                     break;
                 }
 
-                // Šm•Û‚µ‚½ƒƒ‚ƒŠ[‚ðŽg‚Á‚ÄƒKƒCƒhƒ‰ƒCƒ“•¶Žš—ñ‚ðŽæ“¾B
+                // ç¢ºä¿ã—ãŸãƒ¡ãƒ¢ãƒªãƒ¼ã‚’ä½¿ã£ã¦ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³æ–‡å­—åˆ—ã‚’å–å¾—ã€‚
                 dwSize = ImmGetGuideLine(hIMC, GGL_STRING, lpGLStr, dwSize);
                 if (dwSize) {
-                    SetTextColor(hDC, rgb); // ƒeƒLƒXƒgF‚ðŽw’èB
-                    SetBkMode(hDC, TRANSPARENT); // ”wŒi“§–¾B
-                    TextOut(hDC, 0, nCyCap, lpGLStr, dwSize); // •¶Žš—ñ•`‰æB
+                    SetTextColor(hDC, rgb); // ãƒ†ã‚­ã‚¹ãƒˆè‰²ã‚’æŒ‡å®šã€‚
+                    SetBkMode(hDC, TRANSPARENT); // èƒŒæ™¯é€æ˜Žã€‚
+                    TextOut(hDC, 0, nCyCap, lpGLStr, dwSize); // æ–‡å­—åˆ—æç”»ã€‚
                 }
-                GlobalUnlock(hGLStr); // •¶Žš—ñƒƒ‚ƒŠ[‚ÌƒƒbƒN‚ð‰ðœB
+                GlobalUnlock(hGLStr); // æ–‡å­—åˆ—ãƒ¡ãƒ¢ãƒªãƒ¼ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
             }
-            GlobalFree(hGLStr); // ‰ð•úB
+            GlobalFree(hGLStr); // è§£æ”¾ã€‚
         }
     }
 
-    SelectObject(hMemDC, hbmpOld); // ƒrƒbƒgƒ}ƒbƒv‘I‘ð‚ð‰ðœB
-    DeleteDC(hMemDC); // ƒƒ‚ƒŠ[DC‚ð”jŠüB
+    SelectObject(hMemDC, hbmpOld); // ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—é¸æŠžã‚’è§£é™¤ã€‚
+    DeleteDC(hMemDC); // ãƒ¡ãƒ¢ãƒªãƒ¼DCã‚’ç ´æ£„ã€‚
 }
 
-// ƒKƒCƒhƒ‰ƒCƒ“ƒEƒBƒ“ƒhƒE‚Ìƒ}ƒEƒXƒAƒNƒVƒ‡ƒ“B
+// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒžã‚¦ã‚¹ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã€‚
 void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
                      LPARAM lParam) {
     POINT pt;
@@ -203,32 +203,32 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
     static RECT rc;
     static DWORD dwCurrentPushedGuide;
 
-    hDC = GetDC(hGuideWnd); // DC‚ðŽæ“¾B
+    hDC = GetDC(hGuideWnd); // DCã‚’å–å¾—ã€‚
     switch (message) {
-    case WM_SETCURSOR: // ƒJ[ƒ\ƒ‹Œ`ó‚ÌÝ’èŽžB
+    case WM_SETCURSOR: // ã‚«ãƒ¼ã‚½ãƒ«å½¢çŠ¶ã®è¨­å®šæ™‚ã€‚
         if (HIWORD(lParam) == WM_LBUTTONDOWN ||
-            HIWORD(lParam) == WM_RBUTTONDOWN) { // ¶ƒ{ƒ^ƒ“‚©‰Eƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½ŽžB
-            GetCursorPos(&pt); // ƒJ[ƒ\ƒ‹ˆÊ’u‚ðŽæ“¾B
-            SetCapture(hGuideWnd); // ƒLƒƒƒvƒ`ƒƒ[‚ðƒZƒbƒg‚µ‚Äƒhƒ‰ƒbƒO‚ðŠJŽnB
-            GetWindowRect(hGuideWnd, &drc); // ƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ÆƒTƒCƒY‚ðŽæ“¾B
-            // ƒEƒBƒ“ƒhƒEˆÊ’u‚ÆƒNƒŠƒbƒNˆÊ’u‚Ì·‚ðŽæ“¾B
+            HIWORD(lParam) == WM_RBUTTONDOWN) { // å·¦ãƒœã‚¿ãƒ³ã‹å³ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸæ™‚ã€‚
+            GetCursorPos(&pt); // ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’å–å¾—ã€‚
+            SetCapture(hGuideWnd); // ã‚­ãƒ£ãƒ—ãƒãƒ£ãƒ¼ã‚’ã‚»ãƒƒãƒˆã—ã¦ãƒ‰ãƒ©ãƒƒã‚°ã‚’é–‹å§‹ã€‚
+            GetWindowRect(hGuideWnd, &drc); // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã¨ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
+            // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®ã¨ã‚¯ãƒªãƒƒã‚¯ä½ç½®ã®å·®ã‚’å–å¾—ã€‚
             ptdif.x = pt.x - drc.left;
             ptdif.y = pt.y - drc.top;
             rc = drc;
             rc.right -= rc.left;
             rc.bottom -= rc.top;
-            ::SetWindowLongPtr(hGuideWnd, FIGWL_MOUSE, FIM_CAPUTURED); // ƒLƒƒƒvƒ`ƒƒó‘Ô‚ð•Û‘¶B
+            ::SetWindowLongPtr(hGuideWnd, FIGWL_MOUSE, FIM_CAPUTURED); // ã‚­ãƒ£ãƒ—ãƒãƒ£çŠ¶æ…‹ã‚’ä¿å­˜ã€‚
             dwPushedGuide = CheckPushedGuide(hGuideWnd, &pt);
-            ::SetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS, dwPushedGuide); // ‰Ÿ‚³‚ê‚½ó‘Ô‚ð•Û‘¶B
-            GuideWnd_Paint(hGuideWnd, hDC, &pt, dwPushedGuide); // Ä•`‰æB
-            dwCurrentPushedGuide = dwPushedGuide; // ‰Ÿ‚³‚ê‚½ó‘Ô‚ðŠo‚¦‚éB
+            ::SetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS, dwPushedGuide); // æŠ¼ã•ã‚ŒãŸçŠ¶æ…‹ã‚’ä¿å­˜ã€‚
+            GuideWnd_Paint(hGuideWnd, hDC, &pt, dwPushedGuide); // å†æç”»ã€‚
+            dwCurrentPushedGuide = dwPushedGuide; // æŠ¼ã•ã‚ŒãŸçŠ¶æ…‹ã‚’è¦šãˆã‚‹ã€‚
         }
         break;
 
     case WM_MOUSEMOVE:
-        dwMouse = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_MOUSE); // ó‘Ô‚ðŽæ“¾B
-        if (!(dwPushedGuide = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS))) { // ‰Ÿ‚³‚ê‚½ó‘Ô‚ª‚È‚¯‚ê‚Î
-            if (dwMouse & FIM_MOVED) { // ˆÚ“®‚µ‚½H
+        dwMouse = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_MOUSE); // çŠ¶æ…‹ã‚’å–å¾—ã€‚
+        if (!(dwPushedGuide = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS))) { // æŠ¼ã•ã‚ŒãŸçŠ¶æ…‹ãŒãªã‘ã‚Œã°
+            if (dwMouse & FIM_MOVED) { // ç§»å‹•ã—ãŸï¼Ÿ
                 DrawUIBorder(&drc);
                 GetCursorPos(&pt);
                 drc.left = pt.x - ptdif.x;
@@ -241,7 +241,7 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
                 ::SetWindowLongPtr(hGuideWnd, FIGWL_MOUSE, dwMouse | FIM_MOVED);
             }
         } else {
-            GetCursorPos(&pt); // ƒ}ƒEƒXƒJ[ƒ\ƒ‹ˆÊ’u‚ðŽæ“¾B
+            GetCursorPos(&pt); // ãƒžã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’å–å¾—ã€‚
             dwTemp = CheckPushedGuide(hGuideWnd, &pt);
             if ((dwTemp ^ dwCurrentPushedGuide) & dwPushedGuide)
                 GuideWnd_Paint(hGuideWnd, hDC, &pt, dwPushedGuide & dwTemp);
@@ -249,42 +249,42 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
         }
         break;
 
-    case WM_LBUTTONUP: // ¶ƒ{ƒ^ƒ“‰ð•úŽžB
-    case WM_RBUTTONUP: // ‰Eƒ{ƒ^ƒ“‰ð•úŽžB
-        dwMouse = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_MOUSE); // ƒ}ƒEƒXó‘Ô‚ðŽæ“¾B
-        if (dwMouse & FIM_CAPUTURED) { // ƒLƒƒƒvƒ`ƒƒ‚µ‚Ä‚¢‚éH
-            ReleaseCapture(); // ƒLƒƒƒvƒ`ƒƒ‚ð‰ð•úB
-            if (dwMouse & FIM_MOVED) { // ˆÚ“®‚µ‚½H
-                DrawUIBorder(&drc); // ƒ{[ƒ_[‚ðÄ•`‰æB
-                GetCursorPos(&pt); // ƒ}ƒEƒXƒJ[ƒ\ƒ‹ˆÊ’u‚ðŽæ“¾B
-                // ƒ}ƒEƒXˆÊ’u‚ÉˆÚ“®B
+    case WM_LBUTTONUP: // å·¦ãƒœã‚¿ãƒ³è§£æ”¾æ™‚ã€‚
+    case WM_RBUTTONUP: // å³ãƒœã‚¿ãƒ³è§£æ”¾æ™‚ã€‚
+        dwMouse = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_MOUSE); // ãƒžã‚¦ã‚¹çŠ¶æ…‹ã‚’å–å¾—ã€‚
+        if (dwMouse & FIM_CAPUTURED) { // ã‚­ãƒ£ãƒ—ãƒãƒ£ã—ã¦ã„ã‚‹ï¼Ÿ
+            ReleaseCapture(); // ã‚­ãƒ£ãƒ—ãƒãƒ£ã‚’è§£æ”¾ã€‚
+            if (dwMouse & FIM_MOVED) { // ç§»å‹•ã—ãŸï¼Ÿ
+                DrawUIBorder(&drc); // ãƒœãƒ¼ãƒ€ãƒ¼ã‚’å†æç”»ã€‚
+                GetCursorPos(&pt); // ãƒžã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’å–å¾—ã€‚
+                // ãƒžã‚¦ã‚¹ä½ç½®ã«ç§»å‹•ã€‚
                 MoveWindow(hGuideWnd, pt.x - ptdif.x, pt.y - ptdif.y, rc.right,
                            rc.bottom, TRUE);
             }
         }
 
-        // UIƒT[ƒo[‚ðŽæ“¾B
+        // UIã‚µãƒ¼ãƒãƒ¼ã‚’å–å¾—ã€‚
         hSvrWnd = (HWND)GetWindowLongPtr(hGuideWnd, FIGWLP_SERVERWND);
 
-        hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMCB
+        hIMC = (HIMC)GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMCã€‚
         if (hIMC) {
-            GetCursorPos(&pt); // ƒ}ƒEƒXˆÊ’u‚ðŽæ“¾B
-            dwPushedGuide = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS); // ‰Ÿ‚³‚ê‚½ó‘Ô‚ðŽæ“¾B
+            GetCursorPos(&pt); // ãƒžã‚¦ã‚¹ä½ç½®ã‚’å–å¾—ã€‚
+            dwPushedGuide = (DWORD)::GetWindowLongPtr(hGuideWnd, FIGWL_PUSHSTATUS); // æŠ¼ã•ã‚ŒãŸçŠ¶æ…‹ã‚’å–å¾—ã€‚
             dwPushedGuide &= CheckPushedGuide(hGuideWnd, &pt);
             if (!dwPushedGuide) {
             } else if (dwPushedGuide == PUSHED_STATUS_CLOSE) {
                 PostMessage(hGuideWnd, WM_UI_HIDE, 0, 0);
             }
         }
-        GuideWnd_Paint(hGuideWnd, hDC, NULL, 0); // Ä•`‰æB
+        GuideWnd_Paint(hGuideWnd, hDC, NULL, 0); // å†æç”»ã€‚
         break;
     }
-    ReleaseDC(hGuideWnd, hDC); // DC‚ð‰ð•úB
+    ReleaseDC(hGuideWnd, hDC); // DCã‚’è§£æ”¾ã€‚
 }
 
-// ƒKƒCƒhƒ‰ƒCƒ“‚ÌXVB
+// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®æ›´æ–°ã€‚
 void GuideWnd_Update(UIEXTRA *lpUIExtra) {
-    // ƒKƒCƒhƒ‰ƒCƒ“ƒEƒBƒ“ƒhƒE‚ÉXVƒƒbƒZ[ƒW‚ð‘—‚éB
+    // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«æ›´æ–°ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ã‚‹ã€‚
     if (::IsWindow(lpUIExtra->hwndGuide)) {
         ::SendMessage(lpUIExtra->hwndGuide, WM_UI_UPDATE, 0, 0);
     }

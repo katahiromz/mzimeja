@@ -1,5 +1,5 @@
 // process.cpp --- mzimeja input process
-// ì¸óÕèàóùÅB
+// ÂÖ•ÂäõÂá¶ÁêÜ„ÄÇ
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -14,7 +14,7 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // A function which handles WM_IME_KEYDOWN.
-// WM_IME_KEYDOWNÇèàóùÇ∑ÇÈä÷êîÅB
+// WM_IME_KEYDOWN„ÇíÂá¶ÁêÜ„Åô„ÇãÈñ¢Êï∞„ÄÇ
 BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
                        INPUT_MODE imode) {
     FOOTMARK_FORMAT("(%p, 0x%08lX, %p, %u)\n", hIMC, wParam, lpbKeyState, (INT)imode);
@@ -38,7 +38,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
     BOOL bCapsLock = lpbKeyState[VK_CAPITAL] & 0x80;
     BOOL bRoman = IsRomanMode(hIMC);
 
-    // Is Ctrl down? CtrlÉLÅ[Ç™âüÇ≥ÇÍÇƒÇ¢ÇÈÇ©ÅH
+    // Is Ctrl down? Ctrl„Ç≠„Éº„ÅåÊäº„Åï„Çå„Å¶„ÅÑ„Çã„ÅãÔºü
     if (bCtrl) {
         if (bOpen) {
             if (vk == VK_SPACE) {
@@ -54,13 +54,13 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
         return FALSE;
     }
 
-    // Get translated char. â¬î\Ç»ÇÁï∂éöÇÇ–ÇÁÇ™Ç»Ç…Ç∑ÇÈÅB
+    // Get translated char. ÂèØËÉΩ„Å™„ÇâÊñáÂ≠ó„Çí„Å≤„Çâ„Åå„Å™„Å´„Åô„Çã„ÄÇ
     WCHAR chTranslated = 0;
     if (!bRoman) {
         chTranslated = vkey_to_hiragana(vk, bShift);
     }
 
-    // Get typed character. â¬î\Ç»ÇÁÉLÅ[ì¸óÕÇï∂éöÇ…Ç∑ÇÈÅB
+    // Get typed character. ÂèØËÉΩ„Å™„Çâ„Ç≠„ÉºÂÖ•Âäõ„ÇíÊñáÂ≠ó„Å´„Åô„Çã„ÄÇ
     WCHAR chTyped;
     if (vk == VK_PACKET) {
         chTyped = chTranslated = HIWORD(wParam);
@@ -68,18 +68,18 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
         chTyped = typing_key_to_char(vk, bShift, bCapsLock);
     }
 
-    if (chTranslated || chTyped) { // ì¸óÕÉLÅ[Çïœä∑Ç≈Ç´ÇΩÇÁ
-        lpIMC = TheIME.LockIMC(hIMC); // ì¸óÕÉRÉìÉeÉLÉXÉgÇÉçÉbÉNÅB
+    if (chTranslated || chTyped) { // ÂÖ•Âäõ„Ç≠„Éº„ÇíÂ§âÊèõ„Åß„Åç„Åü„Çâ
+        lpIMC = TheIME.LockIMC(hIMC); // ÂÖ•Âäõ„Ç≥„É≥„ÉÜ„Ç≠„Çπ„Éà„Çí„É≠„ÉÉ„ÇØ„ÄÇ
         ASSERT(lpIMC != NULL);
         if (lpIMC) {
-            // åÛï‚èÓïÒÇ™Ç†ÇËÅAåÛï‚ÇÃëIëÇ≈Ç†ÇÍÇŒÅAåÛï‚ÇëIëÅB
-            // Ç≥Ç‡Ç»ÇØÇÍÇŒï∂éöÇí«â¡ÅB
+            // ÂÄôË£úÊÉÖÂ†±„Åå„ÅÇ„Çä„ÄÅÂÄôË£ú„ÅÆÈÅ∏Êäû„Åß„ÅÇ„Çå„Å∞„ÄÅÂÄôË£ú„ÇíÈÅ∏Êäû„ÄÇ
+            // „Åï„ÇÇ„Å™„Åë„Çå„Å∞ÊñáÂ≠ó„ÇíËøΩÂä†„ÄÇ
             if (lpIMC->HasCandInfo() && L'1' <= chTyped && chTyped <= L'9') {
                 lpIMC->SelectCand(chTyped - L'1');
             } else {
                 lpIMC->AddChar(chTyped, chTranslated);
             }
-            TheIME.UnlockIMC(hIMC); // ì¸óÕÉRÉìÉeÉLÉXÉgÇÃÉçÉbÉNÇâèúÅB
+            TheIME.UnlockIMC(hIMC); // ÂÖ•Âäõ„Ç≥„É≥„ÉÜ„Ç≠„Çπ„Éà„ÅÆ„É≠„ÉÉ„ÇØ„ÇíËß£Èô§„ÄÇ
         }
         return TRUE;
     }
@@ -173,7 +173,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
                 lpIMC->Convert(bShift);
             } else {
                 // add ideographic space
-                TheIME.GenerateMessage(WM_IME_CHAR, L'Å@', 1);
+                TheIME.GenerateMessage(WM_IME_CHAR, 0x3000, 1);
             }
             TheIME.UnlockIMC(hIMC);
         }

@@ -1,10 +1,10 @@
 // uicand.cpp --- mzimeja candidate window UI
-// Œó•âƒEƒBƒ“ƒhƒEB
+// å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
 
-// ¡–@B
+// å¯¸æ³•ã€‚
 #define CX_HEADER 32
 #define CX_BORDER ::GetSystemMetrics(SM_CXBORDER)
 #define CY_BORDER ::GetSystemMetrics(SM_CYBORDER)
@@ -13,18 +13,18 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// Œó•âƒEƒBƒ“ƒhƒE‚Ì“–‚½‚è”»’èB
+// å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å½“ãŸã‚Šåˆ¤å®šã€‚
 DWORD CandWnd_HitTest(HWND hWnd, POINT pt, InputContext *lpIMC) {
     DWORD ret = 0;
     int height = 0;
     HDC hDC = ::CreateCompatibleDC(NULL);
     ASSERT(hDC != NULL);
     HFONT hOldFont = CheckNativeCharset(hDC);
-    CandInfo *lpCandInfo = lpIMC->LockCandInfo(); // Œó•âî•ñ‚ðƒƒbƒN‚·‚éB
+    CandInfo *lpCandInfo = lpIMC->LockCandInfo(); // å€™è£œæƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
     ASSERT(lpCandInfo != NULL);
     if (lpCandInfo) {
-        if (lpCandInfo->dwCount > 0) { // Œó•â‚ª‚ ‚ê‚Î
-            CANDINFOEXTRA *pExtra = lpCandInfo->GetExtra(); // —]èî•ñ‚ðŽæ“¾B
+        if (lpCandInfo->dwCount > 0) { // å€™è£œãŒã‚ã‚Œã°
+            CANDINFOEXTRA *pExtra = lpCandInfo->GetExtra(); // ä½™å‰°æƒ…å ±ã‚’å–å¾—ã€‚
             DWORD iList = 0;
             if (pExtra) iList = pExtra->iClause;
             CandList *lpCandList = lpCandInfo->GetList(iList);
@@ -289,13 +289,13 @@ void CandWnd_Hide(UIEXTRA *lpUIExtra) {
     }
 } // CandWnd_Hide
 
-// Œó•âƒEƒBƒ“ƒhƒE‚ÌˆÚ“®ŽžB
+// å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç§»å‹•æ™‚ã€‚
 void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
                   BOOL fForceComp) {
     RECT rc;
     POINT pt;
 
-    // Not initialized yet? ‰Šú‰»‚³‚ê‚Ä‚È‚¢‚©H
+    // Not initialized yet? åˆæœŸåŒ–ã•ã‚Œã¦ãªã„ã‹ï¼Ÿ
     if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
         lpIMC->DumpCandInfo();
         if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
@@ -314,7 +314,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
         return;
     }
 
-    // Has any candidates? Œó•â‚ª‚ ‚é‚©H
+    // Has any candidates? å€™è£œãŒã‚ã‚‹ã‹ï¼Ÿ
     if (!lpIMC->HasCandInfo()) {
         FOOTMARK_POINT();
         lpIMC->DumpCandInfo();

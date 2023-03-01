@@ -1,9 +1,6 @@
 // mzimeja.cpp --- MZ-IME Japanese Input (mzimeja)
-// ƒƒCƒ“B
+// ãƒ¡ã‚¤ãƒ³ã€‚
 //////////////////////////////////////////////////////////////////////////////
-// (Japanese, Shift_JIS)
-// NOTE: This file uses Japanese cp932 encoding. To compile this on g++,
-//       please add options: -finput-charset=CP932 -fexec-charset=CP932
 
 #include "mzimeja.h"
 #include <shlobj.h>
@@ -13,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // The window classes for mzimeja UI windows.
-// mzimeja‚Åg‚í‚ê‚éƒEƒBƒ“ƒhƒEƒNƒ‰ƒX‚Ì–¼‘OB
+// mzimejaã§ä½¿ã‚ã‚Œã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹ã®åå‰ã€‚
 const WCHAR szUIServerClassName[] = L"MZIMEUI";
 const WCHAR szCompStrClassName[]  = L"MZIMECompStr";
 const WCHAR szCandClassName[]     = L"MZIMECand";
@@ -21,7 +18,7 @@ const WCHAR szStatusClassName[]   = L"MZIMEStatus";
 const WCHAR szGuideClassName[]    = L"MZIMEGuide";
 
 // The table of guideline.
-// ƒKƒCƒhƒ‰ƒCƒ“‚Ìƒe[ƒuƒ‹B
+// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®ãƒ†ãƒ¼ãƒ–ãƒ«ã€‚
 const MZGUIDELINE glTable[] = {
     {GL_LEVEL_ERROR, GL_ID_NODICTIONARY, IDS_GL_NODICTIONARY, 0},
     {GL_LEVEL_WARNING, GL_ID_TYPINGERROR, IDS_GL_TYPINGERROR, 0},
@@ -29,12 +26,12 @@ const MZGUIDELINE glTable[] = {
      IDS_GL_TESTGUIDELINEPRIVATE}
 };
 
-// The filename of the IME. IME‚Ìƒtƒ@ƒCƒ‹–¼B
+// The filename of the IME. IMEã®ãƒ•ã‚¡ã‚¤ãƒ«åã€‚
 const WCHAR szImeFileName[] = L"mzimeja.ime";
 
 //////////////////////////////////////////////////////////////////////////////
 
-// IME—p‚ÌƒtƒHƒ“ƒg‚ğì¬‚µA‘I‘ğB
+// IMEç”¨ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½œæˆã—ã€é¸æŠã€‚
 HFONT CheckNativeCharset(HDC hDC) {
     HFONT hOldFont = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
 
@@ -53,7 +50,7 @@ HFONT CheckNativeCharset(HDC hDC) {
 } // CheckNativeCharset
 
 // Adjust window position.
-// ƒEƒBƒ“ƒhƒEˆÊ’u‚ğ‰æ–Ê“à‚É•â³B
+// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®ã‚’ç”»é¢å†…ã«è£œæ­£ã€‚
 void RepositionWindow(HWND hWnd) {
     RECT rc, rcWorkArea;
     ::GetWindowRect(hWnd, &rc);
@@ -84,7 +81,7 @@ void RepositionWindow(HWND hWnd) {
 
 MzIme TheIME;
 
-// mzimeja‚ÌƒRƒ“ƒXƒgƒ‰ƒNƒ^B
+// mzimejaã®ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 MzIme::MzIme() {
     m_hInst = NULL;
     m_hMyKL = NULL;
@@ -99,7 +96,7 @@ MzIme::MzIme() {
     m_lpIMC = NULL;
 }
 
-// mzimeja‚Ì«‘‚ğ“Ç‚İ‚ŞB
+// mzimejaã®è¾æ›¸ã‚’èª­ã¿è¾¼ã‚€ã€‚
 BOOL MzIme::LoadDict() {
     BOOL ret = TRUE;
     DWORD dw;
@@ -133,13 +130,13 @@ BOOL MzIme::LoadDict() {
     return ret;
 }
 
-// mzimeja‚Ì«‘‚ğƒAƒ“ƒ[ƒh‚·‚éB
+// mzimejaã®è¾æ›¸ã‚’ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
 void MzIme::UnloadDict() {
     m_basic_dict.Unload();
     m_name_dict.Unload();
 }
 
-// mzimeja‚ğ‰Šú‰»B
+// mzimejaã‚’åˆæœŸåŒ–ã€‚
 BOOL MzIme::Init(HINSTANCE hInstance) {
     m_hInst = hInstance;
     //::InitCommonControls();
@@ -153,16 +150,16 @@ BOOL MzIme::Init(HINSTANCE hInstance) {
     return RegisterClasses(m_hInst);
 } // MzIme::Init
 
-// mzimeja‚ğ‹t‰Šú‰»B
+// mzimejaã‚’é€†åˆæœŸåŒ–ã€‚
 VOID MzIme::Uninit(VOID) {
     UnregisterClasses();
     UnloadDict();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// registry - ƒŒƒWƒXƒgƒŠŠÖ˜AB
+// registry - ãƒ¬ã‚¸ã‚¹ãƒˆãƒªé–¢é€£ã€‚
 
-// ƒŒƒWƒXƒgƒŠƒL[‚ğŠJ‚­B
+// ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã‚’é–‹ãã€‚
 LONG MzIme::OpenRegKey(
         HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const
 {
@@ -175,7 +172,7 @@ LONG MzIme::OpenRegKey(
     return result;
 } // MzIme::OpenRegKey
 
-// ƒŒƒWƒXƒgƒŠƒL[‚ğì¬B
+// ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã‚’ä½œæˆã€‚
 LONG MzIme::CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey) {
     LONG result;
     DWORD dwDisposition;
@@ -195,7 +192,7 @@ LONG MzIme::CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey) {
 static const WCHAR s_szRegKey[] =
         L"SOFTWARE\\Katayama Hirofumi MZ\\mzimeja";
 
-// ƒ}ƒVƒ“‘¤‚ÌƒŒƒWƒXƒgƒŠ‚ğŠJ‚­B
+// ãƒã‚·ãƒ³å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚’é–‹ãã€‚
 LONG MzIme::OpenComputerSettingKey(BOOL bWrite, HKEY *phKey) {
     LONG result;
     if (bWrite) {
@@ -206,7 +203,7 @@ LONG MzIme::OpenComputerSettingKey(BOOL bWrite, HKEY *phKey) {
     return result;
 }
 
-// ƒ†[ƒU[‘¤‚ÌƒŒƒWƒXƒgƒŠ‚ğŠJ‚­B
+// ãƒ¦ãƒ¼ã‚¶ãƒ¼å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚’é–‹ãã€‚
 LONG MzIme::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
     LONG result;
     if (bWrite) {
@@ -232,7 +229,7 @@ LONG MzIme::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
     return result;
 }
 
-// ƒRƒ“ƒsƒ…[ƒ^‘¤‚ÌƒŒƒWƒXƒgƒŠ•¶š—ñ‚ğæ“¾‚·‚éB
+// ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªæ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ã€‚
 BOOL MzIme::GetComputerString(LPCWSTR pszSettingName, std::wstring& value) {
     HKEY hKey;
     WCHAR szValue[MAX_PATH * 2];
@@ -250,7 +247,7 @@ BOOL MzIme::GetComputerString(LPCWSTR pszSettingName, std::wstring& value) {
     return FALSE;
 } // MzIme::GetComputerString
 
-// ƒRƒ“ƒsƒ…[ƒ^‘¤‚ÌƒŒƒWƒXƒgƒŠ•¶š—ñ‚ğİ’è‚·‚éB
+// ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªæ–‡å­—åˆ—ã‚’è¨­å®šã™ã‚‹ã€‚
 BOOL MzIme::SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     HKEY hKey;
     LONG result = OpenComputerSettingKey(TRUE, &hKey);
@@ -266,7 +263,7 @@ BOOL MzIme::SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     return FALSE;
 } // MzIme::SetComputerString
 
-// ƒRƒ“ƒsƒ…[ƒ^‘¤‚ÌƒŒƒWƒXƒgƒŠƒf[ƒ^‚ğæ“¾‚·‚éB
+// ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹ã€‚
 BOOL
 MzIme::GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     HKEY hKey;
@@ -283,7 +280,7 @@ MzIme::GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     return FALSE;
 } // MzIme::GetComputerData
 
-// ƒRƒ“ƒsƒ…[ƒ^‘¤‚ÌƒŒƒWƒXƒgƒŠƒf[ƒ^‚ğİ’è‚·‚éB
+// ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ã€‚
 BOOL
 MzIme::SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     HKEY hKey;
@@ -299,7 +296,7 @@ MzIme::SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     return FALSE;
 } // MzIme::SetComputerData
 
-// ƒRƒ“ƒsƒ…[ƒ^‘¤‚ÌƒŒƒWƒXƒgƒŠDWORDƒf[ƒ^‚ğæ“¾‚·‚éB
+// ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªDWORDãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹ã€‚
 BOOL MzIme::GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr) {
     HKEY hKey;
     LONG result = OpenComputerSettingKey(FALSE, &hKey);
@@ -315,7 +312,7 @@ BOOL MzIme::GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr) {
     return FALSE;
 } // MzIme::GetComputerData
 
-// ƒRƒ“ƒsƒ…[ƒ^‘¤‚ÌƒŒƒWƒXƒgƒŠDWORDƒf[ƒ^‚ğİ’è‚·‚éB
+// ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªDWORDãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ã€‚
 BOOL MzIme::SetComputerDword(LPCWSTR pszSettingName, DWORD data) {
     HKEY hKey;
     DWORD dwData = data;
@@ -332,7 +329,7 @@ BOOL MzIme::SetComputerDword(LPCWSTR pszSettingName, DWORD data) {
     return FALSE;
 } // MzIme::SetComputerData
 
-// ƒ†[ƒU[‘¤‚ÌƒŒƒWƒXƒgƒŠ•¶š—ñƒf[ƒ^‚ğæ“¾‚·‚éB
+// ãƒ¦ãƒ¼ã‚¶ãƒ¼å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªæ–‡å­—åˆ—ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹ã€‚
 BOOL MzIme::GetUserString(LPCWSTR pszSettingName, std::wstring& value) {
     HKEY hKey;
     WCHAR szValue[MAX_PATH * 2];
@@ -350,7 +347,7 @@ BOOL MzIme::GetUserString(LPCWSTR pszSettingName, std::wstring& value) {
     return FALSE;
 } // MzIme::GetUserString
 
-// ƒ†[ƒU[‘¤‚ÌƒŒƒWƒXƒgƒŠ•¶š—ñƒf[ƒ^‚ğİ’è‚·‚éB
+// ãƒ¦ãƒ¼ã‚¶ãƒ¼å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªæ–‡å­—åˆ—ãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ã€‚
 BOOL MzIme::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     HKEY hKey;
     LONG result = OpenUserSettingKey(TRUE, &hKey);
@@ -368,7 +365,7 @@ BOOL MzIme::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
     return FALSE;
 } // MzIme::SetUserString
 
-// ƒ†[ƒU[‘¤‚ÌƒŒƒWƒXƒgƒŠƒf[ƒ^‚ğæ“¾‚·‚éB
+// ãƒ¦ãƒ¼ã‚¶ãƒ¼å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹ã€‚
 BOOL MzIme::GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     HKEY hKey;
     LONG result = OpenUserSettingKey(FALSE, &hKey);
@@ -384,7 +381,7 @@ BOOL MzIme::GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     return FALSE;
 } // MzIme::GetUserData
 
-// ƒ†[ƒU[‘¤‚ÌƒŒƒWƒXƒgƒŠƒf[ƒ^‚ğİ’è‚·‚éB
+// ãƒ¦ãƒ¼ã‚¶ãƒ¼å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ã€‚
 BOOL MzIme::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     HKEY hKey;
     LONG result = OpenUserSettingKey(TRUE, &hKey);
@@ -401,7 +398,7 @@ BOOL MzIme::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     return FALSE;
 } // MzIme::SetUserData
 
-// ƒ†[ƒU[‘¤‚ÌƒŒƒWƒXƒgƒŠDWORDƒf[ƒ^‚ğæ“¾‚·‚éB
+// ãƒ¦ãƒ¼ã‚¶ãƒ¼å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªDWORDãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹ã€‚
 BOOL MzIme::GetUserDword(LPCWSTR pszSettingName, DWORD *ptr) {
     HKEY hKey;
     LONG result = OpenUserSettingKey(FALSE, &hKey);
@@ -417,7 +414,7 @@ BOOL MzIme::GetUserDword(LPCWSTR pszSettingName, DWORD *ptr) {
     return FALSE;
 } // MzIme::GetUserData
 
-// ƒ†[ƒU[‘¤‚ÌƒŒƒWƒXƒgƒŠDWORDƒf[ƒ^‚ğİ’è‚·‚éB
+// ãƒ¦ãƒ¼ã‚¶ãƒ¼å´ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªDWORDãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ã€‚
 BOOL MzIme::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
     HKEY hKey;
     DWORD dwData = data;
@@ -438,13 +435,13 @@ BOOL MzIme::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// mzimeja‚ÌƒEƒBƒ“ƒhƒEƒNƒ‰ƒX‚ğ“o˜^‚·‚éB
+// mzimejaã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹ã‚’ç™»éŒ²ã™ã‚‹ã€‚
 BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
 #define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
     WNDCLASSEX wcx;
 
     // Register the UI server window.
-    // UIƒT[ƒo[ƒEƒBƒ“ƒhƒE‚ğ“o˜^B
+    // UIã‚µãƒ¼ãƒãƒ¼ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç™»éŒ²ã€‚
     wcx.cbSize = sizeof(WNDCLASSEX);
     wcx.style = CS_MZIME;
     wcx.lpfnWndProc = MZIMEWndProc;
@@ -463,7 +460,7 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
     }
 
     // Register the composition window.
-    // –¢Šm’è•¶š—ñƒEƒBƒ“ƒhƒE‚ğ“o˜^B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç™»éŒ²ã€‚
     wcx.cbSize = sizeof(WNDCLASSEX);
     wcx.style = CS_MZIME;
     wcx.lpfnWndProc = CompWnd_WindowProc;
@@ -482,7 +479,7 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
     }
 
     // Register the candidate window.
-    // Œó•âƒEƒBƒ“ƒhƒE‚ğ“o˜^B
+    // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç™»éŒ²ã€‚
     wcx.cbSize = sizeof(WNDCLASSEX);
     wcx.style = CS_MZIME;
     wcx.lpfnWndProc = CandWnd_WindowProc;
@@ -501,7 +498,7 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
     }
 
     // Register the status window.
-    // ó‘ÔƒEƒBƒ“ƒhƒE‚ğ“o˜^B
+    // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç™»éŒ²ã€‚
     wcx.cbSize = sizeof(WNDCLASSEX);
     wcx.style = CS_MZIME;
     wcx.lpfnWndProc = StatusWnd_WindowProc;
@@ -520,7 +517,7 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
     }
 
     // Register the guideline window.
-    // ƒKƒCƒhƒ‰ƒCƒ“ƒEƒBƒ“ƒhƒE‚ğ“o˜^B
+    // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç™»éŒ²ã€‚
     wcx.cbSize = sizeof(WNDCLASSEX);
     wcx.style = CS_MZIME;
     wcx.lpfnWndProc = GuideWnd_WindowProc;
@@ -542,7 +539,7 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
 #undef CS_MZIME
 } // MzIme::RegisterClasses
 
-// ƒL[ƒ{[ƒhƒŒƒCƒAƒEƒgƒŠƒXƒg‚©‚ç©•ª‚ÌHKL‚ğæ“¾‚·‚éB
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆãƒªã‚¹ãƒˆã‹ã‚‰è‡ªåˆ†ã®HKLã‚’å–å¾—ã™ã‚‹ã€‚
 HKL MzIme::GetHKL(VOID) {
     HKL hKL = NULL;
 
@@ -563,7 +560,7 @@ HKL MzIme::GetHKL(VOID) {
         HKL hKLTemp = pHKLs[dwi];
         ::ImmGetIMEFileName(hKLTemp, szFile, _countof(szFile));
 
-        if (::lstrcmp(szFile, szImeFileName) == 0) { // IMEƒtƒ@ƒCƒ‹–¼‚ªˆê’v‚µ‚½H
+        if (::lstrcmp(szFile, szImeFileName) == 0) { // IMEãƒ•ã‚¡ã‚¤ãƒ«åãŒä¸€è‡´ã—ãŸï¼Ÿ
             hKL = hKLTemp;
             break;
         }
@@ -575,7 +572,7 @@ HKL MzIme::GetHKL(VOID) {
 }
 
 // Update the translate key buffer.
-// ƒƒbƒZ[ƒW‚ğ¶¬‚·‚éB
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã™ã‚‹ã€‚
 BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
     BOOL ret = FALSE;
     FOOTMARK_FORMAT("(%u,%d,%d)\n",
@@ -599,7 +596,7 @@ BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
     FOOTMARK_RETURN_INT(ret);
 }
 
-// ƒƒbƒZ[ƒW‚ğ¶¬‚·‚éB
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã™ã‚‹ã€‚
 BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
     FOOTMARK_FORMAT("(%u, 0x%08lX, 0x%08lX)\n", message, wParam, lParam);
     TRANSMSG genmsg;
@@ -627,7 +624,7 @@ BOOL MzIme::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
     return TRUE;
 }
 
-// mzimeja‚ÌƒRƒ}ƒ“ƒh‚ğÀs‚·‚éB
+// mzimejaã®ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œã™ã‚‹ã€‚
 BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
     switch (dwCommand) {
     case IDM_RECONVERT:
@@ -673,7 +670,7 @@ BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
     return TRUE;
 } // MzIme::DoCommand
 
-// ƒCƒ“ƒWƒP[ƒ^[‚ÌƒAƒCƒRƒ“‚ğXVB
+// ã‚¤ãƒ³ã‚¸ã‚±ãƒ¼ã‚¿ãƒ¼ã®ã‚¢ã‚¤ã‚³ãƒ³ã‚’æ›´æ–°ã€‚
 void MzIme::UpdateIndicIcon(HIMC hIMC) {
     if (m_hMyKL == NULL) {
         m_hMyKL = GetHKL();
@@ -698,7 +695,7 @@ void MzIme::UpdateIndicIcon(HIMC hIMC) {
     }
 }
 
-// ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX‚Ì“o˜^‚ğ‰ğœB
+// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹ã®ç™»éŒ²ã‚’è§£é™¤ã€‚
 void MzIme::UnregisterClasses() {
     ::UnregisterClass(szUIServerClassName, m_hInst);
     ::UnregisterClass(szCompStrClassName, m_hInst);
@@ -706,12 +703,12 @@ void MzIme::UnregisterClasses() {
     ::UnregisterClass(szStatusClassName, m_hInst);
 }
 
-// ƒrƒbƒgƒ}ƒbƒv‚ğƒŠƒ\[ƒX‚©‚ç“Ç‚İ‚ŞB
+// ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’ãƒªã‚½ãƒ¼ã‚¹ã‹ã‚‰èª­ã¿è¾¼ã‚€ã€‚
 HBITMAP MzIme::LoadBMP(LPCTSTR pszName) {
     return ::LoadBitmap(m_hInst, pszName);
 }
 
-// •¶š—ñ‚ğƒŠƒ\[ƒX‚©‚ç“Ç‚İ‚ŞB
+// æ–‡å­—åˆ—ã‚’ãƒªã‚½ãƒ¼ã‚¹ã‹ã‚‰èª­ã¿è¾¼ã‚€ã€‚
 WCHAR *MzIme::LoadSTR(INT nID) {
     static WCHAR sz[512];
     sz[0] = 0;
@@ -719,7 +716,7 @@ WCHAR *MzIme::LoadSTR(INT nID) {
     return sz;
 }
 
-// “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
+// å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
 InputContext *MzIme::LockIMC(HIMC hIMC) {
     InputContext *context = (InputContext *)::ImmLockIMC(hIMC);
     if (context) {
@@ -730,7 +727,7 @@ InputContext *MzIme::LockIMC(HIMC hIMC) {
     return context;
 }
 
-// “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœB
+// å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
 VOID MzIme::UnlockIMC(HIMC hIMC) {
     ::ImmUnlockIMC(hIMC);
     if (::ImmGetIMCLockCount(hIMC) == 0) {
@@ -745,7 +742,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 // UI extra related
-// —]èî•ñB
+// ä½™å‰°æƒ…å ±ã€‚
 
 HGLOBAL GetUIExtraFromServerWnd(HWND hwndServer) {
     return (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE);
@@ -775,13 +772,13 @@ void FreeUIExtra(HWND hwndServer) {
 
 //////////////////////////////////////////////////////////////////////////////
 // For debugging.
-// ƒfƒoƒbƒO—pB
+// ãƒ‡ãƒãƒƒã‚°ç”¨ã€‚
 
 #ifdef MZIMEJA_DEBUG_OUTPUT
 
-BOOL g_bTrace = TRUE;   // ‚±‚Ì•Ï”‚ªFALSE‚Ì‚Æ‚«‚ÍƒfƒoƒbƒOo—Í‚µ‚È‚¢B
+BOOL g_bTrace = TRUE;   // ã“ã®å¤‰æ•°ãŒFALSEã®ã¨ãã¯ãƒ‡ãƒãƒƒã‚°å‡ºåŠ›ã—ãªã„ã€‚
 
-// printfŠÖ”‚Æ“¯‚¶•¶–@‚ÅƒfƒoƒbƒOo—Í‚ğs‚¤ŠÖ”B
+// printfé–¢æ•°ã¨åŒã˜æ–‡æ³•ã§ãƒ‡ãƒãƒƒã‚°å‡ºåŠ›ã‚’è¡Œã†é–¢æ•°ã€‚
 void DebugPrintA(const char *lpszFormat, ...) {
     char szMsgA[1024];
 
@@ -796,7 +793,7 @@ void DebugPrintA(const char *lpszFormat, ...) {
     OutputDebugStringA(szMsgA);
 }
 
-// wprintfŠÖ”‚Æ“¯‚¶•¶–@‚ÅƒfƒoƒbƒOo—Í‚ğs‚¤ŠÖ”B
+// wprintfé–¢æ•°ã¨åŒã˜æ–‡æ³•ã§ãƒ‡ãƒãƒƒã‚°å‡ºåŠ›ã‚’è¡Œã†é–¢æ•°ã€‚
 void DebugPrintW(const WCHAR *lpszFormat, ...) {
     WCHAR szMsg[1024];
 
@@ -811,7 +808,7 @@ void DebugPrintW(const WCHAR *lpszFormat, ...) {
     OutputDebugStringW(szMsg);
 }
 
-// ASSERT¸”s‚ÉŒÄ‚Ño‚³‚ê‚éŠÖ”B
+// ASSERTå¤±æ•—æ™‚ã«å‘¼ã³å‡ºã•ã‚Œã‚‹é–¢æ•°ã€‚
 void DebugAssert(const char *file, int line, const char *exp) {
     DebugPrintA("%s (%d): ASSERT(%s) failed\n", file, line, exp);
 }
@@ -820,19 +817,19 @@ void DebugAssert(const char *file, int line, const char *exp) {
 //////////////////////////////////////////////////////////////////////////////
 // DLL entry point
 
-// IME‚ÍDLLƒtƒ@ƒCƒ‹‚Ìˆêí‚Å‚ ‚é‚©‚çAIME‚ª“Ç‚İ‚Ü‚ê‚½‚çAƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚Ì
-// DllMain‚ªŒÄ‚Ño‚³‚ê‚é‚Í‚¸B
+// IMEã¯DLLãƒ•ã‚¡ã‚¤ãƒ«ã®ä¸€ç¨®ã§ã‚ã‚‹ã‹ã‚‰ã€IMEãŒèª­ã¿è¾¼ã¾ã‚ŒãŸã‚‰ã€ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®
+// DllMainãŒå‘¼ã³å‡ºã•ã‚Œã‚‹ã¯ãšã€‚
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
     FOOTMARK_FORMAT("(%p, 0x%08lX, %p)\n", hInstDLL, dwFunction, lpNot);
 
     switch (dwFunction) {
     case DLL_PROCESS_ATTACH:
         ::DisableThreadLibraryCalls(hInstDLL);
-        TheIME.Init(hInstDLL); // ‰Šú‰»B
+        TheIME.Init(hInstDLL); // åˆæœŸåŒ–ã€‚
         break;
 
     case DLL_PROCESS_DETACH:
-        TheIME.Uninit(); // ‹t‰Šú‰»B
+        TheIME.Uninit(); // é€†åˆæœŸåŒ–ã€‚
         break;
 
     case DLL_THREAD_ATTACH:

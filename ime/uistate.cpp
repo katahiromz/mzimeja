@@ -1,24 +1,24 @@
 // uistate.cpp --- mzimeja status window UI
-// IMEó‘ÔƒEƒBƒ“ƒhƒEB
+// IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
 #include "resource.h"
 
-// ¡–@iƒsƒNƒZƒ‹’PˆÊjB
+// å¯¸æ³•ï¼ˆãƒ”ã‚¯ã‚»ãƒ«å˜ä½ï¼‰ã€‚
 #define CX_MINICAPTION 10
 #define CX_BUTTON 24
 #define CY_BUTTON 24
 #define CX_BTNEDGE 2
 #define CY_BTNEDGE 2
 
-// “–‚½‚è”»’è‚ÌŒ‹‰ÊB
+// å½“ãŸã‚Šåˆ¤å®šã®çµæœã€‚
 enum STATUS_WND_HITTEST {
-    SWHT_NONE,      // ‚È‚É‚à“–‚½‚Á‚Ä‚¢‚È‚¢B
-    SWHT_CAPTION,   // ƒLƒƒƒvƒVƒ‡ƒ“B
-    SWHT_BUTTON_1,  // ƒ{ƒ^ƒ“1B
-    SWHT_BUTTON_2,  // ƒ{ƒ^ƒ“2B
-    SWHT_BUTTON_3   // ƒ{ƒ^ƒ“3B
+    SWHT_NONE,      // ãªã«ã‚‚å½“ãŸã£ã¦ã„ãªã„ã€‚
+    SWHT_CAPTION,   // ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³ã€‚
+    SWHT_BUTTON_1,  // ãƒœã‚¿ãƒ³1ã€‚
+    SWHT_BUTTON_2,  // ãƒœã‚¿ãƒ³2ã€‚
+    SWHT_BUTTON_3   // ãƒœã‚¿ãƒ³3ã€‚
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -28,13 +28,13 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // Create status window.
-// IMEó‘ÔƒEƒBƒ“ƒhƒE‚ğì¬‚·‚éB
+// IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½œæˆã™ã‚‹ã€‚
 HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
-    const DWORD style = WS_DISABLED | WS_POPUP; // ƒEƒBƒ“ƒhƒEƒXƒ^ƒCƒ‹B
-    const DWORD exstyle = WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME; // Šg’£ƒXƒ^ƒCƒ‹B
+    const DWORD style = WS_DISABLED | WS_POPUP; // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¹ã‚¿ã‚¤ãƒ«ã€‚
+    const DWORD exstyle = WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME; // æ‹¡å¼µã‚¹ã‚¿ã‚¤ãƒ«ã€‚
     HWND hwndStatus = lpUIExtra->hwndStatus;
-    if (!::IsWindow(hwndStatus)) { // ó‘ÔƒEƒBƒ“ƒhƒE‚ª‚È‚¢‚©H
-        // ó‘ÔƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY‚ğŒvZ‚·‚éB
+    if (!::IsWindow(hwndStatus)) { // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒãªã„ã‹ï¼Ÿ
+        // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºã‚’è¨ˆç®—ã™ã‚‹ã€‚
         INT cx, cy;
         cx = CX_MINICAPTION + CX_BUTTON * 3;
         cx += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
@@ -43,62 +43,62 @@ HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
         cy += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
         cy += 2 * CY_BTNEDGE;
         POINT pt;
-        if (!TheIME.GetUserData(L"ptStatusWindow", &pt, sizeof(pt))) { // ˆÊ’uî•ñ‚ª‚ ‚é‚©H
-            // ƒ[ƒNƒGƒŠƒA‚ğg‚Á‚ÄˆÊ’u‚ğ‰Šú‰»‚·‚éB
+        if (!TheIME.GetUserData(L"ptStatusWindow", &pt, sizeof(pt))) { // ä½ç½®æƒ…å ±ãŒã‚ã‚‹ã‹ï¼Ÿ
+            // ãƒ¯ãƒ¼ã‚¯ã‚¨ãƒªã‚¢ã‚’ä½¿ã£ã¦ä½ç½®ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
             RECT rcWorkArea;
             ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, FALSE);
             pt.x = rcWorkArea.right - cx;
             pt.y = rcWorkArea.bottom - cy;
         }
-        // ÀÛ‚Éó‘ÔƒEƒBƒ“ƒhƒE‚ğì¬‚·‚éB
+        // å®Ÿéš›ã«çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½œæˆã™ã‚‹ã€‚
         lpUIExtra->hwndStatus = hwndStatus = ::CreateWindowEx(
                 exstyle, szStatusClassName, NULL, style,
                 pt.x, pt.y, cx, cy,
                 hWnd, NULL, TheIME.m_hInst, NULL);
     } else {
-        StatusWnd_Update(lpUIExtra); // ó‘ÔƒEƒBƒ“ƒhƒE‚ğXV‚·‚éB
+        StatusWnd_Update(lpUIExtra); // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æ›´æ–°ã™ã‚‹ã€‚
     }
-    RepositionWindow(hwndStatus); // ˆÊ’u‚ğ•â³‚·‚éB
-    ::ShowWindow(hwndStatus, SW_SHOWNOACTIVATE); // ƒAƒNƒeƒBƒu‰»‚·‚é‚±‚Æ‚È‚­•\¦‚·‚éB
-    ::SetWindowLongPtr(hwndStatus, FIGWLP_SERVERWND, (LONG_PTR)hWnd); // UIƒT[ƒo[‚ğƒZƒbƒg‚·‚éB
+    RepositionWindow(hwndStatus); // ä½ç½®ã‚’è£œæ­£ã™ã‚‹ã€‚
+    ::ShowWindow(hwndStatus, SW_SHOWNOACTIVATE); // ã‚¢ã‚¯ãƒ†ã‚£ãƒ–åŒ–ã™ã‚‹ã“ã¨ãªãè¡¨ç¤ºã™ã‚‹ã€‚
+    ::SetWindowLongPtr(hwndStatus, FIGWLP_SERVERWND, (LONG_PTR)hWnd); // UIã‚µãƒ¼ãƒãƒ¼ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã€‚
     return hwndStatus;
 } // StatusWnd_Create
 
 // Draw status window.
-// IMEó‘ÔƒEƒBƒ“ƒhƒE‚ğ•`‰æ‚·‚éB
+// IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æç”»ã™ã‚‹ã€‚
 void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
-    // UIƒT[ƒo[‚ÆIMC‚ğæ“¾‚·‚éB
+    // UIã‚µãƒ¼ãƒãƒ¼ã¨IMCã‚’å–å¾—ã™ã‚‹ã€‚
     HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
     HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
-    InputContext *lpIMC = TheIME.LockIMC(hIMC); // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒNB
+    InputContext *lpIMC = TheIME.LockIMC(hIMC); // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã€‚
 
-    // ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ğ“h‚è‚Â‚Ô‚·B
+    // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã‚’å¡—ã‚Šã¤ã¶ã™ã€‚
     HBRUSH hbr3DFace = ::CreateSolidBrush(GetSysColor(COLOR_3DFACE));
     RECT rc;
     ::GetClientRect(hWnd, &rc);
     ::FillRect(hDC, &rc, hbr3DFace);
     DeleteObject(hbr3DFace);
 
-    // ƒLƒƒƒvƒVƒ‡ƒ“iƒ^ƒCƒgƒ‹ƒo[j‚ğ“h‚è•¨|B
+    // ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³ï¼ˆã‚¿ã‚¤ãƒˆãƒ«ãƒãƒ¼ï¼‰ã‚’å¡—ã‚Šç‰©é…¢ã€‚
     HBRUSH hbrCaption = ::CreateSolidBrush(RGB(0, 32, 255));
     rc.right = rc.left + CX_MINICAPTION;
     ::FillRect(hDC, &rc, hbrCaption);
     ::DeleteObject(hbrCaption);
 
-    // ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ğÄæ“¾‚·‚éBƒLƒƒƒvƒVƒ‡ƒ“—Ìˆæ‚ğœŠO‚·‚éB
+    // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã‚’å†å–å¾—ã™ã‚‹ã€‚ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³é ˜åŸŸã‚’é™¤å¤–ã™ã‚‹ã€‚
     ::GetClientRect(hWnd, &rc);
     rc.left += CX_MINICAPTION;
 
-    // ƒrƒbƒgƒ}ƒbƒv‚ğæ“¾‚·‚éB
+    // ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’å–å¾—ã™ã‚‹ã€‚
     HBITMAP hbmStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
 
-    // ƒƒ‚ƒŠ[DC‚ğì¬‚·‚éB
+    // ãƒ¡ãƒ¢ãƒªãƒ¼DCã‚’ä½œæˆã™ã‚‹ã€‚
     HDC hMemDC = ::CreateCompatibleDC(hDC);
     ASSERT(hMemDC != NULL);
 
-    HGDIOBJ hbmOld = ::SelectObject(hMemDC, hbmStatus); // ƒrƒbƒgƒ}ƒbƒv‚ğ‘I‘ğ‚·‚éB
+    HGDIOBJ hbmOld = ::SelectObject(hMemDC, hbmStatus); // ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’é¸æŠã™ã‚‹ã€‚
 
-    // Å‰‚Ìƒ{ƒ^ƒ“1‚Ì”wŒiB
+    // æœ€åˆã®ãƒœã‚¿ãƒ³1ã®èƒŒæ™¯ã€‚
     RECT rcButton;
     rcButton.left = rc.left;
     rcButton.top = rc.top;
@@ -111,7 +111,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
         ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON, DFCS_BUTTONPUSH);
     }
 
-    // ƒ{ƒ^ƒ“2‚Ì”wŒiB
+    // ãƒœã‚¿ãƒ³2ã®èƒŒæ™¯ã€‚
     rcButton.left += CX_BUTTON + 2 * CX_BTNEDGE;
     rcButton.right += CX_BUTTON + 2 * CY_BTNEDGE;
     if (nPushed == 2) {
@@ -122,7 +122,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
                            DFCS_BUTTONPUSH);
     }
 
-    // ƒ{ƒ^ƒ“3‚Ì”wŒiB
+    // ãƒœã‚¿ãƒ³3ã®èƒŒæ™¯ã€‚
     rcButton.left += CX_BUTTON + 2 * CX_BTNEDGE;
     rcButton.right += CX_BUTTON + 2 * CY_BTNEDGE;
     if (nPushed == 3) {
@@ -133,7 +133,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
                            DFCS_BUTTONPUSH);
     }
 
-    // IME‚ÌOn/Off‚ğƒrƒbƒgƒ}ƒbƒv‚Å•`‰æ‚·‚éB
+    // IMEã®On/Offã‚’ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã§æç”»ã™ã‚‹ã€‚
     if (lpIMC) {
         if (lpIMC->IsOpen()) {
             ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
@@ -151,59 +151,59 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
                  hMemDC, 0, 9 * CY_BUTTON, SRCCOPY);
     }
 
-    // “ü—Íƒ‚[ƒh‚ğƒrƒbƒgƒ}ƒbƒv‚Å•`‰æ‚·‚éB
+    // å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‚’ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã§æç”»ã™ã‚‹ã€‚
     rc.left += CX_BUTTON + CX_BTNEDGE * 2;
-    if (lpIMC) { // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ª—LŒø‚©H
-        if (lpIMC->IsOpen()) { // ŠJ‚©‚ê‚Ä‚¢‚é‚©H
-            if (lpIMC->Conversion() & IME_CMODE_FULLSHAPE) { // ‘SŠp‚©H
-                if (lpIMC->Conversion() & IME_CMODE_JAPANESE) { // “ú–{Œê“ü—Í‚©H
-                    if (lpIMC->Conversion() & IME_CMODE_KATAKANA) { // ƒJƒ^ƒJƒi‚©H
+    if (lpIMC) { // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãŒæœ‰åŠ¹ã‹ï¼Ÿ
+        if (lpIMC->IsOpen()) { // é–‹ã‹ã‚Œã¦ã„ã‚‹ã‹ï¼Ÿ
+            if (lpIMC->Conversion() & IME_CMODE_FULLSHAPE) { // å…¨è§’ã‹ï¼Ÿ
+                if (lpIMC->Conversion() & IME_CMODE_JAPANESE) { // æ—¥æœ¬èªå…¥åŠ›ã‹ï¼Ÿ
+                    if (lpIMC->Conversion() & IME_CMODE_KATAKANA) { // ã‚«ã‚¿ã‚«ãƒŠã‹ï¼Ÿ
                         // fullwidth katakana
                         ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                                  CX_BUTTON, CY_BUTTON,
                                  hMemDC, 0, 1 * CY_BUTTON, SRCCOPY);
-                    } else { // ‚Ğ‚ç‚ª‚È‚©H
+                    } else { // ã²ã‚‰ãŒãªã‹ï¼Ÿ
                         // fullwidth hiragana
                         ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                                  CX_BUTTON, CY_BUTTON,
                                  hMemDC, 0, 0 * CY_BUTTON, SRCCOPY);
                     }
-                } else { // ‘SŠp‰p”“ü—Í‚©H
+                } else { // å…¨è§’è‹±æ•°å…¥åŠ›ã‹ï¼Ÿ
                     // fullwidth alphanumeric
                     ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                              CX_BUTTON, CY_BUTTON,
                              hMemDC, 0, 2 * CY_BUTTON, SRCCOPY);
                 }
-            } else { // ”¼Šp“ü—Í‚©H
-                if (lpIMC->Conversion() & IME_CMODE_JAPANESE) { // ”¼ŠpƒJƒi‚©H
+            } else { // åŠè§’å…¥åŠ›ã‹ï¼Ÿ
+                if (lpIMC->Conversion() & IME_CMODE_JAPANESE) { // åŠè§’ã‚«ãƒŠã‹ï¼Ÿ
                     // halfwidth kana
                     ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                              CX_BUTTON, CY_BUTTON,
                              hMemDC, 0, 3 * CY_BUTTON, SRCCOPY);
-                } else { // ”¼Šp‰p”‚©H
+                } else { // åŠè§’è‹±æ•°ã‹ï¼Ÿ
                     // halfwidth alphanumeric
                     ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                              CX_BUTTON, CY_BUTTON,
                              hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
                 }
             }
-        } else { // •Â‚¶‚ç‚ê‚Ä‚¢‚é‚©H
+        } else { // é–‰ã˜ã‚‰ã‚Œã¦ã„ã‚‹ã‹ï¼Ÿ
             // halfwidth alphanumeric
             ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
         }
-    } else { // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ª‚È‚¢B
+    } else { // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãŒãªã„ã€‚
         // disabled
         ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                  CX_BUTTON, CY_BUTTON,
                  hMemDC, 0, 9 * CY_BUTTON, SRCCOPY);
     }
 
-    // ƒ[ƒ}š“ü—Í‚ğƒrƒbƒgƒ}ƒbƒv‚Å•`‰æ‚·‚éB
+    // ãƒ­ãƒ¼ãƒå­—å…¥åŠ›ã‚’ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã§æç”»ã™ã‚‹ã€‚
     rc.left += CX_BUTTON + CX_BTNEDGE * 2;
-    if (lpIMC) { // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ª—LŒø‚©H
-        if (lpIMC->Conversion() & IME_CMODE_ROMAN) { // ƒ[ƒ}š“ü—Í‚©H
+    if (lpIMC) { // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãŒæœ‰åŠ¹ã‹ï¼Ÿ
+        if (lpIMC->Conversion() & IME_CMODE_ROMAN) { // ãƒ­ãƒ¼ãƒå­—å…¥åŠ›ã‹ï¼Ÿ
             ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 5 * CY_BUTTON, SRCCOPY);
@@ -212,20 +212,20 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 6 * CY_BUTTON, SRCCOPY);
         }
-    } else { // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ª–³Œø‚©H
+    } else { // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãŒç„¡åŠ¹ã‹ï¼Ÿ
         // disabled
         ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                  CX_BUTTON, CY_BUTTON,
                  hMemDC, 0, 9 * CY_BUTTON, SRCCOPY);
     }
 
-    ::SelectObject(hMemDC, hbmOld); // ƒrƒbƒgƒ}ƒbƒv‚Ì‘I‘ğ‚ğ‰ğœ‚·‚éB
-    ::DeleteDC(hMemDC); // ƒƒ‚ƒŠ[DC‚ğ”jŠü‚·‚éB
+    ::SelectObject(hMemDC, hbmOld); // ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã®é¸æŠã‚’è§£é™¤ã™ã‚‹ã€‚
+    ::DeleteDC(hMemDC); // ãƒ¡ãƒ¢ãƒªãƒ¼DCã‚’ç ´æ£„ã™ã‚‹ã€‚
 
     if (lpIMC) TheIME.UnlockIMC(hIMC);
 } // StatusWnd_Paint
 
-// IMEó‘ÔƒEƒBƒ“ƒhƒE‚Ì“–‚½‚è”»’èB
+// IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å½“ãŸã‚Šåˆ¤å®šã€‚
 STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
     ::ScreenToClient(hWnd, &pt);
     RECT rc;
@@ -233,33 +233,33 @@ STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
     rc.left += CX_MINICAPTION;
     rc.right = rc.left + CX_BUTTON + 2 * CX_BTNEDGE;
     if (::PtInRect(&rc, pt)) {
-        return SWHT_BUTTON_1; // ƒ{ƒ^ƒ“1B
+        return SWHT_BUTTON_1; // ãƒœã‚¿ãƒ³1ã€‚
     }
     ::GetClientRect(hWnd, &rc);
     rc.left += CX_MINICAPTION + CX_BUTTON + 2 * CX_BTNEDGE;
     rc.right = rc.left + CX_BUTTON + 2 * CX_BTNEDGE;
     if (::PtInRect(&rc, pt)) {
-        return SWHT_BUTTON_2; // ƒ{ƒ^ƒ“2B
+        return SWHT_BUTTON_2; // ãƒœã‚¿ãƒ³2ã€‚
     }
     ::GetClientRect(hWnd, &rc);
     rc.left += CX_MINICAPTION + 2 * (CX_BUTTON + 2 * CX_BTNEDGE);
     rc.right = rc.left + CX_BUTTON + 2 * CX_BTNEDGE;
     if (::PtInRect(&rc, pt)) {
-        return SWHT_BUTTON_3; // ƒ{ƒ^ƒ“3B
+        return SWHT_BUTTON_3; // ãƒœã‚¿ãƒ³3ã€‚
     }
     ::GetWindowRect(hWnd, &rc);
     ::ClientToScreen(hWnd, &pt);
     if (::PtInRect(&rc, pt)) {
-        return SWHT_CAPTION; // ƒLƒƒƒvƒVƒ‡ƒ“B
+        return SWHT_CAPTION; // ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³ã€‚
     }
     return SWHT_NONE;
 } // StatusWnd_HitTest
 
-// IMEó‘ÔƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ğXVB
+// IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã‚’æ›´æ–°ã€‚
 void StatusWnd_Update(UIEXTRA *lpUIExtra) {
     HWND hwndStatus = lpUIExtra->hwndStatus;
     if (::IsWindow(hwndStatus)) {
-        // İ’èƒf[ƒ^ "ptStatusWindow" ‚ğg‚Á‚ÄAƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ğ•œŒ³‚·‚éB
+        // è¨­å®šãƒ‡ãƒ¼ã‚¿ "ptStatusWindow" ã‚’ä½¿ã£ã¦ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã‚’å¾©å…ƒã™ã‚‹ã€‚
         POINT pt;
         if (TheIME.GetUserData(L"ptStatusWindow", &pt, sizeof(pt))) {
             RECT rc;
@@ -273,17 +273,17 @@ void StatusWnd_Update(UIEXTRA *lpUIExtra) {
     }
 } // StatusWnd_Update
 
-// IMEó‘ÔƒEƒBƒ“ƒhƒE‚Ìƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚½‚Æ‚«‚Ì“®ìB
+// IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸã¨ãã®å‹•ä½œã€‚
 void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
-    // UIƒT[ƒo[ƒEƒBƒ“ƒhƒE‚ÆIMC‚ğæ“¾‚·‚éB
-    HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND); // ƒT[ƒo[ƒEƒBƒ“ƒhƒEB
-    HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC); // IMCB
+    // UIã‚µãƒ¼ãƒãƒ¼ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã¨IMCã‚’å–å¾—ã™ã‚‹ã€‚
+    HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND); // ã‚µãƒ¼ãƒãƒ¼ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
+    HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC); // IMCã€‚
     if (hIMC == NULL) {
         ASSERT(0);
         return;
     }
 
-    // IME‚Ìó‘Ô‚ğæ“¾‚·‚éB
+    // IMEã®çŠ¶æ…‹ã‚’å–å¾—ã™ã‚‹ã€‚
     DWORD dwConversion, dwSentence;
     BOOL bOpen = ImmGetOpenStatus(hIMC);
     if (!::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence)) {
@@ -294,7 +294,7 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
     INPUT_MODE imode;
     switch (hittest) {
     case SWHT_BUTTON_1:
-        // •ÏŠ·ƒ‚[ƒh‚ğØ‚è‘Ö‚¦‚éB
+        // å¤‰æ›ãƒ¢ãƒ¼ãƒ‰ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ã€‚
         if (bOpen) {
             SetInputMode(hIMC, IMODE_HALF_ASCII);
         } else {
@@ -302,13 +302,13 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
         }
         break;
     case SWHT_BUTTON_2:
-        // “ü—Íƒ‚[ƒh‚ğØ‚è‘Ö‚¦‚éB
+        // å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ã€‚
         imode = InputModeFromConversionMode(bOpen, dwConversion);
         imode = NextInputMode(imode);
         SetInputMode(hIMC, imode);
         break;
     case SWHT_BUTTON_3:
-        // ƒ[ƒ}š“ü—Íƒ‚[ƒh‚ğØ‚è‘Ö‚¦‚éB
+        // ãƒ­ãƒ¼ãƒå­—å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ã€‚
         if (dwConversion & IME_CMODE_ROMAN) {
             dwConversion &= ~IME_CMODE_ROMAN;
         } else {
@@ -321,13 +321,13 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
     }
 }
 
-// IMEó‘ÔƒEƒBƒ“ƒhƒEã‚Åƒ}ƒEƒX‚ªˆÚ“®‚µ‚Ä‚¢‚éB
+// IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä¸Šã§ãƒã‚¦ã‚¹ãŒç§»å‹•ã—ã¦ã„ã‚‹ã€‚
 void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
-    static POINT prev = {-1, -1}; // ˆê‚Â‘O‚ÌˆÊ’uB
-    if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) { // ƒLƒƒƒvƒVƒ‡ƒ“‚ğƒhƒ‰ƒbƒO‚µ‚Ä‚¢‚éB
-        if (bDown && ::GetCapture() == hWnd) { // ƒhƒ‰ƒbƒO’†‚©H
-            if (prev.x != -1 && prev.y != -1) { // ˆê‚Â‘O‚ÌˆÊ’u‚ª‚ ‚é‚©H
-                // ƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ğ‚¸‚ç‚·B
+    static POINT prev = {-1, -1}; // ä¸€ã¤å‰ã®ä½ç½®ã€‚
+    if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) { // ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³ã‚’ãƒ‰ãƒ©ãƒƒã‚°ã—ã¦ã„ã‚‹ã€‚
+        if (bDown && ::GetCapture() == hWnd) { // ãƒ‰ãƒ©ãƒƒã‚°ä¸­ã‹ï¼Ÿ
+            if (prev.x != -1 && prev.y != -1) { // ä¸€ã¤å‰ã®ä½ç½®ãŒã‚ã‚‹ã‹ï¼Ÿ
+                // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã‚’ãšã‚‰ã™ã€‚
                 RECT rc;
                 ::GetWindowRect(hWnd, &rc);
                 ::MoveWindow(hWnd,
@@ -336,7 +336,7 @@ void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
                              TRUE);
             }
             prev = pt;
-        } else { // ‚»‚êˆÈŠOBƒhƒ‰ƒbƒO‚ğƒLƒƒƒ“ƒZƒ‹‚·‚éB
+        } else { // ãã‚Œä»¥å¤–ã€‚ãƒ‰ãƒ©ãƒƒã‚°ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ã€‚
             prev.x = -1;
             prev.y = -1;
             ::ReleaseCapture();
@@ -345,83 +345,83 @@ void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
     }
 }
 
-// IMEó‘ÔƒEƒBƒ“ƒhƒE‚Å¶ƒ{ƒ^ƒ“‚ğ‰Ÿ‚³‚ê‚½^—£‚³‚ê‚½B
+// IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã§å·¦ãƒœã‚¿ãƒ³ã‚’æŠ¼ã•ã‚ŒãŸï¼é›¢ã•ã‚ŒãŸã€‚
 void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
-    STATUS_WND_HITTEST hittest = StatusWnd_HitTest(hWnd, pt); // “–‚½‚è”»’è‚ğs‚¤B
+    STATUS_WND_HITTEST hittest = StatusWnd_HitTest(hWnd, pt); // å½“ãŸã‚Šåˆ¤å®šã‚’è¡Œã†ã€‚
     switch (hittest) {
-    case SWHT_CAPTION: // ƒLƒƒƒvƒVƒ‡ƒ“ãB
+    case SWHT_CAPTION: // ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³ä¸Šã€‚
         break;
-    case SWHT_BUTTON_1: // ƒ{ƒ^ƒ“1B
+    case SWHT_BUTTON_1: // ãƒœã‚¿ãƒ³1ã€‚
         if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_1) {
-            // Ä•`‰æB
+            // å†æç”»ã€‚
             HDC hDC = ::GetDC(hWnd);
             StatusWnd_Paint(hWnd, hDC, (bDown ? 1 : 0));
             ::ReleaseDC(hWnd, hDC);
         }
         break;
-    case SWHT_BUTTON_2: // ƒ{ƒ^ƒ“2B
+    case SWHT_BUTTON_2: // ãƒœã‚¿ãƒ³2ã€‚
         if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_2) {
-            // Ä•`‰æB
+            // å†æç”»ã€‚
             HDC hDC = ::GetDC(hWnd);
             StatusWnd_Paint(hWnd, hDC, (bDown ? 2 : 0));
             ::ReleaseDC(hWnd, hDC);
         }
         break;
-    case SWHT_BUTTON_3: // ƒ{ƒ^ƒ“3B
+    case SWHT_BUTTON_3: // ãƒœã‚¿ãƒ³3ã€‚
         if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_BUTTON_3) {
-            // Ä•`‰æB
+            // å†æç”»ã€‚
             HDC hDC = ::GetDC(hWnd);
             StatusWnd_Paint(hWnd, hDC, (bDown ? 3 : 0));
             ::ReleaseDC(hWnd, hDC);
         }
         break;
-    case SWHT_NONE: // ‚»‚êˆÈŠOB
+    case SWHT_NONE: // ãã‚Œä»¥å¤–ã€‚
     {
-        // Ä•`‰æB
+        // å†æç”»ã€‚
         HDC hDC = ::GetDC(hWnd);
         StatusWnd_Paint(hWnd, hDC, 0);
         ::ReleaseDC(hWnd, hDC);
     }
     break;
     }
-    if (bDown) { // ‰Ÿ‚³‚ê‚½B
-        ::SetCapture(hWnd); // ƒhƒ‰ƒbƒO‚ğŠJn‚·‚é‚½‚ßAƒLƒƒƒvƒ`ƒƒ[‚ğƒZƒbƒg‚·‚éB
-        ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, hittest); // ‰Ÿ‚³‚ê‚½ˆÊ’u‚ğŠo‚¦‚Ä‚¨‚­B
-    } else { // —£‚³‚ê‚½B
-        ::ReleaseCapture(); // ƒLƒƒƒvƒ`ƒƒ[‚ğ‰ğ•ú‚µAƒhƒ‰ƒbƒO‚ğI—¹‚·‚éB
-        if (hittest == SWHT_CAPTION) { // ƒLƒƒƒvƒVƒ‡ƒ“ã‚Å‚ ‚ê‚Î
-            RepositionWindow(hWnd); // ˆÊ’u‚ğ•â³‚·‚éB
-        } else { // ‚³‚à‚È‚¯‚ê‚Î
-            StatusWnd_OnButton(hWnd, hittest); // ƒ{ƒ^ƒ“‚ÌƒAƒNƒVƒ‡ƒ“‚ğ”­“®‚·‚éB
-            ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, SWHT_NONE); // ‰Ÿ‚³‚ê‚½ˆÊ’u‚ğƒNƒŠƒA‚·‚éB
+    if (bDown) { // æŠ¼ã•ã‚ŒãŸã€‚
+        ::SetCapture(hWnd); // ãƒ‰ãƒ©ãƒƒã‚°ã‚’é–‹å§‹ã™ã‚‹ãŸã‚ã€ã‚­ãƒ£ãƒ—ãƒãƒ£ãƒ¼ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã€‚
+        ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, hittest); // æŠ¼ã•ã‚ŒãŸä½ç½®ã‚’è¦šãˆã¦ãŠãã€‚
+    } else { // é›¢ã•ã‚ŒãŸã€‚
+        ::ReleaseCapture(); // ã‚­ãƒ£ãƒ—ãƒãƒ£ãƒ¼ã‚’è§£æ”¾ã—ã€ãƒ‰ãƒ©ãƒƒã‚°ã‚’çµ‚äº†ã™ã‚‹ã€‚
+        if (hittest == SWHT_CAPTION) { // ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³ä¸Šã§ã‚ã‚Œã°
+            RepositionWindow(hWnd); // ä½ç½®ã‚’è£œæ­£ã™ã‚‹ã€‚
+        } else { // ã•ã‚‚ãªã‘ã‚Œã°
+            StatusWnd_OnButton(hWnd, hittest); // ãƒœã‚¿ãƒ³ã®ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã‚’ç™ºå‹•ã™ã‚‹ã€‚
+            ::SetWindowLongPtr(hWnd, FIGWL_MOUSE, SWHT_NONE); // æŠ¼ã•ã‚ŒãŸä½ç½®ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹ã€‚
         }
     }
 } // StatusWnd_OnLButton
 
-// IMEó‘ÔƒEƒBƒ“ƒhƒE‚ğ‰EƒNƒŠƒbƒN‚³‚ê‚½B
+// IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’å³ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã€‚
 static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
-    HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND); // IME UIƒT[ƒo[ƒEƒBƒ“ƒhƒEB
-    HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC); // IMCB
+    HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND); // IME UIã‚µãƒ¼ãƒãƒ¼ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
+    HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC); // IMCã€‚
     if (hIMC == NULL) {
         ASSERT(0);
         return FALSE;
     }
 
-    HMENU hMenu = ::LoadMenu(TheIME.m_hInst, TEXT("STATUSRMENU")); // ƒƒjƒ…[‚ğƒŠƒ\[ƒX‚©‚ç“Ç‚İ‚ŞB
+    HMENU hMenu = ::LoadMenu(TheIME.m_hInst, TEXT("STATUSRMENU")); // ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ãƒªã‚½ãƒ¼ã‚¹ã‹ã‚‰èª­ã¿è¾¼ã‚€ã€‚
     if (hMenu == NULL) {
         ASSERT(0);
         return FALSE;
     }
 
-    HMENU hSubMenu = ::GetSubMenu(hMenu, 0); // ƒCƒ“ƒfƒbƒNƒX0‚Ìqƒƒjƒ…[‚ğæ“¾B
+    HMENU hSubMenu = ::GetSubMenu(hMenu, 0); // ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹0ã®å­ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’å–å¾—ã€‚
 
     TPMPARAMS params = { sizeof(params) };
     ::GetWindowRect(hWnd, &params.rcExclude);
 
-    HWND hwndFore = ::GetForegroundWindow(); // Å‘O–ÊƒEƒBƒ“ƒhƒE‚ğŠo‚¦‚Ä‚¨‚­B
-    ::SetForegroundWindow(hWnd); // TrackPopupMenuEx‚ÌƒoƒO‚ğ‰ñ”ğB
+    HWND hwndFore = ::GetForegroundWindow(); // æœ€å‰é¢ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’è¦šãˆã¦ãŠãã€‚
+    ::SetForegroundWindow(hWnd); // TrackPopupMenuExã®ãƒã‚°ã‚’å›é¿ã€‚
 
-    // ƒƒjƒ…[‚Ì“ü—Íƒ‚[ƒh‚Éƒ‰ƒWƒIƒ}[ƒN‚ğ•t‚¯‚éB
+    // ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã«ãƒ©ã‚¸ã‚ªãƒãƒ¼ã‚¯ã‚’ä»˜ã‘ã‚‹ã€‚
     UINT uCheck = CommandFromInputMode(GetInputMode(hIMC));
     ::CheckMenuRadioItem(hSubMenu, IDM_HIRAGANA, IDM_HALF_ASCII, uCheck, MF_BYCOMMAND);
     if (IsRomanMode(hIMC)) {
@@ -432,17 +432,17 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
                              IDM_KANA_INPUT, MF_BYCOMMAND);
     }
 
-    // ƒƒjƒ…[‚ğ•\¦‚µ‚Ä‘I‘ğ‚³‚ê‚é‚Ì‚ğ‘Ò‚ÂB‘I‘ğ‚³‚ê‚½‚çƒRƒ}ƒ“ƒhID‚ğ•Ô‚·B
+    // ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’è¡¨ç¤ºã—ã¦é¸æŠã•ã‚Œã‚‹ã®ã‚’å¾…ã¤ã€‚é¸æŠã•ã‚ŒãŸã‚‰ã‚³ãƒãƒ³ãƒ‰IDã‚’è¿”ã™ã€‚
     UINT nCommand = ::TrackPopupMenuEx(hSubMenu, TPM_RETURNCMD | TPM_NONOTIFY,
                                        pt.x, pt.y, hWnd, &params);
-    TheIME.DoCommand(hIMC, nCommand); // ƒRƒ}ƒ“ƒh”­“®B
-    ::PostMessage(hWnd, WM_NULL, 0, 0); // TrackPopupMenuEx‚ÌƒoƒO‰ñ”ğB
-    ::DestroyMenu(hMenu); // ƒƒjƒ…[‚ğ”jŠü‚·‚éB
-    ::SetForegroundWindow(hwndFore); // Å‘O–ÊƒEƒBƒ“ƒhƒE‚ğ–ß‚·B
+    TheIME.DoCommand(hIMC, nCommand); // ã‚³ãƒãƒ³ãƒ‰ç™ºå‹•ã€‚
+    ::PostMessage(hWnd, WM_NULL, 0, 0); // TrackPopupMenuExã®ãƒã‚°å›é¿ã€‚
+    ::DestroyMenu(hMenu); // ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ç ´æ£„ã™ã‚‹ã€‚
+    ::SetForegroundWindow(hwndFore); // æœ€å‰é¢ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æˆ»ã™ã€‚
     return TRUE;
 } // StatusWnd_OnRClick
 
-// IMEó‘ÔƒEƒBƒ“ƒhƒE‚ÌƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒB
+// IMEçŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã€‚
 LRESULT CALLBACK
 StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     PAINTSTRUCT ps;
@@ -452,40 +452,40 @@ StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     POINT pt;
 
     switch (message) {
-    case WM_CREATE: // ƒEƒBƒ“ƒhƒEì¬B
-        // ƒrƒbƒgƒ}ƒbƒv‚ğ“Ç‚İ‚İAƒZƒbƒg‚·‚éB
+    case WM_CREATE: // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½œæˆæ™‚ã€‚
+        // ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’èª­ã¿è¾¼ã¿ã€ã‚»ãƒƒãƒˆã™ã‚‹ã€‚
         hbm = TheIME.LoadBMP(TEXT("MODESBMP"));
         ::SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbm);
         break;
 
-    case WM_PAINT: // •`‰æB
+    case WM_PAINT: // æç”»æ™‚ã€‚
         hDC = ::BeginPaint(hWnd, &ps);
         StatusWnd_Paint(hWnd, hDC, 0);
         ::EndPaint(hWnd, &ps);
         break;
 
-    case WM_DESTROY: // ƒEƒBƒ“ƒhƒE”jŠüB
+    case WM_DESTROY: // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç ´æ£„æ™‚ã€‚
         hbm = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
         ::DeleteObject(hbm);
         break;
 
-    case WM_UI_UPDATE: // UIXVB
+    case WM_UI_UPDATE: // UIæ›´æ–°æ™‚ã€‚
         ::InvalidateRect(hWnd, NULL, FALSE);
         break;
 
-    case WM_LBUTTONUP: // ¶ƒ{ƒ^ƒ“‰ğ•úB
+    case WM_LBUTTONUP: // å·¦ãƒœã‚¿ãƒ³è§£æ”¾æ™‚ã€‚
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
         StatusWnd_OnLButton(hWnd, pt, FALSE);
         break;
 
-    case WM_LBUTTONDOWN: // ¶ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½B
+    case WM_LBUTTONDOWN: // å·¦ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸæ™‚ã€‚
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
         StatusWnd_OnLButton(hWnd, pt, TRUE);
         break;
 
-    case WM_MOUSEMOVE: // ƒ}ƒEƒXˆÚ“®B“Á‚Éƒhƒ‰ƒbƒOB
+    case WM_MOUSEMOVE: // ãƒã‚¦ã‚¹ç§»å‹•æ™‚ã€‚ç‰¹ã«ãƒ‰ãƒ©ãƒƒã‚°æ™‚ã€‚
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
         if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
@@ -493,48 +493,48 @@ StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
         }
         break;
 
-    case WM_RBUTTONUP: // ‰Eƒ{ƒ^ƒ“‰ğ•úB
+    case WM_RBUTTONUP: // å³ãƒœã‚¿ãƒ³è§£æ”¾æ™‚ã€‚
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
         break;
 
-    case WM_RBUTTONDOWN: // ‰Eƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½B
+    case WM_RBUTTONDOWN: // å³ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸæ™‚ã€‚
         // This message comes from the captured window.
         ::GetCursorPos(&pt);
         break;
 
-    case WM_SETCURSOR: // ƒ}ƒEƒXƒJ[ƒ\ƒ‹İ’èB
+    case WM_SETCURSOR: // ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«è¨­å®šæ™‚ã€‚
         // This message comes even from the disabled window.
-        // ‚±‚ÌƒƒbƒZ[ƒW‚Í–³Œø‚ÈƒEƒBƒ“ƒhƒE‚Å‚à—ˆ‚éB
+        // ã“ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯ç„¡åŠ¹ãªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã§ã‚‚æ¥ã‚‹ã€‚
         ::GetCursorPos(&pt);
         switch (HIWORD(lParam)) {
-        case WM_MOUSEMOVE: // ƒ}ƒEƒXˆÚ“®B
+        case WM_MOUSEMOVE: // ãƒã‚¦ã‚¹ç§»å‹•æ™‚ã€‚
             if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) {
                 StatusWnd_OnMouseMove(hWnd, pt, ::GetAsyncKeyState(VK_LBUTTON) < 0);
             }
             break;
-        case WM_LBUTTONDOWN: // ¶ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½B
+        case WM_LBUTTONDOWN: // å·¦ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸæ™‚ã€‚
             StatusWnd_OnLButton(hWnd, pt, TRUE);
             break;
-        case WM_LBUTTONUP: // ¶ƒ{ƒ^ƒ“‰ğ•úB
+        case WM_LBUTTONUP: // å·¦ãƒœã‚¿ãƒ³è§£æ”¾æ™‚ã€‚
             StatusWnd_OnLButton(hWnd, pt, FALSE);
             break;
-        case WM_RBUTTONDOWN: // ‰Eƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½B
+        case WM_RBUTTONDOWN: // å³ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸæ™‚ã€‚
             break;
-        case WM_RBUTTONUP: // ‰Eƒ{ƒ^ƒ“‰ğ•úB
+        case WM_RBUTTONUP: // å³ãƒœã‚¿ãƒ³è§£æ”¾æ™‚ã€‚
             StatusWnd_OnRClick(hWnd, pt);
             break;
         }
-        ::SetCursor(::LoadCursor(NULL, IDC_ARROW)); // –îˆóƒJ[ƒ\ƒ‹‚ğw’èB
+        ::SetCursor(::LoadCursor(NULL, IDC_ARROW)); // çŸ¢å°ã‚«ãƒ¼ã‚½ãƒ«ã‚’æŒ‡å®šã€‚
         break;
 
-    case WM_MOVE: // ƒEƒBƒ“ƒhƒEˆÚ“®B
+    case WM_MOVE: // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç§»å‹•æ™‚ã€‚
         hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
         if (::IsWindow(hwndServer))
-            SendMessage(hwndServer, WM_UI_STATEMOVE, 0, 0); // UIƒT[ƒo[‚É‘—‚éB
+            SendMessage(hwndServer, WM_UI_STATEMOVE, 0, 0); // UIã‚µãƒ¼ãƒãƒ¼ã«é€ã‚‹ã€‚
         break;
 
-    default: // ‚»‚Ì‘¼‚ÌƒƒbƒZ[ƒWB
+    default: // ãã®ä»–ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€‚
         if (!IsImeMessage(message))
             return ::DefWindowProc(hWnd, message, wParam, lParam);
         break;
