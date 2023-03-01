@@ -126,10 +126,10 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue) {
             DPRINT("IMC_SETOPENSTATUS\n");
             lpIMC = TheIME.LockIMC(hIMC);
             if (lpIMC) {
-                if (dwIndex == 0) { // close
-                    lpIMC->CancelText();
-                } else { // open
-                    ;
+                if (!lpIMC->fOpen) { // Closed
+                    if (lpIMC->HasCompStr()) {
+                        lpIMC->MakeResult();
+                    }
                 }
                 TheIME.UnlockIMC(hIMC);
             }
