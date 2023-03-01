@@ -244,7 +244,7 @@ void ImePad::OnEraseBkGnd(HWND hWnd) {
     ::SetTextColor(hDC, GetSysColor(COLOR_BTNTEXT));
     ::SetBkMode(hDC, TRANSPARENT);
     ::SetBkColor(hDC, GetSysColor(COLOR_BTNFACE));
-    ::DrawText(hDC, TEXT("(èÌópäøéöÇÃÇ›Ç≈Ç∑)"), -1,
+    ::DrawText(hDC, LoadStringDx(IDM_ONLYJOUYOU), -1,
                &rc, DT_RIGHT | DT_TOP | DT_SINGLELINE | DT_NOCLIP | DT_NOPREFIX);
     ::ReleaseDC(hWnd, hDC);
 }
@@ -669,7 +669,7 @@ BOOL ImePad::OnCreate(HWND hWnd) {
     std::set<WORD>::iterator it, end = strokes.end();
     TCHAR sz[128];
     for (it = strokes.begin(); it != end; ++it) {
-        ::wsprintf(sz, TEXT("%uâÊ"), *it);
+        ::wsprintf(sz, LoadStringDx(IDM_KAKUSUU), *it);
         ::SendMessage(m_hListBox1, LB_ADDSTRING, 0, (LPARAM)sz);
     }
 

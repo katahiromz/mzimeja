@@ -28,6 +28,8 @@ BEGIN
     IDM_IME_PAD,                "MZ-IMEパッド"
     IDM_STROKES,                "総字画"
     IDM_RADICALS,               "部首"
+    IDM_ONLYJOUYOU,             "(常用漢字のみです)"
+    IDM_KAKUSUU,                "%u画"
 END
 
 /////////////////////////////////////////////////////////////////////////////

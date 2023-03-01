@@ -1,6 +1,7 @@
 // mzimeja.h --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
-// (Japanese, UTF-8)
+// (Japanese, Shift_JIS)
+// NOTE: This file uses Japanese cp932 encoding for historic reason.
 
 #pragma once
 
@@ -15,7 +16,7 @@
 #ifndef _INC_WINDOWS
   #include <windows.h>      // Windows
 #endif
-#include <commctrl.h>       // for Windows Common Controls
+//#include <commctrl.h>       // for Windows Common Controls
 #include <tchar.h>          // for Windows generic text
 
 #include <string>           // for std::string, std::wstring, ...
@@ -48,7 +49,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 // For debugging.
-// ãƒ‡ãƒãƒƒã‚°ç”¨ã€‚
+// ƒfƒoƒbƒO—pB
 
 #ifndef MZIMEJA_DEBUG_OUTPUT
   #define DebugPrintA   (void)
@@ -83,12 +84,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // For limit of MZ-IME.
-// MZ-IMEã®åˆ¶é™ã€‚
+// MZ-IME‚Ì§ŒÀB
 #define MAXCOMPWND  10  // maximum number of composition windows
 #define MAXGLCHAR   32  // maximum number of guideline characters
 
 // Special messages.
-// ç‰¹åˆ¥ãªãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€‚
+// “Á•Ê‚ÈƒƒbƒZ[ƒWB
 #define WM_UI_UPDATE      (WM_USER + 500)
 #define WM_UI_HIDE        (WM_USER + 501)
 #define WM_UI_STATEMOVE   (WM_USER + 601)
@@ -100,12 +101,12 @@
 #define IME_ESC_PRI_GETDWORDTEST (IME_ESC_PRIVATE_FIRST + 0)
 
 // Special style.
-// ç‰¹åˆ¥ãªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¹ã‚¿ã‚¤ãƒ«ã€‚
+// “Á•Ê‚ÈƒEƒBƒ“ƒhƒEƒXƒ^ƒCƒ‹B
 #define WS_COMPDEFAULT    (WS_DISABLED | WS_POPUP)
 #define WS_COMPNODEFAULT  (WS_DISABLED | WS_POPUP)
 
 // The IDs of guideline entry.
-// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚¨ãƒ³ãƒˆãƒªãƒ¼ã®IDã€‚
+// ƒKƒCƒhƒ‰ƒCƒ“ƒGƒ“ƒgƒŠ[‚ÌIDB
 #define MYGL_NODICTIONARY   0
 #define MYGL_TYPINGERROR    1
 #define MYGL_TESTGUIDELINE  2
@@ -123,12 +124,12 @@
 #define UIEXTRASIZE             (FIGWLP_CHILDWND + sizeof(LONG_PTR))
 
 // The flags of FIGWL_MOUSE.
-// FIGWL_MOUSEã®ãƒ•ãƒ©ã‚°ã€‚
+// FIGWL_MOUSE‚Ìƒtƒ‰ƒOB
 #define FIM_CAPUTURED 0x01
 #define FIM_MOVED 0x02
 
 // The flags of the close button.
-// é–‰ã˜ã‚‹ãƒœã‚¿ãƒ³ã®ãƒ•ãƒ©ã‚°ã€‚
+// •Â‚¶‚éƒ{ƒ^ƒ“‚Ìƒtƒ‰ƒOB
 #define PUSHED_STATUS_CLOSE 0x08
 
 // Statue Close Button.
@@ -175,14 +176,14 @@ struct MZGUIDELINE {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹åã€‚
-extern const WCHAR szUIServerClassName[];   // UIã‚µãƒ¼ãƒãƒ¼ã€‚
-extern const WCHAR szCompStrClassName[];    // æœªç¢ºå®šæ–‡å­—åˆ—ã€‚
-extern const WCHAR szCandClassName[];       // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
-extern const WCHAR szStatusClassName[];     // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
-extern const WCHAR szGuideClassName[];      // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
+// ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX–¼B
+extern const WCHAR szUIServerClassName[];   // UIƒT[ƒo[B
+extern const WCHAR szCompStrClassName[];    // –¢Šm’è•¶š—ñB
+extern const WCHAR szCandClassName[];       // Œó•âƒEƒBƒ“ƒhƒEB
+extern const WCHAR szStatusClassName[];     // ó‘ÔƒEƒBƒ“ƒhƒEB
+extern const WCHAR szGuideClassName[];      // ƒKƒCƒhƒ‰ƒCƒ“ƒEƒBƒ“ƒhƒEB
 
-// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ãƒ†ãƒ¼ãƒ–ãƒ«ã€‚
+// ƒKƒCƒhƒ‰ƒCƒ“ƒe[ƒuƒ‹B
 extern const MZGUIDELINE glTable[];
 
 //////////////////////////////////////////////////////////////////////////////
@@ -326,13 +327,13 @@ WCHAR get_comma(void);
 
 //////////////////////////////////////////////////////////////////////////////
 
-// å¤‰æ›å€™è£œã€‚
+// •ÏŠ·Œó•âB
 struct MzConvCandidate {
-    std::wstring hiragana;              // ã²ã‚‰ãŒãªã€‚
-    std::wstring converted;             // å¤‰æ›å¾Œã€‚
-    int cost;                           // ã‚³ã‚¹ãƒˆã€‚
-    std::set<HinshiBunrui>  bunruis;    // å“è©åˆ†é¡é›†åˆã€‚
-    std::wstring tags;                  // ã‚¿ã‚°ã€‚
+    std::wstring hiragana;              // ‚Ğ‚ç‚ª‚ÈB
+    std::wstring converted;             // •ÏŠ·ŒãB
+    int cost;                           // ƒRƒXƒgB
+    std::set<HinshiBunrui>  bunruis;    // •iŒ•ª—ŞW‡B
+    std::wstring tags;                  // ƒ^ƒOB
 
     void clear() {
         hiragana.clear();
@@ -343,48 +344,48 @@ struct MzConvCandidate {
     }
 };
 
-// å¤‰æ›æ–‡ç¯€ã€‚
+// •ÏŠ·•¶ßB
 struct MzConvClause {
-    std::vector<MzConvCandidate> candidates;    // å€™è£œç¾¤ã€‚
-    void sort();                                // ã‚½ãƒ¼ãƒˆã™ã‚‹ã€‚
-    void add(const LatticeNode *node);          // ãƒãƒ¼ãƒ‰ã‚’è¿½åŠ ã™ã‚‹ã€‚
+    std::vector<MzConvCandidate> candidates;    // Œó•âŒQB
+    void sort();                                // ƒ\[ƒg‚·‚éB
+    void add(const LatticeNode *node);          // ƒm[ƒh‚ğ’Ç‰Á‚·‚éB
 
     void clear() {
         candidates.clear();
     }
 };
 
-// å¤‰æ›çµæœã€‚
+// •ÏŠ·Œ‹‰ÊB
 struct MzConvResult {
-    std::vector<MzConvClause> clauses;      // æ–‡ç¯€ç¾¤ã€‚
-    void sort();                            // ã‚½ãƒ¼ãƒˆã™ã‚‹ã€‚
-    void clear() { clauses.clear(); }       // ã‚¯ãƒªã‚¢ã™ã‚‹ã€‚
+    std::vector<MzConvClause> clauses;      // •¶ßŒQB
+    void sort();                            // ƒ\[ƒg‚·‚éB
+    void clear() { clauses.clear(); }       // ƒNƒŠƒA‚·‚éB
 };
 
 //////////////////////////////////////////////////////////////////////////////
-// dictionary - è¾æ›¸
+// dictionary - «‘
 
 class Dict {
 public:
     Dict();
     ~Dict();
 
-    // è¾æ›¸ã‚’èª­ã¿è¾¼ã‚€ã€‚
+    // «‘‚ğ“Ç‚İ‚ŞB
     BOOL Load(const wchar_t *file_name, const wchar_t *object_name);
-    // è¾æ›¸ã‚’ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
+    // «‘‚ğƒAƒ“ƒ[ƒh‚·‚éB
     void Unload();
 
-    BOOL IsLoaded() const;  // èª­ã¿è¾¼ã¿æ¸ˆã¿ã‹ï¼Ÿ
-    DWORD GetSize() const;  // ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹ã€‚
+    BOOL IsLoaded() const;  // “Ç‚İ‚İÏ‚İ‚©H
+    DWORD GetSize() const;  // ƒTƒCƒY‚ğæ“¾‚·‚éB
 
-    wchar_t *Lock();            // ãƒ­ãƒƒã‚¯ã—ã¦èª­ã¿è¾¼ã¿ã‚’é–‹å§‹ã™ã‚‹ã€‚
-    void Unlock(wchar_t *data); // ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã—ã¦èª­ã¿è¾¼ã¿ã‚’çµ‚äº†ã™ã‚‹ã€‚
+    wchar_t *Lock();            // ƒƒbƒN‚µ‚Ä“Ç‚İ‚İ‚ğŠJn‚·‚éB
+    void Unlock(wchar_t *data); // ƒƒbƒN‚ğ‰ğœ‚µ‚Ä“Ç‚İ‚İ‚ğI—¹‚·‚éB
 
 protected:
-    std::wstring m_strFileName;     // ãƒ•ã‚¡ã‚¤ãƒ«åã€‚
-    std::wstring m_strObjectName;   // è¤‡æ•°ã®è¾æ›¸ã‚’ä½¿ã†ã®ã§ã€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåã§åŒºåˆ¥ã™ã‚‹ã€‚
-    HANDLE m_hMutex;                // æ’ä»–åˆ¶å¾¡ç”¨ã€‚
-    HANDLE m_hFileMapping;          // ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒƒãƒ”ãƒ³ã‚°ã€‚
+    std::wstring m_strFileName;     // ƒtƒ@ƒCƒ‹–¼B
+    std::wstring m_strObjectName;   // •¡”‚Ì«‘‚ğg‚¤‚Ì‚ÅAƒIƒuƒWƒFƒNƒg–¼‚Å‹æ•Ê‚·‚éB
+    HANDLE m_hMutex;                // ”r‘¼§Œä—pB
+    HANDLE m_hFileMapping;          // ƒtƒ@ƒCƒ‹ƒ}ƒbƒsƒ“ƒOB
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -401,46 +402,46 @@ class MzIme {
 
 public:
     // literal map
-    std::unordered_map<wchar_t,wchar_t>   m_vowel_map;      // æ¯éŸ³å†™åƒã€‚
-    std::unordered_map<wchar_t,wchar_t>   m_consonant_map;  // å­éŸ³å†™åƒã€‚
+    std::unordered_map<wchar_t,wchar_t>   m_vowel_map;      // •ê‰¹Ê‘œB
+    std::unordered_map<wchar_t,wchar_t>   m_consonant_map;  // q‰¹Ê‘œB
     void MakeLiteralMaps();
 
 public:
     MzIme();
 
-    // åˆæœŸåŒ–ã€‚
+    // ‰Šú‰»B
     BOOL Init(HINSTANCE hInstance);
-    // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹ã®ç™»éŒ²ã€‚
+    // ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX‚Ì“o˜^B
     BOOL RegisterClasses(HINSTANCE hInstance);
     void UnregisterClasses();
-    // é€†åˆæœŸåŒ–ã€‚
+    // ‹t‰Šú‰»B
     VOID Uninit(VOID);
 
-    // ãƒªã‚½ãƒ¼ã‚¹ã‹ã‚‰ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’èª­ã¿è¾¼ã‚€ã€‚
+    // ƒŠƒ\[ƒX‚©‚çƒrƒbƒgƒ}ƒbƒv‚ğ“Ç‚İ‚ŞB
     HBITMAP LoadBMP(LPCTSTR pszName);
     HBITMAP LoadBMP(UINT nID) { return LoadBMP(MAKEINTRESOURCE(nID)); }
-    // ãƒªã‚½ãƒ¼ã‚¹ã‹ã‚‰æ–‡å­—åˆ—ã‚’èª­ã¿è¾¼ã‚€ã€‚
+    // ƒŠƒ\[ƒX‚©‚ç•¶š—ñ‚ğ“Ç‚İ‚ŞB
     WCHAR *LoadSTR(INT nID);
 
-    void UpdateIndicIcon(HIMC hIMC);    // ã‚¤ãƒ³ã‚¸ã‚±ãƒ¼ã‚¿ãƒ¼ã‚¢ã‚¤ã‚³ãƒ³ã‚’æ›´æ–°ã™ã‚‹ã€‚
+    void UpdateIndicIcon(HIMC hIMC);    // ƒCƒ“ƒWƒP[ƒ^[ƒAƒCƒRƒ“‚ğXV‚·‚éB
 
-    HKL GetHKL(VOID);                   // ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã®ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã™ã‚‹ã€‚
+    HKL GetHKL(VOID);                   // ƒL[ƒ{[ƒhƒŒƒCƒAƒEƒg‚Ìƒnƒ“ƒhƒ‹‚ğæ“¾‚·‚éB
 
-    InputContext *LockIMC(HIMC hIMC);   // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
-    VOID UnlockIMC(HIMC hIMC);          // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã™ã‚‹ã€‚
+    InputContext *LockIMC(HIMC hIMC);   // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
+    VOID UnlockIMC(HIMC hIMC);          // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœ‚·‚éB
 
-    // ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®ç”Ÿæˆã€‚
+    // ƒƒbƒZ[ƒW‚Ì¶¬B
     BOOL GenerateMessage(LPTRANSMSG lpGeneMsg);
     BOOL GenerateMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
     BOOL GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg);
 
-    BOOL DoCommand(HIMC hIMC, DWORD dwCommand);     // ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œã™ã‚‹ã€‚
+    BOOL DoCommand(HIMC hIMC, DWORD dwCommand);     // ƒRƒ}ƒ“ƒh‚ğÀs‚·‚éB
 
-    // åŸºæœ¬è¾æ›¸ã€‚
-    BOOL LoadBasicDict();                   // åŸºæœ¬è¾æ›¸ã‚’èª­ã¿è¾¼ã‚€ã€‚
-    BOOL IsBasicDictLoaded() const;         // åŸºæœ¬è¾æ›¸ãŒèª­ã¿è¾¼ã¾ã‚ŒãŸã‹ï¼Ÿ
-    WCHAR *LockBasicDict();                 // åŸºæœ¬è¾æ›¸ã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
-    void UnlockBasicDict(WCHAR *data);      // åŸºæœ¬è¾æ›¸ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã™ã‚‹ã€‚
+    // Šî–{«‘B
+    BOOL LoadBasicDict();                   // Šî–{«‘‚ğ“Ç‚İ‚ŞB
+    BOOL IsBasicDictLoaded() const;         // Šî–{«‘‚ª“Ç‚İ‚Ü‚ê‚½‚©H
+    WCHAR *LockBasicDict();                 // Šî–{«‘‚ğƒƒbƒN‚·‚éB
+    void UnlockBasicDict(WCHAR *data);      // Šî–{«‘‚ÌƒƒbƒN‚ğ‰ğœ‚·‚éB
 
     // make lattice
     BOOL MakeLattice(Lattice& lattice, const std::wstring& pre);
@@ -464,7 +465,7 @@ public:
     BOOL StoreResult(
             const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
 
-    // ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿å´ã®è¨­å®šã€‚
+    // ƒRƒ“ƒsƒ…[ƒ^‘¤‚Ìİ’èB
     BOOL GetComputerString(LPCWSTR pszSettingName, std::wstring& value);
     BOOL SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue);
     BOOL GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr);
@@ -472,7 +473,7 @@ public:
     BOOL GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size);
     BOOL SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 
-    // ãƒ¦ãƒ¼ã‚¶ãƒ¼å´ã®è¨­å®šã€‚
+    // ƒ†[ƒU[‘¤‚Ìİ’èB
     BOOL GetUserString(LPCWSTR pszSettingName, std::wstring& value);
     BOOL SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue);
     BOOL GetUserDword(LPCWSTR pszSettingName, DWORD *ptr);

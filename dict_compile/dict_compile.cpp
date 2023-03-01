@@ -1,6 +1,7 @@
 // dict_compile.cpp --- dictionary compiler of MZ-IME Japanese Input
 /////////////////////////////////////////////////////////////////////////////
-// WARNING: This file is Shift_JIS encoding for historical reason. Be careful.
+// (Japanese, Shift_JIS)
+// NOTE: This file uses Japanese cp932 encoding for historic reason.
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "../dict.hpp"
