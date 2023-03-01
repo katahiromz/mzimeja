@@ -16,21 +16,15 @@
 #ifndef _INC_WINDOWS
   #include <windows.h>      // Windows
 #endif
-//#include <commctrl.h>       // for Windows Common Controls
 #include <tchar.h>          // for Windows generic text
 
 #include <string>           // for std::string, std::wstring, ...
 #include <vector>           // for std::vector
 #include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
-#include <algorithm>        // for std::sort
 
 #include <cstdlib>          // for C standard library
 #include <cstdio>           // for C standard I/O
-#include <cctype>           // for C character types
-#include <cstring>          // for C string
-
-#include <process.h>        // for _beginthreadex
 
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development

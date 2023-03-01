@@ -6,6 +6,7 @@
 //       please add options: -finput-charset=CP932 -fexec-charset=CP932
 
 #include "mzimeja.h"
+#include <algorithm>        // for std::sort
 
 const DWORD c_dwMilliseconds = 8000;
 
