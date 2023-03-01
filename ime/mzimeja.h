@@ -14,7 +14,7 @@
 #include "../targetver.h"   // target Windows version
 
 #ifndef _INC_WINDOWS
-  #include <windows.h>      // Windows
+    #include <windows.h>      // Windows
 #endif
 #include <tchar.h>          // for Windows generic text
 
@@ -22,9 +22,6 @@
 #include <vector>           // for std::vector
 #include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
-
-#include <cstdlib>          // for C standard library
-#include <cstdio>           // for C standard I/O
 
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development
@@ -134,7 +131,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // additional GCS bits
 
-#define GCS_COMPALL                                                  \
+#define GCS_COMPALL \
         (GCS_COMPSTR | GCS_COMPATTR | GCS_COMPREADSTR | GCS_COMPREADATTR | \
          GCS_COMPCLAUSE | GCS_COMPREADCLAUSE)
 
