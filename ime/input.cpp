@@ -1,5 +1,5 @@
 // input.cpp --- mzimeja input context and related
-// “ü—ÍƒRƒ“ƒeƒLƒXƒgŠÖ˜AB
+// å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆé–¢é€£ã€‚
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -8,7 +8,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // input modes
 
-// “ü—Íƒ‚[ƒh‚©‚ç•ÏŠ·ƒ‚[ƒh‚ªŠJ‚©‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğ•Ô‚·B
+// å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‹ã‚‰å¤‰æ›ãƒ¢ãƒ¼ãƒ‰ãŒé–‹ã‹ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹ã‚’è¿”ã™ã€‚
 BOOL IsInputModeOpen(INPUT_MODE imode) {
     switch (imode) {
     case IMODE_FULL_HIRAGANA:
@@ -23,7 +23,7 @@ BOOL IsInputModeOpen(INPUT_MODE imode) {
     }
 }
 
-// IME•ÏŠ·ƒ‚[ƒh‚©‚ç“ü—Íƒ‚[ƒh‚ğ•Ô‚·B
+// IMEå¤‰æ›ãƒ¢ãƒ¼ãƒ‰ã‹ã‚‰å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‚’è¿”ã™ã€‚
 INPUT_MODE InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
     if (bOpen) {
         if (dwConversion & IME_CMODE_FULLSHAPE) {
@@ -48,7 +48,7 @@ INPUT_MODE InputModeFromConversionMode(BOOL bOpen, DWORD dwConversion) {
     }
 }
 
-// “ü—Íƒ‚[ƒh‚©‚çƒRƒ}ƒ“ƒhID‚ğ•Ô‚·B
+// å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‹ã‚‰ã‚³ãƒãƒ³ãƒ‰IDã‚’è¿”ã™ã€‚
 UINT CommandFromInputMode(INPUT_MODE imode) {
     switch (imode) {
     case IMODE_FULL_HIRAGANA:
@@ -66,7 +66,7 @@ UINT CommandFromInputMode(INPUT_MODE imode) {
     }
 }
 
-// “ü—Íƒ‚[ƒh‚ğæ“¾‚·‚éB
+// å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾—ã™ã‚‹ã€‚
 INPUT_MODE GetInputMode(HIMC hIMC) {
     if (hIMC) {
         DWORD dwConversion, dwSentence;
@@ -77,7 +77,7 @@ INPUT_MODE GetInputMode(HIMC hIMC) {
     return IMODE_DISABLED;
 }
 
-// Ÿ‚Ì“ü—Íƒ‚[ƒhB
+// æ¬¡ã®å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã€‚
 INPUT_MODE NextInputMode(INPUT_MODE imode) {
     switch (imode) {
     case IMODE_FULL_HIRAGANA:
@@ -96,7 +96,7 @@ INPUT_MODE NextInputMode(INPUT_MODE imode) {
     }
 }
 
-// “ü—Íƒ‚[ƒh‚ğİ’èB
+// å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‚’è¨­å®šã€‚
 void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
     if (imode == IMODE_DISABLED) {
         return;
@@ -104,70 +104,70 @@ void SetInputMode(HIMC hIMC, INPUT_MODE imode) {
     DWORD dwConversion, dwSentence;
     ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence);
     switch (imode) {
-    case IMODE_FULL_HIRAGANA: // ‘SŠp‚Ğ‚ç‚ª‚Èƒ‚[ƒhB
+    case IMODE_FULL_HIRAGANA: // å…¨è§’ã²ã‚‰ãŒãªãƒ¢ãƒ¼ãƒ‰ã€‚
         ImmSetOpenStatus(hIMC, TRUE);
         dwConversion &= ~IME_CMODE_KATAKANA;
         dwConversion |= IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE;
         break;
-    case IMODE_FULL_KATAKANA: // ‘SŠpƒJƒ^ƒJƒiƒ‚[ƒhB
+    case IMODE_FULL_KATAKANA: // å…¨è§’ã‚«ã‚¿ã‚«ãƒŠãƒ¢ãƒ¼ãƒ‰ã€‚
         ImmSetOpenStatus(hIMC, TRUE);
         dwConversion |= IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE | IME_CMODE_KATAKANA;
         break;
-    case IMODE_FULL_ASCII: // ‘SŠp‰p”ƒ‚[ƒhB
+    case IMODE_FULL_ASCII: // å…¨è§’è‹±æ•°ãƒ¢ãƒ¼ãƒ‰ã€‚
         ImmSetOpenStatus(hIMC, TRUE);
         dwConversion &= ~(IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
         dwConversion |= IME_CMODE_FULLSHAPE;
         break;
-    case IMODE_HALF_KANA: // ”¼ŠpƒJƒiƒ‚[ƒhB
+    case IMODE_HALF_KANA: // åŠè§’ã‚«ãƒŠãƒ¢ãƒ¼ãƒ‰ã€‚
         ImmSetOpenStatus(hIMC, TRUE);
         dwConversion &= ~IME_CMODE_FULLSHAPE;
         dwConversion |= IME_CMODE_JAPANESE | IME_CMODE_KATAKANA;
         break;
-    case IMODE_HALF_ASCII: // ”¼Šp‰p”ƒ‚[ƒhB
+    case IMODE_HALF_ASCII: // åŠè§’è‹±æ•°ãƒ¢ãƒ¼ãƒ‰ã€‚
         ImmSetOpenStatus(hIMC, FALSE);
         dwConversion &= ~(IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
         break;
-    case IMODE_DISABLED: // –³ŒøB
+    case IMODE_DISABLED: // ç„¡åŠ¹ã€‚
         ASSERT(0);
         break;
     }
-    // •ÏŠ·ƒ‚[ƒh‚ğƒZƒbƒg‚·‚éB
+    // å¤‰æ›ãƒ¢ãƒ¼ãƒ‰ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã€‚
     ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence);
 }
 
-// ƒ[ƒ}š“ü—Íƒ‚[ƒh‚©H
+// ãƒ­ãƒ¼ãƒå­—å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‹ï¼Ÿ
 BOOL IsRomanMode(HIMC hIMC) {
     DWORD dwConversion, dwSentence;
-    ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence); // •ÏŠ·ƒ‚[ƒh‚ğæ“¾B
-    return (dwConversion & IME_CMODE_ROMAN); // ƒ[ƒ}š‚©H
+    ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence); // å¤‰æ›ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾—ã€‚
+    return (dwConversion & IME_CMODE_ROMAN); // ãƒ­ãƒ¼ãƒå­—ã‹ï¼Ÿ
 }
 
-// ƒ[ƒ}š“ü—Íƒ‚[ƒh‚ğİ’è‚·‚éB
+// ãƒ­ãƒ¼ãƒå­—å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‚’è¨­å®šã™ã‚‹ã€‚
 void SetRomanMode(HIMC hIMC, BOOL bRoman) {
     DWORD dwConversion, dwSentence;
-    ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence); // •ÏŠ·ƒ‚[ƒh‚ğæ“¾B
+    ::ImmGetConversionStatus(hIMC, &dwConversion, &dwSentence); // å¤‰æ›ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾—ã€‚
     if (bRoman) {
         dwConversion |= IME_CMODE_ROMAN;
     } else {
         dwConversion &= ~IME_CMODE_ROMAN;
     }
-    ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence); // •ÏŠ·ƒ‚[ƒh‚ğİ’èB
+    ::ImmSetConversionStatus(hIMC, dwConversion, dwSentence); // å¤‰æ›ãƒ¢ãƒ¼ãƒ‰ã‚’è¨­å®šã€‚
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // input context
 
-// “ü—ÍƒRƒ“ƒeƒLƒXƒg‚©‚ç“ü—Íƒ‚[ƒh‚ğæ“¾B
+// å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‹ã‚‰å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾—ã€‚
 INPUT_MODE InputContext::GetInputMode() const {
     return InputModeFromConversionMode(fOpen, Conversion());
 }
 
-// “ü—ÍƒRƒ“ƒeƒLƒXƒg‚©‚çƒ[ƒ}š“ü—Íƒ‚[ƒh‚ğæ“¾B
+// å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‹ã‚‰ãƒ­ãƒ¼ãƒå­—å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾—ã€‚
 BOOL InputContext::IsRomanMode() const {
     return Conversion() & IME_CMODE_ROMAN;
 }
 
-// “ü—ÍƒRƒ“ƒeƒLƒXƒgî•ñ‚Ìƒ_ƒ“ƒvB
+// å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆæƒ…å ±ã®ãƒ€ãƒ³ãƒ—ã€‚
 void InputContext::Dump() {
     DebugPrintA("### INPUTCONTEXT ###\n");
     DebugPrintA("hWnd: %p\n", hWnd);
@@ -205,7 +205,7 @@ void InputContext::Dump() {
     DebugPrintA("fdwInit: %08X\n", fdwInit);
 }
 
-// “ü—ÍƒRƒ“ƒeƒLƒXƒg‚Ì‰Šú‰»B
+// å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®åˆæœŸåŒ–ã€‚
 void InputContext::Initialize() {
     FOOTMARK();
     Dump();
@@ -226,97 +226,97 @@ void InputContext::Initialize() {
     }
     fdwInit |= INIT_CONVERSION;
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, NULL);
     hCandInfo = CandInfo::ReCreate(hCandInfo, NULL);
 }
 
-// Œó•âî•ñ‚ª‚ ‚é‚©H
+// å€™è£œæƒ…å ±ãŒã‚ã‚‹ã‹ï¼Ÿ
 BOOL InputContext::HasCandInfo() {
     BOOL fRet = FALSE;
 
-    if (ImmGetIMCCSize(hCandInfo) < sizeof(CANDIDATEINFO)) { // ƒTƒCƒY‚Í—LŒø‚©H
+    if (ImmGetIMCCSize(hCandInfo) < sizeof(CANDIDATEINFO)) { // ã‚µã‚¤ã‚ºã¯æœ‰åŠ¹ã‹ï¼Ÿ
         return FALSE;
     }
 
-    CandInfo *lpCandInfo = LockCandInfo(); // Œó•âî•ñ‚ğƒƒbƒNB
+    CandInfo *lpCandInfo = LockCandInfo(); // å€™è£œæƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã€‚
     if (lpCandInfo) {
-        fRet = (lpCandInfo->dwCount > 0); // Œó•âî•ñ‚Ì€–Ú‚ª‚ ‚é‚©H
-        UnlockCandInfo(); // Œó•âî•ñ‚ÌƒƒbƒN‚ğ‰ğœB
+        fRet = (lpCandInfo->dwCount > 0); // å€™è£œæƒ…å ±ã®é …ç›®ãŒã‚ã‚‹ã‹ï¼Ÿ
+        UnlockCandInfo(); // å€™è£œæƒ…å ±ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
     }
     return fRet;
 }
 
-// –¢Šm’è•¶š—ñ‚ª‚ ‚é‚©H
+// æœªç¢ºå®šæ–‡å­—åˆ—ãŒã‚ã‚‹ã‹ï¼Ÿ
 BOOL InputContext::HasCompStr() {
-    if (ImmGetIMCCSize(hCompStr) <= sizeof(COMPOSITIONSTRING)) { // ƒTƒCƒY‚Í—LŒø‚©H
+    if (ImmGetIMCCSize(hCompStr) <= sizeof(COMPOSITIONSTRING)) { // ã‚µã‚¤ã‚ºã¯æœ‰åŠ¹ã‹ï¼Ÿ
         return FALSE;
     }
 
     BOOL ret = FALSE;
-    CompStr *pCompStr = LockCompStr(); // –¢Šm’è•¶š—ñ‚ğƒƒbƒNB
+    CompStr *pCompStr = LockCompStr(); // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ãƒ­ãƒƒã‚¯ã€‚
     if (pCompStr) {
-        ret = (pCompStr->dwCompStrLen > 0); // –¢Šm’è•¶š—ñ‚Ì’·‚³‚ª‚ ‚é‚©H
-        UnlockCompStr(); // –¢Šm’è•¶š—ñ‚ÌƒƒbƒN‚ğ‰ğœB
+        ret = (pCompStr->dwCompStrLen > 0); // æœªç¢ºå®šæ–‡å­—åˆ—ã®é•·ã•ãŒã‚ã‚‹ã‹ï¼Ÿ
+        UnlockCompStr(); // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
     }
     return ret;
 }
 
-// Œó•âî•ñ‚ğƒƒbƒNB
+// å€™è£œæƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã€‚
 CandInfo *InputContext::LockCandInfo() {
     CandInfo *info = (CandInfo *)::ImmLockIMCC(hCandInfo);
     ASSERT(info);
     return info;
 }
 
-// Œó•âî•ñ‚ÌƒƒbƒN‚ğ‰ğœB
+// å€™è£œæƒ…å ±ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
 void InputContext::UnlockCandInfo() {
     ::ImmUnlockIMCC(hCandInfo);
 }
 
-// –¢Šm’è•¶š—ñ‚ğƒƒbƒNB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ãƒ­ãƒƒã‚¯ã€‚
 CompStr *InputContext::LockCompStr() {
     CompStr *comp_str = (CompStr *)::ImmLockIMCC(hCompStr);
     ASSERT(comp_str);
     return comp_str;
 }
 
-// –¢Šm’è•¶š—ñ‚ÌƒƒbƒN‚ğ‰ğœB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
 void InputContext::UnlockCompStr() {
     ::ImmUnlockIMCC(hCompStr);
 }
 
-// ƒƒbƒZ[ƒWƒoƒbƒtƒ@‚ğƒƒbƒNB
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒƒãƒ•ã‚¡ã‚’ãƒ­ãƒƒã‚¯ã€‚
 LPTRANSMSG InputContext::LockMsgBuf() {
     LPTRANSMSG lpTransMsg = (LPTRANSMSG) ::ImmLockIMCC(hMsgBuf);
     ASSERT(lpTransMsg);
     return lpTransMsg;
 }
 
-// ƒƒbƒZ[ƒWƒoƒbƒtƒ@‚ÌƒƒbƒN‚ğ‰ğœB
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒƒãƒ•ã‚¡ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
 void InputContext::UnlockMsgBuf() {
     ::ImmUnlockIMCC(hMsgBuf);
 }
 
-// ƒƒbƒZ[ƒWƒoƒbƒtƒ@‚Ì—v‘f‚ÌŒÂ”B
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒƒãƒ•ã‚¡ã®è¦ç´ ã®å€‹æ•°ã€‚
 DWORD& InputContext::NumMsgBuf() {
     return dwNumMsgBuf;
 }
 
-// ƒƒbƒZ[ƒWƒoƒbƒtƒ@‚Ì—v‘f‚ÌŒÂ”B
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒƒãƒ•ã‚¡ã®è¦ç´ ã®å€‹æ•°ã€‚
 const DWORD& InputContext::NumMsgBuf() const {
     return dwNumMsgBuf;
 }
 
-// ƒKƒCƒhƒ‰ƒCƒ“‚ğì¬B
+// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚’ä½œæˆã€‚
 void InputContext::MakeGuideLine(DWORD dwID) {
     DWORD dwSize = sizeof(GUIDELINE) + (MAXGLCHAR + sizeof(TCHAR)) * 2 * sizeof(TCHAR);
     WCHAR *lpStr;
 
-    hGuideLine = ImmReSizeIMCC(hGuideLine, dwSize); // ƒKƒCƒhƒ‰ƒCƒ“‚ğÄì¬B
-    LPGUIDELINE lpGuideLine = LockGuideLine(); // ƒKƒCƒhƒ‰ƒCƒ“‚ğƒƒbƒNB
+    hGuideLine = ImmReSizeIMCC(hGuideLine, dwSize); // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚’å†ä½œæˆã€‚
+    LPGUIDELINE lpGuideLine = LockGuideLine(); // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚’ãƒ­ãƒƒã‚¯ã€‚
 
-    // ƒKƒCƒhƒ‰ƒCƒ“‚ÌŠî–{î•ñ‚ğİ’èB
+    // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®åŸºæœ¬æƒ…å ±ã‚’è¨­å®šã€‚
     lpGuideLine->dwSize = dwSize;
     lpGuideLine->dwLevel = glTable[dwID].dwLevel;
     lpGuideLine->dwIndex = glTable[dwID].dwIndex;
@@ -325,7 +325,7 @@ void InputContext::MakeGuideLine(DWORD dwID) {
     LoadString(TheIME.m_hInst, glTable[dwID].dwStrID, lpStr, MAXGLCHAR);
     lpGuideLine->dwStrLen = lstrlen(lpStr);
 
-    // ƒKƒCƒhƒ‰ƒCƒ“‚Ì—]èî•ñ‚ğİ’è‚·‚éB
+    // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®ä½™å‰°æƒ…å ±ã‚’è¨­å®šã™ã‚‹ã€‚
     if (glTable[dwID].dwPrivateID) {
         lpGuideLine->dwPrivateOffset =
                 sizeof(GUIDELINE) + (MAXGLCHAR + 1) * sizeof(TCHAR);
@@ -337,25 +337,25 @@ void InputContext::MakeGuideLine(DWORD dwID) {
         lpGuideLine->dwPrivateSize = 0;
     }
 
-    // ƒKƒCƒhƒ‰ƒCƒ“‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_GUIDELINE, 0);
 
-    UnlockGuideLine(); // ƒKƒCƒhƒ‰ƒCƒ“‚ÌƒƒbƒN‚ğ‰ğœB
+    UnlockGuideLine(); // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
 }
 
-// ƒKƒCƒhƒ‰ƒCƒ“‚ğƒƒbƒNB
+// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚’ãƒ­ãƒƒã‚¯ã€‚
 LPGUIDELINE InputContext::LockGuideLine() {
     LPGUIDELINE guideline = (LPGUIDELINE) ::ImmLockIMCC(hGuideLine);
     ASSERT(guideline);
     return guideline;
 }
 
-// ƒKƒCƒhƒ‰ƒCƒ“‚ÌƒƒbƒN‚ğ‰ğœB
+// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
 void InputContext::UnlockGuideLine() {
     ::ImmUnlockIMCC(hGuideLine);
 }
 
-// ˜_—ƒIƒuƒWƒFƒNƒg‚ğæ“¾‚·‚éB
+// è«–ç†ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚
 void InputContext::GetLogObjects(LogCompStr& comp, LogCandInfo& cand) {
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -370,11 +370,11 @@ void InputContext::GetLogObjects(LogCompStr& comp, LogCandInfo& cand) {
     }
 } // InputContext::GetLogObjects
 
-// Œó•â‚ğ‘I‘ğ‚·‚éB
+// å€™è£œã‚’é¸æŠã™ã‚‹ã€‚
 BOOL InputContext::SelectCand(UINT uCandIndex) {
     LogCompStr comp;
     LogCandInfo cand;
-    GetLogObjects(comp, cand); // ˜_—î•ñ‚ğæ“¾B
+    GetLogObjects(comp, cand); // è«–ç†æƒ…å ±ã‚’å–å¾—ã€‚
 
     // select a candidate
     if (cand.HasCandInfo() && comp.IsClauseConverted()) {
@@ -382,11 +382,11 @@ BOOL InputContext::SelectCand(UINT uCandIndex) {
             std::wstring str = cand.GetString();
             comp.SetClauseCompString(comp.extra.iClause, str);
 
-            // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚ÌÄì¬B
+            // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
             hCompStr = CompStr::ReCreate(hCompStr, &comp);
             hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-            // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+            // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
             TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL);
 
             // update candidate
@@ -397,13 +397,13 @@ BOOL InputContext::SelectCand(UINT uCandIndex) {
     return FALSE;
 } // InputContext::SelectCand
 
-// •¶š‚ğ’Ç‰ÁB
+// æ–‡å­—ã‚’è¿½åŠ ã€‚
 void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
     LogCompStr comp;
-    CompStr *lpCompStr = LockCompStr(); // –¢Šm’è•¶š—ñ‚ğƒƒbƒNB
+    CompStr *lpCompStr = LockCompStr(); // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ãƒ­ãƒƒã‚¯ã€‚
     if (lpCompStr) {
-        lpCompStr->GetLog(comp); // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
-        UnlockCompStr(); // –¢Šm’è•¶š—ñ‚ÌƒƒbƒN‚ğ‰ğœB
+        lpCompStr->GetLog(comp); // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
+        UnlockCompStr(); // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
     }
 
     // if the current clause is converted,
@@ -421,7 +421,7 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
         }
     }
 
-    // ‚P•¶š‚ğ’Ç‰ÁB
+    // ï¼‘æ–‡å­—ã‚’è¿½åŠ ã€‚
     comp.AssertValid();
     if ((Conversion() & IME_CMODE_JAPANESE) && !::IsCharAlphaW(chTyped)) {
         if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
@@ -432,76 +432,76 @@ void InputContext::AddChar(WCHAR chTyped, WCHAR chTranslated) {
     comp.AddChar(chTyped, chTranslated, Conversion());
     comp.AssertValid();
 
-    // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
-    if (bHasResult) { // Œ‹‰Ê‚ª‚ ‚éH
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
+    if (bHasResult) { // çµæœãŒã‚ã‚‹ï¼Ÿ
         LPARAM lParam = GCS_COMPALL | GCS_RESULTALL | GCS_CURSORPOS;
         TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
-    } else { // Œ‹‰Ê‚ª‚È‚¢H
+    } else { // çµæœãŒãªã„ï¼Ÿ
         LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
         TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
     }
 } // InputContext::AddChar
 
-// Œó•âƒEƒBƒ“ƒhƒE‚ğŠJ‚­B
+// å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‹ãã€‚
 BOOL InputContext::OpenCandidate() {
     BOOL ret = FALSE;
     LogCompStr comp;
-    CompStr *lpCompStr = LockCompStr(); // –¢Šm’è•¶š—ñ‚ğƒƒbƒNB
+    CompStr *lpCompStr = LockCompStr(); // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ãƒ­ãƒƒã‚¯ã€‚
     if (!lpCompStr)
         return ret;
 
-    lpCompStr->GetLog(comp); // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
-    UnlockCompStr(); // –¢Šm’è•¶š—ñ‚ÌƒƒbƒN‚ğ‰ğœB
+    lpCompStr->GetLog(comp); // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
+    UnlockCompStr(); // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
 
     LogCandInfo cand;
-    CandInfo *lpCandInfo = LockCandInfo(); // Œó•âî•ñ‚ğƒƒbƒNB
+    CandInfo *lpCandInfo = LockCandInfo(); // å€™è£œæƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã€‚
     if (lpCandInfo) {
-        lpCandInfo->GetLog(cand); // Œó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
-        UnlockCandInfo(); // Œó•âî•ñ‚ÌƒƒbƒN‚ğ‰ğœB
+        lpCandInfo->GetLog(cand); // å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
+        UnlockCandInfo(); // å€™è£œæƒ…å ±ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
 
-        // Œó•â‚ğŠJ‚­ƒƒbƒZ[ƒW‚ğ¶¬B
+        // å€™è£œã‚’é–‹ããƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
-        // Œó•âî•ñ‚ğÄì¬B
+        // å€™è£œæƒ…å ±ã‚’å†ä½œæˆã€‚
         hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
-        // Œó•âî•ñ‚Ì•ÏXƒƒbƒZ[ƒW‚ğ¶¬B
+        // å€™è£œæƒ…å ±ã®å¤‰æ›´ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
-        ret = TRUE; // ¬Œ÷B
+        ret = TRUE; // æˆåŠŸã€‚
     }
     return ret;
 }
 
-// Œó•âƒEƒBƒ“ƒhƒE‚ğ•Â‚¶‚éB
+// å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‰ã˜ã‚‹ã€‚
 BOOL InputContext::CloseCandidate(BOOL bClearCandInfo /* = TRUE*/) {
-    if (HasCandInfo()) { // Œó•âî•ñ‚ª‚ ‚é‚©H
-        if (bClearCandInfo) { // Œó•â‚ğƒNƒŠƒA‚·‚é‚©H
-            hCandInfo = CandInfo::ReCreate(hCandInfo, NULL); // Œó•âî•ñ‚ÌÄì¬B
+    if (HasCandInfo()) { // å€™è£œæƒ…å ±ãŒã‚ã‚‹ã‹ï¼Ÿ
+        if (bClearCandInfo) { // å€™è£œã‚’ã‚¯ãƒªã‚¢ã™ã‚‹ã‹ï¼Ÿ
+            hCandInfo = CandInfo::ReCreate(hCandInfo, NULL); // å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
         }
-        // Œó•â‚ğ•Â‚¶‚éƒƒbƒZ[ƒW‚ğ¶¬B
+        // å€™è£œã‚’é–‰ã˜ã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CLOSECANDIDATE, 1);
         return TRUE;
     }
     return FALSE;
 }
 
-// •ÏŠ·B
+// å¤‰æ›ã€‚
 BOOL InputContext::Convert(BOOL bShift) {
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // –¢Šm’è•¶š—ñ‚ª‚È‚¯‚ê‚Î•ÏŠ·‚Å‚«‚È‚¢B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ãŒãªã‘ã‚Œã°å¤‰æ›ã§ããªã„ã€‚
     if (!comp.HasCompStr()) {
         return FALSE;
     }
 
-    // •ÏŠ·B
-    if (cand.HasCandInfo()) { // Œó•âî•ñ‚ª‚ ‚é‚©H
-        if (comp.IsClauseConverted()) { // •¶ß‚ª•ÏŠ·‚³‚ê‚Ä‚¢‚é‚©H
+    // å¤‰æ›ã€‚
+    if (cand.HasCandInfo()) { // å€™è£œæƒ…å ±ãŒã‚ã‚‹ã‹ï¼Ÿ
+        if (comp.IsClauseConverted()) { // æ–‡ç¯€ãŒå¤‰æ›ã•ã‚Œã¦ã„ã‚‹ã‹ï¼Ÿ
             LogCandList& cand_list = cand.cand_lists[comp.extra.iClause];
             if (bShift) {
                 cand_list.MovePrev();
@@ -511,45 +511,45 @@ BOOL InputContext::Convert(BOOL bShift) {
             std::wstring str = cand_list.cand_strs[cand_list.dwSelection];
             comp.SetClauseCompString(comp.extra.iClause, str);
         } else {
-            // Œó•â‚ğŠJ‚­ƒƒbƒZ[ƒW‚ğ¶¬B
+            // å€™è£œã‚’é–‹ããƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
             TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
 
             BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
             TheIME.ConvertSingleClause(comp, cand, bRoman);
         }
-    } else { // Œó•âî•ñ‚ª‚È‚¢B
+    } else { // å€™è£œæƒ…å ±ãŒãªã„ã€‚
         if (Conversion() & IME_CMODE_JAPANESE) {
             if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
                 comp.AddChar(L'n', L'n', Conversion());
             }
         }
-        // Œó•â‚ğŠJ‚­ƒƒbƒZ[ƒW‚ğ¶¬B
+        // å€™è£œã‚’é–‹ããƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
 
         BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
         TheIME.ConvertMultiClause(comp, cand, bRoman);
     }
 
-    // Œó•âî•ñ‚ğÄì¬B
+    // å€™è£œæƒ…å ±ã‚’å†ä½œæˆã€‚
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
-    // Œó•â‚Ì•ÏXƒƒbƒZ[ƒW‚ğ¶¬B
+    // å€™è£œã®å¤‰æ›´ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
-    // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 
     return TRUE;
 } // InputContext::Convert
 
-// •ÏŠ·Œ‹‰Ê‚ğì¬B
+// å¤‰æ›çµæœã‚’ä½œæˆã€‚
 void InputContext::MakeResult() {
-    // Œó•â‚ğ•Â‚¶‚éB
+    // å€™è£œã‚’é–‰ã˜ã‚‹ã€‚
     CloseCandidate();
 
-    // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -557,26 +557,26 @@ void InputContext::MakeResult() {
         UnlockCompStr();
     }
 
-    // Œ‹‰Ê‚ğì¬B
+    // çµæœã‚’ä½œæˆã€‚
     comp.AssertValid();
     comp.MakeResult();
     comp.AssertValid();
 
-    // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_RESULTALL);
-    // –¢Šm’è•¶š—ñ‚ÌŠm’èƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ç¢ºå®šãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::MakeResult
 
-// –¢Šm’è•¶š—ñ‚ğ‚Ğ‚ç‚ª‚È‚É‚·‚éB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ã²ã‚‰ãŒãªã«ã™ã‚‹ã€‚
 void InputContext::MakeHiragana() {
-    // Œó•â‚ğ•Â‚¶‚éB
+    // å€™è£œã‚’é–‰ã˜ã‚‹ã€‚
     CloseCandidate();
 
-    // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -584,7 +584,7 @@ void InputContext::MakeHiragana() {
         UnlockCompStr();
     }
 
-    // –¢Šm’è•¶š—ñ‚ÌXVB
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®æ›´æ–°ã€‚
     comp.AssertValid();
     if (Conversion() & IME_CMODE_JAPANESE) {
         if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
@@ -592,23 +592,23 @@ void InputContext::MakeHiragana() {
         }
     }
     comp.AssertValid();
-    comp.MakeHiragana(); // ‚Ğ‚ç‚ª‚È‚É‚·‚éB
+    comp.MakeHiragana(); // ã²ã‚‰ãŒãªã«ã™ã‚‹ã€‚
     comp.AssertValid();
 
-    // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
-// –¢Šm’è•¶š—ñ‚ğƒJƒ^ƒJƒi‚É‚·‚éB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ã‚«ã‚¿ã‚«ãƒŠã«ã™ã‚‹ã€‚
 void InputContext::MakeKatakana() {
-    // Œó•â‚ğ•Â‚¶‚éB
+    // å€™è£œã‚’é–‰ã˜ã‚‹ã€‚
     CloseCandidate();
 
-    // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -616,7 +616,7 @@ void InputContext::MakeKatakana() {
         UnlockCompStr();
     }
 
-    // –¢Šm’è•¶š—ñ‚ÌXVB
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®æ›´æ–°ã€‚
     comp.AssertValid();
     if (Conversion() & IME_CMODE_JAPANESE) {
         if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
@@ -624,23 +624,23 @@ void InputContext::MakeKatakana() {
         }
     }
     comp.AssertValid();
-    comp.MakeKatakana(); // ƒJƒ^ƒJƒi‚É‚·‚éB
+    comp.MakeKatakana(); // ã‚«ã‚¿ã‚«ãƒŠã«ã™ã‚‹ã€‚
     comp.AssertValid();
 
-    // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
-// –¢Šm’è•¶š—ñ‚ğ”¼Šp‚É‚·‚éB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚’åŠè§’ã«ã™ã‚‹ã€‚
 void InputContext::MakeHankaku() {
-    // Œó•â‚ğ•Â‚¶‚éB
+    // å€™è£œã‚’é–‰ã˜ã‚‹ã€‚
     CloseCandidate();
 
-    // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -648,7 +648,7 @@ void InputContext::MakeHankaku() {
         UnlockCompStr();
     }
 
-    // –¢Šm’è•¶š—ñ‚ÌXVB
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®æ›´æ–°ã€‚
     comp.AssertValid();
     if (Conversion() & IME_CMODE_JAPANESE) {
         if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
@@ -656,23 +656,23 @@ void InputContext::MakeHankaku() {
         }
     }
     comp.AssertValid();
-    comp.MakeHankaku(); // ”¼Šp‚É‚·‚éB
+    comp.MakeHankaku(); // åŠè§’ã«ã™ã‚‹ã€‚
     comp.AssertValid();
 
-    // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
-// –¢Šm’è•¶š—ñ‚ğ‘SŠp‰p”‚É‚·‚éB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚’å…¨è§’è‹±æ•°ã«ã™ã‚‹ã€‚
 void InputContext::MakeZenEisuu() {
-    // Œó•â‚ğ•Â‚¶‚éB
+    // å€™è£œã‚’é–‰ã˜ã‚‹ã€‚
     CloseCandidate();
 
-    // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -680,25 +680,25 @@ void InputContext::MakeZenEisuu() {
         UnlockCompStr();
     }
 
-    // –¢Šm’è•¶š—ñ‚ğXVB
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’æ›´æ–°ã€‚
     comp.AssertValid();
-    comp.MakeZenEisuu(); // ‘SŠp‰p”‚É‚·‚éB
+    comp.MakeZenEisuu(); // å…¨è§’è‹±æ•°ã«ã™ã‚‹ã€‚
     comp.AssertValid();
 
-    // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
-// –¢Šm’è•¶š—ñ‚ğ”¼Šp‰p”‚É‚·‚éB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã‚’åŠè§’è‹±æ•°ã«ã™ã‚‹ã€‚
 void InputContext::MakeHanEisuu() {
-    // Œó•â‚ğ•Â‚¶‚éB
+    // å€™è£œã‚’é–‰ã˜ã‚‹ã€‚
     CloseCandidate();
 
-    // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -706,55 +706,55 @@ void InputContext::MakeHanEisuu() {
         UnlockCompStr();
     }
 
-    // –¢Šm’è•¶š—ñ‚ğXVB
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’æ›´æ–°ã€‚
     comp.AssertValid();
-    comp.MakeHanEisuu(); // ”¼Šp‰p”‚É‚·‚éB
+    comp.MakeHanEisuu(); // åŠè§’è‹±æ•°ã«ã™ã‚‹ã€‚
     comp.AssertValid();
 
-    // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 }
 
-// ƒR[ƒh“ü—Í‚ğ•ÏŠ·‚·‚éB
+// ã‚³ãƒ¼ãƒ‰å…¥åŠ›ã‚’å¤‰æ›ã™ã‚‹ã€‚
 BOOL InputContext::ConvertCode() {
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // –¢Šm’è•¶š—ñ‚ª‚È‚¯‚ê‚Î•ÏŠ·‚Å‚«‚È‚¢B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ãŒãªã‘ã‚Œã°å¤‰æ›ã§ããªã„ã€‚
     if (!comp.HasCompStr())
         return FALSE;
 
-    // Œó•âî•ñ‚ª‚È‚¯‚ê‚ÎŒó•â‚ğŠJ‚­B
+    // å€™è£œæƒ…å ±ãŒãªã‘ã‚Œã°å€™è£œã‚’é–‹ãã€‚
     if (!cand.HasCandInfo()) {
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_OPENCANDIDATE, 1);
     }
 
-    // ƒR[ƒh•ÏŠ·‚·‚éB
+    // ã‚³ãƒ¼ãƒ‰å¤‰æ›ã™ã‚‹ã€‚
     TheIME.ConvertCode(comp, cand);
 
-    // Œó•âî•ñ‚ÌÄì¬B
+    // å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 
-    // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 
     return TRUE;
 }
 
-// ƒL[ƒ{[ƒh‚ÌEscƒL[‚ğˆ—‚·‚éB
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®Escã‚­ãƒ¼ã‚’å‡¦ç†ã™ã‚‹ã€‚
 void InputContext::Escape() {
-    // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -762,33 +762,33 @@ void InputContext::Escape() {
         UnlockCompStr();
     }
 
-    if (comp.IsClauseConverted()) { // Œ»İ‚Ì•¶ß‚ª•ÏŠ·Ï‚İ‚È‚ç
-        RevertText(); // ‚Ğ‚ç‚ª‚È‚É–ß‚·B
+    if (comp.IsClauseConverted()) { // ç¾åœ¨ã®æ–‡ç¯€ãŒå¤‰æ›æ¸ˆã¿ãªã‚‰
+        RevertText(); // ã²ã‚‰ãŒãªã«æˆ»ã™ã€‚
     } else {
-        CancelText(); // •ÏŠ·‚ğƒLƒƒƒ“ƒZƒ‹‚·‚éB
+        CancelText(); // å¤‰æ›ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ã€‚
     }
 } // InputContext::Escape
 
-// •ÏŠ·‚ğƒLƒƒƒ“ƒZƒ‹‚·‚éB
+// å¤‰æ›ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ã€‚
 void InputContext::CancelText() {
-    // Œó•â‚ğ•Â‚¶‚éB
+    // å€™è£œã‚’é–‰ã˜ã‚‹ã€‚
     CloseCandidate();
 
-    // –¢Šm’è•¶š—ñ‚ğƒŠƒZƒbƒg‚·‚éB
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹ã€‚
     hCompStr = CompStr::ReCreate(hCompStr, NULL);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
-    // –¢Šm’è•¶š—ñ‚ÌI—¹ƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®çµ‚äº†ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
 } // InputContext::CancelText
 
-// Ä•ÏŠ·‚·‚éB
+// å†å¤‰æ›ã™ã‚‹ã€‚
 void InputContext::RevertText() {
-    // Œó•â‚ğ•Â‚¶‚éB
+    // å€™è£œã‚’é–‰ã˜ã‚‹ã€‚
     CloseCandidate(FALSE);
 
-    // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -796,27 +796,27 @@ void InputContext::RevertText() {
         UnlockCompStr();
     }
 
-    // –¢Šm’è•¶š—ñ‚ª‚È‚¯‚ê‚ÎI—¹B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ãŒãªã‘ã‚Œã°çµ‚äº†ã€‚
     if (!comp.HasCompStr()) {
         return;
     }
 
-    // •¶ß‚ğ‚Ğ‚ç‚ª‚È‚É–ß‚·B
+    // æ–‡ç¯€ã‚’ã²ã‚‰ãŒãªã«æˆ»ã™ã€‚
     comp.AssertValid();
     comp.RevertText();
     comp.AssertValid();
 
-    // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
 } // InputContext::RevertText
 
-// •¶š‚ğíœ‚·‚éB
+// æ–‡å­—ã‚’å‰Šé™¤ã™ã‚‹ã€‚
 void InputContext::DeleteChar(BOOL bBackSpace) {
-    // –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     CompStr *lpCompStr = LockCompStr();
     if (lpCompStr) {
@@ -824,275 +824,275 @@ void InputContext::DeleteChar(BOOL bBackSpace) {
         UnlockCompStr();
     }
 
-    // •¶š‚ğíœB
+    // æ–‡å­—ã‚’å‰Šé™¤ã€‚
     comp.AssertValid();
     comp.DeleteChar(bBackSpace, Conversion());
     comp.AssertValid();
 
-    if (comp.comp_str.empty()) { // –¢Šm’è•¶š—ñ‚ª‹ó‚Å‚ ‚ê‚Î
-        // Œó•â‚ğ•Â‚¶‚éB
+    if (comp.comp_str.empty()) { // æœªç¢ºå®šæ–‡å­—åˆ—ãŒç©ºã§ã‚ã‚Œã°
+        // å€™è£œã‚’é–‰ã˜ã‚‹ã€‚
         CloseCandidate();
 
-        // –¢Šm’è•¶š—ñ‚ğƒŠƒZƒbƒgB
+        // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ãƒªã‚»ãƒƒãƒˆã€‚
         hCompStr = CompStr::ReCreate(hCompStr, NULL);
 
-        // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+        // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
         LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
         TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
-        // –¢Šm’è•¶š—ñ‚ÌI—¹ƒƒbƒZ[ƒW‚ğ¶¬B
+        // æœªç¢ºå®šæ–‡å­—åˆ—ã®çµ‚äº†ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
         TheIME.GenerateMessage(WM_IME_ENDCOMPOSITION);
     } else {
-        // –¢Šm’è•¶š—ñ‚ÌÄì¬B
+        // æœªç¢ºå®šæ–‡å­—åˆ—ã®å†ä½œæˆã€‚
         hCompStr = CompStr::ReCreate(hCompStr, &comp);
 
-        // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+        // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
         LPARAM lParam = GCS_COMPALL | GCS_CURSORPOS;
         TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, lParam);
     }
 } // InputContext::DeleteChar
 
-// ¶‚ÉˆÚ“®‚·‚éB
+// å·¦ã«ç§»å‹•ã™ã‚‹ã€‚
 void InputContext::MoveLeft(BOOL bShift) {
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
     BOOL bCandChanged = FALSE;
-    if (bShift) { // ShiftƒL[‚ª‰Ÿ‚³‚ê‚Ä‚¢‚é‚©H
-        if (cand.HasCandInfo()) { // Œó•â‚ª‚ ‚é‚©H
+    if (bShift) { // Shiftã‚­ãƒ¼ãŒæŠ¼ã•ã‚Œã¦ã„ã‚‹ã‹ï¼Ÿ
+        if (cand.HasCandInfo()) { // å€™è£œãŒã‚ã‚‹ã‹ï¼Ÿ
             BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
-            if (!TheIME.StretchClauseLeft(comp, cand, bRoman)) { // •¶ß‚ğLk‚·‚éB
+            if (!TheIME.StretchClauseLeft(comp, cand, bRoman)) { // æ–‡ç¯€ã‚’ä¼¸ç¸®ã™ã‚‹ã€‚
                 return;
             }
-            bCandChanged = TRUE; // Œó•â‚ª•ÏX‚³‚ê‚½B
+            bCandChanged = TRUE; // å€™è£œãŒå¤‰æ›´ã•ã‚ŒãŸã€‚
         }
     } else {
-        if (comp.MoveLeft()) { // ¶‚ÉˆÚ“®B
-            cand.iClause = comp.extra.iClause; // •¶ß‚ğæ“¾B
-            bCandChanged = TRUE; // Œó•â‚ª•ÏX‚³‚ê‚½B
+        if (comp.MoveLeft()) { // å·¦ã«ç§»å‹•ã€‚
+            cand.iClause = comp.extra.iClause; // æ–‡ç¯€ã‚’å–å¾—ã€‚
+            bCandChanged = TRUE; // å€™è£œãŒå¤‰æ›´ã•ã‚ŒãŸã€‚
         }
         cand.Dump();
     }
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
-    // Œó•â‚Ì•ÏXƒƒbƒZ[ƒW‚ğ¶¬B
+    // å€™è£œã®å¤‰æ›´ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     if (bCandChanged) {
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
     }
 } // InputContext::MoveLeft
 
-// ‰E‚ÉˆÚ“®‚·‚éB
+// å³ã«ç§»å‹•ã™ã‚‹ã€‚
 void InputContext::MoveRight(BOOL bShift) {
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
     BOOL bCandChanged = FALSE;
-    if (bShift) { // ShiftƒL[‚ª‰Ÿ‚³‚ê‚Ä‚¢‚é‚©H
-        if (cand.HasCandInfo()) { // Œó•â‚ª‚ ‚é‚©H
+    if (bShift) { // Shiftã‚­ãƒ¼ãŒæŠ¼ã•ã‚Œã¦ã„ã‚‹ã‹ï¼Ÿ
+        if (cand.HasCandInfo()) { // å€™è£œãŒã‚ã‚‹ã‹ï¼Ÿ
             BOOL bRoman = (Conversion() & IME_CMODE_ROMAN);
-            if (!TheIME.StretchClauseRight(comp, cand, bRoman)) { // •¶ß‚ğ‰E‚ÉLkB
+            if (!TheIME.StretchClauseRight(comp, cand, bRoman)) { // æ–‡ç¯€ã‚’å³ã«ä¼¸ç¸®ã€‚
                 return;
             }
-            bCandChanged = TRUE; // Œó•â‚ª•ÏX‚³‚ê‚½B
+            bCandChanged = TRUE; // å€™è£œãŒå¤‰æ›´ã•ã‚ŒãŸã€‚
         }
     } else {
         // move right
-        if (comp.MoveRight()) { // ‰E‚ÉˆÚ“®B
-            cand.iClause = comp.extra.iClause; // •¶ß‚ğæ“¾B
-            bCandChanged = TRUE; // Œó•â‚ª•ÏX‚³‚ê‚½B
+        if (comp.MoveRight()) { // å³ã«ç§»å‹•ã€‚
+            cand.iClause = comp.extra.iClause; // æ–‡ç¯€ã‚’å–å¾—ã€‚
+            bCandChanged = TRUE; // å€™è£œãŒå¤‰æ›´ã•ã‚ŒãŸã€‚
         }
         cand.Dump();
     }
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_CURSORPOS);
-    // Œó•â‚Ì•ÏXƒƒbƒZ[ƒW‚ğ¶¬B
+    // å€™è£œã®å¤‰æ›´ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     if (bCandChanged) {
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
     }
 } // InputContext::MoveRight
 
-// ã‚ÉˆÚ“®‚·‚éB
+// ä¸Šã«ç§»å‹•ã™ã‚‹ã€‚
 void InputContext::MoveUp() {
-    if (!HasCandInfo()) return; // Œó•â‚ª‚ ‚é‚©H
+    if (!HasCandInfo()) return; // å€™è£œãŒã‚ã‚‹ã‹ï¼Ÿ
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // ˆê‚Â‘O‚ÉˆÚ“®B
+    // ä¸€ã¤å‰ã«ç§»å‹•ã€‚
     cand.MovePrev();
-    // •¶ß‚Ì–¢Šm’è•¶š—ñ‚Ìİ’èB
+    // æ–‡ç¯€ã®æœªç¢ºå®šæ–‡å­—åˆ—ã®è¨­å®šã€‚
     std::wstring str = cand.GetString();
     comp.SetClauseCompString(cand.iClause, str);
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
-    // Œó•â‚Ì•ÏXƒƒbƒZ[ƒW‚ğ¶¬B
+    // å€™è£œã®å¤‰æ›´ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 }
 
-// ‰º‚ÉˆÚ“®‚·‚éB
+// ä¸‹ã«ç§»å‹•ã™ã‚‹ã€‚
 void InputContext::MoveDown() {
-    if (!HasCandInfo()) return; // Œó•â‚ª‚ ‚é‚©H
+    if (!HasCandInfo()) return; // å€™è£œãŒã‚ã‚‹ã‹ï¼Ÿ
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // ˆê‚ÂŸ‚ÖˆÚ“®B
+    // ä¸€ã¤æ¬¡ã¸ç§»å‹•ã€‚
     cand.MoveNext();
     std::wstring str = cand.GetString();
-    // •¶ß‚Ì–¢Šm’è•¶š—ñ‚Ìİ’èB
+    // æ–‡ç¯€ã®æœªç¢ºå®šæ–‡å­—åˆ—ã®è¨­å®šã€‚
     comp.SetClauseCompString(cand.iClause, str);
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
-    // Œó•â‚Ì•ÏXƒƒbƒZ[ƒW‚ğ¶¬B
+    // å€™è£œã®å¤‰æ›´ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 }
 
-// ƒL[ƒ{[ƒh‚ÌHomeƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®Homeã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void InputContext::MoveHome() {
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // æ“ª‚ÉˆÚ“®B
+    // å…ˆé ­ã«ç§»å‹•ã€‚
     comp.AssertValid();
-    if (cand.HasCandInfo()) { // Œó•â‚ª‚ ‚é‚©H
-        cand.MoveHome(); // Å‰‚ÌŒó•â‚ÉˆÚ“®B
+    if (cand.HasCandInfo()) { // å€™è£œãŒã‚ã‚‹ã‹ï¼Ÿ
+        cand.MoveHome(); // æœ€åˆã®å€™è£œã«ç§»å‹•ã€‚
     } else {
-        comp.MoveHome(); // –¢Šm’è•¶š—ñ‚ÌÅ‰‚ÉˆÚ“®B
+        comp.MoveHome(); // æœªç¢ºå®šæ–‡å­—åˆ—ã®æœ€åˆã«ç§»å‹•ã€‚
     }
     comp.AssertValid();
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
     if (cand.HasCandInfo()) {
-        // Œó•â‚Ì•ÏXƒƒbƒZ[ƒW‚ğ¶¬B
+        // å€™è£œã®å¤‰æ›´ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
     }
 } // InputContext::MoveHome
 
-// ƒL[ƒ{[ƒh‚ÌEndƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®Endã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void InputContext::MoveEnd() {
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // ––”ö‚ÉˆÚ“®B
+    // æœ«å°¾ã«ç§»å‹•ã€‚
     comp.AssertValid();
-    if (cand.HasCandInfo()) { // Œó•â‚ª‚ ‚é‚©H
-        cand.MoveEnd(); // ÅŒã‚ÌŒó•â‚ÉˆÚ“®B
+    if (cand.HasCandInfo()) { // å€™è£œãŒã‚ã‚‹ã‹ï¼Ÿ
+        cand.MoveEnd(); // æœ€å¾Œã®å€™è£œã«ç§»å‹•ã€‚
     } else {
-        comp.MoveEnd(); // –¢Šm’è•¶š—ñ‚ÌÅŒã‚ÉˆÚ“®B
+        comp.MoveEnd(); // æœªç¢ºå®šæ–‡å­—åˆ—ã®æœ€å¾Œã«ç§»å‹•ã€‚
     }
     comp.AssertValid();
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
     if (cand.HasCandInfo() && comp.IsClauseConverted()) {
-        // Œó•â‚Ì•ÏXƒƒbƒZ[ƒW‚ğ¶¬B
+        // å€™è£œã®å¤‰æ›´ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
         TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
     }
 } // InputContext::MoveEnd
 
-// ƒL[ƒ{[ƒh‚ÌPageUpƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®PageUpã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void InputContext::PageUp() {
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    // ˆê‚Â‘O‚Ìƒy[ƒW‚ÉˆÚ“®B
+    // ä¸€ã¤å‰ã®ãƒšãƒ¼ã‚¸ã«ç§»å‹•ã€‚
     cand.PageUp();
-    // •¶ß‚Ì–¢Šm’è•¶š—ñ‚ğİ’èB
+    // æ–‡ç¯€ã®æœªç¢ºå®šæ–‡å­—åˆ—ã‚’è¨­å®šã€‚
     std::wstring str = cand.GetString();
     comp.SetClauseCompString(cand.iClause, str);
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // –¢Šm’è•¶š—ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
-    // Œó•â‚Ì•ÏXƒƒbƒZ[ƒW‚ğ¶¬B
+    // å€™è£œã®å¤‰æ›´ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 } // InputContext::PageUp
 
-// ƒL[ƒ{[ƒh‚ÌPageDownƒL[‚Ìˆ—B
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®PageDownã‚­ãƒ¼ã®å‡¦ç†ã€‚
 void InputContext::PageDown() {
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚Ì˜_—ƒf[ƒ^‚ğæ“¾B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     LogCompStr comp;
     LogCandInfo cand;
     GetLogObjects(comp, cand);
 
-    cand.PageDown(); // Ÿ‚ÌˆÊ’u‚ÖB
+    cand.PageDown(); // æ¬¡ã®ä½ç½®ã¸ã€‚
 
-    // •¶ß‚Ì•¶š—ñ‚ğw’èB
+    // æ–‡ç¯€ã®æ–‡å­—åˆ—ã‚’æŒ‡å®šã€‚
     std::wstring str = cand.GetString();
     comp.SetClauseCompString(cand.iClause, str);
 
-    // –¢Šm’è•¶š—ñ‚ÆŒó•âî•ñ‚ÌÄì¬B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã¨å€™è£œæƒ…å ±ã®å†ä½œæˆã€‚
     hCompStr = CompStr::ReCreate(hCompStr, &comp);
     hCandInfo = CandInfo::ReCreate(hCandInfo, &cand);
 
-    // –¢Šm’èî•ñ‚ÆƒJ[ƒ\ƒ‹ˆÊ’u‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // æœªç¢ºå®šæƒ…å ±ã¨ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_COMPOSITION, 0, GCS_COMPALL | GCS_CURSORPOS);
-    // Œó•âî•ñ‚ÌƒƒbƒZ[ƒW‚ğ¶¬B
+    // å€™è£œæƒ…å ±ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã€‚
     TheIME.GenerateMessage(WM_IME_NOTIFY, IMN_CHANGECANDIDATE, 1);
 } // InputContext::PageDown
 
-// –¢Šm’è•¶š—ñ‚Ìî•ñ‚ğƒ_ƒ“ƒv‚·‚éB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã®æƒ…å ±ã‚’ãƒ€ãƒ³ãƒ—ã™ã‚‹ã€‚
 void InputContext::DumpCompStr() {
-    CompStr *pCompStr = LockCompStr(); // –¢Šm’è•¶š—ñ‚ğƒƒbƒNB
+    CompStr *pCompStr = LockCompStr(); // æœªç¢ºå®šæ–‡å­—åˆ—ã‚’ãƒ­ãƒƒã‚¯ã€‚
     if (pCompStr) {
-        pCompStr->Dump(); // ƒ_ƒ“ƒvB
-        UnlockCompStr(); // –¢Šm’è•¶š—ñ‚ÌƒƒbƒN‚ğ‰ğœB
+        pCompStr->Dump(); // ãƒ€ãƒ³ãƒ—ã€‚
+        UnlockCompStr(); // æœªç¢ºå®šæ–‡å­—åˆ—ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
     } else {
         DebugPrintA("(no comp str)\n");
     }
 } // InputContext::DumpCompStr
 
-// Œó•âî•ñ‚ğƒ_ƒ“ƒv‚·‚éB
+// å€™è£œæƒ…å ±ã‚’ãƒ€ãƒ³ãƒ—ã™ã‚‹ã€‚
 void InputContext::DumpCandInfo() {
-    CandInfo *pCandInfo = LockCandInfo(); // Œó•âî•ñ‚ğƒƒbƒNB
+    CandInfo *pCandInfo = LockCandInfo(); // å€™è£œæƒ…å ±ã‚’ãƒ­ãƒƒã‚¯ã€‚
     if (pCandInfo) {
-        pCandInfo->Dump(); // ƒ_ƒ“ƒvB
-        UnlockCandInfo(); // Œó•âî•ñ‚ÌƒƒbƒN‚ğ‰ğœB
+        pCandInfo->Dump(); // ãƒ€ãƒ³ãƒ—ã€‚
+        UnlockCandInfo(); // å€™è£œæƒ…å ±ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã€‚
     } else {
         DebugPrintA("(no cand info)\n");
     }
