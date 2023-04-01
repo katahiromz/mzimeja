@@ -24,8 +24,3 @@ EXPORTS
                 StatusWnd_WindowProc
                 CompWnd_WindowProc
                 GuideWnd_WindowProc
-
-                GeneralDlgProc
-                AboutDlgProc
-                RegWordDlgProc
-                SelectDictionaryDlgProc

@@ -227,16 +227,12 @@ void GuideWnd_Update(UIEXTRA *lpUIExtra);
 LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
 
 // config.c
-INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
-                                LPARAM lParam);
-INT_PTR CALLBACK SelectDictionaryDlgProc(HWND hDlg, UINT message, WPARAM wParam,
-                                         LPARAM lParam);
-INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam,
-                              LPARAM lParam);
-INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT message, WPARAM wParam,
-                                LPARAM lParam);
-INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT message, WPARAM wParam,
-                                    LPARAM lParam);
+INT_PTR CALLBACK WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK ChooseDictDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 // immsec.cpp
 SECURITY_ATTRIBUTES *CreateSecurityAttributes(void);

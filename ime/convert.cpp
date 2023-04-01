@@ -857,7 +857,7 @@ void Lattice::AddExtra() {
     // ÉJÉbÉR (parens, brackets, braces, ...)
     if (pre == L"Ç©Ç¡Ç±") {
         WStrings items;
-        str_split(items, TheIME.LoadSTR(100), std::wstring(L"\t"));
+        str_split(items, TheIME.LoadSTR(IDS_PAREN), std::wstring(L"\t"));
 
         WStrings fields(4);
         fields[0] = pre;

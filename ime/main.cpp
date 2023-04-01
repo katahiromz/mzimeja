@@ -712,7 +712,7 @@ HBITMAP MzIme::LoadBMP(LPCTSTR pszName) {
 WCHAR *MzIme::LoadSTR(INT nID) {
     static WCHAR sz[512];
     sz[0] = 0;
-    ::LoadStringW(m_hInst, nID, sz, 512);
+    ::LoadStringW(m_hInst, nID, sz, _countof(sz));
     return sz;
 }
 
