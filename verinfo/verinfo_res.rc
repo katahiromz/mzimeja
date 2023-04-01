@@ -21,8 +21,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
 // RT_VERSION
 
 1 VERSIONINFO
-FILEVERSION     0, 9, 8, 0
-PRODUCTVERSION  0, 9, 8, 0
+FILEVERSION     0, 9, 8, 1
+PRODUCTVERSION  0, 9, 8, 1
 FILEOS          0x40004
 FILETYPE        0x1
 {
@@ -32,10 +32,10 @@ FILETYPE        0x1
         {
             VALUE "CompanyName", "片山博文MZ\0"
             VALUE "FileDescription", "MZ-IME日本語入力 バージョン情報\0"
-            VALUE "FileVersion", "0.9.8.0\0"
+            VALUE "FileVersion", "0.9.8.1\0"
             VALUE "LegalCopyright", "Copyright (C) 2016-2017 片山博文MZ.\0"
             VALUE "ProductName", "MZ-IME日本語入力\0"
-            VALUE "ProductVersion", "0.9.8.0\0"
+            VALUE "ProductVersion", "0.9.8.1\0"
         }
     }
     BLOCK "VarFileInfo"
@@ -66,7 +66,7 @@ STYLE DS_CENTER | DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPT
 FONT 10, "ＭＳ Ｐゴシック"
 {
     ICON 0, ico1, 5, 5, 20, 20, WS_GROUP
-    LTEXT "MZ-IME日本語入力 0.9.8.0\nby 片山博文MZ\npublic domain software (PDS)", 0, 33, 5, 145, 30
+    LTEXT "MZ-IME日本語入力 0.9.8.1\nby 片山博文MZ\npublic domain software (PDS)", 0, 33, 5, 145, 30
     DEFPUSHBUTTON "OK", IDOK, 5, 45, 60, 14, BS_CENTER
     PUSHBUTTON "ホームページへ移動(&M)", psh1, 70, 45, 110, 14, BS_CENTER
 }
