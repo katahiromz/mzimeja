@@ -2415,11 +2415,19 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
     node.bunrui = HB_MEISHI; // 名詞。
 
     // 文節にひらがなを追加。
-    node.post = pre; // 変換後の文字列。
+    node.post = lcmap(pre, LCMAP_HIRAGANA); // 変換後の文字列。
     clause.add(&node);
 
     // 文節にカタカナを追加。
-    node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_FULLWIDTH); // 変換後の文字列。
+    node.post = lcmap(pre, LCMAP_KATAKANA); // 変換後の文字列。
+    clause.add(&node);
+
+    // 文節に全角を追加。
+    node.post = lcmap(hiragana, LCMAP_FULLWIDTH); // 変換後の文字列。
+    clause.add(&node);
+
+    // 文節に半角を追加。
+    node.post = lcmap(hiragana, LCMAP_HALFWIDTH | LCMAP_KATAKANA); // 変換後の文字列。
     clause.add(&node);
 
     // 結果に文節を追加。
@@ -2443,18 +2451,26 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
     }
 
     // ノードを初期化する。
-    std::wstring hiragana = lattice.pre; // 変換前の文字列。
+    std::wstring pre = lattice.pre; // 変換前の文字列。
     LatticeNode node;
-    node.pre = hiragana;
+    node.pre = pre;
     node.bunrui = HB_UNKNOWN;
     node.cost = 10; // コストは10。
 
     // 文節にひらがなを追加。
-    node.post = hiragana; // 変換後の文字列。
+    node.post = lcmap(pre, LCMAP_HIRAGANA); // 変換後の文字列。
     clause.add(&node);
 
     // 文節にカタカナを追加。
-    node.post = lcmap(hiragana, LCMAP_FULLWIDTH | LCMAP_KATAKANA); // 変換後の文字列。
+    node.post = lcmap(pre, LCMAP_KATAKANA); // 変換後の文字列。
+    clause.add(&node);
+
+    // 文節に全角を追加。
+    node.post = lcmap(pre, LCMAP_FULLWIDTH); // 変換後の文字列。
+    clause.add(&node);
+
+    // 文節に半角を追加。
+    node.post = lcmap(pre, LCMAP_HALFWIDTH | LCMAP_KATAKANA); // 変換後の文字列。
     clause.add(&node);
 
     // 結果に文節を追加。
