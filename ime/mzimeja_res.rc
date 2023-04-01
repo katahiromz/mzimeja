@@ -11,14 +11,30 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
 //////////////////////////////////////////////////////////////////////////////
 // RT_BITMAP
 
-CLOSEBMP BITMAP "res/1033_Bitmap_CLOSEBMP.bmp"
+CLOSEBMP BITMAP "res/Bitmap_CLOSEBMP.bmp"
 
-MODESBMP BITMAP "res/1033_Bitmap_MODESBMP.bmp"
+//////////////////////////////////////////////////////////////////////////////
+// RT_GROUP_ICON
+
+INDICOPENICON ICON "res/Icon_INDICOPENICON.ico"
+
+//////////////////////////////////////////////////////////////////////////////
+
+LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
+
+//////////////////////////////////////////////////////////////////////////////
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_BITMAP
+
+MODESBMP BITMAP "res/1041_Bitmap_MODESBMP.bmp"
 
 //////////////////////////////////////////////////////////////////////////////
 // RT_MENU
@@ -102,7 +118,7 @@ FONT 10, "ＭＳ Ｐゴシック"
     LTEXT "単語(&W):", -1, 15, 7, 40, 10
     EDITTEXT edt1, 65, 5, 85, 15, ES_AUTOHSCROLL
     LTEXT "品詞(&T):", -1, 15, 50, 40, 10
-    COMBOBOX cmb1, 65, 50, 85, 35, CBS_SORT | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX cmb1, 65, 50, 85, 35, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT "よみがな(&R):", -1, 15, 70, 40, 10
     EDITTEXT edt2, 65, 70, 85, 15, ES_AUTOHSCROLL
     PUSHBUTTON "OK", IDOK, 55, 95, 60, 15
@@ -111,19 +127,17 @@ FONT 10, "ＭＳ Ｐゴシック"
 //////////////////////////////////////////////////////////////////////////////
 // RT_GROUP_ICON
 
-INDICOPENICON ICON "res/1033_Icon_INDICOPENICON.ico"
+MODE0ICON ICON "res/1041_Icon_MODE0ICON.ico"
 
-MODE0ICON ICON "res/1033_Icon_MODE0ICON.ico"
+MODE1ICON ICON "res/1041_Icon_MODE1ICON.ico"
 
-MODE1ICON ICON "res/1033_Icon_MODE1ICON.ico"
+MODE2ICON ICON "res/1041_Icon_MODE2ICON.ico"
 
-MODE2ICON ICON "res/1033_Icon_MODE2ICON.ico"
+MODE3ICON ICON "res/1041_Icon_MODE3ICON.ico"
 
-MODE3ICON ICON "res/1033_Icon_MODE3ICON.ico"
+MODE4ICON ICON "res/1041_Icon_MODE4ICON.ico"
 
-MODE4ICON ICON "res/1033_Icon_MODE4ICON.ico"
-
-MODE5ICON ICON "res/1033_Icon_MODE5ICON.ico"
+MODE5ICON ICON "res/1041_Icon_MODE5ICON.ico"
 
 //////////////////////////////////////////////////////////////////////////////
 // RT_VERSION
