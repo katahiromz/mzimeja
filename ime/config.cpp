@@ -196,7 +196,7 @@ void WordList_PopulateList(HWND hDlg)
     {
         // 値の名前を取得する。
         TCHAR szValueName[MAX_PATH];
-        DWORD cchValueName = sizeof(szValueName);
+        DWORD cchValueName = _countof(szValueName);
         error = ::RegEnumValue(hKey, dwIndex, szValueName, &cchValueName, NULL, NULL, NULL, NULL);
         if (error) {
             break;
