@@ -2438,6 +2438,10 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
     node.cost = 0; // コストはゼロ。
     node.bunrui = HB_MEISHI; // 名詞。
 
+    // 文節に無変換文字列を追加。
+    node.post = pre; // 変換後の文字列。
+    clause.add(&node);
+
     // 文節にひらがなを追加。
     node.post = lcmap(pre, LCMAP_HIRAGANA); // 変換後の文字列。
     clause.add(&node);
@@ -2480,6 +2484,10 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
     node.pre = pre;
     node.bunrui = HB_UNKNOWN;
     node.cost = 10; // コストは10。
+
+    // 文節に無変換文字列を追加。
+    node.post = pre; // 変換後の文字列。
+    clause.add(&node);
 
     // 文節にひらがなを追加。
     node.post = lcmap(pre, LCMAP_HIRAGANA); // 変換後の文字列。
