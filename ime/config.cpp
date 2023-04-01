@@ -137,7 +137,6 @@ INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT message, WPARAM wParam,
             break;
 
         case PSN_APPLY:
-
             if (!GetDlgItemText(hDlg, ID_WR_READING, szRead, _countof(szRead))) {
                 WCHAR *psz = TheIME.LoadSTR(IDS_NOREADING);
                 ::MessageBoxW(hDlg, psz, NULL, MB_OK);

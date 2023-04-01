@@ -39,3 +39,4 @@ mzimeja-*-debug-setup.exe
 mzimeja-*-setup.exe
 *.ninja
 .ninja*
+*-old
