@@ -90,6 +90,33 @@
 #define IDS_PROPERTY                        40013
 #define IDS_REGISTERWORD                    40015
 #define IDS_IMEPAD                          40016
+#define IDS_HINSHI_00                       40017
+#define IDS_HINSHI_01                       40018
+#define IDS_HINSHI_02                       40019
+#define IDS_HINSHI_03                       40020
+#define IDS_HINSHI_04                       40021
+#define IDS_HINSHI_05                       40022
+#define IDS_HINSHI_06                       40023
+#define IDS_HINSHI_07                       40024
+#define IDS_HINSHI_08                       40025
+#define IDS_HINSHI_09                       40026
+#define IDS_HINSHI_10                       40027
+#define IDS_HINSHI_11                       40028
+#define IDS_HINSHI_12                       40029
+#define IDS_HINSHI_13                       40030
+#define IDS_HINSHI_14                       40031
+#define IDS_HINSHI_15                       40032
+#define IDS_HINSHI_16                       40033
+#define IDS_HINSHI_17                       40034
+#define IDS_HINSHI_18                       40035
+#define IDS_HINSHI_19                       40036
+#define IDS_HINSHI_20                       40037
+#define IDS_HINSHI_21                       40038
+#define IDS_HINSHI_22                       40039
+#define IDS_HINSHI_23                       40040
+#define IDS_HINSHI_24                       40041
+#define IDS_HINSHI_25                       40042
+#define IDS_HINSHI_26                       40043
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS

@@ -29,7 +29,12 @@ GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 // 品詞リストを埋める。
 void RegWord_PopulateHinshi(HWND hDlg) {
-    // TODO:
+    HWND hCmb1 = GetDlgItem(hDlg, cmb1);
+    for (INT i = IDS_HINSHI_00; i <= IDS_HINSHI_26; ++i) {
+        LPTSTR psz = TheIME.LoadSTR(i);
+        ComboBox_AddString(hCmb1, psz);
+    }
+    ComboBox_SetCurSel(hCmb1, 0);
 }
 
 // 単語を追加または削除する。
