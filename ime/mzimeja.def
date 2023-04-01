@@ -1,26 +1,19 @@
-LIBRARY         MZIMEJA
+LIBRARY MZIMEJA
 
 EXPORTS
-                ; IME DDI
-                ImeConversionList
-                ImeConfigure
-                ImeDestroy
-                ImeEscape
-                ImeInquire
-                ImeProcessKey
-                ImeSelect
-                ImeSetActiveContext
-                ImeToAsciiEx
-                NotifyIME
-                ImeRegisterWord
-                ImeUnregisterWord
-                ImeGetRegisterWordStyle
-                ImeEnumRegisterWord
-                ImeSetCompositionString
-                ImeGetImeMenuItems
-
-                MZIMEWndProc
-                CompWnd_WindowProc
-                StatusWnd_WindowProc
-                CompWnd_WindowProc
-                GuideWnd_WindowProc
+    ImeConversionList
+    ImeConfigure
+    ImeDestroy
+    ImeEscape
+    ImeInquire
+    ImeProcessKey
+    ImeSelect
+    ImeSetActiveContext
+    ImeToAsciiEx
+    NotifyIME
+    ImeRegisterWord
+    ImeUnregisterWord
+    ImeGetRegisterWordStyle
+    ImeEnumRegisterWord
+    ImeSetCompositionString
+    ImeGetImeMenuItems
