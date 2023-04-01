@@ -181,10 +181,11 @@ void WordList_PopulateList(HWND hDlg)
 {
     HWND hLst1 = GetDlgItem(hDlg, lst1);
 
-    // カラムを削除。
+    // すべてを削除。
     ListView_DeleteColumn(hLst1, 2);
     ListView_DeleteColumn(hLst1, 1);
     ListView_DeleteColumn(hLst1, 0);
+    ListView_DeleteAllItems(hLst1);
 
     // カラムを追加。
     LV_COLUMN column = { LVCF_TEXT | LVCF_WIDTH | LVCF_FMT, LVCFMT_LEFT, 100 };
@@ -273,7 +274,6 @@ WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
                 // リストを更新。
                 HWND hLst1 = ::GetDlgItem(hDlg, lst1);
                 SetWindowRedraw(hLst1, FALSE);
-                ListView_DeleteAllItems(hLst1);
                 WordList_PopulateList(hDlg);
                 SetWindowRedraw(hLst1, TRUE);
                 InvalidateRect(hLst1, NULL, TRUE);
