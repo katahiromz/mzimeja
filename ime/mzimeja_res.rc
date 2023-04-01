@@ -104,7 +104,7 @@ FONT 10, "ＭＳ Ｐゴシック"
     AUTORADIOBUTTON "追加(&A)", rad1, 25, 25, 60, 15, WS_TABSTOP
     AUTORADIOBUTTON "削除(R)", rad2, 100, 25, 60, 15, WS_TABSTOP
     LTEXT "品詞(&T):", -1, 15, 50, 40, 10
-    COMBOBOX cmb1, 65, 50, 85, 35, CBS_SORT | CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX cmb1, 65, 50, 85, 35, CBS_SORT | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT "よみがな(&R):", -1, 15, 70, 40, 10
     EDITTEXT edt2, 65, 70, 85, 15, ES_AUTOHSCROLL
     PUSHBUTTON "OK", IDOK, 55, 95, 60, 15
@@ -195,6 +195,9 @@ STRINGTABLE
     IDS_DOWN, "↓"
     IDS_LEFT, "←"
     IDS_RIGHT, "→⇒"
+    IDS_WORD, "単語"
+    IDS_READING, "読み"
+    IDS_HINSHI, "品詞"
     IDS_DICFILENAME, "mzimeja.dic"
     IDS_CONFIGNAME, "mzimeja.ime"
     IDS_GL_NODICTIONARY, "辞書が見つかりません。"

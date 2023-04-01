@@ -174,11 +174,11 @@ void WordList_PopulateList(HWND hDlg)
 
     // カラムを追加。
     LV_COLUMN column = { LVCF_TEXT | LVCF_WIDTH | LVCF_FMT, LVCFMT_LEFT, 100 };
-    column.pszText = TEXT("Word");
+    column.pszText = TheIME.LoadSTR(IDS_WORD);
     ListView_InsertColumn(hLst1, 0, &column);
-    column.pszText = TEXT("Yomi");
+    column.pszText = TheIME.LoadSTR(IDS_READING);
     ListView_InsertColumn(hLst1, 1, &column);
-    column.pszText = TEXT("Hinshi");
+    column.pszText = TheIME.LoadSTR(IDS_HINSHI);
     ListView_InsertColumn(hLst1, 2, &column);
 
     // レジストリキーを開く。
@@ -224,7 +224,9 @@ void WordList_PopulateList(HWND hDlg)
         *pch++ = 0;
 
         // 単語。
-        LV_ITEM item = { LVIF_TEXT, -1, 0 };
+        LV_ITEM item = { LVIF_TEXT };
+        item.iItem = -1;
+        item.iSubItem = 1;
         item.pszText = szValueName;
         INT iItem = ListView_InsertItem(hLst1, &item);
 

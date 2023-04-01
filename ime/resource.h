@@ -66,6 +66,9 @@
 #define IDS_DOWN                            130
 #define IDS_LEFT                            131
 #define IDS_RIGHT                           132
+#define IDS_WORD                            133
+#define IDS_READING                         134
+#define IDS_HINSHI                          135
 #define IDS_DICFILENAME                     1000
 #define IDS_CONFIGNAME                      1001
 #define IDS_GL_NODICTIONARY                 1010
