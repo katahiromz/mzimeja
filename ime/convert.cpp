@@ -871,19 +871,43 @@ void Lattice::AddExtra() {
 
     // ãLçÜÅisymbolsÅj
     static const wchar_t *s_words[] = {
-        L"Ç´Ç≤Ç§", L"ÇØÇ¢ÇπÇÒ", L"ÇØÇ¢Ç≥ÇÒ", L"Ç≥ÇÒÇ©Ç≠",
-        L"ÇµÇ©Ç≠", L"Ç∏ÇØÇ¢", L"Ç‹ÇÈ", L"ÇŸÇµ", L"Ç–Çµ",
-        L"ÇƒÇÒ", L"ÇΩÇÒÇ¢", L"Ç”Ç∆Ç§Ç≤Ç§",
-        L"ÇΩÇƒ", L"ÇΩÇƒÇ–ÇæÇË", L"ÇΩÇƒÇ›Ç¨", L"Ç–ÇæÇËÇ§Ç¶",
-        L"Ç–ÇæÇËÇµÇΩ", L"Ç”Ç∆ÇÌÇ≠", L"ÇŸÇªÇÌÇ≠", L"Ç‹ÇÒÇ»Ç©",
-        L"Ç›Ç¨Ç§Ç¶", L"Ç›Ç¨ÇµÇΩ", L"ÇÊÇ±", L"ÇÊÇ±Ç§Ç¶", L"ÇÊÇ±ÇµÇΩ",
-        L"Ç®Ç»Ç∂", L"Ç‚Ç∂ÇÈÇµ", L"Ç¨ÇËÇµÇ·",
-        L"Ç§Ç¶", L"ÇµÇΩ", L"Ç–ÇæÇË", L"Ç›Ç¨"
+        L"Ç´Ç≤Ç§",      // IDS_SYMBOLS
+        L"ÇØÇ¢ÇπÇÒ",    // IDS_KEISEN
+        L"ÇØÇ¢Ç≥ÇÒ",    // IDS_MATH
+        L"Ç≥ÇÒÇ©Ç≠",    // IDS_SANKAKU
+        L"ÇµÇ©Ç≠",      // IDS_SHIKAKU
+        L"Ç∏ÇØÇ¢",      // IDS_ZUKEI
+        L"Ç‹ÇÈ",        // IDS_MARU
+        L"ÇŸÇµ",        // IDS_STARS
+        L"Ç–Çµ",        // IDS_HISHI
+        L"ÇƒÇÒ",        // IDS_POINTS
+        L"ÇΩÇÒÇ¢",      // IDS_UNITS
+        L"Ç”Ç∆Ç§Ç≤Ç§",  // IDS_FUTOUGOU
+        L"ÇΩÇƒ",        // IDS_TATE
+        L"ÇΩÇƒÇ–ÇæÇË",  // IDS_TATE_HIDARI
+        L"ÇΩÇƒÇ›Ç¨",    // IDS_TATE_MIGI
+        L"Ç–ÇæÇËÇ§Ç¶",  // IDS_HIDARI_UE
+        L"Ç–ÇæÇËÇµÇΩ",  // IDS_HIDARI_SHITA
+        L"Ç”Ç∆ÇÌÇ≠",    // IDS_FUTO_WAKU
+        L"ÇŸÇªÇÌÇ≠",    // IDS_HOSO_WAKU
+        L"Ç‹ÇÒÇ»Ç©",    // IDS_MANNAKA
+        L"Ç›Ç¨Ç§Ç¶",    // IDS_MIGI_UE
+        L"Ç›Ç¨ÇµÇΩ",    // IDS_MIGI_SHITA
+        L"ÇÊÇ±",        // IDS_YOKO
+        L"ÇÊÇ±Ç§Ç¶",    // IDS_YOKO_UE
+        L"ÇÊÇ±ÇµÇΩ",    // IDS_YOKO_SHITA
+        L"Ç®Ç»Ç∂",      // IDS_SAME
+        L"Ç‚Ç∂ÇÈÇµ",    // IDS_ARROWS
+        L"Ç¨ÇËÇµÇ·",    // IDS_GREEK
+        L"Ç§Ç¶",        // IDS_UP
+        L"ÇµÇΩ",        // IDS_DOWN
+        L"Ç–ÇæÇË",      // IDS_LEFT
+        L"Ç›Ç¨",        // IDS_RIGHT
     };
     for (size_t i = 0; i < _countof(s_words); ++i) {
         if (pre == s_words[i]) {
             WStrings items;
-            WCHAR *pch = TheIME.LoadSTR(101 + INT(i));
+            WCHAR *pch = TheIME.LoadSTR(IDS_SYMBOLS + INT(i));
             WStrings fields(4);
             fields[0] = pre;
             fields[1].assign(1, MAKEWORD(HB_SYMBOL, 0));

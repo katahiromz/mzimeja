@@ -15,6 +15,13 @@
 #define IDC_DEBF_THREADID                   313
 #define IDC_DEBF_GUIDELINE                  314
 
+#define IDD_GENERAL                         100
+#define IDD_WORDLIST                        101
+#define IDD_CHOOSEDICT                      102
+#define IDD_ABOUTIME                        103
+#define IDD_DEBUG                           104
+#define IDD_ADDDELWORD                      105
+
 #define IDM_RECONVERT                       40001
 #define IDM_ABOUT                           40002
 #define IDM_HIRAGANA                        40003
@@ -32,6 +39,39 @@
 #define IDM_STROKES                         40017
 #define IDM_RADICALS                        40018
 
+#define IDS_PAREN                           100
+#define IDS_SYMBOLS                         101
+#define IDS_KEISEN                          102
+#define IDS_MATH                            103
+#define IDS_SANKAKU                         104
+#define IDS_SHIKAKU                         105
+#define IDS_ZUKEI                           106
+#define IDS_MARU                            107
+#define IDS_STARS                           108
+#define IDS_HISHI                           109
+#define IDS_POINTS                          110
+#define IDS_UNITS                           111
+#define IDS_FUTOUGOU                        112
+#define IDS_TATE                            113
+#define IDS_TATE_HIDARI                     114
+#define IDS_TATE_MIGI                       115
+#define IDS_HIDARI_UE                       116
+#define IDS_HIDARI_SHITA                    117
+#define IDS_FUTO_WAKU                       118
+#define IDS_HOSO_WAKU                       119
+#define IDS_MANNAKA                         120
+#define IDS_MIGI_UE                         121
+#define IDS_MIGI_SHITA                      122
+#define IDS_YOKO                            123
+#define IDS_YOKO_UE                         124
+#define IDS_YOKO_SHITA                      125
+#define IDS_SAME                            126
+#define IDS_ARROWS                          127
+#define IDS_GREEK                           128
+#define IDS_UP                              129
+#define IDS_DOWN                            130
+#define IDS_LEFT                            131
+#define IDS_RIGHT                           132
 #define IDS_DICFILENAME                     1000
 #define IDS_CONFIGNAME                      1001
 #define IDS_GL_NODICTIONARY                 1010
@@ -42,6 +82,19 @@
 #define IDS_NOSTRING                        1021
 #define IDS_NOMEMORY                        1022
 #define IDS_REGWORDRET                      1023
+#define IDS_RECONVERT                       40001
+#define IDS_VERSIONINFO                     40002
+#define IDS_HIRAGANA                        40003
+#define IDS_ZENKAKU_KATAKANA                40004
+#define IDS_ZENKAKU_EISUU                   40005
+#define IDS_HANKAKU_KANA                    40006
+#define IDS_HANKAKU_EISUU                   40007
+#define IDS_CANCEL                          40009
+#define IDS_ROMAJI_INPUT                    40010
+#define IDS_KANA_INPUT                      40011
+#define IDS_PROPERTY                        40013
+#define IDS_REGISTERWORD                    40015
+#define IDS_IMEPAD                          40016
 
 #define ID_WR_READING                       200
 #define ID_WR_STRING                        201

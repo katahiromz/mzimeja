@@ -45,7 +45,7 @@ STATUSRMENU MENU
 //////////////////////////////////////////////////////////////////////////////
 // RT_DIALOG
 
-100 DIALOG 30, 28, 147, 134
+IDD_GENERAL DIALOG 30, 28, 147, 134
 CAPTION "全般設定"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
@@ -53,7 +53,7 @@ FONT 10, "ＭＳ Ｐゴシック"
     LTEXT "(開発中)", -1, 14, 46, 107, 10
 }
 
-101 DIALOG 46, 36, 172, 116
+IDD_WORDLIST DIALOG 46, 36, 172, 116
 CAPTION "登録単語一覧"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
@@ -64,7 +64,7 @@ FONT 10, "ＭＳ Ｐゴシック"
     PUSHBUTTON "削除(&R)...", psh2, 107, 93, 60, 14
 }
 
-102 DIALOG 34, 31, 186, 85
+IDD_CHOOSEDICT DIALOG 34, 31, 186, 85
 CAPTION "辞書の選択"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
@@ -74,7 +74,7 @@ FONT 10, "ＭＳ Ｐゴシック"
     PUSHBUTTON "選択(&S)", ID_SD_SELDIC, 123, 43, 40, 14
 }
 
-103 DIALOG 30, 65, 137, 118
+IDD_ABOUTIME DIALOG 30, 65, 137, 118
 CAPTION "このIMEについて"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
@@ -82,7 +82,7 @@ FONT 10, "ＭＳ Ｐゴシック"
     LTEXT "MZ-IME日本語入力 (mzimeja)", 109, 14, 22, 79, 8
 }
 
-104 DIALOG 30, 65, 138, 122
+IDD_DEBUG DIALOG 30, 65, 138, 122
 CAPTION "デバッグ オプション"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
@@ -94,7 +94,7 @@ FONT 10, "ＭＳ Ｐゴシック"
     AUTOCHECKBOX "Show GuideLine on Ctrl-G", IDC_DEBF_GUIDELINE, 5, 89, 98, 14
 }
 
-105 DIALOG 46, 36, 172, 116
+IDD_ADDDELWORD DIALOG 46, 36, 172, 116
 CAPTION "単語の登録"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
@@ -161,39 +161,39 @@ FILETYPE        0x3
 
 STRINGTABLE
 {
-    100, "【】\t『』\t《》\t“""\t「」\t〈〉\t｛｝\t［］\t（）\t≪≫\t｢｣\t{}\t[]\t<>\t()\t<>\t‘’\t〔〕"
-    101, "〃仝ゝゞ々〆ヾ―‐／〇ヽ＿￣¨｀´゜゛＼§＾≫￢⇒⇔∀∃∠⊥⌒∂∇≡∨≪†√∽∝∵∫∬Å‰♯♭♪‡～′≒×∥∧｜…±÷≠≦≧∞∴♂♀∪‥°⊃⊂⊇∩⊆∋∈〓〒※″"
-    102, "─│┌┐┘└├┬┤┴┼━┃┏┓┛┗┣┳┫┻╋┠┯┨┷┿┝┰┥┸╂"
-    103, "≧÷±－×＋＝≠＜≦＞"
-    104, "▲▽△▼"
-    105, "◇◆□■"
-    106, "★○▼▽▲△■□◆◇◎●☆"
-    107, "．｡〇。●○◎"
-    108, "☆※★"
-    109, "◆◇"
-    110, "゜゛；：．，、´.・｀¨…‥∵･:;ﾞﾟ∴"
-    111, "′″℃￥Å￠￡％‰＄°"
-    112, "≧≦≠"
-    113, "│┃"
-    114, "┨┥┤┫"
-    115, "┣┠┝├"
-    116, "┌┏"
-    117, "└┗"
-    118, "┗┻━┛┏┳━┓"
-    119, "└┴─┘┌┬─┐"
-    120, "┼╋┿╂"
-    121, "┐┓"
-    122, "┘┛"
-    123, "─━"
-    124, "┻┷┸┴"
-    125, "┳┯┰┬"
-    126, "〃仝ゞゝヾヽ々"
-    127, "→↓←↑"
-    128, "αβγδεζηθθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"
-    129, "↑"
-    130, "↓"
-    131, "←"
-    132, "→⇒"
+    IDS_PAREN, "【】\t『』\t《》\t“""\t「」\t〈〉\t｛｝\t［］\t（）\t≪≫\t｢｣\t{}\t[]\t<>\t()\t<>\t‘’\t〔〕"
+    IDS_SYMBOLS, "〃仝ゝゞ々〆ヾ―‐／〇ヽ＿￣¨｀´゜゛＼§＾≫￢⇒⇔∀∃∠⊥⌒∂∇≡∨≪†√∽∝∵∫∬Å‰♯♭♪‡～′≒×∥∧｜…±÷≠≦≧∞∴♂♀∪‥°⊃⊂⊇∩⊆∋∈〓〒※″"
+    IDS_KEISEN, "─│┌┐┘└├┬┤┴┼━┃┏┓┛┗┣┳┫┻╋┠┯┨┷┿┝┰┥┸╂"
+    IDS_MATH, "≧÷±－×＋＝≠＜≦＞"
+    IDS_SANKAKU, "▲▽△▼"
+    IDS_SHIKAKU, "◇◆□■"
+    IDS_ZUKEI, "★○▼▽▲△■□◆◇◎●☆"
+    IDS_MARU, "．｡〇。●○◎"
+    IDS_STARS, "☆※★"
+    IDS_HISHI, "◆◇"
+    IDS_POINTS, "゜゛；：．，、´.・｀¨…‥∵･:;ﾞﾟ∴"
+    IDS_UNITS, "′″℃￥Å￠￡％‰＄°"
+    IDS_FUTOUGOU, "≧≦≠"
+    IDS_TATE, "│┃"
+    IDS_TATE_HIDARI, "┨┥┤┫"
+    IDS_TATE_MIGI, "┣┠┝├"
+    IDS_HIDARI_UE, "┌┏"
+    IDS_HIDARI_SHITA, "└┗"
+    IDS_FUTO_WAKU, "┗┻━┛┏┳━┓"
+    IDS_HOSO_WAKU, "└┴─┘┌┬─┐"
+    IDS_MANNAKA, "┼╋┿╂"
+    IDS_MIGI_UE, "┐┓"
+    IDS_MIGI_SHITA, "┘┛"
+    IDS_YOKO, "─━"
+    IDS_YOKO_UE, "┻┷┸┴"
+    IDS_YOKO_SHITA, "┳┯┰┬"
+    IDS_SAME, "〃仝ゞゝヾヽ々"
+    IDS_ARROWS, "→↓←↑"
+    IDS_GREEK, "αβγδεζηθθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"
+    IDS_UP, "↑"
+    IDS_DOWN, "↓"
+    IDS_LEFT, "←"
+    IDS_RIGHT, "→⇒"
     IDS_DICFILENAME, "mzimeja.DIC"
     IDS_CONFIGNAME, "mzimeja.DLL"
     IDS_GL_NODICTIONARY, "Can not find dictionary"
@@ -204,19 +204,19 @@ STRINGTABLE
     IDS_NOSTRING, "There is no string\r\nPlease enter the string"
     IDS_NOMEMORY, "Memory Error"
     IDS_REGWORDRET, "Fail to register Word"
-    40001, "再変換"
-    40002, "バージョン情報"
-    40003, "ひらがな"
-    40004, "全角カタカナ"
-    40005, "全角英数"
-    40006, "半角カタカナ"
-    40007, "半角英数"
-    40009, "キャンセル"
-    40010, "ローマ字入力"
-    40011, "かな入力"
-    40013, "プロパティ"
-    40015, "単語登録"
-    40016, "MZ-IMEパッド"
+    IDS_RECONVERT, "再変換"
+    IDS_VERSIONINFO, "バージョン情報"
+    IDS_HIRAGANA, "ひらがな"
+    IDS_ZENKAKU_KATAKANA, "全角カタカナ"
+    IDS_ZENKAKU_EISUU, "全角英数"
+    IDS_HANKAKU_KANA, "半角カタカナ"
+    IDS_HANKAKU_EISUU, "半角英数"
+    IDS_CANCEL, "キャンセル"
+    IDS_ROMAJI_INPUT, "ローマ字入力"
+    IDS_KANA_INPUT, "かな入力"
+    IDS_PROPERTY, "プロパティ"
+    IDS_REGISTERWORD, "単語登録"
+    IDS_IMEPAD, "MZ-IMEパッド"
 }
 
 //////////////////////////////////////////////////////////////////////////////
