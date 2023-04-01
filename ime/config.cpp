@@ -14,7 +14,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// IDD_GENERAL - 全般設定プロパティシート。
+// IDD_GENERAL - 全般設定プロパティシートページ。
 INT_PTR CALLBACK
 GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -247,7 +247,7 @@ void WordList_PopulateList(HWND hDlg)
     ::RegCloseKey(hKey);
 }
 
-// IDD_WORDLIST - 単語の一覧プロパティシート。
+// IDD_WORDLIST - 単語の一覧プロパティシートページ。
 INT_PTR CALLBACK
 WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -293,7 +293,7 @@ WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 }
 
-// IDD_ABOUTIME - IMEのバージョン情報プロパティシート。
+// IDD_ABOUTIME - IMEのバージョン情報プロパティシートページ。
 INT_PTR CALLBACK
 AboutDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
