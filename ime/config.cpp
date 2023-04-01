@@ -58,7 +58,7 @@ BOOL RegWord_AddWord(HWND hDlg, BOOL bAdd) {
 
     // アプリキーを開く。
     HKEY hAppKey;
-    error = ::RegCreateKeyEx(hKey, TEXT("mzimeja"), 0, NULL, 0, KEY_WRITE, NULL, &hAppKey, NULL);
+    error = ::RegCreateKeyEx(hKey, TEXT("mzimeja-user-dict"), 0, NULL, 0, KEY_WRITE, NULL, &hAppKey, NULL);
     if (error) {
         DPRINT("error: 0x%08lX", error);
         ::RegCloseKey(hKey);
@@ -163,7 +163,7 @@ void WordList_PopulateList(HWND hDlg)
     // レジストリキーを開く。
     HKEY hKey;
     LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
-                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja"),
+                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja-user-dict"),
                                 0, KEY_READ, &hKey);
     if (error) {
         DPRINT("error: 0x%08lX", error);
@@ -185,12 +185,16 @@ void WordList_PopulateList(HWND hDlg)
         // 値を取得する。
         TCHAR szValue[MAX_PATH];
         DWORD cbValue = sizeof(szValue);
-        error = ::RegQueryValueEx(hKey, szValueName, NULL, NULL, (LPBYTE)szValue, &cbValue);
+        DWORD dwType;
+        error = ::RegQueryValueEx(hKey, szValueName, NULL, &dwType, (LPBYTE)szValue, &cbValue);
         if (error) {
             DPRINT("error: 0x%08lX", error);
             break;
         }
         szValue[_countof(szValue) - 1] = 0;
+
+        if (dwType != REG_SZ)
+            continue;
 
         // コロンで値の文字列を分割する。
         LPWSTR pch = wcschr(szValue, L':');
