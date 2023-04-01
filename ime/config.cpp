@@ -28,11 +28,11 @@ GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 // IDD_ADDDELWORD - 単語の登録ダイアログ。
 INT_PTR CALLBACK
 RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    static BOOL s_bAdd = TRUE;
+    BOOL bAdd = !!GetWindowLongPtr(hDlg, DWLP_USER);
 
     switch (uMsg) {
     case WM_INITDIALOG:
-        s_bAdd = !!lParam;
+        SetWindowLongPtr(hDlg, DWLP_USER, !!lParam);
         return TRUE;
 
     case WM_COMMAND:
