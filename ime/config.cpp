@@ -97,8 +97,16 @@ RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
     switch (uMsg) {
     case WM_INITDIALOG:
-        SetWindowLongPtr(hDlg, DWLP_USER, !!lParam);
+        bAdd = !!lParam;
+        SetWindowLongPtr(hDlg, DWLP_USER, bAdd);
         RegWord_PopulateHinshi(hDlg);
+        if (bAdd) {
+            CheckRadioButton(hDlg, rad1, rad2, rad1);
+        } else {
+            CheckRadioButton(hDlg, rad1, rad2, rad2);
+            EnableWindow(GetDlgItem(hwnd, cmb1), FALSE);
+            EnableWindow(GetDlgItem(hwnd, edt2), FALSE);
+        }
         return TRUE;
 
     case WM_COMMAND:
