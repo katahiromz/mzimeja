@@ -76,6 +76,7 @@
 #define IDS_NOSTRING                        1021
 #define IDS_NOMEMORY                        1022
 #define IDS_REGWORDRET                      1023
+#define IDS_IMENAME                         1024
 #define IDS_RECONVERT                       40001
 #define IDS_VERSIONINFO                     40002
 #define IDS_HIRAGANA                        40003
