@@ -222,10 +222,30 @@ WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         switch (LOWORD(wParam))
         {
         case psh1: // 追加。
-            ::DialogBoxParam(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDDELWORD), hDlg, RegWordDlgProc, TRUE);
+            if (::DialogBoxParam(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDDELWORD),
+                                 hDlg, RegWordDlgProc, TRUE) == IDOK)
+            {
+                // リストを更新。
+                HWND hLst1 = ::GetDlgItem(hDlg, lst1);
+                SetWindowRedraw(hLst1, FALSE);
+                ListView_DeleteAllItems(hLst1);
+                WordList_PopulateList(hDlg);
+                SetWindowRedraw(hLst1, TRUE);
+                InvalidateRect(hLst1, NULL, TRUE);
+            }
             break;
         case psh2: // 削除。
-            ::DialogBoxParam(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDDELWORD), hDlg, RegWordDlgProc, FALSE);
+            if (::DialogBoxParam(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDDELWORD),
+                                 hDlg, RegWordDlgProc, FALSE) == IDOK)
+            {
+                // リストを更新。
+                HWND hLst1 = ::GetDlgItem(hDlg, lst1);
+                SetWindowRedraw(hLst1, FALSE);
+                ListView_DeleteAllItems(hLst1);
+                WordList_PopulateList(hDlg);
+                SetWindowRedraw(hLst1, TRUE);
+                InvalidateRect(hLst1, NULL, TRUE);
+            }
             break;
         }
         break;
