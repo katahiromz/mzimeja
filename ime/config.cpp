@@ -165,6 +165,22 @@ ChooseDictDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 // 単語リストを埋める。
 void WordList_PopulateList(HWND hDlg)
 {
+    HWND hLst1 = GetDlgItem(hDlg, lst1);
+
+    // カラムを削除。
+    ListView_DeleteColumn(hLst1, 2);
+    ListView_DeleteColumn(hLst1, 1);
+    ListView_DeleteColumn(hLst1, 0);
+
+    // カラムを追加。
+    LV_COLUMN column = { LVCF_TEXT | LVCF_WIDTH | LVCF_FMT, LVCFMT_LEFT, 100 };
+    column.pszText = TEXT("Word");
+    ListView_InsertColumn(hLst1, 0, &column);
+    column.pszText = TEXT("Yomi");
+    ListView_InsertColumn(hLst1, 1, &column);
+    column.pszText = TEXT("Hinshi");
+    ListView_InsertColumn(hLst1, 2, &column);
+
     // レジストリキーを開く。
     HKEY hKey;
     LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
@@ -210,19 +226,19 @@ void WordList_PopulateList(HWND hDlg)
         // 単語。
         LV_ITEM item = { LVIF_TEXT, -1, 0 };
         item.pszText = szValueName;
-        INT iItem = ListView_InsertItem(hDlg, &item);
+        INT iItem = ListView_InsertItem(hLst1, &item);
 
         // 読み。
         item.iItem = iItem;
         item.iSubItem = 1;
         item.pszText = pch;
-        ListView_SetItem(hDlg, &item);
+        ListView_SetItem(hLst1, &item);
 
         // 品詞。
         item.iItem = iItem;
         item.iSubItem = 2;
         item.pszText = szValue;
-        ListView_SetItem(hDlg, &item);
+        ListView_SetItem(hLst1, &item);
     }
 
     // レジストリキーを閉じる。
