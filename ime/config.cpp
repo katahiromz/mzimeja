@@ -104,8 +104,8 @@ RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             CheckRadioButton(hDlg, rad1, rad2, rad1);
         } else {
             CheckRadioButton(hDlg, rad1, rad2, rad2);
-            EnableWindow(GetDlgItem(hwnd, cmb1), FALSE);
-            EnableWindow(GetDlgItem(hwnd, edt2), FALSE);
+            EnableWindow(GetDlgItem(hDlg, cmb1), FALSE);
+            EnableWindow(GetDlgItem(hDlg, edt2), FALSE);
         }
         return TRUE;
 
