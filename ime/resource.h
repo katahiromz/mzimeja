@@ -91,14 +91,6 @@
 #define IDS_REGISTERWORD                    40015
 #define IDS_IMEPAD                          40016
 
-#define ID_WR_READING                       200
-#define ID_WR_STRING                        201
-#define ID_WR_STYLE                         202
-#define ID_SD_SELDIC                        301
-#define ID_SD_DICPATH                       302
-
-#define VER_DEBUG                           0
-
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS
         #define _APS_NO_MFC                 1

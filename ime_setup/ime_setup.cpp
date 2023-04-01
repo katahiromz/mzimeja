@@ -165,7 +165,7 @@ INT DoSetRegistry1(VOID) {
         if (result == ERROR_SUCCESS && hkLayouts) {
             if (DoSetRegSz(hkLayouts, L"Layout File", L"kbdjpn.kbd") &&
                 DoSetRegSz(hkLayouts, L"Layout Text", DoLoadString(4)) &&
-                DoSetRegSz(hkLayouts, L"Layout Display Name", L"@%SystemRoot%\system32\mzimeja.ime,-1024") &&
+                DoSetRegSz(hkLayouts, L"Layout Display Name", L"@%SystemRoot%\\system32\\mzimeja.ime,-1024") &&
                 DoSetRegSz(hkLayouts, L"IME File", L"mzimeja.ime"))
             {
                 ret = TRUE;

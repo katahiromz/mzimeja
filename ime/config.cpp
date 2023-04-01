@@ -4,6 +4,8 @@
 
 #include "mzimeja.h"
 #include <prsht.h>
+#include <commctrl.h>
+#include <windowsx.h>
 #include "resource.h"
 
 #define MAX_PAGES 5
@@ -25,6 +27,69 @@ GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 } // GeneralDlgProc
 
+// 品詞リストを埋める。
+void RegWord_PopulateHinshi(HWND hDlg) {
+    // TODO:
+}
+
+// 単語を追加または削除する。
+BOOL RegWord_AddWord(HWND hDlg, BOOL bAdd) {
+    // 単語を取得。
+    TCHAR szWord[MAX_PATH];
+    ::GetDlgItemText(hDlg, edt1, szWord, _countof(szWord));
+
+    // 品詞を取得。
+    HWND hCmb1 = GetDlgItem(hDlg, cmb1);
+    TCHAR szHinshi[MAX_PATH];
+    ComboBox_GetText(hCmb1, szHinshi, _countof(szHinshi));
+
+    // 読みを取得。
+    TCHAR szYomi[MAX_PATH];
+    ::GetDlgItemText(hDlg, edt2, szYomi, _countof(szYomi));
+
+    // 会社名キーを開く。
+    HKEY hKey;
+    LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"), 0, NULL,
+                                  0, KEY_WRITE, NULL, &hKey, NULL);
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+        return TRUE;
+    }
+
+    // アプリキーを開く。
+    HKEY hAppKey;
+    error = ::RegCreateKeyEx(hKey, TEXT("mzimeja"), 0, NULL, 0, KEY_WRITE, NULL, &hAppKey, NULL);
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+        ::RegCloseKey(hKey);
+        return TRUE;
+    }
+
+    if (bAdd) {
+        // 値文字列は、"品詞:読み"の形。
+        TCHAR szValue[MAX_PATH];
+        lstrcpyn(szValue, szHinshi, _countof(szValue));
+        INT cchValue;
+        cchValue = lstrlen(szValue);
+        lstrcpyn(szValue + cchValue, TEXT(":"), _countof(szValue) - cchValue);
+        cchValue = lstrlen(szValue);
+        lstrcpyn(szValue + cchValue, szYomi, _countof(szValue) - cchValue);
+        cchValue = lstrlen(szValue);
+
+        // レジストリに値をセット。
+        ::RegSetValueEx(hAppKey, szWord, 0, REG_SZ, (LPBYTE)szValue, (cchValue + 1) * sizeof(TCHAR));
+    } else {
+        // レジストリの値を削除。
+        ::RegDeleteValue(hAppKey, szWord);
+    }
+
+    // レジストリキーを閉じる。
+    ::RegCloseKey(hAppKey);
+    ::RegCloseKey(hKey);
+
+    return TRUE;
+}
+
 // IDD_ADDDELWORD - 単語の登録ダイアログ。
 INT_PTR CALLBACK
 RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -33,14 +98,17 @@ RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_INITDIALOG:
         SetWindowLongPtr(hDlg, DWLP_USER, !!lParam);
+        RegWord_PopulateHinshi(hDlg);
         return TRUE;
 
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
         case IDOK:
-            // TODO:
-            ::EndDialog(hDlg, IDOK);
+            if (RegWord_AddWord(hDlg, bAdd))
+            {
+                ::EndDialog(hDlg, IDOK);
+            }
             break;
         case IDCANCEL:
             ::EndDialog(hDlg, IDCANCEL);
@@ -79,11 +147,75 @@ ChooseDictDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 } // ChooseDictDlgProc
 
+// 単語リストを埋める。
+void WordList_PopulateList(HWND hDlg)
+{
+    // レジストリキーを開く。
+    HKEY hKey;
+    LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
+                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja"),
+                                0, KEY_READ, &hKey);
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+        return;
+    }
+
+    // 値を列挙する。
+    for (DWORD dwIndex = 0; dwIndex < 0x1000; ++dwIndex)
+    {
+        // 値の名前を取得する。
+        TCHAR szValueName[MAX_PATH];
+        DWORD cchValueName = sizeof(szValueName);
+        error = ::RegEnumValue(hKey, dwIndex, szValueName, &cchValueName, NULL, NULL, NULL, NULL);
+        if (error) {
+            break;
+        }
+        szValueName[_countof(szValueName) - 1] = 0;
+
+        // 値を取得する。
+        TCHAR szValue[MAX_PATH];
+        DWORD cbValue = sizeof(szValue);
+        error = ::RegQueryValueEx(hKey, szValueName, NULL, NULL, (LPBYTE)szValue, &cbValue);
+        if (error) {
+            DPRINT("error: 0x%08lX", error);
+            break;
+        }
+        szValue[_countof(szValue) - 1] = 0;
+
+        // コロンで値の文字列を分割する。
+        LPWSTR pch = wcschr(szValue, L':');
+        if (pch == NULL)
+            continue;
+        *pch++ = 0;
+
+        // 単語。
+        LV_ITEM item = { LVIF_TEXT, -1, 0 };
+        item.pszText = szValueName;
+        INT iItem = ListView_InsertItem(hDlg, &item);
+
+        // 読み。
+        item.iItem = iItem;
+        item.iSubItem = 1;
+        item.pszText = pch;
+        ListView_SetItem(hDlg, &item);
+
+        // 品詞。
+        item.iItem = iItem;
+        item.iSubItem = 2;
+        item.pszText = szValue;
+        ListView_SetItem(hDlg, &item);
+    }
+
+    // レジストリキーを閉じる。
+    ::RegCloseKey(hKey);
+}
+
 // IDD_WORDLIST - 単語の一覧プロパティシート。
 INT_PTR CALLBACK
 WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_INITDIALOG:
+        WordList_PopulateList(hDlg);
         return TRUE;
 
     case WM_COMMAND:
