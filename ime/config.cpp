@@ -192,30 +192,24 @@ void WordList_PopulateList(HWND hDlg)
     }
 
     // 値を列挙する。
-    for (DWORD dwIndex = 0; dwIndex < 0x1000; ++dwIndex)
-    {
+    for (DWORD dwIndex = 0; dwIndex < 0x1000; ++dwIndex) {
         // 値の名前を取得する。
         TCHAR szValueName[MAX_PATH];
         DWORD cchValueName = _countof(szValueName);
-        error = ::RegEnumValue(hKey, dwIndex, szValueName, &cchValueName, NULL, NULL, NULL, NULL);
-        if (error) {
-            break;
-        }
-        szValueName[_countof(szValueName) - 1] = 0;
-
-        // 値を取得する。
         TCHAR szValue[MAX_PATH];
         DWORD cbValue = sizeof(szValue);
         DWORD dwType;
-        error = ::RegQueryValueEx(hKey, szValueName, NULL, &dwType, (LPBYTE)szValue, &cbValue);
+        error = ::RegEnumValue(hKey, dwIndex, szValueName, &cchValueName, NULL, &dwType, (LPBYTE)szValue, &cbValue);
         if (error) {
-            DPRINT("error: 0x%08lX", error);
+            if (error != ERROR_NO_MORE_ITEMS) {
+                DPRINT("error: 0x%08lX", error);
+            }
             break;
         }
-        szValue[_countof(szValue) - 1] = 0;
-
         if (dwType != REG_SZ)
             continue;
+        szValueName[_countof(szValueName) - 1] = 0; // avoid buffer overrun
+        szValue[_countof(szValue) - 1] = 0; // avoid buffer overrun
 
         // コロンで値の文字列を分割する。
         LPWSTR pch = wcschr(szValue, L':');
@@ -225,7 +219,7 @@ void WordList_PopulateList(HWND hDlg)
 
         // 単語。
         LV_ITEM item = { LVIF_TEXT };
-        item.iItem = -1;
+        item.iItem = ListView_GetItemCount(hLst1);
         item.iSubItem = 1;
         item.pszText = szValueName;
         INT iItem = ListView_InsertItem(hLst1, &item);
