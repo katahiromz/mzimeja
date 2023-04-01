@@ -4,8 +4,8 @@
 
 #include "mzimeja.h"
 
-#define MAX_CANDLISTS   32
-#define CANDPAGE_SIZE   8
+#define MAX_CANDLISTS   32 // 候補リストの最大数。
+#define CANDPAGE_SIZE   8  // 候補ページの最大数。
 
 //////////////////////////////////////////////////////////////////////////////
 // LogCandList - 候補リストの論理データ。
