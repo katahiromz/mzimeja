@@ -107,6 +107,8 @@ RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             EnableWindow(GetDlgItem(hDlg, cmb1), FALSE);
             EnableWindow(GetDlgItem(hDlg, edt2), FALSE);
         }
+        EnableWindow(GetDlgItem(hDlg, rad1), FALSE);
+        EnableWindow(GetDlgItem(hDlg, rad2), FALSE);
         return TRUE;
 
     case WM_COMMAND:
