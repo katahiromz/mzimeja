@@ -38,10 +38,13 @@ void RegWord_PopulateHinshi(HWND hDlg) {
 }
 
 // 単語を追加または削除する。
-BOOL RegWord_AddWord(HWND hDlg, BOOL bAdd) {
+BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL) {
     // 単語を取得。
     TCHAR szWord[MAX_PATH];
-    ::GetDlgItemText(hDlg, edt1, szWord, _countof(szWord));
+    if (!pszWord) {
+        ::GetDlgItemText(hDlg, edt1, szWord, _countof(szWord));
+        pszWord = szWord;
+    }
 
     // 品詞を取得。
     HWND hCmb1 = GetDlgItem(hDlg, cmb1);
@@ -70,23 +73,18 @@ BOOL RegWord_AddWord(HWND hDlg, BOOL bAdd) {
         return TRUE;
     }
 
-    if (bAdd) {
-        // 値文字列は、"品詞:読み"の形。
-        TCHAR szValue[MAX_PATH];
-        lstrcpyn(szValue, szHinshi, _countof(szValue));
-        INT cchValue;
-        cchValue = lstrlen(szValue);
-        lstrcpyn(szValue + cchValue, TEXT(":"), _countof(szValue) - cchValue);
-        cchValue = lstrlen(szValue);
-        lstrcpyn(szValue + cchValue, szYomi, _countof(szValue) - cchValue);
-        cchValue = lstrlen(szValue);
+    // 値文字列は、"品詞:読み"の形。
+    TCHAR szValue[MAX_PATH];
+    lstrcpyn(szValue, szHinshi, _countof(szValue));
+    INT cchValue;
+    cchValue = lstrlen(szValue);
+    lstrcpyn(szValue + cchValue, TEXT(":"), _countof(szValue) - cchValue);
+    cchValue = lstrlen(szValue);
+    lstrcpyn(szValue + cchValue, szYomi, _countof(szValue) - cchValue);
+    cchValue = lstrlen(szValue);
 
-        // レジストリに値をセット。
-        ::RegSetValueEx(hAppKey, szWord, 0, REG_SZ, (LPBYTE)szValue, (cchValue + 1) * sizeof(TCHAR));
-    } else {
-        // レジストリの値を削除。
-        ::RegDeleteValue(hAppKey, szWord);
-    }
+    // レジストリに値をセット。
+    ::RegSetValueEx(hAppKey, pszWord, 0, REG_SZ, (LPBYTE)szValue, (cchValue + 1) * sizeof(TCHAR));
 
     // レジストリキーを閉じる。
     ::RegCloseKey(hAppKey);
@@ -95,33 +93,49 @@ BOOL RegWord_AddWord(HWND hDlg, BOOL bAdd) {
     return TRUE;
 }
 
-// IDD_ADDDELWORD - 単語の登録ダイアログ。
+// 単語を削除する。
+BOOL RegWord_DeleteWord(HWND hDlg, LPCTSTR pszWord) {
+    // 会社名キーを開く。
+    HKEY hKey;
+    LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"), 0, NULL,
+                                  0, KEY_WRITE, NULL, &hKey, NULL);
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+        return TRUE;
+    }
+
+    // アプリキーを開く。
+    HKEY hAppKey;
+    error = ::RegCreateKeyEx(hKey, TEXT("mzimeja-user-dict"), 0, NULL, 0, KEY_WRITE, NULL, &hAppKey, NULL);
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+        ::RegCloseKey(hKey);
+        return TRUE;
+    }
+
+    // レジストリの値を削除。
+    ::RegDeleteValue(hAppKey, pszWord);
+
+    // レジストリキーを閉じる。
+    ::RegCloseKey(hAppKey);
+    ::RegCloseKey(hKey);
+
+    return TRUE;
+}
+
+
+// IDD_ADDWORD - 単語の登録ダイアログ。
 INT_PTR CALLBACK
 RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    BOOL bAdd = !!GetWindowLongPtr(hDlg, DWLP_USER);
-
     switch (uMsg) {
     case WM_INITDIALOG:
-        bAdd = !!lParam;
-        SetWindowLongPtr(hDlg, DWLP_USER, bAdd);
         RegWord_PopulateHinshi(hDlg);
-        if (bAdd) {
-            CheckRadioButton(hDlg, rad1, rad2, rad1);
-        } else {
-            CheckRadioButton(hDlg, rad1, rad2, rad2);
-            EnableWindow(GetDlgItem(hDlg, cmb1), FALSE);
-            EnableWindow(GetDlgItem(hDlg, edt2), FALSE);
-        }
-        EnableWindow(GetDlgItem(hDlg, rad1), FALSE);
-        EnableWindow(GetDlgItem(hDlg, rad2), FALSE);
         return TRUE;
 
     case WM_COMMAND:
-        switch (LOWORD(wParam))
-        {
+        switch (LOWORD(wParam)) {
         case IDOK:
-            if (RegWord_AddWord(hDlg, bAdd))
-            {
+            if (RegWord_AddWord(hDlg, NULL)) {
                 ::EndDialog(hDlg, IDOK);
             }
             break;
@@ -220,7 +234,7 @@ void WordList_PopulateList(HWND hDlg)
         // 単語。
         LV_ITEM item = { LVIF_TEXT };
         item.iItem = ListView_GetItemCount(hLst1);
-        item.iSubItem = 1;
+        item.iSubItem = 0;
         item.pszText = szValueName;
         INT iItem = ListView_InsertItem(hLst1, &item);
 
@@ -253,8 +267,8 @@ WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         switch (LOWORD(wParam))
         {
         case psh1: // 追加。
-            if (::DialogBoxParam(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDDELWORD),
-                                 hDlg, RegWordDlgProc, TRUE) == IDOK)
+            if (::DialogBox(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDWORD),
+                            hDlg, RegWordDlgProc) == IDOK)
             {
                 // リストを更新。
                 HWND hLst1 = ::GetDlgItem(hDlg, lst1);
@@ -266,16 +280,31 @@ WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             }
             break;
         case psh2: // 削除。
-            if (::DialogBoxParam(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDDELWORD),
-                                 hDlg, RegWordDlgProc, FALSE) == IDOK)
             {
-                // リストを更新。
-                HWND hLst1 = ::GetDlgItem(hDlg, lst1);
-                SetWindowRedraw(hLst1, FALSE);
-                ListView_DeleteAllItems(hLst1);
-                WordList_PopulateList(hDlg);
-                SetWindowRedraw(hLst1, TRUE);
-                InvalidateRect(hLst1, NULL, TRUE);
+                // 選択項目を取得する。
+                HWND hLst1 = GetDlgItem(hDlg, lst1);
+                INT iItem = ListView_GetNextItem(hLst1, -1, LVNI_SELECTED);
+                if (iItem == -1)
+                    return 0;
+
+                // 選択項目のテキストを習得する。
+                TCHAR szText[MAX_PATH];
+                LV_ITEM item = { LVIF_TEXT };
+                item.iItem = iItem;
+                item.iSubItem = 0;
+                item.pszText = szText;
+                item.cchTextMax = _countof(szText);
+                if (ListView_GetItem(hLst1, &item))
+                {
+                    // 削除するか確認。
+                    if (MessageBox(hDlg, TheIME.LoadSTR(IDS_WANNADELETEWORD),
+                                   szText, MB_ICONINFORMATION | MB_YESNO) == IDYES)
+                    {
+                        // 単語を削除。
+                        RegWord_DeleteWord(hDlg, szText);
+                        ListView_DeleteItem(hLst1, iItem);
+                    }
+                }
             }
             break;
         }
@@ -397,7 +426,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
         break;
 
     case IME_CONFIG_REGISTERWORD: // 単語登録。
-        ::DialogBoxParam(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDDELWORD), hWnd, RegWordDlgProc, TRUE);
+        ::DialogBoxParam(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDWORD), hWnd, RegWordDlgProc, TRUE);
         break;
 
     case IME_CONFIG_SELECTDICTIONARY: // 辞書の選択。

@@ -14,7 +14,7 @@
 #define IDD_CHOOSEDICT                      102
 #define IDD_ABOUTIME                        103
 #define IDD_DEBUG                           104
-#define IDD_ADDDELWORD                      105
+#define IDD_ADDWORD                         105
 
 #define IDM_RECONVERT                       40001
 #define IDM_ABOUT                           40002
@@ -69,6 +69,7 @@
 #define IDS_WORD                            133
 #define IDS_READING                         134
 #define IDS_HINSHI                          135
+#define IDS_WANNADELETEWORD                 136
 #define IDS_DICFILENAME                     1000
 #define IDS_CONFIGNAME                      1001
 #define IDS_GL_NODICTIONARY                 1010
