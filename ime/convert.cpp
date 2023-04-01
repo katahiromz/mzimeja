@@ -6,6 +6,7 @@
 //       please add options: -finput-charset=CP932 -fexec-charset=CP932
 
 #include "mzimeja.h"
+#include "resource.h"
 #include <algorithm>        // for std::sort
 
 const DWORD c_dwMilliseconds = 8000;
@@ -2451,11 +2452,11 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
     clause.add(&node);
 
     // 文節に全角を追加。
-    node.post = lcmap(hiragana, LCMAP_FULLWIDTH); // 変換後の文字列。
+    node.post = lcmap(pre, LCMAP_FULLWIDTH); // 変換後の文字列。
     clause.add(&node);
 
     // 文節に半角を追加。
-    node.post = lcmap(hiragana, LCMAP_HALFWIDTH | LCMAP_KATAKANA); // 変換後の文字列。
+    node.post = lcmap(pre, LCMAP_HALFWIDTH | LCMAP_KATAKANA); // 変換後の文字列。
     clause.add(&node);
 
     // 結果に文節を追加。
