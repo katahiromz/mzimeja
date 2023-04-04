@@ -491,7 +491,8 @@ static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
         pch2 = pch3; // 現在の位置を更新。
     }
     pch3 = wcschr(pch2 + 1, RECORD_SEP); // 現在の位置の次のレコード区切りを検索する。
-    ASSERT(pch3);
+    if (pch3 == NULL)
+        return FALSE;
 
     // 最初に発見したレコード区切りから最後のレコード区切りまでの文字列を取得する。
     std::wstring str;
@@ -518,70 +519,68 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
     Gyou gyou = GYOU_A;
     HinshiBunrui bunrui = StyleToHinshi(dw);
 
-    MakeLiteralMaps();
-
     std::wstring substr;
     wchar_t ch;
     size_t i, ngyou;
     switch (bunrui) {
     case HB_NAKEIYOUSHI:
-      i = pre.size() - 1;
-      if (pre[i] == L'な') pre.resize(i);
-      i = post.size() - 1;
-      if (post[i] == L'な') post.resize(i);
-      break;
+        i = pre.size() - 1;
+        if (pre[i] == L'な') pre.resize(i);
+        i = post.size() - 1;
+        if (post[i] == L'な') post.resize(i);
+        break;
     case HB_IKEIYOUSHI:
-      i = pre.size() - 1;
-      if (pre[i] == L'い') pre.resize(i);
-      i = post.size() - 1;
-      if (post[i] == L'い') post.resize(i);
-      break;
+        i = pre.size() - 1;
+        if (pre[i] == L'い') pre.resize(i);
+        i = post.size() - 1;
+        if (post[i] == L'い') post.resize(i);
+        break;
     case HB_ICHIDAN_DOUSHI:
-      assert(pre[pre.size() - 1] == L'る');
-      assert(post[post.size() - 1] == L'る');
-      pre.resize(pre.size() - 1);
-      post.resize(post.size() - 1);
-      break;
+        assert(pre[pre.size() - 1] == L'る');
+        assert(post[post.size() - 1] == L'る');
+        pre.resize(pre.size() - 1);
+        post.resize(post.size() - 1);
+        break;
     case HB_KAHEN_DOUSHI:
-      if (pre == L"くる") 
-        return TRUE;
-      substr = pre.substr(pre.size() - 2, 2);
-      if (substr != L"くる") 
-        return TRUE;
-      pre = substr;
-      substr = post.substr(pre.size() - 2, 2);
-      post = substr;
-      break;
+        substr = pre.substr(pre.size() - 2, 2);
+        if (substr != L"くる") 
+            return TRUE;
+        pre = substr;
+        substr = post.substr(pre.size() - 2, 2);
+        post = substr;
+        break;
     case HB_SAHEN_DOUSHI:
-      if (pre == L"する") 
-        return TRUE;
-      substr = pre.substr(pre.size() - 2, 2);
-      if (substr == L"する") gyou = GYOU_SA;
-      else if (substr != L"ずる") 
-        gyou = GYOU_ZA;
-      else
-        return TRUE;
-      pre = substr;
-      post = post.substr(pre.size() - 2, 2);
-      break;
+        if (pre == L"する") 
+            return TRUE;
+        substr = pre.substr(pre.size() - 2, 2);
+        if (substr == L"する")
+            gyou = GYOU_SA;
+        else if (substr != L"ずる") 
+            gyou = GYOU_ZA;
+        else
+            return TRUE;
+        pre = substr;
+        post = post.substr(pre.size() - 2, 2);
+        break;
     case HB_GODAN_DOUSHI:
-      ch = pre[pre.size() - 1];
-      if (g_vowel_map[ch] != L'う')
-        return TRUE;
-      pre.resize(pre.size() - 1);
-      post.resize(post.size() - 1);
-      ch = g_consonant_map[ch];
-      ngyou = GYOU_A;
-      for (i = 0; i < _countof(s_hiragana_table); ++i) {
-        if (s_hiragana_table[i][0] == ch) {
-          ngyou = i;
-          break;
+        MakeLiteralMaps();
+        ch = pre[pre.size() - 1];
+        if (g_vowel_map[ch] != L'う')
+            return TRUE;
+        pre.resize(pre.size() - 1);
+        post.resize(post.size() - 1);
+        ch = g_consonant_map[ch];
+        ngyou = GYOU_A;
+        for (i = 0; i < _countof(s_hiragana_table); ++i) {
+            if (s_hiragana_table[i][0] == ch) {
+                ngyou = i;
+                break;
+            }
         }
-      }
-      gyou = (Gyou)ngyou;
-      break;
+        gyou = (Gyou)ngyou;
+        break;
     default:
-      break;
+        break;
     }
 
     // レコードの仕様：
