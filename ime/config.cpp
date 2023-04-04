@@ -98,8 +98,9 @@ BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL) {
         }
         break;
     case HB_SAHEN_DOUSHI: // サ変動詞
-        if (len <= 1 || pszWord[len - 1] != 0x308B ||
-            (pszWord[len - 2] != 0x3059 && pszWord[len - 2] != 0x305A)) // 「する」「ずる」で終わらなければならない。
+        if (len <= 1 || 
+            (pszWord[len - 2] != 0x3059 && pszWord[len - 2] != 0x305A) ||
+            pszWord[len - 1] != 0x308B) // 「する」「ずる」で終わらなければならない。
         {
             bWrong = TRUE;
         }
