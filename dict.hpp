@@ -78,7 +78,8 @@ enum HinshiBunrui {
     HB_SETSUBIJI,           // 接尾辞
     HB_PERIOD,              // 句点（。）
     HB_COMMA,               // 読点（、）
-    HB_SYMBOL               // 記号類
+    HB_SYMBOL,              // 記号類
+    HB_MAX = HB_SYMBOL
 }; // enum HinshiBunrui
 
 // 動詞活用形。

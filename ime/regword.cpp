@@ -62,8 +62,8 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
         return FALSE;
     }
 
-    HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
-    if (!(HB_MEISHI <= hinshi && hinshi <= HB_SYMBOL)) {
+    HinshiBunrui hinshi = StyleToHinshi(dw);
+    if (!(HB_MEISHI <= hinshi && hinshi <= HB_MAX)) {
         DPRINT("%d\n", hinshi);
         return FALSE;
     }
@@ -174,8 +174,8 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
         return FALSE;
     }
 
-    HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
-    if (!(HB_MEISHI <= hinshi && hinshi <= HB_SYMBOL)) {
+    HinshiBunrui hinshi = StyleToHinshi(dw);
+    if (!(HB_MEISHI <= hinshi && hinshi <= HB_MAX)) {
         DPRINT("%d\n", hinshi);
         return FALSE;
     }
@@ -232,9 +232,21 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 //    ならば、このIMEですべての可能なスタイルを受け取るのに必要な配列の
 //    要素数になります。
 UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
-    UINT ret = 0;
     FOOTMARK();
-    return ret;
+    UINT uMax = (HB_MAX - HB_MEISHI) + 1;
+    if (u == 0)
+        return uMax;
+    if (u > uMax)
+        u = uMax;
+    UINT i = 0;
+    for (i = HB_MEISHI; i <= HB_MAX; ++i) {
+        HinshiBunrui hinshi = (HinshiBunrui)i;
+        if (i >= u)
+            break;
+        lp[i].dwStyle = HinshiToStyle(hinshi);
+        StringCchCopy(lp[i].szDescription, _countof(lp[i].szDescription), HinshiToString(hinshi));
+    }
+    return i;
 }
 
 //  ImeEnumRegisterWord
@@ -297,8 +309,8 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
             DPRINT("%08lX\n", dw);
             return 0;
         }
-        hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
-        if (!(HB_MEISHI <= hinshi && hinshi <= HB_SYMBOL)) {
+        hinshi = StyleToHinshi(dw);
+        if (!(HB_MEISHI <= hinshi && hinshi <= HB_MAX)) {
             DPRINT("%d\n", hinshi);
             return FALSE;
         }
@@ -356,7 +368,7 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
         HinshiBunrui hinshi = StringToHinshi(pch2);
         if (hinshi == HB_UNKNOWN)
             continue;
-        DWORD dwStyle = ((hinshi - HB_MEISHI) | MZIME_REGWORD_STYLE);
+        DWORD dwStyle = HinshiToStyle(hinshi);
         ret = lpfn(szValueName, dwStyle, pch1, lpData);
     }
 

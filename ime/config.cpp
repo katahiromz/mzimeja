@@ -16,14 +16,14 @@ extern "C" {
 
 // 品詞分類から文字列を取得する関数。
 LPCTSTR HinshiToString(HinshiBunrui hinshi) {
-    if (HB_MEISHI <= hinshi && hinshi <= HB_SYMBOL)
+    if (HB_MEISHI <= hinshi && hinshi <= HB_MAX)
         return TheIME.LoadSTR(IDS_HINSHI_00 + (hinshi - HB_MEISHI));
     return NULL;
 }
 
 // 文字列から品詞分類を取得する関数。
 HinshiBunrui StringToHinshi(LPCTSTR str) {
-    for (INT hinshi = HB_MEISHI; hinshi <= HB_SYMBOL; ++hinshi) {
+    for (INT hinshi = HB_MEISHI; hinshi <= HB_MAX; ++hinshi) {
         LPCTSTR psz = HinshiToString((HinshiBunrui)hinshi);
         if (lstrcmpW(psz, str) == 0)
             return (HinshiBunrui)hinshi;
@@ -74,7 +74,7 @@ BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL) {
     ::GetDlgItemText(hDlg, edt2, szYomi, _countof(szYomi));
 
     HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + iHinshi);
-    return ImeRegisterWord(szYomi, ((hinshi - HB_MEISHI) | MZIME_REGWORD_STYLE), pszWord);
+    return ImeRegisterWord(szYomi, HinshiToStyle(hinshi), pszWord);
 }
 
 // 単語を削除する。
@@ -114,7 +114,7 @@ BOOL RegWord_DeleteWord(HWND hDlg, INT iItem) {
         return FALSE;
     }
 
-    return ImeUnregisterWord(szText1, ((hinshi - HB_MEISHI) | MZIME_REGWORD_STYLE), szText2);
+    return ImeUnregisterWord(szText1, HinshiToStyle(hinshi), szText2);
 }
 
 
@@ -187,7 +187,9 @@ static INT CALLBACK EnumRegWordProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPV
     ListView_SetItem(hLst1, &item);
 
     // 品詞。
-    HinshiBunrui hinshi = (HinshiBunrui)((dw & ~MZIME_REGWORD_STYLE) + HB_MEISHI);
+    if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE)
+        return TRUE;
+    HinshiBunrui hinshi = StyleToHinshi(dw);
     std::wstring strHinshi = HinshiToString(hinshi);
     item.iItem = iItem;
     item.iSubItem = 2;

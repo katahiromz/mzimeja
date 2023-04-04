@@ -133,6 +133,18 @@
 // The style flags of ImeRegisterWord
 #define MZIME_REGWORD_STYLE (IME_REGWORD_STYLE_USER_FIRST | 0x40000000)
 
+static inline HinshiBunrui StyleToHinshi(DWORD dwStyle) {
+    ASSERT((dwStyle & MZIME_REGWORD_STYLE) == MZIME_REGWORD_STYLE);
+    HinshiBunrui ret = (HinshiBunrui)((dwStyle & ~MZIME_REGWORD_STYLE) + HB_MEISHI);
+    ASSERT(HB_MEISHI <= ret && ret <= HB_MAX);
+    return ret;
+}
+
+static inline DWORD HinshiToStyle(HinshiBunrui hinshi) {
+    ASSERT(HB_MEISHI <= hinshi && hinshi <= HB_MAX);
+    return ((DWORD)hinshi - HB_MEISHI) | MZIME_REGWORD_STYLE;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // additional GCS bits
 
