@@ -44,22 +44,35 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     TCHAR szStr[MAX_PATH];
     FOOTMARK();
 
-    if (!lpRead || !lpStr)
+    if (!lpRead || !lpStr) {
+        DPRINT("!lpRead || !lpStr\n");
         return FALSE;
-    if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE)
+    }
+    if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE) {
+        DPRINT("dw:0x%08lX\n", dw);
         return FALSE;
+    }
 
-    StringCchCopy(szRead, _countof(szRead), lpRead);
     StringCchCopy(szStr, _countof(szStr), lpStr);
+    LCMapString(0, LCMAP_HIRAGANA | LCMAP_FULLWIDTH, lpRead, -1, szRead, _countof(szRead));
     StrTrimW(szRead, L" \t\r\n\x3000");
     StrTrimW(szStr, L" \t\r\n\x3000");
-    if (!szRead[0] || !szStr[0])
+    if (!szRead[0] || !szStr[0]) {
+        DPRINT("'%ls', '%ls'\n", szRead, szStr);
         return FALSE;
+    }
 
     HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
-    LPCTSTR pszHinshi = HinshiToString(hinshi);
-    if (!pszHinshi || !pszHinshi[0])
+    if (!(HB_MEISHI <= hinshi && hinshi <= HB_SYMBOL)) {
+        DPRINT("%d\n", hinshi);
         return FALSE;
+    }
+
+    LPCTSTR pszHinshi = HinshiToString(hinshi);
+    if (!pszHinshi || !pszHinshi[0]) {
+        DPRINT("%d\n", hinshi);
+        return FALSE;
+    }
 
     // 会社名キーを開く。
     HKEY hCompanyKey;
@@ -104,6 +117,9 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 
     // レジストリに値をセット。
     error = ::RegSetValueEx(hUserDict, szName, 0, REG_SZ, (LPBYTE)szValue, (cchValue + 1) * sizeof(TCHAR));
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+    }
     BOOL ret = (error == ERROR_SUCCESS);
 
     // レジストリキーを閉じる。
@@ -139,23 +155,35 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 
     FOOTMARK();
 
-    if (!lpRead || !lpStr)
+    if (!lpRead || !lpStr) {
+        DPRINT("!lpRead || !lpStr\n");
         return FALSE;
+    }
 
-    if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE)
+    if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE) {
+        DPRINT("%08lX\n", dw);
         return FALSE;
+    }
 
     StringCchCopy(szRead, _countof(szRead), lpRead);
     StringCchCopy(szStr, _countof(szStr), lpStr);
     StrTrimW(szRead, L" \t\r\n\x3000");
     StrTrimW(szStr, L" \t\r\n\x3000");
-    if (!szRead[0] || !szStr[0])
+    if (!szRead[0] || !szStr[0]) {
+        DPRINT("'%ls', '%ls'\n", szRead, szStr);
         return FALSE;
+    }
 
     HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
-    LPCTSTR pszHinshi = HinshiToString(hinshi);
-    if (!pszHinshi || !pszHinshi[0])
+    if (!(HB_MEISHI <= hinshi && hinshi <= HB_SYMBOL)) {
+        DPRINT("%d\n", hinshi);
         return FALSE;
+    }
+    LPCTSTR pszHinshi = HinshiToString(hinshi);
+    if (!pszHinshi || !pszHinshi[0]) {
+        DPRINT("%d\n", hinshi);
+        return FALSE;
+    }
 
     // ユーザー辞書キーを開く。
     HKEY hUserDict;
@@ -177,6 +205,9 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 
     // レジストリの値を削除。
     BOOL ret = (::RegDeleteValue(hUserDict, szName) == ERROR_SUCCESS);
+    if (!ret) {
+        DPRINT("%ls\n", szName);
+    }
 
     // レジストリキーを閉じる。
     ::RegCloseKey(hUserDict);
@@ -254,13 +285,23 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
     UINT ret;
     FOOTMARK();
 
-    if (!lpfn || (dw && (dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE))
+    if (!lpfn || (dw && (dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE)) {
+        DPRINT("%p, %08lX\n", lpfn, dw);
         return 0;
+    }
 
     HinshiBunrui hinshi;
     std::wstring strHinshi;
     if (dw) {
+        if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE) {
+            DPRINT("%08lX\n", dw);
+            return 0;
+        }
         hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
+        if (!(HB_MEISHI <= hinshi && hinshi <= HB_SYMBOL)) {
+            DPRINT("%d\n", hinshi);
+            return FALSE;
+        }
         strHinshi = HinshiToString(hinshi);
     }
 
