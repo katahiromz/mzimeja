@@ -35,6 +35,7 @@ static const wchar_t s_hiragana_table[][5] = {
 std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
 std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
 
+// 子音の写像と母音の写像を作成する。
 void MakeLiteralMaps() {
   if (g_consonant_map.size()) {
     return;
@@ -50,7 +51,7 @@ void MakeLiteralMaps() {
       g_vowel_map[s_hiragana_table[i][k]] = s_hiragana_table[0][k];
     }
   }
-} // MzIme::MakeLiteralMaps
+} // MakeLiteralMaps
 
 // 品詞分類を文字列に変換する（デバッグ用）。
 LPCWSTR BunruiToString(HinshiBunrui bunrui) {
@@ -565,11 +566,12 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
       break;
     case HB_GODAN_DOUSHI:
       ch = pre[pre.size() - 1];
-      if (g_vowel_map[ch] != L'う') 
+      if (g_vowel_map[ch] != L'う')
         return TRUE;
       pre.resize(pre.size() - 1);
       post.resize(post.size() - 1);
       ch = g_consonant_map[ch];
+      ngyou = GYOU_A;
       for (i = 0; i < _countof(s_hiragana_table); ++i) {
         if (s_hiragana_table[i][0] == ch) {
           ngyou = i;
@@ -610,26 +612,6 @@ static size_t ScanUserDict(WStrings& records, WCHAR ch, Lattice *pThis) {
  
     return records.size();
 }
-
-// 子音の写像と母音の写像を作成する。
-void MzIme::MakeLiteralMaps() {
-    if (m_consonant_map.size())
-        return; // 初期化済み。
-    // 以下の２つの写像を初期化する。
-    //
-    // - ひらがな１文字から子音への写像。
-    // - ひらがな１文字から母音への写像。
-    //
-    // これらは品詞の活用で使用される。
-    m_consonant_map.clear();
-    m_vowel_map.clear();
-    for (size_t iGyou = 0; iGyou < _countof(s_hiragana_table); ++iGyou) {
-        for (INT iDan = DAN_A; iDan <= DAN_O; ++iDan) {
-            m_consonant_map[s_hiragana_table[iGyou][iDan]] = s_hiragana_table[iGyou][DAN_A];
-            m_vowel_map[s_hiragana_table[iGyou][iDan]] = s_hiragana_table[GYOU_A][iDan];
-        }
-    }
-} // MzIme::MakeLiteralMaps
 
 //////////////////////////////////////////////////////////////////////////////
 // Dict (dictionary) - 辞書データ。
@@ -1419,6 +1401,8 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
         refs[index + fields[0].size() + 2]++;
     } while(0);
 
+    MakeLiteralMaps();
+
     // 連用形
     node.katsuyou = RENYOU_KEI;
     do {
@@ -1445,9 +1429,9 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
     do {
         if (fields[0].empty() || str.empty()) break;
         wchar_t ch0 = fields[0][fields[0].size() - 1];
-        wchar_t ch1 = TheIME.m_consonant_map[ch0];
+        wchar_t ch1 = g_consonant_map[ch0];
         std::wstring addition;
-        switch (TheIME.m_vowel_map[ch0]) {
+        switch (g_vowel_map[ch0]) {
         case L'あ':
             str = fields[1].substr(0, fields[1].size() - 1);
             for (size_t i = 0; i < _countof(s_hiragana_table); ++i) {

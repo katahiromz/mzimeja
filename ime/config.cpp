@@ -74,6 +74,50 @@ BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL) {
     ::GetDlgItemText(hDlg, edt2, szYomi, _countof(szYomi));
 
     HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + iHinshi);
+
+    BOOL bWrong = FALSE;
+    INT len = lstrlen(pszWord);
+    switch (hinshi) {
+    case HB_NAKEIYOUSHI: // な形容詞
+        if (len == 0 || pszWord[len - 1] != 0x306A) // 「な」で終わらなければならない。
+            bWrong = TRUE;
+        break;
+    case HB_IKEIYOUSHI: // い形容詞
+        if (len == 0 || pszWord[len - 1] != 0x3044) // 「い」で終わらなければならない。
+            bWrong = TRUE;
+        break;
+    case HB_ICHIDAN_DOUSHI: // 一段動詞
+        if (len == 0 || pszWord[len - 1] != 0x308B) // 「る」で終わらなければならない。
+            bWrong = TRUE;
+        break;
+    case HB_KAHEN_DOUSHI: // カ変動詞
+        if (len <= 1 ||
+            (pszWord[len - 2] != 0x304F && pszWord[len - 1] != 0x308B)) // 「くる」で終わらなければならない。
+        {
+            bWrong = TRUE;
+        }
+        break;
+    case HB_SAHEN_DOUSHI: // サ変動詞
+        if (len <= 1 || pszWord[len - 1] != 0x308B ||
+            (pszWord[len - 2] != 0x3059 && pszWord[len - 2] != 0x305A)) // 「する」「ずる」で終わらなければならない。
+        {
+            bWrong = TRUE;
+        }
+        break;
+    case HB_GODAN_DOUSHI: // 五段動詞
+        MakeLiteralMaps();
+        if (len == 0 || g_vowel_map[pszWord[len - 1]] != 0x3046) // う段で終わらなければならない。
+            bWrong = TRUE;
+        break;
+    default:
+        break;
+    }
+
+    if (bWrong) {
+        MessageBoxW(hDlg, TheIME.LoadSTR(IDS_HINSHIWRONG), NULL, MB_ICONERROR);
+        return FALSE;
+    }
+
     return ImeRegisterWord(szYomi, HinshiToStyle(hinshi), pszWord);
 }
 

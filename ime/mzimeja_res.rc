@@ -207,6 +207,7 @@ STRINGTABLE
     IDS_READING, "読み"
     IDS_HINSHI, "品詞"
     IDS_WANNADELETEWORD, "この単語を削除しますか？"
+    IDS_HINSHIWRONG, "品詞が間違っています。"
     IDS_DICFILENAME, "mzimeja.dic"
     IDS_CONFIGNAME, "mzimeja.ime"
     IDS_GL_NODICTIONARY, "辞書が見つかりません。"

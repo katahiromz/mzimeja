@@ -198,6 +198,9 @@ extern const MZGUIDELINE glTable[];
 extern "C" {
 
 // convert.c
+extern std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
+extern std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
+void MakeLiteralMaps(); // 子音の写像と母音の写像を作成する。
 LPCWSTR BunruiToString(HinshiBunrui bunrui);
 
 // notify.c
@@ -407,12 +410,6 @@ class MzIme {
     LPTRANSMSGLIST m_lpCurTransKey;
     UINT m_uNumTransKey;
     BOOL m_fOverflowKey;
-
-public:
-    // literal map
-    std::unordered_map<wchar_t,wchar_t>   m_vowel_map;      // 母音写像。
-    std::unordered_map<wchar_t,wchar_t>   m_consonant_map;  // 子音写像。
-    void MakeLiteralMaps();
 
 public:
     MzIme();
