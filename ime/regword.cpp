@@ -296,7 +296,7 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
         if (pch1 == NULL)
             continue;
         *pch1++ = 0;
-        LPTSTR pch2 = wcschr(pch2, L':');
+        LPTSTR pch2 = wcschr(pch1, L':');
         if (pch2 == NULL)
             continue;
         *pch2++ = 0;
