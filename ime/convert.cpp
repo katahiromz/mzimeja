@@ -450,8 +450,8 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
     return TRUE;
 } // IsNodeConnectable
 
-// 辞書データをスキャンする。
-static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
+// 基本辞書データをスキャンする。
+static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
     ASSERT(dict_data);
 
     // レコード区切りと文字chの組み合わせを検索する。
@@ -482,7 +482,13 @@ static size_t ScanDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
     str_split(records, str, sz);
     ASSERT(records.size());
     return records.size();
-} // ScanDict
+} // ScanBasicDict
+
+// ユーザー辞書データをスキャンする。
+static size_t ScanUserDict(WStrings& records, WCHAR ch) {
+    // FIXME
+    return 0;
+}
 
 // 子音の写像と母音の写像を作成する。
 void MzIme::MakeLiteralMaps() {
@@ -1054,9 +1060,12 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
             continue;
         }
 
-        // scan dictionary
-        size_t count = ScanDict(records, dict_data, pre[index]);
-        DebugPrintW(L"ScanDict(%c) count: %d\n", pre[index], count);
+        // 基本辞書をスキャンする。
+        size_t count = ScanBasicDict(records, dict_data, pre[index]);
+        DebugPrintW(L"ScanBasicDict(%c) count: %d\n", pre[index], count);
+
+        // ユーザー辞書をスキャンする。
+        count += ScanUserDict(records, pre[index]);
 
         // store data for each record
         for (size_t k = 0; k < records.size(); ++k) {
@@ -1103,10 +1112,13 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
     std::wstring sep;
     sep += FIELD_SEP;
 
-    // 辞書をスキャンする。
+    // 基本辞書をスキャンする。
     WStrings fields, records;
-    size_t count = ScanDict(records, dict_data, pre[0]);
-    DebugPrintW(L"ScanDict(%c) count: %d\n", pre[0], count);
+    size_t count = ScanBasicDict(records, dict_data, pre[0]);
+    DebugPrintW(L"ScanBasicDict(%c) count: %d\n", pre[0], count);
+
+    // ユーザー辞書をスキャンする。
+    count += ScanUserDict(records, pre[0]);
 
     // store data for each record
     for (size_t k = 0; k < records.size(); ++k) {
