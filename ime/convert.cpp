@@ -68,6 +68,7 @@ LPCWSTR BunruiToString(HinshiBunrui bunrui) {
         L"HB_COMMA",
         L"HB_SYMBOL"
     };
+    ASSERT(index <= HB_MAX);
     return s_array[index];
 } // BunruiToString
 
