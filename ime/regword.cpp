@@ -313,6 +313,8 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
             continue;
 
         HinshiBunrui hinshi = StringToHinshi(pch2);
+        if (hinshi == HB_UNKNOWN)
+            continue;
         DWORD dwStyle = ((hinshi - HB_MEISHI) | MZIME_REGWORD_STYLE);
         ret = lpfn(szValueName, dwStyle, pch1, lpData);
     }
