@@ -185,6 +185,9 @@ extern const MZGUIDELINE glTable[];
 
 extern "C" {
 
+// convert.c
+LPCWSTR BunruiToString(HinshiBunrui bunrui);
+
 // notify.c
 BOOL PASCAL NotifyUCSetOpen(HIMC hIMC);
 BOOL PASCAL NotifyUCConversionMode(HIMC hIMC);

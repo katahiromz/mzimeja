@@ -33,7 +33,7 @@ static const wchar_t s_hiragana_table[][5] = {
 }; // ※ s_hiragana_table[GYOU_DA][DAN_U] のように使用する。
 
 // 品詞分類を文字列に変換する（デバッグ用）。
-static const wchar_t *BunruiToString(HinshiBunrui bunrui) {
+LPCWSTR BunruiToString(HinshiBunrui bunrui) {
     int index = int(bunrui) - int(HB_HEAD);
     static const wchar_t *s_array[] = {
         L"HB_HEAD",

@@ -18,7 +18,7 @@ extern "C" {
 LPCTSTR HinshiToString(HinshiBunrui hinshi) {
     if (HB_MEISHI <= hinshi && hinshi <= HB_SYMBOL)
         return TheIME.LoadSTR(IDS_HINSHI_00 + (hinshi - HB_MEISHI));
-    return TEXT("");
+    return NULL;
 }
 
 // 文字列から品詞分類を取得する関数。
@@ -73,7 +73,7 @@ BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL) {
     TCHAR szYomi[MAX_PATH];
     ::GetDlgItemText(hDlg, edt2, szYomi, _countof(szYomi));
 
-    HinshiBunrui hinshi = (HinshiBunrui)iHinshi;
+    HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + iHinshi);
     return ImeRegisterWord(szYomi, ((hinshi - HB_MEISHI) | MZIME_REGWORD_STYLE), pszWord);
 }
 
@@ -202,6 +202,10 @@ void WordList_PopulateList(HWND hDlg)
 {
     HWND hLst1 = GetDlgItem(hDlg, lst1);
 
+    DWORD exstyle = ListView_GetExtendedListViewStyle(hLst1);
+    exstyle |= LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES;
+    ListView_SetExtendedListViewStyle(hLst1, exstyle);
+
     // すべてを削除。
     ListView_DeleteColumn(hLst1, 2);
     ListView_DeleteColumn(hLst1, 1);
@@ -210,9 +214,9 @@ void WordList_PopulateList(HWND hDlg)
 
     // カラムを追加。
     LV_COLUMN column = { LVCF_TEXT | LVCF_WIDTH | LVCF_FMT, LVCFMT_LEFT, 100 };
-    column.pszText = TheIME.LoadSTR(IDS_WORD);
-    ListView_InsertColumn(hLst1, 0, &column);
     column.pszText = TheIME.LoadSTR(IDS_READING);
+    ListView_InsertColumn(hLst1, 0, &column);
+    column.pszText = TheIME.LoadSTR(IDS_WORD);
     ListView_InsertColumn(hLst1, 1, &column);
     column.pszText = TheIME.LoadSTR(IDS_HINSHI);
     ListView_InsertColumn(hLst1, 2, &column);

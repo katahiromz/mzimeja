@@ -62,9 +62,9 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
         return FALSE;
 
     // 会社名キーを開く。
-    HKEY hKey;
-    LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"), 0, NULL,
-                                  0, KEY_WRITE, NULL, &hKey, NULL);
+    HKEY hCompanyKey;
+    LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"),
+                                  0, NULL, 0, KEY_WRITE, NULL, &hCompanyKey, NULL);
     if (error) {
         DPRINT("error: 0x%08lX", error);
         return FALSE;
@@ -72,10 +72,10 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 
     // アプリキーを開く。
     HKEY hAppKey;
-    error = ::RegCreateKeyEx(hKey, TEXT("mzimeja"), 0, NULL, 0, KEY_WRITE, NULL, &hAppKey, NULL);
+    error = ::RegCreateKeyEx(hCompanyKey, TEXT("mzimeja"), 0, NULL, 0, KEY_WRITE, NULL, &hAppKey, NULL);
     if (error) {
         DPRINT("error: 0x%08lX", error);
-        ::RegCloseKey(hKey);
+        ::RegCloseKey(hCompanyKey);
         return FALSE;
     }
 
@@ -85,7 +85,7 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     if (error) {
         DPRINT("error: 0x%08lX", error);
         ::RegCloseKey(hAppKey);
-        ::RegCloseKey(hKey);
+        ::RegCloseKey(hCompanyKey);
         return FALSE;
     }
 
@@ -103,13 +103,13 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     INT cchValue = lstrlen(szValue);
 
     // レジストリに値をセット。
-    error = ::RegSetValueEx(hAppKey, szName, 0, REG_SZ, (LPBYTE)szValue, (cchValue + 1) * sizeof(TCHAR));
+    error = ::RegSetValueEx(hUserDict, szName, 0, REG_SZ, (LPBYTE)szValue, (cchValue + 1) * sizeof(TCHAR));
     BOOL ret = (error == ERROR_SUCCESS);
 
     // レジストリキーを閉じる。
     ::RegCloseKey(hUserDict);
     ::RegCloseKey(hAppKey);
-    ::RegCloseKey(hKey);
+    ::RegCloseKey(hCompanyKey);
 
     return ret;
 }
@@ -254,16 +254,20 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
     UINT ret;
     FOOTMARK();
 
-    if (!lpfn || (dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE)
+    if (!lpfn || (dw && (dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE))
         return 0;
 
-    HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
-    std::wstring strHinshi = HinshiToString(hinshi);
+    HinshiBunrui hinshi;
+    std::wstring strHinshi;
+    if (dw) {
+        hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
+        strHinshi = HinshiToString(hinshi);
+    }
 
     // レジストリキーを開く。
     HKEY hUserDict;
     LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
-                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja\\hUserDict"),
+                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja\\UserDict"),
                                 0, KEY_READ, &hUserDict);
     if (error) {
         DPRINT("error: 0x%08lX", error);
@@ -292,7 +296,7 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
         szValue[_countof(szValue) - 1] = 0; // avoid buffer overrun
 
         // コロンで値の文字列を分割する。
-        LPTSTR pch1 = wcschr(szValue, L':');
+        LPTSTR pch1 = wcschr(szValueName, L':');
         if (pch1 == NULL)
             continue;
         *pch1++ = 0;
@@ -301,7 +305,7 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
             continue;
         *pch2++ = 0;
 
-        if (lpRead && lpRead[0] && lstrcmpi(szValue, lpRead) != 0)
+        if (lpRead && lpRead[0] && lstrcmpi(szValueName, lpRead) != 0)
             continue;
         if (lpStr && lpStr[0] && lstrcmpi(pch1, lpStr) != 0)
             continue;
@@ -310,7 +314,7 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
 
         HinshiBunrui hinshi = StringToHinshi(pch2);
         DWORD dwStyle = ((hinshi - HB_MEISHI) | MZIME_REGWORD_STYLE);
-        ret = lpfn(szValue, dwStyle, pch1, lpData);
+        ret = lpfn(szValueName, dwStyle, pch1, lpData);
     }
 
     // レジストリキーを閉じる。
