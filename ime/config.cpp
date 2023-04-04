@@ -14,6 +14,23 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// 品詞分類から文字列を取得する関数。
+LPCTSTR HinshiToString(HinshiBunrui hinshi) {
+    if (HB_MEISHI <= hinshi && hinshi <= HB_SYMBOL)
+        return TheIME.LoadSTR(IDS_HINSHI_00 + (hinshi - HB_MEISHI));
+    return TEXT("");
+}
+
+// 文字列から品詞分類を取得する関数。
+HinshiBunrui StringToHinshi(LPCTSTR str) {
+    for (INT hinshi = HB_MEISHI; hinshi <= HB_SYMBOL; ++hinshi) {
+        LPCTSTR psz = HinshiToString((HinshiBunrui)hinshi);
+        if (lstrcmpW(psz, str) == 0)
+            return (HinshiBunrui)hinshi;
+    }
+    return HB_UNKNOWN;
+}
+
 // IDD_GENERAL - 全般設定プロパティシートページ。
 INT_PTR CALLBACK
 GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {

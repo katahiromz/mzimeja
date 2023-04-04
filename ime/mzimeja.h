@@ -233,6 +233,8 @@ INT_PTR CALLBACK ChooseDictDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM l
 INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LPCTSTR HinshiToString(HinshiBunrui hinshi);
+HinshiBunrui StringToHinshi(LPCTSTR str);
 
 // immsec.cpp
 SECURITY_ATTRIBUTES *CreateSecurityAttributes(void);
