@@ -32,6 +32,26 @@ static const wchar_t s_hiragana_table[][5] = {
     {L'ん',     0,     0,     0,     0}, // GYOU_NN
 }; // ※ s_hiragana_table[GYOU_DA][DAN_U] のように使用する。
 
+std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
+std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
+
+void MakeLiteralMaps() {
+  if (g_consonant_map.size()) {
+    return;
+  }
+  g_consonant_map.clear();
+  g_vowel_map.clear();
+  const size_t count = _countof(s_hiragana_table);
+  for (size_t i = 0; i < count; ++i) {
+    for (size_t k = 0; k < 5; ++k) {
+      g_consonant_map[s_hiragana_table[i][k]] = s_hiragana_table[i][0];
+    }
+    for (size_t k = 0; k < 5; ++k) {
+      g_vowel_map[s_hiragana_table[i][k]] = s_hiragana_table[0][k];
+    }
+  }
+} // MzIme::MakeLiteralMaps
+
 // 品詞分類を文字列に変換する（デバッグ用）。
 LPCWSTR BunruiToString(HinshiBunrui bunrui) {
     int index = int(bunrui) - int(HB_HEAD);
@@ -484,10 +504,111 @@ static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
     return records.size();
 } // ScanBasicDict
 
+static WStrings s_UserDictRecords;
+
+static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID lpData) {
+    ASSERT(lpStr && lpStr[0]);
+    ASSERT(lpRead && lpRead[0]);
+    Lattice *pThis = (Lattice *)lpData;
+    assert(pThis != NULL);
+
+    std::wstring pre = lpRead;
+    std::wstring post = lpStr;
+    Gyou gyou = GYOU_A;
+    HinshiBunrui bunrui = StyleToHinshi(dw);
+
+    MakeLiteralMaps();
+
+    std::wstring substr;
+    wchar_t ch;
+    size_t i, ngyou;
+    switch (bunrui) {
+    case HB_NAKEIYOUSHI:
+      i = pre.size() - 1;
+      if (pre[i] == L'な') pre.resize(i);
+      i = post.size() - 1;
+      if (post[i] == L'な') post.resize(i);
+      break;
+    case HB_IKEIYOUSHI:
+      i = pre.size() - 1;
+      if (pre[i] == L'い') pre.resize(i);
+      i = post.size() - 1;
+      if (post[i] == L'い') post.resize(i);
+      break;
+    case HB_ICHIDAN_DOUSHI:
+      assert(pre[pre.size() - 1] == L'る');
+      assert(post[post.size() - 1] == L'る');
+      pre.resize(pre.size() - 1);
+      post.resize(post.size() - 1);
+      break;
+    case HB_KAHEN_DOUSHI:
+      if (pre == L"くる") 
+        return TRUE;
+      substr = pre.substr(pre.size() - 2, 2);
+      if (substr != L"くる") 
+        return TRUE;
+      pre = substr;
+      substr = post.substr(pre.size() - 2, 2);
+      post = substr;
+      break;
+    case HB_SAHEN_DOUSHI:
+      if (pre == L"する") 
+        return TRUE;
+      substr = pre.substr(pre.size() - 2, 2);
+      if (substr == L"する") gyou = GYOU_SA;
+      else if (substr != L"ずる") 
+        gyou = GYOU_ZA;
+      else
+        return TRUE;
+      pre = substr;
+      post = post.substr(pre.size() - 2, 2);
+      break;
+    case HB_GODAN_DOUSHI:
+      ch = pre[pre.size() - 1];
+      if (g_vowel_map[ch] != L'う') 
+        return TRUE;
+      pre.resize(pre.size() - 1);
+      post.resize(post.size() - 1);
+      ch = g_consonant_map[ch];
+      for (i = 0; i < _countof(s_hiragana_table); ++i) {
+        if (s_hiragana_table[i][0] == ch) {
+          ngyou = i;
+          break;
+        }
+      }
+      gyou = (Gyou)ngyou;
+      break;
+    default:
+      break;
+    }
+
+    // レコードの仕様：
+    //     fields[0]: std::wstring 変換前文字列;
+    //     fields[1]: { MAKEWORD(HinshiBunrui, Gyou), 0 };
+    //     fields[2]: std::wstring 変換後文字列;
+    //     fields[3]: std::wstring tags;
+    WStrings fields(4);
+    fields[0] = pre;
+    fields[1] += (WCHAR)MAKEWORD(bunrui, gyou);
+    fields[2] = post;
+    fields[3] = L"[ユーザ辞書]";
+
+    std::wstring sep = { FIELD_SEP };
+    std::wstring record = str_join(fields, sep);
+    s_UserDictRecords.push_back(record);
+
+    return TRUE;
+}
+
 // ユーザー辞書データをスキャンする。
-static size_t ScanUserDict(WStrings& records, WCHAR ch) {
-    // FIXME
-    return 0;
+static size_t ScanUserDict(WStrings& records, WCHAR ch, Lattice *pThis) {
+    s_UserDictRecords.clear();
+    ImeEnumRegisterWord(UserDictProc, NULL, 0, NULL, pThis);
+
+    records.insert(records.end(), s_UserDictRecords.begin(), s_UserDictRecords.end());
+    s_UserDictRecords.clear();
+ 
+    return records.size();
 }
 
 // 子音の写像と母音の写像を作成する。
@@ -1065,7 +1186,8 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
         DebugPrintW(L"ScanBasicDict(%c) count: %d\n", pre[index], count);
 
         // ユーザー辞書をスキャンする。
-        count += ScanUserDict(records, pre[index]);
+        count = ScanUserDict(records, pre[index], this);
+        DebugPrintW(L"ScanUserDict(%c) count: %d\n", pre[index], count);
 
         // store data for each record
         for (size_t k = 0; k < records.size(); ++k) {
@@ -1118,7 +1240,8 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
     DebugPrintW(L"ScanBasicDict(%c) count: %d\n", pre[0], count);
 
     // ユーザー辞書をスキャンする。
-    count += ScanUserDict(records, pre[0]);
+    count = ScanUserDict(records, pre[0], this);
+    DebugPrintW(L"ScanUserDict(%c) count: %d\n", pre[0], count);
 
     // store data for each record
     for (size_t k = 0; k < records.size(); ++k) {
@@ -2068,6 +2191,12 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
         return;
     }
     DebugPrintW(L"DoFields: %s\n", fields[0].c_str());
+
+    // レコードの仕様：
+    //     fields[0]: std::wstring 変換前文字列;
+    //     fields[1]: { MAKEWORD(HinshiBunrui, Gyou), 0 };
+    //     fields[2]: std::wstring 変換後文字列;
+    //     fields[3]: std::wstring tags;
 
     // initialize the node
     LatticeNode node;

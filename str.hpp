@@ -16,6 +16,27 @@ void str_trim_right(std::basic_string<T_CHAR>& str, const T_CHAR* spaces)
 }
 
 template <typename T_STR_CONTAINER>
+inline typename T_STR_CONTAINER::value_type
+str_join(const T_STR_CONTAINER& container,
+         const typename T_STR_CONTAINER::value_type& sep)
+{
+    typename T_STR_CONTAINER::value_type result;
+    typename T_STR_CONTAINER::const_iterator it, end;
+    it = container.begin();
+    end = container.end();
+    if (it != end)
+    {
+        result = *it;
+        for (++it; it != end; ++it)
+        {
+            result += sep;
+            result += *it;
+        }
+    }
+    return result;
+}
+
+template <typename T_STR_CONTAINER>
 void
 str_split(T_STR_CONTAINER& container,
     const typename T_STR_CONTAINER::value_type& str,
