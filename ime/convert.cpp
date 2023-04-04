@@ -37,20 +37,19 @@ std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
 
 // 子音の写像と母音の写像を作成する。
 void MakeLiteralMaps() {
-  if (g_consonant_map.size()) {
-    return;
-  }
-  g_consonant_map.clear();
-  g_vowel_map.clear();
-  const size_t count = _countof(s_hiragana_table);
-  for (size_t i = 0; i < count; ++i) {
-    for (size_t k = 0; k < 5; ++k) {
-      g_consonant_map[s_hiragana_table[i][k]] = s_hiragana_table[i][0];
+    if (g_consonant_map.size())
+        return;
+    g_consonant_map.clear();
+    g_vowel_map.clear();
+    const size_t count = _countof(s_hiragana_table);
+    for (size_t i = 0; i < count; ++i) {
+        for (size_t k = 0; k < 5; ++k) {
+            g_consonant_map[s_hiragana_table[i][k]] = s_hiragana_table[i][0];
+        }
+        for (size_t k = 0; k < 5; ++k) {
+            g_vowel_map[s_hiragana_table[i][k]] = s_hiragana_table[0][k];
+        }
     }
-    for (size_t k = 0; k < 5; ++k) {
-      g_vowel_map[s_hiragana_table[i][k]] = s_hiragana_table[0][k];
-    }
-  }
 } // MakeLiteralMaps
 
 // 品詞分類を文字列に変換する（デバッグ用）。
