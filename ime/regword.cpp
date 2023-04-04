@@ -238,7 +238,7 @@ UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
         return uMax;
     if (u > uMax)
         u = uMax;
-    UINT i = 0;
+    UINT i;
     for (i = 0; i <= HB_MAX - HB_MEISHI; ++i) {
         HinshiBunrui hinshi = (HinshiBunrui)(i + HB_MEISHI);
         if (i >= u)
