@@ -193,7 +193,7 @@ void CandWnd_Paint(HWND hCandWnd) {
                               x1 + CX_HEADER, y + siz.cy + CY_BORDER * 2);
                     ::DrawFrameControl(hDC, &rcHeader, DFC_BUTTON,
                                        DFCS_BUTTONPUSH | DFCS_ADJUSTRECT);
-                    wsprintfW(sz, L"%u", k);
+                    StringCchPrintf(sz, _countof(sz), TEXT("%u"), k);
                     ::SetTextColor(hDC, ::GetSysColor(COLOR_BTNTEXT));
                     ::InflateRect(&rcHeader, -::GetSystemMetrics(SM_CXBORDER), 0);
                     ::DrawTextW(hDC, sz, -1, &rcHeader,

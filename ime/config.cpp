@@ -54,7 +54,7 @@ void RegWord_PopulateHinshi(HWND hDlg) {
     ComboBox_SetCurSel(hCmb1, 0);
 }
 
-// 単語を追加または削除する。
+// 単語を追加する。
 BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL) {
     // 単語を取得。
     TCHAR szWord[MAX_PATH];
@@ -65,79 +65,56 @@ BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL) {
 
     // 品詞を取得。
     HWND hCmb1 = GetDlgItem(hDlg, cmb1);
-    TCHAR szHinshi[MAX_PATH];
-    ComboBox_GetText(hCmb1, szHinshi, _countof(szHinshi));
+    INT iHinshi = ComboBox_GetCurSel(hCmb1);
+    if (iHinshi < 0)
+        return FALSE;
 
     // 読みを取得。
     TCHAR szYomi[MAX_PATH];
     ::GetDlgItemText(hDlg, edt2, szYomi, _countof(szYomi));
 
-    // 会社名キーを開く。
-    HKEY hKey;
-    LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"), 0, NULL,
-                                  0, KEY_WRITE, NULL, &hKey, NULL);
-    if (error) {
-        DPRINT("error: 0x%08lX", error);
-        return TRUE;
-    }
-
-    // アプリキーを開く。
-    HKEY hAppKey;
-    error = ::RegCreateKeyEx(hKey, TEXT("mzimeja-user-dict"), 0, NULL, 0, KEY_WRITE, NULL, &hAppKey, NULL);
-    if (error) {
-        DPRINT("error: 0x%08lX", error);
-        ::RegCloseKey(hKey);
-        return TRUE;
-    }
-
-    // 値文字列は、"品詞:読み"の形。
-    TCHAR szValue[MAX_PATH];
-    lstrcpyn(szValue, szHinshi, _countof(szValue));
-    INT cchValue;
-    cchValue = lstrlen(szValue);
-    lstrcpyn(szValue + cchValue, TEXT(":"), _countof(szValue) - cchValue);
-    cchValue = lstrlen(szValue);
-    lstrcpyn(szValue + cchValue, szYomi, _countof(szValue) - cchValue);
-    cchValue = lstrlen(szValue);
-
-    // レジストリに値をセット。
-    ::RegSetValueEx(hAppKey, pszWord, 0, REG_SZ, (LPBYTE)szValue, (cchValue + 1) * sizeof(TCHAR));
-
-    // レジストリキーを閉じる。
-    ::RegCloseKey(hAppKey);
-    ::RegCloseKey(hKey);
-
-    return TRUE;
+    HinshiBunrui hinshi = (HinshiBunrui)iHinshi;
+    return ImeRegisterWord(szYomi, ((hinshi - HB_MEISHI) | MZIME_REGWORD_STYLE), pszWord);
 }
 
 // 単語を削除する。
-BOOL RegWord_DeleteWord(HWND hDlg, LPCTSTR pszWord) {
-    // 会社名キーを開く。
-    HKEY hKey;
-    LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"), 0, NULL,
-                                  0, KEY_WRITE, NULL, &hKey, NULL);
-    if (error) {
-        DPRINT("error: 0x%08lX", error);
-        return TRUE;
+BOOL RegWord_DeleteWord(HWND hDlg, INT iItem) {
+    HWND hLst1 = GetDlgItem(hDlg, lst1);
+
+    // 選択項目のテキストを習得する。
+    TCHAR szText1[MAX_PATH];
+    TCHAR szText2[MAX_PATH];
+    TCHAR szText3[MAX_PATH];
+    szText1[0] = szText2[0] = szText3[0] = 0;
+    LV_ITEM item = { LVIF_TEXT };
+    item.iItem = iItem;
+    item.iSubItem = 0;
+    item.pszText = szText1;
+    item.cchTextMax = _countof(szText1);
+    ListView_GetItem(hLst1, &item);
+    item.iSubItem = 1;
+    item.pszText = szText2;
+    item.cchTextMax = _countof(szText2);
+    ListView_GetItem(hLst1, &item);
+    item.iSubItem = 2;
+    item.pszText = szText3;
+    item.cchTextMax = _countof(szText3);
+    ListView_GetItem(hLst1, &item);
+    if (!szText1[0] || !szText2[0] || !szText3[0])
+        return FALSE;
+
+    HinshiBunrui hinshi = StringToHinshi(szText3);
+    if (hinshi == HB_UNKNOWN)
+        return FALSE;
+
+    // 削除するか確認。
+    if (MessageBox(hDlg, TheIME.LoadSTR(IDS_WANNADELETEWORD),
+                   szText2, MB_ICONINFORMATION | MB_YESNOCANCEL) != IDYES)
+    {
+        return FALSE;
     }
 
-    // アプリキーを開く。
-    HKEY hAppKey;
-    error = ::RegCreateKeyEx(hKey, TEXT("mzimeja-user-dict"), 0, NULL, 0, KEY_WRITE, NULL, &hAppKey, NULL);
-    if (error) {
-        DPRINT("error: 0x%08lX", error);
-        ::RegCloseKey(hKey);
-        return TRUE;
-    }
-
-    // レジストリの値を削除。
-    ::RegDeleteValue(hAppKey, pszWord);
-
-    // レジストリキーを閉じる。
-    ::RegCloseKey(hAppKey);
-    ::RegCloseKey(hKey);
-
-    return TRUE;
+    return ImeUnregisterWord(szText1, ((hinshi - HB_MEISHI) | MZIME_REGWORD_STYLE), szText2);
 }
 
 
@@ -193,6 +170,33 @@ ChooseDictDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 } // ChooseDictDlgProc
 
+static INT CALLBACK EnumRegWordProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID lpData){
+    HWND hLst1 = (HWND)lpData;
+
+    // 読み。
+    LV_ITEM item = { LVIF_TEXT };
+    item.iItem = ListView_GetItemCount(hLst1);
+    item.iSubItem = 0;
+    item.pszText = const_cast<LPTSTR>(lpRead);
+    INT iItem = ListView_InsertItem(hLst1, &item);
+
+    // 単語。
+    item.iItem = iItem;
+    item.iSubItem = 1;
+    item.pszText = const_cast<LPTSTR>(lpStr);
+    ListView_SetItem(hLst1, &item);
+
+    // 品詞。
+    HinshiBunrui hinshi = (HinshiBunrui)((dw & ~MZIME_REGWORD_STYLE) + HB_MEISHI);
+    std::wstring strHinshi = HinshiToString(hinshi);
+    item.iItem = iItem;
+    item.iSubItem = 2;
+    item.pszText = &strHinshi[0];
+    ListView_SetItem(hLst1, &item);
+
+    return TRUE;
+}
+
 // 単語リストを埋める。
 void WordList_PopulateList(HWND hDlg)
 {
@@ -213,64 +217,8 @@ void WordList_PopulateList(HWND hDlg)
     column.pszText = TheIME.LoadSTR(IDS_HINSHI);
     ListView_InsertColumn(hLst1, 2, &column);
 
-    // レジストリキーを開く。
-    HKEY hKey;
-    LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
-                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja-user-dict"),
-                                0, KEY_READ, &hKey);
-    if (error) {
-        DPRINT("error: 0x%08lX", error);
-        return;
-    }
-
-    // 値を列挙する。
-    for (DWORD dwIndex = 0; dwIndex < 0x1000; ++dwIndex) {
-        // 値の名前を取得する。
-        TCHAR szValueName[MAX_PATH];
-        DWORD cchValueName = _countof(szValueName);
-        TCHAR szValue[MAX_PATH];
-        DWORD cbValue = sizeof(szValue);
-        DWORD dwType;
-        error = ::RegEnumValue(hKey, dwIndex, szValueName, &cchValueName, NULL, &dwType, (LPBYTE)szValue, &cbValue);
-        if (error) {
-            if (error != ERROR_NO_MORE_ITEMS) {
-                DPRINT("error: 0x%08lX", error);
-            }
-            break;
-        }
-        if (dwType != REG_SZ)
-            continue;
-        szValueName[_countof(szValueName) - 1] = 0; // avoid buffer overrun
-        szValue[_countof(szValue) - 1] = 0; // avoid buffer overrun
-
-        // コロンで値の文字列を分割する。
-        LPWSTR pch = wcschr(szValue, L':');
-        if (pch == NULL)
-            continue;
-        *pch++ = 0;
-
-        // 単語。
-        LV_ITEM item = { LVIF_TEXT };
-        item.iItem = ListView_GetItemCount(hLst1);
-        item.iSubItem = 0;
-        item.pszText = szValueName;
-        INT iItem = ListView_InsertItem(hLst1, &item);
-
-        // 読み。
-        item.iItem = iItem;
-        item.iSubItem = 1;
-        item.pszText = pch;
-        ListView_SetItem(hLst1, &item);
-
-        // 品詞。
-        item.iItem = iItem;
-        item.iSubItem = 2;
-        item.pszText = szValue;
-        ListView_SetItem(hLst1, &item);
-    }
-
-    // レジストリキーを閉じる。
-    ::RegCloseKey(hKey);
+    // 項目を追加する。
+    ImeEnumRegisterWord(EnumRegWordProc, NULL, 0, NULL, hLst1);
 }
 
 // IDD_WORDLIST - 単語の一覧プロパティシートページ。
@@ -304,23 +252,9 @@ WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
                 if (iItem == -1)
                     return 0;
 
-                // 選択項目のテキストを習得する。
-                TCHAR szText[MAX_PATH];
-                LV_ITEM item = { LVIF_TEXT };
-                item.iItem = iItem;
-                item.iSubItem = 0;
-                item.pszText = szText;
-                item.cchTextMax = _countof(szText);
-                if (ListView_GetItem(hLst1, &item))
-                {
-                    // 削除するか確認。
-                    if (MessageBox(hDlg, TheIME.LoadSTR(IDS_WANNADELETEWORD),
-                                   szText, MB_ICONINFORMATION | MB_YESNO) == IDYES)
-                    {
-                        // 単語を削除。
-                        RegWord_DeleteWord(hDlg, szText);
-                        ListView_DeleteItem(hLst1, iItem);
-                    }
+                if (RegWord_DeleteWord(hDlg, iItem)) {
+                    // 単語を削除。
+                    ListView_DeleteItem(hLst1, iItem);
                 }
             }
             break;

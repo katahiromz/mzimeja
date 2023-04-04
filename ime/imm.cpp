@@ -36,7 +36,7 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
 
     lpIMEInfo->fdwSelectCaps = SELECT_CAP_CONVERSION;
 
-    lstrcpy(lpszClassName, szUIServerClassName);
+    StringCchCopy(lpszClassName, 64, szUIServerClassName);
 
     if (dwSystemInfoFlags & IME_SYSINFO_WINLOGON) {
         TheIME.m_bWinLogOn = TRUE;
@@ -85,7 +85,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
     {
         std::wstring pathname;
         if (TheIME.GetComputerString(L"ReadMeFile", pathname)) {
-            lstrcpyW((WCHAR *)lpData, pathname.c_str());
+            StringCchCopy((TCHAR *)lpData, MAX_PATH, pathname.c_str());
             ret = TRUE;
         }
     }
@@ -436,7 +436,7 @@ DWORD WINAPI ImeGetImeMenuItems(HIMC hIMC, DWORD dwFlags, DWORD dwType,
                 lpImeMenu[i].hbmpChecked = 0;
                 lpImeMenu[i].hbmpUnchecked = 0;
                 if (item.nStringID != -1) {
-                    lstrcpy(lpImeMenu[i].szString, TheIME.LoadSTR(item.nStringID));
+                    StringCchCopy(lpImeMenu[i].szString, _countof(lpImeMenu[i].szString), TheIME.LoadSTR(item.nStringID));
                 } else {
                     lpImeMenu[i].szString[0] = TEXT('\0');
                 }

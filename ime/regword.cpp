@@ -40,8 +40,77 @@ extern "C" {
 //  (返り値)
 //    成功したならば、TRUE を。さもなくば FALSE を返す。
 BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
-    BOOL ret = FALSE;
+    TCHAR szRead[MAX_PATH];
+    TCHAR szStr[MAX_PATH];
     FOOTMARK();
+
+    if (!lpRead || !lpStr)
+        return FALSE;
+    if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE)
+        return FALSE;
+
+    StringCchCopy(szRead, _countof(szRead), lpRead);
+    StringCchCopy(szStr, _countof(szStr), lpStr);
+    StrTrimW(szRead, L" \t\r\n\x3000");
+    StrTrimW(szStr, L" \t\r\n\x3000");
+    if (!szRead[0] || !szStr[0])
+        return FALSE;
+
+    HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
+    LPCTSTR pszHinshi = HinshiToString(hinshi);
+    if (!pszHinshi || !pszHinshi[0])
+        return FALSE;
+
+    // 会社名キーを開く。
+    HKEY hKey;
+    LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"), 0, NULL,
+                                  0, KEY_WRITE, NULL, &hKey, NULL);
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+        return FALSE;
+    }
+
+    // アプリキーを開く。
+    HKEY hAppKey;
+    error = ::RegCreateKeyEx(hKey, TEXT("mzimeja"), 0, NULL, 0, KEY_WRITE, NULL, &hAppKey, NULL);
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+        ::RegCloseKey(hKey);
+        return FALSE;
+    }
+
+    // ユーザー辞書キーを開く。
+    HKEY hUserDict;
+    error = ::RegCreateKeyEx(hAppKey, TEXT("UserDict"), 0, NULL, 0, KEY_WRITE, NULL, &hUserDict, NULL);
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+        ::RegCloseKey(hAppKey);
+        ::RegCloseKey(hKey);
+        return FALSE;
+    }
+
+    // 値名文字列は、"読み:単語:品詞"の形。
+    TCHAR szName[MAX_PATH];
+    StringCchCopy(szName, _countof(szName), szRead);
+    StringCchCat(szName, _countof(szName), TEXT(":"));
+    StringCchCat(szName, _countof(szName), szStr);
+    StringCchCat(szName, _countof(szName), TEXT(":"));
+    StringCchCat(szName, _countof(szName), pszHinshi);
+
+    // 値文字列は、現状では空文字列とする。
+    TCHAR szValue[MAX_PATH];
+    StringCchCopy(szValue, _countof(szValue), TEXT(""));
+    INT cchValue = lstrlen(szValue);
+
+    // レジストリに値をセット。
+    error = ::RegSetValueEx(hAppKey, szName, 0, REG_SZ, (LPBYTE)szValue, (cchValue + 1) * sizeof(TCHAR));
+    BOOL ret = (error == ERROR_SUCCESS);
+
+    // レジストリキーを閉じる。
+    ::RegCloseKey(hUserDict);
+    ::RegCloseKey(hAppKey);
+    ::RegCloseKey(hKey);
+
     return ret;
 }
 
@@ -65,8 +134,53 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 //  (返り値)
 //    成功したならば、TRUE を。さもなくば FALSE を返す。
 BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
-    BOOL ret = FALSE;
+    TCHAR szRead[MAX_PATH];
+    TCHAR szStr[MAX_PATH];
+
     FOOTMARK();
+
+    if (!lpRead || !lpStr)
+        return FALSE;
+
+    if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE)
+        return FALSE;
+
+    StringCchCopy(szRead, _countof(szRead), lpRead);
+    StringCchCopy(szStr, _countof(szStr), lpStr);
+    StrTrimW(szRead, L" \t\r\n\x3000");
+    StrTrimW(szStr, L" \t\r\n\x3000");
+    if (!szRead[0] || !szStr[0])
+        return FALSE;
+
+    HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
+    LPCTSTR pszHinshi = HinshiToString(hinshi);
+    if (!pszHinshi || !pszHinshi[0])
+        return FALSE;
+
+    // ユーザー辞書キーを開く。
+    HKEY hUserDict;
+    LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
+                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja\\UserDict"),
+                                0, KEY_READ | KEY_WRITE, &hUserDict);
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+        return TRUE;
+    }
+
+    // 値名文字列は、"読み:単語:品詞"の形。
+    TCHAR szName[MAX_PATH];
+    StringCchCopy(szName, _countof(szName), szRead);
+    StringCchCat(szName, _countof(szName), TEXT(":"));
+    StringCchCat(szName, _countof(szName), szStr);
+    StringCchCat(szName, _countof(szName), TEXT(":"));
+    StringCchCat(szName, _countof(szName), pszHinshi);
+
+    // レジストリの値を削除。
+    BOOL ret = (::RegDeleteValue(hUserDict, szName) == ERROR_SUCCESS);
+
+    // レジストリキーを閉じる。
+    ::RegCloseKey(hUserDict);
+
     return ret;
 }
 
@@ -137,8 +251,71 @@ UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
 //    SKK辞書との相性は最悪では？
 UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
                                 DWORD dw, LPCTSTR lpStr, LPVOID lpData) {
-    UINT ret = 0;
+    UINT ret;
     FOOTMARK();
+
+    if (!lpfn || (dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE)
+        return 0;
+
+    HinshiBunrui hinshi = (HinshiBunrui)(HB_MEISHI + (dw & ~MZIME_REGWORD_STYLE));
+    std::wstring strHinshi = HinshiToString(hinshi);
+
+    // レジストリキーを開く。
+    HKEY hUserDict;
+    LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
+                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja\\hUserDict"),
+                                0, KEY_READ, &hUserDict);
+    if (error) {
+        DPRINT("error: 0x%08lX", error);
+        return 0;
+    }
+
+    // 値を列挙する。
+    for (DWORD dwIndex = 0; dwIndex < 0x1000; ++dwIndex) {
+        // 値の名前を取得する。
+        TCHAR szValueName[MAX_PATH];
+        DWORD cchValueName = _countof(szValueName);
+        TCHAR szValue[MAX_PATH];
+        DWORD cbValue = sizeof(szValue);
+        DWORD dwType;
+        error = ::RegEnumValue(hUserDict, dwIndex, szValueName, &cchValueName, NULL,
+                               &dwType, (LPBYTE)szValue, &cbValue);
+        if (error) {
+            if (error != ERROR_NO_MORE_ITEMS) {
+                DPRINT("error: 0x%08lX", error);
+            }
+            break;
+        }
+        if (dwType != REG_SZ)
+            continue;
+        szValueName[_countof(szValueName) - 1] = 0; // avoid buffer overrun
+        szValue[_countof(szValue) - 1] = 0; // avoid buffer overrun
+
+        // コロンで値の文字列を分割する。
+        LPTSTR pch1 = wcschr(szValue, L':');
+        if (pch1 == NULL)
+            continue;
+        *pch1++ = 0;
+        LPTSTR pch2 = wcschr(pch2, L':');
+        if (pch2 == NULL)
+            continue;
+        *pch2++ = 0;
+
+        if (lpRead && lpRead[0] && lstrcmpi(szValue, lpRead) != 0)
+            continue;
+        if (lpStr && lpStr[0] && lstrcmpi(pch1, lpStr) != 0)
+            continue;
+        if (dw && strHinshi[0] && lstrcmpi(pch2, strHinshi.c_str()) != 0)
+            continue;
+
+        HinshiBunrui hinshi = StringToHinshi(pch2);
+        DWORD dwStyle = ((hinshi - HB_MEISHI) | MZIME_REGWORD_STYLE);
+        ret = lpfn(szValue, dwStyle, pch1, lpData);
+    }
+
+    // レジストリキーを閉じる。
+    ::RegCloseKey(hUserDict);
+
     return ret;
 }
 

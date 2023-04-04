@@ -28,7 +28,7 @@ add_library(ime SHARED
     uistate.cpp
     mzimeja.def
     mzimeja_res.rc)
-target_link_libraries(ime kernel32 user32 gdi32 advapi32 comctl32 imm32 ime_convert)
+target_link_libraries(ime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi ime_convert)
 set_target_properties(ime PROPERTIES PREFIX "")
 set_target_properties(ime PROPERTIES SUFFIX "")
 set_target_properties(ime PROPERTIES OUTPUT_NAME "mzimeja.ime")

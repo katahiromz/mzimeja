@@ -755,23 +755,23 @@ void Lattice::AddExtra() {
         fields[0] = pre;
         fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
 
-        wsprintfW(sz, L"%u”N%uŒŽ%u“ú", st.wYear, st.wMonth, st.wDay);
+        StringCchPrintfW(sz, _countof(sz), L"%u”N%uŒŽ%u“ú", st.wYear, st.wMonth, st.wDay);
         fields[2] = sz;
         DoFields(0, fields);
 
-        wsprintfW(sz, L"%04u/%02u/%02u", st.wYear, st.wMonth, st.wDay);
+        StringCchPrintfW(sz, _countof(sz), L"%04u/%02u/%02u", st.wYear, st.wMonth, st.wDay);
         fields[2] = sz;
         DoFields(0, fields);
 
-        wsprintfW(sz, L"%02u/%02u/%04u", st.wMonth, st.wDay, st.wYear);
+        StringCchPrintfW(sz, _countof(sz), L"%02u/%02u/%04u", st.wMonth, st.wDay, st.wYear);
         fields[2] = sz;
         DoFields(0, fields);
 
-        wsprintfW(sz, L"%04u-%02u-%02u", st.wYear, st.wMonth, st.wDay);
+        StringCchPrintfW(sz, _countof(sz), L"%04u-%02u-%02u", st.wYear, st.wMonth, st.wDay);
         fields[2] = sz;
         DoFields(0, fields);
 
-        wsprintfW(sz, L"%02u-%02u-%04u", st.wMonth, st.wDay, st.wYear);
+        StringCchPrintfW(sz, _countof(sz), L"%02u-%02u-%04u", st.wMonth, st.wDay, st.wYear);
         fields[2] = sz;
         DoFields(0, fields);
         return;
@@ -787,7 +787,7 @@ void Lattice::AddExtra() {
         fields[0] = pre;
         fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
 
-        wsprintfW(sz, L"%u”N", st.wYear);
+        StringCchPrintfW(sz, _countof(sz), L"%u”N", st.wYear);
         fields[2] = sz;
         DoFields(0, fields);
         return;
@@ -810,33 +810,33 @@ void Lattice::AddExtra() {
             DoFields(0, fields);
         }
 
-        wsprintfW(sz, L"%uŽž%u•ª%u•b", st.wHour, st.wMinute, st.wSecond);
+        StringCchPrintfW(sz, _countof(sz), L"%uŽž%u•ª%u•b", st.wHour, st.wMinute, st.wSecond);
         fields[2] = sz;
         DoFields(0, fields);
 
-        wsprintfW(sz, L"%02uŽž%02u•ª%02u•b", st.wHour, st.wMinute, st.wSecond);
+        StringCchPrintfW(sz, _countof(sz), L"%02uŽž%02u•ª%02u•b", st.wHour, st.wMinute, st.wSecond);
         fields[2] = sz;
         DoFields(0, fields);
 
         if (st.wHour >= 12) {
-            wsprintfW(sz, L"ŒßŒã%uŽž%u•ª%u•b", st.wHour - 12, st.wMinute, st.wSecond);
+            StringCchPrintfW(sz, _countof(sz), L"ŒßŒã%uŽž%u•ª%u•b", st.wHour - 12, st.wMinute, st.wSecond);
             fields[2] = sz;
             DoFields(0, fields);
 
-            wsprintfW(sz, L"ŒßŒã%02uŽž%02u•ª%02u•b", st.wHour - 12, st.wMinute, st.wSecond);
+            StringCchPrintfW(sz, _countof(sz), L"ŒßŒã%02uŽž%02u•ª%02u•b", st.wHour - 12, st.wMinute, st.wSecond);
             fields[2] = sz;
             DoFields(0, fields);
         } else {
-            wsprintfW(sz, L"Œß‘O%uŽž%u•ª%u•b", st.wHour, st.wMinute, st.wSecond);
+            StringCchPrintfW(sz, _countof(sz), L"Œß‘O%uŽž%u•ª%u•b", st.wHour, st.wMinute, st.wSecond);
             fields[2] = sz;
             DoFields(0, fields);
 
-            wsprintfW(sz, L"Œß‘O%02uŽž%02u•ª%02u•b", st.wHour, st.wMinute, st.wSecond);
+            StringCchPrintfW(sz, _countof(sz), L"Œß‘O%02uŽž%02u•ª%02u•b", st.wHour, st.wMinute, st.wSecond);
             fields[2] = sz;
             DoFields(0, fields);
         }
 
-        wsprintfW(sz, L"%02u:%02u:%02u", st.wHour, st.wMinute, st.wSecond);
+        StringCchPrintfW(sz, _countof(sz), L"%02u:%02u:%02u", st.wHour, st.wMinute, st.wSecond);
         fields[2] = sz;
         DoFields(0, fields);
         return;
@@ -2553,9 +2553,9 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& re
         MzConvClause clause;
         for (DWORD iCand = 0; iCand < 18; ++iCand) {
             MzConvCandidate cand;
-            ::wsprintfW(sz, L"‚±‚¤‚Ù%u-%u", iClause, iCand);
+            ::StringCchPrintfW(sz, _countof(sz), L"‚±‚¤‚Ù%u-%u", iClause, iCand);
             cand.hiragana = sz;
-            ::wsprintfW(sz, L"Œó•â%u-%u", iClause, iCand);
+            ::StringCchPrintfW(sz, _countof(sz), L"Œó•â%u-%u", iClause, iCand);
             cand.converted = sz;
             clause.candidates.push_back(cand);
         }

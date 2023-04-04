@@ -14,9 +14,11 @@
 #include "../targetver.h"   // target Windows version
 
 #ifndef _INC_WINDOWS
-    #include <windows.h>      // Windows
+    #include <windows.h>    // Windows
 #endif
 #include <tchar.h>          // for Windows generic text
+#include <shlwapi.h>        // Shell Light-Weight API
+#include <strsafe.h>        // for StringC... functions
 
 #include <string>           // for std::string, std::wstring, ...
 #include <vector>           // for std::vector
@@ -127,6 +129,9 @@
 #define STCLBT_Y  1
 #define STCLBT_DX 12
 #define STCLBT_DY 12
+
+// The style flags of ImeRegisterWord
+#define MZIME_REGWORD_STYLE (IME_REGWORD_STYLE_USER_FIRST | 0x40000000)
 
 //////////////////////////////////////////////////////////////////////////////
 // additional GCS bits
