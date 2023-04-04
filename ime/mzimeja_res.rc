@@ -78,7 +78,7 @@ FONT 10, "ＭＳ Ｐゴシック"
 
 IDD_CHOOSEDICT DIALOG 34, 31, 186, 85
 CAPTION "辞書の選択"
-STYLE WS_POPUPWINDOW | WS_SYSMENU | WS_CAPTION
+STYLE WS_POPUPWINDOW | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
 {
     LTEXT "現在の辞書:", -1, 5, 15, 84, 8
@@ -106,18 +106,18 @@ FONT 10, "ＭＳ Ｐゴシック"
     AUTOCHECKBOX "Show GuideLine on Ctrl-G", IDC_DEBF_GUIDELINE, 5, 89, 98, 14
 }
 
-IDD_ADDWORD DIALOG 46, 36, 172, 116
+IDD_ADDWORD DIALOG 46, 36, 172, 94
 CAPTION "単語の登録"
-STYLE WS_POPUPWINDOW | WS_SYSMENU | WS_CAPTION
+STYLE WS_POPUPWINDOW | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
 {
-    LTEXT "単語(&W):", -1, 15, 7, 40, 10
-    EDITTEXT edt1, 65, 5, 85, 15, ES_AUTOHSCROLL
+    LTEXT "よみがな(&R):", -1, 15, 6, 40, 10
+    EDITTEXT edt2, 65, 6, 85, 15, ES_AUTOHSCROLL
+    LTEXT "単語(&W):", -1, 15, 29, 40, 10
+    EDITTEXT edt1, 65, 27, 85, 15, ES_AUTOHSCROLL
     LTEXT "品詞(&T):", -1, 15, 50, 40, 10
     COMBOBOX cmb1, 65, 50, 85, 35, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT "よみがな(&R):", -1, 15, 70, 40, 10
-    EDITTEXT edt2, 65, 70, 85, 15, ES_AUTOHSCROLL
-    PUSHBUTTON "OK", IDOK, 55, 95, 60, 15
+    PUSHBUTTON "OK", IDOK, 55, 71, 60, 15
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ STRINGTABLE
     IDS_LEFT, "←"
     IDS_RIGHT, "→⇒"
     IDS_WORD, "単語"
-    IDS_READING, "読み"
+    IDS_READING, "よみがな"
     IDS_HINSHI, "品詞"
     IDS_WANNADELETEWORD, "この単語を削除しますか？"
     IDS_HINSHIWRONG, "品詞が間違っています。"
