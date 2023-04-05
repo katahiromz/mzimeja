@@ -3,10 +3,9 @@
 
 std::wstring postal_code(LPCWSTR code)
 {
-    std::wstring postal, ret;
-
     DWORD dwTick1 = ::GetTickCount(); // 測定開始。
 
+    std::wstring postal, ret;
     if (!Config_GetDWORD(L"PostalDictDisabled", FALSE)) {
         if (Config_GetSz(L"PostalDictPathName", postal)) {
             if (FILE *fin = _wfopen(postal.c_str(), L"rb")) {
