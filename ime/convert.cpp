@@ -514,7 +514,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
     ASSERT(lpStr && lpStr[0]);
     ASSERT(lpRead && lpRead[0]);
     Lattice *pThis = (Lattice *)lpData;
-    assert(pThis != NULL);
+    ASSERT(pThis != NULL);
 
     std::wstring pre = lpRead;
     std::wstring post = lpStr;
@@ -541,8 +541,8 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
         if (post[i] == L'‚¢') post.resize(i);
         break;
     case HB_ICHIDAN_DOUSHI:
-        assert(pre[pre.size() - 1] == L'‚é');
-        assert(post[post.size() - 1] == L'‚é');
+        ASSERT(pre[pre.size() - 1] == L'‚é');
+        ASSERT(post[post.size() - 1] == L'‚é');
         pre.resize(pre.size() - 1);
         post.resize(post.size() - 1);
         break;
