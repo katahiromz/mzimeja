@@ -664,6 +664,9 @@ BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
     case IDM_IME_PAD:
         GenerateMessage(WM_IME_NOTIFY, IMN_PRIVATE, MAKELPARAM(0, 0xFACE));
         break;
+    case IDM_IME_PROPERTY:
+        ImeConfigure(GetKeyboardLayout(0), NULL, IME_CONFIG_GENERAL, NULL);
+        break;
     default:
         return FALSE;
     }

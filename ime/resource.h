@@ -32,6 +32,7 @@
 #define IDM_IME_PAD                         40016
 #define IDM_STROKES                         40017
 #define IDM_RADICALS                        40018
+#define IDM_IME_PROPERTY                    40019
 
 #define IDS_PAREN                           100
 #define IDS_SYMBOLS                         101
