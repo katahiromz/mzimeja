@@ -1192,7 +1192,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
                         ::MultiByteToWideChar(932, 0, address, -1, szAddr, _countof(szAddr));
                         szAddr[_countof(szAddr) - 1] = 0;
                         fields[2] = szAddr;
-                        DoMeishi(saved, fields);
+                        DoMeishi(saved, fields, TRUE);
                     }
                 }
             }
@@ -2150,7 +2150,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
     } while(0);
 } // Lattice::DoSahenDoushi
 
-void Lattice::DoMeishi(size_t index, const WStrings& fields) {
+void Lattice::DoMeishi(size_t index, const WStrings& fields, BOOL bCostZero) {
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
 
@@ -2169,7 +2169,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields) {
     LatticeNode node;
     node.bunrui = HB_MEISHI;
     node.tags = fields[3];
-    node.cost = node.CalcCost();
+    node.cost = (bCostZero ? 0 : node.CalcCost());
 
     if (pre.substr(index, length) == fields[0]) {
         if (node.HasTag(L"[ìÆêAï®]")) {

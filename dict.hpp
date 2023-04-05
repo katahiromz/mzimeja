@@ -151,7 +151,7 @@ struct Lattice {
 
     void DoFields(size_t index, const WStrings& fields, int cost = 0);
 
-    void DoMeishi(size_t index, const WStrings& fields);
+    void DoMeishi(size_t index, const WStrings& fields, BOOL bCostZero = FALSE);
     void DoIkeiyoushi(size_t index, const WStrings& fields);
     void DoNakeiyoushi(size_t index, const WStrings& fields);
     void DoGodanDoushi(size_t index, const WStrings& fields);
