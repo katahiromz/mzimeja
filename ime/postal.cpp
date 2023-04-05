@@ -6,7 +6,7 @@ std::wstring postal_code(LPCWSTR code)
     std::wstring postal, ret;
     DWORD dw = 0;
     if (!Config_GetDWORD(L"PostalDictDisabled", FALSE)) {
-        if (TheIME.GetUserString(L"PostalDictPathName", postal)) {
+        if (Config_GetSz(L"PostalDictPathName", postal)) {
             if (FILE *fin = _wfopen(postal.c_str(), L"rb")) {
                 char buf[256];
                 while (fgets(buf, _countof(buf), fin)) {

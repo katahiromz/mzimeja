@@ -121,12 +121,12 @@ BOOL Config_GetData(LPCTSTR name, LPVOID pvData, DWORD cbData) {
 }
 
 // レジストリにバイナリ値を書き込む。
-BOOL Config_SetData(LPCTSTR name, LPCVOID pvData, DWORD cbData) {
+BOOL Config_SetData(LPCTSTR name, DWORD dwType, LPCVOID pvData, DWORD cbData) {
     HKEY hKey = Config_CreateAppKey();
     if (!hKey)
         return FALSE;
 
-    LONG error = ::RegSetValueEx(hKey, name, 0, REG_BINARY, (const BYTE*)pvData, cbData);
+    LONG error = ::RegSetValueEx(hKey, name, 0, dwType, (const BYTE*)pvData, cbData);
     ::RegCloseKey(hKey);
     if (error) {
         DPRINT("error: 0x%08lX\n", error);
@@ -134,6 +134,33 @@ BOOL Config_SetData(LPCTSTR name, LPCVOID pvData, DWORD cbData) {
     }
 
     return TRUE;
+}
+
+// レジストリから文字列値を読み込む。
+BOOL Config_GetSz(LPCTSTR name, std::wstring& str) {
+    str.clear();
+
+    HKEY hKey = Config_OpenAppKey();
+    if (!hKey)
+        return FALSE;
+
+    TCHAR szText[MAX_PATH];
+    DWORD cbData = sizeof(szText);
+    LONG error = ::RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)szText, &cbData);
+    szText[_countof(szText) - 1] = 0;
+    ::RegCloseKey(hKey);
+    if (error) {
+        DPRINT("error: 0x%08lX\n", error);
+        return FALSE;
+    }
+
+    str = szText;
+    return TRUE;
+}
+
+// レジストリに文字列値を書き込む。
+BOOL Config_SetSz(LPCTSTR name, LPCTSTR psz) {
+    return Config_SetData(name, REG_SZ, psz, (lstrlen(psz) + 1) * sizeof(TCHAR));
 }
 
 // IDD_GENERAL - 全般設定プロパティシートページ。

@@ -258,7 +258,9 @@ HKEY Config_CreateAppKey(VOID);
 DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault);
 BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue);
 BOOL Config_GetData(LPCTSTR name, LPVOID pvData, DWORD cbData);
-BOOL Config_SetData(LPCTSTR name, LPCVOID pvData, DWORD cbData);
+BOOL Config_SetData(LPCTSTR name, DWORD dwType, LPCVOID pvData, DWORD cbData);
+BOOL Config_GetSz(LPCTSTR name, std::wstring& str);
+BOOL Config_SetSz(LPCTSTR name, LPCTSTR psz);
 INT_PTR CALLBACK WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK ChooseDictDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -472,10 +474,6 @@ public:
     BOOL StoreResult(
             const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
 
-    // ユーザー側の設定。
-    BOOL GetUserString(LPCWSTR pszSettingName, std::wstring& value);
-    BOOL SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue);
-
 protected:
     // input context
     HIMC m_hIMC;
@@ -486,12 +484,6 @@ protected:
     Dict m_name_dict;
     BOOL LoadDict();
     void UnloadDict();
-
-    // registry
-    LONG OpenRegKey(HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const;
-    LONG CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey);
-    LONG OpenComputerSettingKey(BOOL bWrite, HKEY *phKey);
-    LONG OpenUserSettingKey(BOOL bWrite, HKEY *phKey);
 }; // class MzIme
 
 extern MzIme TheIME;

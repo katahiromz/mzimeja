@@ -236,7 +236,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
             // 覚えておく。
             POINT pt = { rc.left, rc.top };
-            Config_SetData(L"ptStatusWindow", &pt, sizeof(pt));
+            Config_SetData(L"ptStatusWindow", REG_BINARY, &pt, sizeof(pt));
             UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
         }
         break;
@@ -250,7 +250,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                 RECT rc;
                 ::GetWindowRect(lpUIExtra->hwndDefComp, &rc);
                 POINT pt = { rc.left, rc.top };
-                Config_SetData(L"ptDefComp", &pt, sizeof(pt));
+                Config_SetData(L"ptDefComp", REG_BINARY, &pt, sizeof(pt));
             }
             UnlockUIExtra(hWnd);
         }
@@ -281,7 +281,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             ::GetWindowRect(lpUIExtra->hwndGuide, &rc);
             // 位置を覚えておく。
             POINT pt = { rc.left, rc.top };
-            Config_SetData(L"ptGuide", &pt, sizeof(pt));
+            Config_SetData(L"ptGuide", REG_BINARY, &pt, sizeof(pt));
             UnlockUIExtra(hWnd);
         }
         break;
@@ -329,7 +329,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
             POINT pt;
             pt.x = rc.left;
             pt.y = rc.top;
-            Config_SetData(L"ptStatusWindow", &pt, sizeof(pt));
+            Config_SetData(L"ptStatusWindow", REG_BINARY, &pt, sizeof(pt));
 
             ::ShowWindow(lpUIExtra->hwndStatus, SW_HIDE); // 実際には破棄されるのではなく隠される。
         }
@@ -494,7 +494,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         DPRINT("IMN_PRIVATE\n");
         if (HIWORD(lParam) == 0xFACE) {
             std::wstring imepad_file;
-            if (TheIME.GetUserString(L"ImePadFile", imepad_file)) {
+            if (Config_GetSz(L"ImePadFile", imepad_file)) {
                 ::ShellExecuteW(NULL, NULL, imepad_file.c_str(),
                                 NULL, NULL, SW_SHOWNOACTIVATE);
             }
@@ -502,7 +502,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         }
         if (HIWORD(lParam) == 0xDEAD) {
             std::wstring verinfo_file;
-            if (TheIME.GetUserString(L"VerInfoFile", verinfo_file)) {
+            if (Config_GetSz(L"VerInfoFile", verinfo_file)) {
                 ::ShellExecuteW(NULL, NULL, verinfo_file.c_str(),
                                 NULL, NULL, SW_SHOWNOACTIVATE);
             }

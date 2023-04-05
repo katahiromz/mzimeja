@@ -102,7 +102,7 @@ BOOL MzIme::LoadDict() {
 
     std::wstring basic;
     if (!Config_GetDWORD(L"BasicDictDisabled", FALSE)) {
-        if (GetUserString(L"BasicDictPathName", basic)) {
+        if (Config_GetSz(L"BasicDictPathName", basic)) {
             if (!m_basic_dict.Load(basic.c_str(), L"BasicDictObject")) {
                 ret = FALSE;
             }
@@ -113,7 +113,7 @@ BOOL MzIme::LoadDict() {
 
     std::wstring name;
     if (!Config_GetDWORD(L"NameDictDisabled", FALSE)) {
-        if (GetUserString(L"NameDictPathName", name)) {
+        if (Config_GetSz(L"NameDictPathName", name)) {
             if (!m_name_dict.Load(name.c_str(), L"NameDictObject")) {
                 ret = FALSE;
             }
@@ -150,115 +150,6 @@ VOID MzIme::Uninit(VOID) {
     UnregisterClasses();
     UnloadDict();
 }
-
-//////////////////////////////////////////////////////////////////////////////
-// registry - レジストリ関連。
-
-// レジストリキーを開く。
-LONG MzIme::OpenRegKey(
-        HKEY hKey, LPCWSTR pszSubKey, BOOL bWrite, HKEY *phSubKey) const
-{
-    LONG result;
-    REGSAM sam = (bWrite ? KEY_WRITE : KEY_READ);
-    result = ::RegOpenKeyExW(hKey, pszSubKey, 0, sam | KEY_WOW64_64KEY, phSubKey);
-    if (result != ERROR_SUCCESS) {
-        result = ::RegOpenKeyExW(hKey, pszSubKey, 0, sam, phSubKey);
-    }
-    return result;
-} // MzIme::OpenRegKey
-
-// レジストリキーを作成。
-LONG MzIme::CreateRegKey(HKEY hKey, LPCWSTR pszSubKey, HKEY *phSubKey) {
-    LONG result;
-    DWORD dwDisposition;
-    const REGSAM sam = KEY_WRITE;
-    result = ::RegCreateKeyExW(hKey, pszSubKey, 0, NULL, 0, sam |
-                               KEY_WOW64_64KEY, NULL, phSubKey, &dwDisposition);
-    if (result != ERROR_SUCCESS) {
-        result = ::RegCreateKeyExW(hKey, pszSubKey, 0, NULL, 0, sam, NULL,
-                                   phSubKey, &dwDisposition);
-    }
-    return result;
-} // MzIme::CreateRegKey
-
-//////////////////////////////////////////////////////////////////////////////
-// settings
-
-static const WCHAR s_szRegKey[] =
-        L"SOFTWARE\\Katayama Hirofumi MZ\\mzimeja";
-
-// マシン側のレジストリを開く。
-LONG MzIme::OpenComputerSettingKey(BOOL bWrite, HKEY *phKey) {
-    LONG result;
-    if (bWrite) {
-        result = OpenRegKey(HKEY_LOCAL_MACHINE, s_szRegKey, TRUE, phKey);
-    } else {
-        result = OpenRegKey(HKEY_LOCAL_MACHINE, s_szRegKey, FALSE, phKey);
-    }
-    return result;
-}
-
-// ユーザー側のレジストリを開く。
-LONG MzIme::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
-    LONG result;
-    if (bWrite) {
-        HKEY hSoftware;
-        result = OpenRegKey(HKEY_CURRENT_USER, L"Software", TRUE, &hSoftware);
-        if (result == ERROR_SUCCESS) {
-            HKEY hCompany;
-            result = CreateRegKey(hSoftware, L"Katayama Hirofumi MZ", &hCompany);
-            if (result == ERROR_SUCCESS) {
-                HKEY hMZIMEJA;
-                result = CreateRegKey(hCompany, L"mzimeja", &hMZIMEJA);
-                if (result == ERROR_SUCCESS) {
-                    ::RegCloseKey(hMZIMEJA);
-                }
-                ::RegCloseKey(hCompany);
-            }
-            ::RegCloseKey(hSoftware);
-        }
-        result = OpenRegKey(HKEY_CURRENT_USER, s_szRegKey, TRUE, phKey);
-    } else {
-        result = OpenRegKey(HKEY_CURRENT_USER, s_szRegKey, FALSE, phKey);
-    }
-    return result;
-}
-
-// ユーザー側のレジストリ文字列データを取得する。
-BOOL MzIme::GetUserString(LPCWSTR pszSettingName, std::wstring& value) {
-    HKEY hKey;
-    WCHAR szValue[MAX_PATH * 2];
-    LONG result = OpenUserSettingKey(FALSE, &hKey);
-    if (result == ERROR_SUCCESS && hKey) {
-        DWORD cbData = sizeof(szValue);
-        result = ::RegQueryValueExW(hKey, pszSettingName, NULL, NULL,
-                                    reinterpret_cast<LPBYTE>(szValue), &cbData);
-        ::RegCloseKey(hKey);
-        if (result == ERROR_SUCCESS) {
-            value = szValue;
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::GetUserString
-
-// ユーザー側のレジストリ文字列データを設定する。
-BOOL MzIme::SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
-    HKEY hKey;
-    LONG result = OpenUserSettingKey(TRUE, &hKey);
-    ASSERT(result == ERROR_SUCCESS);
-    if (result == ERROR_SUCCESS && hKey) {
-        DWORD cbData = (::lstrlenW(pszValue) + 1) * sizeof(WCHAR);
-        result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_SZ,
-                                  reinterpret_cast<const BYTE *>(pszValue), cbData);
-        ::RegCloseKey(hKey);
-        ASSERT(result == ERROR_SUCCESS);
-        if (result == ERROR_SUCCESS) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::SetUserString
 
 //////////////////////////////////////////////////////////////////////////////
 
