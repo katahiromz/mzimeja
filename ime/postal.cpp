@@ -4,7 +4,9 @@
 std::wstring postal_code(LPCWSTR code)
 {
     std::wstring postal, ret;
-    DWORD dw = 0;
+
+    DWORD dwTick1 = ::GetTickCount();
+
     if (!Config_GetDWORD(L"PostalDictDisabled", FALSE)) {
         if (Config_GetSz(L"PostalDictPathName", postal)) {
             if (FILE *fin = _wfopen(postal.c_str(), L"rb")) {
@@ -39,5 +41,7 @@ std::wstring postal_code(LPCWSTR code)
         }
     }
 
+    DWORD dwTick2 = ::GetTickCount();
+    DPRINT("postal_code: %lu\n", dwTick2 - dwTick1);
     return ret;
 }
