@@ -428,7 +428,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
                 lpIMC = TheIME.LockIMC(hIMC);
                 if (lpIMC) {
-                    if (!TheIME.GetUserData(L"ptGuide", &pt, sizeof(pt))) {
+                    if (!Config_GetData(L"ptGuide", &pt, sizeof(pt))) {
                         ::GetWindowRect(lpIMC->hWnd, &rc);
                         pt.x = rc.left;
                         pt.y = rc.bottom;

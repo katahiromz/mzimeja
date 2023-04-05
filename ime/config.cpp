@@ -78,12 +78,12 @@ DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault) {
     DWORD dwValue = dwDefault;
     DWORD cbValue = sizeof(dwValue);
     LONG error = ::RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)&dwValue, &cbValue);
+    ::RegCloseKey(hKey);
     if (error || cbValue != sizeof(DWORD)) {
         DPRINT("error: 0x%08lX\n", error);
         return dwDefault;
     }
 
-    ::RegCloseKey(hKey);
     return dwValue;
 }
 
@@ -94,6 +94,7 @@ BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue) {
         return FALSE;
 
     LONG error = ::RegSetValueEx(hKey, name, 0, REG_DWORD, (LPBYTE)&dwValue, sizeof(dwValue));
+    ::RegCloseKey(hKey);
     if (error) {
         DPRINT("error: 0x%08lX\n", error);
         return FALSE;

@@ -75,7 +75,7 @@ void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
         ::ShowWindow(hwnd, SW_HIDE);
     }
 
-    if (TheIME.GetUserData(L"ptDefComp", &pt, sizeof(pt))) {
+    if (Config_GetData(L"ptDefComp", &pt, sizeof(pt))) {
         ::GetWindowRect(lpIMC->hWnd, &rc);
         pt.x = rc.left;
         pt.y = rc.bottom + 1;

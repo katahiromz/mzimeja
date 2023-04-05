@@ -43,7 +43,7 @@ HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
         cy += ::GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
         cy += 2 * CY_BTNEDGE;
         POINT pt;
-        if (!TheIME.GetUserData(L"ptStatusWindow", &pt, sizeof(pt))) { // 位置情報があるか？
+        if (!Config_GetData(L"ptStatusWindow", &pt, sizeof(pt))) { // 位置情報があるか？
             // ワークエリアを使って位置を初期化する。
             RECT rcWorkArea;
             ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, FALSE);
@@ -261,7 +261,7 @@ void StatusWnd_Update(UIEXTRA *lpUIExtra) {
     if (::IsWindow(hwndStatus)) {
         // 設定データ "ptStatusWindow" を使って、ウィンドウの位置を復元する。
         POINT pt;
-        if (TheIME.GetUserData(L"ptStatusWindow", &pt, sizeof(pt))) {
+        if (Config_GetData(L"ptStatusWindow", &pt, sizeof(pt))) {
             RECT rc;
             ::GetWindowRect(hwndStatus, &rc);
             if (pt.x != rc.left || pt.y != rc.top) {

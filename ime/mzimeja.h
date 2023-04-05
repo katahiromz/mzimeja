@@ -475,7 +475,6 @@ public:
     // ユーザー側の設定。
     BOOL GetUserString(LPCWSTR pszSettingName, std::wstring& value);
     BOOL SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue);
-    BOOL GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size);
 
 protected:
     // input context
