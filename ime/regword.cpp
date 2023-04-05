@@ -71,31 +71,19 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
         return FALSE;
     }
 
-    // 会社名キーを開く。
-    HKEY hCompanyKey;
-    LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"),
-                                  0, NULL, 0, KEY_WRITE, NULL, &hCompanyKey, NULL);
-    if (error) {
-        DPRINT("error: 0x%08lX", error);
+    // アプリキーを作成する。
+    HKEY hAppKey = Config_CreateAppKey();
+    if (!hAppKey) {
         return FALSE;
     }
 
-    // アプリキーを開く。
-    HKEY hAppKey;
-    error = ::RegCreateKeyEx(hCompanyKey, TEXT("mzimeja"), 0, NULL, 0, KEY_WRITE, NULL, &hAppKey, NULL);
-    if (error) {
-        DPRINT("error: 0x%08lX", error);
-        ::RegCloseKey(hCompanyKey);
-        return FALSE;
-    }
-
-    // ユーザー辞書キーを開く。
+    // ユーザー辞書キーを作成する。
     HKEY hUserDict;
-    error = ::RegCreateKeyEx(hAppKey, TEXT("UserDict"), 0, NULL, 0, KEY_WRITE, NULL, &hUserDict, NULL);
+    LONG error = ::RegCreateKeyEx(hAppKey, TEXT("UserDict"), 0, NULL, 0, 
+                                  KEY_READ | KEY_WRITE, NULL, &hUserDict, NULL);
     if (error) {
         DPRINT("error: 0x%08lX", error);
         ::RegCloseKey(hAppKey);
-        ::RegCloseKey(hCompanyKey);
         return FALSE;
     }
 
@@ -122,7 +110,6 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     // レジストリキーを閉じる。
     ::RegCloseKey(hUserDict);
     ::RegCloseKey(hAppKey);
-    ::RegCloseKey(hCompanyKey);
 
     return ret;
 }
@@ -182,14 +169,18 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
         return FALSE;
     }
 
+    // レジストリのアプリキーを開く。
+    HKEY hAppKey = Config_OpenAppKey();
+    if (!hAppKey)
+        return FALSE;
+
     // ユーザー辞書キーを開く。
     HKEY hUserDict;
-    LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
-                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja\\UserDict"),
-                                0, KEY_READ | KEY_WRITE, &hUserDict);
+    LONG error = ::RegOpenKeyEx(hAppKey, TEXT("UserDict"), 0, KEY_READ | KEY_WRITE, &hUserDict);
     if (error) {
         DPRINT("error: 0x%08lX", error);
-        return TRUE;
+        ::RegCloseKey(hAppKey);
+        return FALSE;
     }
 
     // 値名文字列は、"読み:単語:品詞"の形。
@@ -207,6 +198,7 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     }
 
     // レジストリキーを閉じる。
+    ::RegCloseKey(hAppKey);
     ::RegCloseKey(hUserDict);
 
     return ret;

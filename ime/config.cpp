@@ -31,6 +31,77 @@ HinshiBunrui StringToHinshi(LPCTSTR str) {
     return HB_UNKNOWN;
 }
 
+// レジストリのアプリキーを開く。
+HKEY Config_OpenAppKey(VOID) {
+    HKEY hAppKey;
+    LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
+                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja"),
+                                0, KEY_READ | KEY_WRITE, &hAppKey);
+    if (error) {
+        DPRINT("0x%08lX", error);
+        return NULL;
+    }
+    return hAppKey;
+}
+
+// レジストリのアプリキーを作成する。
+HKEY Config_CreateAppKey(VOID) {
+    // 会社名キーを作成する。
+    HKEY hCompanyKey;
+    LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"),
+                                  0, NULL, 0, KEY_READ | KEY_WRITE, NULL, &hCompanyKey, NULL);
+    if (error) {
+        DPRINT("error: 0x%08lX\n", error);
+        return NULL;
+    }
+
+    // アプリキーを開く。
+    HKEY hAppKey;
+    error = ::RegCreateKeyEx(hCompanyKey, TEXT("mzimeja"), 0, NULL, 0,
+                             KEY_READ | KEY_WRITE, NULL, &hAppKey, NULL);
+    if (error) {
+        DPRINT("error: 0x%08lX\n", error);
+        ::RegCloseKey(hCompanyKey);
+        return NULL;
+    }
+
+    ::RegCloseKey(hCompanyKey);
+    return hAppKey;
+}
+
+// レジストリからDWORD値を読み込む。
+DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault) {
+    HKEY hKey = Config_OpenAppKey();
+    if (!hKey)
+        return dwDefault;
+
+    DWORD dwValue = dwDefault;
+    DWORD cbValue = sizeof(dwValue);
+    LONG error = ::RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)&dwValue, &cbValue);
+    if (error || cbValue != sizeof(DWORD)) {
+        DPRINT("error: 0x%08lX\n", error);
+        return dwDefault;
+    }
+
+    ::RegCloseKey(hKey);
+    return dwValue;
+}
+
+// レジストリにDWORD値を書き込む。
+BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue) {
+    HKEY hKey = Config_CreateAppKey();
+    if (!hKey)
+        return FALSE;
+
+    LONG error = ::RegSetValueEx(hKey, name, 0, REG_DWORD, (LPBYTE)&dwValue, sizeof(dwValue));
+    if (error) {
+        DPRINT("error: 0x%08lX\n", error);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
 // IDD_GENERAL - 全般設定プロパティシートページ。
 INT_PTR CALLBACK
 GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {

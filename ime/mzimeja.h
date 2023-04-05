@@ -250,14 +250,18 @@ void GuideWnd_Update(UIEXTRA *lpUIExtra);
 LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
 
 // config.c
+LPCTSTR HinshiToString(HinshiBunrui hinshi);
+HinshiBunrui StringToHinshi(LPCTSTR str);
+HKEY Config_OpenAppKey(VOID);
+HKEY Config_CreateAppKey(VOID);
+DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault);
+BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue);
 INT_PTR CALLBACK WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK ChooseDictDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK DebugOptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LPCTSTR HinshiToString(HinshiBunrui hinshi);
-HinshiBunrui StringToHinshi(LPCTSTR str);
 
 // immsec.cpp
 SECURITY_ATTRIBUTES *CreateSecurityAttributes(void);
