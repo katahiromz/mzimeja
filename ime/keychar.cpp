@@ -12,15 +12,23 @@
 // 設定に応じて文字を変換する。
 WCHAR translateChar(WCHAR ch) {
     if (is_comma(ch)) {
-        if (Config_GetDWORD(L"bCommaPeriod", FALSE))
-            ch = L'，';
-        else
+        if (Config_GetDWORD(L"bCommaPeriod", FALSE)) {
+            if (Config_GetDWORD(L"bNoZenkakuAscii", FALSE))
+                ch = L',';
+            else
+                ch = L'，';
+        } else {
             ch = L'、';
+        }
     } else if (is_period(ch)) {
-        if (Config_GetDWORD(L"bCommaPeriod", FALSE))
-            ch = L'．';
-        else
+        if (Config_GetDWORD(L"bCommaPeriod", FALSE)) {
+            if (Config_GetDWORD(L"bNoZenkakuAscii", FALSE))
+                ch = L'.';
+            else
+                ch = L'．';
+        } else {
             ch = L'。';
+        }
     } else if (L'!' <= ch && ch <= L'~') {
         if (!Config_GetDWORD(L"bNoZenkakuAscii", FALSE)) {
             ch = (WCHAR)(ch + (L'！' - L'!'));
