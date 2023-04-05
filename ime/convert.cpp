@@ -2150,7 +2150,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
     } while(0);
 } // Lattice::DoSahenDoushi
 
-void Lattice::DoMeishi(size_t index, const WStrings& fields, BOOL bCostZero) {
+void Lattice::DoMeishi(size_t index, const WStrings& fields, BOOL bMinusCost) {
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
 
@@ -2169,7 +2169,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, BOOL bCostZero) {
     LatticeNode node;
     node.bunrui = HB_MEISHI;
     node.tags = fields[3];
-    node.cost = (bCostZero ? 0 : node.CalcCost());
+    node.cost = node.CalcCost() + (bMinusCost ? -10 : 0);
 
     if (pre.substr(index, length) == fields[0]) {
         if (node.HasTag(L"[ìÆêAï®]")) {
