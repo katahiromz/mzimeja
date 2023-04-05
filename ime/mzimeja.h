@@ -201,7 +201,6 @@ extern "C" {
 extern std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
 extern std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
 void MakeLiteralMaps(); // 子音の写像と母音の写像を作成する。
-WCHAR ConvertCommaPeriod(WCHAR ch); // 句読点を変換する。
 LPCWSTR BunruiToString(HinshiBunrui bunrui);
 
 // notify.c
@@ -319,6 +318,8 @@ BOOL is_hiragana(WCHAR ch);
 BOOL is_fullwidth_katakana(WCHAR ch);
 // is the character halfwidth katakana?
 BOOL is_halfwidth_katakana(WCHAR ch);
+// is the character fullwidth ascii?
+BOOL is_fullwidth_ascii(WCHAR ch);
 // is the character kanji?
 BOOL is_kanji(WCHAR ch);
 // is the character the education kanji?
@@ -339,6 +340,10 @@ std::wstring convert_to_kansuuji_formal(const std::wstring& str);
 BOOL is_period(WCHAR ch);
 // is the character a comma?
 BOOL is_comma(WCHAR ch);
+// 設定に応じて文字を変換する。
+WCHAR translateChar(WCHAR ch);
+// 設定に応じて文字列を変換する。
+std::wstring translateString(const std::wstring& str);
 
 //////////////////////////////////////////////////////////////////////////////
 

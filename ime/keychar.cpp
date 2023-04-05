@@ -9,6 +9,39 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+// 設定に応じて文字を変換する。
+WCHAR translateChar(WCHAR ch) {
+    if (is_comma(ch)) {
+        if (Config_GetDWORD(L"bCommaPeriod", FALSE))
+            ch = L'，';
+        else
+            ch = L'、';
+    } else if (is_period(ch)) {
+        if (Config_GetDWORD(L"bCommaPeriod", FALSE))
+            ch = L'．';
+        else
+            ch = L'。';
+    } else if (L'!' <= ch && ch <= L'~') {
+        if (!Config_GetDWORD(L"bNoZenkakuAscii", FALSE)) {
+            ch = (WCHAR)(ch + (L'！' - L'!'));
+        }
+    } else if (L'！' <= ch && ch <= L'～') {
+        if (Config_GetDWORD(L"bNoZenkakuAscii", FALSE)) {
+            ch = (WCHAR)(ch - (L'！' - L'!'));
+        }
+    }
+    return ch;
+}
+
+// 設定に応じて文字列を変換する。
+std::wstring translateString(const std::wstring& str) {
+    std::wstring ret = str;
+    for (WCHAR& ch : ret) {
+        ch = translateChar(ch);
+    }
+    return ret;
+}
+
 struct KEYVALUE {
     const WCHAR *key;
     const WCHAR *value;
@@ -1194,6 +1227,7 @@ std::wstring hiragana_to_roman(std::wstring hiragana) {
 // ローマ字からひらがなへ文字列を変換。
 std::wstring roman_to_hiragana(std::wstring roman) {
     std::wstring hiragana, str;
+    roman = lcmap(roman, LCMAP_HALFWIDTH); // 事前に半角にしておく。
     for (size_t k = 0; k < roman.size(); ) {
         bool found = false;
         if (!found) {

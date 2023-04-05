@@ -318,7 +318,9 @@ void LogCompStr::UpdateExtraClause(DWORD iClause, DWORD dwConversion) {
         extra.typing_clauses[iClause] =
                 lcmap(hiragana_to_roman(str), LCMAP_HALFWIDTH);
         str = fullwidth_ascii_to_halfwidth(str);
-        extra.hiragana_clauses[iClause] = roman_to_hiragana(str);
+        str = roman_to_hiragana(str);
+        str = translateString(str);
+        extra.hiragana_clauses[iClause] = str;
     } else {
         extra.hiragana_clauses[iClause] = str;
         extra.typing_clauses[iClause] =
@@ -408,6 +410,7 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
     std::wstring str, typed, translated;
     typed += chTyped;
     translated += chTranslated;
+    // カタカナはひらがなに直す。
     if (is_fullwidth_katakana(chTranslated)) {
         translated = lcmap(translated, LCMAP_HIRAGANA);
         chTranslated = translated[0];
@@ -419,17 +422,21 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
         if (is_hiragana(chTranslated)) {
             // set comp str and get delta length
             len = 1;
+            chTranslated = translateChar(chTranslated);
             extra.comp_str_clauses[extra.iClause] += chTranslated;
             // set hiragana
+            chTranslated = translateChar(chTranslated);
             extra.hiragana_clauses[extra.iClause] += chTranslated;
             // set typing
             if (chTyped == chTranslated) {
                 if (bRoman) {
-                    extra.typing_clauses[extra.iClause] +=
-                            hiragana_to_roman(fullwidth_ascii_to_halfwidth(translated));
+                    translated = fullwidth_ascii_to_halfwidth(translated);
+                    translated = translateString(translated);
+                    translated = hiragana_to_roman(translated);
+                    extra.typing_clauses[extra.iClause] += translated;
                 } else {
-                    extra.typing_clauses[extra.iClause] +=
-                            hiragana_to_typing(translated);
+                    translated = hiragana_to_typing(translated);
+                    extra.typing_clauses[extra.iClause] += translated;
                 }
             } else {
                 extra.typing_clauses[extra.iClause] += chTyped;
@@ -439,15 +446,20 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
             str = extra.comp_str_clauses[extra.iClause];
             len = (int)str.size();
             str += chTyped;
+            str = fullwidth_ascii_to_halfwidth(str);
             str = roman_to_hiragana(str, str.size());
+            str = translateString(str);
             extra.comp_str_clauses[extra.iClause] = str;
             len = (int)str.size() - len;
             // set hiragana
             str = extra.hiragana_clauses[extra.iClause];
             str += chTyped;
+            str = fullwidth_ascii_to_halfwidth(str);
             str = roman_to_hiragana(str, str.size());
+            str = translateString(str);
             extra.hiragana_clauses[extra.iClause] = str;
             // set typing
+            chTyped = translateChar(chTyped);
             extra.typing_clauses[extra.iClause] += chTyped;
         }
         break;
@@ -461,11 +473,14 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
             // set typing
             if (chTyped == chTranslated) {
                 if (bRoman) {
-                    extra.typing_clauses[extra.iClause] +=
-                            hiragana_to_roman(fullwidth_ascii_to_halfwidth(translated));
+                    translated = fullwidth_ascii_to_halfwidth(translated);
+                    translated = hiragana_to_roman(translated);
+                    translated = translateString(translated);
+                    extra.typing_clauses[extra.iClause] += translated;
                 } else {
-                    extra.typing_clauses[extra.iClause] +=
-                            hiragana_to_typing(translated);
+                    translated = hiragana_to_typing(translated);
+                    translated = translateString(translated);
+                    extra.typing_clauses[extra.iClause] += translated;
                 }
             } else {
                 extra.typing_clauses[extra.iClause] += typed;
@@ -475,15 +490,20 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
             str = extra.comp_str_clauses[extra.iClause];
             len = (int)str.size();
             str += chTyped;
+            str = fullwidth_ascii_to_halfwidth(str);
             str = roman_to_katakana(str, str.size());
+            str = translateString(str);
             extra.comp_str_clauses[extra.iClause] = str;
             len = (int)str.size() - len;
             // set hiragana
             str = extra.hiragana_clauses[extra.iClause];
             str += chTyped;
+            str = fullwidth_ascii_to_halfwidth(str);
             str = roman_to_hiragana(str, str.size());
+            str = translateString(str);
             extra.hiragana_clauses[extra.iClause] = str;
             // set typing
+            chTyped = translateChar(chTyped);
             extra.typing_clauses[extra.iClause] += chTyped;
         }
         break;
@@ -498,8 +518,9 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
         // set hiragana
         str = extra.hiragana_clauses[extra.iClause];
         str += chTyped;
-        extra.hiragana_clauses[extra.iClause] =
-                roman_to_hiragana(fullwidth_ascii_to_halfwidth(str));
+        str = fullwidth_ascii_to_halfwidth(str);
+        str = roman_to_hiragana(str);
+        extra.hiragana_clauses[extra.iClause] = str;
         // set typing
         extra.typing_clauses[extra.iClause] += chTyped;
         break;
@@ -529,12 +550,14 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
             str = extra.comp_str_clauses[extra.iClause];
             len = (int)str.size();
             str += chTyped;
+            str = fullwidth_ascii_to_halfwidth(str);
             str = roman_to_halfwidth_katakana(str, str.size());
             extra.comp_str_clauses[extra.iClause] = str;
             len = (int)str.size() - len;
             // set hiragana
             str = extra.hiragana_clauses[extra.iClause];
             str += chTyped;
+            str = fullwidth_ascii_to_halfwidth(str);
             str = roman_to_hiragana(str, str.size());
             extra.hiragana_clauses[extra.iClause] = str;
             // set typing
@@ -555,6 +578,7 @@ void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
     typed += chTyped;
     translated += chTranslated;
     DWORD dwIndexInClause = dwCursorPos - ClauseToCompChar(extra.iClause);
+    // カタカナはひらがなに直す。
     if (is_fullwidth_katakana(chTranslated)) {
         translated = lcmap(translated, LCMAP_HIRAGANA);
         chTranslated = translated[0];
@@ -570,7 +594,9 @@ void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
         } else {
             len = (int)str.size();
             str.insert(dwIndexInClause, typed);
+            str = fullwidth_ascii_to_halfwidth(str);
             str = roman_to_hiragana(str);
+            str = translateString(str);
             len = (int)str.size() - len;
         }
         break;
@@ -582,7 +608,9 @@ void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
         } else {
             len = (int)str.size();
             str.insert(dwIndexInClause, typed);
+            str = fullwidth_ascii_to_halfwidth(str);
             str = roman_to_katakana(str);
+            str = translateString(str);
             len = (int)str.size() - len;
         }
         break;
@@ -600,6 +628,7 @@ void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
         } else {
             len = (int)str.size();
             str.insert(dwIndexInClause, typed);
+            str = fullwidth_ascii_to_halfwidth(str);
             str = roman_to_halfwidth_katakana(str);
             len = (int)str.size() - len;
         }
@@ -628,8 +657,6 @@ LogCompStr::AddDakuonChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 
 // 文字を追加する。
 void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
-    chTyped = ConvertCommaPeriod(chTyped);
-    chTranslated = ConvertCommaPeriod(chTranslated);
     size_t size0 = comp_str.size();
     WCHAR ch = PrevCharInClause();
     if (ch) ch = dakuon_shori(ch, chTranslated);

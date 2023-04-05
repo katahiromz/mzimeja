@@ -173,11 +173,16 @@ GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             ::CheckDlgButton(hDlg, chx1, BST_CHECKED);
         else
             ::CheckDlgButton(hDlg, chx1, BST_UNCHECKED);
+        if (Config_GetDWORD(TEXT("bNoZenkakuAscii"), FALSE))
+            ::CheckDlgButton(hDlg, chx2, BST_CHECKED);
+        else
+            ::CheckDlgButton(hDlg, chx2, BST_UNCHECKED);
         return TRUE;
 
     case WM_COMMAND:
         switch (LOWORD(wParam)) {
         case chx1:
+        case chx2:
             ::PropSheet_Changed(::GetParent(hDlg), hDlg);
             break;
         }
@@ -191,6 +196,12 @@ GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             } else {
                 Config_SetDWORD(TEXT("bCommaPeriod"), FALSE);
             }
+            if (::IsDlgButtonChecked(hDlg, chx2) == BST_CHECKED) {
+                Config_SetDWORD(TEXT("bNoZenkakuAscii"), TRUE);
+            } else {
+                Config_SetDWORD(TEXT("bNoZenkakuAscii"), FALSE);
+            }
+            break;
         }
         break;
 
