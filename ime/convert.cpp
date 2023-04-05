@@ -1186,7 +1186,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
                 // óXï÷î‘çÜïœä∑ÅB
                 std::wstring postal = lcmap(fields[0], LCMAP_HALFWIDTH);
                 if (postal.size() == 7) {
-                    DWORD code = _wtoi(postal.c_str());
+                    DWORD code = wcstoul(postal.c_str(), NULL, 10);
                     if (LPCSTR address = postal_code(code)) {
                         WCHAR szAddr[MAX_PATH];
                         ::MultiByteToWideChar(932, 0, address, -1, szAddr, _countof(szAddr));
