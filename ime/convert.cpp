@@ -819,8 +819,8 @@ int LatticeNode::CalcCost() const {
         else if (HasTag(L"[駅名]")) ret += 30;
         else if (HasTag(L"[地名]")) ret += 30;
 
-        // ユーザー辞書単語はコストゼロ。
-        if (HasTag(L"[ユーザ辞書]")) ret = 0;
+        // ユーザー辞書単語はコストマイナス30。
+        if (HasTag(L"[ユーザ辞書]")) ret -= 30;
     }
     return ret;
 }
