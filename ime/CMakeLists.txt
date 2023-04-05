@@ -1,5 +1,5 @@
 # These two files are encoded in Shift_JIS
-add_library(ime_convert STATIC convert.cpp keychar.cpp)
+add_library(ime_convert STATIC convert.cpp keychar.cpp postal.cpp)
 
 # Workaround for Shift_JIS
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -9,6 +9,7 @@ endif()
 if(MSVC)
     # Shift_JIS for Visual C++
     target_compile_options(ime_convert PRIVATE /source-charset:shift_jis /execution-charset:shift_jis)
+    target_compile_options(ime_convert PRIVATE /bigobj) # postal.cpp is huge!
 endif()
 
 add_library(ime SHARED

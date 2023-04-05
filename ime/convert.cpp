@@ -1182,6 +1182,19 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
                 DoMeishi(saved, fields);
                 fields[2] = convert_to_kansuuji_formal(fields[0]);
                 DoMeishi(saved, fields);
+
+                // 郵便番号変換。
+                std::wstring postal = lcmap(fields[0], LCMAP_HALFWIDTH);
+                if (postal.size() == 7) {
+                    DWORD code = _wtoi(postal.c_str());
+                    if (LPCSTR address = postal_code(code)) {
+                        WCHAR szAddr[MAX_PATH];
+                        ::MultiByteToWideChar(932, 0, address, -1, szAddr, _countof(szAddr));
+                        szAddr[_countof(szAddr) - 1] = 0;
+                        fields[2] = szAddr;
+                        DoMeishi(saved, fields);
+                    }
+                }
             }
 
             --index;
@@ -2319,6 +2332,25 @@ void Lattice::Dump(int num) {
 
 //////////////////////////////////////////////////////////////////////////////
 
+BOOL Lattice::MakeLatticeInternal(size_t length, const WCHAR* dict_data)
+{
+    // link and cut not linked
+    UpdateLinks();
+    CutUnlinkedNodes();
+
+    // does it reach the last?
+    size_t index = GetLastLinkedIndex();
+    if (index == length)
+        return TRUE;
+
+    // add complement
+    UpdateRefs();
+    AddComplement(index, 1, 5);
+    AddNodes(index + 1, dict_data);
+
+    return FALSE;
+}
+
 // 複数文節変換において、ラティスを作成する。
 BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre) {
     // 基本辞書が読み込まれていなければ失敗。
@@ -2335,35 +2367,18 @@ BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre) {
     lattice.refs[0] = 1;
 
     size_t count = 0;
-    const DWORD c_retry_count = 50; // 再試行の最大回数。
+    const DWORD c_retry_count = 64; // 再試行の最大回数。
 
     WCHAR *dict_data1 = m_basic_dict.Lock(); // 基本辞書をロック。
     if (dict_data1) {
         // ノードを追加。
         lattice.AddNodes(0, dict_data1);
 
-        // ダンプ。
-        lattice.Dump(1);
-
         // repeat until linked to tail
-        for (;;) {
-            // link and cut not linked
-            lattice.UpdateLinks();
-            lattice.CutUnlinkedNodes();
-            // dump
-            lattice.Dump(2);
-            // does it reach the last?
-            size_t index = lattice.GetLastLinkedIndex();
-            if (index == length) break;
-            // add complement
-            lattice.UpdateRefs();
-            lattice.AddComplement(index, 1, 5);
-            lattice.AddNodes(index + 1, dict_data1);
-            // dump
-            lattice.Dump(3);
-
+        while (!lattice.MakeLatticeInternal(length, dict_data1)) {
             ++count;
-            if (count >= c_retry_count) break;
+            if (count >= c_retry_count)
+                break;
         }
 
         m_basic_dict.Unlock(dict_data1); // 基本辞書のロックを解除。
@@ -2374,28 +2389,11 @@ BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre) {
         // ノードを追加。
         lattice.AddNodes(0, dict_data2);
 
-        // ダンプ。
-        lattice.Dump(1);
-
         // repeat until linked to tail
-        for (;;) {
-            // link and cut not linked
-            lattice.UpdateLinks();
-            lattice.CutUnlinkedNodes();
-            // dump
-            lattice.Dump(2);
-            // does it reach the last?
-            size_t index = lattice.GetLastLinkedIndex();
-            if (index == length) break;
-            // add complement
-            lattice.UpdateRefs();
-            lattice.AddComplement(index, 1, 5);
-            lattice.AddNodes(index + 1, dict_data2);
-            // dump
-            lattice.Dump(3);
-
+        while (!lattice.MakeLatticeInternal(length, dict_data2)) {
             ++count;
-            if (count >= c_retry_count) break;
+            if (count >= c_retry_count)
+                break;
         }
 
         m_name_dict.Unlock(dict_data2); // 人名・地名辞書のロックを解除。
