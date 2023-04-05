@@ -377,7 +377,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
         }
         ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
     } else {
-        DPRINT("dwStyle: 0x%08lX", dwStyle);
+        DPRINT("dwStyle: 0x%08lX\n", dwStyle);
     }
 } // CandWnd_Move
 

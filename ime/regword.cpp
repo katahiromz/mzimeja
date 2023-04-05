@@ -82,7 +82,7 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     LONG error = ::RegCreateKeyEx(hAppKey, TEXT("UserDict"), 0, NULL, 0, 
                                   KEY_READ | KEY_WRITE, NULL, &hUserDict, NULL);
     if (error) {
-        DPRINT("error: 0x%08lX", error);
+        DPRINT("error: 0x%08lX\n", error);
         ::RegCloseKey(hAppKey);
         return FALSE;
     }
@@ -103,7 +103,7 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     // レジストリに値をセット。
     error = ::RegSetValueEx(hUserDict, szName, 0, REG_SZ, (LPBYTE)szValue, (cchValue + 1) * sizeof(TCHAR));
     if (error) {
-        DPRINT("error: 0x%08lX", error);
+        DPRINT("error: 0x%08lX\n", error);
     }
     BOOL ret = (error == ERROR_SUCCESS);
 
@@ -178,7 +178,7 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     HKEY hUserDict;
     LONG error = ::RegOpenKeyEx(hAppKey, TEXT("UserDict"), 0, KEY_READ | KEY_WRITE, &hUserDict);
     if (error) {
-        DPRINT("error: 0x%08lX", error);
+        DPRINT("error: 0x%08lX\n", error);
         ::RegCloseKey(hAppKey);
         return FALSE;
     }
@@ -312,7 +312,7 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
                                 TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja\\UserDict"),
                                 0, KEY_READ, &hUserDict);
     if (error) {
-        DPRINT("error: 0x%08lX", error);
+        DPRINT("error: 0x%08lX\n", error);
         return 0;
     }
 
@@ -328,7 +328,7 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
                                &dwType, (LPBYTE)szValue, &cbValue);
         if (error) {
             if (error != ERROR_NO_MORE_ITEMS) {
-                DPRINT("error: 0x%08lX", error);
+                DPRINT("error: 0x%08lX\n", error);
             }
             break;
         }

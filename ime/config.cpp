@@ -38,7 +38,7 @@ HKEY Config_OpenAppKey(VOID) {
                                 TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja"),
                                 0, KEY_READ | KEY_WRITE, &hAppKey);
     if (error) {
-        DPRINT("0x%08lX", error);
+        DPRINT("0x%08lX\n", error);
         return NULL;
     }
     return hAppKey;

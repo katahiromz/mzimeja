@@ -179,10 +179,10 @@ void LogCandInfo::Dump() {
     DebugPrintA("LogCandInfo::Dump\n");
     for (size_t i = 0; i < cand_lists.size(); ++i) {
         DebugPrintA("### CandList %u ###\n", i);
-        DebugPrintA("+ dwStyle: %08X", cand_lists[i].dwStyle);
-        DebugPrintA("+ dwSelection: %08X", cand_lists[i].dwSelection);
-        DebugPrintA("+ dwPageStart: %08X", cand_lists[i].dwPageStart);
-        DebugPrintA("+ dwPageSize: %08X", cand_lists[i].dwPageSize);
+        DebugPrintA("+ dwStyle: %08X\n", cand_lists[i].dwStyle);
+        DebugPrintA("+ dwSelection: %08X\n", cand_lists[i].dwSelection);
+        DebugPrintA("+ dwPageStart: %08X\n", cand_lists[i].dwPageStart);
+        DebugPrintA("+ dwPageSize: %08X\n", cand_lists[i].dwPageSize);
         DebugPrintA("+ cand_strs: ");
         for (size_t k = 0; k < cand_lists[i].cand_strs.size(); ++k) {
             DebugPrintA("%ls ", cand_lists[i].cand_strs[k].c_str());
