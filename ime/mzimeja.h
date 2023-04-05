@@ -451,8 +451,8 @@ public:
     // make lattice
     BOOL MakeLattice(Lattice& lattice, const std::wstring& pre);
     BOOL MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre);
-    void MakeResult(MzConvResult& result, Lattice& lattice);
     void MakeResultOnFailure(MzConvResult& result, const std::wstring& pre);
+    void MakeResultForMulti(MzConvResult& result, Lattice& lattice);
     void MakeResultForSingle(MzConvResult& result, Lattice& lattice);
     int CalcCost(const std::wstring& tags) const;
 

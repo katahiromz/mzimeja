@@ -2426,7 +2426,7 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
 } // MzIme::MakeLatticeForSingle
 
 // 変換結果を生成する。
-void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
+void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice) {
     result.clear(); // 結果をクリア。
 
     // 2文節最長一致法・改。
@@ -2588,7 +2588,7 @@ void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
 
     // コストによりソートする。
     result.sort();
-} // MzIme::MakeResult
+} // MzIme::MakeResultForMulti
 
 // 変換に失敗したときの結果を作成する。
 void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
@@ -2702,7 +2702,7 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& re
     std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
     if (MakeLattice(lattice, pre)) {
         lattice.AddExtra();
-        MakeResult(result, lattice);
+        MakeResultForMulti(result, lattice);
     } else {
         lattice.AddExtra();
         MakeResultOnFailure(result, pre);
