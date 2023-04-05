@@ -1185,6 +1185,10 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
 
                 // óXï÷î‘çÜïœä∑ÅB
                 std::wstring postal = lcmap(fields[0], LCMAP_HALFWIDTH);
+                if (postal.size() == 3)
+                    postal += L"00";
+                if (postal.size() == 5)
+                    postal += L"00";
                 if (postal.size() == 7) {
                     DWORD code = wcstoul(postal.c_str(), NULL, 10);
                     if (LPCSTR address = postal_code(code)) {
