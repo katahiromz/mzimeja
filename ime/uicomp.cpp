@@ -380,7 +380,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
             POINT pt;
             pt.x = rc.left;
             pt.y = rc.top;
-            TheIME.SetUserData(L"ptDefComp", &pt, sizeof(pt));
+            Config_SetData(L"ptDefComp", &pt, sizeof(pt));
             width += 2 * ::GetSystemMetrics(SM_CXEDGE) + CARET_WIDTH;
             height += 2 * ::GetSystemMetrics(SM_CYEDGE) + UNDERLINE_HEIGHT;
 

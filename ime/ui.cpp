@@ -236,7 +236,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
             // 覚えておく。
             POINT pt = { rc.left, rc.top };
-            TheIME.SetUserData(L"ptStatusWindow", &pt, sizeof(pt));
+            Config_SetData(L"ptStatusWindow", &pt, sizeof(pt));
             UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
         }
         break;
@@ -250,7 +250,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                 RECT rc;
                 ::GetWindowRect(lpUIExtra->hwndDefComp, &rc);
                 POINT pt = { rc.left, rc.top };
-                TheIME.SetUserData(L"ptDefComp", &pt, sizeof(pt));
+                Config_SetData(L"ptDefComp", &pt, sizeof(pt));
             }
             UnlockUIExtra(hWnd);
         }
@@ -281,7 +281,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             ::GetWindowRect(lpUIExtra->hwndGuide, &rc);
             // 位置を覚えておく。
             POINT pt = { rc.left, rc.top };
-            TheIME.SetUserData(L"ptGuide", &pt, sizeof(pt));
+            Config_SetData(L"ptGuide", &pt, sizeof(pt));
             UnlockUIExtra(hWnd);
         }
         break;
@@ -329,7 +329,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
             POINT pt;
             pt.x = rc.left;
             pt.y = rc.top;
-            TheIME.SetUserData(L"ptStatusWindow", &pt, sizeof(pt));
+            Config_SetData(L"ptStatusWindow", &pt, sizeof(pt));
 
             ::ShowWindow(lpUIExtra->hwndStatus, SW_HIDE); // 実際には破棄されるのではなく隠される。
         }

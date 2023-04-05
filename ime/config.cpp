@@ -102,6 +102,39 @@ BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue) {
     return TRUE;
 }
 
+// レジストリからバイナリ値を読み込む。
+BOOL Config_GetData(LPCTSTR name, LPVOID pvData, DWORD cbData) {
+    HKEY hKey = Config_OpenAppKey();
+    if (!hKey)
+        return FALSE;
+
+    DWORD cbDataOld = cbData;
+    LONG error = ::RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)pvData, &cbData);
+    ::RegCloseKey(hKey);
+    if (error || cbDataOld != cbData) {
+        DPRINT("error: 0x%08lX\n", error);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+// レジストリにバイナリ値を書き込む。
+BOOL Config_SetData(LPCTSTR name, LPCVOID pvData, DWORD cbData) {
+    HKEY hKey = Config_CreateAppKey();
+    if (!hKey)
+        return FALSE;
+
+    LONG error = ::RegSetValueEx(hKey, name, 0, REG_BINARY, (const BYTE*)pvData, cbData);
+    ::RegCloseKey(hKey);
+    if (error) {
+        DPRINT("error: 0x%08lX\n", error);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
 // IDD_GENERAL - 全般設定プロパティシートページ。
 INT_PTR CALLBACK
 GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {

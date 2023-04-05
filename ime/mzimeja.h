@@ -257,6 +257,8 @@ HKEY Config_OpenAppKey(VOID);
 HKEY Config_CreateAppKey(VOID);
 DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault);
 BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue);
+BOOL Config_GetData(LPCTSTR name, LPVOID pvData, DWORD cbData);
+BOOL Config_SetData(LPCTSTR name, LPCVOID pvData, DWORD cbData);
 INT_PTR CALLBACK WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK ChooseDictDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -474,7 +476,6 @@ public:
     BOOL GetUserString(LPCWSTR pszSettingName, std::wstring& value);
     BOOL SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue);
     BOOL GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size);
-    BOOL SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 
 protected:
     // input context

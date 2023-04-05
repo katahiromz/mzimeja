@@ -276,23 +276,6 @@ BOOL MzIme::GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
     return FALSE;
 } // MzIme::GetUserData
 
-// ユーザー側のレジストリデータを設定する。
-BOOL MzIme::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
-    HKEY hKey;
-    LONG result = OpenUserSettingKey(TRUE, &hKey);
-    ASSERT(result == ERROR_SUCCESS);
-    if (result == ERROR_SUCCESS && hKey) {
-        result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_BINARY,
-                                  reinterpret_cast<const BYTE *>(ptr), size);
-        ::RegCloseKey(hKey);
-        ASSERT(result == ERROR_SUCCESS);
-        if (result == ERROR_SUCCESS) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::SetUserData
-
 //////////////////////////////////////////////////////////////////////////////
 
 // mzimejaのウィンドウクラスを登録する。
