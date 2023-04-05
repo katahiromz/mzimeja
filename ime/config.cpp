@@ -105,9 +105,32 @@ BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue) {
 // IDD_GENERAL - 全般設定プロパティシートページ。
 INT_PTR CALLBACK
 GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    LPNMHDR pnmhdr = (LPNMHDR)lParam;
     switch (uMsg) {
     case WM_INITDIALOG:
+        if (Config_GetDWORD(TEXT("bCommaPeriod"), FALSE))
+            ::CheckDlgButton(hDlg, chx1, BST_CHECKED);
+        else
+            ::CheckDlgButton(hDlg, chx1, BST_UNCHECKED);
         return TRUE;
+
+    case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+        case chx1:
+            ::PropSheet_Changed(::GetParent(hDlg), hDlg);
+        }
+        break;
+
+    case WM_NOTIFY:
+        switch (pnmhdr->code) {
+        case PSN_APPLY:
+            if (::IsDlgButtonChecked(hDlg, chx1) == BST_CHECKED) {
+                Config_SetDWORD(TEXT("bCommaPeriod"), TRUE);
+            } else {
+                Config_SetDWORD(TEXT("bCommaPeriod"), FALSE);
+            }
+        }
+        break;
 
     default:
         break;

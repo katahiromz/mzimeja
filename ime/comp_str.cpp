@@ -628,6 +628,8 @@ LogCompStr::AddDakuonChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 
 // 文字を追加する。
 void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
+    chTyped = ConvertCommaPeriod(chTyped);
+    chTranslated = ConvertCommaPeriod(chTranslated);
     size_t size0 = comp_str.size();
     WCHAR ch = PrevCharInClause();
     if (ch) ch = dakuon_shori(ch, chTranslated);

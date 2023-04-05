@@ -58,12 +58,12 @@ STATUSRMENU MENU
 //////////////////////////////////////////////////////////////////////////////
 // RT_DIALOG
 
-IDD_GENERAL DIALOG 30, 28, 147, 134
+IDD_GENERAL DIALOG 30, 28, 187, 132
 CAPTION "全般設定"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
 {
-    LTEXT "(開発中)", -1, 14, 46, 107, 10
+    AUTOCHECKBOX "「、」「。」の代わりに「，」「．」を使用する", chx1, 5, 5, 155, 15
 }
 
 IDD_WORDLIST DIALOG 46, 36, 172, 116

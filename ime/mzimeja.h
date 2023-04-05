@@ -201,6 +201,7 @@ extern "C" {
 extern std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
 extern std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
 void MakeLiteralMaps(); // 子音の写像と母音の写像を作成する。
+WCHAR ConvertCommaPeriod(WCHAR ch); // 句読点を変換する。
 LPCWSTR BunruiToString(HinshiBunrui bunrui);
 
 // notify.c
@@ -334,11 +335,6 @@ std::wstring convert_to_kansuuji_formal(const std::wstring& str);
 BOOL is_period(WCHAR ch);
 // is the character a comma?
 BOOL is_comma(WCHAR ch);
-
-// returns a Japanese period
-WCHAR get_period(void);
-// returns a Japanese comma
-WCHAR get_comma(void);
 
 //////////////////////////////////////////////////////////////////////////////
 

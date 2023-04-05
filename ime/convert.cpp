@@ -52,6 +52,22 @@ void MakeLiteralMaps() {
     }
 } // MakeLiteralMaps
 
+// 句読点を変換する。
+WCHAR ConvertCommaPeriod(WCHAR ch) {
+    if (ch == L',') {
+        if (Config_GetDWORD(L"bCommaPeriod", FALSE))
+            ch = L'，';
+        else
+            ch = L'、';
+    } else if (ch == L'.') {
+        if (Config_GetDWORD(L"bCommaPeriod", FALSE))
+            ch = L'．';
+        else
+            ch = L'。';
+    }
+    return ch;
+}
+
 // 品詞分類を文字列に変換する（デバッグ用）。
 LPCWSTR BunruiToString(HinshiBunrui bunrui) {
     int index = int(bunrui) - int(HB_HEAD);

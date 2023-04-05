@@ -211,8 +211,8 @@ static KEYVALUE kana_table[] = {
 
 // 記号の変換テーブル。
 static KEYVALUE kigou_table[] = {
-    {L",", L"、"},
-    {L".", L"。"},
+    //{L",", L"、"}, // bCommaPeriodで処理する。
+    //{L".", L"。"}, // bCommaPeriodで処理する。
     {L"/", L"・"},
     {L"~", L"～"},
     {L"[", L"「"},
@@ -1242,6 +1242,24 @@ std::wstring roman_to_hiragana(std::wstring roman) {
                 }
             }
         }
+        if (!found) {
+            if (roman[k] == L',') {
+                if (Config_GetDWORD(L"bCommaPeriod", FALSE))
+                    hiragana += L'，';
+                else
+                    hiragana += L'、';
+                k += 1;
+                found = true;
+            }
+            else if (roman[k] == L'.') {
+                if (Config_GetDWORD(L"bCommaPeriod", FALSE))
+                    hiragana += L'．';
+                else
+                    hiragana += L'。';
+                k += 1;
+                found = true;
+            }
+        }
         if (!found) hiragana += roman[k++];
     }
     return hiragana;
@@ -1296,6 +1314,24 @@ std::wstring roman_to_katakana(std::wstring roman) {
                     found = true;
                     break;
                 }
+            }
+        }
+        if (!found) {
+            if (roman[k] == L',') {
+                if (Config_GetDWORD(L"bCommaPeriod", FALSE))
+                    katakana += L'，';
+                else
+                    katakana += L'、';
+                k += 1;
+                found = true;
+            }
+            else if (roman[k] == L'.') {
+                if (Config_GetDWORD(L"bCommaPeriod", FALSE))
+                    katakana += L'．';
+                else
+                    katakana += L'。';
+                k += 1;
+                found = true;
             }
         }
         if (!found) katakana += roman[k++];
@@ -1604,8 +1640,16 @@ WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift) {
     case VK_9:          return (bShift ? L'ょ' : L'よ');
     case VK_OEM_PLUS:   return L'れ';
     case VK_OEM_MINUS:  return L'ほ';
-    case VK_OEM_COMMA:  return (bShift ? L'、' : L'ね');
-    case VK_OEM_PERIOD: return (bShift ? L'。' : L'る');
+    case VK_OEM_COMMA:
+        if (Config_GetDWORD(TEXT("bCommaPeriod"), FALSE))
+            return (bShift ? L'，' : L'ね');
+        else
+            return (bShift ? L'、' : L'ね');
+    case VK_OEM_PERIOD:
+        if (Config_GetDWORD(TEXT("bCommaPeriod"), FALSE))
+            return (bShift ? L'．' : L'る');
+        else
+            return (bShift ? L'。' : L'る');
     case VK_OEM_1:      return L'け';
     case VK_OEM_2:      return (bShift ? L'・' : L'め');
     case VK_OEM_3:      return L'゛';
@@ -1678,16 +1722,6 @@ BOOL is_period(WCHAR ch) {
 // 読点（コンマ）か？
 BOOL is_comma(WCHAR ch) {
     return ch == L'、' || ch == L'，' || ch == L',' || ch == L'､';
-}
-
-// 句点。
-WCHAR get_period(void) {
-    return L'。';
-}
-
-// 読点。
-WCHAR get_comma(void) {
-    return L'、';
 }
 
 // ひらがなか？
