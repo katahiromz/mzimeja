@@ -506,6 +506,17 @@ DebugOptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         return TRUE;
 
     case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+        case psh1: // [Test 1] button
+            MessageBoxW(hDlg, L"Test 1", L"Test 1", 0);
+            break;
+        case psh2: // [Test 2] button
+            MessageBoxW(hDlg, L"Test 2", L"Test 2", 0);
+            break;
+        case psh3: // [Test 3] button
+            MessageBoxW(hDlg, L"Test 3", L"Test 3", 0);
+            break;
+        }
         break;
 
     default:
@@ -574,7 +585,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
 
     // プロパティシートを開く準備。
     psh.dwSize = sizeof(psh);
-    psh.dwFlags = PSH_PROPTITLE;
+    psh.dwFlags = PSH_PROPTITLE | PSH_NOAPPLYNOW;
     psh.hwndParent = hWnd;
     psh.hInstance = TheIME.m_hInst;
     psh.pszCaption = MAKEINTRESOURCE(IDS_CONFIGNAME);
@@ -588,9 +599,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
         AddPage(&psh, IDD_GENERAL, GeneralDlgProc);
         AddPage(&psh, IDD_WORDLIST, WordListDlgProc);
         AddPage(&psh, IDD_ABOUTIME, AboutDlgProc);
-#ifdef _DEBUG
         AddPage(&psh, IDD_DEBUG, DebugOptionDlgProc);
-#endif
         ::PropertySheet(&psh);
         break;
 
