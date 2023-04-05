@@ -118,6 +118,7 @@ GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         switch (LOWORD(wParam)) {
         case chx1:
             ::PropSheet_Changed(::GetParent(hDlg), hDlg);
+            break;
         }
         break;
 
