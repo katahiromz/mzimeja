@@ -99,13 +99,10 @@ MzIme::MzIme() {
 // mzimejaの辞書を読み込む。
 BOOL MzIme::LoadDict() {
     BOOL ret = TRUE;
-    DWORD dw;
 
     std::wstring basic;
-    if (!GetUserDword(L"BasicDictDisabled", &dw) || !dw) {
-        if (GetUserString(L"BasicDictPathName", basic) ||
-            GetComputerString(L"BasicDictPathName", basic))
-        {
+    if (!Config_GetDWORD(L"BasicDictDisabled", FALSE)) {
+        if (GetUserString(L"BasicDictPathName", basic)) {
             if (!m_basic_dict.Load(basic.c_str(), L"BasicDictObject")) {
                 ret = FALSE;
             }
@@ -115,10 +112,8 @@ BOOL MzIme::LoadDict() {
     }
 
     std::wstring name;
-    if (!GetUserDword(L"NameDictDisabled", &dw) || !dw) {
-        if (GetUserString(L"NameDictPathName", name) ||
-            GetComputerString(L"NameDictPathName", name))
-        {
+    if (!Config_GetDWORD(L"NameDictDisabled", FALSE)) {
+        if (GetUserString(L"NameDictPathName", name)) {
             if (!m_name_dict.Load(name.c_str(), L"NameDictObject")) {
                 ret = FALSE;
             }
@@ -229,106 +224,6 @@ LONG MzIme::OpenUserSettingKey(BOOL bWrite, HKEY *phKey) {
     return result;
 }
 
-// コンピュータ側のレジストリ文字列を取得する。
-BOOL MzIme::GetComputerString(LPCWSTR pszSettingName, std::wstring& value) {
-    HKEY hKey;
-    WCHAR szValue[MAX_PATH * 2];
-    LONG result = OpenComputerSettingKey(FALSE, &hKey);
-    if (result == ERROR_SUCCESS && hKey) {
-        DWORD cbData = sizeof(szValue);
-        result = ::RegQueryValueExW(hKey, pszSettingName, NULL, NULL,
-                                    reinterpret_cast<LPBYTE>(szValue), &cbData);
-        ::RegCloseKey(hKey);
-        if (result == ERROR_SUCCESS) {
-            value = szValue;
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::GetComputerString
-
-// コンピュータ側のレジストリ文字列を設定する。
-BOOL MzIme::SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue) {
-    HKEY hKey;
-    LONG result = OpenComputerSettingKey(TRUE, &hKey);
-    if (result == ERROR_SUCCESS && hKey) {
-        DWORD cbData = (::lstrlenW(pszValue) + 1) * sizeof(WCHAR);
-        result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_SZ,
-                                  reinterpret_cast<const BYTE *>(pszValue), cbData);
-        ::RegCloseKey(hKey);
-        if (result == ERROR_SUCCESS) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::SetComputerString
-
-// コンピュータ側のレジストリデータを取得する。
-BOOL
-MzIme::GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size) {
-    HKEY hKey;
-    LONG result = OpenComputerSettingKey(FALSE, &hKey);
-    if (result == ERROR_SUCCESS && hKey) {
-        DWORD cbData = size;
-        result = ::RegQueryValueExW(hKey, pszSettingName, NULL, NULL,
-                                    reinterpret_cast<LPBYTE>(ptr), &cbData);
-        ::RegCloseKey(hKey);
-        if (result == ERROR_SUCCESS) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::GetComputerData
-
-// コンピュータ側のレジストリデータを設定する。
-BOOL
-MzIme::SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
-    HKEY hKey;
-    LONG result = OpenComputerSettingKey(TRUE, &hKey);
-    if (result == ERROR_SUCCESS && hKey) {
-        result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_BINARY,
-                                  reinterpret_cast<const BYTE *>(ptr), size);
-        ::RegCloseKey(hKey);
-        if (result == ERROR_SUCCESS) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::SetComputerData
-
-// コンピュータ側のレジストリDWORDデータを取得する。
-BOOL MzIme::GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr) {
-    HKEY hKey;
-    LONG result = OpenComputerSettingKey(FALSE, &hKey);
-    if (result == ERROR_SUCCESS && hKey) {
-        DWORD cbData = sizeof(DWORD);
-        result = ::RegQueryValueExW(hKey, pszSettingName, NULL, NULL,
-                                    reinterpret_cast<LPBYTE>(ptr), &cbData);
-        ::RegCloseKey(hKey);
-        if (result == ERROR_SUCCESS) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::GetComputerData
-
-// コンピュータ側のレジストリDWORDデータを設定する。
-BOOL MzIme::SetComputerDword(LPCWSTR pszSettingName, DWORD data) {
-    HKEY hKey;
-    DWORD dwData = data;
-    LONG result = OpenComputerSettingKey(TRUE, &hKey);
-    if (result == ERROR_SUCCESS && hKey) {
-        DWORD size = sizeof(DWORD);
-        result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_BINARY,
-                                  reinterpret_cast<const BYTE *>(&dwData), size);
-        ::RegCloseKey(hKey);
-        if (result == ERROR_SUCCESS) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::SetComputerData
-
 // ユーザー側のレジストリ文字列データを取得する。
 BOOL MzIme::GetUserString(LPCWSTR pszSettingName, std::wstring& value) {
     HKEY hKey;
@@ -389,41 +284,6 @@ BOOL MzIme::SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size) {
     if (result == ERROR_SUCCESS && hKey) {
         result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_BINARY,
                                   reinterpret_cast<const BYTE *>(ptr), size);
-        ::RegCloseKey(hKey);
-        ASSERT(result == ERROR_SUCCESS);
-        if (result == ERROR_SUCCESS) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::SetUserData
-
-// ユーザー側のレジストリDWORDデータを取得する。
-BOOL MzIme::GetUserDword(LPCWSTR pszSettingName, DWORD *ptr) {
-    HKEY hKey;
-    LONG result = OpenUserSettingKey(FALSE, &hKey);
-    if (result == ERROR_SUCCESS && hKey) {
-        DWORD cbData = sizeof(DWORD);
-        result = ::RegQueryValueExW(hKey, pszSettingName, NULL, NULL,
-                                    reinterpret_cast<LPBYTE>(ptr), &cbData);
-        ::RegCloseKey(hKey);
-        if (result == ERROR_SUCCESS) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-} // MzIme::GetUserData
-
-// ユーザー側のレジストリDWORDデータを設定する。
-BOOL MzIme::SetUserDword(LPCWSTR pszSettingName, DWORD data) {
-    HKEY hKey;
-    DWORD dwData = data;
-    LONG result = OpenUserSettingKey(TRUE, &hKey);
-    ASSERT(result == ERROR_SUCCESS);
-    if (result == ERROR_SUCCESS && hKey) {
-        DWORD size = sizeof(DWORD);
-        result = ::RegSetValueExW(hKey, pszSettingName, 0, REG_DWORD,
-                                  reinterpret_cast<const BYTE *>(&dwData), size);
         ::RegCloseKey(hKey);
         ASSERT(result == ERROR_SUCCESS);
         if (result == ERROR_SUCCESS) {

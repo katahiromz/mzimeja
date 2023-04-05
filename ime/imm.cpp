@@ -84,7 +84,7 @@ LRESULT WINAPI ImeEscape(HIMC hIMC, UINT uSubFunc, LPVOID lpData) {
     case IME_ESC_GETHELPFILENAME:
     {
         std::wstring pathname;
-        if (TheIME.GetComputerString(L"ReadMeFile", pathname)) {
+        if (TheIME.GetUserString(L"ReadMeFile", pathname)) {
             StringCchCopy((TCHAR *)lpData, MAX_PATH, pathname.c_str());
             ret = TRUE;
         }

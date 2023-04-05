@@ -64,13 +64,10 @@ void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam) {
                     }
                 }
 
-                DWORD bIsNonRoman = FALSE;
-                if (TheIME.GetUserDword(L"IsNonRoman", &bIsNonRoman)) {
-                    if (bIsNonRoman) {
-                        lpIMC->Conversion() &= ~IME_CMODE_ROMAN;
-                    } else {
-                        lpIMC->Conversion() |= IME_CMODE_ROMAN;
-                    }
+                if (Config_GetDWORD(L"IsNonRoman", FALSE)) {
+                    lpIMC->Conversion() &= ~IME_CMODE_ROMAN;
+                } else {
+                    lpIMC->Conversion() |= IME_CMODE_ROMAN;
                 }
 
                 lpIMC->UnlockCompStr();
@@ -349,9 +346,9 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         if (lpIMC) {
             // ローマ字モードを保存。
             if (lpIMC->Conversion() & IME_CMODE_ROMAN) {
-                TheIME.SetUserDword(L"IsNonRoman", FALSE);
+                Config_SetDWORD(L"IsNonRoman", FALSE);
             } else {
-                TheIME.SetUserDword(L"IsNonRoman", TRUE);
+                Config_SetDWORD(L"IsNonRoman", TRUE);
             }
             TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
@@ -497,7 +494,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         DPRINT("IMN_PRIVATE\n");
         if (HIWORD(lParam) == 0xFACE) {
             std::wstring imepad_file;
-            if (TheIME.GetComputerString(L"ImePadFile", imepad_file)) {
+            if (TheIME.GetUserString(L"ImePadFile", imepad_file)) {
                 ::ShellExecuteW(NULL, NULL, imepad_file.c_str(),
                                 NULL, NULL, SW_SHOWNOACTIVATE);
             }
@@ -505,7 +502,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
         }
         if (HIWORD(lParam) == 0xDEAD) {
             std::wstring verinfo_file;
-            if (TheIME.GetComputerString(L"VerInfoFile", verinfo_file)) {
+            if (TheIME.GetUserString(L"VerInfoFile", verinfo_file)) {
                 ::ShellExecuteW(NULL, NULL, verinfo_file.c_str(),
                                 NULL, NULL, SW_SHOWNOACTIVATE);
             }

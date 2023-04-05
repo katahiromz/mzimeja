@@ -470,19 +470,9 @@ public:
     BOOL StoreResult(
             const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
 
-    // コンピュータ側の設定。
-    BOOL GetComputerString(LPCWSTR pszSettingName, std::wstring& value);
-    BOOL SetComputerString(LPCWSTR pszSettingName, LPCWSTR pszValue);
-    BOOL GetComputerDword(LPCWSTR pszSettingName, DWORD *ptr);
-    BOOL SetComputerDword(LPCWSTR pszSettingName, DWORD data);
-    BOOL GetComputerData(LPCWSTR pszSettingName, void *ptr, DWORD size);
-    BOOL SetComputerData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
-
     // ユーザー側の設定。
     BOOL GetUserString(LPCWSTR pszSettingName, std::wstring& value);
     BOOL SetUserString(LPCWSTR pszSettingName, LPCWSTR pszValue);
-    BOOL GetUserDword(LPCWSTR pszSettingName, DWORD *ptr);
-    BOOL SetUserDword(LPCWSTR pszSettingName, DWORD data);
     BOOL GetUserData(LPCWSTR pszSettingName, void *ptr, DWORD size);
     BOOL SetUserData(LPCWSTR pszSettingName, const void *ptr, DWORD size);
 

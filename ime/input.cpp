@@ -216,13 +216,11 @@ void InputContext::Initialize() {
 
     fdwConversion = IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE |
                     IME_CMODE_JAPANESE;
-    DWORD bIsNonRoman = FALSE;
-    if (TheIME.GetUserDword(L"IsNonRoman", &bIsNonRoman)) {
-        if (bIsNonRoman) {
-            fdwConversion &= ~IME_CMODE_ROMAN;
-        } else {
-            fdwConversion |= IME_CMODE_ROMAN;
-        }
+    DWORD bIsNonRoman = Config_GetDWORD(L"IsNonRoman", FALSE);
+    if (bIsNonRoman) {
+        fdwConversion &= ~IME_CMODE_ROMAN;
+    } else {
+        fdwConversion |= IME_CMODE_ROMAN;
     }
     fdwInit |= INIT_CONVERSION;
 

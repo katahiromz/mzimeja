@@ -184,7 +184,7 @@ INT DoSetRegistry1(VOID) {
 INT DoSetRegistry2(VOID) {
     BOOL ret = FALSE;
     HKEY hKey;
-    LONG result = OpenRegKey(HKEY_LOCAL_MACHINE, L"SOFTWARE", TRUE, &hKey);
+    LONG result = OpenRegKey(HKEY_CURRENT_USER, L"SOFTWARE", TRUE, &hKey);
     if (result == ERROR_SUCCESS && hKey) {
         HKEY hkCompany;
         result = CreateRegKey(hKey, L"Katayama Hirofumi MZ", &hkCompany);
@@ -319,10 +319,10 @@ static const WCHAR s_sz_katahiromz[] =
 INT DoUnsetRegistry2(VOID) {
     BOOL ret = FALSE;
     HKEY hKey;
-    LONG result = RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+    LONG result = RegOpenKeyExW(HKEY_CURRENT_USER,
                                 s_sz_katahiromz, 0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
     if (result != ERROR_SUCCESS) {
-        result = RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+        result = RegOpenKeyExW(HKEY_CURRENT_USER,
                                s_sz_katahiromz, 0, KEY_ALL_ACCESS, &hKey);
     }
     if (result == ERROR_SUCCESS && hKey) {
