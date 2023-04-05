@@ -5,7 +5,7 @@ std::wstring postal_code(LPCWSTR code)
 {
     std::wstring postal, ret;
 
-    DWORD dwTick1 = ::GetTickCount();
+    DWORD dwTick1 = ::GetTickCount(); // 測定開始。
 
     if (!Config_GetDWORD(L"PostalDictDisabled", FALSE)) {
         if (Config_GetSz(L"PostalDictPathName", postal)) {
@@ -41,7 +41,8 @@ std::wstring postal_code(LPCWSTR code)
         }
     }
 
-    DWORD dwTick2 = ::GetTickCount();
+    DWORD dwTick2 = ::GetTickCount(); // 測定終了。
+
     DPRINT("postal_code: %lu\n", dwTick2 - dwTick1);
     return ret;
 }
