@@ -5,6 +5,7 @@ std::wstring postal_code(LPCWSTR code)
 {
     DWORD dwTick1 = ::GetTickCount(); // 測定開始。
 
+    // TODO: ここのコードをなるべく高速にせよ。
     std::wstring postal, ret;
     if (!Config_GetDWORD(L"PostalDictDisabled", FALSE)) {
         if (Config_GetSz(L"PostalDictPathName", postal)) {
