@@ -255,6 +255,7 @@ BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
 {
   // calculate the total size
   size_t size = 0;
+  size += 1;  // UTF-16 BOM
   size += 1;  // \n
   for (size_t i = 0; i < entries.size(); ++i) {
     const DictEntry& entry = entries[i];
@@ -270,21 +271,20 @@ BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
   size *= sizeof(WCHAR);
   printf("size: %d\n", (INT)size);
 
-  void *pv = malloc(size);
+  void *pv = calloc(1, size);
   if (pv == NULL) {
     return FALSE;
   }
 
-  wchar_t *pch = (wchar_t *)pv;
-
-  size_t cch;
-  *pch++ += RECORD_SEP;
+  WCHAR *pch = (WCHAR *)pv;
+  *pch++ = 0xFEFF; // UTF-16 BOM
+  *pch++ = RECORD_SEP;
   for (size_t i = 0; i < entries.size(); ++i) {
     // line format:
     // pre FIELD_SEP MAKEWORD(bunrui, gyou) FIELD_SEP post FIELD_SEP tags RECORD_SEP
     const DictEntry& entry = entries[i];
     // pre \t
-    cch = entry.pre.size();
+    size_t cch = entry.pre.size();
     memcpy(pch, entry.pre.c_str(), cch * sizeof(WCHAR));
     pch += cch;
     *pch++ = FIELD_SEP;
@@ -305,9 +305,6 @@ BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
   }
   *pch++ = L'\0'; // NUL
   assert(size / 2 == size_t(pch - reinterpret_cast<WCHAR *>(pv)));
-
-  pch = (wchar_t *)pv;
-  *pch = RECORD_SEP;
 
   BOOL ret = FALSE;
 

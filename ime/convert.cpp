@@ -474,6 +474,9 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
 static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
     ASSERT(dict_data);
 
+    if (ch == 0)
+        return 0;
+
     // レコード区切りと文字chの組み合わせを検索する。
     // これで文字chで始まる単語を検索できる。
     WCHAR sz[3] = {RECORD_SEP, ch, 0};
@@ -517,6 +520,9 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
     std::wstring post = lpStr;
     Gyou gyou = GYOU_A;
     HinshiBunrui bunrui = StyleToHinshi(dw);
+
+    if (pre.size() <= 1)
+        return 0;
 
     std::wstring substr;
     wchar_t ch;
