@@ -2303,8 +2303,8 @@ void Lattice::Dump(int num) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// ラティスを作成する。
-BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
+// 複数文節変換において、ラティスを作成する。
+BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre) {
     // 基本辞書が読み込まれていなければ失敗。
     if (!m_basic_dict.IsLoaded())
         return FALSE;
@@ -2391,7 +2391,7 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
     // ダンプ。
     lattice.Dump(4);
     return FALSE; // 失敗。
-} // MzIme::MakeLattice
+} // MzIme::MakeLatticeForMulti
 
 // 単一文節変換において、ラティスを作成する。
 BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
@@ -2425,7 +2425,7 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
     return FALSE; // 失敗。
 } // MzIme::MakeLatticeForSingle
 
-// 変換結果を生成する。
+// 単一文節変換において、変換結果を生成する。
 void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice) {
     result.clear(); // 結果をクリア。
 
@@ -2700,7 +2700,7 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& re
     // make lattice and make result
     Lattice lattice;
     std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
-    if (MakeLattice(lattice, pre)) {
+    if (MakeLatticeForMulti(lattice, pre)) {
         lattice.AddExtra();
         MakeResultForMulti(result, lattice);
     } else {

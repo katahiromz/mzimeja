@@ -449,7 +449,7 @@ public:
     void UnlockBasicDict(WCHAR *data);      // 基本辞書のロックを解除する。
 
     // make lattice
-    BOOL MakeLattice(Lattice& lattice, const std::wstring& pre);
+    BOOL MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre);
     BOOL MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre);
     void MakeResultOnFailure(MzConvResult& result, const std::wstring& pre);
     void MakeResultForMulti(MzConvResult& result, Lattice& lattice);
