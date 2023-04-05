@@ -2305,8 +2305,6 @@ void Lattice::Dump(int num) {
 
 // ラティスを作成する。
 BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
-    const DWORD c_retry_count = 32;
-
     // 基本辞書が読み込まれていなければ失敗。
     if (!m_basic_dict.IsLoaded())
         return FALSE;
@@ -2320,11 +2318,13 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
     lattice.refs.assign(length + 1, 0);
     lattice.refs[0] = 1;
 
-    WCHAR *dict_data = m_basic_dict.Lock(); // 基本辞書をロック。
     size_t count = 0;
-    if (dict_data) {
+    const DWORD c_retry_count = 50; // 再試行の最大回数。
+
+    WCHAR *dict_data1 = m_basic_dict.Lock(); // 基本辞書をロック。
+    if (dict_data1) {
         // ノードを追加。
-        lattice.AddNodes(0, dict_data);
+        lattice.AddNodes(0, dict_data1);
 
         // ダンプ。
         lattice.Dump(1);
@@ -2342,7 +2342,7 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
             // add complement
             lattice.UpdateRefs();
             lattice.AddComplement(index, 1, 5);
-            lattice.AddNodes(index + 1, dict_data);
+            lattice.AddNodes(index + 1, dict_data1);
             // dump
             lattice.Dump(3);
 
@@ -2350,11 +2350,43 @@ BOOL MzIme::MakeLattice(Lattice& lattice, const std::wstring& pre) {
             if (count >= c_retry_count) break;
         }
 
-        m_basic_dict.Unlock(dict_data); // 基本辞書のロックを解除。
-
-        if (count < c_retry_count)
-            return TRUE; // 成功。
+        m_basic_dict.Unlock(dict_data1); // 基本辞書のロックを解除。
     }
+
+    WCHAR *dict_data2 = m_name_dict.Lock(); // 人名・地名辞書をロック。
+    if (dict_data2) {
+        // ノードを追加。
+        lattice.AddNodes(0, dict_data2);
+
+        // ダンプ。
+        lattice.Dump(1);
+
+        // repeat until linked to tail
+        for (;;) {
+            // link and cut not linked
+            lattice.UpdateLinks();
+            lattice.CutUnlinkedNodes();
+            // dump
+            lattice.Dump(2);
+            // does it reach the last?
+            size_t index = lattice.GetLastLinkedIndex();
+            if (index == length) break;
+            // add complement
+            lattice.UpdateRefs();
+            lattice.AddComplement(index, 1, 5);
+            lattice.AddNodes(index + 1, dict_data2);
+            // dump
+            lattice.Dump(3);
+
+            ++count;
+            if (count >= c_retry_count) break;
+        }
+
+        m_name_dict.Unlock(dict_data2); // 人名・地名辞書のロックを解除。
+    }
+
+    if (count < c_retry_count)
+        return TRUE; // 成功。
 
     // ダンプ。
     lattice.Dump(4);
@@ -2511,7 +2543,7 @@ void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
         if (is_hiragana(hiragana[0])) {
             LatticeNode node;
             node.bunrui = HB_UNKNOWN;
-            node.cost = 10;
+            node.cost = 40; // コストは人名・地名よりも高くする。
 
             // add hiragana
             node.pre = hiragana;
@@ -2526,7 +2558,7 @@ void MzIme::MakeResult(MzConvResult& result, Lattice& lattice) {
         } else {
             LatticeNode node;
             node.bunrui = HB_UNKNOWN;
-            node.cost = 10;
+            node.cost = 40; // コストは人名・地名よりも高くする。
             node.pre = hiragana;
 
             // add the lowercase and fullwidth
@@ -2571,7 +2603,7 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
     // ノードを初期化。
     LatticeNode node;
     node.pre = pre; // 変換前の文字列。
-    node.cost = 0; // コストはゼロ。
+    node.cost = 40; // コストは人名・地名よりも高くする。
     node.bunrui = HB_MEISHI; // 名詞。
 
     // 文節に無変換文字列を追加。
@@ -2619,7 +2651,7 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
     LatticeNode node;
     node.pre = pre;
     node.bunrui = HB_UNKNOWN;
-    node.cost = 10; // コストは10。
+    node.cost = 40; // コストは人名・地名よりも高くする。
 
     // 文節に無変換文字列を追加。
     node.post = pre; // 変換後の文字列。
