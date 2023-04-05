@@ -507,6 +507,6 @@ protected:
 extern MzIme TheIME;
 
 // postal.cpp
-LPCSTR postal_code(DWORD code);
+std::wstring postal_code(LPCWSTR code);
 
 //////////////////////////////////////////////////////////////////////////////

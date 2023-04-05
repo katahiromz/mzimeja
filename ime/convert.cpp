@@ -1190,13 +1190,10 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
                 if (postal.size() == 5)
                     postal += L"00";
                 if (postal.size() == 7) {
-                    DWORD code = wcstoul(postal.c_str(), NULL, 10);
-                    if (LPCSTR address = postal_code(code)) {
-                        WCHAR szAddr[MAX_PATH];
-                        ::MultiByteToWideChar(932, 0, address, -1, szAddr, _countof(szAddr));
-                        szAddr[_countof(szAddr) - 1] = 0;
-                        fields[2] = szAddr;
-                        DoMeishi(saved, fields, TRUE);
+                    std::wstring addr = postal_code(postal.c_str());
+                    if (addr.size()) {
+                        fields[2] = addr;
+                        DoMeishi(saved, fields, -10);
                     }
                 }
             }
@@ -2154,7 +2151,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
     } while(0);
 } // Lattice::DoSahenDoushi
 
-void Lattice::DoMeishi(size_t index, const WStrings& fields, BOOL bMinusCost) {
+void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost) {
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
 
@@ -2173,7 +2170,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, BOOL bMinusCost) {
     LatticeNode node;
     node.bunrui = HB_MEISHI;
     node.tags = fields[3];
-    node.cost = node.CalcCost() + (bMinusCost ? -10 : 0);
+    node.cost = node.CalcCost() + deltaCost;
 
     if (pre.substr(index, length) == fields[0]) {
         if (node.HasTag(L"[ìÆêAï®]")) {

@@ -60,6 +60,10 @@ LPWSTR GetNameDictPathName(LPWSTR pszPath) {
     return FindLocalFile(pszPath, L"res\\name.dic");
 }
 
+LPWSTR GetPostalDictPathName(LPWSTR pszPath) {
+    return FindLocalFile(pszPath, L"res\\postal.dat");
+}
+
 LPWSTR GetKanjiDataPathName(LPWSTR pszPath) {
     return FindLocalFile(pszPath, L"res\\kanji.dat");
 }
@@ -190,6 +194,7 @@ INT DoSetRegistry2(VOID) {
             if (result == ERROR_SUCCESS && hkSoftware) {
                 TCHAR szBasicDictPath[MAX_PATH];
                 TCHAR szNameDictPath[MAX_PATH];
+                TCHAR szPostalDictPath[MAX_PATH];
                 TCHAR szKanjiPath[MAX_PATH];
                 TCHAR szRadicalPath[MAX_PATH];
                 TCHAR szImePadPath[MAX_PATH];
@@ -198,6 +203,7 @@ INT DoSetRegistry2(VOID) {
 
                 GetBasicDictPathName(szBasicDictPath);
                 GetNameDictPathName(szNameDictPath);
+                GetPostalDictPathName(szPostalDictPath);
                 GetKanjiDataPathName(szKanjiPath);
                 GetRadicalDataPathName(szRadicalPath);
                 GetImePadPathName(szImePadPath);
@@ -207,6 +213,7 @@ INT DoSetRegistry2(VOID) {
                 if (
                         DoSetRegSz(hkSoftware, L"BasicDictPathName", szBasicDictPath) &&
                         DoSetRegSz(hkSoftware, L"NameDictPathName", szNameDictPath) &&
+                        DoSetRegSz(hkSoftware, L"PostalDictPathName", szPostalDictPath) &&
                         DoSetRegSz(hkSoftware, L"KanjiDataFile", szKanjiPath) &&
                         DoSetRegSz(hkSoftware, L"RadicalDataFile", szRadicalPath) &&
                         DoSetRegSz(hkSoftware, L"ImePadFile", szImePadPath) &&

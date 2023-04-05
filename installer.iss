@@ -33,6 +33,7 @@ Source: "res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
+Source: "res\postal.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 
 ; Source: "build\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
 ; Source: "build\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion
