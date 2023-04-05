@@ -170,7 +170,7 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
     }
 
     // レジストリのアプリキーを開く。
-    HKEY hAppKey = Config_OpenAppKey();
+    HKEY hAppKey = Config_OpenAppKey(TRUE);
     if (!hAppKey)
         return FALSE;
 

@@ -181,10 +181,10 @@ INT DoSetRegistry1(VOID) {
     return (ret ? 0 : -1);
 } // DoSetRegistry1
 
-INT DoSetRegistry2(VOID) {
+INT DoSetRegistry2(HKEY hBaseKey) {
     BOOL ret = FALSE;
     HKEY hKey;
-    LONG result = OpenRegKey(HKEY_CURRENT_USER, L"SOFTWARE", TRUE, &hKey);
+    LONG result = OpenRegKey(hBaseKey, L"SOFTWARE", TRUE, &hKey);
     if (result == ERROR_SUCCESS && hKey) {
         HKEY hkCompany;
         result = CreateRegKey(hKey, L"Katayama Hirofumi MZ", &hkCompany);
@@ -367,7 +367,9 @@ INT DoInstall(VOID) {
         ::MessageBoxW(NULL, DoLoadString(2), NULL, MB_ICONERROR);
         return 2;
     }
-    if (0 != DoSetRegistry2()) {
+    if (0 != DoSetRegistry2(HKEY_LOCAL_MACHINE) ||
+        0 != DoSetRegistry2(HKEY_CURRENT_USER))
+    {
         // failure
         ::MessageBoxW(NULL, DoLoadString(8), NULL, MB_ICONERROR);
         return 2;

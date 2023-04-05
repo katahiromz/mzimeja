@@ -32,14 +32,21 @@ HinshiBunrui StringToHinshi(LPCTSTR str) {
 }
 
 // レジストリのアプリキーを開く。
-HKEY Config_OpenAppKey(VOID) {
+HKEY Config_OpenAppKey(BOOL bWrite) {
+    DWORD dwDesiredAccess = KEY_READ | (bWrite ? KEY_WRITE : 0);
     HKEY hAppKey;
     LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
                                 TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja"),
-                                0, KEY_READ | KEY_WRITE, &hAppKey);
+                                0, dwDesiredAccess, &hAppKey);
     if (error) {
         DPRINT("0x%08lX\n", error);
-        return NULL;
+        error = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+                               TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja"),
+                               0, dwDesiredAccess, &hAppKey);
+        if (error) {
+            DPRINT("0x%08lX\n", error);
+            return NULL;
+        }
     }
     return hAppKey;
 }
@@ -71,7 +78,7 @@ HKEY Config_CreateAppKey(VOID) {
 
 // レジストリからDWORD値を読み込む。
 DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault) {
-    HKEY hKey = Config_OpenAppKey();
+    HKEY hKey = Config_OpenAppKey(FALSE);
     if (!hKey)
         return dwDefault;
 
@@ -105,7 +112,7 @@ BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue) {
 
 // レジストリからバイナリ値を読み込む。
 BOOL Config_GetData(LPCTSTR name, LPVOID pvData, DWORD cbData) {
-    HKEY hKey = Config_OpenAppKey();
+    HKEY hKey = Config_OpenAppKey(FALSE);
     if (!hKey)
         return FALSE;
 
@@ -140,7 +147,7 @@ BOOL Config_SetData(LPCTSTR name, DWORD dwType, LPCVOID pvData, DWORD cbData) {
 BOOL Config_GetSz(LPCTSTR name, std::wstring& str) {
     str.clear();
 
-    HKEY hKey = Config_OpenAppKey();
+    HKEY hKey = Config_OpenAppKey(FALSE);
     if (!hKey)
         return FALSE;
 

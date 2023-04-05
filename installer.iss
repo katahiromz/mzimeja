@@ -34,13 +34,6 @@ Source: "res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Source: "res\postal.dat"; DestDir: "{app}\res"; Flags: ignoreversion
-
-; Source: "build\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
-; Source: "build\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion
-; Source: "build\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
-; Source: "build\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
-; Source: "build\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
-
 Source: "build\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
