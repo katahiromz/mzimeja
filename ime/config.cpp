@@ -599,7 +599,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData)
         break;
 
     case IME_CONFIG_REGISTERWORD: // 単語登録。
-        ::DialogBoxParam(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDWORD), hWnd, RegWordDlgProc, TRUE);
+        ::DialogBox(TheIME.m_hInst, MAKEINTRESOURCE(IDD_ADDWORD), hWnd, RegWordDlgProc);
         break;
 
     case IME_CONFIG_SELECTDICTIONARY: // 辞書の選択。
