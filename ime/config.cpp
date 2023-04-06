@@ -507,6 +507,7 @@ AboutDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 INT_PTR CALLBACK
 DebugOptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    TCHAR szText[MAX_PATH];
     switch (uMsg) {
     case WM_INITDIALOG:
         return TRUE;
@@ -514,13 +515,16 @@ DebugOptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
         switch (LOWORD(wParam)) {
         case psh1: // [Test 1] button
-            MessageBoxW(hDlg, L"Test 1", L"Test 1", 0);
+            GetDlgItemText(hDlg, edt1, szText, _countof(szText));
+            MessageBox(hDlg, szText, TEXT("Test 1"), 0);
             break;
         case psh2: // [Test 2] button
-            MessageBoxW(hDlg, L"Test 2", L"Test 2", 0);
+            GetDlgItemText(hDlg, edt1, szText, _countof(szText));
+            MessageBox(hDlg, szText, TEXT("Test 2"), 0);
             break;
         case psh3: // [Test 3] button
-            MessageBoxW(hDlg, L"Test 3", L"Test 3", 0);
+            GetDlgItemText(hDlg, edt1, szText, _countof(szText));
+            MessageBox(hDlg, szText, TEXT("Test 3"), 0);
             break;
         }
         break;
