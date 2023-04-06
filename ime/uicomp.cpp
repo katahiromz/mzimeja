@@ -200,10 +200,12 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
 // calc the position of composition windows and move them
 void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 {
+    FOOTMARK_FORMAT("%p, %p\n", lpUIExtra, lpIMC);
     lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
 
     HFONT hFont = NULL;
     HFONT hOldFont = NULL;
+    DPRINT("dwStyle: 0x%08X\n", lpIMC->cfCompForm.dwStyle);
     if (lpIMC->cfCompForm.dwStyle) { // style is not CFS_DEFAULT
         // lock the COMPOSITIONSTRING structure
         if (!lpIMC->HasCompStr()) return;
@@ -224,6 +226,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 
         // check the start position
         if (!::PtInRect(&rcSrc, ptSrc)) {
+            DPRINT("!::PtInRect\n");
             lpIMC->UnlockCompStr();
             return;
         }
