@@ -562,8 +562,8 @@ static void AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn)
 //      親 Window のハンドル。
 //    dwMode
 //      Dialog のモード。以下のようなフラグが与えられる。
-//      IME_CONFIG_GENERAL      一般 configuration のための Dialog
-//      IME_CONFIG_REGWORD      単語登録のための Dialog
+//      IME_CONFIG_GENERAL          一般 configuration のための Dialog
+//      IME_CONFIG_REGISTERWORD     単語登録のための Dialog
 //      IME_CONFIG_SELECTDICTIONARY IME 辞書選択のための Dialog
 //    lpData
 //      VOID 型のポインタ。もし dwMode == IME_CONFIG_REGISTERWORD なら、
@@ -572,19 +572,6 @@ static void AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn)
 //      であっても、NULL であってかまわない。
 //    Return Values
 //      この関数が成功したら、TRUE。さもなくば FALSE。
-//  Comments
-//    IME は次のような擬似コードでもって lpData をチェックする。
-//
-//  if (dwmode != IME_CONFIG_REGISTERWORD){
-//    // Does original execution
-//  } else if (IsBadReadPtr(lpdata, sizeof(REGISTERWORD))==FALSE){
-//    if (IsBadStringPtr(PREGISTERWORD(lpdata)->lpReading, (UINT)-1)==FALSE){
-//      // Set the reading string to word registering dialogbox
-//    }
-//    if (IsBadStringPtr(PREGISTERWORD(lpdata)->lpWord, (UINT)-1)==FALSE){
-//      // Set the word string to word registering dialogbox
-//    }
-//  }
 BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData)
 {
     HPROPSHEETPAGE rPages[MAX_PAGES];
