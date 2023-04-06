@@ -63,7 +63,7 @@ void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC)
 {
     RECT rc;
     POINT pt;
-    FOOTMARK();
+    FOOTMARK_FORMAT("%p, %p, %p\n", hUIWnd, lpUIExtra, lpIMC);
 
     lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
     for (int i = 0; i < MAXCOMPWND; i++) {
@@ -273,6 +273,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
                         lpUIExtra->rcComp[i].bottom = siz.cy;
                         ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTSTR, LONG(pch - psz));
                         ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTNUM, num);
+                        DPRINT("%d, %d, %d, %d\n", curx, cury, siz.cy, siz.cx);
                         ::MoveWindow(hwnd, curx, cury, siz.cx, siz.cy, TRUE);
                         ::ShowWindow(hwnd, SW_SHOWNOACTIVATE);
 
@@ -323,6 +324,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
                         lpUIExtra->rcComp[i].bottom = siz.cx;
                         ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTSTR, LONG(pch - psz));
                         ::SetWindowLongPtr(hwnd, FIGWL_COMPSTARTNUM, num);
+                        DPRINT("%d, %d, %d, %d\n", curx, cury, siz.cy, siz.cx);
                         ::MoveWindow(hwnd, curx, cury, siz.cy, siz.cx, TRUE);
                         ::ShowWindow(hwnd, SW_SHOWNOACTIVATE);
 
@@ -392,6 +394,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
             height += 2 * ::GetSystemMetrics(SM_CYEDGE) + UNDERLINE_HEIGHT;
 
             // move and show window
+            DPRINT("%d, %d, %d, %d\n", rc.left, rc.top, width, height);
             ::MoveWindow(hwndDef, rc.left, rc.top, width, height, TRUE);
             ::ShowWindow(hwndDef, SW_SHOWNOACTIVATE);
 

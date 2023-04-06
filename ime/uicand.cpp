@@ -284,8 +284,8 @@ void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 
         RECT rc;
         ::GetWindowRect(lpUIExtra->hwndCand, &rc);
-        ::MoveWindow(lpUIExtra->hwndCand, rc.left, rc.top,
-                     siz.cx, siz.cy, TRUE);
+        DPRINT("%d, %d, %d, %d\n", rc.left, rc.top, siz.cx, siz.cy);
+        ::MoveWindow(lpUIExtra->hwndCand, rc.left, rc.top, siz.cx, siz.cy, TRUE);
     }
 } // CandWnd_Resize
 
@@ -298,6 +298,7 @@ void CandWnd_Hide(UIEXTRA *lpUIExtra)
         ::GetWindowRect(lpUIExtra->hwndCand, (LPRECT)&rc);
         lpUIExtra->ptCand.x = rc.left;
         lpUIExtra->ptCand.y = rc.top;
+        DPRINT("%d, %d, %d, %d\n", -1, -1, 0, 0);
         ::MoveWindow(lpUIExtra->hwndCand, -1, -1, 0, 0, TRUE);
         ::ShowWindow(lpUIExtra->hwndCand, SW_HIDE);
     }
@@ -322,6 +323,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             int cx, cy;
             cx = rc.right - rc.left;
             cy = rc.bottom - rc.top;
+            DPRINT("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
             ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);

@@ -241,6 +241,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
             // 覚えておく。
             POINT pt = { rc.left, rc.top };
+            DPRINT("%d, %d\n", pt.x, pt.y);
             Config_SetData(L"ptStatusWindow", REG_BINARY, &pt, sizeof(pt));
             UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
         }
@@ -255,6 +256,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                 RECT rc;
                 ::GetWindowRect(lpUIExtra->hwndDefComp, &rc);
                 POINT pt = { rc.left, rc.top };
+                DPRINT("%d, %d\n", pt.x, pt.y);
                 Config_SetData(L"ptDefComp", REG_BINARY, &pt, sizeof(pt));
             }
             UnlockUIExtra(hWnd);
@@ -271,6 +273,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             ::GetWindowRect(lpUIExtra->hwndCand, &rc);
             // 位置を覚えておく。
             POINT pt = { rc.left, rc.top };
+            DPRINT("%d, %d\n", pt.x, pt.y);
             lpUIExtra->ptCand = pt;
             UnlockUIExtra(hWnd);
         }

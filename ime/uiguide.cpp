@@ -262,8 +262,8 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
                 DrawUIBorder(&drc); // ボーダーを再描画。
                 GetCursorPos(&pt); // マウスカーソル位置を取得。
                 // マウス位置に移動。
-                MoveWindow(hGuideWnd, pt.x - ptdif.x, pt.y - ptdif.y, rc.right,
-                           rc.bottom, TRUE);
+                ::MoveWindow(hGuideWnd, pt.x - ptdif.x, pt.y - ptdif.y, rc.right,
+                             rc.bottom, TRUE);
             }
         }
 
