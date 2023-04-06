@@ -252,7 +252,7 @@ LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
 // config.c
 LPCTSTR HinshiToString(HinshiBunrui hinshi);
 HinshiBunrui StringToHinshi(LPCTSTR str);
-HKEY Config_OpenAppKey(BOOL bWrite);
+HKEY Config_OpenAppKey(VOID);
 HKEY Config_CreateAppKey(VOID);
 DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault);
 BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue);
