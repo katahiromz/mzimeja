@@ -36,7 +36,8 @@ extern "C" {
 //      登録される文字列。
 //  (返り値)
 //    成功したならば、TRUE を。さもなくば FALSE を返す。
-BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
+BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
+{
     TCHAR szRead[MAX_PATH];
     TCHAR szStr[MAX_PATH];
     FOOTMARK();
@@ -133,7 +134,8 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 //      削除される文字列。
 //  (返り値)
 //    成功したならば、TRUE を。さもなくば FALSE を返す。
-BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
+BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
+{
     TCHAR szRead[MAX_PATH];
     TCHAR szStr[MAX_PATH];
 
@@ -220,7 +222,8 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr) {
 //    バッファにコピーされたスタイルの数が返り値です。もし、nItems が零
 //    ならば、このIMEですべての可能なスタイルを受け取るのに必要な配列の
 //    要素数になります。
-UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
+UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp)
+{
     FOOTMARK();
     UINT uMax = (HB_MAX - HB_MEISHI) + 1;
     if (u == 0)
@@ -282,7 +285,8 @@ UINT WINAPI ImeGetRegisterWordStyle(UINT u, LPSTYLEBUF lp) {
 //    のは最低条件みたいです。
 //    SKK辞書との相性は最悪では？
 UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
-                                DWORD dw, LPCTSTR lpStr, LPVOID lpData) {
+                                DWORD dw, LPCTSTR lpStr, LPVOID lpData)
+{
     UINT ret;
     FOOTMARK();
 

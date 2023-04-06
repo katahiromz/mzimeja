@@ -15,14 +15,16 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // 品詞分類から文字列を取得する関数。
-LPCTSTR HinshiToString(HinshiBunrui hinshi) {
+LPCTSTR HinshiToString(HinshiBunrui hinshi)
+{
     if (HB_MEISHI <= hinshi && hinshi <= HB_MAX)
         return TheIME.LoadSTR(IDS_HINSHI_00 + (hinshi - HB_MEISHI));
     return NULL;
 }
 
 // 文字列から品詞分類を取得する関数。
-HinshiBunrui StringToHinshi(LPCTSTR str) {
+HinshiBunrui StringToHinshi(LPCTSTR str)
+{
     for (INT hinshi = HB_MEISHI; hinshi <= HB_MAX; ++hinshi) {
         LPCTSTR psz = HinshiToString((HinshiBunrui)hinshi);
         if (lstrcmpW(psz, str) == 0)
@@ -32,7 +34,8 @@ HinshiBunrui StringToHinshi(LPCTSTR str) {
 }
 
 // レジストリのアプリキーを開く。
-HKEY Config_OpenAppKey(VOID) {
+HKEY Config_OpenAppKey(VOID)
+{
     HKEY hAppKey;
     LONG error = ::RegOpenKeyEx(HKEY_CURRENT_USER,
                                 TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja"),
@@ -51,7 +54,8 @@ HKEY Config_OpenAppKey(VOID) {
 }
 
 // レジストリのアプリキーを作成する。
-HKEY Config_CreateAppKey(VOID) {
+HKEY Config_CreateAppKey(VOID)
+{
     // 会社名キーを作成する。
     HKEY hCompanyKey;
     LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"),
@@ -76,7 +80,8 @@ HKEY Config_CreateAppKey(VOID) {
 }
 
 // レジストリからDWORD値を読み込む。
-DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault) {
+DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault)
+{
     HKEY hKey = Config_OpenAppKey();
     if (!hKey)
         return dwDefault;
@@ -94,7 +99,8 @@ DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault) {
 }
 
 // レジストリにDWORD値を書き込む。
-BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue) {
+BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue)
+{
     HKEY hKey = Config_CreateAppKey();
     if (!hKey)
         return FALSE;
@@ -110,7 +116,8 @@ BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue) {
 }
 
 // レジストリからバイナリ値を読み込む。
-BOOL Config_GetData(LPCTSTR name, LPVOID pvData, DWORD cbData) {
+BOOL Config_GetData(LPCTSTR name, LPVOID pvData, DWORD cbData)
+{
     HKEY hKey = Config_OpenAppKey();
     if (!hKey)
         return FALSE;
@@ -127,7 +134,8 @@ BOOL Config_GetData(LPCTSTR name, LPVOID pvData, DWORD cbData) {
 }
 
 // レジストリにバイナリ値を書き込む。
-BOOL Config_SetData(LPCTSTR name, DWORD dwType, LPCVOID pvData, DWORD cbData) {
+BOOL Config_SetData(LPCTSTR name, DWORD dwType, LPCVOID pvData, DWORD cbData)
+{
     HKEY hKey = Config_CreateAppKey();
     if (!hKey)
         return FALSE;
@@ -143,7 +151,8 @@ BOOL Config_SetData(LPCTSTR name, DWORD dwType, LPCVOID pvData, DWORD cbData) {
 }
 
 // レジストリから文字列値を読み込む。
-BOOL Config_GetSz(LPCTSTR name, std::wstring& str) {
+BOOL Config_GetSz(LPCTSTR name, std::wstring& str)
+{
     str.clear();
 
     HKEY hKey = Config_OpenAppKey();
@@ -165,13 +174,15 @@ BOOL Config_GetSz(LPCTSTR name, std::wstring& str) {
 }
 
 // レジストリに文字列値を書き込む。
-BOOL Config_SetSz(LPCTSTR name, LPCTSTR psz) {
+BOOL Config_SetSz(LPCTSTR name, LPCTSTR psz)
+{
     return Config_SetData(name, REG_SZ, psz, (lstrlen(psz) + 1) * sizeof(TCHAR));
 }
 
 // IDD_GENERAL - 全般設定プロパティシートページ。
 INT_PTR CALLBACK
-GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
     LPNMHDR pnmhdr = (LPNMHDR)lParam;
     switch (uMsg) {
     case WM_INITDIALOG:
@@ -218,7 +229,8 @@ GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 } // GeneralDlgProc
 
 // 品詞リストを埋める。
-void RegWord_PopulateHinshi(HWND hDlg) {
+void RegWord_PopulateHinshi(HWND hDlg)
+{
     HWND hCmb1 = GetDlgItem(hDlg, cmb1);
     for (INT i = IDS_HINSHI_00; i <= IDS_HINSHI_26; ++i) {
         LPTSTR psz = TheIME.LoadSTR(i);
@@ -228,7 +240,8 @@ void RegWord_PopulateHinshi(HWND hDlg) {
 }
 
 // 単語を追加する。
-BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL) {
+BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL)
+{
     // 単語を取得。
     TCHAR szWord[MAX_PATH];
     if (!pszWord) {
@@ -296,7 +309,8 @@ BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL) {
 }
 
 // 単語を削除する。
-BOOL RegWord_DeleteWord(HWND hDlg, INT iItem) {
+BOOL RegWord_DeleteWord(HWND hDlg, INT iItem)
+{
     HWND hLst1 = GetDlgItem(hDlg, lst1);
 
     // 選択項目のテキストを習得する。
@@ -338,7 +352,8 @@ BOOL RegWord_DeleteWord(HWND hDlg, INT iItem) {
 
 // IDD_ADDWORD - 単語の登録ダイアログ。
 INT_PTR CALLBACK
-RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
     switch (uMsg) {
     case WM_INITDIALOG:
         RegWord_PopulateHinshi(hDlg);
@@ -365,7 +380,8 @@ RegWordDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 // IDD_CHOOSEDICT - 辞書の選択ダイアログ。
 INT_PTR CALLBACK
-ChooseDictDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+ChooseDictDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
     switch (uMsg) {
     case WM_INITDIALOG:
         return TRUE;
@@ -447,7 +463,8 @@ void WordList_PopulateList(HWND hDlg)
 
 // IDD_WORDLIST - 単語の一覧プロパティシートページ。
 INT_PTR CALLBACK
-WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
     switch (uMsg) {
     case WM_INITDIALOG:
         WordList_PopulateList(hDlg);
@@ -493,7 +510,8 @@ WordListDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 // IDD_ABOUTIME - IMEのバージョン情報プロパティシートページ。
 INT_PTR CALLBACK
-AboutDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+AboutDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
     switch (uMsg) {
     case WM_INITDIALOG:
         return TRUE;
@@ -506,7 +524,8 @@ AboutDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 // IDD_DEBUG - デバッグオプション。
 INT_PTR CALLBACK
-DebugOptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+DebugOptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
     switch (uMsg) {
     case WM_INITDIALOG:
         return TRUE;
@@ -532,7 +551,8 @@ DebugOptionDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 } // DebugOptionDlgProc
 
 // ページをプロパティシートに追加するヘルパー関数。
-static void AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
+static void AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn)
+{
     if (ppsh->nPages < MAX_PAGES) {
         PROPSHEETPAGE psp = { sizeof(psp) };
         psp.dwFlags = PSP_DEFAULT;
@@ -584,7 +604,8 @@ static void AddPage(LPPROPSHEETHEADER ppsh, UINT id, DLGPROC pfn) {
 //      // Set the word string to word registering dialogbox
 //    }
 //  }
-BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
+BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData)
+{
     HPROPSHEETPAGE rPages[MAX_PAGES];
     PROPSHEETHEADER psh;
     FOOTMARK();

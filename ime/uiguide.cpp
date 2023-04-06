@@ -9,7 +9,8 @@ extern "C" {
 
 // ガイドラインウィンドウのウィンドウプロシージャ。
 LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
-                                     LPARAM lParam) {
+                                     LPARAM lParam)
+{
     PAINTSTRUCT ps;
     HWND hUIWnd;
     HDC hDC;
@@ -71,7 +72,8 @@ LRESULT CALLBACK GuideWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     return 0;
 }
 
-DWORD PASCAL CheckPushedGuide(HWND hGuideWnd, LPPOINT lppt) {
+DWORD PASCAL CheckPushedGuide(HWND hGuideWnd, LPPOINT lppt)
+{
     POINT pt;
     RECT rc;
 
@@ -92,7 +94,8 @@ DWORD PASCAL CheckPushedGuide(HWND hGuideWnd, LPPOINT lppt) {
 
 // ガイドラインの描画時。
 void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
-                    DWORD dwPushedGuide) {
+                    DWORD dwPushedGuide)
+{
     HBITMAP hbmpOld;
     HANDLE hGLStr;
     WCHAR *lpGLStr;
@@ -190,7 +193,8 @@ void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt,
 
 // ガイドラインウィンドウのマウスアクション。
 void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
-                     LPARAM lParam) {
+                     LPARAM lParam)
+{
     POINT pt;
     HDC hDC;
     DWORD dwMouse;
@@ -283,7 +287,8 @@ void GuideWnd_Button(HWND hGuideWnd, UINT message, WPARAM wParam,
 }
 
 // ガイドラインの更新。
-void GuideWnd_Update(UIEXTRA *lpUIExtra) {
+void GuideWnd_Update(UIEXTRA *lpUIExtra)
+{
     // ガイドラインウィンドウに更新メッセージを送る。
     if (::IsWindow(lpUIExtra->hwndGuide)) {
         ::SendMessage(lpUIExtra->hwndGuide, WM_UI_UPDATE, 0, 0);

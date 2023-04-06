@@ -10,8 +10,10 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // 指定されているUIウィンドウを表示する／非表示にする。
-void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
-    int nsw = (fFlag ? SW_SHOWNOACTIVATE : SW_HIDE);
+void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag)
+{
+    FOOTMARK_FORMAT("%p, %d\n", hwndServer, fFlag);
+    INT nsw = (fFlag ? SW_SHOWNOACTIVATE : SW_HIDE);
 
     UIEXTRA *lpUIExtra = LockUIExtra(hwndServer);
     if (lpUIExtra) {
@@ -31,7 +33,8 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag) {
     }
 }
 
-void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam) {
+void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam)
+{
     UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
     if (lpUIExtra) {
         // input context was changed.
@@ -84,7 +87,8 @@ void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam) {
     }
 } // OnImeSetContext
 
-void OnDestroy(HWND hWnd) {
+void OnDestroy(HWND hWnd)
+{
     UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
     if (lpUIExtra) {
         if (::IsWindow(lpUIExtra->hwndStatus))
@@ -116,7 +120,8 @@ void OnDestroy(HWND hWnd) {
 // IME UI server window procedure
 // IME UIサーバーウィンドウのウィンドウプロシージャ。
 LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
-                              LPARAM lParam) {
+                              LPARAM lParam)
+{
     InputContext *lpIMC;
     UIEXTRA *lpUIExtra;
     HGLOBAL hUIExtra;
@@ -294,7 +299,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 }
 
 // フォントの高さを取得する。
-int GetCompFontHeight(UIEXTRA *lpUIExtra) {
+int GetCompFontHeight(UIEXTRA *lpUIExtra)
+{
     HDC hIC = CreateIC(TEXT("DISPLAY"), NULL, NULL, NULL); // DCを作成する（情報のみ）。
     HFONT hOldFont = NULL;
 
@@ -312,7 +318,8 @@ int GetCompFontHeight(UIEXTRA *lpUIExtra) {
 }
 
 // WM_IME_NOTIFY メッセージを処理する。
-LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
+LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
     LONG ret = 0;
     RECT rc;
     LOGFONT lf;
@@ -520,7 +527,8 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 }
 
 // WM_IME_CONTROL メッセージを処理する。
-LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
+LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
     LONG ret = 1;
 
     InputContext *lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
@@ -565,7 +573,8 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam) {
 }
 
 // 子ウィンドウがドラッグされていれば、この関数はボーダーを描画する。
-void DrawUIBorder(LPRECT lprc) {
+void DrawUIBorder(LPRECT lprc)
+{
     HDC hDC = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL); // DCを作成。
     SelectObject(hDC, GetStockObject(GRAY_BRUSH)); // ブラシを選択。これでPatBltで塗りつぶす。
 
@@ -583,7 +592,8 @@ void DrawUIBorder(LPRECT lprc) {
 }
 
 // Handling mouse messages for the child windows
-void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
     POINT pt;
     static POINT ptdif;
     static RECT drc;
@@ -641,7 +651,8 @@ void DragUI(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
 // IMEメッセージか（その１）？
 // Any UI window should not pass the IME messages to DefWindowProc.
-BOOL IsImeMessage(UINT message) {
+BOOL IsImeMessage(UINT message)
+{
     switch (message) {
     case WM_IME_STARTCOMPOSITION:
     case WM_IME_ENDCOMPOSITION:
@@ -658,7 +669,8 @@ BOOL IsImeMessage(UINT message) {
 }
 
 // IMEメッセージか（その２）？
-BOOL IsImeMessage2(UINT message) {
+BOOL IsImeMessage2(UINT message)
+{
     switch (message) {
     case WM_IME_STARTCOMPOSITION:
     case WM_IME_ENDCOMPOSITION:

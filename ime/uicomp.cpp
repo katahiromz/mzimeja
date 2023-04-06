@@ -16,7 +16,8 @@ extern "C" {
 
 // Count how may the char can be arranged in DX.
 // ピクセル位置dxの左に何文字あるか？
-static int NumCharInDX(HDC hDC, const WCHAR *psz, int dx) {
+static int NumCharInDX(HDC hDC, const WCHAR *psz, int dx)
+{
     int ret = 0;
     if (*psz) {
         SIZE siz;
@@ -36,7 +37,8 @@ static int NumCharInDX(HDC hDC, const WCHAR *psz, int dx) {
 
 // Count how may the char can be arranged in DY.
 // ピクセル位置dyの上に何文字あるか？
-static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
+static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy)
+{
     int ret = 0;
     if (*psz) {
         SIZE siz;
@@ -57,9 +59,11 @@ static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy) {
 //////////////////////////////////////////////////////////////////////////////
 
 // 未確定文字列ウィンドウの作成時。
-void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
+void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC)
+{
     RECT rc;
     POINT pt;
+    FOOTMARK();
 
     lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
     for (int i = 0; i < MAXCOMPWND; i++) {
@@ -75,11 +79,12 @@ void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
         ::ShowWindow(hwnd, SW_HIDE);
     }
 
-    if (Config_GetData(L"ptDefComp", &pt, sizeof(pt))) {
+    if (!Config_GetData(L"ptDefComp", &pt, sizeof(pt))) {
         ::GetWindowRect(lpIMC->hWnd, &rc);
         pt.x = rc.left;
         pt.y = rc.bottom + 1;
     }
+    DPRINT("pt.x:%ld, pt.y:%ld\n", pt.x, pt.y);
 
     HWND hwndDef = lpUIExtra->hwndDefComp;
     if (!::IsWindow(hwndDef)) {
@@ -98,6 +103,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
                             DWORD iClause, LPPOINT ppt)
 {
     HWND hCompWnd;
+    FOOTMARK_FORMAT("%p, %p, %d, %p\n", lpUIExtra, lpIMC, iClause, ppt);
 
     // is it vertical?
     BOOL fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
@@ -138,7 +144,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
         }
 
         DWORD cch = (DWORD)::GetWindowLongPtr(hCompWnd, FIGWL_COMPSTARTNUM);
-        DebugPrintA("ich: %d, cch: %d, dwClauseIndex: %d\n", ich, cch, dwClauseIndex);
+        DPRINT("ich: %d, cch: %d, dwClauseIndex: %d\n", ich, cch, dwClauseIndex);
 
         HDC hDC = ::GetDC(hCompWnd);
         HFONT hFont = (HFONT) ::GetWindowLongPtr(hCompWnd, FIGWLP_FONT);
@@ -192,7 +198,8 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
 } // GetCandPosHintFromComp
 
 // calc the position of composition windows and move them
-void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
+void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
+{
     lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
 
     HFONT hFont = NULL;
@@ -396,7 +403,8 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
 
 // 未確定文字列の一行を描画する。
 void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
-                     DWORD ich, DWORD cch, CompStr *lpCompStr, BOOL fVert) {
+                     DWORD ich, DWORD cch, CompStr *lpCompStr, BOOL fVert)
+{
     if (cch == 0) return; // 文字列の長さがゼロなら終了。
 
     // Attribute. 属性。
@@ -523,7 +531,8 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
 }
 
 // 未確定文字列を描画する。
-void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompStr) {
+void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompStr)
+{
     // 未確定文字列を取得。
     std::wstring str(lpCompStr->GetCompStr(), lpCompStr->dwCompStrLen);
     const WCHAR *pch = str.c_str();
@@ -547,7 +556,8 @@ void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompSt
 }
 
 // 未確定文字列ウィンドウの再描画時。
-void CompWnd_Paint(HWND hCompWnd) {
+void CompWnd_Paint(HWND hCompWnd)
+{
     PAINTSTRUCT ps;
     HDC hDC = ::BeginPaint(hCompWnd, &ps); // 描画を開始。
 
@@ -579,7 +589,8 @@ void CompWnd_Paint(HWND hCompWnd) {
 } // CompWnd_Paint
 
 // 未確定文字列ウィンドウを隠す。
-void CompWnd_Hide(UIEXTRA *lpUIExtra) {
+void CompWnd_Hide(UIEXTRA *lpUIExtra)
+{
     HWND hwndDef = lpUIExtra->hwndDefComp; // 既定のウィンドウ。
     if (::IsWindow(hwndDef)) {
         ::ShowWindow(hwndDef, SW_HIDE); // 隠す。
@@ -594,7 +605,8 @@ void CompWnd_Hide(UIEXTRA *lpUIExtra) {
 } // CompWnd_Hide
 
 // 未確定文字列ウィンドウのフォントを設定する。
-void CompWnd_SetFont(UIEXTRA *lpUIExtra) {
+void CompWnd_SetFont(UIEXTRA *lpUIExtra)
+{
     for (int i = 0; i < MAXCOMPWND; i++) { // 既定以外のウィンドウ。
         HWND hwnd = lpUIExtra->hwndComp[i]; // ウィンドウハンドル。
         if (::IsWindow(hwnd)) {
@@ -605,7 +617,8 @@ void CompWnd_SetFont(UIEXTRA *lpUIExtra) {
 
 // 未確定文字列ウィンドウのウィンドウプロシージャ。
 LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
-                                    LPARAM lParam) {
+                                    LPARAM lParam)
+{
     HWND hUIWnd;
 
     switch (message) {

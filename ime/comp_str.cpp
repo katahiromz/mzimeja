@@ -7,7 +7,8 @@
 // 未確定文字列の余剰情報の論理データ。
 
 // 余剰情報の物理データの合計サイズ。
-DWORD LogCompStrExtra::GetTotalSize() const {
+DWORD LogCompStrExtra::GetTotalSize() const
+{
     DWORD total = sizeof(COMPSTREXTRA);
     for (size_t i = 0; i < hiragana_clauses.size(); ++i) {
         total += DWORD((hiragana_clauses[i].size() + 1) * sizeof(WCHAR));
@@ -19,7 +20,8 @@ DWORD LogCompStrExtra::GetTotalSize() const {
 }
 
 // 余剰情報の論理データをクリア。
-void LogCompStrExtra::clear() {
+void LogCompStrExtra::clear()
+{
     iClause = 0;
     hiragana_clauses.clear();
     typing_clauses.clear();
@@ -29,7 +31,8 @@ void LogCompStrExtra::clear() {
 // 未確定文字列の余剰情報の物理データ。
 
 // ひらがな文節を取得する。
-WCHAR *COMPSTREXTRA::GetHiraganaClauses(DWORD& dwCount) {
+WCHAR *COMPSTREXTRA::GetHiraganaClauses(DWORD& dwCount)
+{
     dwCount = dwHiraganaClauseCount;
     if (dwCount) {
         return (WCHAR *)(GetBytes() + dwHiraganaClauseOffset);
@@ -38,7 +41,8 @@ WCHAR *COMPSTREXTRA::GetHiraganaClauses(DWORD& dwCount) {
 }
 
 // 入力文節を取得する。
-WCHAR *COMPSTREXTRA::GetTypingClauses(DWORD& dwCount) {
+WCHAR *COMPSTREXTRA::GetTypingClauses(DWORD& dwCount)
+{
     dwCount = dwTypingClauseCount;
     if (dwCount) {
         return (WCHAR *)(GetBytes() + dwTypingClauseOffset);
@@ -47,7 +51,8 @@ WCHAR *COMPSTREXTRA::GetTypingClauses(DWORD& dwCount) {
 }
 
 // 未確定文字列の余剰情報の物理データから論理データへ。
-void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
+void COMPSTREXTRA::GetLog(LogCompStrExtra& log)
+{
     log.clear(); // 論理データをクリア。
     log.iClause = iClause; // 文節を指定。
 
@@ -70,7 +75,8 @@ void COMPSTREXTRA::GetLog(LogCompStrExtra& log) {
 } // COMPSTREXTRA::GetLog
 
 // 未確定文字列の余剰情報の論理データから物理データへ。
-DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
+DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log)
+{
     ASSERT(this);
     ASSERT(log);
 
@@ -107,7 +113,8 @@ DWORD COMPSTREXTRA::Store(const LogCompStrExtra *log) {
 // 未確定文字列の論理データ。
 
 // 未確定文字列のクリア。
-void LogCompStr::clear() {
+void LogCompStr::clear()
+{
     clear_read();
     clear_comp();
     clear_result();
@@ -116,7 +123,8 @@ void LogCompStr::clear() {
 }
 
 // 未確定文字列の補正。
-void LogCompStr::fix() {
+void LogCompStr::fix()
+{
     extra.comp_str_clauses.clear();
     size_t count = comp_clause.size();
     if (count >= 1) {
@@ -137,14 +145,16 @@ void LogCompStr::fix() {
 } // LogCompStr::fix
 
 // 読みがなをクリア。
-void LogCompStr::clear_read() {
+void LogCompStr::clear_read()
+{
     comp_read_attr.clear();
     comp_read_clause.clear();
     comp_read_str.clear();
 }
 
 // 未確定文字列をクリア。
-void LogCompStr::clear_comp() {
+void LogCompStr::clear_comp()
+{
     dwCursorPos = 0;
     dwDeltaStart = 0;
     comp_attr.clear();
@@ -153,7 +163,8 @@ void LogCompStr::clear_comp() {
 }
 
 // 変換結果をクリア。
-void LogCompStr::clear_result() {
+void LogCompStr::clear_result()
+{
     result_read_clause.clear();
     result_read_str.clear();
     result_clause.clear();
@@ -161,13 +172,15 @@ void LogCompStr::clear_result() {
 }
 
 // 文節の個数を取得。
-DWORD LogCompStr::GetClauseCount() const {
+DWORD LogCompStr::GetClauseCount() const
+{
     if (comp_clause.size() < 2) return 0;
     return (DWORD)(comp_clause.size() - 1);
 }
 
 // 未確定文字列の物理データの合計サイズを取得。
-DWORD LogCompStr::GetTotalSize() const {
+DWORD LogCompStr::GetTotalSize() const
+{
     size_t total = sizeof(COMPOSITIONSTRING);
     total += comp_read_attr.size() * sizeof(BYTE);
     total += comp_read_clause.size() * sizeof(DWORD);
@@ -184,7 +197,8 @@ DWORD LogCompStr::GetTotalSize() const {
 }
 
 // 変換中か？
-BOOL LogCompStr::IsBeingConverted() {
+BOOL LogCompStr::IsBeingConverted()
+{
     for (size_t i = 0; i < comp_attr.size(); ++i) {
         if (comp_attr[i] != ATTR_INPUT) return TRUE;
     }
@@ -192,7 +206,8 @@ BOOL LogCompStr::IsBeingConverted() {
 }
 
 // 未確定文字列があるか？
-BOOL LogCompStr::HasCompStr() const {
+BOOL LogCompStr::HasCompStr() const
+{
     return comp_str.size() > 0;
 }
 
@@ -211,7 +226,8 @@ BOOL LogCompStr::CompCharInClause(
 }
 
 // 文節属性を取得。
-BYTE LogCompStr::GetClauseAttr(DWORD dwClauseIndex) const {
+BYTE LogCompStr::GetClauseAttr(DWORD dwClauseIndex) const
+{
     BYTE ret = ATTR_INPUT;
     if (dwClauseIndex < GetClauseCount()) {
         DWORD ich = ClauseToCompChar(dwClauseIndex);
@@ -221,7 +237,8 @@ BYTE LogCompStr::GetClauseAttr(DWORD dwClauseIndex) const {
 }
 
 // 文節属性を設定。
-void LogCompStr::SetClauseAttr(DWORD dwClauseIndex, BYTE attr) {
+void LogCompStr::SetClauseAttr(DWORD dwClauseIndex, BYTE attr)
+{
     if (dwClauseIndex < GetClauseCount()) {
         DWORD ich0 = comp_clause[dwClauseIndex];
         DWORD ich1 = comp_clause[dwClauseIndex + 1];
@@ -234,22 +251,26 @@ void LogCompStr::SetClauseAttr(DWORD dwClauseIndex, BYTE attr) {
 }
 
 // 現在の文節が変換されているか？
-BOOL LogCompStr::IsClauseConverted() const {
+BOOL LogCompStr::IsClauseConverted() const
+{
     return IsClauseConverted(extra.iClause);
 }
 
 // 文節が変換されているか？
-BOOL LogCompStr::IsClauseConverted(DWORD dwClauseIndex) const {
+BOOL LogCompStr::IsClauseConverted(DWORD dwClauseIndex) const
+{
     return GetClauseAttr(dwClauseIndex) != ATTR_INPUT;
 }
 
 // 現在の文節が選択されているか？
-BOOL LogCompStr::HasClauseSelected() const {
+BOOL LogCompStr::HasClauseSelected() const
+{
     return IsClauseConverted(extra.iClause);
 }
 
 // 未確定文字列の文字属性を取得する。
-BYTE LogCompStr::GetCompCharAttr(DWORD ich) const {
+BYTE LogCompStr::GetCompCharAttr(DWORD ich) const
+{
     BYTE ret = ATTR_INPUT;
     if (ich < (DWORD)comp_attr.size()) {
         ret = comp_attr[ich];
@@ -258,18 +279,21 @@ BYTE LogCompStr::GetCompCharAttr(DWORD ich) const {
 }
 
 // 未確定文字列の文字数を取得する。
-DWORD LogCompStr::GetCompCharCount() const {
+DWORD LogCompStr::GetCompCharCount() const
+{
     return (DWORD)comp_str.size();
 }
 
 // 文節インデックスから文字位置を返す。
-DWORD LogCompStr::ClauseToCompChar(DWORD dwClauseIndex) const {
+DWORD LogCompStr::ClauseToCompChar(DWORD dwClauseIndex) const
+{
     if (dwClauseIndex >= GetClauseCount()) return GetCompCharCount();
     return comp_clause[dwClauseIndex];
 }
 
 // 文字位置から文節インデックスを返す。
-DWORD LogCompStr::CompCharToClause(DWORD iCompChar) const {
+DWORD LogCompStr::CompCharToClause(DWORD iCompChar) const
+{
     DWORD dwClauseIndex = 0;
     const DWORD cClause = GetClauseCount();
     for (DWORD iClause = 0; iClause <= cClause; ++iClause) {
@@ -283,7 +307,8 @@ DWORD LogCompStr::CompCharToClause(DWORD iCompChar) const {
 }
 
 // 文節インデックスから未確定文字列を返す。
-std::wstring LogCompStr::GetClauseCompString(DWORD dwClauseIndex) const {
+std::wstring LogCompStr::GetClauseCompString(DWORD dwClauseIndex) const
+{
     std::wstring ret;
     if (dwClauseIndex + 1 <= GetClauseCount()) {
         DWORD ich0 = comp_clause[dwClauseIndex];
@@ -294,13 +319,15 @@ std::wstring LogCompStr::GetClauseCompString(DWORD dwClauseIndex) const {
 }
 
 // 文字列を合併する。
-void LogCompStr::MergeAt(std::vector<std::wstring>& strs, DWORD istr) {
+void LogCompStr::MergeAt(std::vector<std::wstring>& strs, DWORD istr)
+{
     strs[istr - 1] += strs[istr];
     strs.erase(strs.begin() + istr);
 }
 
 // 一つ前の文字位置が現在の文節に含まれるか？
-WCHAR LogCompStr::PrevCharInClause() const {
+WCHAR LogCompStr::PrevCharInClause() const
+{
     if (dwCursorPos > 0) {
         if (CompCharInClause(dwCursorPos - 1, extra.iClause)) {
             return comp_str[dwCursorPos - 1];
@@ -310,7 +337,8 @@ WCHAR LogCompStr::PrevCharInClause() const {
 }
 
 // 余剰情報を更新する。
-void LogCompStr::UpdateExtraClause(DWORD iClause, DWORD dwConversion) {
+void LogCompStr::UpdateExtraClause(DWORD iClause, DWORD dwConversion)
+{
     BOOL bRoman = (dwConversion & IME_CMODE_ROMAN);
     std::wstring str = extra.comp_str_clauses[iClause];
     str = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
@@ -329,7 +357,8 @@ void LogCompStr::UpdateExtraClause(DWORD iClause, DWORD dwConversion) {
 } // LogCompStr::UpdateExtraClause
 
 // 未確定文字列を更新する。
-void LogCompStr::UpdateCompStr() {
+void LogCompStr::UpdateCompStr()
+{
     std::wstring str;
     size_t ich = 0;
     size_t count = extra.comp_str_clauses.size();
@@ -344,7 +373,8 @@ void LogCompStr::UpdateCompStr() {
 }
 
 // 余剰情報から未確定文字列を更新する。
-void LogCompStr::UpdateFromExtra(BOOL bRoman) {
+void LogCompStr::UpdateFromExtra(BOOL bRoman)
+{
     UpdateCompStr();
     extra.typing_clauses.resize(extra.hiragana_clauses.size());
     if (bRoman) {
@@ -364,7 +394,8 @@ void LogCompStr::UpdateFromExtra(BOOL bRoman) {
 }
 
 // 現在の文節をひらがなにする。
-void LogCompStr::MakeHiragana() {
+void LogCompStr::MakeHiragana()
+{
     std::wstring str =
             lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_HIRAGANA);
     SetClauseCompString(extra.iClause, str);
@@ -372,7 +403,8 @@ void LogCompStr::MakeHiragana() {
 }
 
 // 現在の文節をカタカナにする。
-void LogCompStr::MakeKatakana() {
+void LogCompStr::MakeKatakana()
+{
     std::wstring str =
             lcmap(extra.hiragana_clauses[extra.iClause], LCMAP_KATAKANA);
     SetClauseCompString(extra.iClause, str);
@@ -380,7 +412,8 @@ void LogCompStr::MakeKatakana() {
 }
 
 // 現在の文節を半角にする。
-void LogCompStr::MakeHankaku() {
+void LogCompStr::MakeHankaku()
+{
     std::wstring str = lcmap(
             extra.hiragana_clauses[extra.iClause],
             LCMAP_HALFWIDTH | LCMAP_KATAKANA);
@@ -389,7 +422,8 @@ void LogCompStr::MakeHankaku() {
 }
 
 // 現在の文節を全角英数にする。
-void LogCompStr::MakeZenEisuu() {
+void LogCompStr::MakeZenEisuu()
+{
     std::wstring str =
             lcmap(extra.typing_clauses[extra.iClause], LCMAP_FULLWIDTH);
     SetClauseCompString(extra.iClause, str);
@@ -397,7 +431,8 @@ void LogCompStr::MakeZenEisuu() {
 }
 
 // 現在の文節を半角英数にする。
-void LogCompStr::MakeHanEisuu() {
+void LogCompStr::MakeHanEisuu()
+{
     std::wstring str =
             lcmap(extra.typing_clauses[extra.iClause], LCMAP_HALFWIDTH);
     SetClauseCompString(extra.iClause, str);
@@ -405,7 +440,8 @@ void LogCompStr::MakeHanEisuu() {
 }
 
 // 末尾に文字を追加する。
-void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
+void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv)
+{
     BOOL bRoman = (dwConv & IME_CMODE_ROMAN);
     std::wstring str, typed, translated;
     typed += chTyped;
@@ -573,7 +609,8 @@ void LogCompStr::AddCharToEnd(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 } // LogCompStr::AddCharToEnd
 
 // 文字を挿入する。
-void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
+void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv)
+{
     std::wstring typed, translated;
     typed += chTyped;
     translated += chTranslated;
@@ -644,7 +681,8 @@ void LogCompStr::InsertChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 } // LogCompStr::InsertChar
 
 void
-LogCompStr::AddDakuonChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
+LogCompStr::AddDakuonChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv)
+{
     DWORD dwIndexInClause = dwCursorPos - ClauseToCompChar(extra.iClause);
     std::wstring str = extra.comp_str_clauses[extra.iClause];
     if (dwIndexInClause - 1 < str.size()) {
@@ -656,7 +694,8 @@ LogCompStr::AddDakuonChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
 }
 
 // 文字を追加する。
-void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
+void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv)
+{
     size_t size0 = comp_str.size();
     WCHAR ch = PrevCharInClause();
     if (ch) ch = dakuon_shori(ch, chTranslated);
@@ -680,7 +719,8 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv) {
     }
 } // LogCompStr::AddChar
 
-void LogCompStr::DeleteChar(BOOL bBackSpace /* = FALSE*/, DWORD dwConv) {
+void LogCompStr::DeleteChar(BOOL bBackSpace /* = FALSE*/, DWORD dwConv)
+{
     // is the current clause being converted?
     if (IsClauseConverted()) { // being converted
         // set hiragana string to current clause
@@ -717,7 +757,8 @@ void LogCompStr::DeleteChar(BOOL bBackSpace /* = FALSE*/, DWORD dwConv) {
     }
 } // LogCompStr::DeleteChar
 
-void LogCompStr::RevertText() {
+void LogCompStr::RevertText()
+{
     // reset composition
     if (extra.iClause < GetClauseCount()) {
         // merge adjacent not converted clauses
@@ -765,7 +806,8 @@ void LogCompStr::RevertText() {
     }
 } // LogCompStr::RevertText
 
-void LogCompStr::MakeResult() {
+void LogCompStr::MakeResult()
+{
     // setting result_read_clause and result_read_str
     result_read_str.clear();
     const size_t count = extra.hiragana_clauses.size();
@@ -786,7 +828,8 @@ void LogCompStr::MakeResult() {
 }
 
 // 左に移動。
-BOOL LogCompStr::MoveLeft() {
+BOOL LogCompStr::MoveLeft()
+{
     if (IsClauseConverted()) { // 現在の文節が変換中か？
         // untarget
         SetClauseAttr(extra.iClause, ATTR_CONVERTED);
@@ -827,7 +870,8 @@ BOOL LogCompStr::MoveLeft() {
 } // LogCompStr::MoveLeft
 
 // 右に移動。
-BOOL LogCompStr::MoveRight() {
+BOOL LogCompStr::MoveRight()
+{
     if (IsClauseConverted()) { // 現在の文節が変換中か？
         // untarget
         SetClauseAttr(extra.iClause, ATTR_CONVERTED);
@@ -867,7 +911,8 @@ BOOL LogCompStr::MoveRight() {
 } // LogCompStr::MoveRight
 
 // 未確定文字列の先頭に移動。
-BOOL LogCompStr::MoveHome() {
+BOOL LogCompStr::MoveHome()
+{
     if (IsClauseConverted()) { // 現在の文節が変換中か？
         // untarget
         SetClauseAttr(extra.iClause, ATTR_CONVERTED);
@@ -885,7 +930,8 @@ BOOL LogCompStr::MoveHome() {
 } // LogCompStr::MoveHome
 
 // 未確定文字列の末尾に移動。
-BOOL LogCompStr::MoveEnd() {
+BOOL LogCompStr::MoveEnd()
+{
     if (IsClauseConverted()) { // 現在の文節が変換中か？
         // untarget
         SetClauseAttr(extra.iClause, ATTR_CONVERTED);
@@ -902,11 +948,13 @@ BOOL LogCompStr::MoveEnd() {
     }
 } // LogCompStr::MoveEnd
 
-DWORD LogCompStr::GetClauseCompStrLen(DWORD dwClauseIndex) const {
+DWORD LogCompStr::GetClauseCompStrLen(DWORD dwClauseIndex) const
+{
     return (DWORD)extra.comp_str_clauses[dwClauseIndex].size();
 }
 
-void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
+void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str)
+{
     if (iClause < GetClauseCount()) {
         // fix comp_attr
         std::wstring old_str = extra.comp_str_clauses[iClause];
@@ -935,7 +983,8 @@ void LogCompStr::SetClauseCompString(DWORD iClause, std::wstring& str) {
 } // LogCompStr::SetClauseCompString
 
 // 指定した文節にひらがなをセットする。
-void LogCompStr::SetClauseCompHiragana(DWORD iClause, std::wstring& str) {
+void LogCompStr::SetClauseCompHiragana(DWORD iClause, std::wstring& str)
+{
     if (iClause < GetClauseCount()) {
         extra.hiragana_clauses[iClause] = str;
     }
@@ -958,7 +1007,8 @@ void LogCompStr::SetClauseCompHiragana(
 //////////////////////////////////////////////////////////////////////////////
 
 // 未確定文字列の論理データから物理データを格納する。
-DWORD CompStr::Store(const LogCompStr *log) {
+DWORD CompStr::Store(const LogCompStr *log)
+{
     const DWORD total = log->GetTotalSize();
 
     BYTE *pb = GetBytes();
@@ -1039,7 +1089,8 @@ DWORD CompStr::Store(const LogCompStr *log) {
 } // CompStr::Store
 
 // 未確定文字列の論理データを取得する。
-void CompStr::GetLog(LogCompStr& log) {
+void CompStr::GetLog(LogCompStr& log)
+{
     log.dwCursorPos = dwCursorPos;
     log.dwDeltaStart = dwDeltaStart;
     log.comp_read_attr.assign(GetCompReadAttr(), GetCompReadAttr() + dwCompReadAttrLen);
@@ -1087,7 +1138,8 @@ void CompStr::GetLog(LogCompStr& log) {
 } // CompStr::ReCreate
 
 // 未確定文字列の余剰情報を取得する。
-COMPSTREXTRA *CompStr::GetExtra() {
+COMPSTREXTRA *CompStr::GetExtra()
+{
     if (dwPrivateSize > sizeof(COMPSTREXTRA)) {
         BYTE *pb = GetBytes();
         pb += dwPrivateOffset;
@@ -1102,7 +1154,8 @@ COMPSTREXTRA *CompStr::GetExtra() {
 //////////////////////////////////////////////////////////////////////////////
 // デバッグ用。
 
-void LogCompStr::AssertValid() {
+void LogCompStr::AssertValid()
+{
     if (dwCursorPos > GetCompCharCount()) {
         Dump();
         ASSERT(0);
@@ -1176,7 +1229,8 @@ void LogCompStr::AssertValid() {
 } // LogCompStr::AssertValid
 
 // 未確定文字列のダンプ。
-void CompStr::Dump() {
+void CompStr::Dump()
+{
     DebugPrintA("dwSize: %08X\n", dwSize);
     DebugPrintA("dwCursorPos: %08X\n", dwCursorPos);
     DebugPrintA("dwDeltaStart: %08X\n", dwDeltaStart);
@@ -1255,7 +1309,8 @@ void CompStr::Dump() {
 } // CompStr::Dump
 
 // 未確定文字列の論理データをダンプ。
-void LogCompStr::Dump() {
+void LogCompStr::Dump()
+{
     DebugPrintA("### LogCompStr ###\n");
     DebugPrintA("+ dwCursorPos: %08X\n", dwCursorPos);
     DebugPrintA("+ dwDeltaStart: %08X\n", dwDeltaStart);

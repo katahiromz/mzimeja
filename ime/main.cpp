@@ -32,7 +32,8 @@ const WCHAR szImeFileName[] = L"mzimeja.ime";
 //////////////////////////////////////////////////////////////////////////////
 
 // IME用のフォントを作成し、選択。
-HFONT CheckNativeCharset(HDC hDC) {
+HFONT CheckNativeCharset(HDC hDC)
+{
     HFONT hOldFont = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
 
     LOGFONT lfFont;
@@ -51,7 +52,8 @@ HFONT CheckNativeCharset(HDC hDC) {
 
 // Adjust window position.
 // ウィンドウ位置を画面内に補正。
-void RepositionWindow(HWND hWnd) {
+void RepositionWindow(HWND hWnd)
+{
     RECT rc, rcWorkArea;
     ::GetWindowRect(hWnd, &rc);
     ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, FALSE);
@@ -82,7 +84,8 @@ void RepositionWindow(HWND hWnd) {
 MzIme TheIME;
 
 // mzimejaのコンストラクタ。
-MzIme::MzIme() {
+MzIme::MzIme()
+{
     m_hInst = NULL;
     m_hMyKL = NULL;
     m_bWinLogOn = FALSE;
@@ -97,7 +100,8 @@ MzIme::MzIme() {
 }
 
 // mzimejaの辞書を読み込む。
-BOOL MzIme::LoadDict() {
+BOOL MzIme::LoadDict()
+{
     BOOL ret = TRUE;
 
     std::wstring basic;
@@ -126,13 +130,15 @@ BOOL MzIme::LoadDict() {
 }
 
 // mzimejaの辞書をアンロードする。
-void MzIme::UnloadDict() {
+void MzIme::UnloadDict()
+{
     m_basic_dict.Unload();
     m_name_dict.Unload();
 }
 
 // mzimejaを初期化。
-BOOL MzIme::Init(HINSTANCE hInstance) {
+BOOL MzIme::Init(HINSTANCE hInstance)
+{
     m_hInst = hInstance;
     //::InitCommonControls();
 
@@ -146,7 +152,8 @@ BOOL MzIme::Init(HINSTANCE hInstance) {
 } // MzIme::Init
 
 // mzimejaを逆初期化。
-VOID MzIme::Uninit(VOID) {
+VOID MzIme::Uninit(VOID)
+{
     UnregisterClasses();
     UnloadDict();
 }
@@ -154,7 +161,8 @@ VOID MzIme::Uninit(VOID) {
 //////////////////////////////////////////////////////////////////////////////
 
 // mzimejaのウィンドウクラスを登録する。
-BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
+BOOL MzIme::RegisterClasses(HINSTANCE hInstance)
+{
 #define CS_MZIME (CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_IME)
     WNDCLASSEX wcx;
 
@@ -258,7 +266,8 @@ BOOL MzIme::RegisterClasses(HINSTANCE hInstance) {
 } // MzIme::RegisterClasses
 
 // キーボードレイアウトリストから自分のHKLを取得する。
-HKL MzIme::GetHKL(VOID) {
+HKL MzIme::GetHKL(VOID)
+{
     HKL hKL = NULL;
 
     // get list size and allocate buffer for list
@@ -291,7 +300,8 @@ HKL MzIme::GetHKL(VOID) {
 
 // Update the translate key buffer.
 // メッセージを生成する。
-BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
+BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg)
+{
     BOOL ret = FALSE;
     FOOTMARK_FORMAT("(%u,%d,%d)\n",
                     lpGeneMsg->message, lpGeneMsg->wParam, lpGeneMsg->lParam);
@@ -315,7 +325,8 @@ BOOL MzIme::GenerateMessage(LPTRANSMSG lpGeneMsg) {
 }
 
 // メッセージを生成する。
-BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
+BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam)
+{
     FOOTMARK_FORMAT("(%u, 0x%08lX, 0x%08lX)\n", message, wParam, lParam);
     TRANSMSG genmsg;
     genmsg.message = message;
@@ -325,7 +336,8 @@ BOOL MzIme::GenerateMessage(UINT message, WPARAM wParam, LPARAM lParam) {
 }
 
 // Update the translate key buffer.
-BOOL MzIme::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
+BOOL MzIme::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg)
+{
     // increment the number
     ++m_uNumTransKey;
 
@@ -343,7 +355,8 @@ BOOL MzIme::GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg) {
 }
 
 // mzimejaのコマンドを実行する。
-BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
+BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand)
+{
     switch (dwCommand) {
     case IDM_RECONVERT:
         break;
@@ -392,7 +405,8 @@ BOOL MzIme::DoCommand(HIMC hIMC, DWORD dwCommand) {
 } // MzIme::DoCommand
 
 // インジケーターのアイコンを更新。
-void MzIme::UpdateIndicIcon(HIMC hIMC) {
+void MzIme::UpdateIndicIcon(HIMC hIMC)
+{
     if (m_hMyKL == NULL) {
         m_hMyKL = GetHKL();
         if (m_hMyKL == NULL) return;
@@ -417,7 +431,8 @@ void MzIme::UpdateIndicIcon(HIMC hIMC) {
 }
 
 // ウィンドウクラスの登録を解除。
-void MzIme::UnregisterClasses() {
+void MzIme::UnregisterClasses()
+{
     ::UnregisterClass(szUIServerClassName, m_hInst);
     ::UnregisterClass(szCompStrClassName, m_hInst);
     ::UnregisterClass(szCandClassName, m_hInst);
@@ -425,12 +440,14 @@ void MzIme::UnregisterClasses() {
 }
 
 // ビットマップをリソースから読み込む。
-HBITMAP MzIme::LoadBMP(LPCTSTR pszName) {
+HBITMAP MzIme::LoadBMP(LPCTSTR pszName)
+{
     return ::LoadBitmap(m_hInst, pszName);
 }
 
 // 文字列をリソースから読み込む。
-WCHAR *MzIme::LoadSTR(INT nID) {
+WCHAR *MzIme::LoadSTR(INT nID)
+{
     static WCHAR sz[512];
     sz[0] = 0;
     ::LoadStringW(m_hInst, nID, sz, _countof(sz));
@@ -438,7 +455,8 @@ WCHAR *MzIme::LoadSTR(INT nID) {
 }
 
 // 入力コンテキストをロックする。
-InputContext *MzIme::LockIMC(HIMC hIMC) {
+InputContext *MzIme::LockIMC(HIMC hIMC)
+{
     InputContext *context = (InputContext *)::ImmLockIMC(hIMC);
     if (context) {
         m_hIMC = hIMC;
@@ -449,7 +467,8 @@ InputContext *MzIme::LockIMC(HIMC hIMC) {
 }
 
 // 入力コンテキストのロックを解除。
-VOID MzIme::UnlockIMC(HIMC hIMC) {
+VOID MzIme::UnlockIMC(HIMC hIMC)
+{
     ::ImmUnlockIMC(hIMC);
     if (::ImmGetIMCLockCount(hIMC) == 0) {
         m_hIMC = NULL;
@@ -465,27 +484,32 @@ extern "C" {
 // UI extra related
 // 余剰情報。
 
-HGLOBAL GetUIExtraFromServerWnd(HWND hwndServer) {
+HGLOBAL GetUIExtraFromServerWnd(HWND hwndServer)
+{
     return (HGLOBAL)GetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE);
 }
 
-void SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra) {
+void SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra)
+{
     ::SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)hUIExtra);
 }
 
-UIEXTRA *LockUIExtra(HWND hwndServer) {
+UIEXTRA *LockUIExtra(HWND hwndServer)
+{
     HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
     UIEXTRA *lpUIExtra = (UIEXTRA *)::GlobalLock(hUIExtra);
     ASSERT(lpUIExtra);
     return lpUIExtra;
 }
 
-void UnlockUIExtra(HWND hwndServer) {
+void UnlockUIExtra(HWND hwndServer)
+{
     HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
     ::GlobalUnlock(hUIExtra);
 }
 
-void FreeUIExtra(HWND hwndServer) {
+void FreeUIExtra(HWND hwndServer)
+{
     HGLOBAL hUIExtra = GetUIExtraFromServerWnd(hwndServer);
     ::GlobalFree(hUIExtra);
     ::SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
@@ -500,7 +524,8 @@ void FreeUIExtra(HWND hwndServer) {
 BOOL g_bTrace = TRUE;   // この変数がFALSEのときはデバッグ出力しない。
 
 // printf関数と同じ文法でデバッグ出力を行う関数。
-void DebugPrintA(const char *lpszFormat, ...) {
+void DebugPrintA(const char *lpszFormat, ...)
+{
     char szMsgA[1024];
 
     if (!g_bTrace)
@@ -515,7 +540,8 @@ void DebugPrintA(const char *lpszFormat, ...) {
 }
 
 // wprintf関数と同じ文法でデバッグ出力を行う関数。
-void DebugPrintW(const WCHAR *lpszFormat, ...) {
+void DebugPrintW(const WCHAR *lpszFormat, ...)
+{
     WCHAR szMsg[1024];
 
     if (!g_bTrace)
@@ -530,7 +556,8 @@ void DebugPrintW(const WCHAR *lpszFormat, ...) {
 }
 
 // ASSERT失敗時に呼び出される関数。
-void DebugAssert(const char *file, int line, const char *exp) {
+void DebugAssert(const char *file, int line, const char *exp)
+{
     DebugPrintA("%s (%d): ASSERT(%s) failed\n", file, line, exp);
 }
 #endif  // def MZIMEJA_DEBUG_OUTPUT
@@ -540,7 +567,8 @@ void DebugAssert(const char *file, int line, const char *exp) {
 
 // IMEはDLLファイルの一種であるから、IMEが読み込まれたら、エントリーポイントの
 // DllMainが呼び出されるはず。
-BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot) {
+BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot)
+{
     FOOTMARK_FORMAT("(%p, 0x%08lX, %p)\n", hInstDLL, dwFunction, lpNot);
 
     switch (dwFunction) {

@@ -10,7 +10,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // İ’è‚É‰‚¶‚Ä•¶š‚ğ•ÏŠ·‚·‚éB
-WCHAR translateChar(WCHAR ch) {
+WCHAR translateChar(WCHAR ch)
+{
     if (is_comma(ch)) {
         if (Config_GetDWORD(L"bCommaPeriod", FALSE)) {
             if (Config_GetDWORD(L"bNoZenkakuAscii", FALSE))
@@ -42,7 +43,8 @@ WCHAR translateChar(WCHAR ch) {
 }
 
 // İ’è‚É‰‚¶‚Ä•¶š—ñ‚ğ•ÏŠ·‚·‚éB
-std::wstring translateString(const std::wstring& str) {
+std::wstring translateString(const std::wstring& str)
+{
     std::wstring ret = str;
     for (WCHAR& ch : ret) {
         ch = translateChar(ch);
@@ -1184,7 +1186,8 @@ static KEYVALUE kana2type_table[] = {
 //////////////////////////////////////////////////////////////////////////////
 
 // ‚Ğ‚ç‚ª‚È‚©‚çƒ[ƒ}š‚Ö•¶š—ñ‚ğ•ÏŠ·B
-std::wstring hiragana_to_roman(std::wstring hiragana) {
+std::wstring hiragana_to_roman(std::wstring hiragana)
+{
     std::wstring roman;
     bool found;
     for (size_t k = 0; k < hiragana.size(); ) {
@@ -1233,7 +1236,8 @@ std::wstring hiragana_to_roman(std::wstring hiragana) {
 } // hiragana_to_roman
 
 // ƒ[ƒ}š‚©‚ç‚Ğ‚ç‚ª‚È‚Ö•¶š—ñ‚ğ•ÏŠ·B
-std::wstring roman_to_hiragana(std::wstring roman) {
+std::wstring roman_to_hiragana(std::wstring roman)
+{
     std::wstring hiragana, str;
     roman = lcmap(roman, LCMAP_HALFWIDTH); // –‘O‚É”¼Šp‚É‚µ‚Ä‚¨‚­B
     for (size_t k = 0; k < roman.size(); ) {
@@ -1308,7 +1312,8 @@ std::wstring roman_to_hiragana(std::wstring roman) {
 } // roman_to_hiragana
 
 // ƒ[ƒ}š‚©‚çƒJƒ^ƒJƒi‚Ö•¶š—ñ‚ğ•ÏŠ·B
-std::wstring roman_to_katakana(std::wstring roman) {
+std::wstring roman_to_katakana(std::wstring roman)
+{
     std::wstring katakana, str;
     for (size_t k = 0; k < roman.size(); ) {
         bool found = false;
@@ -1382,7 +1387,8 @@ std::wstring roman_to_katakana(std::wstring roman) {
 } // roman_to_katakana
 
 // ƒ[ƒ}š‚©‚ç”¼ŠpƒJƒi‚Ö•¶š—ñ‚ğ•ÏŠ·B
-std::wstring roman_to_halfwidth_katakana(std::wstring roman) {
+std::wstring roman_to_halfwidth_katakana(std::wstring roman)
+{
     std::wstring katakana, str;
     //DebugPrintW(L"roman_to_halfwidth_katakana(%s)\n", roman.c_str());
     for (size_t k = 0; k < roman.size(); ) {
@@ -1444,7 +1450,8 @@ std::wstring roman_to_halfwidth_katakana(std::wstring roman) {
 } // roman_to_halfwidth_katakana
 
 // ƒ[ƒ}š‚©‚ç‚Ğ‚ç‚ª‚È‚Ö•¶š—ñ‚ğ•ÏŠ·B
-std::wstring roman_to_hiragana(std::wstring roman, size_t ichTarget) {
+std::wstring roman_to_hiragana(std::wstring roman, size_t ichTarget)
+{
     std::wstring str, key, value, extra;
     size_t key_len = 0;
     for (size_t i = 0; i < _countof(sokuon_table); ++i) {
@@ -1502,7 +1509,8 @@ std::wstring roman_to_hiragana(std::wstring roman, size_t ichTarget) {
 } // roman_to_hiragana
 
 // ƒ[ƒ}š‚©‚çƒJƒ^ƒJƒi‚Ö•¶š—ñ‚ğ•ÏŠ·B
-std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget) {
+std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget)
+{
     std::wstring str, key, value, extra;
     size_t key_len = 0;
     for (size_t i = 0; i < _countof(sokuon_table); ++i) {
@@ -1561,7 +1569,8 @@ std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget) {
 } // roman_to_katakana
 
 // ƒ[ƒ}š‚©‚ç”¼ŠpƒJƒi‚Ö•¶š—ñ‚ğ•ÏŠ·B
-std::wstring roman_to_halfwidth_katakana(std::wstring roman, size_t ichTarget) {
+std::wstring roman_to_halfwidth_katakana(std::wstring roman, size_t ichTarget)
+{
     //DebugPrintW(L"roman_to_halfwidth_katakana(%s,%d)\n", roman.c_str(), (int)ichTarget);
     std::wstring str, key, value, extra;
     size_t key_len = 0;
@@ -1622,7 +1631,8 @@ std::wstring roman_to_halfwidth_katakana(std::wstring roman, size_t ichTarget) {
 } // roman_to_halfwidth_katakana
 
 // ‚Ğ‚ç‚ª‚È‚©‚ç“ü—Í•¶š—ñ‚Ö•¶š—ñ‚ğ•ÏŠ·B
-std::wstring hiragana_to_typing(std::wstring hiragana) {
+std::wstring hiragana_to_typing(std::wstring hiragana)
+{
     std::wstring typing;
     for (size_t k = 0; k < hiragana.size(); ) {
         bool found = false;
@@ -1642,7 +1652,8 @@ std::wstring hiragana_to_typing(std::wstring hiragana) {
 } // hiragana_to_typing
 
 // ‰¼‘zƒL[‚©‚ç‚Ğ‚ç‚ª‚È‚ÖB
-WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift) {
+WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift)
+{
     switch (vk) {
     case VK_A:          return L'‚¿';
     case VK_B:          return L'‚±';
@@ -1705,7 +1716,8 @@ WCHAR vkey_to_hiragana(BYTE vk, BOOL bShift) {
 } // vkey_to_hiragana
 
 // “ü—ÍƒL[‚©‚ç•¶š‚ÖB
-WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock) {
+WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock)
+{
     if (VK_A <= vk && vk <= VK_Z) {
         if (!bShift == !bCapsLock) {
             return vk + (L'a' - VK_A);
@@ -1757,17 +1769,20 @@ WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock) {
 } // typing_key_to_char
 
 // ‹å“_iƒsƒŠƒIƒhj‚©H
-BOOL is_period(WCHAR ch) {
+BOOL is_period(WCHAR ch)
+{
     return ch == L'B' || ch == L'D' || ch == L'.' || ch == L'¡';
 }
 
 // “Ç“_iƒRƒ“ƒ}j‚©H
-BOOL is_comma(WCHAR ch) {
+BOOL is_comma(WCHAR ch)
+{
     return ch == L'A' || ch == L'C' || ch == L',' || ch == L'¤';
 }
 
 // ‚Ğ‚ç‚ª‚È‚©H
-BOOL is_hiragana(WCHAR ch) {
+BOOL is_hiragana(WCHAR ch)
+{
     if (0x3040 <= ch && ch <= 0x309F) return TRUE;
     switch (ch) {
     case 0x3095: case 0x3096: case 0x3099: case 0x309A: case 0x309B:
@@ -1779,7 +1794,8 @@ BOOL is_hiragana(WCHAR ch) {
 }
 
 // ‘SŠpƒJƒ^ƒJƒi‚©H
-BOOL is_fullwidth_katakana(WCHAR ch) {
+BOOL is_fullwidth_katakana(WCHAR ch)
+{
     if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
     switch (ch) {
     case 0x30FD: case 0x30FE: case 0x3099: case 0x309A: case 0x309B:
@@ -1791,7 +1807,8 @@ BOOL is_fullwidth_katakana(WCHAR ch) {
 }
 
 // ”¼ŠpƒJƒi‚©H
-BOOL is_halfwidth_katakana(WCHAR ch) {
+BOOL is_halfwidth_katakana(WCHAR ch)
+{
     if (0xFF65 <= ch && ch <= 0xFF9F) return TRUE;
     switch (ch) {
     case 0xFF61: case 0xFF62: case 0xFF63: case 0xFF64:
@@ -1802,29 +1819,34 @@ BOOL is_halfwidth_katakana(WCHAR ch) {
 }
 
 // Š¿š‚©H
-BOOL is_kanji(WCHAR ch) {
+BOOL is_kanji(WCHAR ch)
+{
     if (0x4E00 <= ch && ch <= 0x9FFF) return TRUE;
     if (0xF900 <= ch && ch <= 0xFAFF) return TRUE;
     return FALSE;
 }
 
 // ‹³ˆçŠ¿š‚©H
-BOOL is_education_kanji(WCHAR ch) {
+BOOL is_education_kanji(WCHAR ch)
+{
     return wcschr(L"ˆê‰¹‰J‰~‰¤‰Î‰ÔŠLŠw‹x‹ã‹Ê‹ó‹C‰ºŒŒ©Œ¢ŒÜŒûZ‹à¶ORlq…š¨µÔè\o—¬³ãXl…¶ÂÔÎ—[çæì‘‘‘«‘º‘å’j’|’’†’¬“V“c“y“ñ“ú“ü”N”’”ª•S–{–¼–Ø–Ú•¶‰E—Í—§—Ñ˜Zˆø‰H‰_‰“‰€‰Æ‰½‰Ä‰È‰Ì‰æ‰ï‰ñŠCŠGŠOŠpŠyŠˆŠÔŠçŠâŠÛ‹L‹D‹A‹|‹‹›‹³‹­‹ß¡ŒZŒ`‹ŒvŒ´Œ¾Œ³ŒÃŒËŒêŒßŒãLŒğHŒõŒöl‰©s‚‡‘’J•×ËìZ†–îos~›©FºĞãñTHt‘­êHVeS}“ª”¼¯º°áØ‘Dü‘O‘g‘–‘¾‘½‘Ì‘ä’í’r’n’m’ƒ’‹’·’©’¹’¼’Ê“_“X“d“~““–“š“Œ“¹“¯“Ç“à“ì“÷”n”ƒ”„””¼”Ô•ƒ•à•—•ª•·•Ä•ê•û–k–ˆ–…–œ–Â–¾–Ñ–å–ì–é—F—j—p—ˆ—¢—˜bvˆ«ˆÀˆÃˆÓˆÏˆãˆç‰@ˆõˆù‰^‰j‰w‰¡‰›‰®‰·‰×ŠJŠEŠKŠÙŠ´Š¦Š¿Šİ‹NŠú‹q‹}‹‰‹…‹†‹‹´‹Æ‹È‹Ç‹â‹ê‹æ‹ï‹{ŒN‰»ŒyŒWŒŒŒˆŒ§Œ¤ŒÎŒÉKŒü`†ªÕMwn•€dgŸ–®ÀÊÒÌğçåæóKEWIBdZh‹Š•ÁºÍ¤ŸæAgi\[^_¢®‘S‘z‘Š‘—‘§‘¬‘°‘¼‘Å‘ã‘Î‘Ò‘æ‘è’Z’Y’k’…’’Œ’²’ ’Ç’š’è’ë“J“S“]“s“x“‡“™“o“’“Š“¤“®“¶”_”g”z”{” ”¨”­”½”Ââ”ß”ç•@”ü•M•X•\•a•b•i•‰•”•Ÿ••¨•½•Ô•×•ú–¡–½–Ê–â–ò–ğ—R–û—V—L—\—t—z—r—m—l——·—¼—Î—¬—ç—ñ—û˜H˜aˆ¤ˆÄˆÈˆÊˆİˆÍˆßˆó‰p‰h‰–‰­‰İ‰Û‰Á‰Ê‰èŠB‰üŠQŠXŠoŠeŠÖŠ®ŠÇŠ¯ŠÏŠèŠì‹GŠø‹IŠó‹@Ší‹c‹~‹ƒ‹‹‹‹“‹¦‹¾‹£‹¤‹ÉŒPŒRŒSŒ^ŒaŒiŒ|Œ‹Œ‡ŒšŒ’Œ±ŒÅŒóŒ÷DqN·ÅØŞğEüD@QUYcjmi¡™«¸Øíüj‡‰¥ÎÄ¼ÜÛÆÈMb´Ã¬ÈÏßÜàí‘Ió‘ƒ‘ˆ‘q‘©‘¤‘±‘²‘·‘à‘Ñ’B’P’u’‡’™’›’°’â’á’ê“I“T“`“k“w“”“­“°“Á“¾“Å”M‘R”O”s”~””Ñ”ò”ï•K•[•W•t•{•s•v–³•›•²•º•Ê•Ó•Ï•Ö–@•ï–]–q––––¢–¬–¯–ñ—E—v—{——˜—¤—Ê—Ç‹™—¿—Ö—Ş—ß—â—á—ğ˜A˜V˜J˜^ˆ³ˆÚˆö‰i‰q‰c‰vˆÕ‰t‰‰÷‰‰‰¶‰¿‰ß‰Â‰Í‰¼‰ê‰ğ‰õŠmŠiŠzŠµŠ²Š§Šá‹KŠîŠñ‹Z‹`‹t‹Œ‹v‹–‹‹«‹Ï‹Ö‹åŒQŒoŒ‰Œ¯ŒŸŒ”ŒŒ»ŒÀŒ¸ŒÂŒÌŒìŒøu\zkŒú‹»¬¸ĞÌÈÛÄİßàG^_x‘tu”}¦—¯¿ÓÉöCqp€˜Ø³µíóğîED»¸«­§¨ÅÓÑİÚâã‘K‘c‘f‘‘‘œ‘¢‘¥‘ª‘®‘¹‘İ‘Ş‘Ô’c’f’z’£’ö’ñ“G“K““º“±“¿“Æ”C”R”\”j”Æ”Å”»”ì”ä”ñ”õ•U•]•n•x•z•w••œ•¡•§•Ò•Ù•Û•æ–L•ñ–h–\–²–±–À–È—A—]—a—e—¦—ª—¯—Ì–f—¥ˆÙˆâˆæ‰F‰f‰ˆ‰„‰äŠDŠtŠvŠgŠ„Š”ŠÈŠ±ŠÅŠªŠëŠöŠ÷‹M‹^‹z‹½‹¹‹Ÿ‹Ø‹ÎŒhŒnŒxŒ€ŒƒŒŠŒ¦Œ›Œ ŒµŒ¹ŒÈŒÄŒëFc@g|~’œ¢»ÀÏÙôû\‹„ŒŠp¥ÌËÚá÷@ûOA]cknƒˆ”œá«éöjm„‚¡½¹·êéõòô‘P‘w‘•‘t‘€‘n‘‹‘ ‘Ÿ‘¸‘¶‘î’T’S’a’g’i’l’ˆ’‰’˜’ª’¸’¡’À’É“W“}“¢“œ“Í“ï“û”F”]”[”h”x”w”o”q”Ç”Ó”Û”é”á• •±•Ã•À•Â•â•é–K•ó–_–Y–S–‡–‹–§–¿–Í–ó—D—X—c—‚—~—‘———— —Õ˜_˜N•Ğ", ch) != NULL;
 }
 
 // í—pŠ¿š‚©H
-BOOL is_common_use_kanji(WCHAR ch) {
+BOOL is_common_use_kanji(WCHAR ch)
+{
     return wcschr(L"ˆŸˆ£ˆ¥ˆ¤Bˆ«ˆ¬ˆ³ˆµˆ¶—’ˆÀˆÄˆÃˆÈˆßˆÊˆÍˆãˆËˆÏˆĞˆ×ˆØˆİˆÑˆÙˆÚˆŞˆÌˆÖœbˆÓˆáˆÛˆÔˆâˆÜˆæˆçˆêˆëˆíˆïˆğˆøˆóˆöˆôˆ÷ˆõ‰@ˆú‰Aˆù‰B‰C‰E‰F‰H‰J‰SŸT¤‰Y‰^‰_‰i‰j‰p‰f‰h‰c‰r‰e‰s‰qˆÕ‰u‰v‰t‰w‰x‰z‰y‰{‰~‰„‰ˆ‰Š‰…‰ƒ•Q‰‡‰€‰Œ‰‰“‰”‰–‰‰‰‰‰˜‰¤‰š‰›‰‰‰Ÿ‰ ‰¢‰£÷‰¥‰œ‰¡‰ª‰®‰­‰¯‰°‹ñ‰³‰´‰µ‰¹‰¶‰·‰¸‰º‰»‰Î‰Á‰Â‰¼‰½‰Ô‰À‰¿‰Ê‰Í‰Õ‰È‰Ë‰Ä‰Æ‰×‰Ø‰Ù‰İ‰Q‰ß‰Å‰É‰ĞŒC‰Ç‰Ì‰Ó‰Ò‰Û‰á‰åŠ¢‰ä‰æ‰è‰ê‰ë‰ì‰î‰ñŠD‰ï‰õ‰ú‰ü‰ö‰û‰÷ŠCŠEŠFŠBŠGŠJŠK‰ò²‰ğ’×‰ó‰ùæ~ŠLŠOŠNŠQŠRŠUŠXŠSŠWŠYŠTŠ[Š_Š`ŠeŠpŠgŠvŠiŠjŠkŠsŠoŠrŠuŠtŠmŠlŠdŠnŠwŠxŠyŠzŠ{Š|ŠƒŠ‡ŠˆŠ…Š‰Š„Š‹ŠŠŠŒŠŠŠ”Š˜Š™Š Š±Š§ŠÃŠ¾ŠÊŠ®ŠÌŠ¯Š¥ŠªŠÅŠ×Š£Š¨Š³ŠÑŠ¦Š«Š¬Š·Š¸Š»Š¼ŠÔŠÕŠ©Š°Š²Š´Š¿ŠµŠÇŠÖŠ½ŠÄŠÉŠ¶ŠÒŠÙŠÂŠÈŠÏŠØŠÍŠÓŠÛŠÜŠİŠâŠßŠáŠæŠçŠèŠéŠêŠëŠ÷‹CŠòŠóŠõ‹DŠï‹F‹G‹I‹OŠù‹L‹N‹Q‹S‹AŠîŠñ‹K‹TŠìŠôŠöŠúŠû‹MŠüšÊŠøŠí‹E‹P‹@‹R‹Z‹X‹U‹\‹`‹^‹V‹Y‹[‹]‹c‹e‹g‹i‹l‹p‹q‹r‹t‹s‹ã‹v‹y‹|‹u‹Œ‹x‹z‹€‰P‹‹†‹ƒ‹}‹‰‹Š‹{‹~‹…‹‹šk‹‡‹‹‹‹‹‘‹’‹“‹•‹–‹—‹›Œä‹™‹¥‹¤‹©‹¶‹‹‹Ÿ‹¦‹µ‹¬‹²‹·‹°‹±‹¹‹º‹­‹³‹½‹«‹´‹¸‹¾‹£‹¿‹Á‹Â‹Å‹Æ‹Ã‹È‹Ç‹É‹Ê‹Ğ‹Ò‹Ï‹ß‹à‹Û‹Î‹Õ‹Ø‹Í‹Ö‹Ù‹Ñ‹Ş‹İ‹á‹â‹æ‹å‹ê‹ì‹ïœœ‹ğ‹ó‹ô‹ö‹÷‹ø‹üŒ@ŒAŒFŒJŒNŒPŒMŒOŒRŒSŒQŒZŒYŒ`ŒnŒaŒsŒWŒ^Œ_ŒvŒbŒ[ŒfŒkŒoŒuŒhŒiŒyŒXŒgŒpŒwŒcœÛŒmŒeŒxŒ{Œ|Œ}Œ~Œ„Œ€Œ‚ŒƒŒ…Œ‡ŒŠŒŒŒˆŒ‹Œ†Œ‰ŒŒ¢ŒŒ©Œ”Œ¨ŒšŒ¤Œ§ŒŒ“Œ•ŒŒ¬Œ’Œ¯Œ—Œ˜ŒŸŒ™Œ£Œ¦Œ­Œ Œ›Œ«ŒªŒ®–šŒ°Œ±ŒœŒ³Œ¶ŒºŒ¾Œ·ŒÀŒ´Œ»Œ½Œ¸Œ¹ŒµŒÈŒËŒÃŒÄŒÅŒÒŒÕŒÇŒÊŒÌŒÍŒÂŒÉŒÎŒÙŒÖŒÛçüŒÚŒÜŒİŒßŒàŒãŒâŒåŒéŒêŒëŒìŒûHŒöŒùEŒ÷ILbŒğŒõŒü@D]lsBFRUXŒøKSmŒòŒúP^cgrxŒóZkqv~‚NT[‰©AQ`di€az\jye‹»t|uwŒî†‡‰„˜ü‹’J‘•’“–œ‹î ¡¢©¦ª¥¬­®°¤§¶²¹¸»´·¼½ÀÁËÄĞÈÑÓÉÍÊÌÏÕÖ×ØÅÙÂÃÇÎÚÛéİŞÜàßèìíğòõô|ïöçûDü™‹AE@BCGMORQV\SYPUZ_^cabmqx~djils–î|€…Šfu„ghno}ƒˆpvw{tœ“†‰‹‡Œ•k‘”“•’¦š›Ÿ¨©—™–˜¡ œ«¥‰a£­®¯²µ¶¸º¾·¼¹½¿ÀÅÊĞÔÉÒËÌÍÎÏÕÓ×ÖÚØŞßİáãâèåçéæëñêìğîíïõóôöùò÷ûúBMGü@EHLC‘³IãµKTAOWDVXRP\`[Z_d]aebcfjhilkmnoqprtu{„‚y}ƒz‡€…ˆ‰Š‘‹”—”@•˜–™œ¬¡­¢ °´Ñ®µ³¸¼Àºª«ÁÇËÌÎ¥¤ÂÍĞ×Ÿ¶»ÄÅÉÏÙØÛ§ÆÚ²á“²ÕÜÊàãäçğóæéòèíîêôö“êëìù÷øF@HABüGúDEJKS\LbcghNM’Ã_OPUZ^j[aiXfQTVRkdelnmsvrwqt{}…‚†ƒˆŠ„Œ‹‡•ä‘•’”˜™¡£¥ˆä¢³¶¬¼º§©ª«ÂÄ­¯µÈ¦À´·–¹°¨¹½¸»¾Ã¿®ÁÅ—[ËÎÔÌÍÈÒÇÉÊÓÕÏÑĞØÜÙŞÚİáÛßàãâçìåèæéêòóôõîğù‘Dí÷‘A‘B‘F‘Hâ³‘Köü‘J‘I‘E‘@‘N‘S‘O‘P‘R‘T‘Q‘V‘U‘_‘j‘c‘d‘f‘[‘e‘g‘a‘i‘Y‘k‘b‘o‘s‘‘ˆ‘–‘t‘Š‘‘‘‘—‘q‘{‘}ŒK‘ƒ‘|‘‚‘]‘u‘‹‘n‘r‘‰‘’‘•‘m‘z‘w‘‘˜‘…çH‘€‘‡‘š‘›‘”‘¢‘œ‘‘‘ ‘¡‘Ÿ‘¦‘©‘«‘£‘¥‘§‘¨‘¬‘¤‘ª‘­‘°‘®‘¯‘±‘²—¦‘¶‘º‘·‘¸‘¹‘»‘¼‘½‘¿‘Å‘Ã‘Á‘Â‘Ä‘Ê‘¾‘Î‘Ì‘Ï‘Ò‘Ó‘Ù‘Ş‘Ñ‘×‘Í‘Ü‘ß‘Ö‘İ‘à‘Ø‘Ô‘Õ‘å‘ã‘ä‘æ‘è‘ê‘î‘ğ‘ò‘ì‘ñ‘õ‘ó‘ø‘÷’A’B’E’D’I’N’O’U’S’P’Y’_’T’W’Z’Q’[’]’a’b’c’j’i’f’e’g’k’d’n’r’m’l’p’v’x’s’t’uãk’|’{’€’~’z’’‚’ƒ’…’„’†’‡’‰«’ˆ’‰’Š’’‹’Œ’’‘’’’“’˜’™’š’¢’¡’›’¬’·’§’ ’£’¤’­’Ş’¸’¹’©“\’´’°’µ’¥š}’ªŸ’²’®’¦’¼’º’»’¾’¿’½’Â’À’Á’Ç’Å’Ä’Ê’É’Ë’Ğ’Ø’Ü’ß’á’æ’ì’í’è’ê’ï“@’à’å’é’ù’ë’ü’â’ã’ç’ñ’ö’ø’÷’ú“D“I“J“E“H“K“G“M“R“N“S“O“P“V“T“X“_“W“Y“]“U“c“`“a“d“l“f“i“k“r“s“n“h“q“y“z“w“x“{““~“”“–“Š“¤“Œ““¦“|“€“‚“‡““¢“§“}“‰““©“ƒ“‹““’“—“o“š“™“›“ˆî“¥“œ“ª“£“¡“¬“«“¯“´“·“®“°“¶“¹“­“º“±“µ“»“½“Á“¾“Â“¿“Ä“Å“Æ“Ç“È“Ê“Ë“Í“Ô“Ø“ÚæÃ“İ“Ü˜¥“ß“Ş“à—œ“ä“ç“ì“î“ï“ñ“ò“ó“õ“÷“ø“ú“ü“û”A”C”D”E”F”J”M”N”O”P”S”R”Y”[”\”]”_”Z”c”g”h”j”e”n”k”l”q”t”w”x”o”z”r”s”p”y”„”{”~”|”†”}”ƒ”…”’”Œ””‘”—””•””–””™”›”š” ”¢”¨”§”ª”«”­”¯”°”²”±”´”½”¼”Ã”Æ”¿”Ä”º”»âã”Â”Å”Ç”È”Ê”Ì”Á”Ñ”À”Ï”Ğ”Í”É”Ë”Ó”Ô”Ø”Õ”ä”ç”Ü”Û”á”Ş”â”ì”ñ”Ú”ò”æ”é”í”ß”à”ï”è”ë”ğ”ö”û”ü”õ”÷•@•G•I•C•K”å•M•P•S•X•\•U•[•]•Y•W•c•b•a•`”L•i•l•n•o•p•q•r•s•v•ƒ•t•z•}•{•|•Œ•æ]•‰•‹•‚•w•„•x••…•~•†•Š•ˆ•••”•‘•••—•š••›••œ•Ÿ• •¡•¢•¥•¦•§•¨•²•´•µ•¬•­•®•±•ª•¶•·•¸•½•º•¹•À•¿•Ã•Â•»•¼•¾•Á–İ•Ä•Çàø•È•Ê•Ì•Ğ•Ó•Ô•Ï•Î•Õ•Ò•Ù•Ö•×•à•ÛšM•ß•â•Ü•ê•å•æ•ç•é•ë•û•ï–F–M•ò•ó•ø•ú–@–A–E•î•í•ô–C•ö–K•ñ–I–L–O–J–D–S–R–Z–V–W–Y–h–[–b–^–`–U–a–]–T–X–_–f–e–\–c–d–j–k–Ø–p–q–r–l–n–o–v–u–x–{–z–|–}–~–ƒ–€––‚–ˆ–…–‡–†–„–‹–Œ––”–––•–œ–––Ÿ–¢–¡–£–¦–§–¨–¬–­–¯–°–µ–±–³–²–¶–º–¼–½–¾–À–»–¿–Á–Â–Å–Æ–Ê–È–Ë–Î–Í–Ñ–Ï–Ó–Õ–Ò–Ô–Ú–Ù–å–ä–â–è–é–ì–í–ï–ğ–ñ–ó–ò–ôˆÅ—R–ûšg–ù—@—A–ü—B—F—L—E—H—I—X—N—P—T—V—Y—U—J—Z—D—^—\—]—_—a—c—p—r—d—m—v—e—f—g—h—t—z—n˜—lá‡—x—q—{—i—w—j—}—€——~—‚—ƒf—‡—…—ˆ—‹—Š———ç…——‘———”—•—“—™—˜—¢——Ÿ— —š——£—¤—§—¥œÉ—ª–ö—¬—¯—³—±—²—°—µ—·—¸—¶—¹—¼—Ç—¿—Á—Â—Ë—Ê—»—Ì—¾—Ã—Ä—Æ—Í—Î—Ñ—Ğ—Ï—Ö—×—Õ—Ú—Ü—İ—Û—Ş—ß—ç—â—ã–ß—á—é—ë—ì—ê—î—í—ï—ğ—ñ—ò—ó—ô—ö˜A—õ—û˜B˜C˜F˜G˜H˜I˜V˜J˜M˜Y˜N˜Q˜L˜O˜RâÄ˜Z˜^˜[˜_˜a˜b˜d˜e˜f˜g˜p˜r", ch) != NULL;
 } // is_common_use_kanji
 
 // ‘SŠpASCII‚©H
-BOOL is_fullwidth_ascii(WCHAR ch) {
+BOOL is_fullwidth_ascii(WCHAR ch)
+{
     return (0xFF00 <= ch && ch <= 0xFFEF);
 }
 
 // ‚·‚×‚Ä‚Ì•¶š‚ª”š“I‚©H
-BOOL are_all_chars_numeric(const std::wstring& str) {
+BOOL are_all_chars_numeric(const std::wstring& str)
+{
     for (size_t i = 0; i < str.size(); ++i) {
         if (L'0' <= str[i] && str[i] <= L'9') {
             ;
@@ -1840,7 +1862,8 @@ BOOL are_all_chars_numeric(const std::wstring& str) {
 static const wchar_t s_szKanjiDigits[] = L"Zˆê“ñOlŒÜ˜Zµ”ª‹ã";
 
 // Š¿”š•ÏŠ·i‚»‚Ì‚PjB
-std::wstring convert_to_kansuuji_1(wchar_t ch, size_t digit_level) {
+std::wstring convert_to_kansuuji_1(wchar_t ch, size_t digit_level)
+{
     static const wchar_t s_szKanjiDigitLevels[] = L" \•Sç";
     std::wstring ret;
     if (ch == L'0') return ret;
@@ -1854,7 +1877,8 @@ std::wstring convert_to_kansuuji_1(wchar_t ch, size_t digit_level) {
 }
 
 // Š¿”š•ÏŠ·i‚»‚Ì‚QjB
-std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth) {
+std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth)
+{
     ASSERT(are_all_chars_numeric(halfwidth));
     ASSERT(halfwidth.size() <= 4);
     const size_t length = halfwidth.size();
@@ -1869,7 +1893,8 @@ std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth) {
 }
 
 // Š¿”š•ÏŠ·i‚»‚Ì‚RjB
-std::wstring convert_to_kansuuji(const std::wstring& str) {
+std::wstring convert_to_kansuuji(const std::wstring& str)
+{
     std::wstring halfwidth = lcmap(str, LCMAP_HALFWIDTH);
     ASSERT(are_all_chars_numeric(halfwidth));
     if (halfwidth.size() >= 24) return halfwidth;
@@ -1904,7 +1929,8 @@ std::wstring convert_to_kansuuji(const std::wstring& str) {
 }
 
 // Š¿”š•ÏŠ·i‚»‚Ì‚SjB
-std::wstring convert_to_kansuuji_brief(const std::wstring& str) {
+std::wstring convert_to_kansuuji_brief(const std::wstring& str)
+{
     std::wstring halfwidth = lcmap(str, LCMAP_HALFWIDTH);
     ASSERT(are_all_chars_numeric(halfwidth));
     std::wstring ret;
@@ -1915,7 +1941,8 @@ std::wstring convert_to_kansuuji_brief(const std::wstring& str) {
 }
 
 // Š¿”š•ÏŠ·i‚»‚Ì‚TjB
-std::wstring convert_to_kansuuji_formal(const std::wstring& str) {
+std::wstring convert_to_kansuuji_formal(const std::wstring& str)
+{
     std::wstring ret = convert_to_kansuuji(str);
     str_replace_all(ret, L"ˆê", L"ˆë");
     str_replace_all(ret, L"“ñ", L"“ó");
@@ -1928,7 +1955,8 @@ std::wstring convert_to_kansuuji_formal(const std::wstring& str) {
 }
 
 // ‘÷‰¹ˆ—B
-WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1) {
+WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1)
+{
     switch (MAKELONG(ch0, ch1)) {
     case MAKELONG(L'‚©', L'J'): return L'‚ª';
     case MAKELONG(L'‚«', L'J'): return L'‚¬';
@@ -1987,7 +2015,8 @@ WCHAR dakuon_shori(WCHAR ch0, WCHAR ch1) {
 }
 
 // •¶ší•ÏŠ·B
-std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
+std::wstring lcmap(const std::wstring& str, DWORD dwFlags)
+{
     WCHAR szBuf[1024];
     const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
     ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
@@ -1996,7 +2025,8 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
 }
 
 // ‘SŠp‰p”‚©‚ç”¼Šp‚Ö‚Ì•¶š—ñ•ÏŠ·B
-std::wstring fullwidth_ascii_to_halfwidth(const std::wstring& str) {
+std::wstring fullwidth_ascii_to_halfwidth(const std::wstring& str)
+{
     std::wstring ret;
     const size_t count = str.size();
     wchar_t ch;

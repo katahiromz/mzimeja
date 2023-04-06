@@ -16,7 +16,8 @@ extern "C" {
 // A function which handles WM_IME_KEYDOWN.
 // WM_IME_KEYDOWNを処理する関数。
 BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
-                       INPUT_MODE imode) {
+                       INPUT_MODE imode)
+{
     FOOTMARK_FORMAT("(%p, 0x%08lX, %p, %u)\n", hIMC, wParam, lpbKeyState, (INT)imode);
     InputContext *lpIMC;
     BYTE vk = (BYTE)wParam;
@@ -403,7 +404,8 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
 } // IMEKeyDownHandler
 
 BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
-                          CONST LPBYTE lpbKeyState) {
+                          CONST LPBYTE lpbKeyState)
+{
     BOOL ret = FALSE;
     FOOTMARK_FORMAT("(%p, %u, 0x%08lX, %p)\n",
                     hIMC, vKey, lKeyData, lpbKeyState);
@@ -544,7 +546,8 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 } // ImeProcessKey
 
 UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
-                         LPTRANSMSGLIST lpTransBuf, UINT fuState, HIMC hIMC) {
+                         LPTRANSMSGLIST lpTransBuf, UINT fuState, HIMC hIMC)
+{
     UINT ret = 0;
     FOOTMARK_FORMAT("(%u, %u, %p, %p, %u, %p)\n",
                     uVKey, uScanCode, lpbKeyState, lpTransBuf, fuState, hIMC);

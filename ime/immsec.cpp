@@ -12,7 +12,8 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 // internal functions
 
-PSID MyCreateSid(VOID) {
+PSID MyCreateSid(VOID)
+{
     PSID psid;
     BOOL fResult;
     SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_WORLD_SID_AUTHORITY;
@@ -34,7 +35,8 @@ PSID MyCreateSid(VOID) {
     return psid;
 }
 
-POSVERSIONINFO GetVersionInfo(VOID) {
+POSVERSIONINFO GetVersionInfo(VOID)
+{
     static BOOL fFirstCall = TRUE;
     static OSVERSIONINFO os;
 
@@ -64,7 +66,8 @@ POSVERSIONINFO GetVersionInfo(VOID) {
 // Remarks:
 //      FreeSecurityAttributes() should be called to free up the
 //      SECURITY_ATTRIBUTES allocated by this function.
-SECURITY_ATTRIBUTES *CreateSecurityAttributes(void) {
+SECURITY_ATTRIBUTES *CreateSecurityAttributes(void)
+{
     if (!IsNT()) return NULL;
 
     // create a sid for everyone access
@@ -177,7 +180,8 @@ SECURITY_ATTRIBUTES *CreateSecurityAttributes(void) {
 // The purpose of this function:
 //      Frees the memory objects allocated by previous
 //      CreateSecurityAttributes() call.
-void FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa) {
+void FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa)
+{
     if (psa == NULL) return;
 
     BOOL fResult;
@@ -205,7 +209,8 @@ void FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa) {
 //      The implementation of this function is not multi-thread safe.
 //      You need to modify the function if you call the function in
 //      multi-thread environment.
-BOOL IsNT(void) {
+BOOL IsNT(void)
+{
     return GetVersionInfo()->dwPlatformId == VER_PLATFORM_WIN32_NT;
 }
 

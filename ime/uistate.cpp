@@ -29,7 +29,8 @@ extern "C" {
 
 // Create status window.
 // IME状態ウィンドウを作成する。
-HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
+HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra)
+{
     const DWORD style = WS_DISABLED | WS_POPUP; // ウィンドウスタイル。
     const DWORD exstyle = WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME; // 拡張スタイル。
     HWND hwndStatus = lpUIExtra->hwndStatus;
@@ -66,7 +67,8 @@ HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra) {
 
 // Draw status window.
 // IME状態ウィンドウを描画する。
-void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
+void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed)
+{
     // UIサーバーとIMCを取得する。
     HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
     HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
@@ -226,7 +228,8 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed) {
 } // StatusWnd_Paint
 
 // IME状態ウィンドウの当たり判定。
-STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
+STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt)
+{
     ::ScreenToClient(hWnd, &pt);
     RECT rc;
     ::GetClientRect(hWnd, &rc);
@@ -256,7 +259,8 @@ STATUS_WND_HITTEST StatusWnd_HitTest(HWND hWnd, POINT pt) {
 } // StatusWnd_HitTest
 
 // IME状態ウィンドウの位置を更新。
-void StatusWnd_Update(UIEXTRA *lpUIExtra) {
+void StatusWnd_Update(UIEXTRA *lpUIExtra)
+{
     HWND hwndStatus = lpUIExtra->hwndStatus;
     if (::IsWindow(hwndStatus)) {
         // 設定データ "ptStatusWindow" を使って、ウィンドウの位置を復元する。
@@ -274,7 +278,8 @@ void StatusWnd_Update(UIEXTRA *lpUIExtra) {
 } // StatusWnd_Update
 
 // IME状態ウィンドウのボタンを押したときの動作。
-void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
+void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest)
+{
     // UIサーバーウィンドウとIMCを取得する。
     HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND); // サーバーウィンドウ。
     HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC); // IMC。
@@ -322,7 +327,8 @@ void StatusWnd_OnButton(HWND hWnd, STATUS_WND_HITTEST hittest) {
 }
 
 // IME状態ウィンドウ上でマウスが移動している。
-void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
+void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown)
+{
     static POINT prev = {-1, -1}; // 一つ前の位置。
     if (::GetWindowLongPtr(hWnd, FIGWL_MOUSE) == SWHT_CAPTION) { // キャプションをドラッグしている。
         if (bDown && ::GetCapture() == hWnd) { // ドラッグ中か？
@@ -346,7 +352,8 @@ void StatusWnd_OnMouseMove(HWND hWnd, POINT pt, BOOL bDown) {
 }
 
 // IME状態ウィンドウで左ボタンを押された／離された。
-void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
+void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown)
+{
     STATUS_WND_HITTEST hittest = StatusWnd_HitTest(hWnd, pt); // 当たり判定を行う。
     switch (hittest) {
     case SWHT_CAPTION: // キャプション上。
@@ -399,7 +406,8 @@ void StatusWnd_OnLButton(HWND hWnd, POINT pt, BOOL bDown) {
 } // StatusWnd_OnLButton
 
 // IME状態ウィンドウを右クリックされた。
-static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
+static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt)
+{
     HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND); // IME UIサーバーウィンドウ。
     HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC); // IMC。
     if (hIMC == NULL) {
@@ -444,7 +452,8 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt) {
 
 // IME状態ウィンドウのウィンドウプロシージャ。
 LRESULT CALLBACK
-StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
     PAINTSTRUCT ps;
     HWND hwndServer;
     HDC hDC;

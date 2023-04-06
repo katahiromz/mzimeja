@@ -4,38 +4,38 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef FOOTMARK_HPP_
-#define FOOTMARK_HPP_   13    // Version 13
+#define FOOTMARK_HPP_   14    // Version 14
 
 #ifndef __cplusplus
-  #error This library (footmark++) needs C++. You lose.
+    #error This library (footmark++) needs C++. You lose.
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // FootmarkDebugPrint
 
 #ifndef FootmarkDebugPrint
-  #ifdef DebugPrintA
-    #define FootmarkDebugPrint  DebugPrintA
-  #elif defined(DebugPrint)
-    #define FootmarkDebugPrint  DebugPrint
-  #else
-    #include <cstdio>
-    #define FootmarkDebugPrint  printf
-  #endif
+    #ifdef DebugPrintA
+        #define FootmarkDebugPrint  DebugPrintA
+    #elif defined(DebugPrint)
+        #define FootmarkDebugPrint  DebugPrint
+    #else
+        #include <cstdio>
+        #define FootmarkDebugPrint  printf
+    #endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // FootmarkLocation and FootmarkPrintCallStack (on debugging)
 
 #ifdef MZIMEJA_DEBUG_OUTPUT
-  #include <vector>   // for std::vector
-  #include <string>   // for std::string and std::wstring
-  #include <cassert>  // for assert
-  #ifdef _WIN32
-    #ifndef _INC_WINDOWS
-      #include <windows.h>
+    #include <vector>   // for std::vector
+    #include <string>   // for std::string and std::wstring
+    #include <cassert>  // for assert
+    #ifdef _WIN32
+        #ifndef _INC_WINDOWS
+            #include <windows.h>
+        #endif
     #endif
-  #endif
 
 struct FootmarkLocation {
     const char *m_file;
@@ -123,56 +123,56 @@ inline void FootmarkLocation::Leave() {
 // FOOTMARK* Macros
 
 #if defined(MZIMEJA_DEBUG_OUTPUT)
-  #if (__cplusplus >= 201103L) // C++11
-    #define FOOTMARK() \
-        FootmarkLocation the_footmark(__FILE__, __LINE__, __func__);
-  #else // until C++11
-    #define FOOTMARK() \
-        FootmarkLocation the_footmark(__FILE__, __LINE__, __FUNCTION__);
-  #endif
-  #define FOOTMARK_POINT() FootmarkDebugPrint("%s (%d): FOOTMARK_POINT()\n", \
-                                              __FILE__, __LINE__)
-  #if (__cplusplus >= 201103L) // C++11
-    #define FOOTMARK_FORMAT \
-        FootmarkLocation the_footmark(__FILE__, __LINE__, __func__); \
-        FootmarkDebugPrint
-  #else
-    #define FOOTMARK_FORMAT \
-        FootmarkLocation the_footmark(__FILE__, __LINE__, __FUNCTION__); \
-        FootmarkDebugPrint
-  #endif
-  #define FOOTMARK_RETURN_INT(retval) do { \
-        the_footmark.m_retval_type = FootmarkLocation::RETVAL_INT; \
-        the_footmark.m_retval_int = (int)(retval); \
-        return the_footmark.m_retval_int; \
-} while (0)
-  #define FOOTMARK_RETURN_LONG(retval) do { \
-        the_footmark.m_retval_type = FootmarkLocation::RETVAL_LONG; \
-        the_footmark.m_retval_long = (long)(retval); \
-        return the_footmark.m_retval_long; \
-} while (0)
-  #define FOOTMARK_RETURN_PTR(ptrtype,retval) do { \
-        the_footmark.m_retval_type = FootmarkLocation::RETVAL_PTR; \
-        the_footmark.m_retval_ptr = (void *)(retval); \
-        return (ptrtype)the_footmark.m_retval_ptr; \
-} while (0)
-  #ifdef _WIN32
-    #define FOOTMARK_RETURN_LPARAM(retval) do { \
-        the_footmark.m_retval_type = FootmarkLocation::RETVAL_LPARAM; \
-        the_footmark.m_retval_lparam = (LPARAM)(retval); \
-        return the_footmark.m_retval_lparam; \
-} while (0)
-  #endif
+    #if (__cplusplus >= 201103L) // C++11
+        #define FOOTMARK() \
+            FootmarkLocation the_footmark(__FILE__, __LINE__, __func__);
+    #else // until C++11
+        #define FOOTMARK() \
+            FootmarkLocation the_footmark(__FILE__, __LINE__, __FUNCTION__);
+    #endif
+    #define FOOTMARK_POINT() FootmarkDebugPrint("%s (%d): FOOTMARK_POINT()\n", \
+                                                __FILE__, __LINE__)
+    #if (__cplusplus >= 201103L) // C++11
+        #define FOOTMARK_FORMAT \
+            FootmarkLocation the_footmark(__FILE__, __LINE__, __func__); \
+            FootmarkDebugPrint
+    #else
+        #define FOOTMARK_FORMAT \
+            FootmarkLocation the_footmark(__FILE__, __LINE__, __FUNCTION__); \
+            FootmarkDebugPrint
+    #endif
+    #define FOOTMARK_RETURN_INT(retval) do { \
+            the_footmark.m_retval_type = FootmarkLocation::RETVAL_INT; \
+            the_footmark.m_retval_int = (int)(retval); \
+            return the_footmark.m_retval_int; \
+    } while (0)
+    #define FOOTMARK_RETURN_LONG(retval) do { \
+            the_footmark.m_retval_type = FootmarkLocation::RETVAL_LONG; \
+            the_footmark.m_retval_long = (long)(retval); \
+            return the_footmark.m_retval_long; \
+    } while (0)
+    #define FOOTMARK_RETURN_PTR(ptrtype,retval) do { \
+            the_footmark.m_retval_type = FootmarkLocation::RETVAL_PTR; \
+            the_footmark.m_retval_ptr = (void *)(retval); \
+            return (ptrtype)the_footmark.m_retval_ptr; \
+    } while (0)
+    #ifdef _WIN32
+        #define FOOTMARK_RETURN_LPARAM(retval) do { \
+            the_footmark.m_retval_type = FootmarkLocation::RETVAL_LPARAM; \
+            the_footmark.m_retval_lparam = (LPARAM)(retval); \
+            return the_footmark.m_retval_lparam; \
+        } while (0)
+    #endif
 #else   // !def MZIMEJA_DEBUG_OUTPUT
-  #define FOOTMARK()                          /*empty*/
-  #define FOOTMARK_POINT()                    /*empty*/
-  #define FOOTMARK_FORMAT                     /*empty*/
-  #define FOOTMARK_RETURN_INT(retval)         return retval
-  #define FOOTMARK_RETURN_LONG(retval)        return retval
-  #define FOOTMARK_RETURN_PTR(ptrtype,retval) return retval
-  #ifdef _WIN32
-    #define FOOTMARK_RETURN_LPARAM(retval)    return retval
-  #endif
+    #define FOOTMARK()                          /*empty*/
+    #define FOOTMARK_POINT()                    /*empty*/
+    #define FOOTMARK_FORMAT                     /*empty*/
+    #define FOOTMARK_RETURN_INT(retval)         return retval
+    #define FOOTMARK_RETURN_LONG(retval)        return retval
+    #define FOOTMARK_RETURN_PTR(ptrtype,retval) return retval
+    #ifdef _WIN32
+        #define FOOTMARK_RETURN_LPARAM(retval)    return retval
+    #endif
 #endif  // !def MZIMEJA_DEBUG_OUTPUT
 
 ///////////////////////////////////////////////////////////////////////////////

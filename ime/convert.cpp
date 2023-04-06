@@ -12,7 +12,8 @@
 const DWORD c_dwMilliseconds = 8000;
 
 // ひらがな表。品詞の活用で使用される。
-static const wchar_t s_hiragana_table[][5] = {
+static const wchar_t s_hiragana_table[][5] =
+{
     // DAN_A, DAN_I, DAN_U, DAN_E, DAN_O
     {L'あ', L'い', L'う', L'え', L'お'}, // GYOU_A
     {L'か', L'き', L'く', L'け', L'こ'}, // GYOU_KA
@@ -36,7 +37,8 @@ std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
 std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
 
 // 子音の写像と母音の写像を作成する。
-void MakeLiteralMaps() {
+void MakeLiteralMaps()
+{
     if (g_consonant_map.size())
         return;
     g_consonant_map.clear();
@@ -53,7 +55,8 @@ void MakeLiteralMaps() {
 } // MakeLiteralMaps
 
 // 品詞分類を文字列に変換する（デバッグ用）。
-LPCWSTR BunruiToString(HinshiBunrui bunrui) {
+LPCWSTR BunruiToString(HinshiBunrui bunrui)
+{
     int index = int(bunrui) - int(HB_HEAD);
     static const wchar_t *s_array[] = {
         L"HB_HEAD",
@@ -159,7 +162,8 @@ CandConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2)
 
 // 品詞の連結可能性。
 static BOOL
-IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
+IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
+{
     if (node2.bunrui == HB_PERIOD || node2.bunrui == HB_COMMA) return TRUE;
     if (node2.bunrui == HB_TAIL) return TRUE;
     if (node1.bunrui == HB_SYMBOL || node2.bunrui == HB_SYMBOL) return TRUE;
@@ -471,7 +475,8 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2) {
 } // IsNodeConnectable
 
 // 基本辞書データをスキャンする。
-static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch) {
+static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
+{
     ASSERT(dict_data);
 
     if (ch == 0)
@@ -510,7 +515,8 @@ static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
 
 static WStrings s_UserDictRecords;
 
-static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID lpData) {
+static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID lpData)
+{
     ASSERT(lpStr && lpStr[0]);
     ASSERT(lpRead && lpRead[0]);
     Lattice *pThis = (Lattice *)lpData;
@@ -609,7 +615,8 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
 }
 
 // ユーザー辞書データをスキャンする。
-static size_t ScanUserDict(WStrings& records, WCHAR ch, Lattice *pThis) {
+static size_t ScanUserDict(WStrings& records, WCHAR ch, Lattice *pThis)
+{
     s_UserDictRecords.clear();
     ImeEnumRegisterWord(UserDictProc, NULL, 0, NULL, pThis);
 
@@ -623,18 +630,21 @@ static size_t ScanUserDict(WStrings& records, WCHAR ch, Lattice *pThis) {
 // Dict (dictionary) - 辞書データ。
 
 // 辞書データのコンストラクタ。
-Dict::Dict() {
+Dict::Dict()
+{
     m_hMutex = NULL;
     m_hFileMapping = NULL;
 }
 
 // 辞書データのデストラクタ。
-Dict::~Dict() {
+Dict::~Dict()
+{
     Unload();
 }
 
 // 辞書データファイルのサイズを取得する。
-DWORD Dict::GetSize() const {
+DWORD Dict::GetSize() const
+{
     DWORD ret = 0;
     WIN32_FIND_DATAW find;
     find.nFileSizeLow = 0;
@@ -647,7 +657,8 @@ DWORD Dict::GetSize() const {
 }
 
 // 辞書を読み込む。
-BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
+BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name)
+{
     if (IsLoaded()) return TRUE; // すでに読み込み済み。
 
     m_strFileName = file_name;
@@ -706,7 +717,8 @@ BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name) {
 } // Dict::Load
 
 // 辞書をアンロードする。
-void Dict::Unload() {
+void Dict::Unload()
+{
     if (m_hMutex) {
         if (m_hFileMapping) {
             DWORD wait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds); // 排他制御を待つ。
@@ -727,7 +739,8 @@ void Dict::Unload() {
 }
 
 // 辞書をロックして情報の取得を開始。
-wchar_t *Dict::Lock() {
+wchar_t *Dict::Lock()
+{
     if (m_hFileMapping == NULL) return NULL;
     DWORD cbSize = GetSize();
     void *pv = ::MapViewOfFile(m_hFileMapping,
@@ -736,12 +749,14 @@ wchar_t *Dict::Lock() {
 }
 
 // 辞書のロックを解除して、情報の取得を終了。
-void Dict::Unlock(wchar_t *data) {
+void Dict::Unlock(wchar_t *data)
+{
     ::UnmapViewOfFile(data);
 }
 
 // 辞書は読み込まれたか？
-BOOL Dict::IsLoaded() const {
+BOOL Dict::IsLoaded() const
+{
     return (m_hMutex != NULL && m_hFileMapping != NULL);
 }
 
@@ -749,7 +764,8 @@ BOOL Dict::IsLoaded() const {
 // MzConvResult, MzConvClause etc.
 
 // 文節にノードを追加する。
-void MzConvClause::add(const LatticeNode *node) {
+void MzConvClause::add(const LatticeNode *node)
+{
     bool matched = false;
     for (size_t i = 0; i < candidates.size(); ++i) {
         if (candidates[i].converted == node->post) {
@@ -775,17 +791,20 @@ void MzConvClause::add(const LatticeNode *node) {
 }
 
 static inline bool
-CandidateCompare(const MzConvCandidate& cand1, const MzConvCandidate& cand2) {
+CandidateCompare(const MzConvCandidate& cand1, const MzConvCandidate& cand2)
+{
     return cand1.cost < cand2.cost;
 }
 
 // コストで候補をソートする。
-void MzConvClause::sort() {
+void MzConvClause::sort()
+{
     std::sort(candidates.begin(), candidates.end(), CandidateCompare);
 }
 
 // コストで結果をソートする。
-void MzConvResult::sort() {
+void MzConvResult::sort()
+{
     for (size_t i = 1; i < clauses.size(); ++i) {
         for (size_t iCand1 = 0; iCand1 < clauses[i - 1].candidates.size(); ++iCand1) {
             for (size_t iCand2 = 0; iCand2 < clauses[i].candidates.size(); ++iCand2) {
@@ -816,7 +835,8 @@ void MzConvResult::sort() {
 // LatticeNode - ラティス（lattice）のノード。
 
 // コストを計算。
-int LatticeNode::CalcCost() const {
+int LatticeNode::CalcCost() const
+{
     int ret = 0;
     if (bunrui == HB_KANGO) ret += 200;
     if (bunrui == HB_SYMBOL) ret += 120;
@@ -834,7 +854,8 @@ int LatticeNode::CalcCost() const {
 }
 
 // 動詞か？
-bool LatticeNode::IsDoushi() const {
+bool LatticeNode::IsDoushi() const
+{
     switch (bunrui) {
     case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
     case HB_KAHEN_DOUSHI: case HB_SAHEN_DOUSHI:
@@ -846,7 +867,8 @@ bool LatticeNode::IsDoushi() const {
 }
 
 // 助動詞か？
-bool LatticeNode::IsJodoushi() const {
+bool LatticeNode::IsJodoushi() const
+{
     switch (bunrui) {
     case HB_JODOUSHI:
     case HB_MIZEN_JODOUSHI: case HB_RENYOU_JODOUSHI:
@@ -863,7 +885,8 @@ bool LatticeNode::IsJodoushi() const {
 // Lattice - ラティス
 
 // 追加情報。
-void Lattice::AddExtra() {
+void Lattice::AddExtra()
+{
     // 今日（today）
     if (pre == L"きょう") {
         SYSTEMTIME st;
@@ -1043,7 +1066,8 @@ void Lattice::AddExtra() {
 } // Lattice::AddExtra
 
 // 辞書からノードを追加する。
-BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data) {
+BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
+{
     const size_t length = pre.size();
     ASSERT(length);
 
@@ -1235,7 +1259,8 @@ struct DeleteDifferentSizeNode {
 };
 
 // 単一文節変換用のノード群を追加する。
-BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
+BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data)
+{
     std::wstring sep;
     sep += FIELD_SEP;
 
@@ -1266,7 +1291,8 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data) {
 }
 
 // 参照を更新する。
-void Lattice::UpdateRefs() {
+void Lattice::UpdateRefs()
+{
     const size_t length = pre.size();
 
     // initialize the reference counts
@@ -1284,7 +1310,8 @@ void Lattice::UpdateRefs() {
 } // Lattice::UpdateRefs
 
 // リンクを更新する。
-void Lattice::UpdateLinks() {
+void Lattice::UpdateLinks()
+{
     const size_t length = pre.size();
     ASSERT(length);
     ASSERT(length + 1 == chunks.size());
@@ -1332,7 +1359,8 @@ void Lattice::UpdateLinks() {
     }
 } // Lattice::UpdateLinks
 
-void Lattice::UnlinkAllNodes() {
+void Lattice::UnlinkAllNodes()
+{
     // clear the branch links and the linked counts
     const size_t length = pre.size();
     for (size_t index = 0; index < length; ++index) {
@@ -1344,7 +1372,8 @@ void Lattice::UnlinkAllNodes() {
     }
 } // Lattice::UnlinkAllNodes
 
-void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size) {
+void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
+{
     const size_t length = pre.size();
     // add the undefined words on failure of conversion
     WStrings fields(4);
@@ -1358,12 +1387,14 @@ void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size) {
     }
 } // Lattice::AddComplement
 
-static inline bool IsNodeUnlinked(const LatticeNodePtr& node) {
+static inline bool IsNodeUnlinked(const LatticeNodePtr& node)
+{
     return node->linked == 0;
 }
 
 // リンクされていないノードを削除。
-void Lattice::CutUnlinkedNodes() {
+void Lattice::CutUnlinkedNodes()
+{
     const size_t length = pre.size();
     for (size_t index = 0; index < length; ++index) {
         LatticeChunk& chunk1 = chunks[index];
@@ -1373,7 +1404,8 @@ void Lattice::CutUnlinkedNodes() {
 } // Lattice::CutUnlinkedNodes
 
 // 最後にリンクされたインデックスを取得する。
-size_t Lattice::GetLastLinkedIndex() const {
+size_t Lattice::GetLastLinkedIndex() const
+{
     // is the last node linked?
     const size_t length = pre.size();
     if (chunks[length][0]->linked) {
@@ -1393,7 +1425,8 @@ size_t Lattice::GetLastLinkedIndex() const {
 } // Lattice::GetLastLinkedIndex
 
 // イ形容詞を変換する。
-void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
+void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
+{
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1571,7 +1604,8 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoIkeiyoushi
 
 // ナ形容詞を変換する。
-void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
+void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields)
+{
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1674,7 +1708,8 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoNakeiyoushi
 
 // 五段動詞を変換する。
-void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
+void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
+{
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1802,7 +1837,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoGodanDoushi
 
 // 一段動詞を変換する。
-void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
+void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields)
+{
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1887,7 +1923,8 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoIchidanDoushi
 
 // カ変動詞を変換する。
-void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
+void Lattice::DoKahenDoushi(size_t index, const WStrings& fields)
+{
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1973,7 +2010,8 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields) {
 } // Lattice::DoKahenDoushi
 
 // サ変動詞を変換する。
-void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
+void Lattice::DoSahenDoushi(size_t index, const WStrings& fields)
+{
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -2135,7 +2173,8 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields) {
     } while(0);
 } // Lattice::DoSahenDoushi
 
-void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost) {
+void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
+{
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
 
@@ -2186,7 +2225,8 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost) {
     }
 } // Lattice::DoMeishi
 
-void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) {
+void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
+{
     ASSERT(fields.size() == 4);
     const size_t length = fields[0].size();
     // boundary check
@@ -2301,7 +2341,8 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/) 
 } // Lattice::DoFields
 
 // ラティスをダンプする。
-void Lattice::Dump(int num) {
+void Lattice::Dump(int num)
+{
     const size_t length = pre.size();
     DebugPrintW(L"### Lattice::Dump(%d) ###\n", num);
     DebugPrintW(L"Lattice length: %d\n", int(length));
@@ -2337,7 +2378,8 @@ BOOL Lattice::MakeLatticeInternal(size_t length, const WCHAR* dict_data)
 }
 
 // 複数文節変換において、ラティスを作成する。
-BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre) {
+BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre)
+{
     // 基本辞書が読み込まれていなければ失敗。
     if (!m_basic_dict.IsLoaded())
         return FALSE;
@@ -2393,7 +2435,8 @@ BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre) {
 } // MzIme::MakeLatticeForMulti
 
 // 単一文節変換において、ラティスを作成する。
-BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
+BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre)
+{
     // failure if the dictionary not loaded
     if (!m_basic_dict.IsLoaded()) {
         return FALSE;
@@ -2425,7 +2468,8 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre) {
 } // MzIme::MakeLatticeForSingle
 
 // 単一文節変換において、変換結果を生成する。
-void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice) {
+void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
+{
     result.clear(); // 結果をクリア。
 
     // 2文節最長一致法・改。
@@ -2590,7 +2634,8 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice) {
 } // MzIme::MakeResultForMulti
 
 // 変換に失敗したときの結果を作成する。
-void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
+void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre)
+{
     MzConvClause clause; // 文節。
     result.clear(); // 結果をクリア。
 
@@ -2625,7 +2670,8 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre) {
 } // MzIme::MakeResultOnFailure
 
 // 単一文節変換の結果を作成する。
-void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice) {
+void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice)
+{
     result.clear(); // 結果をクリア。
     const size_t length = lattice.pre.size();
 
@@ -2963,29 +3009,34 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 } // MzIme::StretchClauseRight
 
 // Shift_JISのマルチバイト文字の1バイト目か？
-inline bool is_sjis_lead(BYTE ch) {
+inline bool is_sjis_lead(BYTE ch)
+{
     return (((0x81 <= ch) && (ch <= 0x9F)) || ((0xE0 <= ch) && (ch <= 0xEF)));
 }
 
 // Shift_JISのマルチバイト文字の2バイト目か？
-inline bool is_sjis_trail(BYTE ch) {
+inline bool is_sjis_trail(BYTE ch)
+{
     return (((0x40 <= ch) && (ch <= 0x7E)) || ((0x80 <= ch) && (ch <= 0xFC)));
 }
 
 // JISバイトか？
-inline bool is_jis_byte(BYTE ch) {
+inline bool is_jis_byte(BYTE ch)
+{
     return ((0x21 <= ch) && (ch <= 0x7E));
 }
 
 // JISコードか？
-inline bool is_jis_code(WORD w) {
+inline bool is_jis_code(WORD w)
+{
     BYTE ch0 = BYTE(w >> 8);
     BYTE ch1 = BYTE(w);
     return (is_jis_byte(ch0) && is_jis_byte(ch1));
 }
 
 // JISコードをShift_JISに変換する。
-inline WORD jis2sjis(BYTE c0, BYTE c1) {
+inline WORD jis2sjis(BYTE c0, BYTE c1)
+{
     if (c0 & 0x01) {
         c0 >>= 1;
         if (c0 < 0x2F) {
@@ -3012,19 +3063,22 @@ inline WORD jis2sjis(BYTE c0, BYTE c1) {
 } // jis2sjis
 
 // JISコードをShift_JISコードに変換する。
-inline WORD jis2sjis(WORD jis_code) {
+inline WORD jis2sjis(WORD jis_code)
+{
     BYTE c0 = BYTE(jis_code >> 8);
     BYTE c1 = BYTE(jis_code);
     return jis2sjis(c0, c1);
 }
 
 // Shift_JISコードか？
-inline bool is_sjis_code(WORD w) {
+inline bool is_sjis_code(WORD w)
+{
     return is_sjis_lead(BYTE(w >> 8)) && is_sjis_trail(BYTE(w));
 }
 
 // 区点からJISコードに変換。
-inline WORD kuten_to_jis(const std::wstring& str) {
+inline WORD kuten_to_jis(const std::wstring& str)
+{
     if (str.size() != 5) return 0; // 五文字でなければ区点コードではない。
     std::wstring ku_bangou = str.substr(0, 3); // 区番号。
     std::wstring ten_bangou = str.substr(3, 2); // 点番号。
@@ -3109,7 +3163,8 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
 } // MzIme::ConvertCode
 
 // コード変換。
-BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand) {
+BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand)
+{
     MzConvResult result;
     std::wstring strTyping = comp.extra.typing_clauses[comp.extra.iClause];
     if (!ConvertCode(strTyping, result)) {

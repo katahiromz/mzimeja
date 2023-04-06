@@ -11,7 +11,8 @@
 // LogCandList - 候補リストの論理データ。
 
 // 候補情報のクリア。
-void LogCandList::clear() {
+void LogCandList::clear()
+{
     dwStyle = IME_CAND_READ;
     dwSelection = 0;
     dwPageStart = 0;
@@ -20,7 +21,8 @@ void LogCandList::clear() {
 }
 
 // 候補リストの物理データの合計サイズを計算。
-DWORD LogCandList::GetTotalSize() const {
+DWORD LogCandList::GetTotalSize() const
+{
     DWORD total = sizeof(CANDIDATELIST);
     total += DWORD(cand_strs.size() * sizeof(DWORD));
     for (size_t iCand = 0; iCand < cand_strs.size(); ++iCand) {
@@ -30,12 +32,14 @@ DWORD LogCandList::GetTotalSize() const {
 }
 
 // 候補の個数。
-DWORD LogCandList::GetCandCount() const {
+DWORD LogCandList::GetCandCount() const
+{
     return (DWORD)cand_strs.size();
 }
 
 // 次の候補リストへ。
-void LogCandList::MoveNext() {
+void LogCandList::MoveNext()
+{
     ++dwSelection;
     if (dwSelection >= GetCandCount()) {
         dwSelection = 0;
@@ -44,7 +48,8 @@ void LogCandList::MoveNext() {
 }
 
 // 前の候補リストへ。
-void LogCandList::MovePrev() {
+void LogCandList::MovePrev()
+{
     if (dwSelection > 0) {
         --dwSelection;
     } else {
@@ -54,7 +59,8 @@ void LogCandList::MovePrev() {
 }
 
 // キーボードのPageUpキーの処理。
-void LogCandList::PageUp() {
+void LogCandList::PageUp()
+{
     if (dwPageStart >= dwPageSize) {
         dwSelection -= dwPageSize;
     } else {
@@ -64,7 +70,8 @@ void LogCandList::PageUp() {
 }
 
 // キーボードのPageDownキーの処理。
-void LogCandList::PageDown() {
+void LogCandList::PageDown()
+{
     if (dwPageStart + dwPageSize < GetCandCount()) {
         dwSelection += dwPageSize;
     } else {
@@ -74,24 +81,28 @@ void LogCandList::PageDown() {
 }
 
 // キーボードのHomeキーの処理。
-void LogCandList::MoveHome() {
+void LogCandList::MoveHome()
+{
     dwSelection = 0;
     dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
 // キーボードのEndキーの処理。
-void LogCandList::MoveEnd() {
+void LogCandList::MoveEnd()
+{
     dwSelection = GetCandCount() - 1;
     dwPageStart = dwSelection / CANDPAGE_SIZE * CANDPAGE_SIZE;
 }
 
 // 候補の文字列を取得する。
-std::wstring LogCandList::GetString(DWORD iCand) const {
+std::wstring LogCandList::GetString(DWORD iCand) const
+{
     return cand_strs[iCand];
 }
 
 // 候補の文字列を取得する。
-std::wstring LogCandList::GetString() const {
+std::wstring LogCandList::GetString() const
+{
     return GetString(dwSelection);
 }
 
@@ -99,23 +110,27 @@ std::wstring LogCandList::GetString() const {
 // LogCandInfo - 候補情報の論理データ。
 
 // クリア。
-void LogCandInfo::clear() {
+void LogCandInfo::clear()
+{
     cand_lists.clear();
     iClause = 0;
 }
 
 // 候補情報があるか？
-BOOL LogCandInfo::HasCandInfo() const {
+BOOL LogCandInfo::HasCandInfo() const
+{
     return cand_lists.size() > 0;
 }
 
 // 節の個数。
-DWORD LogCandInfo::GetClauseCount() const {
+DWORD LogCandInfo::GetClauseCount() const
+{
     return DWORD(cand_lists.size());
 }
 
 // 候補を選択する。
-BOOL LogCandInfo::SelectCand(UINT uCandIndex) {
+BOOL LogCandInfo::SelectCand(UINT uCandIndex)
+{
     DWORD dwPageStart = cand_lists[iClause].dwPageStart;
     if (dwPageStart + uCandIndex < cand_lists[iClause].dwPageSize) {
         cand_lists[iClause].dwSelection = dwPageStart + uCandIndex;
@@ -125,47 +140,56 @@ BOOL LogCandInfo::SelectCand(UINT uCandIndex) {
 }
 
 // 次の候補へ移動。
-void LogCandInfo::MoveNext() {
+void LogCandInfo::MoveNext()
+{
     cand_lists[iClause].MoveNext();
 }
 
 // 前の候補へ移動。
-void LogCandInfo::MovePrev() {
+void LogCandInfo::MovePrev()
+{
     cand_lists[iClause].MovePrev();
 }
 
 // キーボードのHomeキーの処理。
-void LogCandInfo::MoveHome() {
+void LogCandInfo::MoveHome()
+{
     cand_lists[iClause].MoveHome();
 }
 
 // キーボードのEndキーの処理。
-void LogCandInfo::MoveEnd() {
+void LogCandInfo::MoveEnd()
+{
     cand_lists[iClause].MoveEnd();
 }
 
 // キーボードのPageUpキーの処理。
-void LogCandInfo::PageUp() {
+void LogCandInfo::PageUp()
+{
     cand_lists[iClause].PageUp();
 }
 
 // キーボードのPageDownキーの処理。
-void LogCandInfo::PageDown() {
+void LogCandInfo::PageDown()
+{
     cand_lists[iClause].PageDown();
 }
 
 // 候補項目の文字列。
-std::wstring LogCandInfo::GetString() const {
+std::wstring LogCandInfo::GetString() const
+{
     return cand_lists[iClause].GetString(cand_lists[iClause].dwSelection);
 }
 
 // 候補項目の文字列。
-std::wstring LogCandInfo::GetString(DWORD iCand) const {
+std::wstring LogCandInfo::GetString(DWORD iCand) const
+{
     return cand_lists[iClause].GetString(iCand);
 }
 
 // 候補情報の物理データの合計サイズを計算する。
-DWORD LogCandInfo::GetTotalSize() const {
+DWORD LogCandInfo::GetTotalSize() const
+{
     DWORD total = sizeof(CANDIDATEINFO);
     for (size_t i = 0; i < cand_lists.size(); ++i) {
         total += cand_lists[i].GetTotalSize();
@@ -175,7 +199,8 @@ DWORD LogCandInfo::GetTotalSize() const {
 }
 
 // 候補情報の論理データをダンプ。
-void LogCandInfo::Dump() {
+void LogCandInfo::Dump()
+{
     DebugPrintA("LogCandInfo::Dump\n");
     for (size_t i = 0; i < cand_lists.size(); ++i) {
         DebugPrintA("### CandList %u ###\n", i);
@@ -195,14 +220,16 @@ void LogCandInfo::Dump() {
 // CandList - 候補リストの物理データ。
 
 // 最後のページを取得する。
-DWORD CandList::GetPageEnd() const {
+DWORD CandList::GetPageEnd() const
+{
     DWORD dw = dwPageStart + dwPageSize;
     if (dw > dwCount) dw = dwCount;
     return dw;
 }
 
 // 物理データから論理データへ。
-void CandList::GetLog(LogCandList& log) {
+void CandList::GetLog(LogCandList& log)
+{
     log.dwStyle = dwStyle;
     log.dwSelection = dwSelection;
     log.dwPageStart = dwPageStart;
@@ -214,7 +241,8 @@ void CandList::GetLog(LogCandList& log) {
 }
 
 // 論理データから物理データへ。
-DWORD CandList::Store(const LogCandList *log) {
+DWORD CandList::Store(const LogCandList *log)
+{
     dwSize = log->GetTotalSize();
     dwStyle = log->dwStyle;
     dwCount = DWORD(log->cand_strs.size());
@@ -243,13 +271,15 @@ DWORD CandList::Store(const LogCandList *log) {
 // CandInfo - 候補情報。
 
 // 候補リストの物理データを参照する。
-CandList *CandInfo::GetList(DWORD i) {
+CandList *CandInfo::GetList(DWORD i)
+{
     ASSERT(i < dwCount);
     return (CandList *)(GetBytes() + dwOffset[i]);
 }
 
 // 候補情報の物理データから論理データへ。
-void CandInfo::GetLog(LogCandInfo& log) {
+void CandInfo::GetLog(LogCandInfo& log)
+{
     log.clear(); // 論理データをクリア。
 
     LogCandList cand; // 候補リストの論理データ。
@@ -268,7 +298,8 @@ void CandInfo::GetLog(LogCandInfo& log) {
 }
 
 // 候補情報の論理データから物理データへ。
-DWORD CandInfo::Store(const LogCandInfo *log) {
+DWORD CandInfo::Store(const LogCandInfo *log)
+{
     dwSize = log->GetTotalSize();
     dwCount = (DWORD)log->cand_lists.size();
     if (MAX_CANDLISTS < dwCount) {
@@ -297,7 +328,8 @@ DWORD CandInfo::Store(const LogCandInfo *log) {
 }
 
 // 候補情報の余剰情報を取得する。
-CANDINFOEXTRA *CandInfo::GetExtra() {
+CANDINFOEXTRA *CandInfo::GetExtra()
+{
     if (dwPrivateSize >= sizeof(CANDINFOEXTRA)) {
         BYTE *pb = GetBytes();
         pb += dwPrivateOffset;
@@ -312,7 +344,8 @@ CANDINFOEXTRA *CandInfo::GetExtra() {
 }
 
 // 候補情報を再作成する。
-/*static*/ HIMCC CandInfo::ReCreate(HIMCC hCandInfo, const LogCandInfo *log) {
+/*static*/ HIMCC CandInfo::ReCreate(HIMCC hCandInfo, const LogCandInfo *log)
+{
     LogCandInfo log_cand_info;
     if (log == NULL) {
         log = &log_cand_info;
@@ -338,7 +371,8 @@ CANDINFOEXTRA *CandInfo::GetExtra() {
 } // CandInfo::ReCreate
 
 // 候補情報をダンプする。
-void CandInfo::Dump() {
+void CandInfo::Dump()
+{
     DebugPrintA("### CandInfo ###\n");
     DebugPrintA("+ dwSize: %u\n", dwSize);
     DebugPrintA("+ dwCount: %u\n", dwCount);

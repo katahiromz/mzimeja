@@ -14,7 +14,8 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 
 // 候補ウィンドウの当たり判定。
-DWORD CandWnd_HitTest(HWND hWnd, POINT pt, InputContext *lpIMC) {
+DWORD CandWnd_HitTest(HWND hWnd, POINT pt, InputContext *lpIMC)
+{
     DWORD ret = 0;
     int height = 0;
     HDC hDC = ::CreateCompatibleDC(NULL);
@@ -50,7 +51,8 @@ DWORD CandWnd_HitTest(HWND hWnd, POINT pt, InputContext *lpIMC) {
     return ret;
 }
 
-void CandWnd_OnClick(HWND hWnd) {
+void CandWnd_OnClick(HWND hWnd)
+{
     POINT pt;
     ::GetCursorPos(&pt);
     ::ScreenToClient(hWnd, &pt);
@@ -75,7 +77,8 @@ void CandWnd_OnClick(HWND hWnd) {
 } // CandWnd_OnClick
 
 LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
-                                    LPARAM lParam) {
+                                    LPARAM lParam)
+{
     HWND hUIWnd;
 
     switch (message) {
@@ -103,8 +106,10 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     return 0;
 } // CandWnd_WindowProc
 
-BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt) {
+BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt)
+{
     BOOL ret = FALSE;
+    FOOTMARK_FORMAT("%p, %p, %p\n", lpIMC, lpUIExtra, lppt);
 
     DWORD iClause = 0;
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
@@ -126,7 +131,9 @@ BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt
 }
 
 BOOL GetCandPosFromCompForm(InputContext *lpIMC, UIEXTRA *lpUIExtra,
-                            LPPOINT lppt) {
+                            LPPOINT lppt)
+{
+    FOOTMARK_FORMAT("%p, %p, %p\n", lpIMC, lpUIExtra, lppt);
     if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, lppt)) {
         ::ScreenToClient(lpIMC->hWnd, lppt);
         return TRUE;
@@ -134,8 +141,10 @@ BOOL GetCandPosFromCompForm(InputContext *lpIMC, UIEXTRA *lpUIExtra,
     return FALSE;
 } // GetCandPosFromCompForm
 
-void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
+void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC)
+{
     POINT pt;
+    FOOTMARK_FORMAT("%p, %p, %p\n", hUIWnd, lpUIExtra, lpIMC);
 
     if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
         lpUIExtra->ptCand.x = pt.x;
@@ -154,7 +163,8 @@ void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     ::ShowWindow(lpUIExtra->hwndCand, SW_HIDE);
 } // CandWnd_Create
 
-void CandWnd_Paint(HWND hCandWnd) {
+void CandWnd_Paint(HWND hCandWnd)
+{
     RECT rc;
     ::GetClientRect(hCandWnd, &rc);
 
@@ -228,7 +238,8 @@ void CandWnd_Paint(HWND hCandWnd) {
     ::EndPaint(hCandWnd, &ps);
 } // CandWnd_Paint
 
-SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
+SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC)
+{
     int width1 = 0, height = 0;
     HDC hDC = ::CreateCompatibleDC(NULL);
     HFONT hOldFont = CheckNativeCharset(hDC);
@@ -264,7 +275,8 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     return ret;
 } // CandWnd_CalcSize
 
-void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
+void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC)
+{
     if (::IsWindow(lpUIExtra->hwndCand)) {
         SIZE siz = CandWnd_CalcSize(lpUIExtra, lpIMC);
         siz.cx += 4 * GetSystemMetrics(SM_CXEDGE);
@@ -277,8 +289,10 @@ void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC) {
     }
 } // CandWnd_Resize
 
-void CandWnd_Hide(UIEXTRA *lpUIExtra) {
+void CandWnd_Hide(UIEXTRA *lpUIExtra)
+{
     RECT rc;
+    FOOTMARK_FORMAT("%p\n", lpUIExtra);
 
     if (::IsWindow(lpUIExtra->hwndCand)) {
         ::GetWindowRect(lpUIExtra->hwndCand, (LPRECT)&rc);
@@ -291,9 +305,11 @@ void CandWnd_Hide(UIEXTRA *lpUIExtra) {
 
 // 候補ウィンドウの移動時。
 void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
-                  BOOL fForceComp) {
+                  BOOL fForceComp)
+{
     RECT rc;
     POINT pt;
+    FOOTMARK_FORMAT("%p, %p, %p, %d\n", hUIWnd, lpIMC, lpUIExtra, fForceComp);
 
     // Not initialized yet? 初期化されてないか？
     if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
@@ -323,6 +339,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
 
     DWORD dwStyle = lpIMC->cfCandForm[0].dwStyle;
     if (dwStyle == CFS_EXCLUDE) {
+        DPRINT("CFS_EXCLUDE\n");
         // get work area and app window rect
         RECT rcWork, rcAppWnd;
         ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
@@ -353,12 +370,14 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             int cx, cy;
             cx = rc.right - rc.left;
             cy = rc.bottom - rc.top;
+            DPRINT("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
             ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
         }
         ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
     } else if (dwStyle == CFS_CANDIDATEPOS) {
+        DPRINT("CFS_CANDIDATEPOS\n");
         // get the specified position in screen coordinates
         pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
         pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
@@ -371,6 +390,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             int cx, cy;
             cx = rc.right - rc.left;
             cy = rc.bottom - rc.top;
+            DPRINT("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
             ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
