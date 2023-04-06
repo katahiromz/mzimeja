@@ -392,7 +392,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
 
             lpUIExtra->hFont = CreateFontIndirect(&lf); // 論理フォントからフォントを作成。
             CompWnd_SetFont(lpUIExtra); // フォントを余剰情報にセット。
-            CompWnd_Move(lpUIExtra, lpIMC); // 状態ウィンドウを移動。
+            CompWnd_Move(lpUIExtra, lpIMC); // 未確定文字列ウィンドウを移動。
 
             TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除
         }
