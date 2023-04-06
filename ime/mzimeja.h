@@ -202,6 +202,8 @@ extern std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
 extern std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
 void MakeLiteralMaps(); // 子音の写像と母音の写像を作成する。
 LPCWSTR BunruiToString(HinshiBunrui bunrui);
+LPCTSTR HinshiToString(HinshiBunrui hinshi);
+HinshiBunrui StringToHinshi(LPCTSTR str);
 
 // notify.c
 BOOL PASCAL NotifyUCSetOpen(HIMC hIMC);
@@ -250,8 +252,6 @@ void GuideWnd_Update(UIEXTRA *lpUIExtra);
 LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
 
 // config.c
-LPCTSTR HinshiToString(HinshiBunrui hinshi);
-HinshiBunrui StringToHinshi(LPCTSTR str);
 HKEY Config_OpenAppKey(VOID);
 HKEY Config_CreateAppKey(VOID);
 DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault);
