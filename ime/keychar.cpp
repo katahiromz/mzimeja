@@ -10,10 +10,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // 設定に応じて文字を変換する。
-WCHAR translateChar(WCHAR ch)
+WCHAR translateChar(WCHAR ch, BOOL bCommaPeriod, BOOL bNoZenkakuAscii)
 {
     if (is_comma(ch)) {
-        if (Config_GetDWORD(L"bCommaPeriod", FALSE)) {
+        if (bCommaPeriod) {
             if (Config_GetDWORD(L"bNoZenkakuAscii", FALSE))
                 ch = L',';
             else
@@ -22,8 +22,8 @@ WCHAR translateChar(WCHAR ch)
             ch = L'、';
         }
     } else if (is_period(ch)) {
-        if (Config_GetDWORD(L"bCommaPeriod", FALSE)) {
-            if (Config_GetDWORD(L"bNoZenkakuAscii", FALSE))
+        if (bCommaPeriod) {
+            if (bNoZenkakuAscii)
                 ch = L'.';
             else
                 ch = L'．';
@@ -31,23 +31,34 @@ WCHAR translateChar(WCHAR ch)
             ch = L'。';
         }
     } else if (L'!' <= ch && ch <= L'~') {
-        if (!Config_GetDWORD(L"bNoZenkakuAscii", FALSE)) {
+        if (!bNoZenkakuAscii) {
             ch = (WCHAR)(ch + (L'！' - L'!'));
         }
     } else if (L'！' <= ch && ch <= L'～') {
-        if (Config_GetDWORD(L"bNoZenkakuAscii", FALSE)) {
+        if (bNoZenkakuAscii) {
             ch = (WCHAR)(ch - (L'！' - L'!'));
         }
     }
     return ch;
 }
 
+// 設定に応じて文字を変換する。
+WCHAR translateChar(WCHAR ch)
+{
+    return translateChar(ch,
+                         Config_GetDWORD(L"bCommaPeriod", FALSE),
+                         Config_GetDWORD(L"bNoZenkakuAscii", FALSE));
+}
+
 // 設定に応じて文字列を変換する。
 std::wstring translateString(const std::wstring& str)
 {
+    BOOL bCommaPeriod = Config_GetDWORD(L"bCommaPeriod", FALSE);
+    BOOL bNoZenkakuAscii = Config_GetDWORD(L"bNoZenkakuAscii", FALSE);
+
     std::wstring ret = str;
     for (WCHAR& ch : ret) {
-        ch = translateChar(ch);
+        ch = translateChar(ch, bCommaPeriod, bNoZenkakuAscii);
     }
     return ret;
 }
