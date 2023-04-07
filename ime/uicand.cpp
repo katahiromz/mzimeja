@@ -166,6 +166,7 @@ void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC)
     ::ShowWindow(lpUIExtra->hwndCand, SW_HIDE);
 } // CandWnd_Create
 
+// WM_PAINT
 void CandWnd_Paint(HWND hCandWnd)
 {
     RECT rc;
@@ -177,7 +178,7 @@ void CandWnd_Paint(HWND hCandWnd)
     // ちらつきを防止するため、メモリービットマップを使用する。
     HDC hdcMem = ::CreateCompatibleDC(hDC);
     HBITMAP hbm = ::CreateCompatibleBitmap(hDC, rc.right, rc.bottom);
-    HGDIOBJ hbmOld = ::SelectObject(hbmMem, hbm);
+    HGDIOBJ hbmOld = ::SelectObject(hdcMem, hbm);
 
     // 背景を塗りつぶす。
     ::FillRect(hdcMem, &rc, (HBRUSH)(COLOR_WINDOW + 1));
@@ -250,8 +251,8 @@ void CandWnd_Paint(HWND hCandWnd)
     ::BitBlt(hDC, 0, 0, rc.right, rc.bottom, hdcMem, 0, 0, SRCCOPY);
 
     // 後始末。
-    ::DeleteObject(::SelectObject(hbmMem, hbmOld));
-    ::DeleteDC(hbmMem);
+    ::DeleteObject(::SelectObject(hdcMem, hbmOld));
+    ::DeleteDC(hdcMem);
 
     ::EndPaint(hCandWnd, &ps);
 } // CandWnd_Paint

@@ -441,8 +441,7 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
     // Is it end? 終わりか？
     SIZE siz;
     const WCHAR *lpEnd = &pch[cch];
-    while (pch < lpEnd) {
-
+    while (pch < lpEnd) { // 一文字ずつ描画する。
         // set color and pen
         HPEN hPen;
         switch (lpattr[ich]) {
@@ -546,6 +545,7 @@ void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompSt
     // Is it vertical? 縦書きか？
     BOOL fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
 
+    // さらにヘルパー関数を用いて描画する。
     if (lpIMC->cfCompForm.dwStyle) {
         ::SetBkMode(hDC, OPAQUE);
 
@@ -567,15 +567,25 @@ void CompWnd_Paint(HWND hCompWnd)
     PAINTSTRUCT ps;
     HDC hDC = ::BeginPaint(hCompWnd, &ps); // 描画を開始。
 
+    // クライアント領域を取得する。
+    RECT rc;
+    ::GetClientRect(hCompWnd, &rc);
+
+    // ちらつきを防止するため、メモリービットマップを使用。
+    HDC hdcMem = ::CreateCompatibleDC(hDC);
+    HBITMAP hbm = ::CreateCompatibleBitmap(hDC, rc.right, rc.bottom);
+    HGDIOBJ hbmOld = ::SelectObject(hdcMem, hbm);
+
     HFONT hOldFont = NULL;
     HFONT hFont = (HFONT) ::GetWindowLongPtr(hCompWnd, FIGWLP_FONT); // フォント。
-    if (hFont) hOldFont = (HFONT) ::SelectObject(hDC, hFont); // フォントを選択。
+    if (hFont) hOldFont = (HFONT) ::SelectObject(hdcMem, hFont); // フォントを選択。
 
+    // UIサーバーからhIMCを取得する。
     HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hCompWnd, FIGWLP_SERVERWND); // UIサーバー。
     ASSERT(hSvrWnd != NULL);
-
     HIMC hIMC = (HIMC) ::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMC。
     ASSERT(hIMC != NULL);
+
     if (hIMC) {
         InputContext *lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロック。
         ASSERT(lpIMC != NULL);
@@ -583,14 +593,24 @@ void CompWnd_Paint(HWND hCompWnd)
             CompStr *lpCompStr = lpIMC->LockCompStr(); // 未確定文字列をロック。
             if (lpCompStr) {
                 if (lpCompStr->dwCompStrLen > 0) { // 文字列があれば
-                    CompWnd_Draw(hCompWnd, hDC, lpIMC, lpCompStr); // 描画する。
+                    // ヘルパー関数を用いて描画する。
+                    CompWnd_Draw(hCompWnd, hdcMem, lpIMC, lpCompStr);
                 }
                 lpIMC->UnlockCompStr(); // 未確定文字列のロックを解除。
             }
             TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
     }
-    if (hFont && hOldFont) ::SelectObject(hDC, hOldFont); // フォントの選択を解除。
+
+    if (hFont && hOldFont) ::SelectObject(hdcMem, hOldFont); // フォントの選択を解除。
+
+    // ビット群を転送（hDC←hdcMem）。
+    ::BitBlt(hDC, 0, 0, rc.right, rc.bottom, hdcMem, 0, 0, SRCCOPY);
+
+    // 後始末。
+    ::DeleteObject(::SelectObject(hdcMem, hbmOld));
+    ::DeleteDC(hdcMem);
+
     ::EndPaint(hCompWnd, &ps); // 描画を終了。
 } // CompWnd_Paint
 
@@ -628,6 +648,9 @@ LRESULT CALLBACK CompWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     HWND hUIWnd;
 
     switch (message) {
+    case WM_ERASEBKGND:
+        return TRUE; // ちらつきを防止するため、ここで背景を描画しない。
+
     case WM_PAINT: // 描画時。
         CompWnd_Paint(hWnd);
         break;
