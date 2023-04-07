@@ -83,7 +83,7 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 
     switch (message) {
     case WM_ERASEBKGND:
-        return TRUE;
+        return TRUE; // ちらつきを防止するため、ここで背景を描画しない。
 
     case WM_PAINT:
         CandWnd_Paint(hWnd);
