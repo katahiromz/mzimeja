@@ -411,22 +411,22 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
                      DWORD ich, DWORD cch, CompStr *lpCompStr, BOOL fVert)
 {
-    if (cch == 0) return; // 文字列の長さがゼロなら終了。
+    if (cch == 0)
+        return; // 文字列の長さがゼロなら終了。
 
-    // Attribute. 属性。
+    // 属性。
     BYTE *lpattr = lpCompStr->GetCompAttr();
 
-    // Get clause info. 節情報を取得。
+    // 節情報（clauses）を取得。
     DWORD *pdw = lpCompStr->GetCompClause();
     DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
     std::unordered_set<DWORD> clauses(pdw, pdwEnd);
 
-    // Get client rect and fill white. クライアント領域を取得し、白で塗りつぶす。
+    // クライアント領域を取得する。
     RECT rc;
     ::GetClientRect(hCompWnd, &rc);
-    ::FillRect(hDC, &rc, (HBRUSH)GetStockObject(WHITE_BRUSH));
 
-    // Starting position. 開始位置。
+    // 開始位置。
     int x, y;
     if (fVert) {
         x = rc.right - UNDERLINE_HEIGHT;
@@ -435,14 +435,14 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
         x = y = 0;
     }
 
-    // Set opaque mode. 文字列描画において不透明モードにする。
+    // 文字列描画において不透明モードにする。
     ::SetBkMode(hDC, OPAQUE);
 
-    // Is it end? 終わりか？
     SIZE siz;
-    const WCHAR *lpEnd = &pch[cch];
+    const WCHAR *lpEnd = &pch[cch]; // 文字列終端の位置。
+
     while (pch < lpEnd) { // 一文字ずつ描画する。
-        // set color and pen
+        // 色とペンをセットする。
         HPEN hPen;
         switch (lpattr[ich]) {
         case ATTR_TARGET_CONVERTED:
@@ -461,13 +461,14 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
             hPen = ::CreatePen(PS_DOT, 1, RGB(0, 121, 0));
             break;
         }
-        // draw text
+
+        // テキストを一文字描画する。
         ::TextOutW(hDC, x, y, pch, 1);
 
-        // get size of text
+        // テキストの寸法を取得する。
         ::GetTextExtentPoint32W(hDC, pch, 1, &siz);
 
-        // draw underline if target converted
+        // 変換中ならば下線を描画する。
         INT nClauseSep = 2 * (clauses.count(ich + 1) > 0);
         HGDIOBJ hPenOld = ::SelectObject(hDC, hPen);
         if (lpattr[ich] == ATTR_TARGET_CONVERTED) {
@@ -493,7 +494,7 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
         }
         ::DeleteObject(::SelectObject(hDC, hPenOld));
 
-        // draw cursor (caret)
+        // カーソルを描画する。
         if (lpCompStr->dwCursorPos == ich) {
             ::SelectObject(hDC, ::GetStockObject(BLACK_PEN));
             if (fVert) {
@@ -509,7 +510,7 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
             }
         }
 
-        // go to next position
+        // 次の位置へ移動する。
         ++pch;
         ++ich;
         if (fVert)
@@ -518,7 +519,7 @@ void DrawTextOneLine(HWND hCompWnd, HDC hDC, const WCHAR *pch,
             x += siz.cx;
     }
 
-    // Draw caret at last if any. キャレットを描画する（もしあれば）。
+    // キャレットを描画する（もしあれば）。
     if (lpCompStr->dwCursorPos == ich) { // 現在の位置か？
         ::SelectObject(hDC, ::GetStockObject(BLACK_PEN)); // 黒いペンで。
         if (fVert) { // 縦書きか？
@@ -576,9 +577,13 @@ void CompWnd_Paint(HWND hCompWnd)
     HBITMAP hbm = ::CreateCompatibleBitmap(hDC, rc.right, rc.bottom);
     HGDIOBJ hbmOld = ::SelectObject(hdcMem, hbm);
 
+    // 背景を描画する。
+    ::FillRect(hdcMem, &rc, (HBRUSH)GetStockObject(WHITE_BRUSH));
+
+    // フォントを選択する。
     HFONT hOldFont = NULL;
-    HFONT hFont = (HFONT) ::GetWindowLongPtr(hCompWnd, FIGWLP_FONT); // フォント。
-    if (hFont) hOldFont = (HFONT) ::SelectObject(hdcMem, hFont); // フォントを選択。
+    HFONT hFont = (HFONT) ::GetWindowLongPtr(hCompWnd, FIGWLP_FONT);
+    if (hFont) hOldFont = (HFONT) ::SelectObject(hdcMem, hFont);
 
     // UIサーバーからhIMCを取得する。
     HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hCompWnd, FIGWLP_SERVERWND); // UIサーバー。
@@ -602,7 +607,8 @@ void CompWnd_Paint(HWND hCompWnd)
         }
     }
 
-    if (hFont && hOldFont) ::SelectObject(hdcMem, hOldFont); // フォントの選択を解除。
+    // フォントの選択を解除。
+    if (hFont && hOldFont) ::SelectObject(hdcMem, hOldFont);
 
     // ビット群を転送（hDC←hdcMem）。
     ::BitBlt(hDC, 0, 0, rc.right, rc.bottom, hdcMem, 0, 0, SRCCOPY);

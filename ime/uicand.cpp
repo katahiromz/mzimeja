@@ -254,6 +254,7 @@ void CandWnd_Paint(HWND hCandWnd)
     ::DeleteObject(::SelectObject(hdcMem, hbmOld));
     ::DeleteDC(hdcMem);
 
+    // 描画を終了する。
     ::EndPaint(hCandWnd, &ps);
 } // CandWnd_Paint
 
