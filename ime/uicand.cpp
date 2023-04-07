@@ -82,6 +82,9 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     HWND hUIWnd;
 
     switch (message) {
+    case WM_ERASEBKGND:
+        return TRUE;
+
     case WM_PAINT:
         CandWnd_Paint(hWnd);
         break;
@@ -170,16 +173,23 @@ void CandWnd_Paint(HWND hCandWnd)
 
     PAINTSTRUCT ps;
     HDC hDC = ::BeginPaint(hCandWnd, &ps);
-    ::FillRect(hDC, &rc, (HBRUSH)(COLOR_WINDOW + 1));
 
-    ::SetBkMode(hDC, TRANSPARENT);
+    // ちらつきを防止するため、メモリービットマップを使用する。
+    HDC hdcMem = ::CreateCompatibleDC(hDC);
+    HBITMAP hbm = ::CreateCompatibleBitmap(hDC, rc.right, rc.bottom);
+    HGDIOBJ hbmOld = ::SelectObject(hbmMem, hbm);
+
+    // 背景を塗りつぶす。
+    ::FillRect(hdcMem, &rc, (HBRUSH)(COLOR_WINDOW + 1));
+
+    ::SetBkMode(hdcMem, TRANSPARENT);
     HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hCandWnd, FIGWLP_SERVERWND);
 
     HIMC hIMC = (HIMC) ::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC);
     if (hIMC) {
         InputContext *lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
-            HFONT hOldFont = CheckNativeCharset(hDC);
+            HFONT hOldFont = CheckNativeCharset(hdcMem);
             CandInfo *lpCandInfo = lpIMC->LockCandInfo();
             if (lpCandInfo) {
                 INT x1 = ::GetSystemMetrics(SM_CXEDGE);
@@ -195,18 +205,18 @@ void CandWnd_Paint(HWND hCandWnd)
                     // get size of cand string
                     WCHAR *psz = lpCandList->GetCandString(i);
                     SIZE siz;
-                    ::GetTextExtentPoint32W(hDC, psz, lstrlenW(psz), &siz);
+                    ::GetTextExtentPoint32W(hdcMem, psz, lstrlenW(psz), &siz);
 
                     // draw header
                     RECT rcHeader;
                     ::SetRect(&rcHeader, x1, y + CY_BORDER,
                               x1 + CX_HEADER, y + siz.cy + CY_BORDER * 2);
-                    ::DrawFrameControl(hDC, &rcHeader, DFC_BUTTON,
+                    ::DrawFrameControl(hdcMem, &rcHeader, DFC_BUTTON,
                                        DFCS_BUTTONPUSH | DFCS_ADJUSTRECT);
                     StringCchPrintf(sz, _countof(sz), TEXT("%u"), k);
-                    ::SetTextColor(hDC, ::GetSysColor(COLOR_BTNTEXT));
+                    ::SetTextColor(hdcMem, ::GetSysColor(COLOR_BTNTEXT));
                     ::InflateRect(&rcHeader, -::GetSystemMetrics(SM_CXBORDER), 0);
-                    ::DrawTextW(hDC, sz, -1, &rcHeader,
+                    ::DrawTextW(hdcMem, sz, -1, &rcHeader,
                                 DT_SINGLELINE | DT_RIGHT | DT_VCENTER | DT_NOCLIP | DT_NOPREFIX);
 
                     // draw text
@@ -215,13 +225,13 @@ void CandWnd_Paint(HWND hCandWnd)
                               rc.right, y + siz.cy + CY_BORDER * 2);
                     ::InflateRect(&rcHeader, -CX_BORDER, -CY_BORDER);
                     if (lpCandList->dwSelection == i) {
-                        ::SetTextColor(hDC, ::GetSysColor(COLOR_HIGHLIGHTTEXT));
-                        ::FillRect(hDC, &rcText, (HBRUSH)(COLOR_HIGHLIGHT + 1));
+                        ::SetTextColor(hdcMem, ::GetSysColor(COLOR_HIGHLIGHTTEXT));
+                        ::FillRect(hdcMem, &rcText, (HBRUSH)(COLOR_HIGHLIGHT + 1));
                     } else {
-                        ::SetTextColor(hDC, ::GetSysColor(COLOR_WINDOWTEXT));
-                        ::FillRect(hDC, &rcText, (HBRUSH)(COLOR_WINDOW + 1));
+                        ::SetTextColor(hdcMem, ::GetSysColor(COLOR_WINDOWTEXT));
+                        ::FillRect(hdcMem, &rcText, (HBRUSH)(COLOR_WINDOW + 1));
                     }
-                    ::DrawTextW(hDC, psz, -1, &rcText,
+                    ::DrawTextW(hdcMem, psz, -1, &rcText,
                                 DT_SINGLELINE | DT_LEFT | DT_VCENTER | DT_NOCLIP | DT_NOPREFIX);
 
                     // go to next line
@@ -230,11 +240,19 @@ void CandWnd_Paint(HWND hCandWnd)
                 lpIMC->UnlockCandInfo();
             }
             if (hOldFont) {
-                ::DeleteObject(SelectObject(hDC, hOldFont));
+                ::DeleteObject(SelectObject(hdcMem, hOldFont));
             }
             TheIME.UnlockIMC(hIMC);
         }
     }
+
+    // ビット群を転送する（hDC ← hdcMem）。
+    ::BitBlt(hDC, 0, 0, rc.right, rc.bottom, hdcMem, 0, 0, SRCCOPY);
+
+    // 後始末。
+    ::DeleteObject(::SelectObject(hbmMem, hbmOld));
+    ::DeleteDC(hbmMem);
+
     ::EndPaint(hCandWnd, &ps);
 } // CandWnd_Paint
 
