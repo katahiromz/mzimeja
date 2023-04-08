@@ -71,6 +71,7 @@
     #define TRACE_OFF()
 #endif
 
+#define FootmarkDebugPrint DPRINTA
 #include "footmark.hpp"   // for footmark++
 
 //////////////////////////////////////////////////////////////////////////////

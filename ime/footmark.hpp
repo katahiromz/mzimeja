@@ -14,12 +14,8 @@
 // FootmarkDebugPrint
 
 #ifndef FootmarkDebugPrint
-    #ifdef DPRINTA
-        #define FootmarkDebugPrint  DPRINTA
-    #else
-        #include <cstdio>
-        #define FootmarkDebugPrint  printf
-    #endif
+    #include <cstdio>
+    #define FootmarkDebugPrint  printf
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
