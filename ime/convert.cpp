@@ -610,7 +610,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
         // 終端の文字を削る。
         pre.resize(pre.size() - 1);
         post.resize(post.size() - 1);
-        // 行を取得する。
+        // 終端の文字だったものの行を取得する。
         ch = g_consonant_map[ch];
         ngyou = GYOU_A;
         for (i = 0; i < _countof(s_hiragana_table); ++i) {
