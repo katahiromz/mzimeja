@@ -41,7 +41,7 @@ std::wstring postal_code(LPCWSTR code)
             StrTrimA(pch2, " \t\r\n");
 
             // 一致しなければ次の行。
-            if (lstrcmpA(szCodeA, szLine) != 0)
+            if (lstrcmpA(szCodeA, szLine) != 0 || *pch2 == 0)
                 continue;
 
             // UTF-8からUTF-16へ変換。
