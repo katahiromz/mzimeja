@@ -1209,19 +1209,15 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
                 DoMeishi(saved, fields);
                 fields[2] = convert_to_kansuuji_formal(fields[0]);
                 DoMeishi(saved, fields);
+            }
 
-                // óXï÷î‘çÜïœä∑ÅB
-                std::wstring postal = lcmap(fields[0], LCMAP_HALFWIDTH);
-                if (postal.size() == 3)
-                    postal += L"00";
-                if (postal.size() == 5)
-                    postal += L"00";
-                if (postal.size() == 7) {
-                    std::wstring addr = postal_code(postal.c_str());
-                    if (addr.size()) {
-                        fields[2] = addr;
-                        DoMeishi(saved, fields, -10);
-                    }
+            // óXï÷î‘çÜïœä∑ÅB
+            std::wstring postal = normalize_postal_code(fields[0]);
+            if (postal.size()) {
+                std::wstring addr = convert_postal_code(postal.c_str());
+                if (addr.size()) {
+                    fields[2] = addr;
+                    DoMeishi(saved, fields, -10);
                 }
             }
 

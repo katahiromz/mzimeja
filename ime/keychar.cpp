@@ -1791,6 +1791,12 @@ BOOL is_comma(WCHAR ch)
     return ch == L'、' || ch == L'，' || ch == L',' || ch == L'､';
 }
 
+// ハイフンか？
+BOOL is_hyphen(WCHAR ch)
+{
+    return ch == L'-' || ch == L'－' || ch == L'ー' || ch == L'ｰ';
+}
+
 // ひらがなか？
 BOOL is_hiragana(WCHAR ch)
 {

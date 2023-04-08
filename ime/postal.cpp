@@ -1,8 +1,27 @@
 // 郵便番号変換。
 #include "mzimeja.h"
 
+std::wstring normalize_postal_code(const std::wstring& str)
+{
+    std::wstring ret = lcmap(str, LCMAP_HALFWIDTH);
+
+    if (ret.size() >= 5 && is_hyphen(ret[3]))
+        ret.erase(3, 1);
+
+    if (!are_all_chars_numeric(ret))
+        return L"";
+
+    if (ret.size() == 3)
+        ret += L"00";
+    if (ret.size() == 5)
+        ret += L"00";
+    if (ret.size() != 7)
+        return L"";
+    return ret;
+}
+
 // 郵便番号変換を行う関数。
-std::wstring postal_code(LPCWSTR code)
+std::wstring convert_postal_code(LPCWSTR code)
 {
     std::wstring postal, ret;
     if (Config_GetDWORD(L"PostalDictDisabled", FALSE)) // 無効化されている？
@@ -61,7 +80,7 @@ std::wstring postal_code(LPCWSTR code)
     DWORD dwTick2 = ::GetTickCount(); // 測定終了。
 
     // 測定値をデバッグ出力。
-    DPRINT("postal_code: %lu\n", dwTick2 - dwTick1);
+    DPRINT("convert_postal_code: %lu\n", dwTick2 - dwTick1);
 
     return ret;
 }

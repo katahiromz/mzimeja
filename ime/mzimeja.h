@@ -336,10 +336,12 @@ std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth);
 std::wstring convert_to_kansuuji(const std::wstring& str);
 std::wstring convert_to_kansuuji_brief(const std::wstring& str);
 std::wstring convert_to_kansuuji_formal(const std::wstring& str);
-// is the character a period?
+// ピリオドか？
 BOOL is_period(WCHAR ch);
-// is the character a comma?
+// カンマか？
 BOOL is_comma(WCHAR ch);
+// ハイフンか？
+BOOL is_hyphen(WCHAR ch);
 // 設定に応じて文字を変換する。
 WCHAR translateChar(WCHAR ch);
 // 設定に応じて文字列を変換する。
@@ -494,6 +496,7 @@ protected:
 extern MzIme TheIME;
 
 // postal.cpp
-std::wstring postal_code(LPCWSTR code);
+std::wstring normalize_postal_code(const std::wstring& str);
+std::wstring convert_postal_code(LPCWSTR code);
 
 //////////////////////////////////////////////////////////////////////////////
