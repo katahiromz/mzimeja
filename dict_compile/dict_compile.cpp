@@ -78,178 +78,179 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
 
 // 辞書データファイルを読み込む。
 BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
-  FILE *fp = _wfopen(fname, L"rb");
-  if (fp == NULL) {
-    return FALSE;
-  }
-
-  // load each line
-  int lineno = 0;
-  char buf[256];
-  wchar_t wbuf[256];
-  while (fgets(buf, 256, fp) != NULL) {
-    ++lineno;
-    if (buf[0] == ';') continue;  // comment
-
-    // convert to UTF-16
-    ::MultiByteToWideChar(CP_UTF8, 0, buf, -1, wbuf, 256);
-    std::wstring str = wbuf;
-
-    // split to fields
-    str_trim_right(str, L"\r\n");
-    WStrings fields;
-    str_split(fields, str, L"\t");
-
-    // is it an invalid line?
-    if (fields.empty() || fields[0].empty()) {
-      assert(0);
-      continue;
+    // ファイルを開く。
+    FILE *fp = _wfopen(fname, L"rb");
+    if (fp == NULL) {
+        return FALSE;
     }
 
-    // parse a record
-    DictEntry entry;
-    entry.gyou = GYOU_A;
-    if (fields.size() == 1) {
-      // only one field, it's a noun (HB_MEISHI)
-      entry.post = str;
-      entry.bunrui = HB_MEISHI;
-      if (is_fullwidth_katakana(str[0])) {
-        // convert to hiragana
-        std::wstring hiragana = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
-        entry.pre = hiragana;
-      } else {
-        entry.pre = str;
-      }
-      entries.push_back(entry);
-      continue;
-    }
+    // 一行ずつ処理する。
+    int lineno = 0;
+    char buf[256];
+    wchar_t wbuf[256];
+    while (fgets(buf, 256, fp) != NULL) {
+        ++lineno;
+        if (buf[0] == ';') continue;  // comment
 
-    // more than 2 fields
-    // classify by the fields[1] string
-    const std::wstring& bunrui_str = fields[1];
-    if (bunrui_str.empty()) {
-      entry.bunrui = HB_MEISHI;
-    } else if (bunrui_str.size() == 2) {
-      if (bunrui_str == L"名詞")            entry.bunrui = HB_MEISHI;
-      else if (bunrui_str == L"副詞")       entry.bunrui = HB_FUKUSHI;
-      else if (bunrui_str == L"漢語")       entry.bunrui = HB_KANGO;
-      else continue;
-    } else if (bunrui_str.size() == 3) {
-      if (bunrui_str == L"連体詞")          entry.bunrui = HB_RENTAISHI;
-      else if (bunrui_str == L"接続詞")     entry.bunrui = HB_SETSUZOKUSHI;
-      else if (bunrui_str == L"感動詞")     entry.bunrui = HB_KANDOUSHI;
-      else if (bunrui_str == L"接頭辞")     entry.bunrui = HB_SETTOUJI;
-      else if (bunrui_str == L"接尾辞")     entry.bunrui = HB_SETSUBIJI;
-      else if (bunrui_str == L"格助詞")     entry.bunrui = HB_KAKU_JOSHI;
-      else if (bunrui_str == L"副助詞")     entry.bunrui = HB_FUKU_JOSHI;
-      else if (bunrui_str == L"終助詞")     entry.bunrui = HB_SHUU_JOSHI;
-      else if (bunrui_str == L"カンマ")     entry.bunrui = HB_COMMA;
-      else if (bunrui_str == L"記号類")     entry.bunrui = HB_SYMBOL;
-      else continue;
-    } else if (bunrui_str.size() == 4) {
-      if (bunrui_str == L"い形容詞")        entry.bunrui = HB_IKEIYOUSHI;
-      else if (bunrui_str == L"な形容詞")   entry.bunrui = HB_NAKEIYOUSHI;
-      else if (bunrui_str == L"五段動詞")   entry.bunrui = HB_GODAN_DOUSHI;
-      else if (bunrui_str == L"一段動詞")   entry.bunrui = HB_ICHIDAN_DOUSHI;
-      else if (bunrui_str == L"カ変動詞")   entry.bunrui = HB_KAHEN_DOUSHI;
-      else if (bunrui_str == L"サ変動詞")   entry.bunrui = HB_SAHEN_DOUSHI;
-      else if (bunrui_str == L"接続助詞")   entry.bunrui = HB_SETSUZOKU_JOSHI;
-      else if (bunrui_str == L"ピリオド")   entry.bunrui = HB_PERIOD;
-      else continue;
-    } else if (bunrui_str.size() == 5) {
-      if (bunrui_str == L"未然助動詞")      entry.bunrui = HB_MIZEN_JODOUSHI;
-      else if (bunrui_str == L"連用助動詞") entry.bunrui = HB_RENYOU_JODOUSHI;
-      else if (bunrui_str == L"終止助動詞") entry.bunrui = HB_SHUUSHI_JODOUSHI;
-      else if (bunrui_str == L"連体助動詞") entry.bunrui = HB_RENTAI_JODOUSHI;
-      else if (bunrui_str == L"仮定助動詞") entry.bunrui = HB_KATEI_JODOUSHI;
-      else if (bunrui_str == L"命令助動詞") entry.bunrui = HB_MEIREI_JODOUSHI;
-      else continue;
-    } else {
-      continue;
-    }
+        // convert to UTF-16
+        ::MultiByteToWideChar(CP_UTF8, 0, buf, -1, wbuf, 256);
+        std::wstring str = wbuf;
 
-    // complete field[2] if lacked
-    if (fields.size() == 2) {
-      fields.push_back(fields[0]);
-    } else if (fields[2].empty()) {
-      fields[2] = fields[0];
-    }
+        // split to fields
+        str_trim_right(str, L"\r\n");
+        WStrings fields;
+        str_split(fields, str, L"\t");
 
-    // optimize
-    std::wstring substr;
-    wchar_t ch;
-    size_t i, ngyou;
-    switch (entry.bunrui) {
-    case HB_NAKEIYOUSHI:
-      i = fields[0].size() - 1;
-      if (fields[0][i] == L'な') fields[0].resize(i);
-      i = fields[2].size() - 1;
-      if (fields[2][i] == L'な') fields[2].resize(i);
-      break;
-    case HB_IKEIYOUSHI:
-      i = fields[0].size() - 1;
-      if (fields[0][i] == L'い') fields[0].resize(i);
-      i = fields[2].size() - 1;
-      if (fields[2][i] == L'い') fields[2].resize(i);
-      break;
-    case HB_ICHIDAN_DOUSHI:
-      assert(fields[0][fields[0].size() - 1] == L'る');
-      assert(fields[2][fields[2].size() - 1] == L'る');
-      fields[0].resize(fields[0].size() - 1);
-      fields[2].resize(fields[2].size() - 1);
-      break;
-    case HB_KAHEN_DOUSHI:
-      if (fields[0] == L"くる") continue;
-      substr = fields[0].substr(fields[0].size() - 2, 2);
-      if (substr != L"くる") continue;
-      fields[0] = substr;
-      substr = fields[2].substr(fields[0].size() - 2, 2);
-      fields[2] = substr;
-      break;
-    case HB_SAHEN_DOUSHI:
-      if (fields[0] == L"する") continue;
-      substr = fields[0].substr(fields[0].size() - 2, 2);
-      if (substr == L"する") entry.gyou = GYOU_SA;
-      else if (substr != L"ずる") entry.gyou = GYOU_ZA;
-      else continue;
-      fields[0] = substr;
-      fields[2] = fields[2].substr(fields[0].size() - 2, 2);
-      break;
-    case HB_GODAN_DOUSHI:
-      ch = fields[0][fields[0].size() - 1];
-      if (g_vowel_map[ch] != L'う') continue;
-      fields[0].resize(fields[0].size() - 1);
-      fields[2].resize(fields[2].size() - 1);
-      ch = g_consonant_map[ch];
-      for (i = 0; i < _countof(s_hiragana_table); ++i) {
-        if (s_hiragana_table[i][0] == ch) {
-          ngyou = i;
-          break;
+        // is it an invalid line?
+        if (fields.empty() || fields[0].empty()) {
+            assert(0);
+            continue;
         }
-      }
-      entry.gyou = (Gyou)ngyou;
-      break;
-    default:
-      break;
+
+        // parse a record
+        DictEntry entry;
+        entry.gyou = GYOU_A;
+        if (fields.size() == 1) {
+            // only one field, it's a noun (HB_MEISHI)
+            entry.post = str;
+            entry.bunrui = HB_MEISHI;
+            if (is_fullwidth_katakana(str[0])) {
+                // convert to hiragana
+                std::wstring hiragana = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+                entry.pre = hiragana;
+            } else {
+                entry.pre = str;
+            }
+            entries.push_back(entry);
+            continue;
+        }
+
+        // more than 2 fields
+        // classify by the fields[1] string
+        const std::wstring& bunrui_str = fields[1];
+        if (bunrui_str.empty()) {
+            entry.bunrui = HB_MEISHI;
+        } else if (bunrui_str.size() == 2) {
+            if (bunrui_str == L"名詞")            entry.bunrui = HB_MEISHI;
+            else if (bunrui_str == L"副詞")       entry.bunrui = HB_FUKUSHI;
+            else if (bunrui_str == L"漢語")       entry.bunrui = HB_KANGO;
+            else continue;
+        } else if (bunrui_str.size() == 3) {
+            if (bunrui_str == L"連体詞")          entry.bunrui = HB_RENTAISHI;
+            else if (bunrui_str == L"接続詞")     entry.bunrui = HB_SETSUZOKUSHI;
+            else if (bunrui_str == L"感動詞")     entry.bunrui = HB_KANDOUSHI;
+            else if (bunrui_str == L"接頭辞")     entry.bunrui = HB_SETTOUJI;
+            else if (bunrui_str == L"接尾辞")     entry.bunrui = HB_SETSUBIJI;
+            else if (bunrui_str == L"格助詞")     entry.bunrui = HB_KAKU_JOSHI;
+            else if (bunrui_str == L"副助詞")     entry.bunrui = HB_FUKU_JOSHI;
+            else if (bunrui_str == L"終助詞")     entry.bunrui = HB_SHUU_JOSHI;
+            else if (bunrui_str == L"カンマ")     entry.bunrui = HB_COMMA;
+            else if (bunrui_str == L"記号類")     entry.bunrui = HB_SYMBOL;
+            else continue;
+        } else if (bunrui_str.size() == 4) {
+            if (bunrui_str == L"い形容詞")        entry.bunrui = HB_IKEIYOUSHI;
+            else if (bunrui_str == L"な形容詞")   entry.bunrui = HB_NAKEIYOUSHI;
+            else if (bunrui_str == L"五段動詞")   entry.bunrui = HB_GODAN_DOUSHI;
+            else if (bunrui_str == L"一段動詞")   entry.bunrui = HB_ICHIDAN_DOUSHI;
+            else if (bunrui_str == L"カ変動詞")   entry.bunrui = HB_KAHEN_DOUSHI;
+            else if (bunrui_str == L"サ変動詞")   entry.bunrui = HB_SAHEN_DOUSHI;
+            else if (bunrui_str == L"接続助詞")   entry.bunrui = HB_SETSUZOKU_JOSHI;
+            else if (bunrui_str == L"ピリオド")   entry.bunrui = HB_PERIOD;
+            else continue;
+        } else if (bunrui_str.size() == 5) {
+            if (bunrui_str == L"未然助動詞")      entry.bunrui = HB_MIZEN_JODOUSHI;
+            else if (bunrui_str == L"連用助動詞") entry.bunrui = HB_RENYOU_JODOUSHI;
+            else if (bunrui_str == L"終止助動詞") entry.bunrui = HB_SHUUSHI_JODOUSHI;
+            else if (bunrui_str == L"連体助動詞") entry.bunrui = HB_RENTAI_JODOUSHI;
+            else if (bunrui_str == L"仮定助動詞") entry.bunrui = HB_KATEI_JODOUSHI;
+            else if (bunrui_str == L"命令助動詞") entry.bunrui = HB_MEIREI_JODOUSHI;
+            else continue;
+        } else {
+            continue;
+        }
+
+        // complete field[2] if lacked
+        if (fields.size() == 2) {
+            fields.push_back(fields[0]);
+        } else if (fields[2].empty()) {
+            fields[2] = fields[0];
+        }
+
+        // optimize
+        std::wstring substr;
+        wchar_t ch;
+        size_t i, ngyou;
+        switch (entry.bunrui) {
+        case HB_NAKEIYOUSHI:
+            i = fields[0].size() - 1;
+            if (fields[0][i] == L'な') fields[0].resize(i);
+            i = fields[2].size() - 1;
+            if (fields[2][i] == L'な') fields[2].resize(i);
+            break;
+        case HB_IKEIYOUSHI:
+            i = fields[0].size() - 1;
+            if (fields[0][i] == L'い') fields[0].resize(i);
+            i = fields[2].size() - 1;
+            if (fields[2][i] == L'い') fields[2].resize(i);
+            break;
+        case HB_ICHIDAN_DOUSHI:
+            assert(fields[0][fields[0].size() - 1] == L'る');
+            assert(fields[2][fields[2].size() - 1] == L'る');
+            fields[0].resize(fields[0].size() - 1);
+            fields[2].resize(fields[2].size() - 1);
+            break;
+        case HB_KAHEN_DOUSHI:
+            if (fields[0] == L"くる") continue;
+            substr = fields[0].substr(fields[0].size() - 2, 2);
+            if (substr != L"くる") continue;
+            fields[0] = substr;
+            substr = fields[2].substr(fields[0].size() - 2, 2);
+            fields[2] = substr;
+            break;
+        case HB_SAHEN_DOUSHI:
+            if (fields[0] == L"する") continue;
+            substr = fields[0].substr(fields[0].size() - 2, 2);
+            if (substr == L"する") entry.gyou = GYOU_SA;
+            else if (substr != L"ずる") entry.gyou = GYOU_ZA;
+            else continue;
+            fields[0] = substr;
+            fields[2] = fields[2].substr(fields[0].size() - 2, 2);
+            break;
+        case HB_GODAN_DOUSHI:
+            ch = fields[0][fields[0].size() - 1];
+            if (g_vowel_map[ch] != L'う') continue;
+            fields[0].resize(fields[0].size() - 1);
+            fields[2].resize(fields[2].size() - 1);
+            ch = g_consonant_map[ch];
+            for (i = 0; i < _countof(s_hiragana_table); ++i) {
+                if (s_hiragana_table[i][0] == ch) {
+                    ngyou = i;
+                    break;
+                }
+            }
+            entry.gyou = (Gyou)ngyou;
+            break;
+        default:
+            break;
+        }
+
+        // store the parsed record to entries
+        entry.pre = fields[0];
+        entry.post = fields[2];
+        if (fields.size() >= 4) {
+            entry.tags = fields[3];
+        } else {
+            entry.tags.clear();
+        }
+        entries.push_back(entry);
     }
 
-    // store the parsed record to entries
-    entry.pre = fields[0];
-    entry.post = fields[2];
-    if (fields.size() >= 4) {
-      entry.tags = fields[3];
-    } else {
-      entry.tags.clear();
-    }
-    entries.push_back(entry);
-  }
+    // close the file
+    fclose(fp);
 
-  // close the file
-  fclose(fp);
-
-  // sort by preconversion string
-  std::sort(entries.begin(), entries.end(), entry_compare_pre);
-  return TRUE;  // success
+    // sort by preconversion string
+    std::sort(entries.begin(), entries.end(), entry_compare_pre);
+    return TRUE;  // success
 } // LoadDictDataFile
 
 // コンパイル済みの辞書ファイルを作成する。
