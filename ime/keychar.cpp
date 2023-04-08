@@ -1779,19 +1779,22 @@ WCHAR typing_key_to_char(BYTE vk, BOOL bShift, BOOL bCapsLock)
     }
 } // typing_key_to_char
 
-// 句点（ピリオド）か？
+// 句点またはピリオドか？
+// 注意：変換しやすさのため、ずぼらな判定にしています。
 BOOL is_period(WCHAR ch)
 {
     return ch == L'。' || ch == L'．' || ch == L'.' || ch == L'｡';
 }
 
-// 読点（コンマ）か？
+// 読点またはコンマか？
+// 注意：変換しやすさのため、ずぼらな判定にしています。
 BOOL is_comma(WCHAR ch)
 {
     return ch == L'、' || ch == L'，' || ch == L',' || ch == L'､';
 }
 
-// ハイフンか？
+// ハイフンまたは長音か？
+// 注意：変換しやすさのため、ずぼらな判定にしています。
 BOOL is_hyphen(WCHAR ch)
 {
     return ch == L'-' || ch == L'－' || ch == L'ー' || ch == L'ｰ';
