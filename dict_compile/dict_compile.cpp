@@ -10,68 +10,70 @@
 #include <cassert>
 
 static const wchar_t s_hiragana_table[][5] = {
-  // DAN_A, DAN_I, DAN_U, DAN_E, DAN_O
-  {L'あ', L'い', L'う', L'え', L'お'},   // GYOU_A
-  {L'か', L'き', L'く', L'け', L'こ'},   // GYOU_KA
-  {L'が', L'ぎ', L'ぐ', L'げ', L'ご'},   // GYOU_GA
-  {L'さ', L'し', L'す', L'せ', L'そ'},   // GYOU_SA
-  {L'ざ', L'じ', L'ず', L'ぜ', L'ぞ'},   // GYOU_ZA
-  {L'た', L'ち', L'つ', L'て', L'と'},   // GYOU_TA
-  {L'だ', L'ぢ', L'づ', L'で', L'ど'},   // GYOU_DA
-  {L'な', L'に', L'ぬ', L'ね', L'の'},   // GYOU_NA
-  {L'は', L'ひ', L'ふ', L'へ', L'ほ'},   // GYOU_HA
-  {L'ば', L'び', L'ぶ', L'べ', L'ぼ'},   // GYOU_BA
-  {L'ぱ', L'ぴ', L'ぷ', L'ぺ', L'ぽ'},   // GYOU_PA
-  {L'ま', L'み', L'む', L'め', L'も'},   // GYOU_MA
-  {L'や', 0, L'ゆ', 0, L'よ'},           // GYOU_YA
-  {L'ら', L'り', L'る', L'れ', L'ろ'},   // GYOU_RA
-  {L'わ', 0, 0, 0, L'を'},               // GYOU_WA
-  {L'ん', 0, 0, 0, 0},                   // GYOU_NN
+    // DAN_A, DAN_I, DAN_U, DAN_E, DAN_O
+    {L'あ', L'い', L'う', L'え', L'お'},   // GYOU_A
+    {L'か', L'き', L'く', L'け', L'こ'},   // GYOU_KA
+    {L'が', L'ぎ', L'ぐ', L'げ', L'ご'},   // GYOU_GA
+    {L'さ', L'し', L'す', L'せ', L'そ'},   // GYOU_SA
+    {L'ざ', L'じ', L'ず', L'ぜ', L'ぞ'},   // GYOU_ZA
+    {L'た', L'ち', L'つ', L'て', L'と'},   // GYOU_TA
+    {L'だ', L'ぢ', L'づ', L'で', L'ど'},   // GYOU_DA
+    {L'な', L'に', L'ぬ', L'ね', L'の'},   // GYOU_NA
+    {L'は', L'ひ', L'ふ', L'へ', L'ほ'},   // GYOU_HA
+    {L'ば', L'び', L'ぶ', L'べ', L'ぼ'},   // GYOU_BA
+    {L'ぱ', L'ぴ', L'ぷ', L'ぺ', L'ぽ'},   // GYOU_PA
+    {L'ま', L'み', L'む', L'め', L'も'},   // GYOU_MA
+    {L'や', 0, L'ゆ', 0, L'よ'},           // GYOU_YA
+    {L'ら', L'り', L'る', L'れ', L'ろ'},   // GYOU_RA
+    {L'わ', 0, 0, 0, L'を'},               // GYOU_WA
+    {L'ん', 0, 0, 0, 0},                   // GYOU_NN
 };
 
 std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
 std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
 
+// 写像を準備する。
 void MakeLiteralMaps() {
-  if (g_consonant_map.size()) {
-    return;
-  }
-  g_consonant_map.clear();
-  g_vowel_map.clear();
-  const size_t count = _countof(s_hiragana_table);
-  for (size_t i = 0; i < count; ++i) {
-    for (size_t k = 0; k < 5; ++k) {
-      g_consonant_map[s_hiragana_table[i][k]] = s_hiragana_table[i][0];
+    if (g_consonant_map.size()) {
+        return;
     }
-    for (size_t k = 0; k < 5; ++k) {
-      g_vowel_map[s_hiragana_table[i][k]] = s_hiragana_table[0][k];
+    g_consonant_map.clear();
+    g_vowel_map.clear();
+    const size_t count = _countof(s_hiragana_table);
+    for (size_t i = 0; i < count; ++i) {
+        for (size_t k = 0; k < 5; ++k) {
+            g_consonant_map[s_hiragana_table[i][k]] = s_hiragana_table[i][0];
+        }
+        for (size_t k = 0; k < 5; ++k) {
+            g_vowel_map[s_hiragana_table[i][k]] = s_hiragana_table[0][k];
+        }
     }
-  }
 } // MzIme::MakeLiteralMaps
 
+// 辞書エントリを比較する。
 inline bool entry_compare_pre(const DictEntry& e1, const DictEntry& e2) {
-  return (e1.pre < e2.pre);
+    return (e1.pre < e2.pre);
 }
 
 // 全角カタカナか？
 inline BOOL is_fullwidth_katakana(WCHAR ch) {
-  if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
-  switch (ch) {
-  case 0x30FD: case 0x30FE: case 0x3099: case 0x309A: case 0x309B:
-  case 0x309C: case 0x30FC:
-    return TRUE;
-  default:
-    return FALSE;
-  }
+    if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
+    switch (ch) {
+    case 0x30FD: case 0x30FE: case 0x3099: case 0x309A: case 0x309B:
+    case 0x309C: case 0x30FC:
+        return TRUE;
+    default:
+        return FALSE;
+    }
 }
 
 // 文字列の文字種を変換する。
 std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
-  WCHAR szBuf[1024];
-  const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
-    str.c_str(), -1, szBuf, 1024);
-  return szBuf;
+    WCHAR szBuf[1024];
+    const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+    ::LCMapStringW(MAKELCID(langid, SORT_DEFAULT), dwFlags,
+                   str.c_str(), -1, szBuf, 1024);
+    return szBuf;
 }
 
 // 辞書データファイルを読み込む。
