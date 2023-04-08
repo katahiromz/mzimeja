@@ -44,6 +44,7 @@ std::wstring convert_postal_code(LPCWSTR code)
 
     DWORD dwTick1 = ::GetTickCount(); // 測定開始。
 
+    // codeをANSI文字列に変換したものをszCodeAとする。
     CHAR szCodeA[16];
     WideCharToMultiByte(CP_ACP, 0, code, -1, szCodeA, _countof(szCodeA), NULL, NULL);
     szCodeA[_countof(szCodeA) - 1] = 0; // Avoid buffer overflow
