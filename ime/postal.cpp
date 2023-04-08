@@ -32,6 +32,9 @@ std::wstring normalize_postal_code(const std::wstring& str)
 // 郵便番号変換を行う関数。
 std::wstring convert_postal_code(LPCWSTR code)
 {
+    if (lstrlenW(code) != 7)
+        return L""; // 正規化されていなければ失敗。
+
     std::wstring postal, ret;
     if (Config_GetDWORD(L"PostalDictDisabled", FALSE)) // 無効化されている？
         return ret;
@@ -42,7 +45,8 @@ std::wstring convert_postal_code(LPCWSTR code)
     DWORD dwTick1 = ::GetTickCount(); // 測定開始。
 
     CHAR szCodeA[16];
-    StringCchPrintfA(szCodeA, _countof(szCodeA), "%07u", code);
+    WideCharToMultiByte(CP_ACP, 0, code, -1, szCodeA, _countof(szCodeA), NULL, NULL);
+    szCodeA[_countof(szCodeA) - 1] = 0; // Avoid buffer overflow
 
     // 郵便番号データのファイルを開く。
     if (FILE *fin = _wfopen(postal.c_str(), L"rb")) {
