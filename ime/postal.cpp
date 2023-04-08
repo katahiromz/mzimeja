@@ -16,7 +16,7 @@ std::wstring normalize_postal_code(const std::wstring& str)
     if (!are_all_chars_numeric(ret))
         return L"";
 
-    // 三桁や五桁の場合は七桁の省略と見なす。
+    // 三桁や五桁の場合は七桁の省略形と見なす。
     if (ret.size() == 3)
         ret += L"00";
     if (ret.size() == 5)
