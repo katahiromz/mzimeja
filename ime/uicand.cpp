@@ -260,17 +260,26 @@ void CandWnd_Paint(HWND hCandWnd)
 
 SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 {
-    int width1 = 0, height = 0;
+    INT width1 = 0, height = 0;
+
+    // 準備。
     HDC hDC = ::CreateCompatibleDC(NULL);
     HFONT hOldFont = CheckNativeCharset(hDC);
+
+    // 候補情報をロックする。
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
     if (lpCandInfo) {
+        // 候補があれば
         if (lpCandInfo->dwCount > 0) {
+            // 現在の候補リストのインデックスを取得する。
             CANDINFOEXTRA *pExtra = lpCandInfo->GetExtra();
             DWORD iList = 0;
             if (pExtra) iList = pExtra->iClause;
+
+            // 候補リストを取得する。
             CandList *lpCandList = lpCandInfo->GetList(iList);
             DWORD i, end = lpCandList->GetPageEnd();
+            // 候補リスト中の候補ごとにサイズを取得し、幅を拡張し、高さを加算する。
             for (i = lpCandList->dwPageStart; i < end; ++i) {
                 WCHAR *psz = lpCandList->GetCandString(i);
                 SIZE siz;
@@ -285,10 +294,12 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC)
         }
         lpIMC->UnlockCandInfo();
     }
-    if (hOldFont) {
-        ::DeleteObject(::SelectObject(hDC, hOldFont));
-    }
+
+    // 後始末。
+    ::DeleteObject(::SelectObject(hDC, hOldFont));
     ::DeleteDC(hDC);
+
+    // 求められた幅と高さに応じて戻り値を設定する。
     SIZE ret;
     ret.cx = width1 + CX_HEADER + CX_BORDER * 4;
     ret.cy = height + CY_BORDER * 2;
