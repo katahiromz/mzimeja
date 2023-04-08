@@ -256,96 +256,96 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
 // コンパイル済みの辞書ファイルを作成する。
 BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
 {
-  // calculate the total size
-  size_t size = 0;
-  size += 1;  // UTF-16 BOM
-  size += 1;  // \n
-  for (size_t i = 0; i < entries.size(); ++i) {
-    const DictEntry& entry = entries[i];
-    size += entry.pre.size();
-    //size += 3;  // \t hb \t
-    size += entry.post.size();
-    //size += 1;  // \t
-    size += entry.tags.size();
-    //size += 1;  // \n
-    size += 3 + 1 + 1;
-  }
-  size += 1;  // \0
-  size *= sizeof(WCHAR);
-  printf("size: %d\n", (INT)size);
+    // calculate the total size
+    size_t size = 0;
+    size += 1;  // UTF-16 BOM
+    size += 1;  // \n
+    for (size_t i = 0; i < entries.size(); ++i) {
+        const DictEntry& entry = entries[i];
+        size += entry.pre.size();
+        //size += 3;  // \t hb \t
+        size += entry.post.size();
+        //size += 1;  // \t
+        size += entry.tags.size();
+        //size += 1;  // \n
+        size += 3 + 1 + 1;
+    }
+    size += 1;  // \0
+    size *= sizeof(WCHAR);
+    printf("size: %d\n", (INT)size);
 
-  void *pv = calloc(1, size);
-  if (pv == NULL) {
-    return FALSE;
-  }
+    void *pv = calloc(1, size);
+    if (pv == NULL) {
+        return FALSE;
+    }
 
-  WCHAR *pch = (WCHAR *)pv;
-  *pch++ = 0xFEFF; // UTF-16 BOM
-  *pch++ = RECORD_SEP;
-  for (size_t i = 0; i < entries.size(); ++i) {
-    // line format:
-    // pre FIELD_SEP MAKEWORD(bunrui, gyou) FIELD_SEP post FIELD_SEP tags RECORD_SEP
-    const DictEntry& entry = entries[i];
-    // pre \t
-    size_t cch = entry.pre.size();
-    memcpy(pch, entry.pre.c_str(), cch * sizeof(WCHAR));
-    pch += cch;
-    *pch++ = FIELD_SEP;
-    // MAKEWORD(bunrui, gyou) \t
-    *pch++ = MAKEWORD(entry.bunrui, entry.gyou);
-    *pch++ = FIELD_SEP;
-    // post \t
-    cch = entry.post.size();
-    memcpy(pch, entry.post.c_str(), cch * sizeof(WCHAR));
-    pch += cch;
-    *pch++ = FIELD_SEP;
-    // tags
-    cch = entry.tags.size();
-    memcpy(pch, entry.tags.c_str(), cch * sizeof(WCHAR));
-    pch += cch;
-    // new line
+    WCHAR *pch = (WCHAR *)pv;
+    *pch++ = 0xFEFF; // UTF-16 BOM
     *pch++ = RECORD_SEP;
-  }
-  *pch++ = L'\0'; // NUL
-  assert(size / 2 == size_t(pch - reinterpret_cast<WCHAR *>(pv)));
+    for (size_t i = 0; i < entries.size(); ++i) {
+        // line format:
+        // pre FIELD_SEP MAKEWORD(bunrui, gyou) FIELD_SEP post FIELD_SEP tags RECORD_SEP
+        const DictEntry& entry = entries[i];
+        // pre \t
+        size_t cch = entry.pre.size();
+        memcpy(pch, entry.pre.c_str(), cch * sizeof(WCHAR));
+        pch += cch;
+        *pch++ = FIELD_SEP;
+        // MAKEWORD(bunrui, gyou) \t
+        *pch++ = MAKEWORD(entry.bunrui, entry.gyou);
+        *pch++ = FIELD_SEP;
+        // post \t
+        cch = entry.post.size();
+        memcpy(pch, entry.post.c_str(), cch * sizeof(WCHAR));
+        pch += cch;
+        *pch++ = FIELD_SEP;
+        // tags
+        cch = entry.tags.size();
+        memcpy(pch, entry.tags.c_str(), cch * sizeof(WCHAR));
+        pch += cch;
+        // new line
+        *pch++ = RECORD_SEP;
+    }
+    *pch++ = L'\0'; // NUL
+    assert(size / 2 == size_t(pch - reinterpret_cast<WCHAR *>(pv)));
 
-  BOOL ret = FALSE;
+    BOOL ret = FALSE;
 
-  // コンパイル済みの辞書ファイルを作成する。
-  HANDLE hFile = ::CreateFileW(fname, GENERIC_WRITE, FILE_SHARE_READ,
-    NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH,
-    NULL);
-  if (hFile != INVALID_HANDLE_VALUE) {
-    DWORD dwWritten;
-    ret = WriteFile(hFile, pv, DWORD(size), &dwWritten, NULL); // 書き込む。
-    CloseHandle(hFile); // ファイルを閉じる。
-  }
+    // コンパイル済みの辞書ファイルを作成する。
+    HANDLE hFile = ::CreateFileW(fname, GENERIC_WRITE, FILE_SHARE_READ,
+        NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH,
+        NULL);
+    if (hFile != INVALID_HANDLE_VALUE) {
+        DWORD dwWritten;
+        ret = WriteFile(hFile, pv, DWORD(size), &dwWritten, NULL); // 書き込む。
+        CloseHandle(hFile); // ファイルを閉じる。
+    }
 
-  free(pv);
-  return ret;
+    free(pv);
+    return ret;
 } // CreateDictFile
 
 extern "C"
 int wmain(int argc, wchar_t **wargv) {
-  if (argc != 3) {
-    printf("ERROR: missing parameters\n");
-    return 1;
-  }
+    if (argc != 3) {
+        printf("ERROR: missing parameters\n");
+        return 1;
+    }
 
-  MakeLiteralMaps();
+    MakeLiteralMaps();
 
-  std::vector<DictEntry> entries;
-  if (!LoadDictDataFile(wargv[1], entries)) {
-    printf("ERROR: cannot load\n");
-    return 2;
-  }
+    std::vector<DictEntry> entries;
+    if (!LoadDictDataFile(wargv[1], entries)) {
+        printf("ERROR: cannot load\n");
+        return 2;
+    }
 
-  if (!CreateDictFile(wargv[2], entries)) {
-    printf("ERROR: cannot create\n");
-    return 3;
-  }
+    if (!CreateDictFile(wargv[2], entries)) {
+        printf("ERROR: cannot create\n");
+        return 3;
+    }
 
-  printf("success.\n");
+    printf("success.\n");
 
-  return 0;
+    return 0;
 } // wmain
