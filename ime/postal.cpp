@@ -32,8 +32,8 @@ std::wstring normalize_postal_code(const std::wstring& str)
 // 郵便番号変換を行う関数。
 std::wstring convert_postal_code(LPCWSTR code)
 {
-    if (lstrlenW(code) != 7)
-        return L""; // 正規化されていなければ失敗。
+    // 正規化されていると仮定する。
+    ASSERT(lstrlenW(code) == 7 && are_all_chars_numeric(code));
 
     std::wstring postal, ret;
     if (Config_GetDWORD(L"PostalDictDisabled", FALSE)) // 無効化されている？
