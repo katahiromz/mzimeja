@@ -36,7 +36,7 @@
 // _countof macro --- get the number of elements in an array
 
 #ifndef _countof
-  #define _countof(array)   (sizeof(array) / sizeof(array[0]))
+    #define _countof(array)   (sizeof(array) / sizeof(array[0]))
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -44,31 +44,37 @@
 // デバッグ用。
 
 #ifndef MZIMEJA_DEBUG_OUTPUT
-  #define DebugPrintA   (void)
-  #define DebugPrintW   (void)
-  #define DebugPrint    (void)
-  #define DPRINT(fmt, ...)
-  #define ASSERT(exp)
-  #define TRACE_ON()
-  #define TRACE_OFF()
+    #define DebugPrintA   (void)
+    #define DebugPrintW   (void)
+    #define DebugPrint    (void)
+    #define DPRINT(fmt, ...)
+    #define ASSERT(exp)
+    #define TRACE_ON()
+    #define TRACE_OFF()
 #else
-  extern "C" {
-    extern BOOL g_bTrace;
-    void DebugPrintA(const char *lpszFormat, ...);
-    void DebugPrintW(const WCHAR *lpszFormat, ...);
-    void DebugAssert(const char *file, int line, const char *exp);
-  } // extern "C"
-  #define DebugPrintA DebugPrintA
-  #define DebugPrintW DebugPrintW
-  #define DPRINT(fmt, ...) DebugPrintA("%s (%d): " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
-  #define ASSERT(exp) ((exp) ? (void)0 : DebugAssert(__FILE__, __LINE__, #exp))
-  #ifdef UNICODE
-    #define DebugPrint DebugPrintW
-  #else
-    #define DebugPrint DebugPrintA
-  #endif
-  #define TRACE_ON()    do { g_bTrace = TRUE; } while (0)
-  #define TRACE_OFF()   do { g_bTrace = FALSE; } while (0)
+    extern "C" {
+        extern BOOL g_bTrace;
+        void DebugPrintA(const char *lpszFormat, ...);
+        void DebugPrintW(const WCHAR *lpszFormat, ...);
+        void DebugAssert(const char *file, int line, const char *exp);
+    } // extern "C"
+    #define DebugPrintA DebugPrintA
+    #define DebugPrintW DebugPrintW
+    #define DPRINTA(fmt, ...) DebugPrintA("%s (%d): " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
+    #define DPRINTW(fmt, ...) DebugPrintW(L"%hs (%d): " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
+    #ifdef UNICODE
+        #define DPRINT DebugPrintW
+    #else
+        #define DPRINT DebugPrintA
+    #endif
+    #define ASSERT(exp) ((exp) ? (void)0 : DebugAssert(__FILE__, __LINE__, #exp))
+    #ifdef UNICODE
+        #define DebugPrint DebugPrintW
+    #else
+        #define DebugPrint DebugPrintA
+    #endif
+    #define TRACE_ON()    do { g_bTrace = TRUE; } while (0)
+    #define TRACE_OFF()   do { g_bTrace = FALSE; } while (0)
 #endif
 
 #include "footmark.hpp"   // for footmark++

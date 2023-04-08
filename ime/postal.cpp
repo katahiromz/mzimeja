@@ -94,7 +94,7 @@ std::wstring convert_postal_code(const std::wstring& code)
     DWORD dwTick2 = ::GetTickCount(); // 測定終了。
 
     // 測定値をデバッグ出力。
-    DPRINT("convert_postal_code: %lu\n", dwTick2 - dwTick1);
+    DPRINTA("convert_postal_code: %lu\n", dwTick2 - dwTick1);
 
     return ret;
 }

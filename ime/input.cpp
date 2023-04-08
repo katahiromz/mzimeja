@@ -180,40 +180,40 @@ BOOL InputContext::IsRomanMode() const
 // 入力コンテキスト情報のダンプ。
 void InputContext::Dump()
 {
-    DebugPrintA("### INPUTCONTEXT ###\n");
-    DebugPrintA("hWnd: %p\n", hWnd);
-    DebugPrintA("fOpen: %d\n", fOpen);
-    DebugPrintA("ptStatusWndPos.x: %d\n", ptStatusWndPos.x);
-    DebugPrintA("ptStatusWndPos.y: %d\n", ptStatusWndPos.y);
-    DebugPrintA("ptSoftKbdPos.x: %d\n", ptSoftKbdPos.x);
-    DebugPrintA("ptSoftKbdPos.y: %d\n", ptSoftKbdPos.y);
-    DebugPrintA("fdwConversion: %08X\n", fdwConversion);
-    DebugPrintA("fdwSentence: %08X\n", fdwSentence);
-    DebugPrintA("lfFont.W.lfHeight: %d\n", lfFont.W.lfHeight);
-    DebugPrintA("lfFont.W.lfCharSet: %d\n", lfFont.W.lfCharSet);
-    DebugPrintW(L"lfFont.W.lfFaceName: %s\n", lfFont.W.lfFaceName);
-    DebugPrintA("cfCompForm.dwStyle: %08X\n", cfCompForm.dwStyle);
-    DebugPrintA("cfCompForm.ptCurrentPos.x: %d\n", cfCompForm.ptCurrentPos.x);
-    DebugPrintA("cfCompForm.ptCurrentPos.y: %d\n", cfCompForm.ptCurrentPos.y);
-    DebugPrintA("cfCompForm.rcArea.left: %d\n", cfCompForm.rcArea.left);
-    DebugPrintA("cfCompForm.rcArea.top: %d\n", cfCompForm.rcArea.top);
-    DebugPrintA("cfCompForm.rcArea.right: %d\n", cfCompForm.rcArea.right);
-    DebugPrintA("cfCompForm.rcArea.bottom: %d\n", cfCompForm.rcArea.bottom);
-    DebugPrintA("cfCandForm[0].dwIndex: %d\n", cfCandForm[0].dwIndex);
-    DebugPrintA("cfCandForm[0].dwStyle: %08X\n", cfCandForm[0].dwStyle);
-    DebugPrintA("cfCandForm[0].ptCurrentPos.x: %d\n", cfCandForm[0].ptCurrentPos.x);
-    DebugPrintA("cfCandForm[0].ptCurrentPos.y: %d\n", cfCandForm[0].ptCurrentPos.y);
-    DebugPrintA("cfCandForm[0].rcArea.left: %d\n", cfCandForm[0].rcArea.left);
-    DebugPrintA("cfCandForm[0].rcArea.top: %d\n", cfCandForm[0].rcArea.top);
-    DebugPrintA("cfCandForm[0].rcArea.right: %d\n", cfCandForm[0].rcArea.right);
-    DebugPrintA("cfCandForm[0].rcArea.bottom: %d\n", cfCandForm[0].rcArea.bottom);
-    DebugPrintA("hCompStr: %p\n", hCompStr);
-    DebugPrintA("hCandInfo: %p\n", hCandInfo);
-    DebugPrintA("hGuideLine: %p\n", hGuideLine);
-    DebugPrintA("hPrivate: %p\n", hPrivate);
-    DebugPrintA("dwNumMsgBuf: %d\n", dwNumMsgBuf);
-    DebugPrintA("hMsgBuf: %p\n", hMsgBuf);
-    DebugPrintA("fdwInit: %08X\n", fdwInit);
+    DPRINTA("### INPUTCONTEXT ###\n");
+    DPRINTA("hWnd: %p\n", hWnd);
+    DPRINTA("fOpen: %d\n", fOpen);
+    DPRINTA("ptStatusWndPos.x: %d\n", ptStatusWndPos.x);
+    DPRINTA("ptStatusWndPos.y: %d\n", ptStatusWndPos.y);
+    DPRINTA("ptSoftKbdPos.x: %d\n", ptSoftKbdPos.x);
+    DPRINTA("ptSoftKbdPos.y: %d\n", ptSoftKbdPos.y);
+    DPRINTA("fdwConversion: %08X\n", fdwConversion);
+    DPRINTA("fdwSentence: %08X\n", fdwSentence);
+    DPRINTA("lfFont.W.lfHeight: %d\n", lfFont.W.lfHeight);
+    DPRINTA("lfFont.W.lfCharSet: %d\n", lfFont.W.lfCharSet);
+    DPRINTW(L"lfFont.W.lfFaceName: %s\n", lfFont.W.lfFaceName);
+    DPRINTA("cfCompForm.dwStyle: %08X\n", cfCompForm.dwStyle);
+    DPRINTA("cfCompForm.ptCurrentPos.x: %d\n", cfCompForm.ptCurrentPos.x);
+    DPRINTA("cfCompForm.ptCurrentPos.y: %d\n", cfCompForm.ptCurrentPos.y);
+    DPRINTA("cfCompForm.rcArea.left: %d\n", cfCompForm.rcArea.left);
+    DPRINTA("cfCompForm.rcArea.top: %d\n", cfCompForm.rcArea.top);
+    DPRINTA("cfCompForm.rcArea.right: %d\n", cfCompForm.rcArea.right);
+    DPRINTA("cfCompForm.rcArea.bottom: %d\n", cfCompForm.rcArea.bottom);
+    DPRINTA("cfCandForm[0].dwIndex: %d\n", cfCandForm[0].dwIndex);
+    DPRINTA("cfCandForm[0].dwStyle: %08X\n", cfCandForm[0].dwStyle);
+    DPRINTA("cfCandForm[0].ptCurrentPos.x: %d\n", cfCandForm[0].ptCurrentPos.x);
+    DPRINTA("cfCandForm[0].ptCurrentPos.y: %d\n", cfCandForm[0].ptCurrentPos.y);
+    DPRINTA("cfCandForm[0].rcArea.left: %d\n", cfCandForm[0].rcArea.left);
+    DPRINTA("cfCandForm[0].rcArea.top: %d\n", cfCandForm[0].rcArea.top);
+    DPRINTA("cfCandForm[0].rcArea.right: %d\n", cfCandForm[0].rcArea.right);
+    DPRINTA("cfCandForm[0].rcArea.bottom: %d\n", cfCandForm[0].rcArea.bottom);
+    DPRINTA("hCompStr: %p\n", hCompStr);
+    DPRINTA("hCandInfo: %p\n", hCandInfo);
+    DPRINTA("hGuideLine: %p\n", hGuideLine);
+    DPRINTA("hPrivate: %p\n", hPrivate);
+    DPRINTA("dwNumMsgBuf: %d\n", dwNumMsgBuf);
+    DPRINTA("hMsgBuf: %p\n", hMsgBuf);
+    DPRINTA("fdwInit: %08X\n", fdwInit);
 }
 
 // 入力コンテキストの初期化。
@@ -1132,7 +1132,7 @@ void InputContext::DumpCompStr()
         pCompStr->Dump(); // ダンプ。
         UnlockCompStr(); // 未確定文字列のロックを解除。
     } else {
-        DebugPrintA("(no comp str)\n");
+        DPRINTA("(no comp str)\n");
     }
 } // InputContext::DumpCompStr
 
@@ -1144,7 +1144,7 @@ void InputContext::DumpCandInfo()
         pCandInfo->Dump(); // ダンプ。
         UnlockCandInfo(); // 候補情報のロックを解除。
     } else {
-        DebugPrintA("(no cand info)\n");
+        DPRINTA("(no cand info)\n");
     }
 } // InputContext::DumpCandInfo
 

@@ -76,7 +76,7 @@ void RepositionWindow(HWND hWnd)
         rc.top = rcWorkArea.top;
         rc.bottom = rc.top + siz.cy;
     }
-    DPRINT("%d, %d, %d, %d\n", rc.left, rc.top, siz.cx, siz.cy);
+    DPRINTA("%d, %d, %d, %d\n", rc.left, rc.top, siz.cx, siz.cy);
     ::MoveWindow(hWnd, rc.left, rc.top, siz.cx, siz.cy, TRUE);
 }
 

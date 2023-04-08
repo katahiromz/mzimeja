@@ -1401,7 +1401,7 @@ std::wstring roman_to_katakana(std::wstring roman)
 std::wstring roman_to_halfwidth_katakana(std::wstring roman)
 {
     std::wstring katakana, str;
-    //DebugPrintW(L"roman_to_halfwidth_katakana(%s)\n", roman.c_str());
+    //DPRINTW(L"roman_to_halfwidth_katakana(%s)\n", roman.c_str());
     for (size_t k = 0; k < roman.size(); ) {
         bool found = false;
         if (!found) {
@@ -1456,7 +1456,7 @@ std::wstring roman_to_halfwidth_katakana(std::wstring roman)
         }
         if (!found) katakana += roman[k++];
     }
-    //DebugPrintW(L"roman_to_halfwidth_katakana: %s\n", katakana.c_str());
+    //DPRINTW(L"roman_to_halfwidth_katakana: %s\n", katakana.c_str());
     return katakana;
 } // roman_to_halfwidth_katakana
 
@@ -1582,7 +1582,7 @@ std::wstring roman_to_katakana(std::wstring roman, size_t ichTarget)
 // ローマ字から半角カナへ文字列を変換。
 std::wstring roman_to_halfwidth_katakana(std::wstring roman, size_t ichTarget)
 {
-    //DebugPrintW(L"roman_to_halfwidth_katakana(%s,%d)\n", roman.c_str(), (int)ichTarget);
+    //DPRINTW(L"roman_to_halfwidth_katakana(%s,%d)\n", roman.c_str(), (int)ichTarget);
     std::wstring str, key, value, extra;
     size_t key_len = 0;
     for (size_t i = 0; i < _countof(sokuon_table); ++i) {
@@ -1637,7 +1637,7 @@ std::wstring roman_to_halfwidth_katakana(std::wstring roman, size_t ichTarget)
         value = lcmap(value, LCMAP_HALFWIDTH | LCMAP_KATAKANA);
         roman.replace(ichTarget - key.size(), key.size(), value + extra);
     }
-    //DebugPrintW(L"roman_to_halfwidth_katakana: %s\n", roman.c_str());
+    //DPRINTW(L"roman_to_halfwidth_katakana: %s\n", roman.c_str());
     return roman;
 } // roman_to_halfwidth_katakana
 

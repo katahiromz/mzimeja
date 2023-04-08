@@ -133,8 +133,8 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
     // DefWindowProc().
     if (hIMC == NULL) {
         if (IsImeMessage2(message)) {
-            DPRINT("Why hIMC is NULL?\n");
-            DPRINT("hWnd: %p, message: 0x%x, wParam: %x, lParam: %x\n",
+            DPRINTA("Why hIMC is NULL?\n");
+            DPRINTA("hWnd: %p, message: 0x%x, wParam: %x, lParam: %x\n",
                    hWnd, message, wParam, lParam);
             return 0;
         }
@@ -142,7 +142,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
     switch (message) {
     case WM_CREATE: // ウィンドウ作成時。
-        DPRINT("WM_CREATE\n");
+        DPRINTA("WM_CREATE\n");
         // Allocate UI's extra memory block.
         hUIExtra = GlobalAlloc(GHND, sizeof(UIEXTRA));
         lpUIExtra = (UIEXTRA *)GlobalLock(hUIExtra);
@@ -156,7 +156,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_SETCONTEXT: // IMEコンテキスト設定時。
-        DPRINT("WM_IME_SETCONTEXT\n");
+        DPRINTA("WM_IME_SETCONTEXT\n");
         if (wParam) {
             OnImeSetContext(hWnd, hIMC, lParam);
         }
@@ -165,7 +165,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_STARTCOMPOSITION: // IME変換開始時。
-        DPRINT("WM_IME_STARTCOMPOSITION\n");
+        DPRINTA("WM_IME_STARTCOMPOSITION\n");
         // Start composition! Ready to display the composition string.
         lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
         if (lpUIExtra) {
@@ -177,7 +177,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_COMPOSITION: // IME変換時。
-        DPRINT("WM_IME_COMPOSITION\n");
+        DPRINTA("WM_IME_COMPOSITION\n");
         // Update to display the composition string.
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
@@ -192,7 +192,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_ENDCOMPOSITION: // IME変換終了時。
-        DPRINT("WM_IME_ENDCOMPOSITION\n");
+        DPRINTA("WM_IME_ENDCOMPOSITION\n");
         // Finish to display the composition string.
         lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
         if (lpUIExtra) {
@@ -202,11 +202,11 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_COMPOSITIONFULL: // 変換文字列がいっぱい。
-        DPRINT("WM_IME_COMPOSITIONFULL\n");
+        DPRINTA("WM_IME_COMPOSITIONFULL\n");
         break;
 
     case WM_IME_SELECT: // IME選択時。
-        DPRINT("WM_IME_SELECT\n");
+        DPRINTA("WM_IME_SELECT\n");
         if (wParam) {
             lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
             if (lpUIExtra) {
@@ -217,17 +217,17 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
         break;
 
     case WM_IME_CONTROL: // IME制御時。
-        DPRINT("WM_IME_CONTROL\n");
+        DPRINTA("WM_IME_CONTROL\n");
         lRet = ControlCommand(hIMC, hWnd, wParam, lParam);
         break;
 
     case WM_IME_NOTIFY: // IME通知時。
-        DPRINT("WM_IME_NOTIFY\n");
+        DPRINTA("WM_IME_NOTIFY\n");
         lRet = NotifyCommand(hIMC, hWnd, wParam, lParam);
         break;
 
     case WM_DESTROY: // ウィンドウ破棄時。
-        DPRINT("WM_DESTROY\n");
+        DPRINTA("WM_DESTROY\n");
         OnDestroy(hWnd);
         break;
 
@@ -241,7 +241,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
             // 覚えておく。
             POINT pt = { rc.left, rc.top };
-            DPRINT("%d, %d\n", pt.x, pt.y);
+            DPRINTA("%d, %d\n", pt.x, pt.y);
             Config_SetData(L"ptStatusWindow", REG_BINARY, &pt, sizeof(pt));
             UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
         }
@@ -256,7 +256,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
                 RECT rc;
                 ::GetWindowRect(lpUIExtra->hwndDefComp, &rc);
                 POINT pt = { rc.left, rc.top };
-                DPRINT("%d, %d\n", pt.x, pt.y);
+                DPRINTA("%d, %d\n", pt.x, pt.y);
                 Config_SetData(L"ptDefComp", REG_BINARY, &pt, sizeof(pt));
             }
             UnlockUIExtra(hWnd);
@@ -273,7 +273,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             ::GetWindowRect(lpUIExtra->hwndCand, &rc);
             // 位置を覚えておく。
             POINT pt = { rc.left, rc.top };
-            DPRINT("%d, %d\n", pt.x, pt.y);
+            DPRINTA("%d, %d\n", pt.x, pt.y);
             lpUIExtra->ptCand = pt;
             UnlockUIExtra(hWnd);
         }
@@ -332,7 +332,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     switch (wParam) {
     case IMN_CLOSESTATUSWINDOW: // 状態ウィンドウを閉じる。
-        DPRINT("IMN_CLOSESTATUSWINDOW\n");
+        DPRINTA("IMN_CLOSESTATUSWINDOW\n");
         if (::IsWindow(lpUIExtra->hwndStatus)) { // 状態ウィンドウが生きている？
             // 位置を保存。
             ::GetWindowRect(lpUIExtra->hwndStatus, &rc);
@@ -346,12 +346,12 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IMN_OPENSTATUSWINDOW: // 状態ウィンドウが開かれる。
-        DPRINT("IMN_OPENSTATUSWINDOW\n");
+        DPRINTA("IMN_OPENSTATUSWINDOW\n");
         StatusWnd_Create(hWnd, lpUIExtra); // 状態ウィンドウを作成する。
         break;
 
     case IMN_SETCONVERSIONMODE: // 変換モードがセットされる。
-        DPRINT("IMN_SETCONVERSIONMODE\n");
+        DPRINTA("IMN_SETCONVERSIONMODE\n");
         lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
             // ローマ字モードを保存。
@@ -366,11 +366,11 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IMN_SETSENTENCEMODE:
-        DPRINT("IMN_SETSENTENCEMODE\n");
+        DPRINTA("IMN_SETSENTENCEMODE\n");
         break;
 
     case IMN_SETCOMPOSITIONFONT: // 未確定文字列のフォントがセットされる。
-        DPRINT("IMN_SETCOMPOSITIONFONT\n");
+        DPRINTA("IMN_SETCOMPOSITIONFONT\n");
         lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
             lf = lpIMC->lfFont.W; // 論理フォント。
@@ -399,12 +399,12 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IMN_SETOPENSTATUS: // IMEのON/OFFを切り替え。
-        DPRINT("IMN_SETOPENSTATUS\n");
+        DPRINTA("IMN_SETOPENSTATUS\n");
         StatusWnd_Update(lpUIExtra); // 状態ウィンドウを更新する。
         break;
 
     case IMN_OPENCANDIDATE: // 候補が開かれる。
-        DPRINT("IMN_OPENCANDIDATE\n");
+        DPRINTA("IMN_OPENCANDIDATE\n");
         lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
             CandWnd_Create(hWnd, lpUIExtra, lpIMC); // 候補ウィンドウを作成。
@@ -413,7 +413,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IMN_CHANGECANDIDATE: // 候補が変更される。
-        DPRINT("IMN_CHANGECANDIDATE\n");
+        DPRINTA("IMN_CHANGECANDIDATE\n");
         lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
             CandWnd_Resize(lpUIExtra, lpIMC); // 候補ウィンドウのサイズを変更。
@@ -423,12 +423,12 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IMN_CLOSECANDIDATE: // 候補が閉じられる。
-        DPRINT("IMN_CLOSECANDIDATE\n");
+        DPRINTA("IMN_CLOSECANDIDATE\n");
         CandWnd_Hide(lpUIExtra); // 候補ウィンドウを隠す。
         break;
 
     case IMN_GUIDELINE:
-        DPRINT("IMN_GUIDELINE\n");
+        DPRINTA("IMN_GUIDELINE\n");
         if (::ImmGetGuideLine(hIMC, GGL_LEVEL, NULL, 0)) {
             if (!::IsWindow(lpUIExtra->hwndGuide)) {
                 HDC hdcIC;
@@ -467,7 +467,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IMN_SETCANDIDATEPOS: // 候補の位置がセットされる。
-        DPRINT("IMN_SETCANDIDATEPOS\n");
+        DPRINTA("IMN_SETCANDIDATEPOS\n");
         lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
             CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE); // 候補ウィンドウを移動。
@@ -476,7 +476,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IMN_SETCOMPOSITIONWINDOW: // 未確定文字列ウィンドウがセットされる。
-        DPRINT("IMN_SETCOMPOSITIONWINDOW\n");
+        DPRINTA("IMN_SETCOMPOSITIONWINDOW\n");
         lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
             CompWnd_Move(lpUIExtra, lpIMC); // 未確定文字列ウィンドウを移動。
@@ -486,7 +486,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IMN_SETSTATUSWINDOWPOS: // 状態ウィンドウの位置がセットされる。
-        DPRINT("IMN_SETSTATUSWINDOWPOS\n");
+        DPRINTA("IMN_SETSTATUSWINDOWPOS\n");
         lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
             // 位置をセットする。幅と高さはそのまま。
@@ -501,7 +501,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IMN_PRIVATE: // プライベートな通知。
-        DPRINT("IMN_PRIVATE\n");
+        DPRINTA("IMN_PRIVATE\n");
         if (HIWORD(lParam) == 0xFACE) {
             std::wstring imepad_file;
             if (Config_GetSz(L"ImePadFile", imepad_file)) {
@@ -541,7 +541,7 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
     if (lpUIExtra) {
         switch (wParam) {
         case IMC_GETCANDIDATEPOS: // 候補の位置が取得される。
-            DPRINT("IMC_GETCANDIDATEPOS\n");
+            DPRINTA("IMC_GETCANDIDATEPOS\n");
             if (IsWindow(lpUIExtra->hwndCand)) { // 候補ウィンドウが生きていれば
                 *(LPCANDIDATEFORM)lParam = lpIMC->cfCandForm[0]; // 入力コンテキストから取得。
                 ret = 0;
@@ -549,13 +549,13 @@ LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
             break;
 
         case IMC_GETCOMPOSITIONWINDOW: // 未確定文字列の構造体を取得。
-            DPRINT("IMC_GETCOMPOSITIONWINDOW\n");
+            DPRINTA("IMC_GETCOMPOSITIONWINDOW\n");
             *(LPCOMPOSITIONFORM)lParam = lpIMC->cfCompForm; // 入力コンテキストから取得。
             ret = 0;
             break;
 
         case IMC_GETSTATUSWINDOWPOS: // 状態ウィンドウの位置が取得される。
-            DPRINT("IMC_GETSTATUSWINDOWPOS\n");
+            DPRINTA("IMC_GETSTATUSWINDOWPOS\n");
             {
                 RECT rc;
                 ::GetWindowRect(lpUIExtra->hwndStatus, &rc);

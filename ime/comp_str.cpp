@@ -1127,11 +1127,11 @@ void CompStr::GetLog(LogCompStr& log)
             ::ImmUnlockIMCC(hNewCompStr);
             hCompStr = hNewCompStr;
         } else {
-            DebugPrintA("CompStr::ReCreate: failed #2");
+            DPRINTA("CompStr::ReCreate: failed #2");
             ASSERT(0);
         }
     } else {
-        DebugPrintA("CompStr::ReCreate: failed");
+        DPRINTA("CompStr::ReCreate: failed");
         ASSERT(0);
     }
     return hCompStr;
@@ -1231,146 +1231,146 @@ void LogCompStr::AssertValid()
 // 未確定文字列のダンプ。
 void CompStr::Dump()
 {
-    DebugPrintA("dwSize: %08X\n", dwSize);
-    DebugPrintA("dwCursorPos: %08X\n", dwCursorPos);
-    DebugPrintA("dwDeltaStart: %08X\n", dwDeltaStart);
-    DebugPrintA("CompReadAttr: ");
+    DPRINTA("dwSize: %08X\n", dwSize);
+    DPRINTA("dwCursorPos: %08X\n", dwCursorPos);
+    DPRINTA("dwDeltaStart: %08X\n", dwDeltaStart);
+    DPRINTA("CompReadAttr: ");
     if (dwCompReadAttrLen) {
         BYTE *attrs = GetCompReadAttr();
         for (DWORD i = 0; i < dwCompReadAttrLen; ++i) {
-            DebugPrintA("%02X ", attrs[i]);
+            DPRINTA("%02X ", attrs[i]);
         }
     }
-    DebugPrintA("\n");
-    DebugPrintA("CompReadClause: ");
+    DPRINTA("\n");
+    DPRINTA("CompReadClause: ");
     if (dwCompReadClauseLen) {
         DWORD *clauses = GetCompReadClause();
         for (DWORD i = 0; i < dwCompReadClauseLen / 4; ++i) {
-            DebugPrintA("%08X ", clauses[i]);
+            DPRINTA("%08X ", clauses[i]);
         }
     }
-    DebugPrintA("\n");
-    DebugPrintA("CompReadStr: ");
+    DPRINTA("\n");
+    DPRINTA("CompReadStr: ");
     if (dwCompReadStrLen) {
         WCHAR *str = GetCompReadStr();
-        DebugPrintA("%ls", str);
+        DPRINTA("%ls", str);
     }
-    DebugPrintA("\n");
-    DebugPrintA("CompAttr: ");
+    DPRINTA("\n");
+    DPRINTA("CompAttr: ");
     if (dwCompAttrLen) {
         BYTE *attrs = GetCompAttr();
         for (DWORD i = 0; i < dwCompAttrLen; ++i) {
-            DebugPrintA("%02X ", attrs[i]);
+            DPRINTA("%02X ", attrs[i]);
         }
     }
-    DebugPrintA("\n");
-    DebugPrintA("CompClause: ");
+    DPRINTA("\n");
+    DPRINTA("CompClause: ");
     if (dwCompClauseLen) {
         DWORD *clauses = GetCompClause();
         for (DWORD i = 0; i < dwCompClauseLen / 4; ++i) {
-            DebugPrintA("%08X ", clauses[i]);
+            DPRINTA("%08X ", clauses[i]);
         }
     }
-    DebugPrintA("\n");
-    DebugPrintA("CompStr: ");
+    DPRINTA("\n");
+    DPRINTA("CompStr: ");
     if (dwCompStrLen) {
         WCHAR *str = GetCompStr();
-        DebugPrintA("%ls", str);
+        DPRINTA("%ls", str);
     }
-    DebugPrintA("\n");
-    DebugPrintA("ResultReadClause: ");
+    DPRINTA("\n");
+    DPRINTA("ResultReadClause: ");
     if (dwResultReadClauseLen) {
         DWORD *clauses = GetResultReadClause();
         for (DWORD i = 0; i < dwResultReadClauseLen / 4; ++i) {
-            DebugPrintA("%08X ", clauses[i]);
+            DPRINTA("%08X ", clauses[i]);
         }
     }
-    DebugPrintA("\n");
-    DebugPrintA("ResultReadStr: ");
+    DPRINTA("\n");
+    DPRINTA("ResultReadStr: ");
     if (dwResultReadStrLen) {
         WCHAR *str = GetResultReadStr();
-        DebugPrintA("%ls", str);
+        DPRINTA("%ls", str);
     }
-    DebugPrintA("\n");
-    DebugPrintA("ResultClause: ");
+    DPRINTA("\n");
+    DPRINTA("ResultClause: ");
     if (dwResultClauseLen) {
         DWORD *clauses = GetResultClause();
         for (DWORD i = 0; i < dwResultClauseLen / 4; ++i) {
-            DebugPrintA("%08X ", clauses[i]);
+            DPRINTA("%08X ", clauses[i]);
         }
     }
-    DebugPrintA("\n");
-    DebugPrintA("ResultStr: ");
+    DPRINTA("\n");
+    DPRINTA("ResultStr: ");
     if (dwResultStrLen) {
         WCHAR *str = GetResultStr();
-        DebugPrintA("%ls", str);
+        DPRINTA("%ls", str);
     }
-    DebugPrintA("\n");
+    DPRINTA("\n");
 } // CompStr::Dump
 
 // 未確定文字列の論理データをダンプ。
 void LogCompStr::Dump()
 {
-    DebugPrintA("### LogCompStr ###\n");
-    DebugPrintA("+ dwCursorPos: %08X\n", dwCursorPos);
-    DebugPrintA("+ dwDeltaStart: %08X\n", dwDeltaStart);
+    DPRINTA("### LogCompStr ###\n");
+    DPRINTA("+ dwCursorPos: %08X\n", dwCursorPos);
+    DPRINTA("+ dwDeltaStart: %08X\n", dwDeltaStart);
 
-    DebugPrintA("+ comp_read_attr: ");
+    DPRINTA("+ comp_read_attr: ");
     for (size_t i = 0; i < comp_read_attr.size(); ++i) {
-        DebugPrintA("%02X ", comp_read_attr[i]);
+        DPRINTA("%02X ", comp_read_attr[i]);
     }
-    DebugPrintA("\n");
+    DPRINTA("\n");
 
-    DebugPrintA("+ comp_read_clause: ");
+    DPRINTA("+ comp_read_clause: ");
     for (size_t i = 0; i < comp_read_clause.size(); ++i) {
-        DebugPrintA("%08X ", comp_read_clause[i]);
+        DPRINTA("%08X ", comp_read_clause[i]);
     }
-    DebugPrintA("\n");
+    DPRINTA("\n");
 
-    DebugPrintA("+ comp_read_str: %ls\n", comp_read_str.c_str());
-    DebugPrintA("+ comp_attr: ");
+    DPRINTA("+ comp_read_str: %ls\n", comp_read_str.c_str());
+    DPRINTA("+ comp_attr: ");
     for (size_t i = 0; i < comp_attr.size(); ++i) {
-        DebugPrintA("%02X ", comp_attr[i]);
+        DPRINTA("%02X ", comp_attr[i]);
     }
-    DebugPrintA("\n");
+    DPRINTA("\n");
 
-    DebugPrintA("+ comp_clause: ");
+    DPRINTA("+ comp_clause: ");
     for (size_t i = 0; i < comp_clause.size(); ++i) {
-        DebugPrintA("%08X ", comp_clause[i]);
+        DPRINTA("%08X ", comp_clause[i]);
     }
-    DebugPrintA("\n");
+    DPRINTA("\n");
 
-    DebugPrintA("+ comp_str: %ls\n", comp_str.c_str());
+    DPRINTA("+ comp_str: %ls\n", comp_str.c_str());
 
-    DebugPrintA("+ result_read_clause: ");
+    DPRINTA("+ result_read_clause: ");
     for (size_t i = 0; i < result_read_clause.size(); ++i) {
-        DebugPrintA("%08X ", result_read_clause[i]);
+        DPRINTA("%08X ", result_read_clause[i]);
     }
-    DebugPrintA("\n");
+    DPRINTA("\n");
 
-    DebugPrintA("+ result_read_str: %ls\n", result_read_str.c_str());
+    DPRINTA("+ result_read_str: %ls\n", result_read_str.c_str());
 
-    DebugPrintA("+ result_clause: ");
+    DPRINTA("+ result_clause: ");
     for (size_t i = 0; i < result_clause.size(); ++i) {
-        DebugPrintA("%08X ", result_clause[i]);
+        DPRINTA("%08X ", result_clause[i]);
     }
-    DebugPrintA("\n");
+    DPRINTA("\n");
 
-    DebugPrintA("+ result_str: %ls\n", result_str.c_str());
+    DPRINTA("+ result_str: %ls\n", result_str.c_str());
 
-    DebugPrintA("+ extra.iClause: %08X\n", extra.iClause);
+    DPRINTA("+ extra.iClause: %08X\n", extra.iClause);
 
-    DebugPrintA("+ extra.hiragana_clauses: ");
+    DPRINTA("+ extra.hiragana_clauses: ");
     for (size_t i = 0; i < extra.hiragana_clauses.size(); ++i) {
-        DebugPrintA("%ls ", extra.hiragana_clauses[i].c_str());
+        DPRINTA("%ls ", extra.hiragana_clauses[i].c_str());
     }
-    DebugPrintA("\n");
+    DPRINTA("\n");
 
-    DebugPrintA("+ extra.typing_clauses: ");
+    DPRINTA("+ extra.typing_clauses: ");
     for (size_t i = 0; i < extra.typing_clauses.size(); ++i) {
-        DebugPrintA("%ls ", extra.typing_clauses[i].c_str());
+        DPRINTA("%ls ", extra.typing_clauses[i].c_str());
     }
-    DebugPrintA("\n");
+    DPRINTA("\n");
 } // LogCompStr::Dump
 
 //////////////////////////////////////////////////////////////////////////////

@@ -315,7 +315,7 @@ void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 
         RECT rc;
         ::GetWindowRect(lpUIExtra->hwndCand, &rc);
-        DPRINT("%d, %d, %d, %d\n", rc.left, rc.top, siz.cx, siz.cy);
+        DPRINTA("%d, %d, %d, %d\n", rc.left, rc.top, siz.cx, siz.cy);
         ::MoveWindow(lpUIExtra->hwndCand, rc.left, rc.top, siz.cx, siz.cy, TRUE);
     }
 } // CandWnd_Resize
@@ -329,7 +329,7 @@ void CandWnd_Hide(UIEXTRA *lpUIExtra)
         ::GetWindowRect(lpUIExtra->hwndCand, (LPRECT)&rc);
         lpUIExtra->ptCand.x = rc.left;
         lpUIExtra->ptCand.y = rc.top;
-        DPRINT("%d, %d, %d, %d\n", -1, -1, 0, 0);
+        DPRINTA("%d, %d, %d, %d\n", -1, -1, 0, 0);
         ::MoveWindow(lpUIExtra->hwndCand, -1, -1, 0, 0, TRUE);
         ::ShowWindow(lpUIExtra->hwndCand, SW_HIDE);
     }
@@ -354,7 +354,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             int cx, cy;
             cx = rc.right - rc.left;
             cy = rc.bottom - rc.top;
-            DPRINT("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
+            DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
             ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
@@ -372,7 +372,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
 
     DWORD dwStyle = lpIMC->cfCandForm[0].dwStyle;
     if (dwStyle == CFS_EXCLUDE) {
-        DPRINT("CFS_EXCLUDE\n");
+        DPRINTA("CFS_EXCLUDE\n");
         // get work area and app window rect
         RECT rcWork, rcAppWnd;
         ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
@@ -403,14 +403,14 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             int cx, cy;
             cx = rc.right - rc.left;
             cy = rc.bottom - rc.top;
-            DPRINT("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
+            DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
             ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
         }
         ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
     } else if (dwStyle == CFS_CANDIDATEPOS) {
-        DPRINT("CFS_CANDIDATEPOS\n");
+        DPRINTA("CFS_CANDIDATEPOS\n");
         // get the specified position in screen coordinates
         pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
         pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
@@ -423,14 +423,14 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             int cx, cy;
             cx = rc.right - rc.left;
             cy = rc.bottom - rc.top;
-            DPRINT("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
+            DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
             ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
         }
         ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
     } else {
-        DPRINT("dwStyle: 0x%08lX\n", dwStyle);
+        DPRINTA("dwStyle: 0x%08lX\n", dwStyle);
     }
 } // CandWnd_Move
 

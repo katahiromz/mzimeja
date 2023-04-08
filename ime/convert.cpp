@@ -1227,11 +1227,11 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
 
         // 基本辞書をスキャンする。
         size_t count = ScanBasicDict(records, dict_data, pre[index]);
-        DebugPrintW(L"ScanBasicDict(%c) count: %d\n", pre[index], count);
+        DPRINTW(L"ScanBasicDict(%c) count: %d\n", pre[index], count);
 
         // ユーザー辞書をスキャンする。
         count = ScanUserDict(records, pre[index], this);
-        DebugPrintW(L"ScanUserDict(%c) count: %d\n", pre[index], count);
+        DPRINTW(L"ScanUserDict(%c) count: %d\n", pre[index], count);
 
         // store data for each record
         for (size_t k = 0; k < records.size(); ++k) {
@@ -1282,11 +1282,11 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data)
     // 基本辞書をスキャンする。
     WStrings fields, records;
     size_t count = ScanBasicDict(records, dict_data, pre[0]);
-    DebugPrintW(L"ScanBasicDict(%c) count: %d\n", pre[0], count);
+    DPRINTW(L"ScanBasicDict(%c) count: %d\n", pre[0], count);
 
     // ユーザー辞書をスキャンする。
     count = ScanUserDict(records, pre[0], this);
-    DebugPrintW(L"ScanUserDict(%c) count: %d\n", pre[0], count);
+    DPRINTW(L"ScanUserDict(%c) count: %d\n", pre[0], count);
 
     // store data for each record
     for (size_t k = 0; k < records.size(); ++k) {
@@ -1738,7 +1738,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
     }
     // get the right substring
     std::wstring str = pre.substr(index + length);
-    DebugPrintW(L"DoGodanDoushi: %s, %s\n", fields[0].c_str(), str.c_str());
+    DPRINTW(L"DoGodanDoushi: %s, %s\n", fields[0].c_str(), str.c_str());
 
     LatticeNode node;
     node.bunrui = HB_GODAN_DOUSHI;
@@ -2252,7 +2252,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
     if (pre.substr(index, length) != fields[0]) {
         return;
     }
-    DebugPrintW(L"DoFields: %s\n", fields[0].c_str());
+    DPRINTW(L"DoFields: %s\n", fields[0].c_str());
 
     // レコードの仕様：
     //     fields[0]: std::wstring 変換前文字列;
@@ -2359,15 +2359,15 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
 void Lattice::Dump(int num)
 {
     const size_t length = pre.size();
-    DebugPrintW(L"### Lattice::Dump(%d) ###\n", num);
-    DebugPrintW(L"Lattice length: %d\n", int(length));
+    DPRINTW(L"### Lattice::Dump(%d) ###\n", num);
+    DPRINTW(L"Lattice length: %d\n", int(length));
     for (size_t i = 0; i < length; ++i) {
-        DebugPrintW(L"Lattice chunk #%d:", int(i));
+        DPRINTW(L"Lattice chunk #%d:", int(i));
         for (size_t k = 0; k < chunks[i].size(); ++k) {
-            DebugPrintW(L" %s(%s)", chunks[i][k]->post.c_str(),
+            DPRINTW(L" %s(%s)", chunks[i][k]->post.c_str(),
                         BunruiToString(chunks[i][k]->bunrui));
         }
-        DebugPrintW(L"\n");
+        DPRINTW(L"\n");
     }
 } // Lattice::Dump
 

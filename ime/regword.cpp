@@ -43,11 +43,11 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
     FOOTMARK();
 
     if (!lpRead || !lpStr) {
-        DPRINT("!lpRead || !lpStr\n");
+        DPRINTA("!lpRead || !lpStr\n");
         return FALSE;
     }
     if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE) {
-        DPRINT("dw:0x%08lX\n", dw);
+        DPRINTA("dw:0x%08lX\n", dw);
         return FALSE;
     }
 
@@ -56,19 +56,19 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
     StrTrimW(szRead, L" \t\r\n\x3000");
     StrTrimW(szStr, L" \t\r\n\x3000");
     if (!szRead[0] || !szStr[0]) {
-        DPRINT("'%ls', '%ls'\n", szRead, szStr);
+        DPRINTA("'%ls', '%ls'\n", szRead, szStr);
         return FALSE;
     }
 
     HinshiBunrui hinshi = StyleToHinshi(dw);
     if (!(HB_MEISHI <= hinshi && hinshi <= HB_MAX)) {
-        DPRINT("%d\n", hinshi);
+        DPRINTA("%d\n", hinshi);
         return FALSE;
     }
 
     LPCTSTR pszHinshi = HinshiToString(hinshi);
     if (!pszHinshi || !pszHinshi[0]) {
-        DPRINT("%d\n", hinshi);
+        DPRINTA("%d\n", hinshi);
         return FALSE;
     }
 
@@ -83,7 +83,7 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
     LONG error = ::RegCreateKeyEx(hAppKey, TEXT("UserDict"), 0, NULL, 0, 
                                   KEY_READ | KEY_WRITE, NULL, &hUserDict, NULL);
     if (error) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
         ::RegCloseKey(hAppKey);
         return FALSE;
     }
@@ -104,7 +104,7 @@ BOOL WINAPI ImeRegisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
     // レジストリに値をセット。
     error = ::RegSetValueEx(hUserDict, szName, 0, REG_SZ, (LPBYTE)szValue, (cchValue + 1) * sizeof(TCHAR));
     if (error) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
     }
     BOOL ret = (error == ERROR_SUCCESS);
 
@@ -142,12 +142,12 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
     FOOTMARK();
 
     if (!lpRead || !lpStr) {
-        DPRINT("!lpRead || !lpStr\n");
+        DPRINTA("!lpRead || !lpStr\n");
         return FALSE;
     }
 
     if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE) {
-        DPRINT("%08lX\n", dw);
+        DPRINTA("%08lX\n", dw);
         return FALSE;
     }
 
@@ -156,18 +156,18 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
     StrTrimW(szRead, L" \t\r\n\x3000");
     StrTrimW(szStr, L" \t\r\n\x3000");
     if (!szRead[0] || !szStr[0]) {
-        DPRINT("'%ls', '%ls'\n", szRead, szStr);
+        DPRINTA("'%ls', '%ls'\n", szRead, szStr);
         return FALSE;
     }
 
     HinshiBunrui hinshi = StyleToHinshi(dw);
     if (!(HB_MEISHI <= hinshi && hinshi <= HB_MAX)) {
-        DPRINT("%d\n", hinshi);
+        DPRINTA("%d\n", hinshi);
         return FALSE;
     }
     LPCTSTR pszHinshi = HinshiToString(hinshi);
     if (!pszHinshi || !pszHinshi[0]) {
-        DPRINT("%d\n", hinshi);
+        DPRINTA("%d\n", hinshi);
         return FALSE;
     }
 
@@ -180,7 +180,7 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
     HKEY hUserDict;
     LONG error = ::RegOpenKeyEx(hAppKey, TEXT("UserDict"), 0, KEY_READ | KEY_WRITE, &hUserDict);
     if (error) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
         ::RegCloseKey(hAppKey);
         return FALSE;
     }
@@ -196,7 +196,7 @@ BOOL WINAPI ImeUnregisterWord(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr)
     // レジストリの値を削除。
     BOOL ret = (::RegDeleteValue(hUserDict, szName) == ERROR_SUCCESS);
     if (!ret) {
-        DPRINT("%ls\n", szName);
+        DPRINTA("%ls\n", szName);
     }
 
     // レジストリキーを閉じる。
@@ -291,7 +291,7 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
     FOOTMARK();
 
     if (!lpfn || (dw && (dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE)) {
-        DPRINT("%p, %08lX\n", lpfn, dw);
+        DPRINTA("%p, %08lX\n", lpfn, dw);
         return 0;
     }
 
@@ -299,12 +299,12 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
     std::wstring strHinshi;
     if (dw) {
         if ((dw & MZIME_REGWORD_STYLE) != MZIME_REGWORD_STYLE) {
-            DPRINT("%08lX\n", dw);
+            DPRINTA("%08lX\n", dw);
             return 0;
         }
         hinshi = StyleToHinshi(dw);
         if (!(HB_MEISHI <= hinshi && hinshi <= HB_MAX)) {
-            DPRINT("%d\n", hinshi);
+            DPRINTA("%d\n", hinshi);
             return FALSE;
         }
         strHinshi = HinshiToString(hinshi);
@@ -316,7 +316,7 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
                                 TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja\\UserDict"),
                                 0, KEY_READ, &hUserDict);
     if (error) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
         return 0;
     }
 
@@ -332,7 +332,7 @@ UINT WINAPI ImeEnumRegisterWord(REGISTERWORDENUMPROC lpfn, LPCTSTR lpRead,
                                &dwType, (LPBYTE)szValue, &cbValue);
         if (error) {
             if (error != ERROR_NO_MORE_ITEMS) {
-                DPRINT("error: 0x%08lX\n", error);
+                DPRINTA("error: 0x%08lX\n", error);
             }
             break;
         }

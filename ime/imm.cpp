@@ -126,10 +126,10 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue)
 
     switch (dwAction) {
     case NI_CONTEXTUPDATED:
-        DPRINT("NI_CONTEXTUPDATED\n");
+        DPRINTA("NI_CONTEXTUPDATED\n");
         switch (dwValue) {
         case IMC_SETOPENSTATUS:
-            DPRINT("IMC_SETOPENSTATUS\n");
+            DPRINTA("IMC_SETOPENSTATUS\n");
             lpIMC = TheIME.LockIMC(hIMC);
             if (lpIMC) {
                 if (!lpIMC->fOpen) { // Closed
@@ -144,11 +144,11 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue)
             break;
 
         case IMC_SETCONVERSIONMODE:
-            DPRINT("IMC_SETCONVERSIONMODE\n");
+            DPRINTA("IMC_SETCONVERSIONMODE\n");
             break;
 
         case IMC_SETCOMPOSITIONWINDOW:
-            DPRINT("IMC_SETCOMPOSITIONWINDOW\n");
+            DPRINTA("IMC_SETCOMPOSITIONWINDOW\n");
             break;
 
         default:
@@ -157,7 +157,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue)
         break;
 
     case NI_COMPOSITIONSTR:
-        DPRINT("NI_COMPOSITIONSTR\n");
+        DPRINTA("NI_COMPOSITIONSTR\n");
         switch (dwIndex) {
         case CPS_COMPLETE: // make result
             lpIMC = TheIME.LockIMC(hIMC);
@@ -201,7 +201,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue)
         break;
 
     case NI_OPENCANDIDATE: // open candidate
-        DPRINT("NI_OPENCANDIDATE\n");
+        DPRINTA("NI_OPENCANDIDATE\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             lpIMC->OpenCandidate();
@@ -210,7 +210,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue)
         break;
 
     case NI_CLOSECANDIDATE: // close candidate
-        DPRINT("NI_CLOSECANDIDATE\n");
+        DPRINTA("NI_CLOSECANDIDATE\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             ret = lpIMC->CloseCandidate();
@@ -219,7 +219,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue)
         break;
 
     case NI_SELECTCANDIDATESTR:
-        DPRINT("NI_SELECTCANDIDATESTR\n");
+        DPRINTA("NI_SELECTCANDIDATESTR\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             if (dwIndex == 1) {
@@ -230,7 +230,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue)
         break;
 
     case NI_CHANGECANDIDATELIST:
-        DPRINT("NI_CHANGECANDIDATELIST\n");
+        DPRINTA("NI_CHANGECANDIDATELIST\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             if (dwIndex == 1 && lpIMC->HasCandInfo()) ret = TRUE;
@@ -239,7 +239,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue)
         break;
 
     case NI_SETCANDIDATE_PAGESIZE:
-        DPRINT("NI_SETCANDIDATE_PAGESIZE\n");
+        DPRINTA("NI_SETCANDIDATE_PAGESIZE\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             if (dwIndex == 1 && lpIMC->HasCandInfo()) {
@@ -259,7 +259,7 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue)
         break;
 
     case NI_SETCANDIDATE_PAGESTART:
-        DPRINT("NI_SETCANDIDATE_PAGESTART\n");
+        DPRINTA("NI_SETCANDIDATE_PAGESTART\n");
         lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
             if (dwIndex == 1 && lpIMC->HasCandInfo()) {
@@ -279,12 +279,12 @@ BOOL WINAPI NotifyIME(HIMC hIMC, DWORD dwAction, DWORD dwIndex, DWORD dwValue)
         break;
 
     case NI_IMEMENUSELECTED:
-        DPRINT("NI_IMEMENUSELECTED\n");
+        DPRINTA("NI_IMEMENUSELECTED\n");
         TheIME.DoCommand(hIMC, dwIndex);
         break;
 
     default:
-        DPRINT("NI_(unknown)\n");
+        DPRINTA("NI_(unknown)\n");
         break;
     }
 
@@ -318,15 +318,15 @@ BOOL WINAPI ImeSetCompositionString(HIMC hIMC, DWORD dwIndex, LPVOID lpComp,
 
     switch (dwIndex) {
     case SCS_QUERYRECONVERTSTRING:
-        DPRINT("SCS_QUERYRECONVERTSTRING\n");
+        DPRINTA("SCS_QUERYRECONVERTSTRING\n");
         break;
 
     case SCS_SETRECONVERTSTRING:
-        DPRINT("SCS_SETRECONVERTSTRING\n");
+        DPRINTA("SCS_SETRECONVERTSTRING\n");
         break;
 
     default:
-        DPRINT("SCS_(unknown)\n");
+        DPRINTA("SCS_(unknown)\n");
         break;
     }
 

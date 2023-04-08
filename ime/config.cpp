@@ -22,12 +22,12 @@ HKEY Config_OpenAppKey(VOID)
                                 TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja"),
                                 0, KEY_READ, &hAppKey);
     if (error) {
-        DPRINT("0x%08lX\n", error);
+        DPRINTA("0x%08lX\n", error);
         error = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,
                                TEXT("SOFTWARE\\Katayama Hirofumi MZ\\mzimeja"),
                                0, KEY_READ, &hAppKey);
         if (error) {
-            DPRINT("0x%08lX\n", error);
+            DPRINTA("0x%08lX\n", error);
             return NULL;
         }
     }
@@ -42,7 +42,7 @@ HKEY Config_CreateAppKey(VOID)
     LONG error = ::RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Katayama Hirofumi MZ"),
                                   0, NULL, 0, KEY_READ | KEY_WRITE, NULL, &hCompanyKey, NULL);
     if (error) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
         return NULL;
     }
 
@@ -51,7 +51,7 @@ HKEY Config_CreateAppKey(VOID)
     error = ::RegCreateKeyEx(hCompanyKey, TEXT("mzimeja"), 0, NULL, 0,
                              KEY_READ | KEY_WRITE, NULL, &hAppKey, NULL);
     if (error) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
         ::RegCloseKey(hCompanyKey);
         return NULL;
     }
@@ -72,7 +72,7 @@ DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault)
     LONG error = ::RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)&dwValue, &cbValue);
     ::RegCloseKey(hKey);
     if (error || cbValue != sizeof(DWORD)) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
         return dwDefault;
     }
 
@@ -89,7 +89,7 @@ BOOL Config_SetDWORD(LPCTSTR name, DWORD dwValue)
     LONG error = ::RegSetValueEx(hKey, name, 0, REG_DWORD, (LPBYTE)&dwValue, sizeof(dwValue));
     ::RegCloseKey(hKey);
     if (error) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
         return FALSE;
     }
 
@@ -107,7 +107,7 @@ BOOL Config_GetData(LPCTSTR name, LPVOID pvData, DWORD cbData)
     LONG error = ::RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)pvData, &cbData);
     ::RegCloseKey(hKey);
     if (error || cbDataOld != cbData) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
         return FALSE;
     }
 
@@ -124,7 +124,7 @@ BOOL Config_SetData(LPCTSTR name, DWORD dwType, LPCVOID pvData, DWORD cbData)
     LONG error = ::RegSetValueEx(hKey, name, 0, dwType, (const BYTE*)pvData, cbData);
     ::RegCloseKey(hKey);
     if (error) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
         return FALSE;
     }
 
@@ -146,7 +146,7 @@ BOOL Config_GetSz(LPCTSTR name, std::wstring& str)
     szText[_countof(szText) - 1] = 0;
     ::RegCloseKey(hKey);
     if (error) {
-        DPRINT("error: 0x%08lX\n", error);
+        DPRINTA("error: 0x%08lX\n", error);
         return FALSE;
     }
 

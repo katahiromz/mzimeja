@@ -201,18 +201,18 @@ DWORD LogCandInfo::GetTotalSize() const
 // 候補情報の論理データをダンプ。
 void LogCandInfo::Dump()
 {
-    DebugPrintA("LogCandInfo::Dump\n");
+    DPRINTA("LogCandInfo::Dump\n");
     for (size_t i = 0; i < cand_lists.size(); ++i) {
-        DebugPrintA("### CandList %u ###\n", i);
-        DebugPrintA("+ dwStyle: %08X\n", cand_lists[i].dwStyle);
-        DebugPrintA("+ dwSelection: %08X\n", cand_lists[i].dwSelection);
-        DebugPrintA("+ dwPageStart: %08X\n", cand_lists[i].dwPageStart);
-        DebugPrintA("+ dwPageSize: %08X\n", cand_lists[i].dwPageSize);
-        DebugPrintA("+ cand_strs: ");
+        DPRINTA("### CandList %u ###\n", i);
+        DPRINTA("+ dwStyle: %08X\n", cand_lists[i].dwStyle);
+        DPRINTA("+ dwSelection: %08X\n", cand_lists[i].dwSelection);
+        DPRINTA("+ dwPageStart: %08X\n", cand_lists[i].dwPageStart);
+        DPRINTA("+ dwPageSize: %08X\n", cand_lists[i].dwPageSize);
+        DPRINTA("+ cand_strs: ");
         for (size_t k = 0; k < cand_lists[i].cand_strs.size(); ++k) {
-            DebugPrintA("%ls ", cand_lists[i].cand_strs[k].c_str());
+            DPRINTA("%ls ", cand_lists[i].cand_strs[k].c_str());
         }
-        DebugPrintA("+ iClause: %u\n", iClause);
+        DPRINTA("+ iClause: %u\n", iClause);
     }
 } // LogCandInfo::Dump
 
@@ -373,26 +373,26 @@ CANDINFOEXTRA *CandInfo::GetExtra()
 // 候補情報をダンプする。
 void CandInfo::Dump()
 {
-    DebugPrintA("### CandInfo ###\n");
-    DebugPrintA("+ dwSize: %u\n", dwSize);
-    DebugPrintA("+ dwCount: %u\n", dwCount);
-    DebugPrintA("+ dwPrivateSize: %u\n", dwPrivateSize);
-    DebugPrintA("+ dwPrivateOffset: %u\n", dwPrivateOffset);
+    DPRINTA("### CandInfo ###\n");
+    DPRINTA("+ dwSize: %u\n", dwSize);
+    DPRINTA("+ dwCount: %u\n", dwCount);
+    DPRINTA("+ dwPrivateSize: %u\n", dwPrivateSize);
+    DPRINTA("+ dwPrivateOffset: %u\n", dwPrivateOffset);
     for (DWORD i = 0; i < dwCount; ++i) {
-        DebugPrintA("+ List #%u\n", i);
-        DebugPrintA("++ dwOffset: %08X\n", dwOffset[i]);
+        DPRINTA("+ List #%u\n", i);
+        DPRINTA("++ dwOffset: %08X\n", dwOffset[i]);
         CandList *list = GetList(i);
-        DebugPrintA("++ dwSize: %u\n", list->dwSize);
-        DebugPrintA("++ dwStyle: %08X\n", list->dwStyle);
-        DebugPrintA("++ dwCount: %08X\n", list->dwCount);
-        DebugPrintA("++ dwSelection: %08X\n", list->dwSelection);
-        DebugPrintA("++ dwPageStart: %u\n", list->dwPageStart);
-        DebugPrintA("++ dwPageSize: %u\n", list->dwPageSize);
-        DebugPrintA("++ Cand Strings: ");
+        DPRINTA("++ dwSize: %u\n", list->dwSize);
+        DPRINTA("++ dwStyle: %08X\n", list->dwStyle);
+        DPRINTA("++ dwCount: %08X\n", list->dwCount);
+        DPRINTA("++ dwSelection: %08X\n", list->dwSelection);
+        DPRINTA("++ dwPageStart: %u\n", list->dwPageStart);
+        DPRINTA("++ dwPageSize: %u\n", list->dwPageSize);
+        DPRINTA("++ Cand Strings: ");
         for (DWORD k = 0; k < list->dwCount; ++k) {
-            DebugPrintA("%ls ", list->GetCandString(k));
+            DPRINTA("%ls ", list->GetCandString(k));
         }
-        DebugPrintA("\n");
+        DPRINTA("\n");
     }
 } // CandInfo::Dump
 

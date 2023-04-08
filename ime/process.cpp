@@ -415,7 +415,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
         return FALSE;
     }
 
-    DebugPrintA("ImeProcessKey: vKey: %u\n", vKey);
+    DPRINTA("ImeProcessKey: vKey: %u\n", vKey);
 
     InputContext *lpIMC = TheIME.LockIMC(hIMC);
     BOOL fOpen = lpIMC->IsOpen();
@@ -563,10 +563,10 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
         }
 
         if (TheIME.m_fOverflowKey) {
-            DebugPrintA("***************************************\n");
-            DebugPrintA("*   TransKey OVER FLOW Messages!!!    *\n");
-            DebugPrintA("*                by MZIMEJA.IME       *\n");
-            DebugPrintA("***************************************\n");
+            DPRINTA("***************************************\n");
+            DPRINTA("*   TransKey OVER FLOW Messages!!!    *\n");
+            DPRINTA("*                by MZIMEJA.IME       *\n");
+            DPRINTA("***************************************\n");
         }
         ret = TheIME.m_uNumTransKey;
     }

@@ -22,12 +22,12 @@ PSID MyCreateSid(VOID)
     fResult = AllocateAndInitializeSid(&SidAuthority, 1, SECURITY_WORLD_RID, 0, 0,
                                        0, 0, 0, 0, 0, &psid);
     if (!fResult) {
-        DebugPrintA("MyCreateSid:AllocateAndInitializeSid failed");
+        DPRINTA("MyCreateSid:AllocateAndInitializeSid failed");
         return NULL;
     }
 
     if (!IsValidSid(psid)) {
-        DebugPrintA("MyCreateSid:AllocateAndInitializeSid returns bogus sid");
+        DPRINTA("MyCreateSid:AllocateAndInitializeSid returns bogus sid");
         FreeSid(psid);
         return NULL;
     }
@@ -85,14 +85,14 @@ SECURITY_ATTRIBUTES *CreateSecurityAttributes(void)
     PACL pacl;
     pacl = (PACL)MEMALLOC(cbacl);
     if (pacl == NULL) {
-        DebugPrintA("CreateSecurityAttributes:LocalAlloc for ACL failed");
+        DPRINTA("CreateSecurityAttributes:LocalAlloc for ACL failed");
         FreeSid(psid);
         return NULL;
     }
 
     BOOL fResult = InitializeAcl(pacl, cbacl, ACL_REVISION);
     if (!fResult) {
-        DebugPrintA("CreateSecurityAttributes:InitializeAcl failed");
+        DPRINTA("CreateSecurityAttributes:InitializeAcl failed");
         FreeSid(psid);
         MEMFREE(pacl);
         return NULL;
@@ -103,7 +103,7 @@ SECURITY_ATTRIBUTES *CreateSecurityAttributes(void)
     //
     fResult = AddAccessAllowedAce(pacl, ACL_REVISION, GENERIC_ALL, psid);
     if (!fResult) {
-        DebugPrintA("CreateSecurityAttributes:AddAccessAllowedAce failed");
+        DPRINTA("CreateSecurityAttributes:AddAccessAllowedAce failed");
         MEMFREE(pacl);
         FreeSid(psid);
         return NULL;
@@ -114,7 +114,7 @@ SECURITY_ATTRIBUTES *CreateSecurityAttributes(void)
 
     // Let's make sure that our ACL is valid.
     if (!IsValidAcl(pacl)) {
-        DebugPrintA("CreateSecurityAttributes:IsValidAcl returns FALSE!");
+        DPRINTA("CreateSecurityAttributes:IsValidAcl returns FALSE!");
         MEMFREE(pacl);
         return NULL;
     }
@@ -123,7 +123,7 @@ SECURITY_ATTRIBUTES *CreateSecurityAttributes(void)
     SECURITY_ATTRIBUTES *psa;
     psa = (PSECURITY_ATTRIBUTES)MEMALLOC(sizeof(SECURITY_ATTRIBUTES));
     if (psa == NULL) {
-        DebugPrintA("CreateSecurityAttributes:LocalAlloc for psa failed");
+        DPRINTA("CreateSecurityAttributes:LocalAlloc for psa failed");
         MEMFREE(pacl);
         return NULL;
     }
@@ -132,15 +132,14 @@ SECURITY_ATTRIBUTES *CreateSecurityAttributes(void)
     PSECURITY_DESCRIPTOR psd;
     psd = MEMALLOC(SECURITY_DESCRIPTOR_MIN_LENGTH);
     if (psd == NULL) {
-        DebugPrintA("CreateSecurityAttributes:LocalAlloc for psd failed");
+        DPRINTA("CreateSecurityAttributes:LocalAlloc for psd failed");
         MEMFREE(pacl);
         MEMFREE(psa);
         return NULL;
     }
 
     if (!InitializeSecurityDescriptor(psd, SECURITY_DESCRIPTOR_REVISION)) {
-        DebugPrint(
-                TEXT("CreateSecurityAttributes:InitializeSecurityDescriptor failed"));
+        DPRINTA("CreateSecurityAttributes:InitializeSecurityDescriptor failed");
         MEMFREE(pacl);
         MEMFREE(psa);
         MEMFREE(psd);
@@ -152,7 +151,7 @@ SECURITY_ATTRIBUTES *CreateSecurityAttributes(void)
     // after the SetSecurityDescriptorDacl call.
     fResult = SetSecurityDescriptorDacl(psd, TRUE, pacl, FALSE);
     if (!fResult) {
-        DebugPrintA("CreateSecurityAttributes:SetSecurityDescriptorDacl failed");
+        DPRINTA("CreateSecurityAttributes:SetSecurityDescriptorDacl failed");
         MEMFREE(pacl);
         MEMFREE(psa);
         MEMFREE(psd);
@@ -160,7 +159,7 @@ SECURITY_ATTRIBUTES *CreateSecurityAttributes(void)
     }
 
     if (!IsValidSecurityDescriptor(psd)) {
-        DebugPrintA("CreateSecurityAttributes:IsValidSecurityDescriptor failed!");
+        DPRINTA("CreateSecurityAttributes:IsValidSecurityDescriptor failed!");
         MEMFREE(pacl);
         MEMFREE(psa);
         MEMFREE(psd);
@@ -193,7 +192,7 @@ void FreeSecurityAttributes(SECURITY_ATTRIBUTES *psa)
     if (fResult) {
         if (pacl != NULL) MEMFREE(pacl);
     } else {
-        DebugPrintA("FreeSecurityAttributes:GetSecurityDescriptorDacl failed");
+        DPRINTA("FreeSecurityAttributes:GetSecurityDescriptorDacl failed");
     }
 
     MEMFREE(psa->lpSecurityDescriptor);
