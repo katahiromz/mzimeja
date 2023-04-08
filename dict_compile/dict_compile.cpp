@@ -107,7 +107,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             continue;
         }
 
-        // parse a record
+        // 辞書にエントリーを追加する準備をする。
         DictEntry entry;
         entry.gyou = GYOU_A;
         if (fields.size() == 1) {
@@ -176,39 +176,46 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             fields[2] = fields[0];
         }
 
-        // optimize
+        // 辞書形式にする。
         std::wstring substr;
         wchar_t ch;
         size_t i, ngyou;
         switch (entry.bunrui) {
-        case HB_NAKEIYOUSHI:
+        case HB_NAKEIYOUSHI: // 「な形容詞」
+            // 終端の「な」を削る。
             i = fields[0].size() - 1;
             if (fields[0][i] == L'な') fields[0].resize(i);
             i = fields[2].size() - 1;
             if (fields[2][i] == L'な') fields[2].resize(i);
             break;
-        case HB_IKEIYOUSHI:
+        case HB_IKEIYOUSHI: // 「い形容詞」
+            // 終端の「い」を削る。
             i = fields[0].size() - 1;
             if (fields[0][i] == L'い') fields[0].resize(i);
             i = fields[2].size() - 1;
             if (fields[2][i] == L'い') fields[2].resize(i);
             break;
-        case HB_ICHIDAN_DOUSHI:
+        case HB_ICHIDAN_DOUSHI: // 「一段動詞」
+            // 終端の「る」を削る。
             assert(fields[0][fields[0].size() - 1] == L'る');
             assert(fields[2][fields[2].size() - 1] == L'る');
             fields[0].resize(fields[0].size() - 1);
             fields[2].resize(fields[2].size() - 1);
             break;
-        case HB_KAHEN_DOUSHI:
+        case HB_KAHEN_DOUSHI: // 「カ変動詞」
+            // 「くる」そのものは登録しない。
             if (fields[0] == L"くる") continue;
+            // 終端の「くる」を削る。
             substr = fields[0].substr(fields[0].size() - 2, 2);
             if (substr != L"くる") continue;
             fields[0] = substr;
             substr = fields[2].substr(fields[0].size() - 2, 2);
             fields[2] = substr;
             break;
-        case HB_SAHEN_DOUSHI:
+        case HB_SAHEN_DOUSHI: // 「サ変動詞」
+            // 「する」そのものは登録しない。
             if (fields[0] == L"する") continue;
+            // 終端の「する」または「ずる」を削る。
             substr = fields[0].substr(fields[0].size() - 2, 2);
             if (substr == L"する") entry.gyou = GYOU_SA;
             else if (substr != L"ずる") entry.gyou = GYOU_ZA;
@@ -216,11 +223,15 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             fields[0] = substr;
             fields[2] = fields[2].substr(fields[0].size() - 2, 2);
             break;
-        case HB_GODAN_DOUSHI:
+        case HB_GODAN_DOUSHI: // 「五段動詞」
+            // 終端の文字を取得する。
             ch = fields[0][fields[0].size() - 1];
+            // 終端の文字がウ段でなければ失敗。
             if (g_vowel_map[ch] != L'う') continue;
+            // 終端の文字を削る。
             fields[0].resize(fields[0].size() - 1);
             fields[2].resize(fields[2].size() - 1);
+            // 終端文字だったものの行を取得し、セットする。
             ch = g_consonant_map[ch];
             for (i = 0; i < _countof(s_hiragana_table); ++i) {
                 if (s_hiragana_table[i][0] == ch) {
@@ -234,7 +245,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             break;
         }
 
-        // store the parsed record to entries
+        // エントリーをセットする。
         entry.pre = fields[0];
         entry.post = fields[2];
         if (fields.size() >= 4) {
@@ -242,6 +253,8 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
         } else {
             entry.tags.clear();
         }
+
+        // エントリーを追加する。
         entries.push_back(entry);
     }
 
@@ -274,6 +287,7 @@ BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
     size *= sizeof(WCHAR);
     printf("size: %d\n", (INT)size);
 
+    // メモリーブロックを確保する。
     void *pv = calloc(1, size);
     if (pv == NULL) {
         return FALSE;
@@ -327,19 +341,23 @@ BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
 
 extern "C"
 int wmain(int argc, wchar_t **wargv) {
+    // 引数の数を確認する。
     if (argc != 3) {
         printf("ERROR: missing parameters\n");
         return 1;
     }
 
+    // 写像を準備する。
     MakeLiteralMaps();
 
+    // 辞書を読み込んで、辞書形式のエントリ群を構築する。
     std::vector<DictEntry> entries;
     if (!LoadDictDataFile(wargv[1], entries)) {
         printf("ERROR: cannot load\n");
         return 2;
     }
 
+    // バイナリ辞書を書き込む。
     if (!CreateDictFile(wargv[2], entries)) {
         printf("ERROR: cannot create\n");
         return 3;
