@@ -1214,7 +1214,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             // óXï÷î‘çÜïœä∑ÅB
             std::wstring postal = normalize_postal_code(fields[0]);
             if (postal.size()) {
-                std::wstring addr = convert_postal_code(postal.c_str());
+                std::wstring addr = convert_postal_code(postal);
                 if (addr.size()) {
                     fields[2] = addr;
                     DoMeishi(saved, fields, -10);

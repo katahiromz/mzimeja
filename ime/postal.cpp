@@ -30,10 +30,10 @@ std::wstring normalize_postal_code(const std::wstring& str)
 }
 
 // 郵便番号変換を行う関数。
-std::wstring convert_postal_code(LPCWSTR code)
+std::wstring convert_postal_code(const std::wstring& code)
 {
     // 正規化されていると仮定する。
-    ASSERT(lstrlenW(code) == 7 && are_all_chars_numeric(code));
+    ASSERT(code.size() == 7 && are_all_chars_numeric(code));
 
     std::wstring postal, ret;
     if (Config_GetDWORD(L"PostalDictDisabled", FALSE)) // 無効化されている？
@@ -46,7 +46,7 @@ std::wstring convert_postal_code(LPCWSTR code)
 
     // codeをANSI文字列に変換したものをszCodeAとする。
     CHAR szCodeA[16];
-    WideCharToMultiByte(CP_ACP, 0, code, -1, szCodeA, _countof(szCodeA), NULL, NULL);
+    WideCharToMultiByte(CP_ACP, 0, code.c_str(), -1, szCodeA, _countof(szCodeA), NULL, NULL);
     szCodeA[_countof(szCodeA) - 1] = 0; // Avoid buffer overflow
 
     // 郵便番号データのファイルを開く。

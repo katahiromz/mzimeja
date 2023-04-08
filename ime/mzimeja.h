@@ -497,6 +497,6 @@ extern MzIme TheIME;
 
 // postal.cpp
 std::wstring normalize_postal_code(const std::wstring& str);
-std::wstring convert_postal_code(LPCWSTR code);
+std::wstring convert_postal_code(const std::wstring& code);
 
 //////////////////////////////////////////////////////////////////////////////
