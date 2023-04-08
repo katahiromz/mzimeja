@@ -276,10 +276,10 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC)
             DWORD iList = 0;
             if (pExtra) iList = pExtra->iClause;
 
-            // 候補リストを取得する。
+            // 候補リストとページ終端を取得する。
             CandList *lpCandList = lpCandInfo->GetList(iList);
             DWORD i, end = lpCandList->GetPageEnd();
-            // 候補リスト中の候補ごとにサイズを取得し、幅を拡張し、高さを加算する。
+            // 候補リスト中のページ内の候補ごとにサイズを取得し、幅を拡張し、高さを加算する。
             for (i = lpCandList->dwPageStart; i < end; ++i) {
                 WCHAR *psz = lpCandList->GetCandString(i);
                 SIZE siz;
