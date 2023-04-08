@@ -84,9 +84,7 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed)
     InputContext *lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロック。
 
     // クライアント領域を塗りつぶす。
-    HBRUSH hbr3DFace = ::CreateSolidBrush(GetSysColor(COLOR_3DFACE));
-    ::FillRect(hdcMem, &rc, hbr3DFace);
-    DeleteObject(hbr3DFace);
+    ::FillRect(hdcMem, &rc, (HBRUSH)(COLOR_3DFACE + 1));
 
     // 青っぽい色でミニタイトルバーを塗りつぶす。
     HBRUSH hbrCaption = ::CreateSolidBrush(RGB(0, 32, 255));
