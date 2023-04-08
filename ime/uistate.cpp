@@ -69,6 +69,15 @@ HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra)
 // IME状態ウィンドウを描画する。
 void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed)
 {
+    // クライアント領域を取得。
+    RECT rc;
+    ::GetClientRect(hWnd, &rc);
+
+    // ちらつきを防止するため、メモリービットマップを使用する。
+    HDC hdcMem = ::CreateCompatibleDC(hDC);
+    HBITMAP hbm = ::CreateCompatibleBitmap(hDC, rc.right, rc.bottom);
+    HGDIOBJ hbm2Old = ::SelectObject(hdcMem, hbm);
+
     // UIサーバーとIMCを取得する。
     HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
     HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
@@ -76,29 +85,27 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed)
 
     // クライアント領域を塗りつぶす。
     HBRUSH hbr3DFace = ::CreateSolidBrush(GetSysColor(COLOR_3DFACE));
-    RECT rc;
-    ::GetClientRect(hWnd, &rc);
-    ::FillRect(hDC, &rc, hbr3DFace);
+    ::FillRect(hdcMem, &rc, hbr3DFace);
     DeleteObject(hbr3DFace);
 
-    // キャプション（タイトルバー）を塗り物酢。
+    // 青っぽい色でミニタイトルバーを塗りつぶす。
     HBRUSH hbrCaption = ::CreateSolidBrush(RGB(0, 32, 255));
     rc.right = rc.left + CX_MINICAPTION;
-    ::FillRect(hDC, &rc, hbrCaption);
+    ::FillRect(hdcMem, &rc, hbrCaption);
     ::DeleteObject(hbrCaption);
 
     // クライアント領域を再取得する。キャプション領域を除外する。
     ::GetClientRect(hWnd, &rc);
     rc.left += CX_MINICAPTION;
 
-    // ビットマップを取得する。
-    HBITMAP hbmStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
-
     // メモリーDCを作成する。
-    HDC hMemDC = ::CreateCompatibleDC(hDC);
+    HDC hMemDC = ::CreateCompatibleDC(hdcMem);
     ASSERT(hMemDC != NULL);
 
-    HGDIOBJ hbmOld = ::SelectObject(hMemDC, hbmStatus); // ビットマップを選択する。
+    // ビットマップを選択する。
+    HBITMAP hbmStatus = (HBITMAP)GetWindowLongPtr(hWnd, FIGWLP_STATUSBMP);
+    HGDIOBJ hbm1Old = ::SelectObject(hMemDC, hbmStatus);
+    ASSERT(hbmStatus != NULL);
 
     // 最初のボタン1の背景。
     RECT rcButton;
@@ -107,20 +114,20 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed)
     rcButton.right = rc.left + CX_BUTTON + 4;
     rcButton.bottom = rc.bottom;
     if (nPushed == 1) {
-        ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+        ::DrawFrameControl(hdcMem, &rcButton, DFC_BUTTON,
                            DFCS_BUTTONPUSH | DFCS_PUSHED);
     } else {
-        ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON, DFCS_BUTTONPUSH);
+        ::DrawFrameControl(hdcMem, &rcButton, DFC_BUTTON, DFCS_BUTTONPUSH);
     }
 
     // ボタン2の背景。
     rcButton.left += CX_BUTTON + 2 * CX_BTNEDGE;
     rcButton.right += CX_BUTTON + 2 * CY_BTNEDGE;
     if (nPushed == 2) {
-        ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+        ::DrawFrameControl(hdcMem, &rcButton, DFC_BUTTON,
                            DFCS_BUTTONPUSH | DFCS_PUSHED);
     } else {
-        ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+        ::DrawFrameControl(hdcMem, &rcButton, DFC_BUTTON,
                            DFCS_BUTTONPUSH);
     }
 
@@ -128,27 +135,26 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed)
     rcButton.left += CX_BUTTON + 2 * CX_BTNEDGE;
     rcButton.right += CX_BUTTON + 2 * CY_BTNEDGE;
     if (nPushed == 3) {
-        ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+        ::DrawFrameControl(hdcMem, &rcButton, DFC_BUTTON,
                            DFCS_BUTTONPUSH | DFCS_PUSHED);
     } else {
-        ::DrawFrameControl(hDC, &rcButton, DFC_BUTTON,
+        ::DrawFrameControl(hdcMem, &rcButton, DFC_BUTTON,
                            DFCS_BUTTONPUSH);
     }
 
     // IMEのOn/Offをビットマップで描画する。
     if (lpIMC) {
         if (lpIMC->IsOpen()) {
-            ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+            ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 7 * CY_BUTTON, SRCCOPY);
         } else {
-            ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+            ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 8 * CY_BUTTON, SRCCOPY);
         }
     } else {
-        // disabled
-        ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+        ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                  CX_BUTTON, CY_BUTTON,
                  hMemDC, 0, 9 * CY_BUTTON, SRCCOPY);
     }
@@ -160,44 +166,37 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed)
             if (lpIMC->Conversion() & IME_CMODE_FULLSHAPE) { // 全角か？
                 if (lpIMC->Conversion() & IME_CMODE_JAPANESE) { // 日本語入力か？
                     if (lpIMC->Conversion() & IME_CMODE_KATAKANA) { // カタカナか？
-                        // fullwidth katakana
-                        ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                        ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                                  CX_BUTTON, CY_BUTTON,
                                  hMemDC, 0, 1 * CY_BUTTON, SRCCOPY);
                     } else { // ひらがなか？
-                        // fullwidth hiragana
-                        ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                        ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                                  CX_BUTTON, CY_BUTTON,
                                  hMemDC, 0, 0 * CY_BUTTON, SRCCOPY);
                     }
                 } else { // 全角英数入力か？
-                    // fullwidth alphanumeric
-                    ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                    ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                              CX_BUTTON, CY_BUTTON,
                              hMemDC, 0, 2 * CY_BUTTON, SRCCOPY);
                 }
             } else { // 半角入力か？
                 if (lpIMC->Conversion() & IME_CMODE_JAPANESE) { // 半角カナか？
-                    // halfwidth kana
-                    ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                    ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                              CX_BUTTON, CY_BUTTON,
                              hMemDC, 0, 3 * CY_BUTTON, SRCCOPY);
                 } else { // 半角英数か？
-                    // halfwidth alphanumeric
-                    ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+                    ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                              CX_BUTTON, CY_BUTTON,
                              hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
                 }
             }
         } else { // 閉じられているか？
-            // halfwidth alphanumeric
-            ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+            ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 4 * CY_BUTTON, SRCCOPY);
         }
     } else { // 入力コンテキストがない。
-        // disabled
-        ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+        ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                  CX_BUTTON, CY_BUTTON,
                  hMemDC, 0, 9 * CY_BUTTON, SRCCOPY);
     }
@@ -206,24 +205,29 @@ void StatusWnd_Paint(HWND hWnd, HDC hDC, INT nPushed)
     rc.left += CX_BUTTON + CX_BTNEDGE * 2;
     if (lpIMC) { // 入力コンテキストが有効か？
         if (lpIMC->Conversion() & IME_CMODE_ROMAN) { // ローマ字入力か？
-            ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+            ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 5 * CY_BUTTON, SRCCOPY);
         } else {
-            ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+            ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                      CX_BUTTON, CY_BUTTON,
                      hMemDC, 0, 6 * CY_BUTTON, SRCCOPY);
         }
     } else { // 入力コンテキストが無効か？
-        // disabled
-        ::BitBlt(hDC, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
+        ::BitBlt(hdcMem, rc.left + CX_BTNEDGE, rc.top + CY_BTNEDGE,
                  CX_BUTTON, CY_BUTTON,
                  hMemDC, 0, 9 * CY_BUTTON, SRCCOPY);
     }
 
-    ::SelectObject(hMemDC, hbmOld); // ビットマップの選択を解除する。
+    ::SelectObject(hMemDC, hbm1Old); // ビットマップの選択を解除する。
     ::DeleteDC(hMemDC); // メモリーDCを破棄する。
 
+    // ビットを転送する（hDC←hdcMem）。
+    ::BitBlt(hDC, 0, 0, rc.right, rc.bottom, hdcMem, 0, 0, SRCCOPY);
+
+    // 後始末。
+    ::DeleteObject(::SelectObject(hdcMem, hbm2Old));
+    ::DeleteDC(hdcMem);
     if (lpIMC) TheIME.UnlockIMC(hIMC);
 } // StatusWnd_Paint
 
@@ -466,6 +470,9 @@ StatusWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hbm = TheIME.LoadBMP(TEXT("MODESBMP"));
         ::SetWindowLongPtr(hWnd, FIGWLP_STATUSBMP, (LONG_PTR)hbm);
         break;
+
+    case WM_ERASEBKGND:
+        return TRUE; // ちらつきを防止するため、ここで背景を描画しない。
 
     case WM_PAINT: // 描画時。
         hDC = ::BeginPaint(hWnd, &ps);
