@@ -1786,7 +1786,7 @@ BOOL is_period(WCHAR ch)
     return ch == L'。' || ch == L'．' || ch == L'.' || ch == L'｡';
 }
 
-// 読点またはコンマか？
+// 読点またはカンマか？
 // 注意：変換しやすさのため、ずぼらな判定にしています。
 BOOL is_comma(WCHAR ch)
 {
