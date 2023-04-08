@@ -1,22 +1,31 @@
 // 郵便番号変換。
 #include "mzimeja.h"
 
+// 郵便番号を正規化する。
+// 与えられた文字列が郵便番号ではない場合は空文字列を返す。
 std::wstring normalize_postal_code(const std::wstring& str)
 {
+    // 半角に変換。
     std::wstring ret = lcmap(str, LCMAP_HALFWIDTH);
 
+    // 郵便番号中のハイフンを取り除く。
     if (ret.size() >= 5 && is_hyphen(ret[3]))
         ret.erase(3, 1);
 
+    // 全部数字でなければ失敗。
     if (!are_all_chars_numeric(ret))
         return L"";
 
+    // 三桁や五桁の場合は七桁の省略と見なす。
     if (ret.size() == 3)
         ret += L"00";
     if (ret.size() == 5)
         ret += L"00";
+
+    // 最終的に七桁でなければ失敗。
     if (ret.size() != 7)
         return L"";
+
     return ret;
 }
 
