@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef FOOTMARK_HPP_
-#define FOOTMARK_HPP_   14    // Version 14
+#define FOOTMARK_HPP_   15    // Version 15
 
 #ifndef __cplusplus
     #error This library (footmark++) needs C++. You lose.
@@ -14,10 +14,8 @@
 // FootmarkDebugPrint
 
 #ifndef FootmarkDebugPrint
-    #ifdef DebugPrintA
-        #define FootmarkDebugPrint  DebugPrintA
-    #elif defined(DebugPrint)
-        #define FootmarkDebugPrint  DebugPrint
+    #ifdef DPRINTA
+        #define FootmarkDebugPrint  DPRINTA
     #else
         #include <cstdio>
         #define FootmarkDebugPrint  printf
