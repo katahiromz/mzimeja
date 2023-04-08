@@ -92,8 +92,8 @@ static void StatusWnd_Draw(HWND hWnd, HDC hDC, INT nPushed)
     ::FillRect(hdcMem2, &rc, hbrCaption);
     ::DeleteObject(hbrCaption);
 
-    // クライアント領域を再取得する。ミニタイトルバー領域を除外する。
-    ::GetClientRect(hWnd, &rc);
+    // ミニタイトルバー領域を除外する。
+    rc = rcClient;
     rc.left += CX_MINICAPTION;
 
     // 状態ビットマップ選択用のメモリーDCを作成する。
