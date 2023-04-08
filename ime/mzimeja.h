@@ -467,7 +467,7 @@ public:
     void MakeResultForSingle(MzConvResult& result, Lattice& lattice);
     int CalcCost(const std::wstring& tags) const;
 
-    // convert
+    // 変換。
     BOOL ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
     BOOL ConvertMultiClause(const std::wstring& strHiragana,
                             MzConvResult& result);
@@ -478,15 +478,14 @@ public:
     BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
     BOOL ConvertCode(const std::wstring& strTyping, MzConvResult& result);
     BOOL ConvertCode(LogCompStr& comp, LogCandInfo& cand);
-    BOOL StoreResult(
-            const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
+    BOOL StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
 
 protected:
-    // input context
+    // 入力コンテキスト（input context）
     HIMC m_hIMC;
     InputContext *  m_lpIMC;
 
-    // dictionary
+    // 辞書。
     Dict m_basic_dict;
     Dict m_name_dict;
     BOOL LoadDict();
