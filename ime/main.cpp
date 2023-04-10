@@ -31,25 +31,6 @@ const WCHAR szImeFileName[] = L"mzimeja.ime";
 
 //////////////////////////////////////////////////////////////////////////////
 
-// IME用のフォントを作成し、選択。
-HFONT CheckNativeCharset(HDC hDC)
-{
-    HFONT hOldFont = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
-
-    LOGFONT lfFont;
-    GetObject(hOldFont, sizeof(LOGFONT), &lfFont);
-
-    if (lfFont.lfCharSet != SHIFTJIS_CHARSET) {
-        lfFont.lfWeight = FW_NORMAL;
-        lfFont.lfCharSet = SHIFTJIS_CHARSET;
-        lfFont.lfFaceName[0] = 0;
-        SelectObject(hDC, CreateFontIndirect(&lfFont));
-    } else {
-        hOldFont = NULL;
-    }
-    return hOldFont;
-} // CheckNativeCharset
-
 // Adjust window position.
 // ウィンドウ位置を画面内に補正。
 void RepositionWindow(HWND hWnd)

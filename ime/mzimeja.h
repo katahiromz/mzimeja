@@ -230,10 +230,10 @@ void StatusWnd_Update(UIEXTRA *lpUIExtra);
 LRESULT CALLBACK CandWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CandWnd_Paint(HWND hCandWnd);
 void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC);
+void CandWnd_SetFont(UIEXTRA *lpUIExtra);
 void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC);
 void CandWnd_Hide(UIEXTRA *lpUIExtra);
-void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
-                  BOOL fForceComp);
+void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC);
 
 // uicomp.c
 LRESULT CALLBACK CompWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
@@ -275,7 +275,6 @@ BOOL IsNT(void);
 
 // mzimeja.cpp
 void      RepositionWindow(HWND hWnd);
-HFONT     CheckNativeCharset(HDC hDC);
 HGLOBAL   GetUIExtraFromServerWnd(HWND hwndServer);
 void      SetUIExtraToServerWnd(HWND hwndServer, HGLOBAL hUIExtra);
 UIEXTRA * LockUIExtra(HWND hwndServer);

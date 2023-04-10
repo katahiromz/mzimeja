@@ -53,7 +53,7 @@ void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam)
                     if (lpCandInfo->dwCount) {
                         CandWnd_Create(hWnd, lpUIExtra, lpIMC);
                         CandWnd_Resize(lpUIExtra, lpIMC);
-                        CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE);
+                        CandWnd_Move(lpUIExtra, lpIMC);
                     }
                 }
 
@@ -184,7 +184,7 @@ LRESULT CALLBACK MZIMEWndProc(HWND hWnd, UINT message, WPARAM wParam,
             lpUIExtra = LockUIExtra(hWnd); // 余剰情報をロック。
             if (lpUIExtra) {
                 CompWnd_Move(lpUIExtra, lpIMC); // 未確定文字列を移動。
-                CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE); // 候補ウィンドウを移動。
+                CandWnd_Move(lpUIExtra, lpIMC); // 候補ウィンドウを移動。
                 UnlockUIExtra(hWnd); // 余剰情報のロックを解除。
             }
             TheIME.UnlockIMC(hIMC);
@@ -391,8 +391,13 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
             }
 
             lpUIExtra->hFont = CreateFontIndirect(&lf); // 論理フォントからフォントを作成。
-            CompWnd_SetFont(lpUIExtra); // フォントを余剰情報にセット。
+
+            // フォントをセット。
+            CompWnd_SetFont(lpUIExtra);
+            CandWnd_SetFont(lpUIExtra);
+
             CompWnd_Move(lpUIExtra, lpIMC); // 未確定文字列ウィンドウを移動。
+            CandWnd_Move(lpUIExtra, lpIMC); // 候補ウィンドウを移動。
 
             TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除
         }
@@ -417,7 +422,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
             CandWnd_Resize(lpUIExtra, lpIMC); // 候補ウィンドウのサイズを変更。
-            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE); // 候補ウィンドウを移動。
+            CandWnd_Move(lpUIExtra, lpIMC); // 候補ウィンドウを移動。
             TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
         break;
@@ -470,7 +475,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         DPRINTA("IMN_SETCANDIDATEPOS\n");
         lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
-            CandWnd_Move(hWnd, lpIMC, lpUIExtra, FALSE); // 候補ウィンドウを移動。
+            CandWnd_Move(lpUIExtra, lpIMC); // 候補ウィンドウを移動。
             TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
         break;
@@ -480,7 +485,7 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
         lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロックする。
         if (lpIMC) {
             CompWnd_Move(lpUIExtra, lpIMC); // 未確定文字列ウィンドウを移動。
-            CandWnd_Move(hWnd, lpIMC, lpUIExtra, TRUE); // 候補ウィンドウも移動。
+            CandWnd_Move(lpUIExtra, lpIMC); // 候補ウィンドウも移動。
             TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
         break;

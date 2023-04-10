@@ -20,7 +20,8 @@ DWORD CandWnd_HitTest(HWND hWnd, POINT pt, InputContext *lpIMC)
     int height = 0;
     HDC hDC = ::CreateCompatibleDC(NULL);
     ASSERT(hDC != NULL);
-    HFONT hOldFont = CheckNativeCharset(hDC);
+    HFONT hFont = (HFONT)::GetWindowLongPtr(hWnd, FIGWLP_FONT);
+    HFONT hOldFont = (HFONT)::SelectObject(hDC, hFont);
     CandInfo *lpCandInfo = lpIMC->LockCandInfo(); // 候補情報をロックする。
     ASSERT(lpCandInfo != NULL);
     if (lpCandInfo) {
@@ -44,9 +45,7 @@ DWORD CandWnd_HitTest(HWND hWnd, POINT pt, InputContext *lpIMC)
         }
         lpIMC->UnlockCandInfo();
     }
-    if (hOldFont) {
-        ::DeleteObject(::SelectObject(hDC, hOldFont));
-    }
+    ::SelectObject(hDC, hOldFont);
     ::DeleteDC(hDC);
     return ret;
 }
@@ -163,8 +162,15 @@ void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC)
     }
 
     ::SetWindowLongPtr(lpUIExtra->hwndCand, FIGWLP_SERVERWND, (LONG_PTR)hUIWnd);
+    ::SetWindowLongPtr(lpUIExtra->hwndCand, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont);
     ::ShowWindow(lpUIExtra->hwndCand, SW_HIDE);
 } // CandWnd_Create
+
+// 候補ウィンドウのフォントを設定する。
+void CandWnd_SetFont(UIEXTRA *lpUIExtra)
+{
+    ::SetWindowLongPtr(lpUIExtra->hwndCand, FIGWLP_FONT, (LONG_PTR)lpUIExtra->hFont);
+}
 
 // WM_PAINT
 void CandWnd_Paint(HWND hCandWnd)
@@ -190,7 +196,8 @@ void CandWnd_Paint(HWND hCandWnd)
     if (hIMC) {
         InputContext *lpIMC = TheIME.LockIMC(hIMC);
         if (lpIMC) {
-            HFONT hOldFont = CheckNativeCharset(hdcMem);
+            HFONT hFont = (HFONT)::GetWindowLongPtr(hCandWnd, FIGWLP_FONT);
+            HFONT hOldFont = (HFONT)::SelectObject(hdcMem, hFont);
             CandInfo *lpCandInfo = lpIMC->LockCandInfo();
             if (lpCandInfo) {
                 INT x1 = ::GetSystemMetrics(SM_CXEDGE);
@@ -240,9 +247,7 @@ void CandWnd_Paint(HWND hCandWnd)
                 }
                 lpIMC->UnlockCandInfo();
             }
-            if (hOldFont) {
-                ::DeleteObject(SelectObject(hdcMem, hOldFont));
-            }
+            ::SelectObject(hdcMem, hOldFont);
             TheIME.UnlockIMC(hIMC);
         }
     }
@@ -264,7 +269,8 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 
     // 準備。
     HDC hDC = ::CreateCompatibleDC(NULL);
-    HFONT hOldFont = CheckNativeCharset(hDC);
+    HFONT hFont = (HFONT)::GetWindowLongPtr(lpUIExtra->hwndCand, FIGWLP_FONT);
+    HFONT hOldFont = (HFONT)::SelectObject(hDC, hFont);
 
     // 候補情報をロックする。
     CandInfo *lpCandInfo = lpIMC->LockCandInfo();
@@ -296,7 +302,7 @@ SIZE CandWnd_CalcSize(UIEXTRA *lpUIExtra, InputContext *lpIMC)
     }
 
     // 後始末。
-    ::DeleteObject(::SelectObject(hDC, hOldFont));
+    ::SelectObject(hDC, hOldFont);
     ::DeleteDC(hDC);
 
     // 求められた幅と高さに応じて戻り値を設定する。
@@ -336,20 +342,21 @@ void CandWnd_Hide(UIEXTRA *lpUIExtra)
 } // CandWnd_Hide
 
 // 候補ウィンドウの移動時。
-void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
-                  BOOL fForceComp)
+void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 {
     RECT rc;
     POINT pt;
-    FOOTMARK_FORMAT("%p, %p, %p, %d\n", hUIWnd, lpIMC, lpUIExtra, fForceComp);
+    FOOTMARK_FORMAT("%p, %p\n", lpUIExtra, lpIMC);
 
-    // Not initialized yet? 初期化されてないか？
+    HWND hwndCand = lpUIExtra->hwndCand;
+    HWND hSvrWnd = (HWND)::GetWindowLongPtr(hwndCand, FIGWLP_SERVERWND);
+
+    // 初期化されてないか？
     if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
         lpIMC->DumpCandInfo();
         if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
             lpUIExtra->ptCand.x = pt.x;
             lpUIExtra->ptCand.y = pt.y;
-            HWND hwndCand = lpUIExtra->hwndCand;
             ::GetWindowRect(hwndCand, &rc);
             int cx, cy;
             cx = rc.right - rc.left;
@@ -358,12 +365,14 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
-            ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
+
+            HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hwndCand, FIGWLP_SERVERWND);
+            ::SendMessage(hSvrWnd, WM_UI_CANDMOVE, 0, 0);
         }
         return;
     }
 
-    // Has any candidates? 候補があるか？
+    // 候補があるか？
     if (!lpIMC->HasCandInfo()) {
         FOOTMARK_POINT();
         lpIMC->DumpCandInfo();
@@ -396,7 +405,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             }
         }
 
-        // move and show candidate window
+        // 候補ウィンドウを移動・表示する。
         HWND hwndCand = lpUIExtra->hwndCand;
         if (::IsWindow(hwndCand)) {
             ::GetWindowRect(hwndCand, &rc);
@@ -408,7 +417,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
         }
-        ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
+        ::SendMessage(hSvrWnd, WM_UI_CANDMOVE, 0, 0);
     } else if (dwStyle == CFS_CANDIDATEPOS) {
         DPRINTA("CFS_CANDIDATEPOS\n");
         // get the specified position in screen coordinates
@@ -428,7 +437,7 @@ void CandWnd_Move(HWND hUIWnd, InputContext *lpIMC, UIEXTRA *lpUIExtra,
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
             ::InvalidateRect(hwndCand, NULL, FALSE);
         }
-        ::SendMessage(hUIWnd, WM_UI_CANDMOVE, 0, 0);
+        ::SendMessage(hSvrWnd, WM_UI_CANDMOVE, 0, 0);
     } else {
         DPRINTA("dwStyle: 0x%08lX\n", dwStyle);
     }
