@@ -73,15 +73,15 @@ static void StatusWnd_Draw(HWND hWnd, HDC hDC, INT nPushed)
     ::GetClientRect(hWnd, &rcClient);
     RECT rc = rcClient;
 
-    // ちらつきを防止するため、メモリービットマップを使用する。
-    HDC hdcMem2 = ::CreateCompatibleDC(hDC);
-    HBITMAP hbm = ::CreateCompatibleBitmap(hDC, rc.right, rc.bottom);
-    HGDIOBJ hbm2Old = ::SelectObject(hdcMem2, hbm);
-
     // UIサーバーとIMCを取得する。
     HWND hwndServer = (HWND)GetWindowLongPtr(hWnd, FIGWLP_SERVERWND);
     HIMC hIMC = (HIMC)GetWindowLongPtr(hwndServer, IMMGWLP_IMC);
     InputContext *lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロック。
+
+    // ちらつきを防止するため、メモリービットマップを使用する。
+    HDC hdcMem2 = ::CreateCompatibleDC(hDC);
+    HBITMAP hbmMem2 = ::CreateCompatibleBitmap(hDC, rcClient.right, rcClient.bottom);
+    HGDIOBJ hbm2Old = ::SelectObject(hdcMem2, hbmMem2);
 
     // クライアント領域を塗りつぶす。
     ::FillRect(hdcMem2, &rc, (HBRUSH)(COLOR_3DFACE + 1));
@@ -208,14 +208,15 @@ static void StatusWnd_Draw(HWND hWnd, HDC hDC, INT nPushed)
                  hdcMem1, 0, 9 * CY_BUTTON, SRCCOPY);
     }
 
-    // ビットを転送する（hDC←hdcMem2）。
+    // ビット群の転送。
     ::BitBlt(hDC, 0, 0, rcClient.right, rcClient.bottom, hdcMem2, 0, 0, SRCCOPY);
 
     // 後始末。
-    ::DeleteObject(::SelectObject(hdcMem1, hbm1Old));
-    ::DeleteDC(hdcMem1);
-    ::DeleteObject(::SelectObject(hdcMem2, hbm2Old));
+    ::SelectObject(hdcMem2, hbm2Old);
+    ::DeleteObject(hbmMem2);
     ::DeleteDC(hdcMem2);
+    ::SelectObject(hdcMem1, hbm1Old);
+    ::DeleteDC(hdcMem1);
 
     if (lpIMC) TheIME.UnlockIMC(hIMC);
 } // StatusWnd_Draw
