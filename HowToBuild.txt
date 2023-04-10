@@ -3,10 +3,8 @@
 ## 必須条件
 
 mzimejaをWinXP/Win2k3で動かすには、WinXPサポートのあるVisual C++をインストールした日本語Visual Studioでビルドして下さい。
-少なくとも Visual Studio 2019 にはWinXPサポートがあります。XPツールセットをご使用ください。
-
+少なくとも Visual Studio 2017 にはWinXPサポートがあります。XPツールセットをご使用ください。
 MinGW+MSYS2でもビルドできますが、WinXPサポートがありません。RosBEや古い方のMinGWではビルドできません。
-
 ソースコードに一部Shift_JISを使用しているため、RosBEではビルドできません。
 
 ## 日本語Visual Studioでmzimejaビルド
