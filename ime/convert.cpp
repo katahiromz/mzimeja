@@ -1769,6 +1769,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
     default:                                    type = 0; break;
     }
 
+    DPRINTA("XXX1\n");
+
     // 未然形
     do {
         node.katsuyou = MIZEN_KEI;
@@ -1787,6 +1789,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
             refs[index + fields[0].size() + 1]++;
         }
     } while(0);
+
+    DPRINTA("XXX2\n");
 
     // 連用形
     node.katsuyou = RENYOU_KEI;
@@ -1813,6 +1817,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
+    DPRINTA("XXX3\n");
+
     // 終止形
     // 連体形
     do {
@@ -1827,6 +1833,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
+
+    DPRINTA("XXX4\n");
 
     // 仮定形
     // 命令形
@@ -1843,6 +1851,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
+    DPRINTA("XXX5\n");
+
     // 名詞形
     node.bunrui = HB_MEISHI;
     do {
@@ -1854,6 +1864,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
+    DPRINTA("XXX6\n");
+
     // 「動く(五段)」→「動ける(一段)」、
     // 「聞く(五段)」→「聞ける(一段)」など
     {
@@ -1862,6 +1874,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
         new_fields[2] += s_hiragana_table[node.gyou][DAN_I];
         DoIchidanDoushi(index, new_fields);
     }
+
+    DPRINTA("XXX7\n");
 } // Lattice::DoGodanDoushi
 
 // 一段動詞を変換する。
