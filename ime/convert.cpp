@@ -2474,16 +2474,34 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre)
     lattice.refs.assign(length + 1, 0);
     lattice.refs[0] = 1;
 
-    WCHAR *dict_data = m_basic_dict.Lock(); // 基本辞書をロックする。
-    if (dict_data) {
+    BOOL bOK = TRUE;
+
+    WCHAR *dict_data1 = m_basic_dict.Lock(); // 基本辞書をロックする。
+    if (dict_data1) {
         // ノード群を追加。
-        if (!lattice.AddNodesForSingle(dict_data)) {
+        if (!lattice.AddNodesForSingle(dict_data1)) {
             lattice.AddComplement(0, pre.size(), pre.size());
         }
 
-        m_basic_dict.Unlock(dict_data); // 基本辞書のロックを解除。
-        return TRUE; // success
+        m_basic_dict.Unlock(dict_data1); // 基本辞書のロックを解除。
+    } else {
+        bOK = FALSE;
     }
+
+    WCHAR *dict_data2 = m_name_dict.Lock(); // 人名・地名辞書をロックする。
+    if (dict_data2) {
+        // ノード群を追加。
+        if (!lattice.AddNodesForSingle(dict_data2)) {
+            lattice.AddComplement(0, pre.size(), pre.size());
+        }
+
+        m_name_dict.Unlock(dict_data2); // 人名・地名辞書のロックを解除。
+    } else {
+        bOK = FALSE;
+    }
+
+    if (bOK)
+        return TRUE;
 
     // ダンプ。
     lattice.Dump(4);
