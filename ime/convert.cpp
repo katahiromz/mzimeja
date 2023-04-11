@@ -558,36 +558,40 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
     case HB_NAKEIYOUSHI: // な形容詞
         // 終端の「な」を削る。
         i = pre.size() - 1;
-        if (pre[i] == L'な') pre.resize(i);
+        if (pre[i] == L'な')
+            pre.resize(i);
         i = post.size() - 1;
-        if (post[i] == L'な') post.resize(i);
+        if (post[i] == L'な')
+            post.resize(i);
         break;
     case HB_IKEIYOUSHI: // い形容詞
         // 終端の「い」を削る。
         i = pre.size() - 1;
-        if (pre[i] == L'い') pre.resize(i);
+        if (pre[i] == L'い')
+            pre.resize(i);
         i = post.size() - 1;
-        if (post[i] == L'い') post.resize(i);
+        if (post[i] == L'い')
+            post.resize(i);
         break;
     case HB_ICHIDAN_DOUSHI: // 一段動詞
         // 終端の「る」を削る。
-        ASSERT(pre[pre.size() - 1] == L'る');
-        ASSERT(post[post.size() - 1] == L'る');
-        pre.resize(pre.size() - 1);
-        post.resize(post.size() - 1);
+        if (pre[pre.size() - 1] == L'る')
+            pre.resize(pre.size() - 1);
+        if (post[post.size() - 1] == L'る')
+            post.resize(post.size() - 1);
         break;
     case HB_KAHEN_DOUSHI: // カ変動詞
         // 終端の「くる」を削る。
         substr = pre.substr(pre.size() - 2, 2);
-        if (substr != L"くる") 
-            return TRUE;
-        pre = substr;
+        if (substr == L"くる")
+            pre = substr;
         substr = post.substr(pre.size() - 2, 2);
-        post = substr;
+        if (substr == L"くる")
+            post = substr;
         break;
     case HB_SAHEN_DOUSHI: // サ変動詞
         // 「する」そのものは登録しない。
-        if (pre == L"する") 
+        if (pre == L"する")
             return TRUE;
         // 終端の「する」または「ずる」を削る。
         substr = pre.substr(pre.size() - 2, 2);
