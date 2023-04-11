@@ -594,7 +594,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData)
 
     // モードに応じてプロパティシートを選ぶ。
     switch (dwMode) {
-    case IME_CONFIG_GENERAL: // 全般設定。
+    case IME_CONFIG_GENERAL: // プロパティ。
         AddPage(&psh, IDD_GENERAL, GeneralDlgProc);
         AddPage(&psh, IDD_WORDLIST, WordListDlgProc);
         AddPage(&psh, IDD_ABOUTIME, AboutDlgProc);
