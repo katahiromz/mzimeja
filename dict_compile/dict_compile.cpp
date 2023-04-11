@@ -200,9 +200,9 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             break;
         case HB_ICHIDAN_DOUSHI: // 「一段動詞」
             // 終端の「る」を削る。
-            if (fields[0][fields[0].size() - 1] == L'る');
+            if (fields[0][fields[0].size() - 1] == L'る')
                 fields[0].resize(fields[0].size() - 1);
-            if (fields[2][fields[2].size() - 1] == L'る');
+            if (fields[2][fields[2].size() - 1] == L'る')
                 fields[2].resize(fields[2].size() - 1);
             break;
         case HB_KAHEN_DOUSHI: // 「カ変動詞」
