@@ -588,7 +588,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
         substr = pre.substr(pre.size() - 2, 2);
         if (substr == L"くる")
             pre = substr;
-        substr = post.substr(pre.size() - 2, 2);
+        substr = post.substr(post.size() - 2, 2);
         if (substr == L"くる")
             post = substr;
         break;
