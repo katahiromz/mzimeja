@@ -471,7 +471,6 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
             }
         }
         if (!ret) {
-            // Neither Ctrl nor Shift key is down
             if (vKey == VK_F5) {
                 ret = TRUE;
             }
@@ -483,7 +482,9 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
                 case VK_F9: // make composition fullwidth alphanumeric
                 case VK_F10: // make composition halfwidth alphanumeric
                 case VK_ESCAPE: // close composition
-                    ret = TRUE;
+                    if (!fCtrl && !fAlt) {
+                        ret = TRUE;
+                    }
                     break;
                 }
             }
@@ -496,18 +497,24 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
             case VK_OEM_COPY: case VK_OEM_FINISH: case VK_OEM_BACKTAB:
             case VK_OEM_ATTN:
                 // OEM keys
-                ret = TRUE;
+                if (!fCtrl && !fAlt) {
+                    ret = TRUE;
+                }
                 break;
             case VK_ADD: case VK_SUBTRACT:
             case VK_MULTIPLY: case VK_DIVIDE:
             case VK_SEPARATOR: case VK_DECIMAL:
                 // numpad keys
-                ret = TRUE;
+                if (!fCtrl && !fAlt) {
+                    ret = TRUE;
+                }
                 break;
             case VK_HOME: case VK_END:
             case VK_UP: case VK_DOWN: case VK_LEFT: case VK_RIGHT:
                 // arrow and moving key
-                ret = TRUE;
+                if (!fCtrl && !fAlt) {
+                    ret = TRUE;
+                }
                 break;
             case VK_SPACE:
                 if (!fCtrl || fCompStr) ret = TRUE;
@@ -515,24 +522,31 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
             case VK_BACK: case VK_DELETE: case VK_RETURN:
             case VK_CONVERT: case VK_NONCONVERT:
                 // special keys
-                ret = TRUE;
+                if (!fCtrl && !fAlt) {
+                    ret = TRUE;
+                }
                 break;
             default:
-                if ('0' <= vKey && vKey <= '9') {
-                    // numbers
-                    ret = TRUE;
-                } else if ('A' <= vKey && vKey <= 'Z') {
-                    // alphabets
-                    ret = TRUE;
-                } else if (VK_NUMPAD0 <= vKey && vKey <= VK_NUMPAD9) {
-                    // numpad numbers
-                    ret = TRUE;
+                if ('0' <= vKey && vKey <= '9') { // numbers
+                    if (!fCtrl && !fAlt) {
+                        ret = TRUE;
+                    }
+                } else if ('A' <= vKey && vKey <= 'Z') { // alphabets
+                    if (!fCtrl && !fAlt) {
+                        ret = TRUE;
+                    }
+                } else if (VK_NUMPAD0 <= vKey && vKey <= VK_NUMPAD9) { // numpad numbers
+                    if (!fCtrl && !fAlt) {
+                        ret = TRUE;
+                    }
                 } else {
                     if (fCandInfo) {
                         switch (vKey) {
                         case VK_PRIOR: case VK_NEXT:
                             // next or previous page of candidates
-                            ret = TRUE;
+                            if (!fCtrl && !fAlt) {
+                                ret = TRUE;
+                            }
                             break;
                         }
                     }
