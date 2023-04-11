@@ -2506,6 +2506,7 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre)
 // 単一文節変換において、変換結果を生成する。
 void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
 {
+    DPRINTW(L"%ls\n", lattice.pre.c_str());
     result.clear(); // 結果をクリア。
 
     // 2文節最長一致法・改。
@@ -2672,6 +2673,7 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
 // 変換に失敗したときの結果を作成する。
 void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre)
 {
+    DPRINTW(L"%ls\n", pre.c_str());
     MzConvClause clause; // 文節。
     result.clear(); // 結果をクリア。
 
@@ -2708,6 +2710,7 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre)
 // 単一文節変換の結果を作成する。
 void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice)
 {
+    DPRINTW(L"%ls\n", lattice.pre.c_str());
     result.clear(); // 結果をクリア。
     const size_t length = lattice.pre.size();
 
@@ -2772,6 +2775,7 @@ BOOL MzIme::ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 // 複数文節を変換する。
 BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& result)
 {
+    DPRINTW(L"%s\n", strHiragana.c_str());
 #if 1
     // make lattice and make result
     Lattice lattice;
@@ -2849,6 +2853,7 @@ BOOL MzIme::ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman
 // 単一文節を変換する。
 BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana, MzConvResult& result)
 {
+    DPRINTW(L"%s\n", strHiragana.c_str());
     result.clear();
 
 #if 1
