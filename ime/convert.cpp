@@ -581,6 +581,9 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
             post.resize(post.size() - 1);
         break;
     case HB_KAHEN_DOUSHI: // カ変動詞
+        // 「くる」そのものは登録しない。
+        if (pre == L"くる")
+            return TRUE;
         // 終端の「くる」を削る。
         substr = pre.substr(pre.size() - 2, 2);
         if (substr == L"くる")
@@ -590,8 +593,8 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
             post = substr;
         break;
     case HB_SAHEN_DOUSHI: // サ変動詞
-        // 「する」そのものは登録しない。
-        if (pre == L"する")
+        // 「する」「ずる」そのものは登録しない。
+        if (pre == L"する" || pre == "ずる")
             return TRUE;
         // 終端の「する」または「ずる」を削る。
         substr = pre.substr(pre.size() - 2, 2);
