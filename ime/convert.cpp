@@ -2403,9 +2403,7 @@ BOOL Lattice::MakeLatticeInternal(size_t length, const WCHAR* dict_data)
 // 複数文節変換において、ラティスを作成する。
 BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre)
 {
-    // 基本辞書が読み込まれていなければ失敗。
-    if (!m_basic_dict.IsLoaded())
-        return FALSE;
+    DPRINTW(L"%s\n", pre.c_str());
 
     ASSERT(pre.size() != 0);
     const size_t length = pre.size();
@@ -2460,10 +2458,7 @@ BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre)
 // 単一文節変換において、ラティスを作成する。
 BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre)
 {
-    // failure if the dictionary not loaded
-    if (!m_basic_dict.IsLoaded()) {
-        return FALSE;
-    }
+    DPRINTW(L"%s\n", pre.c_str());
 
     ASSERT(pre.size() != 0);
     const size_t length = pre.size();
