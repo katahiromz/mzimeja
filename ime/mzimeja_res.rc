@@ -75,7 +75,7 @@ FONT 10, "ＭＳ Ｐゴシック"
     LTEXT "単語リスト(&L):", -1, 6, 5, 50, 10
     CONTROL "", lst1, "SysListView32", LVS_REPORT | WS_BORDER | WS_VSCROLL, 7, 18, 159, 68
     PUSHBUTTON "追加(&A)...", psh1, 40, 92, 60, 14
-    PUSHBUTTON "削除(&R)...", psh2, 107, 93, 60, 14
+    PUSHBUTTON "削除(&R)...", psh2, 107, 92, 60, 14
 }
 
 IDD_CHOOSEDICT DIALOG 34, 31, 186, 85
@@ -93,7 +93,7 @@ CAPTION "このIMEについて"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
 {
-    LTEXT "MZ-IME日本語入力 (mzimeja) by katahiromz", 109, 14, 22, 100, 8
+    LTEXT "MZ-IME日本語入力 (mzimeja) by katahiromz", 109, 14, 8, 100, 22
 }
 
 IDD_DEBUG DIALOG 30, 65, 138, 122
@@ -101,10 +101,10 @@ CAPTION "デバッグ オプション"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
 {
-    EDITTEXT edt1, 5, 5, 130, 45, ES_MULTILINE | WS_VSCROLL | WS_HSCROLL
-    PUSHBUTTON "Test &1", psh1, 40, 60, 60, 15
-    PUSHBUTTON "Test &2", psh2, 40, 80, 60, 15
-    PUSHBUTTON "Test &3", psh3, 40, 100, 60, 15
+    EDITTEXT edt1, 5, 5, 130, 38, ES_MULTILINE | WS_VSCROLL | WS_HSCROLL
+    PUSHBUTTON "Test &1", psh1, 40, 50, 60, 15
+    PUSHBUTTON "Test &2", psh2, 40, 70, 60, 15
+    PUSHBUTTON "Test &3", psh3, 40, 90, 60, 15
 }
 
 IDD_ADDWORD DIALOG 46, 36, 172, 94
@@ -112,13 +112,13 @@ CAPTION "単語の登録"
 STYLE WS_POPUPWINDOW | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
 {
-    LTEXT "よみがな(&R):", -1, 15, 6, 40, 10
-    EDITTEXT edt2, 65, 6, 85, 15, ES_AUTOHSCROLL
-    LTEXT "単語(&W):", -1, 15, 29, 40, 10
-    EDITTEXT edt1, 65, 27, 85, 15, ES_AUTOHSCROLL
-    LTEXT "品詞(&T):", -1, 15, 50, 40, 10
+    LTEXT "よみがな(&R):", -1, 10, 7, 50, 10
+    EDITTEXT edt2, 65, 5, 85, 15, ES_AUTOHSCROLL
+    LTEXT "単語(&W):", -1, 10, 27, 50, 10
+    EDITTEXT edt1, 65, 25, 85, 15, ES_AUTOHSCROLL
+    LTEXT "品詞(&T):", -1, 10, 50, 50, 10
     COMBOBOX cmb1, 65, 50, 85, 35, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON "OK", IDOK, 55, 71, 60, 15
+    PUSHBUTTON "OK", IDOK, 55, 70, 60, 15
 }
 
 //////////////////////////////////////////////////////////////////////////////
