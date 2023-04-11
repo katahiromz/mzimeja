@@ -224,7 +224,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             substr = fields[0].substr(fields[0].size() - 2, 2);
             if (substr == L"する")
                 entry.gyou = GYOU_SA;
-            else if (substr != L"ずる")
+            else if (substr == L"ずる")
                 entry.gyou = GYOU_ZA;
             else
                 continue;

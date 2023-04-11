@@ -600,7 +600,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
         substr = pre.substr(pre.size() - 2, 2);
         if (substr == L"する")
             gyou = GYOU_SA;
-        else if (substr != L"ずる") 
+        else if (substr == L"ずる") 
             gyou = GYOU_ZA;
         else
             return TRUE;
