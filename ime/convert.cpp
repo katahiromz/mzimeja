@@ -636,7 +636,8 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
     fields[2] = post;
     fields[3] = L"[ユーザ辞書]";
 
-    std::wstring sep = { FIELD_SEP };
+    std::wstring sep;
+    sep += FIELD_SEP;
     std::wstring record = str_join(fields, sep);
     s_UserDictRecords.push_back(record);
 
@@ -1099,7 +1100,7 @@ void Lattice::AddExtra()
 // 辞書からノードを追加する。
 BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
 {
-    DPRINTA("Lattice::AddNodes\n");
+    FOOTMARK();
     const size_t length = pre.size();
     ASSERT(length);
 
@@ -1455,6 +1456,7 @@ size_t Lattice::GetLastLinkedIndex() const
 // イ形容詞を変換する。
 void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
 {
+    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1496,6 +1498,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 2]++;
     } while(0);
+
     do {
         if (str.empty() || str[0] != L'く') break;
         node.pre = fields[0] + L'く';
@@ -1503,53 +1506,13 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
+
     do {
         if (str.empty() || str[0] != L'う') break;
         node.pre = fields[0] + L'う';
         node.post = fields[2] + L'う';
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
-    } while(0);
-    do {
-        if (fields[0].empty() || str.empty()) break;
-        wchar_t ch0 = fields[0][fields[0].size() - 1];
-        wchar_t ch1 = g_consonant_map[ch0];
-        std::wstring addition;
-        switch (g_vowel_map[ch0]) {
-        case L'あ':
-            str = fields[1].substr(0, fields[1].size() - 1);
-            for (size_t i = 0; i < _countof(s_hiragana_table); ++i) {
-                if (s_hiragana_table[i][0] == ch1) {
-                    addition = s_hiragana_table[i][DAN_O];;
-                    addition += L'う';
-                    str += addition;
-                    break;
-                }
-            }
-            node.post = str;
-            str = fields[0].substr(0, fields[0].size() - 1);
-            for (size_t i = 0; i < _countof(s_hiragana_table); ++i) {
-                if (s_hiragana_table[i][0] == ch1) {
-                    addition = s_hiragana_table[i][DAN_O];;
-                    addition += L'う';
-                    str += addition;
-                    break;
-                }
-            }
-            node.pre = str;
-            if (str.empty() || str.substr(0, addition.size()) != addition) break;
-            chunks[index].push_back(std::make_shared<LatticeNode>(node));
-            refs[index + fields[0].size() + addition.size()]++;
-            break;
-        case L'い':
-            if (str.empty() || str.substr(0, 2) != L"ゅう") break;
-            node.pre = fields[0] + L"ゅう";
-            node.post = fields[2] + L"ゅう";
-            chunks[index].push_back(std::make_shared<LatticeNode>(node));
-            refs[index + fields[0].size() + 2]++;
-        default:
-            break;
-        }
     } while(0);
 
     // 終止形
@@ -1634,6 +1597,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
 // ナ形容詞を変換する。
 void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields)
 {
+    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1738,6 +1702,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields)
 // 五段動詞を変換する。
 void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
 {
+    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1769,8 +1734,6 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
     default:                                    type = 0; break;
     }
 
-    DPRINTA("XXX1\n");
-
     // 未然形
     do {
         node.katsuyou = MIZEN_KEI;
@@ -1789,8 +1752,6 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
             refs[index + fields[0].size() + 1]++;
         }
     } while(0);
-
-    DPRINTA("XXX2\n");
 
     // 連用形
     node.katsuyou = RENYOU_KEI;
@@ -1817,8 +1778,6 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
-    DPRINTA("XXX3\n");
-
     // 終止形
     // 連体形
     do {
@@ -1833,8 +1792,6 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + fields[0].size() + 1]++;
     } while(0);
-
-    DPRINTA("XXX4\n");
 
     // 仮定形
     // 命令形
@@ -1851,8 +1808,6 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
-    DPRINTA("XXX5\n");
-
     // 名詞形
     node.bunrui = HB_MEISHI;
     do {
@@ -1864,8 +1819,6 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
         refs[index + fields[0].size() + 1]++;
     } while(0);
 
-    DPRINTA("XXX6\n");
-
     // 「動く(五段)」→「動ける(一段)」、
     // 「聞く(五段)」→「聞ける(一段)」など
     {
@@ -1874,13 +1827,12 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
         new_fields[2] += s_hiragana_table[node.gyou][DAN_I];
         DoIchidanDoushi(index, new_fields);
     }
-
-    DPRINTA("XXX7\n");
 } // Lattice::DoGodanDoushi
 
 // 一段動詞を変換する。
 void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields)
 {
+    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -1967,6 +1919,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields)
 // カ変動詞を変換する。
 void Lattice::DoKahenDoushi(size_t index, const WStrings& fields)
 {
+    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -2054,6 +2007,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields)
 // サ変動詞を変換する。
 void Lattice::DoSahenDoushi(size_t index, const WStrings& fields)
 {
+    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
@@ -2217,6 +2171,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields)
 
 void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
 {
+    FOOTMARK();
     ASSERT(fields.size() == 4);
     ASSERT(fields[0].size());
 
@@ -2270,6 +2225,10 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
 void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
 {
     ASSERT(fields.size() == 4);
+    if (fields.size() != 4) {
+        DPRINTW(L"%s, %s\n", fields[0].c_str(), fields[2].c_str());
+        return;
+    }
     const size_t length = fields[0].size();
     // boundary check
     if (index + length > pre.size()) {
