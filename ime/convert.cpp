@@ -494,6 +494,8 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
 // 基本辞書データをスキャンする。
 static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
 {
+    DPRINTW(L"%c\n", ch);
+
     ASSERT(dict_data);
 
     if (ch == 0)
@@ -644,6 +646,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
 // ユーザー辞書データをスキャンする。
 static size_t ScanUserDict(WStrings& records, WCHAR ch, Lattice *pThis)
 {
+    DPRINTW(L"%c\n", ch);
     s_UserDictRecords.clear();
     ImeEnumRegisterWord(UserDictProc, NULL, 0, NULL, pThis);
 
@@ -914,6 +917,7 @@ bool LatticeNode::IsJodoushi() const
 // 追加情報。
 void Lattice::AddExtra()
 {
+    DPRINTA("Lattice::AddExtra\n");
     // 今日（today）
     if (pre == L"きょう") {
         SYSTEMTIME st;
@@ -1095,6 +1099,7 @@ void Lattice::AddExtra()
 // 辞書からノードを追加する。
 BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
 {
+    DPRINTA("Lattice::AddNodes\n");
     const size_t length = pre.size();
     ASSERT(length);
 
@@ -2506,7 +2511,7 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre)
 // 単一文節変換において、変換結果を生成する。
 void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
 {
-    DPRINTW(L"%ls\n", lattice.pre.c_str());
+    DPRINTW(L"%s\n", lattice.pre.c_str());
     result.clear(); // 結果をクリア。
 
     // 2文節最長一致法・改。
@@ -2673,7 +2678,7 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
 // 変換に失敗したときの結果を作成する。
 void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre)
 {
-    DPRINTW(L"%ls\n", pre.c_str());
+    DPRINTW(L"%s\n", pre.c_str());
     MzConvClause clause; // 文節。
     result.clear(); // 結果をクリア。
 
@@ -2710,7 +2715,7 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre)
 // 単一文節変換の結果を作成する。
 void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice)
 {
-    DPRINTW(L"%ls\n", lattice.pre.c_str());
+    DPRINTW(L"%s\n", lattice.pre.c_str());
     result.clear(); // 結果をクリア。
     const size_t length = lattice.pre.size();
 
