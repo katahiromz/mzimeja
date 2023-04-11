@@ -1,7 +1,6 @@
 // mzimeja.h --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
-// (Japanese, Shift_JIS)
-// NOTE: This file uses Japanese cp932 encoding for historic reason.
+// (Japanese, UTF-8)
 
 #pragma once
 
@@ -37,7 +36,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 // For debugging.
-// ƒfƒoƒbƒO—pB
+// ãƒ‡ãƒãƒƒã‚°ç”¨ã€‚
 
 #ifndef NDEBUG
     extern "C" {
@@ -73,12 +72,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // For limit of MZ-IME.
-// MZ-IME‚Ì§ŒÀB
+// MZ-IMEã®åˆ¶é™ã€‚
 #define MAXCOMPWND  10  // maximum number of composition windows
 #define MAXGLCHAR   32  // maximum number of guideline characters
 
 // Special messages.
-// “Á•Ê‚ÈƒƒbƒZ[ƒWB
+// ç‰¹åˆ¥ãªãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€‚
 #define WM_UI_UPDATE      (WM_USER + 500)
 #define WM_UI_HIDE        (WM_USER + 501)
 #define WM_UI_STATEMOVE   (WM_USER + 601)
@@ -90,12 +89,12 @@
 #define IME_ESC_PRI_GETDWORDTEST (IME_ESC_PRIVATE_FIRST + 0)
 
 // Special style.
-// “Á•Ê‚ÈƒEƒBƒ“ƒhƒEƒXƒ^ƒCƒ‹B
+// ç‰¹åˆ¥ãªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¹ã‚¿ã‚¤ãƒ«ã€‚
 #define WS_COMPDEFAULT    (WS_DISABLED | WS_POPUP)
 #define WS_COMPNODEFAULT  (WS_DISABLED | WS_POPUP)
 
 // The IDs of guideline entry.
-// ƒKƒCƒhƒ‰ƒCƒ“ƒGƒ“ƒgƒŠ[‚ÌIDB
+// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚¨ãƒ³ãƒˆãƒªãƒ¼ã®IDã€‚
 #define MYGL_NODICTIONARY   0
 #define MYGL_TYPINGERROR    1
 #define MYGL_TESTGUIDELINE  2
@@ -113,12 +112,12 @@
 #define UIEXTRASIZE             (FIGWLP_CHILDWND + sizeof(LONG_PTR))
 
 // The flags of FIGWL_MOUSE.
-// FIGWL_MOUSE‚Ìƒtƒ‰ƒOB
+// FIGWL_MOUSEã®ãƒ•ãƒ©ã‚°ã€‚
 #define FIM_CAPUTURED 0x01
 #define FIM_MOVED 0x02
 
 // The flags of the close button.
-// •Â‚¶‚éƒ{ƒ^ƒ“‚Ìƒtƒ‰ƒOB
+// é–‰ã˜ã‚‹ãƒœã‚¿ãƒ³ã®ãƒ•ãƒ©ã‚°ã€‚
 #define PUSHED_STATUS_CLOSE 0x08
 
 // Statue Close Button.
@@ -180,14 +179,14 @@ struct MZGUIDELINE {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX–¼B
-extern const WCHAR szUIServerClassName[];   // UIƒT[ƒo[B
-extern const WCHAR szCompStrClassName[];    // –¢Šm’è•¶š—ñB
-extern const WCHAR szCandClassName[];       // Œó•âƒEƒBƒ“ƒhƒEB
-extern const WCHAR szStatusClassName[];     // ó‘ÔƒEƒBƒ“ƒhƒEB
-extern const WCHAR szGuideClassName[];      // ƒKƒCƒhƒ‰ƒCƒ“ƒEƒBƒ“ƒhƒEB
+// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹åã€‚
+extern const WCHAR szUIServerClassName[];   // UIã‚µãƒ¼ãƒãƒ¼ã€‚
+extern const WCHAR szCompStrClassName[];    // æœªç¢ºå®šæ–‡å­—åˆ—ã€‚
+extern const WCHAR szCandClassName[];       // å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
+extern const WCHAR szStatusClassName[];     // çŠ¶æ…‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
+extern const WCHAR szGuideClassName[];      // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã€‚
 
-// ƒKƒCƒhƒ‰ƒCƒ“ƒe[ƒuƒ‹B
+// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ãƒ†ãƒ¼ãƒ–ãƒ«ã€‚
 extern const MZGUIDELINE glTable[];
 
 //////////////////////////////////////////////////////////////////////////////
@@ -195,9 +194,9 @@ extern const MZGUIDELINE glTable[];
 extern "C" {
 
 // convert.c
-extern std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // •ê‰¹Ê‘œB
-extern std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // q‰¹Ê‘œB
-void MakeLiteralMaps(); // q‰¹‚ÌÊ‘œ‚Æ•ê‰¹‚ÌÊ‘œ‚ğì¬‚·‚éB
+extern std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // æ¯éŸ³å†™åƒã€‚
+extern std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // å­éŸ³å†™åƒã€‚
+void MakeLiteralMaps(); // å­éŸ³ã®å†™åƒã¨æ¯éŸ³ã®å†™åƒã‚’ä½œæˆã™ã‚‹ã€‚
 LPCWSTR BunruiToString(HinshiBunrui bunrui);
 LPCTSTR HinshiToString(HinshiBunrui hinshi);
 HinshiBunrui StringToHinshi(LPCTSTR str);
@@ -332,26 +331,26 @@ std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth);
 std::wstring convert_to_kansuuji(const std::wstring& str);
 std::wstring convert_to_kansuuji_brief(const std::wstring& str);
 std::wstring convert_to_kansuuji_formal(const std::wstring& str);
-// ƒsƒŠƒIƒh‚©H
+// ãƒ”ãƒªã‚ªãƒ‰ã‹ï¼Ÿ
 BOOL is_period(WCHAR ch);
-// ƒJƒ“ƒ}‚©H
+// ã‚«ãƒ³ãƒã‹ï¼Ÿ
 BOOL is_comma(WCHAR ch);
-// ƒnƒCƒtƒ“‚©H
+// ãƒã‚¤ãƒ•ãƒ³ã‹ï¼Ÿ
 BOOL is_hyphen(WCHAR ch);
-// İ’è‚É‰‚¶‚Ä•¶š‚ğ•ÏŠ·‚·‚éB
+// è¨­å®šã«å¿œã˜ã¦æ–‡å­—ã‚’å¤‰æ›ã™ã‚‹ã€‚
 WCHAR translateChar(WCHAR ch);
-// İ’è‚É‰‚¶‚Ä•¶š—ñ‚ğ•ÏŠ·‚·‚éB
+// è¨­å®šã«å¿œã˜ã¦æ–‡å­—åˆ—ã‚’å¤‰æ›ã™ã‚‹ã€‚
 std::wstring translateString(const std::wstring& str);
 
 //////////////////////////////////////////////////////////////////////////////
 
-// •ÏŠ·Œó•âB
+// å¤‰æ›å€™è£œã€‚
 struct MzConvCandidate {
-    std::wstring hiragana;              // ‚Ğ‚ç‚ª‚ÈB
-    std::wstring converted;             // •ÏŠ·ŒãB
-    int cost;                           // ƒRƒXƒgB
-    std::unordered_set<HinshiBunrui>  bunruis;    // •iŒ•ª—ŞW‡B
-    std::wstring tags;                  // ƒ^ƒOB
+    std::wstring hiragana;              // ã²ã‚‰ãŒãªã€‚
+    std::wstring converted;             // å¤‰æ›å¾Œã€‚
+    int cost;                           // ã‚³ã‚¹ãƒˆã€‚
+    std::unordered_set<HinshiBunrui>  bunruis;    // å“è©åˆ†é¡é›†åˆã€‚
+    std::wstring tags;                  // ã‚¿ã‚°ã€‚
 
     void clear() {
         hiragana.clear();
@@ -362,48 +361,48 @@ struct MzConvCandidate {
     }
 };
 
-// •ÏŠ·•¶ßB
+// å¤‰æ›æ–‡ç¯€ã€‚
 struct MzConvClause {
-    std::vector<MzConvCandidate> candidates;    // Œó•âŒQB
-    void sort();                                // ƒ\[ƒg‚·‚éB
-    void add(const LatticeNode *node);          // ƒm[ƒh‚ğ’Ç‰Á‚·‚éB
+    std::vector<MzConvCandidate> candidates;    // å€™è£œç¾¤ã€‚
+    void sort();                                // ã‚½ãƒ¼ãƒˆã™ã‚‹ã€‚
+    void add(const LatticeNode *node);          // ãƒãƒ¼ãƒ‰ã‚’è¿½åŠ ã™ã‚‹ã€‚
 
     void clear() {
         candidates.clear();
     }
 };
 
-// •ÏŠ·Œ‹‰ÊB
+// å¤‰æ›çµæœã€‚
 struct MzConvResult {
-    std::vector<MzConvClause> clauses;      // •¶ßŒQB
-    void sort();                            // ƒ\[ƒg‚·‚éB
-    void clear() { clauses.clear(); }       // ƒNƒŠƒA‚·‚éB
+    std::vector<MzConvClause> clauses;      // æ–‡ç¯€ç¾¤ã€‚
+    void sort();                            // ã‚½ãƒ¼ãƒˆã™ã‚‹ã€‚
+    void clear() { clauses.clear(); }       // ã‚¯ãƒªã‚¢ã™ã‚‹ã€‚
 };
 
 //////////////////////////////////////////////////////////////////////////////
-// dictionary - «‘
+// dictionary - è¾æ›¸
 
 class Dict {
 public:
     Dict();
     ~Dict();
 
-    // «‘‚ğ“Ç‚İ‚ŞB
+    // è¾æ›¸ã‚’èª­ã¿è¾¼ã‚€ã€‚
     BOOL Load(const wchar_t *file_name, const wchar_t *object_name);
-    // «‘‚ğƒAƒ“ƒ[ƒh‚·‚éB
+    // è¾æ›¸ã‚’ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
     void Unload();
 
-    BOOL IsLoaded() const;  // “Ç‚İ‚İÏ‚İ‚©H
-    DWORD GetSize() const;  // ƒTƒCƒY‚ğæ“¾‚·‚éB
+    BOOL IsLoaded() const;  // èª­ã¿è¾¼ã¿æ¸ˆã¿ã‹ï¼Ÿ
+    DWORD GetSize() const;  // ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹ã€‚
 
-    wchar_t *Lock();            // ƒƒbƒN‚µ‚Ä“Ç‚İ‚İ‚ğŠJn‚·‚éB
-    void Unlock(wchar_t *data); // ƒƒbƒN‚ğ‰ğœ‚µ‚Ä“Ç‚İ‚İ‚ğI—¹‚·‚éB
+    wchar_t *Lock();            // ãƒ­ãƒƒã‚¯ã—ã¦èª­ã¿è¾¼ã¿ã‚’é–‹å§‹ã™ã‚‹ã€‚
+    void Unlock(wchar_t *data); // ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã—ã¦èª­ã¿è¾¼ã¿ã‚’çµ‚äº†ã™ã‚‹ã€‚
 
 protected:
-    std::wstring m_strFileName;     // ƒtƒ@ƒCƒ‹–¼B
-    std::wstring m_strObjectName;   // •¡”‚Ì«‘‚ğg‚¤‚Ì‚ÅAƒIƒuƒWƒFƒNƒg–¼‚Å‹æ•Ê‚·‚éB
-    HANDLE m_hMutex;                // ”r‘¼§Œä—pB
-    HANDLE m_hFileMapping;          // ƒtƒ@ƒCƒ‹ƒ}ƒbƒsƒ“ƒOB
+    std::wstring m_strFileName;     // ãƒ•ã‚¡ã‚¤ãƒ«åã€‚
+    std::wstring m_strObjectName;   // è¤‡æ•°ã®è¾æ›¸ã‚’ä½¿ã†ã®ã§ã€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåã§åŒºåˆ¥ã™ã‚‹ã€‚
+    HANDLE m_hMutex;                // æ’ä»–åˆ¶å¾¡ç”¨ã€‚
+    HANDLE m_hFileMapping;          // ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒƒãƒ”ãƒ³ã‚°ã€‚
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -421,39 +420,39 @@ class MzIme {
 public:
     MzIme();
 
-    // ‰Šú‰»B
+    // åˆæœŸåŒ–ã€‚
     BOOL Init(HINSTANCE hInstance);
-    // ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX‚Ì“o˜^B
+    // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹ã®ç™»éŒ²ã€‚
     BOOL RegisterClasses(HINSTANCE hInstance);
     void UnregisterClasses();
-    // ‹t‰Šú‰»B
+    // é€†åˆæœŸåŒ–ã€‚
     VOID Uninit(VOID);
 
-    // ƒŠƒ\[ƒX‚©‚çƒrƒbƒgƒ}ƒbƒv‚ğ“Ç‚İ‚ŞB
+    // ãƒªã‚½ãƒ¼ã‚¹ã‹ã‚‰ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’èª­ã¿è¾¼ã‚€ã€‚
     HBITMAP LoadBMP(LPCTSTR pszName);
     HBITMAP LoadBMP(UINT nID) { return LoadBMP(MAKEINTRESOURCE(nID)); }
-    // ƒŠƒ\[ƒX‚©‚ç•¶š—ñ‚ğ“Ç‚İ‚ŞB
+    // ãƒªã‚½ãƒ¼ã‚¹ã‹ã‚‰æ–‡å­—åˆ—ã‚’èª­ã¿è¾¼ã‚€ã€‚
     WCHAR *LoadSTR(INT nID);
 
-    void UpdateIndicIcon(HIMC hIMC);    // ƒCƒ“ƒWƒP[ƒ^[ƒAƒCƒRƒ“‚ğXV‚·‚éB
+    void UpdateIndicIcon(HIMC hIMC);    // ã‚¤ãƒ³ã‚¸ã‚±ãƒ¼ã‚¿ãƒ¼ã‚¢ã‚¤ã‚³ãƒ³ã‚’æ›´æ–°ã™ã‚‹ã€‚
 
-    HKL GetHKL(VOID);                   // ƒL[ƒ{[ƒhƒŒƒCƒAƒEƒg‚Ìƒnƒ“ƒhƒ‹‚ğæ“¾‚·‚éB
+    HKL GetHKL(VOID);                   // ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã®ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã™ã‚‹ã€‚
 
-    InputContext *LockIMC(HIMC hIMC);   // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ğƒƒbƒN‚·‚éB
-    VOID UnlockIMC(HIMC hIMC);          // “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌƒƒbƒN‚ğ‰ğœ‚·‚éB
+    InputContext *LockIMC(HIMC hIMC);   // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
+    VOID UnlockIMC(HIMC hIMC);          // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã™ã‚‹ã€‚
 
-    // ƒƒbƒZ[ƒW‚Ì¶¬B
+    // ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®ç”Ÿæˆã€‚
     BOOL GenerateMessage(LPTRANSMSG lpGeneMsg);
     BOOL GenerateMessage(UINT message, WPARAM wParam = 0, LPARAM lParam = 0);
     BOOL GenerateMessageToTransKey(LPTRANSMSG lpGeneMsg);
 
-    BOOL DoCommand(HIMC hIMC, DWORD dwCommand);     // ƒRƒ}ƒ“ƒh‚ğÀs‚·‚éB
+    BOOL DoCommand(HIMC hIMC, DWORD dwCommand);     // ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œã™ã‚‹ã€‚
 
-    // Šî–{«‘B
-    BOOL LoadBasicDict();                   // Šî–{«‘‚ğ“Ç‚İ‚ŞB
-    BOOL IsBasicDictLoaded() const;         // Šî–{«‘‚ª“Ç‚İ‚Ü‚ê‚½‚©H
-    WCHAR *LockBasicDict();                 // Šî–{«‘‚ğƒƒbƒN‚·‚éB
-    void UnlockBasicDict(WCHAR *data);      // Šî–{«‘‚ÌƒƒbƒN‚ğ‰ğœ‚·‚éB
+    // åŸºæœ¬è¾æ›¸ã€‚
+    BOOL LoadBasicDict();                   // åŸºæœ¬è¾æ›¸ã‚’èª­ã¿è¾¼ã‚€ã€‚
+    BOOL IsBasicDictLoaded() const;         // åŸºæœ¬è¾æ›¸ãŒèª­ã¿è¾¼ã¾ã‚ŒãŸã‹ï¼Ÿ
+    WCHAR *LockBasicDict();                 // åŸºæœ¬è¾æ›¸ã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ã€‚
+    void UnlockBasicDict(WCHAR *data);      // åŸºæœ¬è¾æ›¸ã®ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã™ã‚‹ã€‚
 
     // make lattice
     BOOL MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre);
@@ -463,7 +462,7 @@ public:
     void MakeResultForSingle(MzConvResult& result, Lattice& lattice);
     int CalcCost(const std::wstring& tags) const;
 
-    // •ÏŠ·B
+    // å¤‰æ›ã€‚
     BOOL ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
     BOOL ConvertMultiClause(const std::wstring& strHiragana,
                             MzConvResult& result);
@@ -477,11 +476,11 @@ public:
     BOOL StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
 
 protected:
-    // “ü—ÍƒRƒ“ƒeƒLƒXƒgiinput contextj
+    // å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆï¼ˆinput contextï¼‰
     HIMC m_hIMC;
     InputContext *  m_lpIMC;
 
-    // «‘B
+    // è¾æ›¸ã€‚
     Dict m_basic_dict;
     Dict m_name_dict;
     BOOL LoadDict();

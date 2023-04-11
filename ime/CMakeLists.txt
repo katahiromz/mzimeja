@@ -1,23 +1,13 @@
-# These two files are encoded in Shift_JIS
-add_library(ime_convert STATIC convert.cpp keychar.cpp)
-
-# Workaround for Shift_JIS
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    # Shift_JIS for Clang/GCC
-    target_compile_options(ime_convert PRIVATE -finput-charset=CP932 -fexec-charset=CP932)
-endif()
-if(MSVC)
-    # Shift_JIS for Visual C++
-    target_compile_options(ime_convert PRIVATE /source-charset:shift_jis /execution-charset:shift_jis)
-endif()
-
+# mzimeja.ime
 add_library(ime SHARED
     cand_info.cpp
     comp_str.cpp
     config.cpp
+    convert.cpp
     imm.cpp
     immsec.cpp
     input.cpp
+    keychar.cpp
     main.cpp
     postal.cpp
     process.cpp
@@ -29,14 +19,14 @@ add_library(ime SHARED
     uistate.cpp
     mzimeja.def
     mzimeja_res.rc)
-target_link_libraries(ime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi ime_convert)
+target_link_libraries(ime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 set_target_properties(ime PROPERTIES PREFIX "")
 set_target_properties(ime PROPERTIES SUFFIX "")
 set_target_properties(ime PROPERTIES OUTPUT_NAME "mzimeja.ime")
 
-# UTF-8 for Visual C++
+# UTF-8
 if(MSVC)
-    target_compile_options(ime PRIVATE /source-charset:utf-8 /execution-charset:utf-8 /validate-charset-)
+    target_compile_options(ime PRIVATE /source-charset:utf-8 /execution-charset:utf-8)
 endif()
 
 # do statically link

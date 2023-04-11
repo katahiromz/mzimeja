@@ -1,7 +1,6 @@
 // dict_compile.cpp --- dictionary compiler of MZ-IME Japanese Input
 /////////////////////////////////////////////////////////////////////////////
-// (Japanese, Shift_JIS)
-// NOTE: This file uses Japanese cp932 encoding for historic reason.
+// (Japanese, UTF-8)
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "../dict.hpp"
@@ -11,28 +10,28 @@
 
 static const wchar_t s_hiragana_table[][5] = {
     // DAN_A, DAN_I, DAN_U, DAN_E, DAN_O
-    {L'‚ ', L'‚¢', L'‚¤', L'‚¦', L'‚¨'},   // GYOU_A
-    {L'‚©', L'‚«', L'‚­', L'‚¯', L'‚±'},   // GYOU_KA
-    {L'‚ª', L'‚¬', L'‚®', L'‚°', L'‚²'},   // GYOU_GA
-    {L'‚³', L'‚µ', L'‚·', L'‚¹', L'‚»'},   // GYOU_SA
-    {L'‚´', L'‚¶', L'‚¸', L'‚º', L'‚¼'},   // GYOU_ZA
-    {L'‚½', L'‚¿', L'‚Â', L'‚Ä', L'‚Æ'},   // GYOU_TA
-    {L'‚¾', L'‚À', L'‚Ã', L'‚Å', L'‚Ç'},   // GYOU_DA
-    {L'‚È', L'‚É', L'‚Ê', L'‚Ë', L'‚Ì'},   // GYOU_NA
-    {L'‚Í', L'‚Ğ', L'‚Ó', L'‚Ö', L'‚Ù'},   // GYOU_HA
-    {L'‚Î', L'‚Ñ', L'‚Ô', L'‚×', L'‚Ú'},   // GYOU_BA
-    {L'‚Ï', L'‚Ò', L'‚Õ', L'‚Ø', L'‚Û'},   // GYOU_PA
-    {L'‚Ü', L'‚İ', L'‚Ş', L'‚ß', L'‚à'},   // GYOU_MA
-    {L'‚â', 0, L'‚ä', 0, L'‚æ'},           // GYOU_YA
-    {L'‚ç', L'‚è', L'‚é', L'‚ê', L'‚ë'},   // GYOU_RA
-    {L'‚í', 0, 0, 0, L'‚ğ'},               // GYOU_WA
-    {L'‚ñ', 0, 0, 0, 0},                   // GYOU_NN
+    {L'ã‚', L'ã„', L'ã†', L'ãˆ', L'ãŠ'},   // GYOU_A
+    {L'ã‹', L'ã', L'ã', L'ã‘', L'ã“'},   // GYOU_KA
+    {L'ãŒ', L'ã', L'ã', L'ã’', L'ã”'},   // GYOU_GA
+    {L'ã•', L'ã—', L'ã™', L'ã›', L'ã'},   // GYOU_SA
+    {L'ã–', L'ã˜', L'ãš', L'ãœ', L'ã'},   // GYOU_ZA
+    {L'ãŸ', L'ã¡', L'ã¤', L'ã¦', L'ã¨'},   // GYOU_TA
+    {L'ã ', L'ã¢', L'ã¥', L'ã§', L'ã©'},   // GYOU_DA
+    {L'ãª', L'ã«', L'ã¬', L'ã­', L'ã®'},   // GYOU_NA
+    {L'ã¯', L'ã²', L'ãµ', L'ã¸', L'ã»'},   // GYOU_HA
+    {L'ã°', L'ã³', L'ã¶', L'ã¹', L'ã¼'},   // GYOU_BA
+    {L'ã±', L'ã´', L'ã·', L'ãº', L'ã½'},   // GYOU_PA
+    {L'ã¾', L'ã¿', L'ã‚€', L'ã‚', L'ã‚‚'},   // GYOU_MA
+    {L'ã‚„', 0, L'ã‚†', 0, L'ã‚ˆ'},           // GYOU_YA
+    {L'ã‚‰', L'ã‚Š', L'ã‚‹', L'ã‚Œ', L'ã‚'},   // GYOU_RA
+    {L'ã‚', 0, 0, 0, L'ã‚’'},               // GYOU_WA
+    {L'ã‚“', 0, 0, 0, 0},                   // GYOU_NN
 };
 
-std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // •ê‰¹Ê‘œB
-std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // q‰¹Ê‘œB
+std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // æ¯éŸ³å†™åƒã€‚
+std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // å­éŸ³å†™åƒã€‚
 
-// Ê‘œ‚ğ€”õ‚·‚éB
+// å†™åƒã‚’æº–å‚™ã™ã‚‹ã€‚
 void MakeLiteralMaps() {
     if (g_consonant_map.size()) {
         return;
@@ -50,12 +49,12 @@ void MakeLiteralMaps() {
     }
 } // MzIme::MakeLiteralMaps
 
-// «‘ƒGƒ“ƒgƒŠ‚ğ”äŠr‚·‚éB
+// è¾æ›¸ã‚¨ãƒ³ãƒˆãƒªã‚’æ¯”è¼ƒã™ã‚‹ã€‚
 inline bool entry_compare_pre(const DictEntry& e1, const DictEntry& e2) {
     return (e1.pre < e2.pre);
 }
 
-// ‘SŠpƒJƒ^ƒJƒi‚©H
+// å…¨è§’ã‚«ã‚¿ã‚«ãƒŠã‹ï¼Ÿ
 inline BOOL is_fullwidth_katakana(WCHAR ch) {
     if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
     switch (ch) {
@@ -67,7 +66,7 @@ inline BOOL is_fullwidth_katakana(WCHAR ch) {
     }
 }
 
-// •¶š—ñ‚Ì•¶ší‚ğ•ÏŠ·‚·‚éB
+// æ–‡å­—åˆ—ã®æ–‡å­—ç¨®ã‚’å¤‰æ›ã™ã‚‹ã€‚
 std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
     WCHAR szBuf[1024];
     const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
@@ -76,15 +75,15 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
     return szBuf;
 }
 
-// «‘ƒf[ƒ^ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚ŞB
+// è¾æ›¸ãƒ‡ãƒ¼ã‚¿ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ã€‚
 BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
-    // ƒtƒ@ƒCƒ‹‚ğŠJ‚­B
+    // ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ãã€‚
     FILE *fp = _wfopen(fname, L"rb");
     if (fp == NULL) {
         return FALSE;
     }
 
-    // ˆês‚¸‚Âˆ—‚·‚éB
+    // ä¸€è¡Œãšã¤å‡¦ç†ã™ã‚‹ã€‚
     int lineno = 0;
     char buf[256];
     wchar_t wbuf[256];
@@ -107,7 +106,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             continue;
         }
 
-        // «‘‚ÉƒGƒ“ƒgƒŠ[‚ğ’Ç‰Á‚·‚é€”õ‚ğ‚·‚éB
+        // è¾æ›¸ã«ã‚¨ãƒ³ãƒˆãƒªãƒ¼ã‚’è¿½åŠ ã™ã‚‹æº–å‚™ã‚’ã™ã‚‹ã€‚
         DictEntry entry;
         entry.gyou = GYOU_A;
         if (fields.size() == 1) {
@@ -131,39 +130,39 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
         if (bunrui_str.empty()) {
             entry.bunrui = HB_MEISHI;
         } else if (bunrui_str.size() == 2) {
-            if (bunrui_str == L"–¼Œ")            entry.bunrui = HB_MEISHI;
-            else if (bunrui_str == L"•›Œ")       entry.bunrui = HB_FUKUSHI;
-            else if (bunrui_str == L"Š¿Œê")       entry.bunrui = HB_KANGO;
+            if (bunrui_str == L"åè©")            entry.bunrui = HB_MEISHI;
+            else if (bunrui_str == L"å‰¯è©")       entry.bunrui = HB_FUKUSHI;
+            else if (bunrui_str == L"æ¼¢èª")       entry.bunrui = HB_KANGO;
             else continue;
         } else if (bunrui_str.size() == 3) {
-            if (bunrui_str == L"˜A‘ÌŒ")          entry.bunrui = HB_RENTAISHI;
-            else if (bunrui_str == L"Ú‘±Œ")     entry.bunrui = HB_SETSUZOKUSHI;
-            else if (bunrui_str == L"Š´“®Œ")     entry.bunrui = HB_KANDOUSHI;
-            else if (bunrui_str == L"Ú“ª«")     entry.bunrui = HB_SETTOUJI;
-            else if (bunrui_str == L"Ú”ö«")     entry.bunrui = HB_SETSUBIJI;
-            else if (bunrui_str == L"Ši•Œ")     entry.bunrui = HB_KAKU_JOSHI;
-            else if (bunrui_str == L"•›•Œ")     entry.bunrui = HB_FUKU_JOSHI;
-            else if (bunrui_str == L"I•Œ")     entry.bunrui = HB_SHUU_JOSHI;
-            else if (bunrui_str == L"ƒJƒ“ƒ}")     entry.bunrui = HB_COMMA;
-            else if (bunrui_str == L"‹L†—Ş")     entry.bunrui = HB_SYMBOL;
+            if (bunrui_str == L"é€£ä½“è©")          entry.bunrui = HB_RENTAISHI;
+            else if (bunrui_str == L"æ¥ç¶šè©")     entry.bunrui = HB_SETSUZOKUSHI;
+            else if (bunrui_str == L"æ„Ÿå‹•è©")     entry.bunrui = HB_KANDOUSHI;
+            else if (bunrui_str == L"æ¥é ­è¾")     entry.bunrui = HB_SETTOUJI;
+            else if (bunrui_str == L"æ¥å°¾è¾")     entry.bunrui = HB_SETSUBIJI;
+            else if (bunrui_str == L"æ ¼åŠ©è©")     entry.bunrui = HB_KAKU_JOSHI;
+            else if (bunrui_str == L"å‰¯åŠ©è©")     entry.bunrui = HB_FUKU_JOSHI;
+            else if (bunrui_str == L"çµ‚åŠ©è©")     entry.bunrui = HB_SHUU_JOSHI;
+            else if (bunrui_str == L"ã‚«ãƒ³ãƒ")     entry.bunrui = HB_COMMA;
+            else if (bunrui_str == L"è¨˜å·é¡")     entry.bunrui = HB_SYMBOL;
             else continue;
         } else if (bunrui_str.size() == 4) {
-            if (bunrui_str == L"‚¢Œ`—eŒ")        entry.bunrui = HB_IKEIYOUSHI;
-            else if (bunrui_str == L"‚ÈŒ`—eŒ")   entry.bunrui = HB_NAKEIYOUSHI;
-            else if (bunrui_str == L"ŒÜ’i“®Œ")   entry.bunrui = HB_GODAN_DOUSHI;
-            else if (bunrui_str == L"ˆê’i“®Œ")   entry.bunrui = HB_ICHIDAN_DOUSHI;
-            else if (bunrui_str == L"ƒJ•Ï“®Œ")   entry.bunrui = HB_KAHEN_DOUSHI;
-            else if (bunrui_str == L"ƒT•Ï“®Œ")   entry.bunrui = HB_SAHEN_DOUSHI;
-            else if (bunrui_str == L"Ú‘±•Œ")   entry.bunrui = HB_SETSUZOKU_JOSHI;
-            else if (bunrui_str == L"ƒsƒŠƒIƒh")   entry.bunrui = HB_PERIOD;
+            if (bunrui_str == L"ã„å½¢å®¹è©")        entry.bunrui = HB_IKEIYOUSHI;
+            else if (bunrui_str == L"ãªå½¢å®¹è©")   entry.bunrui = HB_NAKEIYOUSHI;
+            else if (bunrui_str == L"äº”æ®µå‹•è©")   entry.bunrui = HB_GODAN_DOUSHI;
+            else if (bunrui_str == L"ä¸€æ®µå‹•è©")   entry.bunrui = HB_ICHIDAN_DOUSHI;
+            else if (bunrui_str == L"ã‚«å¤‰å‹•è©")   entry.bunrui = HB_KAHEN_DOUSHI;
+            else if (bunrui_str == L"ã‚µå¤‰å‹•è©")   entry.bunrui = HB_SAHEN_DOUSHI;
+            else if (bunrui_str == L"æ¥ç¶šåŠ©è©")   entry.bunrui = HB_SETSUZOKU_JOSHI;
+            else if (bunrui_str == L"ãƒ”ãƒªã‚ªãƒ‰")   entry.bunrui = HB_PERIOD;
             else continue;
         } else if (bunrui_str.size() == 5) {
-            if (bunrui_str == L"–¢‘R•“®Œ")      entry.bunrui = HB_MIZEN_JODOUSHI;
-            else if (bunrui_str == L"˜A—p•“®Œ") entry.bunrui = HB_RENYOU_JODOUSHI;
-            else if (bunrui_str == L"I~•“®Œ") entry.bunrui = HB_SHUUSHI_JODOUSHI;
-            else if (bunrui_str == L"˜A‘Ì•“®Œ") entry.bunrui = HB_RENTAI_JODOUSHI;
-            else if (bunrui_str == L"‰¼’è•“®Œ") entry.bunrui = HB_KATEI_JODOUSHI;
-            else if (bunrui_str == L"–½—ß•“®Œ") entry.bunrui = HB_MEIREI_JODOUSHI;
+            if (bunrui_str == L"æœªç„¶åŠ©å‹•è©")      entry.bunrui = HB_MIZEN_JODOUSHI;
+            else if (bunrui_str == L"é€£ç”¨åŠ©å‹•è©") entry.bunrui = HB_RENYOU_JODOUSHI;
+            else if (bunrui_str == L"çµ‚æ­¢åŠ©å‹•è©") entry.bunrui = HB_SHUUSHI_JODOUSHI;
+            else if (bunrui_str == L"é€£ä½“åŠ©å‹•è©") entry.bunrui = HB_RENTAI_JODOUSHI;
+            else if (bunrui_str == L"ä»®å®šåŠ©å‹•è©") entry.bunrui = HB_KATEI_JODOUSHI;
+            else if (bunrui_str == L"å‘½ä»¤åŠ©å‹•è©") entry.bunrui = HB_MEIREI_JODOUSHI;
             else continue;
         } else {
             continue;
@@ -176,62 +175,62 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             fields[2] = fields[0];
         }
 
-        // «‘Œ`®‚É‚·‚éB
+        // è¾æ›¸å½¢å¼ã«ã™ã‚‹ã€‚
         std::wstring substr;
         wchar_t ch;
         size_t i, ngyou;
         switch (entry.bunrui) {
-        case HB_NAKEIYOUSHI: // u‚ÈŒ`—eŒv
-            // I’[‚Ìu‚Èv‚ğí‚éB
+        case HB_NAKEIYOUSHI: // ã€Œãªå½¢å®¹è©ã€
+            // çµ‚ç«¯ã®ã€Œãªã€ã‚’å‰Šã‚‹ã€‚
             i = fields[0].size() - 1;
-            if (fields[0][i] == L'‚È') fields[0].resize(i);
+            if (fields[0][i] == L'ãª') fields[0].resize(i);
             i = fields[2].size() - 1;
-            if (fields[2][i] == L'‚È') fields[2].resize(i);
+            if (fields[2][i] == L'ãª') fields[2].resize(i);
             break;
-        case HB_IKEIYOUSHI: // u‚¢Œ`—eŒv
-            // I’[‚Ìu‚¢v‚ğí‚éB
+        case HB_IKEIYOUSHI: // ã€Œã„å½¢å®¹è©ã€
+            // çµ‚ç«¯ã®ã€Œã„ã€ã‚’å‰Šã‚‹ã€‚
             i = fields[0].size() - 1;
-            if (fields[0][i] == L'‚¢') fields[0].resize(i);
+            if (fields[0][i] == L'ã„') fields[0].resize(i);
             i = fields[2].size() - 1;
-            if (fields[2][i] == L'‚¢') fields[2].resize(i);
+            if (fields[2][i] == L'ã„') fields[2].resize(i);
             break;
-        case HB_ICHIDAN_DOUSHI: // uˆê’i“®Œv
-            // I’[‚Ìu‚év‚ğí‚éB
-            assert(fields[0][fields[0].size() - 1] == L'‚é');
-            assert(fields[2][fields[2].size() - 1] == L'‚é');
+        case HB_ICHIDAN_DOUSHI: // ã€Œä¸€æ®µå‹•è©ã€
+            // çµ‚ç«¯ã®ã€Œã‚‹ã€ã‚’å‰Šã‚‹ã€‚
+            assert(fields[0][fields[0].size() - 1] == L'ã‚‹');
+            assert(fields[2][fields[2].size() - 1] == L'ã‚‹');
             fields[0].resize(fields[0].size() - 1);
             fields[2].resize(fields[2].size() - 1);
             break;
-        case HB_KAHEN_DOUSHI: // uƒJ•Ï“®Œv
-            // u‚­‚év‚»‚Ì‚à‚Ì‚Í“o˜^‚µ‚È‚¢B
-            if (fields[0] == L"‚­‚é") continue;
-            // I’[‚Ìu‚­‚év‚ğí‚éB
+        case HB_KAHEN_DOUSHI: // ã€Œã‚«å¤‰å‹•è©ã€
+            // ã€Œãã‚‹ã€ãã®ã‚‚ã®ã¯ç™»éŒ²ã—ãªã„ã€‚
+            if (fields[0] == L"ãã‚‹") continue;
+            // çµ‚ç«¯ã®ã€Œãã‚‹ã€ã‚’å‰Šã‚‹ã€‚
             substr = fields[0].substr(fields[0].size() - 2, 2);
-            if (substr != L"‚­‚é") continue;
+            if (substr != L"ãã‚‹") continue;
             fields[0] = substr;
             substr = fields[2].substr(fields[0].size() - 2, 2);
             fields[2] = substr;
             break;
-        case HB_SAHEN_DOUSHI: // uƒT•Ï“®Œv
-            // u‚·‚év‚»‚Ì‚à‚Ì‚Í“o˜^‚µ‚È‚¢B
-            if (fields[0] == L"‚·‚é") continue;
-            // I’[‚Ìu‚·‚év‚Ü‚½‚Íu‚¸‚év‚ğí‚éB
+        case HB_SAHEN_DOUSHI: // ã€Œã‚µå¤‰å‹•è©ã€
+            // ã€Œã™ã‚‹ã€ãã®ã‚‚ã®ã¯ç™»éŒ²ã—ãªã„ã€‚
+            if (fields[0] == L"ã™ã‚‹") continue;
+            // çµ‚ç«¯ã®ã€Œã™ã‚‹ã€ã¾ãŸã¯ã€Œãšã‚‹ã€ã‚’å‰Šã‚‹ã€‚
             substr = fields[0].substr(fields[0].size() - 2, 2);
-            if (substr == L"‚·‚é") entry.gyou = GYOU_SA;
-            else if (substr != L"‚¸‚é") entry.gyou = GYOU_ZA;
+            if (substr == L"ã™ã‚‹") entry.gyou = GYOU_SA;
+            else if (substr != L"ãšã‚‹") entry.gyou = GYOU_ZA;
             else continue;
             fields[0] = substr;
             fields[2] = fields[2].substr(fields[0].size() - 2, 2);
             break;
-        case HB_GODAN_DOUSHI: // uŒÜ’i“®Œv
-            // I’[‚Ì•¶š‚ğæ“¾‚·‚éB
+        case HB_GODAN_DOUSHI: // ã€Œäº”æ®µå‹•è©ã€
+            // çµ‚ç«¯ã®æ–‡å­—ã‚’å–å¾—ã™ã‚‹ã€‚
             ch = fields[0][fields[0].size() - 1];
-            // I’[‚Ì•¶š‚ªƒE’i‚Å‚È‚¯‚ê‚Î¸”sB
-            if (g_vowel_map[ch] != L'‚¤') continue;
-            // I’[‚Ì•¶š‚ğí‚éB
+            // çµ‚ç«¯ã®æ–‡å­—ãŒã‚¦æ®µã§ãªã‘ã‚Œã°å¤±æ•—ã€‚
+            if (g_vowel_map[ch] != L'ã†') continue;
+            // çµ‚ç«¯ã®æ–‡å­—ã‚’å‰Šã‚‹ã€‚
             fields[0].resize(fields[0].size() - 1);
             fields[2].resize(fields[2].size() - 1);
-            // I’[•¶š‚¾‚Á‚½‚à‚Ì‚Ìs‚ğæ“¾‚µAƒZƒbƒg‚·‚éB
+            // çµ‚ç«¯æ–‡å­—ã ã£ãŸã‚‚ã®ã®è¡Œã‚’å–å¾—ã—ã€ã‚»ãƒƒãƒˆã™ã‚‹ã€‚
             ch = g_consonant_map[ch];
             for (i = 0; i < _countof(s_hiragana_table); ++i) {
                 if (s_hiragana_table[i][0] == ch) {
@@ -245,7 +244,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             break;
         }
 
-        // ƒGƒ“ƒgƒŠ[‚ğƒZƒbƒg‚·‚éB
+        // ã‚¨ãƒ³ãƒˆãƒªãƒ¼ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã€‚
         entry.pre = fields[0];
         entry.post = fields[2];
         if (fields.size() >= 4) {
@@ -254,7 +253,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             entry.tags.clear();
         }
 
-        // ƒGƒ“ƒgƒŠ[‚ğ’Ç‰Á‚·‚éB
+        // ã‚¨ãƒ³ãƒˆãƒªãƒ¼ã‚’è¿½åŠ ã™ã‚‹ã€‚
         entries.push_back(entry);
     }
 
@@ -266,7 +265,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
     return TRUE;  // success
 } // LoadDictDataFile
 
-// ƒRƒ“ƒpƒCƒ‹Ï‚İ‚Ì«‘ƒtƒ@ƒCƒ‹‚ğì¬‚·‚éB
+// ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ¸ˆã¿ã®è¾æ›¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã™ã‚‹ã€‚
 BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
 {
     // calculate the total size
@@ -287,7 +286,7 @@ BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
     size *= sizeof(WCHAR);
     printf("size: %d\n", (INT)size);
 
-    // ƒƒ‚ƒŠ[ƒuƒƒbƒN‚ğŠm•Û‚·‚éB
+    // ãƒ¡ãƒ¢ãƒªãƒ¼ãƒ–ãƒ­ãƒƒã‚¯ã‚’ç¢ºä¿ã™ã‚‹ã€‚
     void *pv = calloc(1, size);
     if (pv == NULL) {
         return FALSE;
@@ -325,14 +324,14 @@ BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
 
     BOOL ret = FALSE;
 
-    // ƒRƒ“ƒpƒCƒ‹Ï‚İ‚Ì«‘ƒtƒ@ƒCƒ‹‚ğì¬‚·‚éB
+    // ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ¸ˆã¿ã®è¾æ›¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã™ã‚‹ã€‚
     HANDLE hFile = ::CreateFileW(fname, GENERIC_WRITE, FILE_SHARE_READ,
         NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH,
         NULL);
     if (hFile != INVALID_HANDLE_VALUE) {
         DWORD dwWritten;
-        ret = WriteFile(hFile, pv, DWORD(size), &dwWritten, NULL); // ‘‚«‚ŞB
-        CloseHandle(hFile); // ƒtƒ@ƒCƒ‹‚ğ•Â‚¶‚éB
+        ret = WriteFile(hFile, pv, DWORD(size), &dwWritten, NULL); // æ›¸ãè¾¼ã‚€ã€‚
+        CloseHandle(hFile); // ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã‚‹ã€‚
     }
 
     free(pv);
@@ -341,23 +340,23 @@ BOOL CreateDictFile(const wchar_t *fname, const std::vector<DictEntry>& entries)
 
 extern "C"
 int wmain(int argc, wchar_t **wargv) {
-    // ˆø”‚Ì”‚ğŠm”F‚·‚éB
+    // å¼•æ•°ã®æ•°ã‚’ç¢ºèªã™ã‚‹ã€‚
     if (argc != 3) {
         printf("ERROR: missing parameters\n");
         return 1;
     }
 
-    // Ê‘œ‚ğ€”õ‚·‚éB
+    // å†™åƒã‚’æº–å‚™ã™ã‚‹ã€‚
     MakeLiteralMaps();
 
-    // «‘‚ğ“Ç‚İ‚ñ‚ÅA«‘Œ`®‚ÌƒGƒ“ƒgƒŠŒQ‚ğ\’z‚·‚éB
+    // è¾æ›¸ã‚’èª­ã¿è¾¼ã‚“ã§ã€è¾æ›¸å½¢å¼ã®ã‚¨ãƒ³ãƒˆãƒªç¾¤ã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
     std::vector<DictEntry> entries;
     if (!LoadDictDataFile(wargv[1], entries)) {
         printf("ERROR: cannot load\n");
         return 2;
     }
 
-    // ƒoƒCƒiƒŠ«‘‚ğ‘‚«‚ŞB
+    // ãƒã‚¤ãƒŠãƒªè¾æ›¸ã‚’æ›¸ãè¾¼ã‚€ã€‚
     if (!CreateDictFile(wargv[2], entries)) {
         printf("ERROR: cannot create\n");
         return 3;

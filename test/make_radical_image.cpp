@@ -1,5 +1,5 @@
 // make_radical_image.cpp
-// (Japanese, Shift_JIS)
+// (Japanese, UTF-8)
 #include <windows.h>
 #include <cstdio>
 #include <cstdlib>
@@ -98,76 +98,77 @@ BOOL SaveBitmapToFile(LPCTSTR pszFileName, HBITMAP hbm)
     return f;
 }
 
-void DrawRectangle(HDC hDC, INT x, INT y) {
-  HGDIOBJ hbrOld = SelectObject(hDC, GetStockObject(NULL_BRUSH));
-  HGDIOBJ hPenOld = SelectObject(hDC, GetStockObject(BLACK_PEN));
-  Rectangle(hDC, x, y, x + ICON_SIZE, y + ICON_SIZE);
-  SelectObject(hDC, hPenOld);
-  SelectObject(hDC, hbrOld);
+void DrawRectangle(HDC hDC, INT x, INT y)
+{
+    HGDIOBJ hbrOld = SelectObject(hDC, GetStockObject(NULL_BRUSH));
+    HGDIOBJ hPenOld = SelectObject(hDC, GetStockObject(BLACK_PEN));
+    Rectangle(hDC, x, y, x + ICON_SIZE, y + ICON_SIZE);
+    SelectObject(hDC, hPenOld);
+    SelectObject(hDC, hbrOld);
 }
 
-int main(void) {
-  std::vector<std::wstring> table;
+int main(void)
+{
+    std::vector<std::wstring> table;
 
-  FILE *fp = fopen("..\\res\\radical.dat", "rb");
-  char buf[256];
-  wchar_t wbuf[256];
-  while (fgets(buf, 256, fp) != NULL) {
-    if (buf[0] == ';') continue;
-    MultiByteToWideChar(CP_UTF8, 0, buf, -1, wbuf, 64);
-    table.push_back(wbuf);
-  }
-  fclose(fp);
-
-  INT count = 258;
-  INT cx = 258 * ICON_SIZE;
-  INT cy = 1 * ICON_SIZE;
-  HDC hDC = CreateCompatibleDC(NULL);
-
-  BITMAPINFO bi;
-  ZeroMemory(&bi, sizeof(bi));
-  bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-  bi.bmiHeader.biWidth = cx;
-  bi.bmiHeader.biHeight = cy;
-  bi.bmiHeader.biPlanes = 1;
-  bi.bmiHeader.biBitCount = 24;
-
-  LPVOID pvBits;
-  HBITMAP hbm = CreateDIBSection(hDC, &bi, DIB_RGB_COLORS,
-    &pvBits, NULL, 0);
-  HGDIOBJ hbmOld = SelectObject(hDC, hbm);
-
-  LOGFONTW lf;
-  ZeroMemory(&lf, sizeof(lf));
-  lstrcpyW(lf.lfFaceName, L"‰Ô‰€–¾’©A");
-  //lf.lfQuality = ANTIALIASED_QUALITY;
-  lf.lfHeight = FONT_SIZE;
-  //lf.lfWeight = FW_SEMIBOLD;
-  HFONT hFont = CreateFontIndirectW(&lf);
-  HGDIOBJ hFontOld = SelectObject(hDC, hFont);
-
-  RECT rc;
-  SetRect(&rc, 0, 0, cx, cy);
-  FillRect(hDC, &rc, (HBRUSH)GetStockObject(WHITE_BRUSH));
-
-  for (size_t i = 0; i < count; ++i) {
-    std::wstring str = table[i];
-    size_t pos = str.find_first_not_of(L"\t0123456789\t\r\n");
-    if (pos != std::wstring::npos) {
-      INT x = i * ICON_SIZE;
-      INT y = 0;
-      INT delta = (ICON_SIZE - FONT_SIZE - 2) / 2;
-      //DrawRectangle(hDC, x, y);
-      TextOutW(hDC, x + delta + 3, y + delta + 1, &str[pos], 1);
+    FILE *fp = fopen("..\\res\\radical.dat", "rb");
+    char buf[256];
+    wchar_t wbuf[256];
+    while (fgets(buf, 256, fp) != NULL) {
+        if (buf[0] == ';') continue;
+        MultiByteToWideChar(CP_UTF8, 0, buf, -1, wbuf, 64);
+        table.push_back(wbuf);
     }
-  }
+    fclose(fp);
 
-  SelectObject(hDC, hFontOld);
-  DeleteObject(hFont);
-  SelectObject(hDC, hbmOld);
+    INT count = 258;
+    INT cx = 258 * ICON_SIZE;
+    INT cy = 1 * ICON_SIZE;
+    HDC hDC = CreateCompatibleDC(NULL);
 
-  SaveBitmapToFile(TEXT("radical.bmp"), hbm);
+    BITMAPINFO bi;
+    ZeroMemory(&bi, sizeof(bi));
+    bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bi.bmiHeader.biWidth = cx;
+    bi.bmiHeader.biHeight = cy;
+    bi.bmiHeader.biPlanes = 1;
+    bi.bmiHeader.biBitCount = 24;
 
-  DeleteObject(hbm);
-  DeleteDC(hDC);
+    LPVOID pvBits;
+    HBITMAP hbm = CreateDIBSection(hDC, &bi, DIB_RGB_COLORS, &pvBits, NULL, 0);
+    HGDIOBJ hbmOld = SelectObject(hDC, hbm);
+
+    LOGFONTW lf;
+    ZeroMemory(&lf, sizeof(lf));
+    lstrcpyW(lf.lfFaceName, L"èŠ±åœ’æ˜ŽæœA");
+    //lf.lfQuality = ANTIALIASED_QUALITY;
+    lf.lfHeight = FONT_SIZE;
+    //lf.lfWeight = FW_SEMIBOLD;
+    HFONT hFont = CreateFontIndirectW(&lf);
+    HGDIOBJ hFontOld = SelectObject(hDC, hFont);
+
+    RECT rc;
+    SetRect(&rc, 0, 0, cx, cy);
+    FillRect(hDC, &rc, (HBRUSH)GetStockObject(WHITE_BRUSH));
+
+    for (size_t i = 0; i < count; ++i) {
+        std::wstring str = table[i];
+        size_t pos = str.find_first_not_of(L"\t0123456789\t\r\n");
+        if (pos != std::wstring::npos) {
+            INT x = i * ICON_SIZE;
+            INT y = 0;
+            INT delta = (ICON_SIZE - FONT_SIZE - 2) / 2;
+            //DrawRectangle(hDC, x, y);
+            TextOutW(hDC, x + delta + 3, y + delta + 1, &str[pos], 1);
+        }
+    }
+
+    SelectObject(hDC, hFontOld);
+    DeleteObject(hFont);
+    SelectObject(hDC, hbmOld);
+
+    SaveBitmapToFile(TEXT("radical.bmp"), hbm);
+
+    DeleteObject(hbm);
+    DeleteDC(hDC);
 }

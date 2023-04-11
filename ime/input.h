@@ -1,7 +1,6 @@
 // input.h --- mzimeja input context and related
 //////////////////////////////////////////////////////////////////////////////
-// (Japanese, Shift_JIS)
-// NOTE: This file uses Japanese cp932 encoding for historic reason.
+// (Japanese, UTF-8)
 
 #ifndef INPUT_H_
 #define INPUT_H_
@@ -15,15 +14,15 @@
 #include <vector>
 
 //////////////////////////////////////////////////////////////////////////////
-// “ü—Íƒ‚[ƒhB
+// å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã€‚
 
 enum INPUT_MODE {
-    IMODE_FULL_HIRAGANA,    // ‘SŠp‚Ğ‚ç‚ª‚ÈB
-    IMODE_FULL_KATAKANA,    // ‘SŠpƒJƒ^ƒJƒiB
-    IMODE_FULL_ASCII,       // ‘SŠp‰p”B
-    IMODE_HALF_KANA,        // ”¼ŠpƒJƒiB
-    IMODE_HALF_ASCII,       // ”¼Šp‰p”B
-    IMODE_DISABLED          // IME‚ª–³ŒøB
+    IMODE_FULL_HIRAGANA,    // å…¨è§’ã²ã‚‰ãŒãªã€‚
+    IMODE_FULL_KATAKANA,    // å…¨è§’ã‚«ã‚¿ã‚«ãƒŠã€‚
+    IMODE_FULL_ASCII,       // å…¨è§’è‹±æ•°ã€‚
+    IMODE_HALF_KANA,        // åŠè§’ã‚«ãƒŠã€‚
+    IMODE_HALF_ASCII,       // åŠè§’è‹±æ•°ã€‚
+    IMODE_DISABLED          // IMEãŒç„¡åŠ¹ã€‚
 };
 
 BOOL        IsInputModeOpen(INPUT_MODE imode);
@@ -36,20 +35,20 @@ void        SetRomanMode(HIMC hIMC, BOOL bRoman);
 UINT        CommandFromInputMode(INPUT_MODE imode);
 
 //////////////////////////////////////////////////////////////////////////////
-// –¢Šm’è•¶š—ñB
+// æœªç¢ºå®šæ–‡å­—åˆ—ã€‚
 
 struct LogCandInfo;
 
-// –¢Šm’è•¶š—ñ‚Ì—]èî•ñ‚Ì˜_—ƒf[ƒ^B
+// æœªç¢ºå®šæ–‡å­—åˆ—ã®ä½™å‰°æƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 struct LogCompStrExtra {
-    // ‘I‘ğ’†‚Ì•¶ß‚ÌƒCƒ“ƒfƒbƒNƒXB
+    // é¸æŠä¸­ã®æ–‡ç¯€ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚
     // assert(iClause <= GetClauseCount());
     DWORD iClause;
-    // ‚Ğ‚ç‚ª‚È•¶ß•¶š—ñB
+    // ã²ã‚‰ãŒãªæ–‡ç¯€æ–‡å­—åˆ—ã€‚
     std::vector<std::wstring>   hiragana_clauses;
-    // “ü—Í•¶ß•¶š—ñB
+    // å…¥åŠ›æ–‡ç¯€æ–‡å­—åˆ—ã€‚
     std::vector<std::wstring>   typing_clauses;
-    // –¢Šm’è•¶š—ñ‚Ì•¶ß•¶š—ñB
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®æ–‡ç¯€æ–‡å­—åˆ—ã€‚
     std::vector<std::wstring>   comp_str_clauses;
 
     LogCompStrExtra() {
@@ -59,52 +58,52 @@ struct LogCompStrExtra {
     DWORD GetTotalSize() const;
 }; // struct LogCompStrExtra
 
-// –¢Šm’è•¶š—ñ‚Ì—]èî•ñ‚Ì•¨—ƒf[ƒ^B
+// æœªç¢ºå®šæ–‡å­—åˆ—ã®ä½™å‰°æƒ…å ±ã®ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 struct COMPSTREXTRA {
-    DWORD dwSignature;              // Šm”F‚Ì‚½‚ßB
-    DWORD iClause;                  // Œ»İ‚Ì•¶ß‚ÌƒCƒ“ƒfƒbƒNƒXB
-    DWORD dwHiraganaClauseCount;    // ‚Ğ‚ç‚ª‚È•¶ß‚ÌŒÂ”B
-    DWORD dwHiraganaClauseOffset;   // ‚Ğ‚ç‚ª‚È•¶ß‚ÌƒIƒtƒZƒbƒgB
-    DWORD dwTypingClauseCount;      // “ü—Í•¶ß‚ÌŒÂ”B
-    DWORD dwTypingClauseOffset;     // “ü—Í•¶ß‚ÌƒIƒtƒZƒbƒgB
+    DWORD dwSignature;              // ç¢ºèªã®ãŸã‚ã€‚
+    DWORD iClause;                  // ç¾åœ¨ã®æ–‡ç¯€ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚
+    DWORD dwHiraganaClauseCount;    // ã²ã‚‰ãŒãªæ–‡ç¯€ã®å€‹æ•°ã€‚
+    DWORD dwHiraganaClauseOffset;   // ã²ã‚‰ãŒãªæ–‡ç¯€ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã€‚
+    DWORD dwTypingClauseCount;      // å…¥åŠ›æ–‡ç¯€ã®å€‹æ•°ã€‚
+    DWORD dwTypingClauseOffset;     // å…¥åŠ›æ–‡ç¯€ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã€‚
 
-    BYTE *GetBytes() { return (LPBYTE) this; }  // ƒoƒCƒg—ñ‚Ìæ“¾B
-    WCHAR *GetHiraganaClauses(DWORD& dwCount);  // ‚Ğ‚ç‚ª‚È•¶ß‚Ìæ“¾B
-    WCHAR *GetTypingClauses(DWORD& dwCount);    // “ü—Í•¶ß‚Ìæ“¾B
+    BYTE *GetBytes() { return (LPBYTE) this; }  // ãƒã‚¤ãƒˆåˆ—ã®å–å¾—ã€‚
+    WCHAR *GetHiraganaClauses(DWORD& dwCount);  // ã²ã‚‰ãŒãªæ–‡ç¯€ã®å–å¾—ã€‚
+    WCHAR *GetTypingClauses(DWORD& dwCount);    // å…¥åŠ›æ–‡ç¯€ã®å–å¾—ã€‚
 
-    void GetLog(LogCompStrExtra& log);          // •¨—ƒf[ƒ^‚©‚ç˜_—ƒf[ƒ^‚ÖB
-    DWORD Store(const LogCompStrExtra *log);    // ˜_—ƒf[ƒ^‚©‚ç•¨—ƒf[ƒ^‚ÖB
+    void GetLog(LogCompStrExtra& log);          // ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰è«–ç†ãƒ‡ãƒ¼ã‚¿ã¸ã€‚
+    DWORD Store(const LogCompStrExtra *log);    // è«–ç†ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã¸ã€‚
 }; // struct COMPSTREXTRA
 
-// –¢Šm’è•¶š—ñ‚Ì˜_—ƒf[ƒ^B
+// æœªç¢ºå®šæ–‡å­—åˆ—ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 struct LogCompStr {
-    DWORD dwCursorPos;                      // Œ»İˆÊ’u‚Ì•¶š‚ÌƒCƒ“ƒfƒbƒNƒXB
-    DWORD dwDeltaStart;                     // Å‰‚É•ÏX‚³‚ê‚½•¶š‚ÌƒCƒ“ƒfƒbƒNƒXB
+    DWORD dwCursorPos;                      // ç¾åœ¨ä½ç½®ã®æ–‡å­—ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚
+    DWORD dwDeltaStart;                     // æœ€åˆã«å¤‰æ›´ã•ã‚ŒãŸæ–‡å­—ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚
     std::vector<BYTE>   comp_read_attr;     // we don't use this member: comp_read_attr
     std::vector<DWORD>  comp_read_clause;   // we don't use this member: comp_read_clause
-    std::wstring comp_read_str;             // “Ç‚İ•¶š—ñB
-    std::vector<BYTE>   comp_attr;          // •¶š‘®«B
-    std::vector<DWORD>  comp_clause;        // –¢Šm’è•¶š—ñ‚Ì•¶ßƒCƒ“ƒfƒbƒNƒX‚©‚ç–¢Šm’è•¶š—ñ‚Ì•¶šƒCƒ“ƒfƒbƒNƒX‚Ö‚ÌÊ‘œB
-    std::wstring comp_str;                  // –¢Šm’è•¶š—ñB
-    std::vector<DWORD>  result_read_clause; // Œ‹‰Ê“Ç‚İ•¶ßƒCƒ“ƒfƒbƒNƒX‚©‚çŒ‹‰Ê•¶šƒCƒ“ƒfƒbƒNƒX‚Ö‚ÌÊ‘œB
-    std::wstring result_read_str;           // Œ‹‰Ê“Ç‚İ•¶š—ñB
-    std::vector<DWORD>  result_clause;      // Œ‹‰Ê•¶ßƒCƒ“ƒfƒbƒNƒX‚©‚çŒ‹‰Ê•¶šƒCƒ“ƒfƒbƒNƒX‚Ö‚ÌÊ‘œB
-    std::wstring result_str;                // Œ‹‰Ê•¶š—ñB
-    LogCompStrExtra extra;                  // —]èî•ñB
+    std::wstring comp_read_str;             // èª­ã¿æ–‡å­—åˆ—ã€‚
+    std::vector<BYTE>   comp_attr;          // æ–‡å­—å±æ€§ã€‚
+    std::vector<DWORD>  comp_clause;        // æœªç¢ºå®šæ–‡å­—åˆ—ã®æ–‡ç¯€ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰æœªç¢ºå®šæ–‡å­—åˆ—ã®æ–‡å­—ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸ã®å†™åƒã€‚
+    std::wstring comp_str;                  // æœªç¢ºå®šæ–‡å­—åˆ—ã€‚
+    std::vector<DWORD>  result_read_clause; // çµæœèª­ã¿æ–‡ç¯€ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰çµæœæ–‡å­—ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸ã®å†™åƒã€‚
+    std::wstring result_read_str;           // çµæœèª­ã¿æ–‡å­—åˆ—ã€‚
+    std::vector<DWORD>  result_clause;      // çµæœæ–‡ç¯€ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰çµæœæ–‡å­—ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸ã®å†™åƒã€‚
+    std::wstring result_str;                // çµæœæ–‡å­—åˆ—ã€‚
+    LogCompStrExtra extra;                  // ä½™å‰°æƒ…å ±ã€‚
 
     LogCompStr() {
         clear();
     }
 
-    // ƒNƒŠƒAB
+    // ã‚¯ãƒªã‚¢ã€‚
     void clear();
     void clear_read();
     void clear_comp();
     void clear_result();
     void clear_extra() { extra.clear(); }
 
-    void fix(); // •â³B
-    DWORD GetTotalSize() const; // •¨—ƒf[ƒ^‚Ì‡ŒvƒTƒCƒYB
+    void fix(); // è£œæ­£ã€‚
+    DWORD GetTotalSize() const; // ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã®åˆè¨ˆã‚µã‚¤ã‚ºã€‚
 
     BOOL IsBeingConverted();
     DWORD GetClauseCount() const;
@@ -125,7 +124,7 @@ struct LogCompStr {
     DWORD CompCharToClause(DWORD iCompChar) const;
     BOOL HasCompStr() const;
 
-    // –¢Šm’è•¶š—ñ‚Ì•¶ší•ÏŠ·B
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã®æ–‡å­—ç¨®å¤‰æ›ã€‚
     void MakeHiragana();
     void MakeKatakana();
     void MakeHankaku();
@@ -153,7 +152,7 @@ struct LogCompStr {
     void UpdateExtraClause(DWORD iClause, DWORD dwConversion);
     void UpdateFromExtra(BOOL bRoman);
 
-    // ƒfƒoƒbƒO—pB
+    // ãƒ‡ãƒãƒƒã‚°ç”¨ã€‚
     void AssertValid();
     void Dump();
 
@@ -167,7 +166,7 @@ inline void SetClause(DWORD *lpdw, DWORD num) {
     *(lpdw + 1) = num;
 }
 
-// –¢Šm’è•¶š—ñ‚Ì•¨—ƒf[ƒ^B
+// æœªç¢ºå®šæ–‡å­—åˆ—ã®ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 struct CompStr : public COMPOSITIONSTRING {
     static HIMCC ReCreate(HIMCC hCompStr, const LogCompStr *log = NULL);
 
@@ -221,7 +220,7 @@ private:
 }; // struct CompStr
 
 //////////////////////////////////////////////////////////////////////////////
-// Œó•âî•ñB
+// å€™è£œæƒ…å ±ã€‚
 
 // private data of CANDIDATEINFO
 struct CANDINFOEXTRA {
@@ -229,7 +228,7 @@ struct CANDINFOEXTRA {
     DWORD iClause; // index of selected clause
 };
 
-// Œó•âƒŠƒXƒg‚Ì˜_—ƒf[ƒ^B
+// å€™è£œãƒªã‚¹ãƒˆã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 struct LogCandList {
     DWORD dwStyle;
     DWORD dwSelection;
@@ -255,7 +254,7 @@ struct LogCandList {
     std::wstring GetString(DWORD iCand) const;
 };
 
-// Œó•âî•ñ‚Ì˜_—ƒf[ƒ^B
+// å€™è£œæƒ…å ±ã®è«–ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 struct LogCandInfo {
     std::vector<LogCandList>  cand_lists;
     DWORD iClause;
@@ -282,7 +281,7 @@ struct LogCandInfo {
     void Dump();
 }; // struct LogCandInfo
 
-// Œó•âƒŠƒXƒg‚Ì•¨—ƒf[ƒ^B
+// å€™è£œãƒªã‚¹ãƒˆã®ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 struct CandList : public CANDIDATELIST {
     BYTE *GetBytes()                { return (BYTE *)this; }
     WCHAR *GetCandString(DWORD i)   { return LPTSTR(GetBytes() + dwOffset[i]); }
@@ -298,7 +297,7 @@ private:
     CandList& operator=(const CandList&);
 }; // struct CandList
 
-// Œó•âî•ñ‚Ì•¨—ƒf[ƒ^B
+// å€™è£œæƒ…å ±ã®ç‰©ç†ãƒ‡ãƒ¼ã‚¿ã€‚
 struct CandInfo : public CANDIDATEINFO {
     static HIMCC ReCreate(HIMCC hCandInfo, const LogCandInfo *log = NULL);
     void GetLog(LogCandInfo& log);
@@ -318,12 +317,12 @@ private:
 }; // struct CandInfo
 
 //////////////////////////////////////////////////////////////////////////////
-// “ü—ÍƒRƒ“ƒeƒLƒXƒgB
+// å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã€‚
 
 struct InputContext : public INPUTCONTEXT {
     void Initialize();
 
-    // ó‘Ô‚ğæ“¾Eİ’è‚·‚éB
+    // çŠ¶æ…‹ã‚’å–å¾—ãƒ»è¨­å®šã™ã‚‹ã€‚
     BOOL& IsOpen()                  { return fOpen; }
     const BOOL& IsOpen() const      { return fOpen; }
     DWORD& Conversion()             { return fdwConversion; }
@@ -339,23 +338,23 @@ struct InputContext : public INPUTCONTEXT {
     INPUT_MODE GetInputMode() const;
     BOOL IsRomanMode() const;
 
-    // Œó•âî•ñB
+    // å€™è£œæƒ…å ±ã€‚
     BOOL HasCandInfo();
     CandInfo *LockCandInfo();
     void UnlockCandInfo();
 
-    // –¢Šm’è•¶š—ñB
+    // æœªç¢ºå®šæ–‡å­—åˆ—ã€‚
     BOOL HasCompStr();
     CompStr *LockCompStr();
     void UnlockCompStr();
 
-    // ƒƒbƒZ[ƒWƒoƒbƒtƒ@B
+    // ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒƒãƒ•ã‚¡ã€‚
     LPTRANSMSG LockMsgBuf();
     void UnlockMsgBuf();
     DWORD& NumMsgBuf();
     const DWORD& NumMsgBuf() const;
 
-    // ƒKƒCƒhƒ‰ƒCƒ“B
+    // ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã€‚
     void MakeGuideLine(DWORD dwID);
     LPGUIDELINE LockGuideLine();
     void UnlockGuideLine();
@@ -388,10 +387,10 @@ struct InputContext : public INPUTCONTEXT {
     void MakeHanEisuu();
     BOOL ConvertCode();
 
-    // ˜_—ƒf[ƒ^‚ğæ“¾B
+    // è«–ç†ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
     void GetLogObjects(LogCompStr& comp, LogCandInfo& cand);
 
-    // ƒfƒoƒbƒO—pB
+    // ãƒ‡ãƒãƒƒã‚°ç”¨ã€‚
     void DumpCandInfo();
     void DumpCompStr();
     void Dump();

@@ -700,7 +700,7 @@ void LogCompStr::AddChar(WCHAR chTyped, WCHAR chTranslated, DWORD dwConv)
     WCHAR ch = PrevCharInClause();
     if (ch) ch = dakuon_shori(ch, chTranslated);
     if (ch) {
-        chTyped = '@';
+        chTyped = L'@';
         chTranslated = ch;
         AddDakuonChar(chTyped, chTranslated, dwConv);
     } else if (!CompCharInClause(dwCursorPos, extra.iClause, TRUE)) {

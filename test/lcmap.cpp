@@ -1,60 +1,64 @@
 // lcmap.cpp
-// (Japanese, Shift_JIS)
+// (Japanese, UTF-8)
 #include <windows.h>
 #include <string>
 #include <iostream>
 
-std::string lcmap(const std::string& str, DWORD dwFlags) {
-  CHAR szBuf[1024];
-  const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
-  ::LCMapStringA(MAKELCID(langid, SORT_DEFAULT), dwFlags,
-    str.c_str(), -1, szBuf, 1024);
-  return std::string(szBuf);
+std::string lcmap(const std::string& str, DWORD dwFlags)
+{
+    CHAR szBuf[1024];
+    const LCID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+    ::LCMapStringA(MAKELCID(langid, SORT_DEFAULT), dwFlags,
+                   str.c_str(), -1, szBuf, 1024);
+    return std::string(szBuf);
 }
 
 // The result is:
 // 
-//   Š¿š‚ ‚¢‚¤‚ ‚¢‚¤±²³‚`‚a‚bABCabcB
-//   Š¿šƒAƒCƒEƒAƒCƒE±²³‚`‚a‚bABCabcB
-//   Š¿š‚ ‚¢‚¤‚ ‚¢‚¤‚ ‚¢‚¤‚`‚a‚b‚`‚a‚b‚‚‚‚ƒB
-//   Š¿šƒAƒCƒEƒAƒCƒEƒAƒCƒE‚`‚a‚b‚`‚a‚b‚‚‚‚ƒB
-//   Š¿š‚ ‚¢‚¤ƒAƒCƒEƒAƒCƒE‚`‚a‚b‚`‚a‚b‚‚‚‚ƒB
-//   Š¿š±²³±²³±²³ABCABCabc¡
-//   Š¿š‚ ‚¢‚¤±²³±²³ABCABCabc¡
+//   æ¼¢å­—ã‚ã„ã†ã‚ã„ã†ï½±ï½²ï½³ï¼¡ï¼¢ï¼£ABCabcã€‚
+//   æ¼¢å­—ã‚¢ã‚¤ã‚¦ã‚¢ã‚¤ã‚¦ï½±ï½²ï½³ï¼¡ï¼¢ï¼£ABCabcã€‚
+//   æ¼¢å­—ã‚ã„ã†ã‚ã„ã†ã‚ã„ã†ï¼¡ï¼¢ï¼£ï¼¡ï¼¢ï¼£ï½ï½‚ï½ƒã€‚
+//   æ¼¢å­—ã‚¢ã‚¤ã‚¦ã‚¢ã‚¤ã‚¦ã‚¢ã‚¤ã‚¦ï¼¡ï¼¢ï¼£ï¼¡ï¼¢ï¼£ï½ï½‚ï½ƒã€‚
+//   æ¼¢å­—ã‚ã„ã†ã‚¢ã‚¤ã‚¦ã‚¢ã‚¤ã‚¦ï¼¡ï¼¢ï¼£ï¼¡ï¼¢ï¼£ï½ï½‚ï½ƒã€‚
+//   æ¼¢å­—ï½±ï½²ï½³ï½±ï½²ï½³ï½±ï½²ï½³ABCABCabcï½¡
+//   æ¼¢å­—ã‚ã„ã†ï½±ï½²ï½³ï½±ï½²ï½³ABCABCabcï½¡
 
-int main(void) {
-  std::string str, strMapped;
-  DWORD dwFlags;
+int main(void)
+{
+    std::string str, strMapped;
+    DWORD dwFlags;
+    CHAR buf[MAX_PATH];
+    WideCharToMultiByte(932, L"æ¼¢å­—ã‚ã„ã†ã‚¢ã‚¤ã‚¦ï½±ï½²ï½³ï¼¡ï¼¢ï¼£ABCabcã€‚", -1,
+                        buf, _countof(buf), NULL, NULL);
+    str = buf;
 
-  str = "Š¿š‚ ‚¢‚¤ƒAƒCƒE±²³‚`‚a‚bABCabcB";
+    dwFlags = LCMAP_HIRAGANA;
+    strMapped = lcmap(str, dwFlags);
+    std::cout << strMapped << std::endl;
 
-  dwFlags = LCMAP_HIRAGANA;
-  strMapped = lcmap(str, dwFlags);
-  std::cout << strMapped << std::endl;
+    dwFlags = LCMAP_KATAKANA;
+    strMapped = lcmap(str, dwFlags);
+    std::cout << strMapped << std::endl;
 
-  dwFlags = LCMAP_KATAKANA;
-  strMapped = lcmap(str, dwFlags);
-  std::cout << strMapped << std::endl;
+    dwFlags = LCMAP_FULLWIDTH | LCMAP_HIRAGANA;
+    strMapped = lcmap(str, dwFlags);
+    std::cout << strMapped << std::endl;
 
-  dwFlags = LCMAP_FULLWIDTH | LCMAP_HIRAGANA;
-  strMapped = lcmap(str, dwFlags);
-  std::cout << strMapped << std::endl;
+    dwFlags = LCMAP_FULLWIDTH | LCMAP_KATAKANA;
+    strMapped = lcmap(str, dwFlags);
+    std::cout << strMapped << std::endl;
 
-  dwFlags = LCMAP_FULLWIDTH | LCMAP_KATAKANA;
-  strMapped = lcmap(str, dwFlags);
-  std::cout << strMapped << std::endl;
+    dwFlags = LCMAP_FULLWIDTH;
+    strMapped = lcmap(str, dwFlags);
+    std::cout << strMapped << std::endl;
 
-  dwFlags = LCMAP_FULLWIDTH;
-  strMapped = lcmap(str, dwFlags);
-  std::cout << strMapped << std::endl;
+    dwFlags = LCMAP_HALFWIDTH | LCMAP_KATAKANA;
+    strMapped = lcmap(str, dwFlags);
+    std::cout << strMapped << std::endl;
 
-  dwFlags = LCMAP_HALFWIDTH | LCMAP_KATAKANA;
-  strMapped = lcmap(str, dwFlags);
-  std::cout << strMapped << std::endl;
+    dwFlags = LCMAP_HALFWIDTH;
+    strMapped = lcmap(str, dwFlags);
+    std::cout << strMapped << std::endl;
 
-  dwFlags = LCMAP_HALFWIDTH;
-  strMapped = lcmap(str, dwFlags);
-  std::cout << strMapped << std::endl;
-
-  return 0;
+    return 0;
 }

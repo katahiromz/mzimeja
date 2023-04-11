@@ -10,133 +10,133 @@
 #endif
 
 // The separators.
-// Ž«‘‚Ì‹æØ‚èB
+// è¾žæ›¸ã®åŒºåˆ‡ã‚Šã€‚
 #define RECORD_SEP   L'\uFFFD'
 #define FIELD_SEP    L'\uFFFC'
 
 // Wide strings
 typedef std::vector<std::wstring> WStrings;
 
-// sB
+// è¡Œã€‚
 enum Gyou {
-    GYOU_A,     // ‚ sB
-    GYOU_KA,    // ‚©sB
-    GYOU_GA,    // ‚ªsB
-    GYOU_SA,    // ‚³sB
-    GYOU_ZA,    // ‚´sB
-    GYOU_TA,    // ‚½sB
-    GYOU_DA,    // ‚¾sB
-    GYOU_NA,    // ‚ÈsB
-    GYOU_HA,    // ‚ÍsB
-    GYOU_BA,    // ‚ÎsB
-    GYOU_PA,    // ‚ÏsB
-    GYOU_MA,    // ‚ÜsB
-    GYOU_YA,    // ‚âsB
-    GYOU_RA,    // ‚çsB
-    GYOU_WA,    // ‚ísB
-    GYOU_NN     // ‚ñsB
+    GYOU_A,     // ã‚è¡Œã€‚
+    GYOU_KA,    // ã‹è¡Œã€‚
+    GYOU_GA,    // ãŒè¡Œã€‚
+    GYOU_SA,    // ã•è¡Œã€‚
+    GYOU_ZA,    // ã–è¡Œã€‚
+    GYOU_TA,    // ãŸè¡Œã€‚
+    GYOU_DA,    // ã è¡Œã€‚
+    GYOU_NA,    // ãªè¡Œã€‚
+    GYOU_HA,    // ã¯è¡Œã€‚
+    GYOU_BA,    // ã°è¡Œã€‚
+    GYOU_PA,    // ã±è¡Œã€‚
+    GYOU_MA,    // ã¾è¡Œã€‚
+    GYOU_YA,    // ã‚„è¡Œã€‚
+    GYOU_RA,    // ã‚‰è¡Œã€‚
+    GYOU_WA,    // ã‚è¡Œã€‚
+    GYOU_NN     // ã‚“è¡Œã€‚
 };
 
-// ’iB
+// æ®µã€‚
 enum Dan {
-    DAN_A,      // ‚ ’iB
-    DAN_I,      // ‚¢’iB
-    DAN_U,      // ‚¤’iB
-    DAN_E,      // ‚¦’iB
-    DAN_O       // ‚¨’iB
+    DAN_A,      // ã‚æ®µã€‚
+    DAN_I,      // ã„æ®µã€‚
+    DAN_U,      // ã†æ®µã€‚
+    DAN_E,      // ãˆæ®µã€‚
+    DAN_O       // ãŠæ®µã€‚
 };
 
-// •iŽŒ•ª—ÞB
+// å“è©žåˆ†é¡žã€‚
 enum HinshiBunrui {
-    HB_HEAD = 0x21,         // Å‰‚Ìƒm[ƒh
-    HB_TAIL,                // ÅŒã‚Ìƒm[ƒh
-    HB_UNKNOWN,             // –¢’m‚Ì•iŽŒ
-    HB_MEISHI,              // –¼ŽŒ
-    HB_IKEIYOUSHI,          // ‚¢Œ`—eŽŒ
-    HB_NAKEIYOUSHI,         // ‚ÈŒ`—eŽŒ
-    HB_RENTAISHI,           // ˜A‘ÌŽŒ
-    HB_FUKUSHI,             // •›ŽŒ
-    HB_SETSUZOKUSHI,        // Ú‘±ŽŒ
-    HB_KANDOUSHI,           // Š´“®ŽŒ
-    HB_KAKU_JOSHI,          // Ši•ŽŒ
-    HB_SETSUZOKU_JOSHI,     // Ú‘±•ŽŒ
-    HB_FUKU_JOSHI,          // •›•ŽŒ
-    HB_SHUU_JOSHI,          // I•ŽŒ
-    HB_JODOUSHI,            // •“®ŽŒ
-    HB_MIZEN_JODOUSHI,      // –¢‘R•“®ŽŒ
-    HB_RENYOU_JODOUSHI,     // ˜A—p•“®ŽŒ
-    HB_SHUUSHI_JODOUSHI,    // IŽ~•“®ŽŒ
-    HB_RENTAI_JODOUSHI,     // ˜A‘Ì•“®ŽŒ
-    HB_KATEI_JODOUSHI,      // ‰¼’è•“®ŽŒ
-    HB_MEIREI_JODOUSHI,     // –½—ß•“®ŽŒ
-    HB_GODAN_DOUSHI,        // ŒÜ’i“®ŽŒ
-    HB_ICHIDAN_DOUSHI,      // ˆê’i“®ŽŒ
-    HB_KAHEN_DOUSHI,        // ƒJ•Ï“®ŽŒ
-    HB_SAHEN_DOUSHI,        // ƒT•Ï“®ŽŒ
-    HB_KANGO,               // Š¿Œê
-    HB_SETTOUJI,            // Ú“ªŽ«
-    HB_SETSUBIJI,           // Ú”öŽ«
-    HB_PERIOD,              // ‹å“_iBj
-    HB_COMMA,               // “Ç“_iAj
-    HB_SYMBOL,              // ‹L†—Þ
+    HB_HEAD = 0x21,         // æœ€åˆã®ãƒŽãƒ¼ãƒ‰
+    HB_TAIL,                // æœ€å¾Œã®ãƒŽãƒ¼ãƒ‰
+    HB_UNKNOWN,             // æœªçŸ¥ã®å“è©ž
+    HB_MEISHI,              // åè©ž
+    HB_IKEIYOUSHI,          // ã„å½¢å®¹è©ž
+    HB_NAKEIYOUSHI,         // ãªå½¢å®¹è©ž
+    HB_RENTAISHI,           // é€£ä½“è©ž
+    HB_FUKUSHI,             // å‰¯è©ž
+    HB_SETSUZOKUSHI,        // æŽ¥ç¶šè©ž
+    HB_KANDOUSHI,           // æ„Ÿå‹•è©ž
+    HB_KAKU_JOSHI,          // æ ¼åŠ©è©ž
+    HB_SETSUZOKU_JOSHI,     // æŽ¥ç¶šåŠ©è©ž
+    HB_FUKU_JOSHI,          // å‰¯åŠ©è©ž
+    HB_SHUU_JOSHI,          // çµ‚åŠ©è©ž
+    HB_JODOUSHI,            // åŠ©å‹•è©ž
+    HB_MIZEN_JODOUSHI,      // æœªç„¶åŠ©å‹•è©ž
+    HB_RENYOU_JODOUSHI,     // é€£ç”¨åŠ©å‹•è©ž
+    HB_SHUUSHI_JODOUSHI,    // çµ‚æ­¢åŠ©å‹•è©ž
+    HB_RENTAI_JODOUSHI,     // é€£ä½“åŠ©å‹•è©ž
+    HB_KATEI_JODOUSHI,      // ä»®å®šåŠ©å‹•è©ž
+    HB_MEIREI_JODOUSHI,     // å‘½ä»¤åŠ©å‹•è©ž
+    HB_GODAN_DOUSHI,        // äº”æ®µå‹•è©ž
+    HB_ICHIDAN_DOUSHI,      // ä¸€æ®µå‹•è©ž
+    HB_KAHEN_DOUSHI,        // ã‚«å¤‰å‹•è©ž
+    HB_SAHEN_DOUSHI,        // ã‚µå¤‰å‹•è©ž
+    HB_KANGO,               // æ¼¢èªž
+    HB_SETTOUJI,            // æŽ¥é ­è¾ž
+    HB_SETSUBIJI,           // æŽ¥å°¾è¾ž
+    HB_PERIOD,              // å¥ç‚¹ï¼ˆã€‚ï¼‰
+    HB_COMMA,               // èª­ç‚¹ï¼ˆã€ï¼‰
+    HB_SYMBOL,              // è¨˜å·é¡ž
     HB_MAX = HB_SYMBOL
 }; // enum HinshiBunrui
 
-// “®ŽŒŠˆ—pŒ`B
+// å‹•è©žæ´»ç”¨å½¢ã€‚
 enum KatsuyouKei {
-    MIZEN_KEI,      // –¢‘RŒ`
-    RENYOU_KEI,     // ˜A—pŒ`
-    SHUUSHI_KEI,    // IŽ~Œ`
-    RENTAI_KEI,     // ˜A‘ÌŒ`
-    KATEI_KEI,      // ‰¼’èŒ`
-    MEIREI_KEI      // –½—ßŒ`
+    MIZEN_KEI,      // æœªç„¶å½¢
+    RENYOU_KEI,     // é€£ç”¨å½¢
+    SHUUSHI_KEI,    // çµ‚æ­¢å½¢
+    RENTAI_KEI,     // é€£ä½“å½¢
+    KATEI_KEI,      // ä»®å®šå½¢
+    MEIREI_KEI      // å‘½ä»¤å½¢
 };
 
-// Ž«‘‚Ì€–ÚB
+// è¾žæ›¸ã®é …ç›®ã€‚
 struct DictEntry {
-    std::wstring pre;       // •ÏŠ·‘OB
-    std::wstring post;      // •ÏŠ·ŒãB
-    HinshiBunrui bunrui;    // •iŽŒ•ª—ÞB
-    std::wstring tags;      // ƒ^ƒOB
-    Gyou gyou;              // Šˆ—p‚ÌsB
+    std::wstring pre;       // å¤‰æ›å‰ã€‚
+    std::wstring post;      // å¤‰æ›å¾Œã€‚
+    HinshiBunrui bunrui;    // å“è©žåˆ†é¡žã€‚
+    std::wstring tags;      // ã‚¿ã‚°ã€‚
+    Gyou gyou;              // æ´»ç”¨ã®è¡Œã€‚
 };
 
 struct LatticeNode;
 typedef std::shared_ptr<LatticeNode>  LatticeNodePtr;
 
-// ƒ‰ƒeƒBƒXilatticejƒm[ƒhB
+// ãƒ©ãƒ†ã‚£ã‚¹ï¼ˆlatticeï¼‰ãƒŽãƒ¼ãƒ‰ã€‚
 struct LatticeNode {
-    std::wstring pre;                       // •ÏŠ·‘OB
-    std::wstring post;                      // •ÏŠ·ŒãB
-    std::wstring tags;                      // ƒ^ƒOB
-    HinshiBunrui bunrui;                    // •ª—ÞB
-    Gyou gyou;                              // Šˆ—p‚ÌsB
-    KatsuyouKei katsuyou;                   // “®ŽŒŠˆ—pŒ`B
-    int cost;                               // ƒRƒXƒgB
-    DWORD linked;                           // ƒŠƒ“ƒNæB
-    std::vector<LatticeNodePtr> branches;   // Ž}•ª‚©‚êB
+    std::wstring pre;                       // å¤‰æ›å‰ã€‚
+    std::wstring post;                      // å¤‰æ›å¾Œã€‚
+    std::wstring tags;                      // ã‚¿ã‚°ã€‚
+    HinshiBunrui bunrui;                    // åˆ†é¡žã€‚
+    Gyou gyou;                              // æ´»ç”¨ã®è¡Œã€‚
+    KatsuyouKei katsuyou;                   // å‹•è©žæ´»ç”¨å½¢ã€‚
+    int cost;                               // ã‚³ã‚¹ãƒˆã€‚
+    DWORD linked;                           // ãƒªãƒ³ã‚¯å…ˆã€‚
+    std::vector<LatticeNodePtr> branches;   // æžåˆ†ã‹ã‚Œã€‚
     LatticeNode() {
         cost = 0;
         linked = 0;
     }
-    int CalcCost() const;       // ƒRƒXƒg‚ðŒvŽZB
-    bool IsDoushi() const;      // “®ŽŒ‚©H
-    bool IsJodoushi() const;    // •“®ŽŒ‚©H
+    int CalcCost() const;       // ã‚³ã‚¹ãƒˆã‚’è¨ˆç®—ã€‚
+    bool IsDoushi() const;      // å‹•è©žã‹ï¼Ÿ
+    bool IsJodoushi() const;    // åŠ©å‹•è©žã‹ï¼Ÿ
 
-    // Žw’è‚µ‚½ƒ^ƒO‚ª‚ ‚é‚©H
+    // æŒ‡å®šã—ãŸã‚¿ã‚°ãŒã‚ã‚‹ã‹ï¼Ÿ
     bool HasTag(const wchar_t *tag) const {
         return tags.find(tag) != std::wstring::npos;
     }
 };
 typedef std::vector<LatticeNodePtr>   LatticeChunk;
 
-// ƒ‰ƒeƒBƒXB
+// ãƒ©ãƒ†ã‚£ã‚¹ã€‚
 struct Lattice {
-    size_t                          index;  // ƒCƒ“ƒfƒbƒNƒXB
-    std::wstring                    pre;    // •ÏŠ·‘OB
-    LatticeNodePtr                  head;   // æ“ªƒm[ƒhB
-    std::vector<LatticeChunk>       chunks; // ƒ`ƒƒƒ“ƒNB
-    std::vector<DWORD>              refs;   // ŽQÆB
+    size_t                          index;  // ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚
+    std::wstring                    pre;    // å¤‰æ›å‰ã€‚
+    LatticeNodePtr                  head;   // å…ˆé ­ãƒŽãƒ¼ãƒ‰ã€‚
+    std::vector<LatticeChunk>       chunks; // ãƒãƒ£ãƒ³ã‚¯ã€‚
+    std::vector<DWORD>              refs;   // å‚ç…§ã€‚
     // pre.size() + 1 == chunks.size().
     // pre.size() + 1 == refs.size().
 
