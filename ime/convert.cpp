@@ -1201,7 +1201,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             size_t saved = index;
             do {
                 ++index;
-            } while (!is_hiragana(pre[index]) && pre[index]);
+            } while ((!is_hiragana(pre[index]) || is_hyphen(pre[index])) && pre[index]);
 
             fields.resize(4);
             fields[0] = pre.substr(saved, index - saved);
