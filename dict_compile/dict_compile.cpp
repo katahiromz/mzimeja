@@ -220,16 +220,17 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             // 「する」「ずる」そのものは登録しない。
             if (fields[0] == L"する" || fields[0] == L"ずる")
                 continue;
-            // 終端の「する」または「ずる」を削る。
+            //  「する」または「ずる」で終わらなければ失敗。
             substr = fields[0].substr(fields[0].size() - 2, 2);
-            if (substr == L"する")
+            if (substr == L"する" && fields[2].substr(fields[2].size() - 2, 2) == L"する")
                 entry.gyou = GYOU_SA;
-            else if (substr == L"ずる")
+            else if (substr == L"ずる" && fields[2].substr(fields[2].size() - 2, 2) == L"ずる")
                 entry.gyou = GYOU_ZA;
             else
                 continue;
-            fields[0] = substr;
-            fields[2] = fields[2].substr(fields[0].size() - 2, 2);
+            // 終端の「する」または「ずる」を削る。
+            fields[0] = fields[0].substr(0, fields[0].size() - 2);
+            fields[2] = fields[2].substr(0, fields[2].size() - 2);
             break;
         case HB_GODAN_DOUSHI: // 「五段動詞」
             // 終端の文字を取得する。

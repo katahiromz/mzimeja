@@ -594,18 +594,18 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
         break;
     case HB_SAHEN_DOUSHI: // サ変動詞
         // 「する」「ずる」そのものは登録しない。
-        if (pre == L"する" || pre == "ずる")
+        if (pre == L"する" || pre == L"ずる")
             return TRUE;
-        // 終端の「する」または「ずる」を削る。
+        //  「する」または「ずる」で終わらなければ失敗。
         substr = pre.substr(pre.size() - 2, 2);
-        if (substr == L"する")
+        if (substr == L"する" && post.substr(post.size() - 2, 2) == L"する")
             gyou = GYOU_SA;
-        else if (substr == L"ずる") 
+        else if (substr == L"ずる" && post.substr(post.size() - 2, 2) == L"ずる")
             gyou = GYOU_ZA;
         else
             return TRUE;
-        pre = substr;
-        post = post.substr(pre.size() - 2, 2);
+        pre = pre.substr(0, pre.size() - 2);
+        post = post.substr(0, post.size() - 2);
         break;
     case HB_GODAN_DOUSHI: // 五段動詞
         // 写像を準備する。
