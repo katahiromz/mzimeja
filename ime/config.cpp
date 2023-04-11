@@ -598,7 +598,9 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData)
         AddPage(&psh, IDD_GENERAL, GeneralDlgProc);
         AddPage(&psh, IDD_WORDLIST, WordListDlgProc);
         AddPage(&psh, IDD_ABOUTIME, AboutDlgProc);
+#ifndef NDEBUG
         AddPage(&psh, IDD_DEBUG, DebugOptionDlgProc);
+#endif
         ::PropertySheet(&psh);
         break;
 
