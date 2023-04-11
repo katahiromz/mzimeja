@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // FootmarkLocation and FootmarkPrintCallStack (on debugging)
 
-#ifdef MZIMEJA_DEBUG_OUTPUT
+#ifndef NDEBUG
     #include <vector>   // for std::vector
     #include <string>   // for std::string and std::wstring
     #include <cassert>  // for assert
@@ -111,12 +111,12 @@ inline void FootmarkLocation::Leave() {
 #endif
     }
 }
-#endif  // def MZIMEJA_DEBUG_OUTPUT
+#endif  // ndef NDEBUG
 
 ///////////////////////////////////////////////////////////////////////////////
 // FOOTMARK* Macros
 
-#if defined(MZIMEJA_DEBUG_OUTPUT)
+#ifndef NDEBUG
     #if (__cplusplus >= 201103L) // C++11
         #define FOOTMARK() \
             FootmarkLocation the_footmark(__FILE__, __LINE__, __func__);
@@ -157,7 +157,7 @@ inline void FootmarkLocation::Leave() {
             return the_footmark.m_retval_lparam; \
         } while (0)
     #endif
-#else   // !def MZIMEJA_DEBUG_OUTPUT
+#else   // def NDEBUG
     #define FOOTMARK()                          /*empty*/
     #define FOOTMARK_POINT()                    /*empty*/
     #define FOOTMARK_FORMAT                     /*empty*/
@@ -167,7 +167,7 @@ inline void FootmarkLocation::Leave() {
     #ifdef _WIN32
         #define FOOTMARK_RETURN_LPARAM(retval)    return retval
     #endif
-#endif  // !def MZIMEJA_DEBUG_OUTPUT
+#endif  // def NDEBUG
 
 ///////////////////////////////////////////////////////////////////////////////
 

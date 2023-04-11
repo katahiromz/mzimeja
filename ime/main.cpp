@@ -501,8 +501,7 @@ void FreeUIExtra(HWND hwndServer)
 // For debugging.
 // デバッグ用。
 
-#ifdef MZIMEJA_DEBUG_OUTPUT
-
+#ifndef NDEBUG
 BOOL g_bTrace = TRUE;   // この変数がFALSEのときはデバッグ出力しない。
 
 // printf関数と同じ文法でデバッグ出力を行う関数。
@@ -542,7 +541,7 @@ void DebugAssert(const char *file, int line, const char *exp)
 {
     DebugPrintA("%s (%d): ASSERT(%s) failed\n", file, line, exp);
 }
-#endif  // def MZIMEJA_DEBUG_OUTPUT
+#endif  // ndef NDEBUG
 
 //////////////////////////////////////////////////////////////////////////////
 // DLL entry point

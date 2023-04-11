@@ -63,12 +63,6 @@ add_definitions(-DUNICODE=1 -D_UNICODE=1)
 # Add include directories
 include_directories(include)
 
-# CMake option. See HowToBuild.txt.
-option(MZIMEJA_DEBUG_OUTPUT "Enable debug output" OFF)
-if(MZIMEJA_DEBUG_OUTPUT)
-    add_definitions(-DMZIMEJA_DEBUG_OUTPUT)
-endif()
-
 # Sub-directories
 add_subdirectory(ime)
 add_subdirectory(imepad)

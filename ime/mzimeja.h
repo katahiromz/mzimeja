@@ -5,10 +5,6 @@
 
 #pragma once
 
-#ifndef NDEBUG
-    #error mzimeja is for Release only. Not for Debug. See HowToBuild.txt.
-#endif
-
 #define _CRT_SECURE_NO_WARNINGS   // use fopen
 
 #include "../targetver.h"   // target Windows version
@@ -43,7 +39,7 @@
 // For debugging.
 // デバッグ用。
 
-#ifdef MZIMEJA_DEBUG_OUTPUT
+#ifndef NDEBUG
     extern "C" {
         extern BOOL g_bTrace;
         void DebugPrintA(const char *lpszFormat, ...);
