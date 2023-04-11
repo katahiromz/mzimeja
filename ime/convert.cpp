@@ -2773,11 +2773,6 @@ BOOL MzIme::ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& result)
 {
 #if 1
-    // failure if the dictionary not loaded
-    if (!m_basic_dict.IsLoaded()) {
-        return FALSE;
-    }
-
     // make lattice and make result
     Lattice lattice;
     std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
