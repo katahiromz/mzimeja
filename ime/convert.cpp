@@ -2264,7 +2264,6 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
     // add new entries by node classification (BUNRUI)
     switch (node.bunrui) {
     case HB_MEISHI:
-        DPRINTA("XXX1\n");
         DoMeishi(index, fields);
         break;
     case HB_PERIOD: case HB_COMMA: case HB_SYMBOL:
@@ -2273,22 +2272,18 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
     case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
     case HB_FUKU_JOSHI: case HB_SHUU_JOSHI:
     case HB_KANGO: case HB_SETTOUJI: case HB_SETSUBIJI:
-        DPRINTA("XXX2\n");
         node.pre = fields[0];
         node.post = fields[2];
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
         refs[index + length]++;
         break;
     case HB_IKEIYOUSHI: // い形容詞。
-        DPRINTA("XXX3\n");
         DoIkeiyoushi(index, fields);
         break;
     case HB_NAKEIYOUSHI: // な形容詞。
-        DPRINTA("XXX4\n");
         DoNakeiyoushi(index, fields);
         break;
     case HB_MIZEN_JODOUSHI:
-        DPRINTA("XXX5\n");
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = MIZEN_KEI;
         node.pre = fields[0];
@@ -2297,7 +2292,6 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
         refs[index + length]++;
         break;
     case HB_RENYOU_JODOUSHI:
-        DPRINTA("XXX6\n");
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = RENYOU_KEI;
         node.pre = fields[0];
@@ -2306,7 +2300,6 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
         refs[index + length]++;
         break;
     case HB_SHUUSHI_JODOUSHI:
-        DPRINTA("XXX7\n");
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = SHUUSHI_KEI;
         node.pre = fields[0];
@@ -2315,7 +2308,6 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
         refs[index + length]++;
         break;
     case HB_RENTAI_JODOUSHI:
-        DPRINTA("XXX8\n");
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = RENTAI_KEI;
         node.pre = fields[0];
@@ -2324,7 +2316,6 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
         refs[index + length]++;
         break;
     case HB_KATEI_JODOUSHI:
-        DPRINTA("XXX9\n");
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = KATEI_KEI;
         node.pre = fields[0];
@@ -2333,7 +2324,6 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
         refs[index + length]++;
         break;
     case HB_MEIREI_JODOUSHI:
-        DPRINTA("XXX10\n");
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = MEIREI_KEI;
         node.pre = fields[0];
@@ -2342,25 +2332,20 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
         refs[index + length]++;
         break;
     case HB_GODAN_DOUSHI:
-        DPRINTA("XXX11\n");
         DoGodanDoushi(index, fields);
         break;
     case HB_ICHIDAN_DOUSHI:
-        DPRINTA("XXX12\n");
         DoIchidanDoushi(index, fields);
         break;
     case HB_KAHEN_DOUSHI:
-        DPRINTA("XXX13\n");
         DoKahenDoushi(index, fields);
         break;
     case HB_SAHEN_DOUSHI:
-        DPRINTA("XXX14\n");
         DoSahenDoushi(index, fields);
         break;
     default:
         break;
     }
-    DPRINTA("XXX15\n");
 } // Lattice::DoFields
 
 // ラティスをダンプする。
