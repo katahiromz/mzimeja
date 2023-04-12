@@ -434,8 +434,9 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt)
     // メニューを表示して選択されるのを待つ。選択されたらコマンドIDを返す。
     UINT nCommand = ::TrackPopupMenu(hSubMenu, TPM_RETURNCMD | TPM_NONOTIFY, pt.x, pt.y,
                                      0, hWnd, NULL);
-    TheIME.DoCommand(hIMC, nCommand); // コマンド発動。
-    ::PostMessage(hWnd, WM_NULL, 0, 0); // TrackPopupMenuExのバグ回避。
+    if (nCommand)
+        TheIME.DoCommand(hIMC, nCommand); // コマンド発動。
+    ::PostMessage(hWnd, WM_NULL, 0, 0); // TrackPopupMenuのバグ回避。
     ::DestroyMenu(hMenu); // メニューを破棄する。
     ::SetForegroundWindow(hwndFore); // 最前面ウィンドウを戻す。
     return TRUE;
