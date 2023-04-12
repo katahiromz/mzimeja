@@ -238,7 +238,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC);
 void CompWnd_Hide(UIEXTRA *lpUIExtra);
 void CompWnd_SetFont(UIEXTRA *lpUIExtra);
 HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
-                            DWORD iClause, LPPOINT ppt);
+                            DWORD iClause, LPPOINT ppt, LPSIZE psizText);
 
 // uiguide.c
 LRESULT CALLBACK GuideWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);

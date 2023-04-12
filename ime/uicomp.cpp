@@ -100,7 +100,7 @@ void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC)
 }
 
 HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
-                            DWORD iClause, LPPOINT ppt)
+                            DWORD iClause, LPPOINT ppt, LPSIZE psizText)
 {
     HWND hCompWnd;
     FOOTMARK_FORMAT("%p, %p, %d, %p\n", lpUIExtra, lpIMC, iClause, ppt);
@@ -167,6 +167,8 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
                     ppt->x = x;
                     ppt->y = y + siz.cy;
                 }
+                if (psizText)
+                    *psizText = siz;
                 ::ClientToScreen(hCompWnd, ppt);
                 bIsDone = TRUE;
                 break;

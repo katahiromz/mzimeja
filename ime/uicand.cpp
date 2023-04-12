@@ -108,7 +108,8 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     return 0;
 } // CandWnd_WindowProc
 
-BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt)
+static BOOL
+GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt, LPSIZE psizText)
 {
     BOOL ret = FALSE;
     FOOTMARK_FORMAT("%p, %p, %p\n", lpIMC, lpUIExtra, lppt);
@@ -124,7 +125,7 @@ BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt
         lpIMC->UnlockCandInfo();
 
         if (ret) {
-            HWND hCompWnd = GetCandPosHintFromComp(lpUIExtra, lpIMC, iClause, lppt);
+            HWND hCompWnd = GetCandPosHintFromComp(lpUIExtra, lpIMC, iClause, lppt, psizText);
             ret = ::IsWindowVisible(hCompWnd);
         }
     }
@@ -132,23 +133,13 @@ BOOL GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt
     return ret;
 }
 
-BOOL GetCandPosFromCompForm(InputContext *lpIMC, UIEXTRA *lpUIExtra,
-                            LPPOINT lppt)
-{
-    FOOTMARK_FORMAT("%p, %p, %p\n", lpIMC, lpUIExtra, lppt);
-    if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, lppt)) {
-        ::ScreenToClient(lpIMC->hWnd, lppt);
-        return TRUE;
-    }
-    return FALSE;
-} // GetCandPosFromCompForm
-
 void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC)
 {
     POINT pt;
+    SIZE sizText;
     FOOTMARK_FORMAT("%p, %p, %p\n", hUIWnd, lpUIExtra, lpIMC);
 
-    if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
+    if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt, &sizText)) {
         lpUIExtra->ptCand.x = pt.x;
         lpUIExtra->ptCand.y = pt.y;
     }
@@ -346,29 +337,53 @@ void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 {
     RECT rc;
     POINT pt;
+    SIZE sizText;
     FOOTMARK_FORMAT("%p, %p\n", lpUIExtra, lpIMC);
 
     HWND hwndCand = lpUIExtra->hwndCand;
     HWND hSvrWnd = (HWND)::GetWindowLongPtr(hwndCand, FIGWLP_SERVERWND);
 
+    // ワークエリアを取得。
+    RECT rcWork;
+    HMONITOR hMonitor = ::MonitorFromWindow(hwndCand, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO mi = { sizeof(mi) };
+    if (::GetMonitorInfo(hMonitor, &mi))
+        rcWork = mi.rcWork;
+    else
+        ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
+
+    // 現在のウィンドウの長方形を取得。
+    RECT rcCand;
+    ::GetWindowRect(hwndCand, &rcCand);
+    INT cx = rcCand.right - rcCand.left, cy = rcCand.bottom - rcCand.top;
+
+    // 位置を決める。
+    GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt, &sizText);
+    if (lpUIExtra->bVertical) { // 縦書き。
+        if (pt.x - cx < rcWork.left) {
+            pt.x += sizText.cx;
+        } else {
+            pt.x -= cx;
+        }
+    } else { // 横書き。
+        if (pt.y + cy > rcWork.bottom) {
+            pt.y -= cy + sizText.cy;
+        }
+    }
+
     // 初期化されてないか？
     if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
         lpIMC->DumpCandInfo();
-        if (GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt)) {
-            lpUIExtra->ptCand.x = pt.x;
-            lpUIExtra->ptCand.y = pt.y;
-            ::GetWindowRect(hwndCand, &rc);
-            int cx, cy;
-            cx = rc.right - rc.left;
-            cy = rc.bottom - rc.top;
-            DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
-            ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
-            ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
-            ::InvalidateRect(hwndCand, NULL, FALSE);
+        lpUIExtra->ptCand.x = pt.x;
+        lpUIExtra->ptCand.y = pt.y;
 
-            HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hwndCand, FIGWLP_SERVERWND);
-            ::SendMessage(hSvrWnd, WM_UI_CANDMOVE, 0, 0);
-        }
+        DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
+        ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
+        ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
+        ::InvalidateRect(hwndCand, NULL, FALSE);
+
+        HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hwndCand, FIGWLP_SERVERWND);
+        ::SendMessage(hSvrWnd, WM_UI_CANDMOVE, 0, 0);
         return;
     }
 
@@ -383,44 +398,9 @@ void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
     if (dwStyle == CFS_EXCLUDE) {
         DPRINTA("CFS_EXCLUDE\n");
 
-        // ワークエリアを取得。
-        RECT rcWork;
-        HMONITOR hMonitor = ::MonitorFromWindow(hwndCand, MONITOR_DEFAULTTONEAREST);
-        MONITORINFO mi = { sizeof(mi) };
-        if (::GetMonitorInfo(hMonitor, &mi))
-            rcWork = mi.rcWork;
-        else
-            ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
-
-        // アプリのウィンドウの長方形を取得。
-        RECT rcAppWnd;
-        ::GetWindowRect(lpIMC->hWnd, &rcAppWnd);
-
-        // get the specified position in screen coordinates
-        ::GetClientRect(lpUIExtra->hwndCand, &rc);
-        if (!lpUIExtra->bVertical) {
-            pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
-            pt.y = lpIMC->cfCandForm[0].rcArea.bottom;
-            ::ClientToScreen(lpIMC->hWnd, &pt);
-            if (pt.y + rc.bottom > rcWork.bottom) {
-                pt.y = rcAppWnd.top + lpIMC->cfCandForm[0].rcArea.top - rc.bottom;
-            }
-        } else {
-            pt.x = lpIMC->cfCandForm[0].rcArea.left - rc.right;
-            pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
-            ::ClientToScreen(lpIMC->hWnd, &pt);
-            if (pt.x < 0) {
-                pt.x = rcAppWnd.left + lpIMC->cfCandForm[0].rcArea.right;
-            }
-        }
-
         // 候補ウィンドウを移動・表示する。
         HWND hwndCand = lpUIExtra->hwndCand;
         if (::IsWindow(hwndCand)) {
-            ::GetWindowRect(hwndCand, &rc);
-            int cx, cy;
-            cx = rc.right - rc.left;
-            cy = rc.bottom - rc.top;
             DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
             ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
@@ -437,10 +417,6 @@ void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
         // move and show candidate window
         HWND hwndCand = lpUIExtra->hwndCand;
         if (::IsWindow(hwndCand)) {
-            ::GetWindowRect(hwndCand, &rc);
-            int cx, cy;
-            cx = rc.right - rc.left;
-            cy = rc.bottom - rc.top;
             DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
             ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
             ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
