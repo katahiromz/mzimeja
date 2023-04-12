@@ -335,9 +335,6 @@ void CandWnd_Hide(UIEXTRA *lpUIExtra)
 // 候補ウィンドウの移動時。
 void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 {
-    RECT rc;
-    POINT pt;
-    SIZE sizText;
     FOOTMARK_FORMAT("%p, %p\n", lpUIExtra, lpIMC);
 
     HWND hwndCand = lpUIExtra->hwndCand;
@@ -358,6 +355,8 @@ void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
     INT cx = rcCand.right - rcCand.left, cy = rcCand.bottom - rcCand.top;
 
     // 位置を決める。
+    POINT pt;
+    SIZE sizText;
     GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt, &sizText);
     if (lpUIExtra->bVertical) { // 縦書き。
         if (pt.x - cx < rcWork.left) {
@@ -397,35 +396,27 @@ void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
     DWORD dwStyle = lpIMC->cfCandForm[0].dwStyle;
     if (dwStyle == CFS_EXCLUDE) {
         DPRINTA("CFS_EXCLUDE\n");
-
-        // 候補ウィンドウを移動・表示する。
-        HWND hwndCand = lpUIExtra->hwndCand;
-        if (::IsWindow(hwndCand)) {
-            DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
-            ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
-            ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
-            ::InvalidateRect(hwndCand, NULL, FALSE);
-        }
-        ::SendMessage(hSvrWnd, WM_UI_CANDMOVE, 0, 0);
     } else if (dwStyle == CFS_CANDIDATEPOS) {
         DPRINTA("CFS_CANDIDATEPOS\n");
-        // get the specified position in screen coordinates
+        // 位置情報を取得する。
         pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
         pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
         ::ClientToScreen(lpIMC->hWnd, &pt);
-
-        // move and show candidate window
-        HWND hwndCand = lpUIExtra->hwndCand;
-        if (::IsWindow(hwndCand)) {
-            DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
-            ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
-            ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
-            ::InvalidateRect(hwndCand, NULL, FALSE);
-        }
-        ::SendMessage(hSvrWnd, WM_UI_CANDMOVE, 0, 0);
     } else {
         DPRINTA("dwStyle: 0x%08lX\n", dwStyle);
+        return;
     }
+
+    // 候補ウィンドウを移動・表示する。
+    if (::IsWindow(hwndCand)) {
+        DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
+        ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
+        ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
+        ::InvalidateRect(hwndCand, NULL, FALSE);
+    }
+
+    // 動いたことをUIサーバーに通知。
+    ::SendMessage(hSvrWnd, WM_UI_CANDMOVE, 0, 0);
 } // CandWnd_Move
 
 //////////////////////////////////////////////////////////////////////////////
