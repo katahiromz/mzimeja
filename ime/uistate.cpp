@@ -417,9 +417,6 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt)
 
     HMENU hSubMenu = ::GetSubMenu(hMenu, 0); // インデックス0の子メニューを取得。
 
-    TPMPARAMS params = { sizeof(params) };
-    ::GetWindowRect(hWnd, &params.rcExclude);
-
     HWND hwndFore = ::GetForegroundWindow(); // 最前面ウィンドウを覚えておく。
     ::SetForegroundWindow(hWnd); // TrackPopupMenuExのバグを回避。
 
@@ -435,8 +432,8 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt)
     }
 
     // メニューを表示して選択されるのを待つ。選択されたらコマンドIDを返す。
-    UINT nCommand = ::TrackPopupMenuEx(hSubMenu, TPM_RETURNCMD | TPM_NONOTIFY,
-                                       pt.x, pt.y, hWnd, &params);
+    UINT nCommand = ::TrackPopupMenu(hSubMenu, TPM_RETURNCMD | TPM_NONOTIFY, pt.x, pt.y,
+                                     0, hWnd, NULL);
     TheIME.DoCommand(hIMC, nCommand); // コマンド発動。
     ::PostMessage(hWnd, WM_NULL, 0, 0); // TrackPopupMenuExのバグ回避。
     ::DestroyMenu(hMenu); // メニューを破棄する。
