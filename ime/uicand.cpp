@@ -382,9 +382,17 @@ void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
     DWORD dwStyle = lpIMC->cfCandForm[0].dwStyle;
     if (dwStyle == CFS_EXCLUDE) {
         DPRINTA("CFS_EXCLUDE\n");
-        // get work area and app window rect
         RECT rcWork, rcAppWnd;
-        ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
+
+        // ワークエリアを取得。
+        HMONITOR hMonitor = ::MonitorFromWindow(hwndCand, MONITOR_DEFAULTTONEAREST);
+        MONITORINFO mi = { sizeof(mi) };
+        if (::GetMonitorInfo(hMonitor, &mi))
+            rcWork = mi.rcWork;
+        else
+            ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
+
+        // アプリのウィンドウの長方形を取得。
         ::GetWindowRect(lpIMC->hWnd, &rcAppWnd);
 
         // get the specified position in screen coordinates
