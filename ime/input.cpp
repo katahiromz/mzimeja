@@ -548,7 +548,10 @@ BOOL InputContext::Convert(BOOL bShift)
         }
     } else { // 候補情報がない。
         if (Conversion() & IME_CMODE_JAPANESE) {
-            if (IsRomanMode() && comp.PrevCharInClause() == L'n') {
+            // ローマ字入力で、最後に'n'を入力したら、それを'ん'に変える。
+            if (IsRomanMode() &&
+                (comp.PrevCharInClause() == L'n' || comp.PrevCharInClause() == L'ｎ'))
+            {
                 comp.AddChar(L'n', L'n', Conversion());
             }
         }
