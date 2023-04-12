@@ -50,6 +50,7 @@ DWORD CandWnd_HitTest(HWND hWnd, POINT pt, InputContext *lpIMC)
     return ret;
 }
 
+// 候補ウィンドウがクリックされた。
 void CandWnd_OnClick(HWND hWnd)
 {
     POINT pt;
@@ -75,8 +76,9 @@ void CandWnd_OnClick(HWND hWnd)
     }
 } // CandWnd_OnClick
 
-LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
-                                    LPARAM lParam)
+// 候補ウィンドウのウィンドウプロシージャ。
+LRESULT CALLBACK
+CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HWND hUIWnd;
 
@@ -108,6 +110,7 @@ LRESULT CALLBACK CandWnd_WindowProc(HWND hWnd, UINT message, WPARAM wParam,
     return 0;
 } // CandWnd_WindowProc
 
+// 候補ウィンドウの位置を計算する。
 static BOOL
 GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt, LPSIZE psizText)
 {
@@ -133,6 +136,7 @@ GetCandPosFromCompWnd(InputContext *lpIMC, UIEXTRA *lpUIExtra, LPPOINT lppt, LPS
     return ret;
 }
 
+// 候補ウィンドウを作成する。
 void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC)
 {
     POINT pt;
@@ -317,6 +321,7 @@ void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC)
     }
 } // CandWnd_Resize
 
+// 候補ウィンドウを隠す。
 void CandWnd_Hide(UIEXTRA *lpUIExtra)
 {
     RECT rc;
