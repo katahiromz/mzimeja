@@ -14,6 +14,15 @@
 #define RECORD_SEP   L'\uFFFD'
 #define FIELD_SEP    L'\uFFFC'
 
+enum
+{
+    I_FIELD_PRE = 0,    // 変換前文字列。
+    I_FIELD_HINSHI = 1, // { MAKEWORD(HinshiBunrui, Gyou) }
+    I_FIELD_POST = 2,   // 変換後文字列。
+    I_FIELD_TAGS = 3,   // タグ群。
+    NUM_FIELDS          // １レコードあたりのフィールドの個数。
+};
+
 // Wide strings
 typedef std::vector<std::wstring> WStrings;
 

@@ -632,12 +632,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
         break;
     }
 
-    // レコードの仕様：
-    //     fields[0]: std::wstring 変換前文字列;
-    //     fields[1]: { MAKEWORD(HinshiBunrui, Gyou), 0 };
-    //     fields[2]: std::wstring 変換後文字列;
-    //     fields[3]: std::wstring tags;
-    WStrings fields(4);
+    WStrings fields(NUM_FIELDS);
     fields[0] = pre;
     fields[1] += (WCHAR)MAKEWORD(bunrui, gyou);
     fields[2] = post;
@@ -932,7 +927,7 @@ void Lattice::AddExtra()
         ::GetLocalTime(&st);
         WCHAR sz[32];
 
-        WStrings fields(4);
+        WStrings fields(NUM_FIELDS);
         fields[0] = pre;
         fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
 
@@ -964,7 +959,7 @@ void Lattice::AddExtra()
         ::GetLocalTime(&st);
         WCHAR sz[32];
 
-        WStrings fields(4);
+        WStrings fields(NUM_FIELDS);
         fields[0] = pre;
         fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
 
@@ -980,7 +975,7 @@ void Lattice::AddExtra()
         ::GetLocalTime(&st);
         WCHAR sz[32];
 
-        WStrings fields(4);
+        WStrings fields(NUM_FIELDS);
         fields[0] = pre;
         fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
 
@@ -1027,7 +1022,7 @@ void Lattice::AddExtra()
         WCHAR sz[64];
         DWORD dwSize = _countof(sz);
         if (::GetUserNameW(sz, &dwSize)) {
-            WStrings fields(4);
+            WStrings fields(NUM_FIELDS);
             fields[0] = pre;
             fields[1].assign(1, MAKEWORD(HB_MEISHI, 0));
             fields[2] = sz;
@@ -1041,7 +1036,7 @@ void Lattice::AddExtra()
         WStrings items;
         str_split(items, TheIME.LoadSTR(IDS_PAREN), std::wstring(L"\t"));
 
-        WStrings fields(4);
+        WStrings fields(NUM_FIELDS);
         fields[0] = pre;
         fields[1].assign(1, MAKEWORD(HB_SYMBOL, 0));
         for (size_t i = 0; i < items.size(); ++i) {
@@ -1090,7 +1085,7 @@ void Lattice::AddExtra()
         if (pre == s_words[i]) {
             WStrings items;
             WCHAR *pch = TheIME.LoadSTR(IDS_SYMBOLS + INT(i));
-            WStrings fields(4);
+            WStrings fields(NUM_FIELDS);
             fields[0] = pre;
             fields[1].assign(1, MAKEWORD(HB_SYMBOL, 0));
             int cost = 0;
@@ -1126,7 +1121,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
                 ++index;
             } while (is_period(pre[index]));
 
-            fields.resize(4);
+            fields.resize(NUM_FIELDS);
             fields[0] = pre.substr(saved, index - saved);
             fields[1] = MAKEWORD(HB_PERIOD, 0);
             switch (index - saved) {
@@ -1151,7 +1146,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
                 ++index;
             } while (pre[index] == L'・');
 
-            fields.resize(4);
+            fields.resize(NUM_FIELDS);
             fields[0] = pre.substr(saved, index - saved);
             fields[1] = MAKEWORD(HB_SYMBOL, 0);
             switch (index - saved) {
@@ -1176,7 +1171,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
                 ++index;
             } while (is_comma(pre[index]));
 
-            fields.resize(4);
+            fields.resize(NUM_FIELDS);
             fields[0] = pre.substr(saved, index - saved);
             fields[1] = MAKEWORD(HB_COMMA, 0);
             fields[2] = fields[0];
@@ -1188,7 +1183,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
         if ((pre[index] == L'-' || pre[index] == L'－' || pre[index] == L'ー') &&
             (pre[index + 1] == L'>' || pre[index + 1] == L'＞'))
         {
-            fields.resize(4);
+            fields.resize(NUM_FIELDS);
             fields[0] = pre.substr(index, 2);
             fields[1] = MAKEWORD(HB_SYMBOL, 0);
             fields[2] += L'→';
@@ -1201,7 +1196,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             (pre[index + 1] == L'-' || pre[index + 1] == L'－' ||
              pre[index + 1] == L'ー'))
         {
-            fields.resize(4);
+            fields.resize(NUM_FIELDS);
             fields[0] = pre.substr(index, 2);
             fields[1] = MAKEWORD(HB_SYMBOL, 0);
             fields[2] += L'←';
@@ -1216,7 +1211,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
                 ++index;
             } while ((!is_hiragana(pre[index]) || is_hyphen(pre[index])) && pre[index]);
 
-            fields.resize(4);
+            fields.resize(NUM_FIELDS);
             fields[0] = pre.substr(saved, index - saved);
             fields[1] = MAKEWORD(HB_MEISHI, 0);
             fields[2] = fields[0];
@@ -1265,13 +1260,13 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
         switch (pre[index]) {
         case L'こ': case L'き': case L'く': // KURU
             // カ変動詞。
-            fields.resize(4);
+            fields.resize(NUM_FIELDS);
             fields[1].push_back(MAKEWORD(HB_KAHEN_DOUSHI, GYOU_KA));
             DoKahenDoushi(index, fields);
             break;
         case L'さ': case L'し': case L'せ': case L'す': // SURU
             // サ変動詞。
-            fields.resize(4);
+            fields.resize(NUM_FIELDS);
             fields[1].push_back(MAKEWORD(HB_SAHEN_DOUSHI, GYOU_SA));
             DoSahenDoushi(index, fields);
             break;
@@ -1412,7 +1407,7 @@ void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
 {
     const size_t length = pre.size();
     // add the undefined words on failure of conversion
-    WStrings fields(4);
+    WStrings fields(NUM_FIELDS);
     fields[1].assign(1, MAKEWORD(HB_UNKNOWN, 0));
     //fields[3].clear();
     for (size_t count = min_size; count <= max_size; ++count) {
@@ -1464,7 +1459,7 @@ size_t Lattice::GetLastLinkedIndex() const
 void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
 {
     FOOTMARK();
-    ASSERT(fields.size() == 4);
+    ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
 
@@ -1605,7 +1600,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
 void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields)
 {
     FOOTMARK();
-    ASSERT(fields.size() == 4);
+    ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
     // boundary check
@@ -1710,7 +1705,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields)
 void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
 {
     FOOTMARK();
-    ASSERT(fields.size() == 4);
+    ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
     // boundary check
@@ -1840,7 +1835,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
 void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields)
 {
     FOOTMARK();
-    ASSERT(fields.size() == 4);
+    ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
     // boundary check
@@ -1927,7 +1922,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields)
 void Lattice::DoKahenDoushi(size_t index, const WStrings& fields)
 {
     FOOTMARK();
-    ASSERT(fields.size() == 4);
+    ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
     // boundary check
@@ -2015,7 +2010,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields)
 void Lattice::DoSahenDoushi(size_t index, const WStrings& fields)
 {
     FOOTMARK();
-    ASSERT(fields.size() == 4);
+    ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[0].size());
     size_t length = fields[0].size();
     // boundary check
@@ -2179,7 +2174,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields)
 void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
 {
     FOOTMARK();
-    ASSERT(fields.size() == 4);
+    ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[0].size());
 
     size_t length = fields[0].size();
@@ -2231,8 +2226,8 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
 
 void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
 {
-    ASSERT(fields.size() == 4);
-    if (fields.size() != 4) {
+    ASSERT(fields.size() == NUM_FIELDS);
+    if (fields.size() != NUM_FIELDS) {
         DPRINTW(L"%s, %s\n", fields[0].c_str(), fields[2].c_str());
         return;
     }
@@ -2246,12 +2241,6 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
         return;
     }
     DPRINTW(L"DoFields: %s\n", fields[0].c_str());
-
-    // レコードの仕様：
-    //     fields[0]: std::wstring 変換前文字列;
-    //     fields[1]: { MAKEWORD(HinshiBunrui, Gyou), 0 };
-    //     fields[2]: std::wstring 変換後文字列;
-    //     fields[3]: std::wstring tags;
 
     // initialize the node
     LatticeNode node;
