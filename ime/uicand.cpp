@@ -381,7 +381,7 @@ void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
         ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
         ::InvalidateRect(hwndCand, NULL, FALSE);
 
-        HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hwndCand, FIGWLP_SERVERWND);
+        // 動いたことをUIサーバーに通知。
         ::SendMessage(hSvrWnd, WM_UI_CANDMOVE, 0, 0);
         return;
     }
@@ -393,6 +393,7 @@ void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
         return;
     }
 
+    // スタイルをチェックする。
     DWORD dwStyle = lpIMC->cfCandForm[0].dwStyle;
     if (dwStyle == CFS_EXCLUDE) {
         DPRINTA("CFS_EXCLUDE\n");
