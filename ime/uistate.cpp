@@ -432,8 +432,7 @@ static BOOL StatusWnd_OnRClick(HWND hWnd, POINT pt)
     }
 
     // メニューを表示して選択されるのを待つ。選択されたらコマンドIDを返す。
-    UINT nCommand = ::TrackPopupMenu(hSubMenu, TPM_RETURNCMD | TPM_NONOTIFY, pt.x, pt.y,
-                                     0, hWnd, NULL);
+    UINT nCommand = ::TrackPopupMenu(hSubMenu, TPM_RETURNCMD, pt.x, pt.y, 0, hWnd, NULL);
     if (nCommand)
         TheIME.DoCommand(hIMC, nCommand); // コマンド発動。
     ::PostMessage(hWnd, WM_NULL, 0, 0); // TrackPopupMenuのバグ回避。
