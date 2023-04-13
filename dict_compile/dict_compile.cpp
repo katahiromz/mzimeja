@@ -101,7 +101,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
         str_split(fields, str, L"\t");
 
         // is it an invalid line?
-        if (fields.empty() || fields[0].empty()) {
+        if (fields.empty() || fields[I_FIELD_PRE].empty()) {
             assert(0);
             continue;
         }
@@ -125,8 +125,8 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
         }
 
         // more than 2 fields
-        // classify by the fields[1] string
-        const std::wstring& bunrui_str = fields[1];
+        // classify by the fields[I_FIELD_HINSHI] string
+        const std::wstring& bunrui_str = fields[I_FIELD_HINSHI];
         if (bunrui_str.empty()) {
             entry.bunrui = HB_MEISHI;
         } else if (bunrui_str.size() == 2) {
@@ -168,11 +168,11 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
             continue;
         }
 
-        // complete field[2] if lacked
+        // complete fields[I_FIELD_POST] if lacked
         if (fields.size() == 2) {
-            fields.push_back(fields[0]);
-        } else if (fields[2].empty()) {
-            fields[2] = fields[0];
+            fields.push_back(fields[I_FIELD_PRE]);
+        } else if (fields[I_FIELD_POST].empty()) {
+            fields[I_FIELD_POST] = fields[I_FIELD_PRE];
         }
 
         // 辞書形式にする。
@@ -182,65 +182,65 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
         switch (entry.bunrui) {
         case HB_NAKEIYOUSHI: // 「な形容詞」
             // 終端の「な」を削る。
-            i = fields[0].size() - 1;
-            if (fields[0][i] == L'な')
-                fields[0].resize(i);
-            i = fields[2].size() - 1;
-            if (fields[2][i] == L'な')
-                fields[2].resize(i);
+            i = fields[I_FIELD_PRE].size() - 1;
+            if (fields[I_FIELD_PRE][i] == L'な')
+                fields[I_FIELD_PRE].resize(i);
+            i = fields[I_FIELD_POST].size() - 1;
+            if (fields[I_FIELD_POST][i] == L'な')
+                fields[I_FIELD_POST].resize(i);
             break;
         case HB_IKEIYOUSHI: // 「い形容詞」
             // 終端の「い」を削る。
-            i = fields[0].size() - 1;
-            if (fields[0][i] == L'い')
-                fields[0].resize(i);
-            i = fields[2].size() - 1;
-            if (fields[2][i] == L'い')
-                fields[2].resize(i);
+            i = fields[I_FIELD_PRE].size() - 1;
+            if (fields[I_FIELD_PRE][i] == L'い')
+                fields[I_FIELD_PRE].resize(i);
+            i = fields[I_FIELD_POST].size() - 1;
+            if (fields[I_FIELD_POST][i] == L'い')
+                fields[I_FIELD_POST].resize(i);
             break;
         case HB_ICHIDAN_DOUSHI: // 「一段動詞」
             // 終端の「る」を削る。
-            if (fields[0][fields[0].size() - 1] == L'る')
-                fields[0].resize(fields[0].size() - 1);
-            if (fields[2][fields[2].size() - 1] == L'る')
-                fields[2].resize(fields[2].size() - 1);
+            if (fields[I_FIELD_PRE][fields[I_FIELD_PRE].size() - 1] == L'る')
+                fields[I_FIELD_PRE].resize(fields[I_FIELD_PRE].size() - 1);
+            if (fields[I_FIELD_POST][fields[I_FIELD_POST].size() - 1] == L'る')
+                fields[I_FIELD_POST].resize(fields[I_FIELD_POST].size() - 1);
             break;
         case HB_KAHEN_DOUSHI: // 「カ変動詞」
             // 「くる」そのものは登録しない。
-            if (fields[0] == L"くる")
+            if (fields[I_FIELD_PRE] == L"くる")
                 continue;
             // 終端の「くる」を削る。
-            substr = fields[0].substr(fields[0].size() - 2, 2);
+            substr = fields[I_FIELD_PRE].substr(fields[I_FIELD_PRE].size() - 2, 2);
             if (substr == L"くる")
-                fields[0] = substr;
-            substr = fields[2].substr(fields[2].size() - 2, 2);
-            fields[2] = substr;
+                fields[I_FIELD_PRE] = substr;
+            substr = fields[I_FIELD_POST].substr(fields[I_FIELD_POST].size() - 2, 2);
+            fields[I_FIELD_POST] = substr;
             break;
         case HB_SAHEN_DOUSHI: // 「サ変動詞」
             // 「する」「ずる」そのものは登録しない。
-            if (fields[0] == L"する" || fields[0] == L"ずる")
+            if (fields[I_FIELD_PRE] == L"する" || fields[I_FIELD_PRE] == L"ずる")
                 continue;
             //  「する」または「ずる」で終わらなければ失敗。
-            substr = fields[0].substr(fields[0].size() - 2, 2);
-            if (substr == L"する" && fields[2].substr(fields[2].size() - 2, 2) == L"する")
+            substr = fields[I_FIELD_PRE].substr(fields[I_FIELD_PRE].size() - 2, 2);
+            if (substr == L"する" && fields[I_FIELD_POST].substr(fields[I_FIELD_POST].size() - 2, 2) == L"する")
                 entry.gyou = GYOU_SA;
-            else if (substr == L"ずる" && fields[2].substr(fields[2].size() - 2, 2) == L"ずる")
+            else if (substr == L"ずる" && fields[I_FIELD_POST].substr(fields[I_FIELD_POST].size() - 2, 2) == L"ずる")
                 entry.gyou = GYOU_ZA;
             else
                 continue;
             // 終端の「する」または「ずる」を削る。
-            fields[0] = fields[0].substr(0, fields[0].size() - 2);
-            fields[2] = fields[2].substr(0, fields[2].size() - 2);
+            fields[I_FIELD_PRE] = fields[I_FIELD_PRE].substr(0, fields[I_FIELD_PRE].size() - 2);
+            fields[I_FIELD_POST] = fields[I_FIELD_POST].substr(0, fields[I_FIELD_POST].size() - 2);
             break;
         case HB_GODAN_DOUSHI: // 「五段動詞」
             // 終端の文字を取得する。
-            ch = fields[0][fields[0].size() - 1];
+            ch = fields[I_FIELD_PRE][fields[I_FIELD_PRE].size() - 1];
             // 終端の文字がウ段でなければ失敗。
             if (g_vowel_map[ch] != L'う')
                 continue;
             // 終端の文字を削る。
-            fields[0].resize(fields[0].size() - 1);
-            fields[2].resize(fields[2].size() - 1);
+            fields[I_FIELD_PRE].resize(fields[I_FIELD_PRE].size() - 1);
+            fields[I_FIELD_POST].resize(fields[I_FIELD_POST].size() - 1);
             // 終端文字だったものの行を取得し、セットする。
             ch = g_consonant_map[ch];
             for (i = 0; i < _countof(s_hiragana_table); ++i) {
@@ -256,10 +256,10 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
         }
 
         // エントリーをセットする。
-        entry.pre = fields[0];
-        entry.post = fields[2];
+        entry.pre = fields[I_FIELD_PRE];
+        entry.post = fields[I_FIELD_POST];
         if (fields.size() >= 4) {
-            entry.tags = fields[3];
+            entry.tags = fields[I_FIELD_TAGS];
         } else {
             entry.tags.clear();
         }
