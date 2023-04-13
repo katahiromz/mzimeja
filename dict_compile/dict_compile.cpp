@@ -102,7 +102,6 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
 
         // is it an invalid line?
         if (fields.empty() || fields[I_FIELD_PRE].empty()) {
-            assert(0);
             continue;
         }
 
