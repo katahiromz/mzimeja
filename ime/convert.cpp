@@ -1289,54 +1289,20 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             continue;
         }
         // arrows (zh, zj, zk, zl)
-        if (m_pre[index] == L'z' || m_pre[index] == L'Z' ||
-            m_pre[index] == L'ｚ' || m_pre[index] == L'Ｚ')
-        {
-            if (m_pre[index + 1] == L'h' || m_pre[index + 1] == L'H' ||
-                m_pre[index + 1] == L'ｈ' || m_pre[index + 1] == L'Ｈ')
-            {
-                // zh
+        WCHAR ch0 = translateChar(m_pre[index], FALSE, TRUE);
+        if (ch0 == L'z' || ch0 == L'Z') {
+            WCHAR ch1 = translateChar(m_pre[index + 1], FALSE, TRUE);
+            WCHAR ch2 = 0;
+            if (ch1 == L'h' || ch1 == L'H') ch2 = L'←'; // zh
+            else if (ch1 == L'j' || ch1 == L'J') ch2 = L'↓'; // zj
+            else if (ch1 == L'k' || ch1 == L'K') ch2 = L'↑'; // zk
+            else if (ch1 == L'l' || ch1 == L'L') ch2 = L'→'; // zl
+            if (ch2) {
                 fields.resize(NUM_FIELDS);
                 fields[I_FIELD_PRE] = m_pre.substr(index, 2);
                 fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
-                fields[I_FIELD_POST] = { L'←' };
-                DoFields(index, fields);
-                ++index;
-                continue;
-            }
-            if (m_pre[index + 1] == L'j' || m_pre[index + 1] == L'J' ||
-                m_pre[index + 1] == L'ｊ' || m_pre[index + 1] == L'Ｊ')
-            {
-                // zj
-                fields.resize(NUM_FIELDS);
-                fields[I_FIELD_PRE] = m_pre.substr(index, 2);
-                fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
-                fields[I_FIELD_POST] = { L'↓' };
-                DoFields(index, fields);
-                ++index;
-                continue;
-            }
-            if (m_pre[index + 1] == L'k' || m_pre[index + 1] == L'K' ||
-                m_pre[index + 1] == L'ｋ' || m_pre[index + 1] == L'Ｋ')
-            {
-                // zk
-                fields.resize(NUM_FIELDS);
-                fields[I_FIELD_PRE] = m_pre.substr(index, 2);
-                fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
-                fields[I_FIELD_POST] = { L'↑' };
-                DoFields(index, fields);
-                ++index;
-                continue;
-            }
-            if (m_pre[index + 1] == L'l' || m_pre[index + 1] == L'L' ||
-                m_pre[index + 1] == L'ｌ' || m_pre[index + 1] == L'Ｌ')
-            {
-                // zl
-                fields.resize(NUM_FIELDS);
-                fields[I_FIELD_PRE] = m_pre.substr(index, 2);
-                fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
-                fields[I_FIELD_POST] = { L'→' };
-                DoFields(index, fields);
+                fields[I_FIELD_POST] = { ch2 };
+                DoFields(index, fields, -10);
                 ++index;
                 continue;
             }

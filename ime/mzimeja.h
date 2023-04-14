@@ -340,6 +340,7 @@ BOOL is_comma(WCHAR ch);
 BOOL is_hyphen(WCHAR ch);
 // 設定に応じて文字を変換する。
 WCHAR translateChar(WCHAR ch);
+WCHAR translateChar(WCHAR ch, BOOL bCommaPeriod, BOOL bNoZenkakuAscii);
 // 設定に応じて文字列を変換する。
 std::wstring translateString(const std::wstring& str);
 
