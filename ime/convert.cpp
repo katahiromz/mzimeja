@@ -1657,14 +1657,10 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     do {
         if (str.empty() || str[0] != L'め') break;
         node.pre = fields[I_FIELD_PRE] + L'め';
-        node.post = fields[I_FIELD_POST] + L'目';
+        node.post = fields[I_FIELD_POST] + L'め';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
-    do {
-        if (str.empty() || str[0] != L'め') break;
-        node.pre = fields[I_FIELD_PRE] + L'め';
-        node.post = fields[I_FIELD_POST] + L'め';
+        node.post = fields[I_FIELD_POST] + L'目';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while(0);
