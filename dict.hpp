@@ -141,11 +141,11 @@ typedef std::vector<LatticeNodePtr>   LatticeChunk;
 
 // ラティス。
 struct Lattice {
-    size_t                          index;  // インデックス。
-    std::wstring                    pre;    // 変換前。
-    LatticeNodePtr                  head;   // 先頭ノード。
-    std::vector<LatticeChunk>       chunks; // チャンク。
-    std::vector<DWORD>              refs;   // 参照。
+    size_t                          m_index;  // インデックス。
+    std::wstring                    m_pre;    // 変換前。
+    LatticeNodePtr                  m_head;   // 先頭ノード。
+    std::vector<LatticeChunk>       m_chunks; // チャンク。
+    std::vector<DWORD>              m_refs;   // 参照。
     // pre.size() + 1 == chunks.size().
     // pre.size() + 1 == refs.size().
 
