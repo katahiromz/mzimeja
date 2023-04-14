@@ -919,12 +919,12 @@ void Lattice::AddExtra()
         L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
         L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
     };
+    SYSTEMTIME st;
+    ::GetLocalTime(&st);
+    WCHAR sz[128];
+
     // 今日（today）
     if (m_pre == L"きょう") {
-        SYSTEMTIME st;
-        ::GetLocalTime(&st);
-        WCHAR sz[64];
-
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
         fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
@@ -988,10 +988,6 @@ void Lattice::AddExtra()
 
     // 今年（this year）
     if (m_pre == L"ことし") {
-        SYSTEMTIME st;
-        ::GetLocalTime(&st);
-        WCHAR sz[32];
-
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
         fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
@@ -1011,10 +1007,6 @@ void Lattice::AddExtra()
 
     // 今月（this month）
     if (m_pre == L"こんげつ") {
-        SYSTEMTIME st;
-        ::GetLocalTime(&st);
-        WCHAR sz[32];
-
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
         fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
@@ -1044,10 +1036,6 @@ void Lattice::AddExtra()
 
     // 現在の時刻（current time）
     if (m_pre == L"じこく" || m_pre == L"ただいま") {
-        SYSTEMTIME st;
-        ::GetLocalTime(&st);
-        WCHAR sz[32];
-
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
         fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
@@ -1127,8 +1115,38 @@ void Lattice::AddExtra()
         return;
     }
 
+    if (m_pre == L"にちじ") { // date and time
+        WStrings fields(NUM_FIELDS);
+        fields[I_FIELD_PRE] = m_pre;
+        fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
+
+        StringCchPrintfW(sz, _countof(sz), L"%u年%u月%u日%u時%u分%u秒",
+                         st.wYear, st.wMonth, st.wDay,
+                         st.wHour, st.wMinute, st.wSecond);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+
+        StringCchPrintfW(sz, _countof(sz), L"%04u年%02u月%02u日%02u時%02u分%02u秒",
+                         st.wYear, st.wMonth, st.wDay,
+                         st.wHour, st.wMinute, st.wSecond);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+
+        StringCchPrintfW(sz, _countof(sz), L"%04u-%02u-%02u %02u:%02u:%02u",
+                         st.wYear, st.wMonth, st.wDay,
+                         st.wHour, st.wMinute, st.wSecond);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+
+        StringCchPrintfW(sz, _countof(sz), L"%s %s %02u %04u %02u:%02u:%02u",
+                         s_weekdays[st.wDayOfWeek], s_months[st.wMonth - 1],
+                         st.wDay, st.wYear,
+                         st.wHour, st.wMinute, st.wSecond);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+    }
+
     if (m_pre == L"じぶん") { // myself
-        WCHAR sz[64];
         DWORD dwSize = _countof(sz);
         if (::GetUserNameW(sz, &dwSize)) {
             WStrings fields(NUM_FIELDS);
