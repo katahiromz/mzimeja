@@ -1297,6 +1297,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             else if (ch1 == L'j' || ch1 == L'J') ch2 = L'↓'; // zj
             else if (ch1 == L'k' || ch1 == L'K') ch2 = L'↑'; // zk
             else if (ch1 == L'l' || ch1 == L'L') ch2 = L'→'; // zl
+            else if (is_period(ch1)) ch2 = L'…'; // z.
             if (ch2) {
                 fields.resize(NUM_FIELDS);
                 fields[I_FIELD_PRE] = m_pre.substr(index, 2);
