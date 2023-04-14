@@ -1288,7 +1288,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             ++index;
             continue;
         }
-        // arrows (zh, zj, zk, zl)
+        // arrows (zh, zj, zk, zl) and z.
         WCHAR ch0 = translateChar(m_pre[index], FALSE, TRUE);
         if (ch0 == L'z' || ch0 == L'Z') {
             WCHAR ch1 = translateChar(m_pre[index + 1], FALSE, TRUE);
