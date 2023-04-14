@@ -1894,8 +1894,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 五段動詞の終止形。
-    // 五段動詞の連体形。
+    // 五段動詞の終止形。「動く」「聞き取る」
+    // 五段動詞の連体形。「動く(とき)」「聞き取る(とき)」
     do {
         wchar_t ch = s_hiragana_table[node.gyou][DAN_U];
         if (str.empty() || str[0] != ch) break;
@@ -1909,8 +1909,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 五段動詞の仮定形。
-    // 五段動詞の命令形。
+    // 五段動詞の仮定形。「動く」→「動け(ば)」、「聞き取る」→「聞き取れ(ば)」
+    // 五段動詞の命令形。「動く」→「動け」、「聞き取る」→「聞き取れ」
     do {
         wchar_t ch = s_hiragana_table[node.gyou][DAN_E];
         if (str.empty() || str[0] != ch) break;
