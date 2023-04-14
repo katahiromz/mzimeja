@@ -1471,7 +1471,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
         node.pre = fields[I_FIELD_PRE] + L"かろ";
         node.post = fields[I_FIELD_POST] + L"かろ";
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 2]++;
+        refs[index + node.pre.size()]++;
     } while(0);
 
     MakeLiteralMaps();
@@ -1483,7 +1483,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
         node.pre = fields[I_FIELD_PRE] + L"かっ";
         node.post = fields[I_FIELD_POST] + L"かっ";
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 2]++;
+        refs[index + node.pre.size()]++;
     } while(0);
 
     do {
@@ -1491,7 +1491,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
         node.pre = fields[I_FIELD_PRE] + L'く';
         node.post = fields[I_FIELD_POST] + L'く';
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        refs[index + node.pre.size()]++;
     } while(0);
 
     do {
@@ -1499,7 +1499,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
         node.pre = fields[I_FIELD_PRE] + L'う';
         node.post = fields[I_FIELD_POST] + L'う';
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        refs[index + node.pre.size()]++;
     } while(0);
 
     // 終止形
@@ -1509,7 +1509,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
         node.pre = fields[I_FIELD_PRE] + L'い';
         node.post = fields[I_FIELD_POST] + L'い';
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        refs[index + node.pre.size()]++;
     } while(0);
 
     // 連体形
@@ -1519,14 +1519,14 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
         node.pre = fields[I_FIELD_PRE] + L'い';
         node.post = fields[I_FIELD_POST] + L'い';
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        refs[index + node.pre.size()]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'き') break;
         node.pre = fields[I_FIELD_PRE] + L'き';
         node.post = fields[I_FIELD_POST] + L'き';
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        refs[index + node.pre.size()]++;
     } while(0);
 
     // 仮定形
@@ -1536,7 +1536,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
         node.pre = fields[I_FIELD_PRE] + L"けれ";
         node.post = fields[I_FIELD_POST] + L"けれ";
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 2]++;
+        refs[index + node.pre.size()]++;
     } while(0);
 
     // 名詞形
@@ -1546,21 +1546,21 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
         node.pre = fields[I_FIELD_PRE] + L'さ';
         node.post = fields[I_FIELD_POST] + L'さ';
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        refs[index + node.pre.size()]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'み') break;
         node.pre = fields[I_FIELD_PRE] + L'み';
         node.post = fields[I_FIELD_POST] + L'み';
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        refs[index + node.pre.size()]++;
     } while(0);
     do {
         if (str.empty() || str[0] != L'め') break;
         node.pre = fields[I_FIELD_PRE] + L'め';
         node.post = fields[I_FIELD_POST] + L'目';
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        refs[index + node.pre.size()]++;
     } while(0);
 
     // (い形容詞の語幹)+"そうだ"
