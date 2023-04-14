@@ -1825,14 +1825,14 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
             node.pre = fields[I_FIELD_PRE] + L'わ';
             node.post = fields[I_FIELD_POST] + L'わ';
             m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-            m_refs[index + fields[I_FIELD_PRE].size() + 1]++;
+            m_refs[index + node.pre.size()]++;
         } else {
             wchar_t ch = s_hiragana_table[node.gyou][DAN_A];
             if (str.empty() || str[0] != ch) break;
             node.pre = fields[I_FIELD_PRE] + ch;
             node.post = fields[I_FIELD_POST] + ch;
             m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-            m_refs[index + fields[I_FIELD_PRE].size() + 1]++;
+            m_refs[index + node.pre.size()]++;
         }
     } while(0);
 
@@ -1844,7 +1844,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        m_refs[index + node.pre.size()]++;
     } while(0);
     do {
         if (type == 0) break;
@@ -1858,7 +1858,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        m_refs[index + node.pre.size()]++;
     } while(0);
 
     // 終止形
@@ -1870,10 +1870,10 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        m_refs[index + node.pre.size()]++;
         node.katsuyou = RENTAI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        m_refs[index + node.pre.size()]++;
     } while(0);
 
     // 仮定形
@@ -1885,10 +1885,10 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        m_refs[index + node.pre.size()]++;
         node.katsuyou = MEIREI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        m_refs[index + node.pre.size()]++;
     } while(0);
 
     // 名詞形
@@ -1899,7 +1899,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        m_refs[index + node.pre.size()]++;
     } while(0);
 
     // 「動く(五段)」→「動ける(一段)」、
@@ -1908,7 +1908,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += s_hiragana_table[node.gyou][DAN_I];
         new_fields[I_FIELD_POST] += s_hiragana_table[node.gyou][DAN_I];
-        DoIchidanDoushi(index, new_fields);
+        DoIchidanDoushi(index, new_fields, deltaCost);
     }
 } // Lattice::DoGodanDoushi
 
