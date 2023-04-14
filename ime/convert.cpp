@@ -1772,7 +1772,8 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 名詞形
+    // 名詞形。
+    // 「きれいな(な形容詞)」→「きれいさ(名詞)」。
     node.bunrui = HB_MEISHI;
     do {
         if (str.empty() || str[0] != L'さ') break;
@@ -1783,10 +1784,14 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     } while(0);
 
     // 「きれい。」「静か。」など
-    switch (str[0]) {
-    case L'。': case L'、': case L'，': case L'．': case 0:
+    if (str.empty()) {
         DoMeishi(index, fields, deltaCost);
-        break;
+    } else {
+        switch (str[0]) {
+        case L'。': case L'、': case L'，': case L'．': case L',': case L'.':
+            DoMeishi(index, fields, deltaCost);
+            break;
+        }
     }
 } // Lattice::DoNakeiyoushi
 
