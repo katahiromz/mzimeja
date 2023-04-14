@@ -145,7 +145,15 @@ bool MakeDictFormat(DictEntry& entry, const std::wstring& strBunrui)
             entry.post.resize(entry.post.size() - 1);
         break;
     case HB_KAHEN_DOUSHI: // 「カ変動詞」
-        // 変更しない。
+        // 読みが３文字以上で「来る」「くる」で終わるとき、「来る」を削る。
+        if (entry.pre.size() >= 3) {
+            if (entry.pre.substr(entry.pre.size() - 2, 2) == L"くる" &&
+                entry.post.substr(entry.post.size() - 2, 2) == L"来る")
+            {
+                entry.pre = entry.pre.substr(0, entry.pre.size() - 2);
+                entry.post = entry.post.substr(0, entry.post.size() - 2);
+            }
+        }
         break;
     case HB_SAHEN_DOUSHI: // 「サ変動詞」
         {
