@@ -1850,7 +1850,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     default:                                    type = 0; break;
     }
 
-    // 未然形
+    // 五段動詞の未然形。
     do {
         node.katsuyou = MIZEN_KEI;
         if (node.gyou == GYOU_A) {
@@ -1869,7 +1869,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         }
     } while(0);
 
-    // 連用形
+    // 五段動詞の連用形。
     node.katsuyou = RENYOU_KEI;
     do {
         wchar_t ch = s_hiragana_table[node.gyou][DAN_I];
@@ -1894,8 +1894,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 終止形
-    // 連体形
+    // 五段動詞の終止形。
+    // 五段動詞の連体形。
     do {
         wchar_t ch = s_hiragana_table[node.gyou][DAN_U];
         if (str.empty() || str[0] != ch) break;
@@ -1909,8 +1909,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 仮定形
-    // 命令形
+    // 五段動詞の仮定形。
+    // 五段動詞の命令形。
     do {
         wchar_t ch = s_hiragana_table[node.gyou][DAN_E];
         if (str.empty() || str[0] != ch) break;
@@ -1924,7 +1924,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 名詞形。
+    // 五段動詞の名詞形。
     // 「動く(五段)」→「動き(名詞)」、
     // 「聞き取る(五段)」→「聞き取り(名詞)」など。
     node.bunrui = HB_MEISHI;
