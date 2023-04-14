@@ -75,8 +75,132 @@ std::wstring lcmap(const std::wstring& str, DWORD dwFlags) {
     return szBuf;
 }
 
+// エントリーを辞書形式にする。
+bool MakeDictFormat(DictEntry& entry, const std::wstring& strBunrui)
+{
+    if (strBunrui.size() == 2) {
+        if (strBunrui == L"名詞")            entry.bunrui = HB_MEISHI;
+        else if (strBunrui == L"副詞")       entry.bunrui = HB_FUKUSHI;
+        else if (strBunrui == L"漢語")       entry.bunrui = HB_KANGO;
+        else return false;
+    } else if (strBunrui.size() == 3) {
+        if (strBunrui == L"連体詞")          entry.bunrui = HB_RENTAISHI;
+        else if (strBunrui == L"接続詞")     entry.bunrui = HB_SETSUZOKUSHI;
+        else if (strBunrui == L"感動詞")     entry.bunrui = HB_KANDOUSHI;
+        else if (strBunrui == L"接頭辞")     entry.bunrui = HB_SETTOUJI;
+        else if (strBunrui == L"接尾辞")     entry.bunrui = HB_SETSUBIJI;
+        else if (strBunrui == L"格助詞")     entry.bunrui = HB_KAKU_JOSHI;
+        else if (strBunrui == L"副助詞")     entry.bunrui = HB_FUKU_JOSHI;
+        else if (strBunrui == L"終助詞")     entry.bunrui = HB_SHUU_JOSHI;
+        else if (strBunrui == L"カンマ")     entry.bunrui = HB_COMMA;
+        else if (strBunrui == L"記号類")     entry.bunrui = HB_SYMBOL;
+        else return false;
+    } else if (strBunrui.size() == 4) {
+        if (strBunrui == L"い形容詞")        entry.bunrui = HB_IKEIYOUSHI;
+        else if (strBunrui == L"な形容詞")   entry.bunrui = HB_NAKEIYOUSHI;
+        else if (strBunrui == L"五段動詞")   entry.bunrui = HB_GODAN_DOUSHI;
+        else if (strBunrui == L"一段動詞")   entry.bunrui = HB_ICHIDAN_DOUSHI;
+        else if (strBunrui == L"カ変動詞")   entry.bunrui = HB_KAHEN_DOUSHI;
+        else if (strBunrui == L"サ変動詞")   entry.bunrui = HB_SAHEN_DOUSHI;
+        else if (strBunrui == L"接続助詞")   entry.bunrui = HB_SETSUZOKU_JOSHI;
+        else if (strBunrui == L"ピリオド")   entry.bunrui = HB_PERIOD;
+        else return false;
+    } else if (strBunrui.size() == 5) {
+        if (strBunrui == L"未然助動詞")      entry.bunrui = HB_MIZEN_JODOUSHI;
+        else if (strBunrui == L"連用助動詞") entry.bunrui = HB_RENYOU_JODOUSHI;
+        else if (strBunrui == L"終止助動詞") entry.bunrui = HB_SHUUSHI_JODOUSHI;
+        else if (strBunrui == L"連体助動詞") entry.bunrui = HB_RENTAI_JODOUSHI;
+        else if (strBunrui == L"仮定助動詞") entry.bunrui = HB_KATEI_JODOUSHI;
+        else if (strBunrui == L"命令助動詞") entry.bunrui = HB_MEIREI_JODOUSHI;
+        else return false;
+    } else {
+        return false;
+    }
+
+    size_t i;
+    switch (entry.bunrui) {
+    case HB_NAKEIYOUSHI: // 「な形容詞」
+        // 終端の「な」を削る。
+        i = entry.pre.size() - 1;
+        if (entry.pre[i] == L'な')
+            entry.pre.resize(i);
+        i = entry.post.size() - 1;
+        if (entry.post[i] == L'な')
+            entry.post.resize(i);
+        break;
+    case HB_IKEIYOUSHI: // 「い形容詞」
+        // 終端の「い」を削る。
+        i = entry.pre.size() - 1;
+        if (entry.pre[i] == L'い')
+            entry.pre.resize(i);
+        i = entry.post.size() - 1;
+        if (entry.post[i] == L'い')
+            entry.post.resize(i);
+        break;
+    case HB_ICHIDAN_DOUSHI: // 「一段動詞」
+        // 終端の「る」を削る。
+        if (entry.pre[entry.pre.size() - 1] == L'る')
+            entry.pre.resize(entry.pre.size() - 1);
+        if (entry.post[entry.post.size() - 1] == L'る')
+            entry.post.resize(entry.post.size() - 1);
+        break;
+    case HB_KAHEN_DOUSHI: // 「カ変動詞」
+        // 変更しない。
+        break;
+    case HB_SAHEN_DOUSHI: // 「サ変動詞」
+        {
+            std::wstring substr;
+            // 「する」「ずる」そのものは登録しない。
+            if (entry.pre == L"する" || entry.pre == L"ずる")
+                return false;
+            //  「する」または「ずる」で終わらなければ失敗。
+
+            substr = entry.pre.substr(entry.pre.size() - 2, 2);
+            if (substr == L"する" && entry.post.substr(entry.post.size() - 2, 2) == L"する")
+                entry.gyou = GYOU_SA;
+            else if (substr == L"ずる" && entry.post.substr(entry.post.size() - 2, 2) == L"ずる")
+                entry.gyou = GYOU_ZA;
+            else
+                return false;
+            // 終端の「する」または「ずる」を削る。
+            entry.pre = entry.pre.substr(0, entry.pre.size() - 2);
+            entry.post = entry.post.substr(0, entry.post.size() - 2);
+        }
+        break;
+    case HB_GODAN_DOUSHI: // 「五段動詞」
+        {
+            // 終端の文字を取得する。
+            WCHAR ch = entry.pre[entry.pre.size() - 1];
+            // 終端の文字がウ段でなければ失敗。
+            if (g_vowel_map[ch] != L'う')
+                return false;
+            // 終端の文字を削る。
+            entry.pre.resize(entry.pre.size() - 1);
+            entry.post.resize(entry.post.size() - 1);
+            // 終端文字だったものの行を取得し、セットする。
+            {
+                size_t ngyou = GYOU_A;
+                ch = g_consonant_map[ch];
+                for (i = 0; i < _countof(s_hiragana_table); ++i) {
+                    if (s_hiragana_table[i][0] == ch) {
+                        ngyou = i;
+                        break;
+                    }
+                }
+                entry.gyou = (Gyou)ngyou;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
+    return true;
+}
+
 // 辞書データファイルを読み込む。
-BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
+BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries)
+{
     // ファイルを開く。
     FILE *fp = _wfopen(fname, L"rb");
     if (fp == NULL) {
@@ -101,159 +225,32 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
         str_split(fields, str, L"\t");
 
         // is it an invalid line?
-        if (fields.empty() || fields[I_FIELD_PRE].empty()) {
+        if (fields.empty() || fields[I_FIELD_PRE].empty())
             continue;
-        }
+
+        fields.resize(NUM_FIELDS);
+
+        // fields[I_FIELD_HINSHI]が空だったら「名詞」にする。
+        if (fields[I_FIELD_HINSHI].empty())
+            fields[I_FIELD_HINSHI] = L"名詞";
+
+        // fields[I_FIELD_POST]が空だったらfields[I_FIELD_PRE]をコピーする。
+        if (fields[I_FIELD_POST].empty())
+            fields[I_FIELD_POST] = fields[I_FIELD_PRE];
+
+        // fields[I_FIELD_PRE]を全角ひらがなにする。
+        fields[I_FIELD_PRE] = lcmap(fields[I_FIELD_PRE], LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
 
         // 辞書にエントリーを追加する準備をする。
         DictEntry entry;
+        entry.pre = fields[I_FIELD_PRE];
         entry.gyou = GYOU_A;
-        if (fields.size() == 1) {
-            // only one field, it's a noun (HB_MEISHI)
-            entry.post = str;
-            entry.bunrui = HB_MEISHI;
-            if (is_fullwidth_katakana(str[0])) {
-                // convert to hiragana
-                std::wstring hiragana = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
-                entry.pre = hiragana;
-            } else {
-                entry.pre = str;
-            }
-            entries.push_back(entry);
-            continue;
-        }
-
-        // more than 2 fields
-        // classify by the fields[I_FIELD_HINSHI] string
-        const std::wstring& bunrui_str = fields[I_FIELD_HINSHI];
-        if (bunrui_str.empty()) {
-            entry.bunrui = HB_MEISHI;
-        } else if (bunrui_str.size() == 2) {
-            if (bunrui_str == L"名詞")            entry.bunrui = HB_MEISHI;
-            else if (bunrui_str == L"副詞")       entry.bunrui = HB_FUKUSHI;
-            else if (bunrui_str == L"漢語")       entry.bunrui = HB_KANGO;
-            else continue;
-        } else if (bunrui_str.size() == 3) {
-            if (bunrui_str == L"連体詞")          entry.bunrui = HB_RENTAISHI;
-            else if (bunrui_str == L"接続詞")     entry.bunrui = HB_SETSUZOKUSHI;
-            else if (bunrui_str == L"感動詞")     entry.bunrui = HB_KANDOUSHI;
-            else if (bunrui_str == L"接頭辞")     entry.bunrui = HB_SETTOUJI;
-            else if (bunrui_str == L"接尾辞")     entry.bunrui = HB_SETSUBIJI;
-            else if (bunrui_str == L"格助詞")     entry.bunrui = HB_KAKU_JOSHI;
-            else if (bunrui_str == L"副助詞")     entry.bunrui = HB_FUKU_JOSHI;
-            else if (bunrui_str == L"終助詞")     entry.bunrui = HB_SHUU_JOSHI;
-            else if (bunrui_str == L"カンマ")     entry.bunrui = HB_COMMA;
-            else if (bunrui_str == L"記号類")     entry.bunrui = HB_SYMBOL;
-            else continue;
-        } else if (bunrui_str.size() == 4) {
-            if (bunrui_str == L"い形容詞")        entry.bunrui = HB_IKEIYOUSHI;
-            else if (bunrui_str == L"な形容詞")   entry.bunrui = HB_NAKEIYOUSHI;
-            else if (bunrui_str == L"五段動詞")   entry.bunrui = HB_GODAN_DOUSHI;
-            else if (bunrui_str == L"一段動詞")   entry.bunrui = HB_ICHIDAN_DOUSHI;
-            else if (bunrui_str == L"カ変動詞")   entry.bunrui = HB_KAHEN_DOUSHI;
-            else if (bunrui_str == L"サ変動詞")   entry.bunrui = HB_SAHEN_DOUSHI;
-            else if (bunrui_str == L"接続助詞")   entry.bunrui = HB_SETSUZOKU_JOSHI;
-            else if (bunrui_str == L"ピリオド")   entry.bunrui = HB_PERIOD;
-            else continue;
-        } else if (bunrui_str.size() == 5) {
-            if (bunrui_str == L"未然助動詞")      entry.bunrui = HB_MIZEN_JODOUSHI;
-            else if (bunrui_str == L"連用助動詞") entry.bunrui = HB_RENYOU_JODOUSHI;
-            else if (bunrui_str == L"終止助動詞") entry.bunrui = HB_SHUUSHI_JODOUSHI;
-            else if (bunrui_str == L"連体助動詞") entry.bunrui = HB_RENTAI_JODOUSHI;
-            else if (bunrui_str == L"仮定助動詞") entry.bunrui = HB_KATEI_JODOUSHI;
-            else if (bunrui_str == L"命令助動詞") entry.bunrui = HB_MEIREI_JODOUSHI;
-            else continue;
-        } else {
-            continue;
-        }
-
-        // complete fields[I_FIELD_POST] if lacked
-        if (fields.size() == 2) {
-            fields.push_back(fields[I_FIELD_PRE]);
-        } else if (fields[I_FIELD_POST].empty()) {
-            fields[I_FIELD_POST] = fields[I_FIELD_PRE];
-        }
+        entry.post = fields[I_FIELD_POST];
+        entry.tags = fields[I_FIELD_TAGS];
 
         // 辞書形式にする。
-        std::wstring substr;
-        wchar_t ch;
-        size_t i, ngyou;
-        switch (entry.bunrui) {
-        case HB_NAKEIYOUSHI: // 「な形容詞」
-            // 終端の「な」を削る。
-            i = fields[I_FIELD_PRE].size() - 1;
-            if (fields[I_FIELD_PRE][i] == L'な')
-                fields[I_FIELD_PRE].resize(i);
-            i = fields[I_FIELD_POST].size() - 1;
-            if (fields[I_FIELD_POST][i] == L'な')
-                fields[I_FIELD_POST].resize(i);
-            break;
-        case HB_IKEIYOUSHI: // 「い形容詞」
-            // 終端の「い」を削る。
-            i = fields[I_FIELD_PRE].size() - 1;
-            if (fields[I_FIELD_PRE][i] == L'い')
-                fields[I_FIELD_PRE].resize(i);
-            i = fields[I_FIELD_POST].size() - 1;
-            if (fields[I_FIELD_POST][i] == L'い')
-                fields[I_FIELD_POST].resize(i);
-            break;
-        case HB_ICHIDAN_DOUSHI: // 「一段動詞」
-            // 終端の「る」を削る。
-            if (fields[I_FIELD_PRE][fields[I_FIELD_PRE].size() - 1] == L'る')
-                fields[I_FIELD_PRE].resize(fields[I_FIELD_PRE].size() - 1);
-            if (fields[I_FIELD_POST][fields[I_FIELD_POST].size() - 1] == L'る')
-                fields[I_FIELD_POST].resize(fields[I_FIELD_POST].size() - 1);
-            break;
-        case HB_KAHEN_DOUSHI: // 「カ変動詞」
-            // 変更しない。
-            break;
-        case HB_SAHEN_DOUSHI: // 「サ変動詞」
-            // 「する」「ずる」そのものは登録しない。
-            if (fields[I_FIELD_PRE] == L"する" || fields[I_FIELD_PRE] == L"ずる")
-                continue;
-            //  「する」または「ずる」で終わらなければ失敗。
-            substr = fields[I_FIELD_PRE].substr(fields[I_FIELD_PRE].size() - 2, 2);
-            if (substr == L"する" && fields[I_FIELD_POST].substr(fields[I_FIELD_POST].size() - 2, 2) == L"する")
-                entry.gyou = GYOU_SA;
-            else if (substr == L"ずる" && fields[I_FIELD_POST].substr(fields[I_FIELD_POST].size() - 2, 2) == L"ずる")
-                entry.gyou = GYOU_ZA;
-            else
-                continue;
-            // 終端の「する」または「ずる」を削る。
-            fields[I_FIELD_PRE] = fields[I_FIELD_PRE].substr(0, fields[I_FIELD_PRE].size() - 2);
-            fields[I_FIELD_POST] = fields[I_FIELD_POST].substr(0, fields[I_FIELD_POST].size() - 2);
-            break;
-        case HB_GODAN_DOUSHI: // 「五段動詞」
-            // 終端の文字を取得する。
-            ch = fields[I_FIELD_PRE][fields[I_FIELD_PRE].size() - 1];
-            // 終端の文字がウ段でなければ失敗。
-            if (g_vowel_map[ch] != L'う')
-                continue;
-            // 終端の文字を削る。
-            fields[I_FIELD_PRE].resize(fields[I_FIELD_PRE].size() - 1);
-            fields[I_FIELD_POST].resize(fields[I_FIELD_POST].size() - 1);
-            // 終端文字だったものの行を取得し、セットする。
-            ch = g_consonant_map[ch];
-            for (i = 0; i < _countof(s_hiragana_table); ++i) {
-                if (s_hiragana_table[i][0] == ch) {
-                    ngyou = i;
-                    break;
-                }
-            }
-            entry.gyou = (Gyou)ngyou;
-            break;
-        default:
-            break;
-        }
-
-        // エントリーをセットする。
-        entry.pre = fields[I_FIELD_PRE];
-        entry.post = fields[I_FIELD_POST];
-        if (fields.size() >= 4) {
-            entry.tags = fields[I_FIELD_TAGS];
-        } else {
-            entry.tags.clear();
-        }
+        if (!MakeDictFormat(entry, fields[I_FIELD_HINSHI]))
+            continue;
 
         // エントリーを追加する。
         entries.push_back(entry);
