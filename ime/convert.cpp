@@ -1312,6 +1312,8 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
                 DoMeishi(saved, fields);
                 fields[I_FIELD_POST] = convert_to_kansuuji_formal(fields[I_FIELD_PRE]);
                 DoMeishi(saved, fields);
+                fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(fields[I_FIELD_PRE]);
+                DoMeishi(saved, fields);
             }
 
             // 郵便番号変換。
