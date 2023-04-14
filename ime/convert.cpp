@@ -2082,7 +2082,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 一段動詞の終止形。「寄せる」「見る」
+    // 一段動詞の終止形。「寄せる」「見る」「見るよ」「見るね」
     // 一段動詞の連体形。「寄せる(とき)」「見る(とき)」
     do {
         if (str.empty() || str[0] != L'る') break;
