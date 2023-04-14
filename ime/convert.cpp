@@ -1921,9 +1921,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     node.bunrui = HB_GODAN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
     node.cost = node.CalcCost() + deltaCost;
-
-    WORD w = fields[I_FIELD_HINSHI][0];
-    node.gyou = (Gyou)HIBYTE(w);
+    node.gyou = (Gyou)HIBYTE(fields[I_FIELD_HINSHI][0]);
 
     // 五段動詞の未然形。
     // 「咲く(五段)」→「咲か(ない)」、「食う(五段)」→「食わ(ない)」
@@ -2337,9 +2335,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     node.bunrui = HB_SAHEN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
     node.cost = node.CalcCost() + deltaCost;
-
-    WORD w = fields[I_FIELD_HINSHI][0];
-    node.gyou = (Gyou)HIBYTE(w);
+    node.gyou = (Gyou)HIBYTE(fields[I_FIELD_HINSHI][0]);
 
     // 未然形
     node.katsuyou = MIZEN_KEI;
