@@ -1635,7 +1635,10 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 名詞形
+    // 名詞形。
+    // 「痛い(い形容詞)」→「痛さ(名詞)」、
+    // 「痛い(い形容詞)」→「痛み(名詞)」、
+    // 「痛い(い形容詞)」→「痛め(名詞)」など。
     node.bunrui = HB_MEISHI;
     do {
         if (str.empty() || str[0] != L'さ') break;
@@ -1664,7 +1667,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] = fields[I_FIELD_PRE] + L"そう";
         new_fields[I_FIELD_POST] = fields[I_FIELD_POST] + L"そう";
-        DoNakeiyoushi(index, new_fields);
+        DoNakeiyoushi(index, new_fields, deltaCost);
     }
 
     // 「痛。」「寒。」など
