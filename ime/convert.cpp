@@ -987,6 +987,39 @@ void Lattice::AddExtra()
         return;
     }
 
+    // 今月（this month）
+    if (m_pre == L"こんげつ") {
+        SYSTEMTIME st;
+        ::GetLocalTime(&st);
+        WCHAR sz[32];
+
+        WStrings fields(NUM_FIELDS);
+        fields[I_FIELD_PRE] = m_pre;
+        fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
+
+        StringCchPrintfW(sz, _countof(sz), L"%u年%u月", st.wYear, st.wMonth);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+        DoFields(0, fields, +10);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+        DoFields(0, fields, +10);
+
+        StringCchPrintfW(sz, _countof(sz), L"%u年%02u月", st.wYear, st.wMonth);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+        DoFields(0, fields, +10);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+        DoFields(0, fields, +10);
+
+        return;
+    }
+
     // 現在の時刻（current time）
     if (m_pre == L"じこく" || m_pre == L"ただいま") {
         SYSTEMTIME st;
