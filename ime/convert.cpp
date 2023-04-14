@@ -1599,6 +1599,15 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while(0);
+    // 「美しい」→「美しゅう(て)」
+    do {
+        if (str.empty() || str[0] != L'ゅ' || str[1] != L'う') break;
+        node.pre = fields[I_FIELD_PRE] + L"ゅう";
+        node.post = fields[I_FIELD_POST] + L"ゅう";
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+    } while(0);
+    // TODO: 「危ない」→「危のう(て)」
 
     // い形容詞の終止形。
     node.katsuyou = SHUUSHI_KEI;
