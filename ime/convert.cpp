@@ -1723,6 +1723,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     node.cost = node.CalcCost() + deltaCost;
 
     // な形容詞の未然形。
+    // 「巨大な」→「巨大だろ(う)」
     do {
         if (str.empty() || str.substr(0, 2) != L"だろ") break;
         node.katsuyou = MIZEN_KEI;
