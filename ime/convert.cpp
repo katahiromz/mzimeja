@@ -926,7 +926,15 @@ void Lattice::AddExtra()
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
 
+        StringCchPrintfW(sz, _countof(sz), L"%u年%02u月%02u日", st.wYear, st.wMonth, st.wDay);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+
         StringCchPrintfW(sz, _countof(sz), L"%04u/%02u/%02u", st.wYear, st.wMonth, st.wDay);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+
+        StringCchPrintfW(sz, _countof(sz), L"%04u.%02u.%02u", st.wYear, st.wMonth, st.wDay);
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
 
@@ -2039,7 +2047,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields)
 } // Lattice::DoKahenDoushi
 
 // サ変動詞を変換する。
-void Lattice::DoSahenDoushi(size_t index, const WStrings& fields)
+void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
 {
     FOOTMARK();
     ASSERT(fields.size() == NUM_FIELDS);
@@ -2059,7 +2067,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields)
     LatticeNode node;
     node.bunrui = HB_SAHEN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost();
+    node.cost = node.CalcCost() + deltaCost;
 
     WORD w = fields[I_FIELD_HINSHI][0];
     node.gyou = (Gyou)HIBYTE(w);
@@ -2253,6 +2261,54 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         new_fields[I_FIELD_PRE] += L"っぽ";
         new_fields[I_FIELD_POST] += L"っぽ";
         DoIkeiyoushi(index, new_fields);
+    }
+
+    // 名詞＋「する」で動詞に
+    if (str.size() >= 2 && str[0] == L'す' && str[1] == L'る') {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += L"する";
+        new_fields[I_FIELD_POST] += L"する";
+        DoSahenDoushi(index, new_fields, -10);
+    }
+
+    // 名詞＋「すれ」で動詞に
+    if (str.size() >= 2 && str[0] == L'す' && str[1] == L'れ') {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += L"すれ";
+        new_fields[I_FIELD_POST] += L"すれ";
+        DoSahenDoushi(index, new_fields, -10);
+    }
+
+    // 名詞＋「し」で動詞に
+    if (str.size() >= 2 && str[0] == L'し') {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += L"し";
+        new_fields[I_FIELD_POST] += L"し";
+        DoSahenDoushi(index, new_fields, -10);
+    }
+
+    // 名詞＋「しろ」で動詞に
+    if (str.size() >= 2 && str[0] == L'し' && str[1] == L'ろ') {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += L"しろ";
+        new_fields[I_FIELD_POST] += L"しろ";
+        DoSahenDoushi(index, new_fields, -10);
+    }
+
+    // 名詞＋「せよ」で動詞に
+    if (str.size() >= 2 && str[0] == L'せ' && str[1] == L'よ') {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += L"せよ";
+        new_fields[I_FIELD_POST] += L"せよ";
+        DoSahenDoushi(index, new_fields, -10);
+    }
+
+    // 名詞＋「な」でな形容詞に
+    if (str.size() >= 2 && str[0] == L'な') {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += L"な";
+        new_fields[I_FIELD_POST] += L"な";
+        DoNakeiyoushi(index, new_fields);
     }
 } // Lattice::DoMeishi
 
