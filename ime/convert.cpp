@@ -1934,6 +1934,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     }
 
     // 五段動詞の未然形。
+    // 「咲く(五段)」→「咲か(ない)」、「食う(五段)」→「食わ(ない)」
     do {
         node.katsuyou = MIZEN_KEI;
         if (node.gyou == GYOU_A) {
@@ -1953,6 +1954,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     } while(0);
 
     // 五段動詞の連用形。
+    // 「咲く(五段)」→「咲き(ます)」、「食う(五段)」→「食い(ます)」
     node.katsuyou = RENYOU_KEI;
     do {
         wchar_t ch = s_hiragana_table[node.gyou][DAN_I];
@@ -1962,6 +1964,10 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while(0);
+    // 音便処理。
+    // 「泣き(た)」「泣き(て)」「泣き(たり)」→「泣い(た)」「泣い(て)」「泣い(たり)」
+    // 「持ち(た)」「持ち(て)」「持ち(たり)」→「持っ(た)」「持っ(て)」「持っ(たり)」
+    // 「呼び(た)」「呼び(て)」「呼び(たり)」→「呼ん(だ)」「呼ん(て)」「呼ん(だり)」
     do {
         if (type == 0) break;
         wchar_t ch;
