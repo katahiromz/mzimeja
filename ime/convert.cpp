@@ -1891,7 +1891,9 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 名詞形
+    // 名詞形。
+    // 「動く(五段)」→「動き(名詞)」、
+    // 「聞き取る(五段)」→「聞き取り(名詞)」など。
     node.bunrui = HB_MEISHI;
     do {
         wchar_t ch = s_hiragana_table[node.gyou][DAN_I];
@@ -1903,7 +1905,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     } while(0);
 
     // 「動く(五段)」→「動ける(一段)」、
-    // 「聞く(五段)」→「聞ける(一段)」など
+    // 「聞く(五段)」→「聞ける(一段)」など。
     {
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += s_hiragana_table[node.gyou][DAN_I];
