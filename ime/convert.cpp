@@ -10,7 +10,7 @@
 const DWORD c_dwMilliseconds = 8000;
 
 // ひらがな表。品詞の活用で使用される。
-static const wchar_t s_hiragana_table[][5] =
+static const WCHAR s_hiragana_table[][5] =
 {
     // DAN_A, DAN_I, DAN_U, DAN_E, DAN_O
     {L'あ', L'い', L'う', L'え', L'お'}, // GYOU_A
@@ -31,8 +31,8 @@ static const wchar_t s_hiragana_table[][5] =
     {L'ん',     0,     0,     0,     0}, // GYOU_NN
 }; // ※ s_hiragana_table[GYOU_DA][DAN_U] のように使用する。
 
-std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
-std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
+std::unordered_map<WCHAR,WCHAR>   g_vowel_map;      // 母音写像。
+std::unordered_map<WCHAR,WCHAR>   g_consonant_map;  // 子音写像。
 
 // 子音の写像と母音の写像を作成する。
 void MakeLiteralMaps()
@@ -75,7 +75,7 @@ HinshiBunrui StringToHinshi(LPCTSTR str)
 LPCWSTR BunruiToString(HinshiBunrui bunrui)
 {
     int index = int(bunrui) - int(HB_HEAD);
-    static const wchar_t *s_array[] = {
+    static const WCHAR *s_array[] = {
         L"HB_HEAD",
         L"HB_TAIL",
         L"HB_UNKNOWN",
@@ -552,7 +552,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
 
     // データを辞書形式に変換する。
     std::wstring substr;
-    wchar_t ch;
+    WCHAR ch;
     size_t i, ngyou;
     switch (bunrui) {
     case HB_NAKEIYOUSHI: // な形容詞
@@ -689,7 +689,7 @@ DWORD Dict::GetSize() const
 }
 
 // 辞書を読み込む。
-BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name)
+BOOL Dict::Load(const WCHAR *file_name, const WCHAR *object_name)
 {
     if (IsLoaded()) return TRUE; // すでに読み込み済み。
 
@@ -729,7 +729,7 @@ BOOL Dict::Load(const wchar_t *file_name, const wchar_t *object_name)
                 // 新しく作成された。ファイルを読み込む。
                 FILE *fp = _wfopen(m_strFileName.c_str(), L"rb");
                 if (fp) {
-                    wchar_t *pch = Lock();
+                    WCHAR *pch = Lock();
                     if (pch) {
                         ret = (BOOL)fread(pch, cbSize, 1, fp);
                         Unlock(pch);
@@ -771,17 +771,17 @@ void Dict::Unload()
 }
 
 // 辞書をロックして情報の取得を開始。
-wchar_t *Dict::Lock()
+WCHAR *Dict::Lock()
 {
     if (m_hFileMapping == NULL) return NULL;
     DWORD cbSize = GetSize();
     void *pv = ::MapViewOfFile(m_hFileMapping,
                                FILE_MAP_ALL_ACCESS, 0, 0, cbSize);
-    return reinterpret_cast<wchar_t *>(pv);
+    return reinterpret_cast<WCHAR *>(pv);
 }
 
 // 辞書のロックを解除して、情報の取得を終了。
-void Dict::Unlock(wchar_t *data)
+void Dict::Unlock(WCHAR *data)
 {
     ::UnmapViewOfFile(data);
 }
@@ -1182,7 +1182,7 @@ void Lattice::AddExtra()
     }
 
     // 記号（symbols）
-    static const wchar_t *s_words[] = {
+    static const WCHAR *s_words[] = {
         L"きごう",      // IDS_SYMBOLS
         L"けいせん",    // IDS_KEISEN
         L"けいさん",    // IDS_MATH
@@ -1925,14 +1925,6 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     WORD w = fields[I_FIELD_HINSHI][0];
     node.gyou = (Gyou)HIBYTE(w);
 
-    int type;
-    switch (node.gyou) {
-    case GYOU_KA: case GYOU_GA:                 type = 1; break;
-    case GYOU_NA: case GYOU_BA: case GYOU_MA:   type = 2; break;
-    case GYOU_TA: case GYOU_RA: case GYOU_WA:   type = 3; break;
-    default:                                    type = 0; break;
-    }
-
     // 五段動詞の未然形。
     // 「咲く(五段)」→「咲か(ない)」、「食う(五段)」→「食わ(ない)」
     do {
@@ -1944,7 +1936,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
             m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
             m_refs[index + node.pre.size()]++;
         } else {
-            wchar_t ch = s_hiragana_table[node.gyou][DAN_A];
+            WCHAR ch = s_hiragana_table[node.gyou][DAN_A];
             if (str.empty() || str[0] != ch) break;
             node.pre = fields[I_FIELD_PRE] + ch;
             node.post = fields[I_FIELD_POST] + ch;
@@ -1957,25 +1949,35 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 「咲く(五段)」→「咲き(ます)」、「食う(五段)」→「食い(ます)」
     node.katsuyou = RENYOU_KEI;
     do {
-        wchar_t ch = s_hiragana_table[node.gyou][DAN_I];
+        WCHAR ch = s_hiragana_table[node.gyou][DAN_I];
         if (str.empty() || str[0] != ch) break;
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while(0);
+
     // 音便処理。
     // 「泣き(た)」「泣き(て)」「泣き(たり)」→「泣い(た)」「泣い(て)」「泣い(たり)」
     // 「持ち(た)」「持ち(て)」「持ち(たり)」→「持っ(た)」「持っ(て)」「持っ(たり)」
     // 「呼び(た)」「呼び(て)」「呼び(たり)」→「呼ん(だ)」「呼ん(で)」「呼ん(だり)」
     do {
+        INT type;
+        switch (node.gyou) {
+        case GYOU_KA: case GYOU_GA:                 type = 1; break;
+        case GYOU_NA: case GYOU_BA: case GYOU_MA:   type = 2; break;
+        case GYOU_TA: case GYOU_RA: case GYOU_WA:   type = 3; break;
+        default:                                    type = 0; break;
+        }
         if (type == 0) break;
-        wchar_t ch;
+
+        WCHAR ch;
         switch (type) {
         case 1:   ch = L'い'; break;
         case 2:   ch = L'ん'; break;
         case 3:   ch = L'っ'; break;
         }
+
         if (str.empty() || str[0] != ch) break;
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
@@ -1986,7 +1988,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 五段動詞の終止形。「動く」「聞き取る」
     // 五段動詞の連体形。「動く(とき)」「聞き取る(とき)」
     do {
-        wchar_t ch = s_hiragana_table[node.gyou][DAN_U];
+        WCHAR ch = s_hiragana_table[node.gyou][DAN_U];
         if (str.empty() || str[0] != ch) break;
         node.katsuyou = SHUUSHI_KEI;
         node.pre = fields[I_FIELD_PRE] + ch;
@@ -2007,7 +2009,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 五段動詞の仮定形。「動く」→「動け(ば)」、「聞き取る」→「聞き取れ(ば)」
     // 五段動詞の命令形。「動く」→「動け」「動けよ」、「聞き取る」→「聞き取れ」「聞き取れよ」
     do {
-        wchar_t ch = s_hiragana_table[node.gyou][DAN_E];
+        WCHAR ch = s_hiragana_table[node.gyou][DAN_E];
         if (str.empty() || str[0] != ch) break;
         node.katsuyou = KATEI_KEI;
         node.pre = fields[I_FIELD_PRE] + ch;
@@ -2029,7 +2031,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 「聞き取る(五段)」→「聞き取り(名詞)」「聞き取り方(名詞)」など。
     node.bunrui = HB_MEISHI;
     do {
-        wchar_t ch = s_hiragana_table[node.gyou][DAN_I];
+        WCHAR ch = s_hiragana_table[node.gyou][DAN_I];
         if (str.empty() || str[0] != ch) break;
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
@@ -3218,7 +3220,7 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     if (str1.size() <= 1) return FALSE;
 
     // get the last character of this clause
-    wchar_t ch = str1[str1.size() - 1];
+    WCHAR ch = str1[str1.size() - 1];
     // shrink
     str1.resize(str1.size() - 1);
 
@@ -3305,7 +3307,7 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     if (str2.empty()) return FALSE;
 
     // get the first character of the second clause
-    wchar_t ch = str2[0];
+    WCHAR ch = str2[0];
     // add the character to the first clause
     str1 += ch;
     if (str2.size() == 1) {
