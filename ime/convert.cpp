@@ -1935,7 +1935,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-        if (str.empty() || str[1] != L'か' || str[2] != L'た') break;
+        if (str[1] != L'か' || str[2] != L'た') break;
         node.pre += L"かた";
         node.post += L"方";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
