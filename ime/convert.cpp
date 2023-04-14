@@ -2032,11 +2032,16 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
     } while(0);
 
     // 一段動詞の名詞形。
-    // 「寄せる」→「寄せ」、「見る」→「見」
+    // 「寄せる」→「寄せ」「寄せ方」、「見る」→「見」「見方」
     node.bunrui = HB_MEISHI;
     do {
         node.pre = fields[I_FIELD_PRE];
         node.post = fields[I_FIELD_POST];
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+        if (str.empty() || str[0] != L'か' || str[1] != L'た') break;
+        node.pre += L"かた";
+        node.post += L"方";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while(0);
