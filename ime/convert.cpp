@@ -1677,7 +1677,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     if (str.size()) {
         switch (str[0]) {
         case L'。': case L'、': case L'，': case L'．': case 0:
-            DoMeishi(index, fields);
+            DoMeishi(index, fields, deltaCost);
             break;
         }
     }
