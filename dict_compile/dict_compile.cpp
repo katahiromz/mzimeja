@@ -205,15 +205,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries) {
                 fields[I_FIELD_POST].resize(fields[I_FIELD_POST].size() - 1);
             break;
         case HB_KAHEN_DOUSHI: // 「カ変動詞」
-            // 「くる」そのものは登録しない。
-            if (fields[I_FIELD_PRE] == L"くる")
-                continue;
-            // 終端の「くる」を削る。
-            substr = fields[I_FIELD_PRE].substr(fields[I_FIELD_PRE].size() - 2, 2);
-            if (substr == L"くる")
-                fields[I_FIELD_PRE] = substr;
-            substr = fields[I_FIELD_POST].substr(fields[I_FIELD_POST].size() - 2, 2);
-            fields[I_FIELD_POST] = substr;
+            // 変更しない。
             break;
         case HB_SAHEN_DOUSHI: // 「サ変動詞」
             // 「する」「ずる」そのものは登録しない。

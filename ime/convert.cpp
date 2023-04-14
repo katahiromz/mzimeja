@@ -581,16 +581,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
             post.resize(post.size() - 1);
         break;
     case HB_KAHEN_DOUSHI: // カ変動詞
-        // 「くる」そのものは登録しない。
-        if (pre == L"くる")
-            return TRUE;
-        // 終端の「くる」を削る。
-        substr = pre.substr(pre.size() - 2, 2);
-        if (substr == L"くる")
-            pre = substr;
-        substr = post.substr(post.size() - 2, 2);
-        if (substr == L"くる")
-            post = substr;
+        // 変更しない。
         break;
     case HB_SAHEN_DOUSHI: // サ変動詞
         // 「する」「ずる」そのものは登録しない。
@@ -1258,12 +1249,6 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
 
         // special cases
         switch (pre[index]) {
-        case L'こ': case L'き': case L'く': // KURU
-            // カ変動詞。
-            fields.resize(NUM_FIELDS);
-            fields[I_FIELD_HINSHI] = { MAKEWORD(HB_KAHEN_DOUSHI, GYOU_KA) };
-            DoKahenDoushi(index, fields);
-            break;
         case L'さ': case L'し': case L'せ': case L'す': // SURU
             // サ変動詞。
             fields.resize(NUM_FIELDS);
@@ -1924,8 +1909,11 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields)
     FOOTMARK();
     ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[I_FIELD_PRE].size());
-    size_t length = fields[I_FIELD_PRE].size();
+
     // boundary check
+    size_t length = fields[I_FIELD_PRE].size();
+    if (length == 0)
+        return;
     if (index + length > pre.size()) {
         return;
     }
@@ -1933,76 +1921,124 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields)
     if (pre.substr(index, length) != fields[I_FIELD_PRE]) {
         return;
     }
-    // get the right substring
-    std::wstring str = pre.substr(index + length);
 
     LatticeNode node;
     node.bunrui = HB_KAHEN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
     node.cost = node.CalcCost();
 
-    // 未然形
-    do {
-        if (str.empty() || str[0] != L'こ') break;
-        node.katsuyou = MIZEN_KEI;
-        node.pre = fields[I_FIELD_PRE] + L'こ';
-        node.post = fields[I_FIELD_POST] + L'来';
-        chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
-    } while(0);
+    // 「来る」を削ったものをpre2, post2とする。
+    BOOL bKuruKezutta = FALSE;
+    std::wstring pre2 = fields[I_FIELD_PRE];
+    std::wstring post2 = fields[I_FIELD_POST];
+    if (pre2.size() >= 2 &&
+        post2.size() >= 2 &&
+        pre2.substr(pre2.size() - 2, 2) == L"くる" &&
+        (post2.substr(post2.size() - 2, 2) == L"来る" ||
+         post2.substr(post2.size() - 2, 2) == L"くる" ||
+         post2.substr(post2.size() - 2, 2) == L"クる"))
+    {
+        pre2 = pre2.substr(0, pre2.size() - 2);
+        post2 = post2.substr(0, post2.size() - 2);
+        bKuruKezutta = TRUE;
+    }
 
-    // 連用形
+    // 終止形と連用形「～来る」
     do {
-        if (str.empty() || str[0] != L'き') break;
-        node.katsuyou = RENYOU_KEI;
-        node.pre = fields[I_FIELD_PRE] + L'き';
-        node.post = fields[I_FIELD_POST] + L'来';
-        chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
-    } while(0);
-
-    // 終止形
-    // 連用形
-    do {
-        if (str.empty() || str.substr(0, 2) != L"くる") break;
+        if (bKuruKezutta)
+        {
+            node.pre = pre2 + L"くる";
+            node.post = post2 + L"来る";
+        }
+        else if (pre2 == L"くる" && post2 == L"来る")
+        {
+            node.pre = pre2;
+            node.post = post2;
+        }
+        if (pre.substr(index).find(node.pre) != 0)
+            break;
         node.katsuyou = SHUUSHI_KEI;
-        node.pre = fields[I_FIELD_PRE] + L"くる";
-        node.post = fields[I_FIELD_POST] + L"来る";
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 2]++;
+        refs[index + node.pre.size()]++;
         node.katsuyou = RENYOU_KEI;
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 2]++;
+        refs[index + node.pre.size()]++;
     } while(0);
 
-    // 仮定形
+    // 命令形「～こい」
     do {
-        if (str.empty() || str.substr(0, 2) != L"くれ") break;
-        node.katsuyou = KATEI_KEI;
-        node.pre = fields[I_FIELD_PRE] + L"くれ";
-        node.post = fields[I_FIELD_POST] + L"来れ";
-        chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 2]++;
-    } while(0);
-
-    // 命令形
-    do {
-        if (str.empty() || str.substr(0, 2) != L"こい") break;
+        if (bKuruKezutta)
+        {
+            node.pre = pre2 + L"こい";
+            node.post = post2 + L"来い";
+        }
+        else if (pre2 == L"こい" && post2 == L"来い")
+        {
+            node.pre = pre2;
+            node.post = post2;
+        }
+        if (pre.substr(index).find(node.pre) != 0)
+            break;
         node.katsuyou = MEIREI_KEI;
-        node.pre = fields[I_FIELD_PRE] + L"こい";
-        node.post = fields[I_FIELD_POST] + L"来い";
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 2]++;
+        refs[index + node.pre.size()]++;
     } while(0);
 
-    // 名詞形
-    node.bunrui = HB_MEISHI;
+    // 仮定形「～来れ」
     do {
-        if (str.empty() || str[0] != L'き') break;
-        node.pre = fields[I_FIELD_PRE] + L'き';
-        node.post = fields[I_FIELD_POST] + L'来';
+        if (bKuruKezutta)
+        {
+            node.pre = pre2 + L"くれ";
+            node.post = post2 + L"来れ";
+        }
+        else if (pre2 == L"くれ" && post2 == L"来れ")
+        {
+            node.pre = L"くれ";
+            node.post = L"来れ";
+        }
+        if (pre.substr(index).find(node.pre) != 0)
+            break;
+        node.katsuyou = KATEI_KEI;
         chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        refs[index + fields[I_FIELD_PRE].size() + 1]++;
+        refs[index + node.pre.size()]++;
+    } while(0);
+
+    // 未然形「～来」（こ）
+    do {
+        if (bKuruKezutta)
+        {
+            node.pre = pre2 + L"こ";
+            node.post = post2 + L"来";
+        }
+        else if (pre2 == L"こ" && post2 == L"来")
+        {
+            node.pre = L"こ";
+            node.post = L"来";
+        }
+        if (pre.substr(index).find(node.pre) != 0)
+            break;
+        node.katsuyou = MIZEN_KEI;
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        refs[index + node.pre.size()]++;
+    } while(0);
+
+    // 連用形「～来」（き）
+    do {
+        if (bKuruKezutta)
+        {
+            node.pre = pre2 + L"き";
+            node.post = post2 + L"来";
+        }
+        else if (pre2 == L"き" && post2 == L"来")
+        {
+            node.pre = L"き";
+            node.post = L"来";
+        }
+        if (pre.substr(index).find(node.pre) != 0)
+            break;
+        node.katsuyou = RENYOU_KEI;
+        chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        refs[index + node.pre.size()]++;
     } while(0);
 } // Lattice::DoKahenDoushi
 
