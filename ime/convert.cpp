@@ -1288,7 +1288,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             ++index;
             continue;
         }
-        // arrows (zh, zj, zk, zl) and z.
+        // arrows (zh, zj, zk, zl) and z. etc.
         WCHAR ch0 = translateChar(m_pre[index], FALSE, TRUE);
         if (ch0 == L'z' || ch0 == L'Z') {
             WCHAR ch1 = translateChar(m_pre[index + 1], FALSE, TRUE);
@@ -1297,7 +1297,12 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             else if (ch1 == L'j' || ch1 == L'J') ch2 = L'↓'; // zj
             else if (ch1 == L'k' || ch1 == L'K') ch2 = L'↑'; // zk
             else if (ch1 == L'l' || ch1 == L'L') ch2 = L'→'; // zl
+            else if (is_hyphen(ch1)) ch2 = L'～'; // z-
             else if (is_period(ch1)) ch2 = L'…'; // z.
+            else if (is_comma(ch1)) ch2 = L'‥'; // z,
+            else if (ch1 == L'[' || ch1 == L'［') ch2 = L'『'; // z[
+            else if (ch1 == L']' || ch1 == L'］') ch2 = L'』'; // z]
+            else if (ch1 == L'/' || ch1 == L'／') ch2 = L'・'; // z/
             if (ch2) {
                 fields.resize(NUM_FIELDS);
                 fields[I_FIELD_PRE] = m_pre.substr(index, 2);
