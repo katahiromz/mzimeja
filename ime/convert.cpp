@@ -1661,6 +1661,13 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while(0);
+    do {
+        if (str.empty() || str[0] != L'め') break;
+        node.pre = fields[I_FIELD_PRE] + L'め';
+        node.post = fields[I_FIELD_POST] + L'め';
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+    } while(0);
 
     // (い形容詞の語幹)+"そうだ"
     if (str.size() >= 2 && str[0] == L'そ' && str[1] == L'う') {
