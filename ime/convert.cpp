@@ -1722,7 +1722,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     node.tags = fields[I_FIELD_TAGS];
     node.cost = node.CalcCost() + deltaCost;
 
-    // 未然形
+    // な形容詞の未然形。
     do {
         if (str.empty() || str.substr(0, 2) != L"だろ") break;
         node.katsuyou = MIZEN_KEI;
@@ -1732,7 +1732,8 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 連用形
+    // な形容詞の連用形。
+    // 「巨大な」→「巨大だっ(た)」
     node.katsuyou = RENYOU_KEI;
     do {
         if (str.empty() || str.substr(0, 2) != L"だっ") break;
@@ -1756,7 +1757,8 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 終止形
+    // な形容詞の終止形。
+    // 「巨大な」→「巨大だ」
     do {
         if (str.empty() || str[0] != L'だ') break;
         node.katsuyou = SHUUSHI_KEI;
@@ -1766,7 +1768,8 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 連体形
+    // な形容詞の連体形。
+    // 「巨大な」→「巨大な(とき)」
     do {
         if (str.empty() || str[0] != L'な') break;
         node.katsuyou = RENTAI_KEI;
@@ -1776,7 +1779,8 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 仮定形
+    // な形容詞の仮定形。
+    // 「巨大な」→「巨大なら」
     do {
         if (str.empty() || str.substr(0, 2) != L"なら") break;
         node.katsuyou = KATEI_KEI;
@@ -1786,8 +1790,9 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 名詞形。
-    // 「きれいな(な形容詞)」→「きれいさ(名詞)」。
+    // な形容詞の名詞形。
+    // 「きれいな(な形容詞)」→「きれいさ(名詞)」、
+    // 「巨大な」→「巨大さ」。
     node.bunrui = HB_MEISHI;
     do {
         if (str.empty() || str[0] != L'さ') break;
@@ -1797,7 +1802,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 「きれい。」「静か。」など
+    // 「きれい。」「静か。」「巨大。」など
     if (str.empty()) {
         DoMeishi(index, fields, deltaCost);
     } else {
