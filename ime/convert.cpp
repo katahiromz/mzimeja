@@ -912,11 +912,18 @@ bool LatticeNode::IsJodoushi() const
 void Lattice::AddExtra()
 {
     FOOTMARK();
+    static const LPCWSTR s_weekdays[] = {
+        L"Sun", L"Mon", L"Tue", L"Wed", L"Thu", L"Fri", L"Sat"
+    };
+    static const LPCWSTR s_months[] = {
+        L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
+        L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
+    };
     // 今日（today）
     if (m_pre == L"きょう") {
         SYSTEMTIME st;
         ::GetLocalTime(&st);
-        WCHAR sz[32];
+        WCHAR sz[64];
 
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
@@ -942,7 +949,15 @@ void Lattice::AddExtra()
         fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
         DoFields(0, fields, +10);
 
+        StringCchPrintfW(sz, _countof(sz), L"%04u-%02u-%02u", st.wYear, st.wMonth, st.wDay);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+
         StringCchPrintfW(sz, _countof(sz), L"%04u/%02u/%02u", st.wYear, st.wMonth, st.wDay);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+
+        StringCchPrintfW(sz, _countof(sz), L"%04u/%u/%u", st.wYear, st.wMonth, st.wDay);
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
 
@@ -950,17 +965,24 @@ void Lattice::AddExtra()
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
 
+        StringCchPrintfW(sz, _countof(sz), L"%04u.%u.%u", st.wYear, st.wMonth, st.wDay);
+        fields[I_FIELD_POST] = sz;
+        DoFields(0, fields);
+
         StringCchPrintfW(sz, _countof(sz), L"%02u/%02u/%04u", st.wMonth, st.wDay, st.wYear);
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
 
-        StringCchPrintfW(sz, _countof(sz), L"%04u-%02u-%02u", st.wYear, st.wMonth, st.wDay);
+        StringCchPrintfW(sz, _countof(sz), L"%u/%u/%04u", st.wMonth, st.wDay, st.wYear);
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
 
-        StringCchPrintfW(sz, _countof(sz), L"%02u-%02u-%04u", st.wMonth, st.wDay, st.wYear);
+        StringCchPrintfW(sz, _countof(sz), L"%s %s %02u %04u",
+                         s_weekdays[st.wDayOfWeek], s_months[st.wMonth - 1],
+                         st.wDay, st.wYear);
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
+
         return;
     }
 
@@ -1300,15 +1322,15 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             else if (is_hyphen(ch1)) ch2 = L'～'; // z-
             else if (is_period(ch1)) ch2 = L'…'; // z.
             else if (is_comma(ch1)) ch2 = L'‥'; // z,
-            else if (ch1 == L'[' || ch1 == L'［') ch2 = L'『'; // z[
-            else if (ch1 == L']' || ch1 == L'］') ch2 = L'』'; // z]
+            else if (ch1 == L'[' || ch1 == L'［' || ch1 == L'「') ch2 = L'『'; // z[
+            else if (ch1 == L']' || ch1 == L'］' || ch1 == L'」') ch2 = L'』'; // z]
             else if (ch1 == L'/' || ch1 == L'／') ch2 = L'・'; // z/
             if (ch2) {
                 fields.resize(NUM_FIELDS);
                 fields[I_FIELD_PRE] = m_pre.substr(index, 2);
                 fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
                 fields[I_FIELD_POST] = { ch2 };
-                DoFields(index, fields, -10);
+                DoFields(index, fields, -100);
                 ++index;
                 continue;
             }
@@ -1607,7 +1629,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while(0);
-    // 「痛い」→「痛く(て)」
+    // 「痛い」→「痛く(て)」、「広い」→「広く(て)」
     do {
         if (str.empty() || str[0] != L'く') break;
         node.pre = fields[I_FIELD_PRE] + L'く';
@@ -1632,6 +1654,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while(0);
     // TODO: 「危ない」→「危のう(て)」
+    // TODO: 「暖かい」→「暖こう(て)」
 
     // い形容詞の終止形。
     node.katsuyou = SHUUSHI_KEI;
@@ -2515,10 +2538,10 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + length]++;
         break;
     case HB_IKEIYOUSHI: // い形容詞。
-        DoIkeiyoushi(index, fields);
+        DoIkeiyoushi(index, fields, deltaCost);
         break;
     case HB_NAKEIYOUSHI: // な形容詞。
-        DoNakeiyoushi(index, fields);
+        DoNakeiyoushi(index, fields, deltaCost);
         break;
     case HB_MIZEN_JODOUSHI:
         node.bunrui = HB_JODOUSHI;
