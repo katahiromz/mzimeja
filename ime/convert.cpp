@@ -1674,9 +1674,11 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     }
 
     // 「痛。」「寒。」など
-    if (str.size()) {
+    if (str.empty()) {
+        DoMeishi(index, fields, deltaCost);
+    } else {
         switch (str[0]) {
-        case L'。': case L'、': case L'，': case L'．': case 0:
+        case L'。': case L'、': case L'，': case L'．': case L'.': case L',':
             DoMeishi(index, fields, deltaCost);
             break;
         }
