@@ -1267,8 +1267,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             continue;
         }
         // arrow right (→)
-        if ((m_pre[index] == L'-' || m_pre[index] == L'－' || m_pre[index] == L'ー') &&
-            (m_pre[index + 1] == L'>' || m_pre[index + 1] == L'＞'))
+        if (is_hyphen(m_pre[index]) && (m_pre[index + 1] == L'>' || m_pre[index + 1] == L'＞'))
         {
             fields.resize(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre.substr(index, 2);
@@ -1279,9 +1278,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             continue;
         }
         // arrow left (←)
-        if ((m_pre[index] == L'<' || m_pre[index] == L'＜') &&
-            (m_pre[index + 1] == L'-' || m_pre[index + 1] == L'－' ||
-                m_pre[index + 1] == L'ー'))
+        if ((m_pre[index] == L'<' || m_pre[index] == L'＜') && is_hyphen(m_pre[index + 1]))
         {
             fields.resize(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre.substr(index, 2);
@@ -1290,6 +1287,59 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             DoFields(index, fields);
             ++index;
             continue;
+        }
+        // arrows (zh, zj, zk, zl)
+        if (m_pre[index] == L'z' || m_pre[index] == L'Z' ||
+            m_pre[index] == L'ｚ' || m_pre[index] == L'Ｚ')
+        {
+            if (m_pre[index + 1] == L'h' || m_pre[index + 1] == L'H' ||
+                m_pre[index + 1] == L'ｈ' || m_pre[index + 1] == L'Ｈ')
+            {
+                // zh
+                fields.resize(NUM_FIELDS);
+                fields[I_FIELD_PRE] = m_pre.substr(index, 2);
+                fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
+                fields[I_FIELD_POST] = { L'←' };
+                DoFields(index, fields);
+                ++index;
+                continue;
+            }
+            if (m_pre[index + 1] == L'j' || m_pre[index + 1] == L'J' ||
+                m_pre[index + 1] == L'ｊ' || m_pre[index + 1] == L'Ｊ')
+            {
+                // zj
+                fields.resize(NUM_FIELDS);
+                fields[I_FIELD_PRE] = m_pre.substr(index, 2);
+                fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
+                fields[I_FIELD_POST] = { L'↓' };
+                DoFields(index, fields);
+                ++index;
+                continue;
+            }
+            if (m_pre[index + 1] == L'k' || m_pre[index + 1] == L'K' ||
+                m_pre[index + 1] == L'ｋ' || m_pre[index + 1] == L'Ｋ')
+            {
+                // zk
+                fields.resize(NUM_FIELDS);
+                fields[I_FIELD_PRE] = m_pre.substr(index, 2);
+                fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
+                fields[I_FIELD_POST] = { L'↑' };
+                DoFields(index, fields);
+                ++index;
+                continue;
+            }
+            if (m_pre[index + 1] == L'l' || m_pre[index + 1] == L'L' ||
+                m_pre[index + 1] == L'ｌ' || m_pre[index + 1] == L'Ｌ')
+            {
+                // zl
+                fields.resize(NUM_FIELDS);
+                fields[I_FIELD_PRE] = m_pre.substr(index, 2);
+                fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
+                fields[I_FIELD_POST] = { L'→' };
+                DoFields(index, fields);
+                ++index;
+                continue;
+            }
         }
         // other non-hiragana
         if (!is_hiragana(m_pre[index])) { // ひらがなではない？
