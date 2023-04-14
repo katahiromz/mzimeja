@@ -1950,10 +1950,14 @@ std::wstring convert_to_kansuuji(const std::wstring& str)
 std::wstring convert_to_kansuuji_brief(const std::wstring& str)
 {
     std::wstring halfwidth = lcmap(str, LCMAP_HALFWIDTH);
-    ASSERT(are_all_chars_numeric(halfwidth));
     std::wstring ret;
     for (size_t i = 0; i < halfwidth.size(); ++i) {
-        ret += s_szKanjiDigits[halfwidth[i] - L'0'];
+        if (L'0' <= halfwidth[i] && halfwidth[i] <= L'9')
+            ret += s_szKanjiDigits[halfwidth[i] - L'0'];
+        else if (L'０' <= halfwidth[i] && halfwidth[i] <= L'９')
+            ret += s_szKanjiDigits[halfwidth[i] - L'０'];
+        else
+            ret += halfwidth[i];
     }
     return ret;
 }
@@ -1962,6 +1966,20 @@ std::wstring convert_to_kansuuji_brief(const std::wstring& str)
 std::wstring convert_to_kansuuji_formal(const std::wstring& str)
 {
     std::wstring ret = convert_to_kansuuji(str);
+    str_replace_all(ret, L"一", L"壱");
+    str_replace_all(ret, L"二", L"弐");
+    str_replace_all(ret, L"三", L"参");
+    str_replace_all(ret, L"五", L"伍");
+    str_replace_all(ret, L"十", L"拾");
+    str_replace_all(ret, L"千", L"仟");
+    str_replace_all(ret, L"万", L"萬");
+    return ret;
+}
+
+// 漢数字変換（その６）。
+std::wstring convert_to_kansuuji_brief_formal(const std::wstring& str)
+{
+    std::wstring ret = convert_to_kansuuji_brief(str);
     str_replace_all(ret, L"一", L"壱");
     str_replace_all(ret, L"二", L"弐");
     str_replace_all(ret, L"三", L"参");

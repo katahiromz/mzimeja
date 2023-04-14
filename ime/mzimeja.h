@@ -331,6 +331,7 @@ std::wstring convert_to_kansuuji_4(const std::wstring& halfwidth);
 std::wstring convert_to_kansuuji(const std::wstring& str);
 std::wstring convert_to_kansuuji_brief(const std::wstring& str);
 std::wstring convert_to_kansuuji_formal(const std::wstring& str);
+std::wstring convert_to_kansuuji_brief_formal(const std::wstring& str);
 // ピリオドか？
 BOOL is_period(WCHAR ch);
 // カンマか？

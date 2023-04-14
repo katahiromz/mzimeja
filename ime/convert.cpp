@@ -926,9 +926,21 @@ void Lattice::AddExtra()
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
 
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+        DoFields(0, fields, +10);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+        DoFields(0, fields, +10);
+
         StringCchPrintfW(sz, _countof(sz), L"%u年%02u月%02u日", st.wYear, st.wMonth, st.wDay);
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+        DoFields(0, fields, +10);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+        DoFields(0, fields, +10);
 
         StringCchPrintfW(sz, _countof(sz), L"%04u/%02u/%02u", st.wYear, st.wMonth, st.wDay);
         fields[I_FIELD_POST] = sz;
@@ -965,6 +977,13 @@ void Lattice::AddExtra()
         StringCchPrintfW(sz, _countof(sz), L"%u年", st.wYear);
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+        DoFields(0, fields, +10);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+        DoFields(0, fields, +10);
+
         return;
     }
 
@@ -989,26 +1008,62 @@ void Lattice::AddExtra()
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
 
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+        DoFields(0, fields, +10);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+        DoFields(0, fields, +10);
+
         StringCchPrintfW(sz, _countof(sz), L"%02u時%02u分%02u秒", st.wHour, st.wMinute, st.wSecond);
         fields[I_FIELD_POST] = sz;
         DoFields(0, fields);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+        DoFields(0, fields, +10);
+
+        fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+        DoFields(0, fields, +10);
 
         if (st.wHour >= 12) {
             StringCchPrintfW(sz, _countof(sz), L"午後%u時%u分%u秒", st.wHour - 12, st.wMinute, st.wSecond);
             fields[I_FIELD_POST] = sz;
             DoFields(0, fields);
 
+            fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+            DoFields(0, fields, +10);
+
+            fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+            DoFields(0, fields, +10);
+
             StringCchPrintfW(sz, _countof(sz), L"午後%02u時%02u分%02u秒", st.wHour - 12, st.wMinute, st.wSecond);
             fields[I_FIELD_POST] = sz;
             DoFields(0, fields);
+
+            fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+            DoFields(0, fields, +10);
+
+            fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+            DoFields(0, fields, +10);
         } else {
             StringCchPrintfW(sz, _countof(sz), L"午前%u時%u分%u秒", st.wHour, st.wMinute, st.wSecond);
             fields[I_FIELD_POST] = sz;
             DoFields(0, fields);
 
+            fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+            DoFields(0, fields, +10);
+
+            fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+            DoFields(0, fields, +10);
+
             StringCchPrintfW(sz, _countof(sz), L"午前%02u時%02u分%02u秒", st.wHour, st.wMinute, st.wSecond);
             fields[I_FIELD_POST] = sz;
             DoFields(0, fields);
+
+            fields[I_FIELD_POST] = convert_to_kansuuji_brief(sz);
+            DoFields(0, fields, +10);
+
+            fields[I_FIELD_POST] = convert_to_kansuuji_brief_formal(sz);
+            DoFields(0, fields, +10);
         }
 
         StringCchPrintfW(sz, _countof(sz), L"%02u:%02u:%02u", st.wHour, st.wMinute, st.wSecond);
@@ -1449,7 +1504,7 @@ size_t Lattice::GetLastLinkedIndex() const
 } // Lattice::GetLastLinkedIndex
 
 // イ形容詞を変換する。
-void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
+void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
 {
     FOOTMARK();
     ASSERT(fields.size() == NUM_FIELDS);
@@ -1470,7 +1525,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
     LatticeNode node;
     node.bunrui = HB_IKEIYOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost();
+    node.cost = node.CalcCost() + deltaCost;
 
     // 未然形
     do {
@@ -1590,7 +1645,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields)
 } // Lattice::DoIkeiyoushi
 
 // ナ形容詞を変換する。
-void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields)
+void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
 {
     FOOTMARK();
     ASSERT(fields.size() == NUM_FIELDS);
@@ -1610,7 +1665,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields)
     LatticeNode node;
     node.bunrui = HB_NAKEIYOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost();
+    node.cost = node.CalcCost() + deltaCost;
 
     // 未然形
     do {
@@ -1695,7 +1750,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields)
 } // Lattice::DoNakeiyoushi
 
 // 五段動詞を変換する。
-void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
+void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
 {
     FOOTMARK();
     ASSERT(fields.size() == NUM_FIELDS);
@@ -1716,7 +1771,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
     LatticeNode node;
     node.bunrui = HB_GODAN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost();
+    node.cost = node.CalcCost() + deltaCost;
 
     WORD w = fields[I_FIELD_HINSHI][0];
     node.gyou = (Gyou)HIBYTE(w);
@@ -1825,7 +1880,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields)
 } // Lattice::DoGodanDoushi
 
 // 一段動詞を変換する。
-void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields)
+void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCost)
 {
     FOOTMARK();
     ASSERT(fields.size() == NUM_FIELDS);
@@ -1845,7 +1900,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields)
     LatticeNode node;
     node.bunrui = HB_ICHIDAN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost();
+    node.cost = node.CalcCost() + deltaCost;
 
     // 未然形
     // 連用形
@@ -1912,7 +1967,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields)
 } // Lattice::DoIchidanDoushi
 
 // カ変動詞を変換する。
-void Lattice::DoKahenDoushi(size_t index, const WStrings& fields)
+void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
 {
     FOOTMARK();
     ASSERT(fields.size() == NUM_FIELDS);
@@ -1929,7 +1984,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields)
     LatticeNode node;
     node.bunrui = HB_KAHEN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost();
+    node.cost = node.CalcCost() + deltaCost;
 
     // 「来る」を削ったものをpre2, post2とする。
     BOOL bKuruKezutta = FALSE;
@@ -2312,7 +2367,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
     }
 } // Lattice::DoMeishi
 
-void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
+void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
 {
     ASSERT(fields.size() == NUM_FIELDS);
     if (fields.size() != NUM_FIELDS) {
@@ -2336,12 +2391,12 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
     node.bunrui = (HinshiBunrui)LOBYTE(w);
     node.gyou = (Gyou)HIBYTE(w);
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost() + cost;
+    node.cost = node.CalcCost() + deltaCost;
 
     // add new entries by node classification (BUNRUI)
     switch (node.bunrui) {
     case HB_MEISHI:
-        DoMeishi(index, fields);
+        DoMeishi(index, fields, deltaCost);
         break;
     case HB_PERIOD: case HB_COMMA: case HB_SYMBOL:
     case HB_RENTAISHI: case HB_FUKUSHI:
@@ -2409,16 +2464,16 @@ void Lattice::DoFields(size_t index, const WStrings& fields, int cost /* = 0*/)
         refs[index + length]++;
         break;
     case HB_GODAN_DOUSHI:
-        DoGodanDoushi(index, fields);
+        DoGodanDoushi(index, fields, deltaCost);
         break;
     case HB_ICHIDAN_DOUSHI:
-        DoIchidanDoushi(index, fields);
+        DoIchidanDoushi(index, fields, deltaCost);
         break;
     case HB_KAHEN_DOUSHI:
-        DoKahenDoushi(index, fields);
+        DoKahenDoushi(index, fields, deltaCost);
         break;
     case HB_SAHEN_DOUSHI:
-        DoSahenDoushi(index, fields);
+        DoSahenDoushi(index, fields, deltaCost);
         break;
     default:
         break;

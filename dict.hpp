@@ -158,14 +158,14 @@ struct Lattice {
     void CutUnlinkedNodes();
     size_t GetLastLinkedIndex() const;
 
-    void DoFields(size_t index, const WStrings& fields, int cost = 0);
+    void DoFields(size_t index, const WStrings& fields, INT deltaCost = 0);
 
     void DoMeishi(size_t index, const WStrings& fields, INT deltaCost = 0);
-    void DoIkeiyoushi(size_t index, const WStrings& fields);
-    void DoNakeiyoushi(size_t index, const WStrings& fields);
-    void DoGodanDoushi(size_t index, const WStrings& fields);
-    void DoIchidanDoushi(size_t index, const WStrings& fields);
-    void DoKahenDoushi(size_t index, const WStrings& fields);
+    void DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
+    void DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
+    void DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
+    void DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
+    void DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
     void DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
 
     void Dump(int num = 0);
