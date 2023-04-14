@@ -1925,14 +1925,18 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     } while(0);
 
     // 五段動詞の名詞形。
-    // 「動く(五段)」→「動き(名詞)」、
-    // 「聞き取る(五段)」→「聞き取り(名詞)」など。
+    // 「動く(五段)」→「動き(名詞)」「動き方(名詞)」、
+    // 「聞き取る(五段)」→「聞き取り(名詞)」「聞き取り方(名詞)」など。
     node.bunrui = HB_MEISHI;
     do {
         wchar_t ch = s_hiragana_table[node.gyou][DAN_I];
         if (str.empty() || str[0] != ch) break;
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+        node.pre += L"かた";
+        node.post += L"方";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while(0);
