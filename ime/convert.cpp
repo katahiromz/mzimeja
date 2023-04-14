@@ -1970,8 +1970,8 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
     node.tags = fields[I_FIELD_TAGS];
     node.cost = node.CalcCost() + deltaCost;
 
-    // 未然形
-    // 連用形
+    // 一段動詞の未然形。「寄せる」→「寄せ(ない/よう)」、「見る」→「見(ない/よう)」
+    // 一段動詞の連用形。「寄せる」→「寄せ(ます/た)」、「見る」→「見(ます/た)」
     do {
         node.katsuyou = MIZEN_KEI;
         node.pre = fields[I_FIELD_PRE];
@@ -1983,8 +1983,8 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 終止形
-    // 連体形
+    // 一段動詞の終止形。「寄せる」「見る」
+    // 一段動詞の連体形。「寄せる(とき)」「見る(とき)」
     do {
         if (str.empty() || str[0] != L'る') break;
         node.katsuyou = SHUUSHI_KEI;
@@ -1997,7 +1997,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 仮定形
+    // 一段動詞の仮定形。「寄せる」→「寄せれ(ば)」、「見る」→「見れ(ば)」
     do {
         if (str.empty() || str[0] != L'れ') break;
         node.katsuyou = KATEI_KEI;
@@ -2007,7 +2007,8 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 命令形
+    // 一段動詞の命令形。
+    // 「寄せる」→「寄せろ」、「見る」→「見ろ」
     node.katsuyou = MEIREI_KEI;
     do {
         if (str.empty() || str[0] != L'ろ') break;
@@ -2016,6 +2017,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while(0);
+    // 「寄せる」→「寄せよ」、「見る」→「見よ」
     do {
         if (str.empty() || str[0] != L'よ') break;
         node.pre = fields[I_FIELD_PRE] + L'よ';
@@ -2024,7 +2026,8 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         m_refs[index + node.pre.size()]++;
     } while(0);
 
-    // 名詞形
+    // 一段動詞の名詞形。
+    // 「寄せる」→「寄せ」、「見る」→「見」
     node.bunrui = HB_MEISHI;
     do {
         node.pre = fields[I_FIELD_PRE];
