@@ -1662,6 +1662,11 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L'く';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
+        if (str.size() < 2 || str[1] != L'て') break;
+        node.pre += str[1]
+        node.post += str[1];
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
     } while(0);
     // 「広い」→「広う(て)」
     do {
@@ -2076,7 +2081,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
     node.cost = node.CalcCost() + deltaCost;
 
     // 一段動詞の未然形。「寄せる」→「寄せ(ない/よう)」、「見る」→「見(ない/よう)」
-    // 一段動詞の連用形。「寄せる」→「寄せ(ます/た)」、「見る」→「見(ます/た)」
+    // 一段動詞の連用形。「寄せる」→「寄せ(ます/た/て)」、「見る」→「見(ます/た/て)」
     do {
         node.katsuyou = MIZEN_KEI;
         node.pre = fields[I_FIELD_PRE];
@@ -2084,6 +2089,11 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
         node.katsuyou = RENYOU_KEI;
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+        if (str.empty() || str[0] != L'て') break;
+        node.pre += str[0];
+        node.post += str[0];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while(0);
