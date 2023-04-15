@@ -1958,7 +1958,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 音便処理。
     // 「泣き(て/た/たり/ても)」→「泣い(て/た/たり/ても)」
     // 「持ち(て/た/たり/ても)」→「持っ(て/た/たり/ても)」
-    // 「呼び(て/た/たり/ても)」→「呼ん(で/だ/だり/ても)」
+    // 「呼び(て/た/たり/ても)」→「呼ん(で/だ/だり/でも)」
     do {
         INT type;
         switch (node.gyou) {
