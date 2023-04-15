@@ -3173,7 +3173,7 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre)
 // 単一文節変換の結果を作成する。
 void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice)
 {
-    DPRINTW(L"%s\n", lattice.pre.c_str());
+    DPRINTW(L"%s\n", lattice.m_pre.c_str());
     result.clear(); // 結果をクリア。
     const size_t length = lattice.m_pre.size();
 
