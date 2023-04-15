@@ -2662,6 +2662,55 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
     }
 } // Lattice::DoMeishi
 
+void Lattice::DoFukushi(size_t index, const WStrings& fields, INT deltaCost)
+{
+    FOOTMARK();
+    ASSERT(fields.size() == NUM_FIELDS);
+    ASSERT(fields[I_FIELD_PRE].size());
+
+    size_t length = fields[I_FIELD_PRE].size();
+    // boundary check
+    if (index + length > m_pre.size()) {
+        return;
+    }
+    // check text matching
+    if (m_pre.substr(index, length) != fields[I_FIELD_PRE]) {
+        return;
+    }
+    // get the right substring
+    std::wstring str = m_pre.substr(index + length);
+
+    // ラティスノードの準備。
+    LatticeNode node;
+    node.bunrui = HB_FUKUSHI;
+    node.tags = fields[I_FIELD_TAGS];
+    node.cost = node.CalcCost() + deltaCost;
+
+    // 副詞。
+    node.pre = fields[I_FIELD_PRE];
+    node.post = fields[I_FIELD_POST];
+    m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+    m_refs[index + node.pre.size()]++;
+
+    // 副詞なら最後に「と」を付けてもいい。
+    do {
+        if (str.size() < 1 || str[0] != L'と') break;
+        node.pre += str[0];
+        node.post += str[0];
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+    } while (0);
+
+    // 副詞なら最後に「に」を付けてもいい。
+    do {
+        if (str.size() < 1 || str[0] != L'に') break;
+        node.pre = fields[I_FIELD_PRE] + str[0];
+        node.post = fields[I_FIELD_POST] + str[0];
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+    } while (0);
+}
+
 void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
 {
     ASSERT(fields.size() == NUM_FIELDS);
@@ -2694,7 +2743,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         DoMeishi(index, fields, deltaCost);
         break;
     case HB_PERIOD: case HB_COMMA: case HB_SYMBOL:
-    case HB_RENTAISHI: case HB_FUKUSHI:
+    case HB_RENTAISHI: 
     case HB_SETSUZOKUSHI: case HB_KANDOUSHI:
     case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
     case HB_FUKU_JOSHI: case HB_SHUU_JOSHI:
@@ -2703,6 +2752,8 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + length]++;
+    case HB_FUKUSHI:
+        DoFukushi(index, fields, deltaCost);
         break;
     case HB_IKEIYOUSHI: // い形容詞。
         DoIkeiyoushi(index, fields, deltaCost);

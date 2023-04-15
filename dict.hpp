@@ -167,6 +167,7 @@ struct Lattice {
     void DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
     void DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
     void DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
+    void DoFukushi(size_t index, const WStrings& fields, INT deltaCost = 0);
 
     void Dump(int num = 0);
     void Fix(const std::wstring& pre);
