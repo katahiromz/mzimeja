@@ -2001,6 +2001,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = RENTAI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
+        // 「動くよ」「動くね」「動くな」
         if (str.size() < 2 || (str[1] != L'よ' && str[1] != L'ね' && str[1] != L'な')) break;
         node.pre += str[1];
         node.post += str[1];
