@@ -2125,6 +2125,19 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
                     node.katsuyou = SHUUSHI_KEI;
                     m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
                     m_refs[index + node.pre.size()]++;
+                    // 「見ていたよぉ」「見ていたなー」「見ていたねえ」
+                    if (str.size() >= 5 &&
+                        (str[4] == L'ー' ||
+                         str[4] == L'あ' || str[4] == L'ぁ' ||
+                         str[4] == L'え' || str[4] == L'ぇ' ||
+                         str[4] == L'お' || str[4] == L'ぉ'))
+                    {
+                        node.pre += str[4];
+                        node.post += str[4];
+                        node.katsuyou = SHUUSHI_KEI;
+                        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+                        m_refs[index + node.pre.size()]++;
+                    }
                 }
             }
             // 「見てた」
@@ -2141,6 +2154,19 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
                     node.katsuyou = SHUUSHI_KEI;
                     m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
                     m_refs[index + node.pre.size()]++;
+                    // 「見てたよぉ」「見てたなー」「見てたねえ」
+                    if (str.size() >= 4 &&
+                        (str[3] == L'ー' ||
+                         str[3] == L'あ' || str[3] == L'ぁ' ||
+                         str[3] == L'え' || str[3] == L'ぇ' ||
+                         str[3] == L'お' || str[3] == L'ぉ'))
+                    {
+                        node.pre += str[3];
+                        node.post += str[3];
+                        node.katsuyou = SHUUSHI_KEI;
+                        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+                        m_refs[index + node.pre.size()]++;
+                    }
                 }
             }
         }
