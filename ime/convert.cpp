@@ -2172,7 +2172,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         }
     } while(0);
 
-    // 一段動詞の終止形。「寄せる」「見る」「見るよ」「見るね」
+    // 一段動詞の終止形。「寄せる」「見る」
     // 一段動詞の連体形。「寄せる(とき)」「見る(とき)」
     do {
         if (str.empty() || str[0] != L'る') break;
@@ -2184,6 +2184,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         node.katsuyou = RENTAI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
+        // 「見るよ」「見るね」「見るな」
         if (str.size() < 2 || (str[1] != L'よ' && str[1] != L'ね' && str[1] != L'な')) break;
         node.pre += str[1];
         node.post += str[1];
