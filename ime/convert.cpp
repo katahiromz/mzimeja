@@ -2709,6 +2709,15 @@ void Lattice::DoFukushi(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while (0);
+
+    // 副詞なら最後に「っと」「って」を付けてもいい。
+    do {
+        if (str.size() < 2 || str[0] != L'っ' || (str[1] != L'と' && str[1] != L'て')) break;
+        node.pre = fields[I_FIELD_PRE] + str[0] + str[1];
+        node.post = fields[I_FIELD_POST] + str[0] + str[1];
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+    } while (0);
 }
 
 void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
