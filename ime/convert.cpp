@@ -3123,6 +3123,11 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
             }
         }
 
+        // 到達できないときは打ち切る。TODO: もっとエレガントに
+        if (kb1 >= node1->branches.size()) {
+            break;
+        }
+
         // add clause
         if (ARRAY_AT(node1->branches, kb1)->pre.size()) {
             MzConvClause clause;

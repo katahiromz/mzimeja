@@ -146,8 +146,8 @@ struct Lattice {
     LatticeNodePtr                  m_head;   // 先頭ノード。
     std::vector<LatticeChunk>       m_chunks; // チャンク。
     std::vector<DWORD>              m_refs;   // 参照。
-    // pre.size() + 1 == chunks.size().
-    // pre.size() + 1 == refs.size().
+    // m_pre.size() + 1 == m_chunks.size().
+    // m_pre.size() + 1 == m_refs.size().
 
     BOOL AddNodes(size_t index, const WCHAR *dict_data);
     BOOL AddNodesForSingle(const WCHAR *dict_data);
