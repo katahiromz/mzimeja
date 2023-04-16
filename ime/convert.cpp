@@ -2732,6 +2732,8 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
 
     // ラティスノードの準備。
     LatticeNode node;
+    node.pre = fields[I_FIELD_PRE];
+    node.post = fields[I_FIELD_POST];
     WORD w = fields[I_FIELD_HINSHI][0];
     node.bunrui = (HinshiBunrui)LOBYTE(w);
     node.gyou = (Gyou)HIBYTE(w);
@@ -2749,10 +2751,8 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
     case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
     case HB_FUKU_JOSHI: case HB_SHUU_JOSHI:
     case HB_KANGO: case HB_SETTOUJI: case HB_SETSUBIJI:
-        node.pre = fields[I_FIELD_PRE];
-        node.post = fields[I_FIELD_POST];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + length]++;
+        m_refs[index + node.pre.size()]++;
         break;
     case HB_FUKUSHI:
         DoFukushi(index, fields, deltaCost);
@@ -2766,50 +2766,38 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
     case HB_MIZEN_JODOUSHI: // 未然助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = MIZEN_KEI;
-        node.pre = fields[I_FIELD_PRE];
-        node.post = fields[I_FIELD_POST];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + length]++;
+        m_refs[index + node.pre.size()]++;
         break;
     case HB_RENYOU_JODOUSHI: // 連用助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = RENYOU_KEI;
-        node.pre = fields[I_FIELD_PRE];
-        node.post = fields[I_FIELD_POST];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + length]++;
+        m_refs[index + node.pre.size()]++;
         break;
     case HB_SHUUSHI_JODOUSHI: // 終止助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = SHUUSHI_KEI;
-        node.pre = fields[I_FIELD_PRE];
-        node.post = fields[I_FIELD_POST];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + length]++;
+        m_refs[index + node.pre.size()]++;
         break;
     case HB_RENTAI_JODOUSHI: // 連体助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = RENTAI_KEI;
-        node.pre = fields[I_FIELD_PRE];
-        node.post = fields[I_FIELD_POST];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + length]++;
+        m_refs[index + node.pre.size()]++;
         break;
     case HB_KATEI_JODOUSHI: // 仮定助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = KATEI_KEI;
-        node.pre = fields[I_FIELD_PRE];
-        node.post = fields[I_FIELD_POST];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + length]++;
+        m_refs[index + node.pre.size()]++;
         break;
     case HB_MEIREI_JODOUSHI: // 命令助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = MEIREI_KEI;
-        node.pre = fields[I_FIELD_PRE];
-        node.post = fields[I_FIELD_POST];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + length]++;
+        m_refs[index + node.pre.size()]++;
         break;
     case HB_GODAN_DOUSHI: // 五段動詞。
         DoGodanDoushi(index, fields, deltaCost);
