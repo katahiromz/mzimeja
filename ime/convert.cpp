@@ -2768,7 +2768,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
     case HB_NAKEIYOUSHI: // な形容詞。
         DoNakeiyoushi(index, fields, deltaCost);
         break;
-    case HB_MIZEN_JODOUSHI:
+    case HB_MIZEN_JODOUSHI: // 未然助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = MIZEN_KEI;
         node.pre = fields[I_FIELD_PRE];
@@ -2776,7 +2776,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + length]++;
         break;
-    case HB_RENYOU_JODOUSHI:
+    case HB_RENYOU_JODOUSHI: // 連用助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = RENYOU_KEI;
         node.pre = fields[I_FIELD_PRE];
@@ -2784,7 +2784,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + length]++;
         break;
-    case HB_SHUUSHI_JODOUSHI:
+    case HB_SHUUSHI_JODOUSHI: // 終始助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = SHUUSHI_KEI;
         node.pre = fields[I_FIELD_PRE];
@@ -2792,7 +2792,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + length]++;
         break;
-    case HB_RENTAI_JODOUSHI:
+    case HB_RENTAI_JODOUSHI: // 連体助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = RENTAI_KEI;
         node.pre = fields[I_FIELD_PRE];
@@ -2800,7 +2800,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + length]++;
         break;
-    case HB_KATEI_JODOUSHI:
+    case HB_KATEI_JODOUSHI: // 仮定助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = KATEI_KEI;
         node.pre = fields[I_FIELD_PRE];
@@ -2808,7 +2808,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + length]++;
         break;
-    case HB_MEIREI_JODOUSHI:
+    case HB_MEIREI_JODOUSHI: // 命令助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = MEIREI_KEI;
         node.pre = fields[I_FIELD_PRE];
@@ -2816,16 +2816,16 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + length]++;
         break;
-    case HB_GODAN_DOUSHI:
+    case HB_GODAN_DOUSHI: // 五段動詞。
         DoGodanDoushi(index, fields, deltaCost);
         break;
-    case HB_ICHIDAN_DOUSHI:
+    case HB_ICHIDAN_DOUSHI: // 一段動詞。
         DoIchidanDoushi(index, fields, deltaCost);
         break;
-    case HB_KAHEN_DOUSHI:
+    case HB_KAHEN_DOUSHI: // カ変動詞。
         DoKahenDoushi(index, fields, deltaCost);
         break;
-    case HB_SAHEN_DOUSHI:
+    case HB_SAHEN_DOUSHI: // サ変動詞。
         DoSahenDoushi(index, fields, deltaCost);
         break;
     default:
