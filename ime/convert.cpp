@@ -2764,7 +2764,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + length]++;
         break;
-    case HB_SHUUSHI_JODOUSHI: // 終始助動詞。
+    case HB_SHUUSHI_JODOUSHI: // 終止助動詞。
         node.bunrui = HB_JODOUSHI;
         node.katsuyou = SHUUSHI_KEI;
         node.pre = fields[I_FIELD_PRE];
