@@ -2591,25 +2591,24 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
     node.tags = fields[I_FIELD_TAGS];
     node.cost = node.CalcCost() + deltaCost;
 
-    if (m_pre.substr(index, length) == fields[I_FIELD_PRE]) {
-        if (node.HasTag(L"[動植物]")) {
-            // animals or plants can be written in katakana
-            node.pre = fields[I_FIELD_PRE];
-            node.post = lcmap(fields[I_FIELD_PRE], LCMAP_KATAKANA | LCMAP_FULLWIDTH);
-            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-            m_refs[index + length]++;
+    // 名詞は活用なし。
+    if (node.HasTag(L"[動植物]")) {
+        // 動植物名は、カタカナでもよい。
+        node.pre = fields[I_FIELD_PRE];
+        node.post = lcmap(fields[I_FIELD_PRE], LCMAP_KATAKANA | LCMAP_FULLWIDTH);
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + length]++;
 
-            node.cost += 30;
-            node.pre = fields[I_FIELD_PRE];
-            node.post = fields[I_FIELD_POST];
-            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-            m_refs[index + length]++;
-        } else {
-            node.pre = fields[I_FIELD_PRE];
-            node.post = fields[I_FIELD_POST];
-            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-            m_refs[index + length]++;
-        }
+        node.cost += 30;
+        node.pre = fields[I_FIELD_PRE];
+        node.post = fields[I_FIELD_POST];
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + length]++;
+    } else {
+        node.pre = fields[I_FIELD_PRE];
+        node.post = fields[I_FIELD_POST];
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + length]++;
     }
 
     // 名詞＋「っぽい」でい形容詞に。
@@ -2617,7 +2616,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L"っぽ";
         new_fields[I_FIELD_POST] += L"っぽ";
-        DoIkeiyoushi(index, new_fields);
+        DoIkeiyoushi(index, new_fields, deltaCost);
     }
 
     // 名詞＋「する」「すれ」でサ変動詞に。
@@ -2627,12 +2626,12 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
 
     // 名詞＋「し」でサ変動詞に
     if (str.size() >= 1 && str[0] == L'し') {
-        DoSahenDoushi(index, fields, -10);
+        DoSahenDoushi(index, fields, deltaCost - 10);
     }
 
     // 名詞＋「せよ」でサ変動詞に。
     if (str.size() >= 2 && str[0] == L'せ' && str[1] == L'よ') {
-        DoSahenDoushi(index, fields, -10);
+        DoSahenDoushi(index, fields, deltaCost - 10);
     }
 
     // 名詞＋「な」でな形容詞に。
