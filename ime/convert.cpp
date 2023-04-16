@@ -174,7 +174,7 @@ CandConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2)
     default:
         break;
     }
-    return 0;
+    return 1;
 } // CandConnectCost
 
 // 品詞の連結可能性。
@@ -610,6 +610,8 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
         // 写像を準備する。
         MakeLiteralMaps();
         // 終端がウ段の文字でなければ失敗。
+        if (pre.empty())
+            return TRUE;
         ch = pre[pre.size() - 1];
         if (g_hiragana_to_dan[ch] != DAN_U)
             return TRUE;
@@ -1634,7 +1636,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L"かろ";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     MakeLiteralMaps();
 
@@ -1653,7 +1655,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = SHUUSHI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     // 「痛い」→「痛く(て)」、「広い」→「広く(て)」
     do {
         if (tail.empty() || tail[0] != L'く') break;
@@ -1666,7 +1668,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post += tail[1];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     // 「広い」→「広う(て)」
     do {
         if (tail.empty() || tail[0] != L'う') break;
@@ -1674,7 +1676,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L'う';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     // 「美しい」→「美しゅう(て)」
     do {
         if (tail.empty() || tail[0] != L'ゅ' || tail[1] != L'う') break;
@@ -1682,7 +1684,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L"ゅう";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     // TODO: 「危ない」→「危のう(て)」
     // TODO: 「暖かい」→「暖こう(て)」
 
@@ -1701,7 +1703,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post += tail[1];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // い形容詞の連体形。
     // 「痛い」→「痛い(とき)」
@@ -1712,7 +1714,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L'い';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     // 「痛い」→「痛き(とき)」
     do {
         if (tail.empty() || tail[0] != L'き') break;
@@ -1720,7 +1722,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L'き';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // い形容詞の仮定形。
     // 「痛い」→「痛けれ(ば)」
@@ -1731,7 +1733,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L"けれ";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // い形容詞の名詞形。
     // 「痛い(い形容詞)」→「痛さ(名詞)」、
@@ -1744,14 +1746,14 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L'さ';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     do {
         if (tail.empty() || tail[0] != L'み') break;
         node.pre = fields[I_FIELD_PRE] + L'み';
         node.post = fields[I_FIELD_POST] + L'み';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     do {
         if (tail.empty() || tail[0] != L'め') break;
         node.pre = fields[I_FIELD_PRE] + L'め';
@@ -1761,7 +1763,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L'目';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 「痛い(い形容詞)」→「痛そうな(な形容詞)」など。
     if (tail.size() >= 2 && tail[0] == L'そ' && tail[1] == L'う') {
@@ -1826,7 +1828,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L"だろ";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // な形容詞の連用形。
     // 「巨大な」→「巨大だっ(た)」
@@ -1843,7 +1845,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = SHUUSHI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     node.katsuyou = RENYOU_KEI;
     do {
         if (tail.empty() || tail[0] != L'で') break;
@@ -1851,14 +1853,14 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L'で';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     do {
         if (tail.empty() || tail[0] != L'に') break;
         node.pre = fields[I_FIELD_PRE] + L'に';
         node.post = fields[I_FIELD_POST] + L'に';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // な形容詞の終止形。
     // 「巨大な」→「巨大だ」「巨大だね」「巨大だぞ」
@@ -1876,7 +1878,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post += tail[1];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // な形容詞の連体形。
     // 「巨大な」→「巨大な(とき)」
@@ -1887,7 +1889,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L'な';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // な形容詞の仮定形。
     // 「巨大な」→「巨大なら」
@@ -1898,7 +1900,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L"なら";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // な形容詞の名詞形。
     // 「きれいな(な形容詞)」→「きれいさ(名詞)」、
@@ -1910,7 +1912,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L'さ';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 「きれい。」「静か。」「巨大。」など
     if (tail.empty()) {
@@ -1955,38 +1957,43 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     do {
         node.katsuyou = MIZEN_KEI;
         if (node.gyou == GYOU_A) {
-            if (tail.empty() || tail[0] != L'わ') break;
+            if (tail.empty() || tail[0] != L'わ')
+                break;
             node.pre = fields[I_FIELD_PRE] + L'わ';
             node.post = fields[I_FIELD_POST] + L'わ';
-            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-            m_refs[index + node.pre.size()]++;
         } else {
             WCHAR ch = s_hiragana_table[node.gyou][DAN_A];
-            if (tail.empty() || tail[0] != ch) break;
+            if (tail.empty() || tail[0] != ch)
+                break;
             node.pre = fields[I_FIELD_PRE] + ch;
             node.post = fields[I_FIELD_POST] + ch;
-            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-            m_refs[index + node.pre.size()]++;
         }
-    } while(0);
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+    } while (0);
 
     // 五段動詞の連用形。
-    // 「咲く(五段)」→「咲き(ます)」、「食う(五段)」→「食い(ます)」
     node.katsuyou = RENYOU_KEI;
     do {
+        // 「咲く(五段)」→「咲き(ます)」、「食う(五段)」→「食い(ます)」
         WCHAR ch = s_hiragana_table[node.gyou][DAN_I];
-        if (tail.empty() || tail[0] != ch) break;
+        if (tail.size() <= 0 || tail[0] != ch)
+            break;
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+        if (tail.size() <= 2 || tail.substr(tail.size() - 2, 2) != L"ます")
+            break;
+        node.pre += L"ます";
+        node.post += L"ます";
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
 
-    // 五段動詞の音便処理。
-    // 「泣き(て/た/たり/ても)」→「泣い(て/た/たり/ても)」
-    // 「持ち(て/た/たり/ても)」→「持っ(て/た/たり/ても)」
-    // 「呼び(て/た/たり/ても)」→「呼ん(で/だ/だり/でも)」
-    do {
+        // 五段動詞の音便処理。
+        // 「泣き(て/た/たり/ても)」→「泣い(て/た/たり/ても)」
+        // 「持ち(て/た/たり/ても)」→「持っ(て/た/たり/ても)」
+        // 「呼び(て/た/たり/ても)」→「呼ん(で/だ/だり/でも)」
         INT type;
         switch (node.gyou) {
         case GYOU_KA: case GYOU_GA:                 type = 1; break;
@@ -1994,35 +2001,48 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         case GYOU_TA: case GYOU_RA: case GYOU_WA:   type = 3; break;
         default:                                    type = 0; break;
         }
-        if (type == 0) break;
+        if (type == 0)
+            break;
 
-        WCHAR ch;
+        WCHAR ch2 = 0, ch3 = 0;
         switch (type) {
-        case 1:   ch = L'い'; break;
-        case 2:   ch = L'ん'; break;
-        case 3:   ch = L'っ'; break;
+        case 1: ch2 = L'い'; ch3 = L'て'; break;
+        case 2: ch2 = L'ん'; ch3 = L'で'; break;
+        case 3: ch2 = L'っ'; ch3 = L'て'; break;
         }
-
-        if (tail.empty() || tail[0] != ch) break;
-        node.pre = fields[I_FIELD_PRE] + ch;
-        node.post = fields[I_FIELD_POST] + ch;
-        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + node.pre.size()]++;
-    } while(0);
+        if (ch2 == 0)
+            break;
+        if (tail.size() >= 1 && tail[0] == ch2) {
+            node.pre = fields[I_FIELD_PRE] + ch2;
+            node.post = fields[I_FIELD_POST] + ch2;
+            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+            m_refs[index + node.pre.size()]++;
+        }
+        if (tail.size() >= 2 && tail[0] == ch2 && tail[1] == ch3) {
+            node.pre = fields[I_FIELD_PRE] + ch2 + ch3;
+            node.post = fields[I_FIELD_POST] + ch2 + ch3;
+            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+            m_refs[index + node.pre.size()]++;
+        }
+    } while (0);
 
     // 五段動詞の終止形。「動く」「聞き取る」
     // 五段動詞の連体形。「動く(とき)」「聞き取る(とき)」
     do {
         WCHAR ch = s_hiragana_table[node.gyou][DAN_U];
-        if (tail.empty() || tail[0] != ch) break;
+        if (tail.size() <= 0 || tail[0] != ch)
+            break;
+
         node.katsuyou = SHUUSHI_KEI;
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
+
         node.katsuyou = RENTAI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
+
         // 「動くよ」「動くね」「動くな」「動くぞ」
         if (tail.size() < 2 ||
             (tail[1] != L'よ' && tail[1] != L'ね' && tail[1] != L'な' && tail[1] != L'ぞ'))
@@ -2032,27 +2052,31 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = SHUUSHI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 五段動詞の仮定形。「動く」→「動け(ば)」、「聞き取る」→「聞き取れ(ば)」
     // 五段動詞の命令形。「動く」→「動け」「動けよ」、「聞き取る」→「聞き取れ」「聞き取れよ」
     do {
         WCHAR ch = s_hiragana_table[node.gyou][DAN_E];
-        if (tail.empty() || tail[0] != ch) break;
+        if (tail.empty() || tail[0] != ch)
+            break;
         node.katsuyou = KATEI_KEI;
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
+
         node.katsuyou = MEIREI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-        if (tail.size() < 2 || (tail[1] != L'よ' && tail[1] != L'や')) break;
+
+        if (tail.size() < 2 || (tail[1] != L'よ' && tail[1] != L'や'))
+            break;
         node.pre += tail[1];
         node.post += tail[1];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 五段動詞の名詞形。
     // 「動く(五段)」→「動き(名詞)」「動き方(名詞)」、
@@ -2060,26 +2084,31 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     node.bunrui = HB_MEISHI;
     do {
         WCHAR ch = s_hiragana_table[node.gyou][DAN_I];
-        if (tail.empty() || tail[0] != ch) break;
+        if (tail.empty() || tail[0] != ch)
+            break;
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-        if (tail[1] != L'か' || tail[2] != L'た') break;
+        if (tail[1] != L'か' || tail[2] != L'た')
+            break;
         node.pre += L"かた";
         node.post += L"方";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 「動く(五段)」→「動ける(一段)」、
     // 「聞く(五段)」→「聞ける(一段)」など。
-    {
+    do {
+        WCHAR ch = s_hiragana_table[node.gyou][DAN_I];
+        if (tail.empty() || tail[0] != ch)
+            break;
         WStrings new_fields = fields;
-        new_fields[I_FIELD_PRE] += s_hiragana_table[node.gyou][DAN_I];
-        new_fields[I_FIELD_POST] += s_hiragana_table[node.gyou][DAN_I];
+        new_fields[I_FIELD_PRE] += ch;
+        new_fields[I_FIELD_POST] += ch;
         DoIchidanDoushi(index, new_fields, deltaCost);
-    }
+    } while (0);
 } // Lattice::DoGodanDoushi
 
 // 一段動詞を変換する。
@@ -2182,7 +2211,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
                 }
             }
         }
-    } while(0);
+    } while (0);
 
     // 一段動詞の終止形。「寄せる」「見る」
     // 一段動詞の連体形。「寄せる(とき)」「見る(とき)」
@@ -2205,7 +2234,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         node.katsuyou = SHUUSHI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 一段動詞の仮定形。「寄せる」→「寄せれ(ば)」、「見る」→「見れ(ば)」
     do {
@@ -2215,7 +2244,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         node.post = fields[I_FIELD_POST] + L'れ';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 一段動詞の命令形。
     // 「寄せる」→「寄せろ」「寄せろよ」、「見る」→「見ろ」「見ろよ」
@@ -2231,7 +2260,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         node.post += tail[1];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     // 「寄せる」→「寄せよ」、「見る」→「見よ」
     do {
         if (tail.empty() || tail[0] != L'よ') break;
@@ -2239,7 +2268,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         node.post = fields[I_FIELD_POST] + L'よ';
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 一段動詞の名詞形。
     // 「寄せる」→「寄せ」「寄せ方」、「見る」→「見」「見方」
@@ -2254,7 +2283,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
         node.post += L"方";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 } // Lattice::DoIchidanDoushi
 
 // カ変動詞を変換する。
@@ -2285,7 +2314,6 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 実際の辞書では「来い」を登録するなど回避策を施している。
 
     // 終止形と連用形「～来る」
-    node.cost -= 30;
     do {
         if (tail.size() < 2 || tail[0] != L'く' || tail[1] != L'る') break;
         node.pre = fields[I_FIELD_PRE] + L"くる";
@@ -2305,8 +2333,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = SHUUSHI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
-    node.cost += 30;
+    } while (0);
     do {
         if (fields[I_FIELD_PRE] != L"くる") break;
         node.pre = fields[I_FIELD_PRE];
@@ -2329,7 +2356,6 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     } while (0);
 
     // 命令形「～こい」「～こいよ」「～こいや」
-    node.cost -= 30;
     do {
         if (tail.size() < 2 || tail[0] != L'こ' || tail[1] != L'い') break;
         node.pre = fields[I_FIELD_PRE] + L"こい";
@@ -2342,8 +2368,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post += tail[2];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
-    node.cost += 30;
+    } while (0);
     do {
         if (fields[I_FIELD_PRE] != L"こい") break;
         node.pre = fields[I_FIELD_PRE];
@@ -2359,7 +2384,6 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     } while (0);
 
     // 仮定形「～来れ」
-    node.cost -= 30;
     do {
         if (tail.size() < 2 || tail[0] != L'く' || tail[1] != L'れ') break;
         node.pre = fields[I_FIELD_PRE] + L"くれ";
@@ -2367,8 +2391,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = KATEI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
-    node.cost += 30;
+    } while (0);
     do {
         if (fields[I_FIELD_PRE] != L"くれ") break;
         node.pre = fields[I_FIELD_PRE];
@@ -2379,7 +2402,6 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     } while (0);
 
     // 未然形「～来」（こ）
-    node.cost -= 30;
     do {
         if (tail.size() < 1 || tail[0] != L'こ') break;
         node.pre = fields[I_FIELD_PRE] + L"こ";
@@ -2387,8 +2409,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = MIZEN_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
-    node.cost += 30;
+    } while (0);
     do {
         if (fields[I_FIELD_PRE] != L"こ") break;
         node.pre = fields[I_FIELD_PRE];
@@ -2399,7 +2420,6 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     } while (0);
 
     // 連用形「～来」（き）
-    node.cost -= 30;
     do {
         if (tail.size() < 1 || tail[0] != L'き') break;
         node.pre = fields[I_FIELD_PRE] + L"き";
@@ -2407,8 +2427,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = RENYOU_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
-    node.cost += 30;
+    } while (0);
     do {
         if (fields[I_FIELD_PRE] != L"き") break;
         node.pre = fields[I_FIELD_PRE];
@@ -2458,7 +2477,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         }
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     do {
         if (node.gyou == GYOU_ZA) {
             if (tail.empty() || tail[0] != L'じ') break;
@@ -2471,7 +2490,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         }
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     do {
         if (node.gyou == GYOU_ZA) {
             if (tail.empty() || tail[0] != L'ぜ') break;
@@ -2484,7 +2503,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         }
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 連用形
     node.katsuyou = RENYOU_KEI;
@@ -2500,7 +2519,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         }
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 終止形
     // 連用形
@@ -2521,7 +2540,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = RENYOU_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     do {
         if (node.gyou == GYOU_ZA) {
             if (tail.empty() || tail[0] != L'ず') break;
@@ -2535,7 +2554,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = SHUUSHI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 仮定形
     do {
@@ -2551,7 +2570,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = KATEI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 
     // 命令形
     node.katsuyou = MEIREI_KEI;
@@ -2567,7 +2586,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         }
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
     do {
         if (node.gyou == GYOU_ZA) {
             if (tail.empty() || tail.substr(0, 2) != L"ぜよ") break;
@@ -2580,7 +2599,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         }
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-    } while(0);
+    } while (0);
 } // Lattice::DoSahenDoushi
 
 void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
