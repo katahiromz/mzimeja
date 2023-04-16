@@ -1402,10 +1402,9 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
         count = ScanUserDict(records, m_pre[index], this);
         DPRINTW(L"ScanUserDict(%c) count: %d\n", m_pre[index], count);
 
-        // store data for each record
-        for (size_t k = 0; k < records.size(); ++k) {
-            const std::wstring& record = records[k];
-            str_split(fields, record, std::wstring(sep));
+        // 各レコードをフィールドに分割し、処理する。
+        for (auto& record : records) {
+            str_split(fields, record, sep);
             DoFields(index, fields);
         }
 
