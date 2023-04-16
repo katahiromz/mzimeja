@@ -2250,6 +2250,22 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
                 }
             }
         }
+        // 終止形「見よう」「見ようね」「見ようや」「見ような」「見ようぞ」
+        if (tail.size() >= 2 && tail[0] == L'よ' && tail[1] == L'う') {
+            node.katsuyou = SHUUSHI_KEI;
+            node.pre = fields[I_FIELD_PRE] + L"よう";
+            node.post = fields[I_FIELD_POST] + L"よう";
+            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+            m_refs[index + node.pre.size()]++;
+            if (tail.size() >= 3 &&
+                (tail[2] == L'ね' || tail[2] == L'や' || tail[2] == L'な' || tail[2] == L'ぞ'))
+            {
+                node.pre += tail[2];
+                node.post += tail[2];
+                m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+                m_refs[index + node.pre.size()]++;
+            }
+        }
     } while (0);
 
     // 一段動詞の終止形。「寄せる」「見る」
