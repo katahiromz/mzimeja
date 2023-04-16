@@ -2753,6 +2753,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + length]++;
+        break;
     case HB_FUKUSHI:
         DoFukushi(index, fields, deltaCost);
         break;
