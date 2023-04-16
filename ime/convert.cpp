@@ -2612,7 +2612,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         }
     }
 
-    // 名詞＋「っぽい」で形容詞に
+    // 名詞＋「っぽい」で形容詞に。
     if (str.size() >= 2 && str[0] == L'っ' && str[1] == L'ぽ') {
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L"っぽ";
@@ -2620,7 +2620,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         DoIkeiyoushi(index, new_fields);
     }
 
-    // 名詞＋「する」で動詞に
+    // 名詞＋「する」で動詞に。
     if (str.size() >= 2 && str[0] == L'す' && str[1] == L'る') {
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L"する";
@@ -2628,7 +2628,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         DoSahenDoushi(index, new_fields, -10);
     }
 
-    // 名詞＋「すれ」で動詞に
+    // 名詞＋「すれ」で動詞に。
     if (str.size() >= 2 && str[0] == L'す' && str[1] == L'れ') {
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L"すれ";
@@ -2644,7 +2644,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         DoSahenDoushi(index, new_fields, -10);
     }
 
-    // 名詞＋「しろ」で動詞に
+    // 名詞＋「しろ」で動詞に。
     if (str.size() >= 2 && str[0] == L'し' && str[1] == L'ろ') {
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L"しろ";
@@ -2652,7 +2652,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         DoSahenDoushi(index, new_fields, -10);
     }
 
-    // 名詞＋「せよ」で動詞に
+    // 名詞＋「せよ」で動詞に。
     if (str.size() >= 2 && str[0] == L'せ' && str[1] == L'よ') {
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L"せよ";
@@ -2660,12 +2660,22 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         DoSahenDoushi(index, new_fields, -10);
     }
 
-    // 名詞＋「な」でな形容詞に
-    if (str.size() >= 2 && str[0] == L'な') {
+    // 名詞＋「な」でな形容詞に。
+    if (str.size() >= 1 && str[0] == L'な') {
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L"な";
         new_fields[I_FIELD_POST] += L"な";
-        DoNakeiyoushi(index, new_fields);
+        DoNakeiyoushi(index, new_fields, deltaCost);
+    }
+
+    // 名詞＋「たる」「たれ」で五段動詞に。
+    if (str.size() >= 2 && str[0] == L'た' && (str[1] == L'る' || str[1] == L'れ')) {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += L"た";
+        new_fields[I_FIELD_PRE] += str[1];
+        new_fields[I_FIELD_POST] += L"た";
+        new_fields[I_FIELD_POST] += str[1];
+        DoGodanDoushi(index, new_fields, deltaCost);
     }
 } // Lattice::DoMeishi
 
