@@ -2642,10 +2642,9 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
     // 名詞＋「たる」「たれ」で五段動詞に。
     if (str.size() >= 2 && str[0] == L'た' && (str[1] == L'る' || str[1] == L'れ')) {
         WStrings new_fields = fields;
-        new_fields[I_FIELD_PRE] += L"た";
-        new_fields[I_FIELD_PRE] += str[1];
-        new_fields[I_FIELD_POST] += L"た";
-        new_fields[I_FIELD_POST] += str[1];
+        new_fields[I_FIELD_PRE] += L'た';
+        new_fields[I_FIELD_POST] += L'た';
+        new_fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, GYOU_RA) };
         DoGodanDoushi(index, new_fields, deltaCost);
     }
 } // Lattice::DoMeishi
