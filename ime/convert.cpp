@@ -2692,20 +2692,11 @@ void Lattice::DoFukushi(size_t index, const WStrings& fields, INT deltaCost)
     m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
     m_refs[index + node.pre.size()]++;
 
-    // 副詞なら最後に「と」を付けてもいい。
+    // 副詞なら最後に「と」「に」を付けてもいい。
     do {
-        if (str.size() < 1 || str[0] != L'と') break;
+        if (str.size() < 1 || (str[0] != L'と' && str[0] != L'に')) break;
         node.pre += str[0];
         node.post += str[0];
-        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        m_refs[index + node.pre.size()]++;
-    } while (0);
-
-    // 副詞なら最後に「に」を付けてもいい。
-    do {
-        if (str.size() < 1 || str[0] != L'に') break;
-        node.pre = fields[I_FIELD_PRE] + str[0];
-        node.post = fields[I_FIELD_POST] + str[0];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while (0);
