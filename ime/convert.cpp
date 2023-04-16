@@ -2294,7 +2294,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = RENTAI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-        // 「来るよ」「来るね」「来るぞ」
+        // 「来るよ」「来るね」「来るな」「来るぞ」
         if (str.size() < 3 ||
             (str[2] != L'よ' && str[2] != L'ね' && str[2] != L'な' && str[2] != L'ぞ'))
                 break;
@@ -2315,7 +2315,10 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = RENTAI_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-        if (str.size() < 1 || (str[0] != L'よ' && str[0] != L'ね' && str[0] != L'な')) break;
+        // 「来るよ」「来るね」「来るな」「来るぞ」
+        if (str.size() < 1 ||
+            (str[0] != L'よ' && str[0] != L'ね' && str[0] != L'な' && str[0] != L'ぞ'))
+                break;
         node.pre += str[0];
         node.post += str[0];
         node.katsuyou = SHUUSHI_KEI;
