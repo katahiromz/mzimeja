@@ -28,23 +28,23 @@ static const wchar_t s_hiragana_table[][5] = {
     {L'ん', 0, 0, 0, 0},                   // GYOU_NN
 };
 
-std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
-std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
+std::unordered_map<WCHAR,Dan>   g_hiragana_to_dan;      // 母音写像。
+std::unordered_map<WCHAR,Gyou>  g_hiragana_to_gyou;  // 子音写像。
 
 // 写像を準備する。
 void MakeLiteralMaps() {
-    if (g_consonant_map.size()) {
+    if (g_hiragana_to_gyou.size()) {
         return;
     }
-    g_consonant_map.clear();
-    g_vowel_map.clear();
+    g_hiragana_to_gyou.clear();
+    g_hiragana_to_dan.clear();
     const size_t count = _countof(s_hiragana_table);
     for (size_t i = 0; i < count; ++i) {
         for (size_t k = 0; k < 5; ++k) {
-            g_consonant_map[s_hiragana_table[i][k]] = s_hiragana_table[i][0];
+            g_hiragana_to_gyou[s_hiragana_table[i][k]] = (Gyou)i;
         }
         for (size_t k = 0; k < 5; ++k) {
-            g_vowel_map[s_hiragana_table[i][k]] = s_hiragana_table[0][k];
+            g_hiragana_to_dan[s_hiragana_table[i][k]] = (Dan)k;
         }
     }
 } // MzIme::MakeLiteralMaps
@@ -180,23 +180,13 @@ bool MakeDictFormat(DictEntry& entry, const std::wstring& strBunrui)
             // 終端の文字を取得する。
             WCHAR ch = entry.pre[entry.pre.size() - 1];
             // 終端の文字がウ段でなければ失敗。
-            if (g_vowel_map[ch] != L'う')
+            if (g_hiragana_to_dan[ch] != DAN_U)
                 return false;
             // 終端の文字を削る。
             entry.pre.resize(entry.pre.size() - 1);
             entry.post.resize(entry.post.size() - 1);
             // 終端文字だったものの行を取得し、セットする。
-            {
-                size_t ngyou = GYOU_A;
-                ch = g_consonant_map[ch];
-                for (i = 0; i < _countof(s_hiragana_table); ++i) {
-                    if (s_hiragana_table[i][0] == ch) {
-                        ngyou = i;
-                        break;
-                    }
-                }
-                entry.gyou = (Gyou)ngyou;
-            }
+            entry.gyou = g_hiragana_to_gyou[ch];
         }
         break;
     default:

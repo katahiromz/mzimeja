@@ -31,23 +31,23 @@ static const WCHAR s_hiragana_table[][5] =
     {L'ん',     0,     0,     0,     0}, // GYOU_NN
 }; // ※ s_hiragana_table[GYOU_DA][DAN_U] のように使用する。
 
-std::unordered_map<WCHAR,WCHAR>   g_vowel_map;      // 母音写像。
-std::unordered_map<WCHAR,WCHAR>   g_consonant_map;  // 子音写像。
+std::unordered_map<WCHAR,Dan>   g_hiragana_to_dan;  // 母音写像。
+std::unordered_map<WCHAR,Gyou>  g_hiragana_to_gyou; // 子音写像。
 
 // 子音の写像と母音の写像を作成する。
 void MakeLiteralMaps()
 {
-    if (g_consonant_map.size())
+    if (g_hiragana_to_gyou.size())
         return;
-    g_consonant_map.clear();
-    g_vowel_map.clear();
+    g_hiragana_to_gyou.clear();
+    g_hiragana_to_dan.clear();
     const size_t count = _countof(s_hiragana_table);
     for (size_t i = 0; i < count; ++i) {
         for (size_t k = 0; k < 5; ++k) {
-            g_consonant_map[s_hiragana_table[i][k]] = s_hiragana_table[i][0];
+            g_hiragana_to_gyou[s_hiragana_table[i][k]] = (Gyou)i;
         }
         for (size_t k = 0; k < 5; ++k) {
-            g_vowel_map[s_hiragana_table[i][k]] = s_hiragana_table[0][k];
+            g_hiragana_to_dan[s_hiragana_table[i][k]] = (Dan)k;
         }
     }
 } // MakeLiteralMaps
@@ -553,7 +553,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
     // データを辞書形式に変換する。
     std::wstring substr;
     WCHAR ch;
-    size_t i, ngyou;
+    size_t i;
     switch (bunrui) {
     case HB_NAKEIYOUSHI: // な形容詞
         // 終端の「な」を削る。
@@ -611,21 +611,13 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
         MakeLiteralMaps();
         // 終端がウ段の文字でなければ失敗。
         ch = pre[pre.size() - 1];
-        if (g_vowel_map[ch] != L'う')
+        if (g_hiragana_to_dan[ch] != DAN_U)
             return TRUE;
         // 終端の文字を削る。
         pre.resize(pre.size() - 1);
         post.resize(post.size() - 1);
         // 終端の文字だったものの行を取得する。
-        ch = g_consonant_map[ch];
-        ngyou = GYOU_A;
-        for (i = 0; i < _countof(s_hiragana_table); ++i) {
-            if (s_hiragana_table[i][0] == ch) {
-                ngyou = i;
-                break;
-            }
-        }
-        gyou = (Gyou)ngyou;
+        gyou = g_hiragana_to_gyou[ch];
         break;
     default:
         break;

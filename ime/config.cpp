@@ -274,7 +274,7 @@ BOOL RegWord_AddWord(HWND hDlg, LPCTSTR pszWord OPTIONAL)
         break;
     case HB_GODAN_DOUSHI: // 五段動詞
         MakeLiteralMaps();
-        if (len == 0 || g_vowel_map[pszWord[len - 1]] != 0x3046) // う段で終わらなければならない。
+        if (len == 0 || g_hiragana_to_dan[pszWord[len - 1]] != DAN_U) // う段で終わらなければならない。
             bWrong = TRUE;
         break;
     default:

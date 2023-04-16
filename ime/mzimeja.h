@@ -194,8 +194,8 @@ extern const MZGUIDELINE glTable[];
 extern "C" {
 
 // convert.c
-extern std::unordered_map<wchar_t,wchar_t>   g_vowel_map;      // 母音写像。
-extern std::unordered_map<wchar_t,wchar_t>   g_consonant_map;  // 子音写像。
+extern std::unordered_map<WCHAR,Dan>  g_hiragana_to_dan;  // 母音写像。
+extern std::unordered_map<WCHAR,Gyou> g_hiragana_to_gyou; // 子音写像。
 void MakeLiteralMaps(); // 子音の写像と母音の写像を作成する。
 LPCWSTR BunruiToString(HinshiBunrui bunrui);
 LPCTSTR HinshiToString(HinshiBunrui hinshi);
