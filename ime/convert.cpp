@@ -3041,11 +3041,11 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
     // 2文節最長一致法・改。
     const size_t length = lattice.m_pre.size();
     LatticeNodePtr node1 = lattice.m_head;
-    LatticeNodePtr tail = lattice.m_chunks[length][0];
+    LatticeNodePtr tail = ARRAY_AT(ARRAY_AT(lattice.m_chunks, length), 0);
     while (node1 != tail) {
         size_t kb1 = 0, max_len = 0, max_len1 = 0;
         for (size_t ib1 = 0; ib1 < node1->branches.size(); ++ib1) {
-            LatticeNodePtr& node2 = node1->branches[ib1];
+            LatticeNodePtr& node2 = ARRAY_AT(node1->branches, ib1);
             if (node2->branches.empty()) {
                 size_t len = node2->pre.size();
                 // (doushi or jodoushi) + jodoushi
@@ -3072,7 +3072,7 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
                 }
             } else {
                 for (size_t ib2 = 0; ib2 < node2->branches.size(); ++ib2) {
-                    LatticeNodePtr& node3 = node2->branches[ib2];
+                    LatticeNodePtr& node3 = ARRAY_AT(node2->branches, ib2);
                     size_t len = node2->pre.size() + node3->pre.size();
                     // (doushi or jodoushi) + jodoushi
                     if ((node1->IsDoushi() || node1->IsJodoushi()) && node2->IsJodoushi()) {
@@ -3124,28 +3124,28 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
         }
 
         // add clause
-        if (node1->branches[kb1]->pre.size()) {
+        if (ARRAY_AT(node1->branches, kb1)->pre.size()) {
             MzConvClause clause;
-            clause.add(node1->branches[kb1].get());
+            clause.add(ARRAY_AT(node1->branches, kb1).get());
             result.clauses.push_back(clause);
         }
 
         // go next
-        node1 = node1->branches[kb1];
+        node1 = ARRAY_AT(node1->branches, kb1);
     }
 
     // add other candidates
     size_t index = 0, iClause = 0;
     while (index < length && iClause < result.clauses.size()) {
-        const LatticeChunk& chunk = lattice.m_chunks[index];
-        MzConvClause& clause = result.clauses[iClause];
+        const LatticeChunk& chunk = ARRAY_AT(lattice.m_chunks, index);
+        MzConvClause& clause = ARRAY_AT(result.clauses, iClause);
 
-        std::wstring hiragana = clause.candidates[0].hiragana;
+        std::wstring hiragana = ARRAY_AT(clause.candidates, 0).hiragana;
         const size_t size = hiragana.size();
         for (size_t i = 0; i < chunk.size(); ++i) {
-            if (chunk[i]->pre.size() == size) {
+            if (ARRAY_AT(chunk, i)->pre.size() == size) {
                 // add a candidate of same size
-                clause.add(chunk[i].get());
+                clause.add(ARRAY_AT(chunk, i).get());
             }
         }
 
@@ -3246,11 +3246,11 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice)
     // add other candidates
     MzConvClause clause;
     ASSERT(lattice.m_chunks.size());
-    const LatticeChunk& chunk = lattice.m_chunks[0];
+    const LatticeChunk& chunk = ARRAY_AT(lattice.m_chunks, 0);
     for (size_t i = 0; i < chunk.size(); ++i) {
-        if (chunk[i]->pre.size() == length) {
+        if (ARRAY_AT(chunk, i)->pre.size() == length) {
             // add a candidate of same size
-            clause.add(chunk[i].get());
+            clause.add(ARRAY_AT(chunk, i).get());
         }
     }
 
@@ -3283,18 +3283,18 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice)
 
     // 結果に文節を追加。
     result.clauses.push_back(clause);
-    ASSERT(result.clauses[0].candidates.size());
+    ASSERT(ARRAY_AT(result.clauses, 0).candidates.size());
 
     // コストによりソートする。
     result.sort();
-    ASSERT(result.clauses[0].candidates.size());
+    ASSERT(ARRAY_AT(result.clauses, 0).candidates.size());
 } // MzIme::MakeResultForSingle
 
 // 複数文節を変換する。
 BOOL MzIme::ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
     MzConvResult result;
-    std::wstring strHiragana = comp.extra.hiragana_clauses[comp.extra.iClause];
+    std::wstring strHiragana = ARRAY_AT(comp.extra.hiragana_clauses, comp.extra.iClause);
     if (!ConvertMultiClause(strHiragana, result)) {
         return FALSE;
     }
@@ -3354,24 +3354,24 @@ BOOL MzIme::ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman
 
     // convert
     MzConvResult result;
-    std::wstring strHiragana = comp.extra.hiragana_clauses[iClause];
+    std::wstring strHiragana = ARRAY_AT(comp.extra.hiragana_clauses, iClause);
     if (!ConvertSingleClause(strHiragana, result)) {
         return FALSE;
     }
 
     // setting composition
     result.clauses.resize(1);
-    MzConvClause& clause = result.clauses[0];
-    comp.SetClauseCompString(iClause, clause.candidates[0].converted);
-    comp.SetClauseCompHiragana(iClause, clause.candidates[0].hiragana, bRoman);
+    MzConvClause& clause = ARRAY_AT(result.clauses, 0);
+    comp.SetClauseCompString(iClause, ARRAY_AT(clause.candidates, 0).converted);
+    comp.SetClauseCompHiragana(iClause, ARRAY_AT(clause.candidates, 0).hiragana, bRoman);
 
     // setting cand
     LogCandList cand_list;
     for (size_t i = 0; i < clause.candidates.size(); ++i) {
-        MzConvCandidate& cand = clause.candidates[i];
+        MzConvCandidate& cand = ARRAY_AT(clause.candidates, i);
         cand_list.cand_strs.push_back(cand.converted);
     }
-    cand.cand_lists[iClause] = cand_list;
+    ARRAY_AT(cand.cand_lists, iClause) = cand_list;
     cand.iClause = iClause;
 
     comp.extra.iClause = iClause;

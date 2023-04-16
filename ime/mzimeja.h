@@ -57,6 +57,21 @@
     #define ASSERT(exp) ((exp) ? (void)0 : DebugAssert(__FILE__, __LINE__, #exp))
     #define TRACE_ON()    do { g_bTrace = TRUE; } while (0)
     #define TRACE_OFF()   do { g_bTrace = FALSE; } while (0)
+
+    template <typename T_ITEM>
+    T_ITEM& Array_At(std::vector<T_ITEM>& array, size_t index, const char *file, int line) {
+        if (index >= array.size())
+            DebugAssert(file, line, "index >= array.size()");
+        return array[index];
+    }
+    template <typename T_ITEM>
+    const T_ITEM& Array_At(const std::vector<T_ITEM>& array, size_t index, const char *file, int line) {
+        if (index >= array.size())
+            DebugAssert(file, line, "index >= array.size()");
+        return array[index];
+    }
+    #define ARRAY_AT(array, index) \
+        Array_At((array), (index), __FILE__, __LINE__)
 #else
     #define DPRINT(fmt, ...)
     #define DPRINTA(fmt, ...)
@@ -64,6 +79,7 @@
     #define ASSERT(exp)
     #define TRACE_ON()
     #define TRACE_OFF()
+    #define ARRAY_AT(array, index)         ((array)[index])
 #endif
 
 #define FootmarkDebugPrint DPRINTA
