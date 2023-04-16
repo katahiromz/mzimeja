@@ -1777,6 +1777,8 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         new_fields[I_FIELD_PRE] = fields[I_FIELD_PRE] + L"すぎ";
         new_fields[I_FIELD_POST] = fields[I_FIELD_POST] + L"すぎ";
         DoIchidanDoushi(index, new_fields, deltaCost);
+        new_fields[I_FIELD_POST] = fields[I_FIELD_POST] + L"過ぎ";
+        DoIchidanDoushi(index, new_fields, deltaCost);
     }
 
     // 「痛。」「寒。」など
