@@ -3,7 +3,7 @@ if exist build\Debug\dict_compile.exe goto label2
 if exist build\Release\dict_compile.exe goto label3
 if exist ..\build\Release\dict_compile.exe goto label4
 if exist build\dict_compile.exe goto label1
-echo dict_compile.exe not found
+echo ERROR: dict_compile.exe not found
 exit /b 1
 
 :label1
