@@ -1771,6 +1771,14 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         DoNakeiyoushi(index, new_fields, deltaCost);
     }
 
+    // 「痛い(い形容詞)」→「痛すぎる(一段動詞)」
+    if (tail.size() >= 2 && tail[0] == L'す' && tail[1] == L'ぎ') {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] = fields[I_FIELD_PRE] + L"すぎ";
+        new_fields[I_FIELD_POST] = fields[I_FIELD_POST] + L"すぎ";
+        DoIchidanDoushi(index, new_fields, deltaCost);
+    }
+
     // 「痛。」「寒。」など
     if (tail.empty()) {
         DoMeishi(index, fields, deltaCost);
