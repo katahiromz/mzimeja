@@ -1616,15 +1616,15 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     ASSERT(fields[I_FIELD_PRE].size());
     size_t length = fields[I_FIELD_PRE].size();
 
-    // boundary check
+    // 区間チェック。
     if (index + length > m_pre.size()) {
         return;
     }
-    // check text matching
+    // 対象のテキストが語幹と一致するか確かめる。
     if (m_pre.substr(index, length) != fields[I_FIELD_PRE]) {
         return;
     }
-    // get the right substring
+    // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
     LatticeNode node;
@@ -1795,15 +1795,15 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[I_FIELD_PRE].size());
     size_t length = fields[I_FIELD_PRE].size();
-    // boundary check
+    // 区間チェック。
     if (index + length > m_pre.size()) {
         return;
     }
-    // check text matching
+    // 対象のテキストが語幹と一致するか確かめる。
     if (m_pre.substr(index, length) != fields[I_FIELD_PRE]) {
         return;
     }
-    // get the right substring
+    // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
     LatticeNode node;
@@ -1923,15 +1923,15 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[I_FIELD_PRE].size());
     size_t length = fields[I_FIELD_PRE].size();
-    // boundary check
+    // 区間チェック。
     if (index + length > m_pre.size()) {
         return;
     }
-    // check text matching
+    // 対象のテキストが語幹と一致するか確かめる。
     if (m_pre.substr(index, length) != fields[I_FIELD_PRE]) {
         return;
     }
-    // get the right substring
+    // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
     DPRINTW(L"DoGodanDoushi: %s, %s\n", fields[I_FIELD_PRE].c_str(), str.c_str());
 
@@ -2078,15 +2078,15 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
     ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[I_FIELD_PRE].size());
     size_t length = fields[I_FIELD_PRE].size();
-    // boundary check
+    // 区間チェック。
     if (index + length > m_pre.size()) {
         return;
     }
-    // check text matching
+    // 対象のテキストが語幹と一致するか確かめる。
     if (m_pre.substr(index, length) != fields[I_FIELD_PRE]) {
         return;
     }
-    // get the right substring
+    // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
     LatticeNode node;
@@ -2250,15 +2250,15 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[I_FIELD_PRE].size());
     size_t length = fields[I_FIELD_PRE].size();
-    // boundary check
+    // 区間チェック。
     if (index + length > m_pre.size()) {
         return;
     }
-    // check text matching
+    // 対象のテキストが語幹と一致するか確かめる。
     if (m_pre.substr(index, length) != fields[I_FIELD_PRE]) {
         return;
     }
-    // get the right substring
+    // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
     LatticeNode node;
@@ -2405,15 +2405,15 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     ASSERT(fields.size() == NUM_FIELDS);
     ASSERT(fields[I_FIELD_PRE].size());
     size_t length = fields[I_FIELD_PRE].size();
-    // boundary check
+    // 区間チェック。
     if (index + length > m_pre.size()) {
         return;
     }
-    // check text matching
+    // 対象のテキストが語幹と一致するか確かめる。
     if (m_pre.substr(index, length) != fields[I_FIELD_PRE]) {
         return;
     }
-    // get the right substring
+    // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
     LatticeNode node;
@@ -2568,15 +2568,15 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
     ASSERT(fields[I_FIELD_PRE].size());
 
     size_t length = fields[I_FIELD_PRE].size();
-    // boundary check
+    // 区間チェック。
     if (index + length > m_pre.size()) {
         return;
     }
-    // check text matching
+    // 対象のテキストが語幹と一致するか確かめる。
     if (m_pre.substr(index, length) != fields[I_FIELD_PRE]) {
         return;
     }
-    // get the right substring
+    // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
     LatticeNode node;
@@ -2669,15 +2669,15 @@ void Lattice::DoFukushi(size_t index, const WStrings& fields, INT deltaCost)
     ASSERT(fields[I_FIELD_PRE].size());
 
     size_t length = fields[I_FIELD_PRE].size();
-    // boundary check
+    // 区間チェック。
     if (index + length > m_pre.size()) {
         return;
     }
-    // check text matching
+    // 対象のテキストが語幹と一致するか確かめる。
     if (m_pre.substr(index, length) != fields[I_FIELD_PRE]) {
         return;
     }
-    // get the right substring
+    // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
     // ラティスノードの準備。
@@ -2686,7 +2686,7 @@ void Lattice::DoFukushi(size_t index, const WStrings& fields, INT deltaCost)
     node.tags = fields[I_FIELD_TAGS];
     node.cost = node.CalcCost() + deltaCost;
 
-    // 副詞。
+    // 副詞。活用はない。
     node.pre = fields[I_FIELD_PRE];
     node.post = fields[I_FIELD_POST];
     m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
@@ -2719,11 +2719,11 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
         return;
     }
     const size_t length = fields[I_FIELD_PRE].size();
-    // boundary check
+    // 区間チェック。
     if (index + length > m_pre.size()) {
         return;
     }
-    // check text matching
+    // 対象のテキストが語幹と一致するか確かめる。
     if (m_pre.substr(index, length) != fields[I_FIELD_PRE]) {
         return;
     }
