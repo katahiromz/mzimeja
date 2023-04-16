@@ -1627,6 +1627,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
+    // ラティスノードの準備。
     LatticeNode node;
     node.bunrui = HB_IKEIYOUSHI;
     node.tags = fields[I_FIELD_TAGS];
@@ -1806,6 +1807,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
+    // ラティスノードの準備。
     LatticeNode node;
     node.bunrui = HB_NAKEIYOUSHI;
     node.tags = fields[I_FIELD_TAGS];
@@ -1935,6 +1937,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     std::wstring str = m_pre.substr(index + length);
     DPRINTW(L"DoGodanDoushi: %s, %s\n", fields[I_FIELD_PRE].c_str(), str.c_str());
 
+    // ラティスノードの準備。
     LatticeNode node;
     node.bunrui = HB_GODAN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
@@ -2089,6 +2092,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
     // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
+    // ラティスノードの準備。
     LatticeNode node;
     node.bunrui = HB_ICHIDAN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
@@ -2261,6 +2265,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
+    // ラティスノードの準備。
     LatticeNode node;
     node.bunrui = HB_KAHEN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
@@ -2416,6 +2421,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
+    // ラティスノードの準備。
     LatticeNode node;
     node.bunrui = HB_SAHEN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
@@ -2579,6 +2585,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
     // 語幹の後の部分文字列。
     std::wstring str = m_pre.substr(index + length);
 
+    // ラティスノードの準備。
     LatticeNode node;
     node.bunrui = HB_MEISHI;
     node.tags = fields[I_FIELD_TAGS];
@@ -2729,7 +2736,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
     }
     DPRINTW(L"DoFields: %s\n", fields[I_FIELD_PRE].c_str());
 
-    // initialize the node
+    // ラティスノードの準備。
     LatticeNode node;
     WORD w = fields[I_FIELD_HINSHI][0];
     node.bunrui = (HinshiBunrui)LOBYTE(w);
