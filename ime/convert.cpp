@@ -2109,7 +2109,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
 
-        if (tail.size() < 3 || (tail[2] != L'よ' && tail[2] != L'や' && tail[2] != L'な'))
+        if (tail.size() < 3 ||
+            (tail[2] != L'よ' && tail[2] != L'や' && tail[2] != L'な' && tail[2] != L'ね'))
             break;
         node.pre += tail[2];
         node.post += tail[2];
@@ -2140,7 +2141,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 「動く(五段)」→「動ける(一段)」、
     // 「聞く(五段)」→「聞ける(一段)」など。
     do {
-        WCHAR ch = s_hiragana_table[node.gyou][DAN_I];
+        WCHAR ch = s_hiragana_table[node.gyou][DAN_E];
         if (tail.empty() || tail[0] != ch)
             break;
         WStrings new_fields = fields;
