@@ -2644,7 +2644,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L'た';
         new_fields[I_FIELD_POST] += L'た';
-        new_fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, GYOU_RA) };
+        new_fields[I_FIELD_HINSHI] = { MAKEWORD(HB_GODAN_DOUSHI, GYOU_RA) };
         DoGodanDoushi(index, new_fields, deltaCost);
     }
 } // Lattice::DoMeishi
