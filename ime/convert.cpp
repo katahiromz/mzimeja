@@ -1973,58 +1973,78 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     } while (0);
 
     // 五段動詞の連用形。
+    // 「咲く(五段)」→「咲き(ます)」、「食う(五段)」→「食い(ます)」
     node.katsuyou = RENYOU_KEI;
-    do {
-        // 「咲く(五段)」→「咲き(ます)」、「食う(五段)」→「食い(ます)」
-        WCHAR ch = s_hiragana_table[node.gyou][DAN_I];
-        if (tail.size() <= 0 || tail[0] != ch)
-            break;
+    WCHAR ch = s_hiragana_table[node.gyou][DAN_I];
+    if (tail.size() >= 1 && tail[0] == ch) {
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-        if (tail.size() <= 2 || tail.substr(tail.size() - 2, 2) != L"ます")
-            break;
-        node.pre += L"ます";
-        node.post += L"ます";
+    }
+
+    // 五段動詞の連用形の音便処理。
+    // 「咲き(て/た/たり/ても)」→「咲い(て/た/たり/ても)」
+    // 「食い(て/た/たり/ても)」→「食っ(て/た/たり/ても)」
+    // 「泣き(て/た/たり/ても)」→「泣い(て/た/たり/ても)」
+    // 「持ち(て/た/たり/ても)」→「持っ(て/た/たり/ても)」
+    // 「呼び(て/た/たり/ても)」→「呼ん(で/だ/だり/でも)」
+    // 「書き(て/た/たり/ても)」→「書い(て/た/たり/ても)」
+    Gyou gyou = g_hiragana_to_gyou[ch];
+    WCHAR ch2 = 0;
+    switch (gyou) {
+    case GYOU_KA: case GYOU_GA:
+        ch2 = L'い';
+        break;
+
+    case GYOU_NA: case GYOU_BA: case GYOU_MA:
+        ch2 = L'ん';
+        break;
+
+    case GYOU_A: case GYOU_TA: case GYOU_RA: case GYOU_WA:
+        ch2 = L'っ';
+        break;
+
+    case GYOU_SA: case GYOU_ZA: case GYOU_DA: case GYOU_HA: case GYOU_PA:
+    case GYOU_YA: case GYOU_NN:
+        ch2 = 0;
+        break;
+    }
+    if (ch2 != 0 && tail.size() >= 1 && tail[0] == ch2) {
+        node.pre = fields[I_FIELD_PRE] + ch2;
+        node.post = fields[I_FIELD_POST] + ch2;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
-
-        // 五段動詞の音便処理。
-        // 「泣き(て/た/たり/ても)」→「泣い(て/た/たり/ても)」
-        // 「持ち(て/た/たり/ても)」→「持っ(て/た/たり/ても)」
-        // 「呼び(て/た/たり/ても)」→「呼ん(で/だ/だり/でも)」
-        INT type;
-        switch (node.gyou) {
-        case GYOU_KA: case GYOU_GA:                 type = 1; break;
-        case GYOU_NA: case GYOU_BA: case GYOU_MA:   type = 2; break;
-        case GYOU_TA: case GYOU_RA: case GYOU_WA:   type = 3; break;
-        default:                                    type = 0; break;
-        }
-        if (type == 0)
-            break;
-
-        WCHAR ch2 = 0, ch3 = 0;
-        switch (type) {
-        case 1: ch2 = L'い'; ch3 = L'て'; break;
-        case 2: ch2 = L'ん'; ch3 = L'で'; break;
-        case 3: ch2 = L'っ'; ch3 = L'て'; break;
-        }
-        if (ch2 == 0)
-            break;
-        if (tail.size() >= 1 && tail[0] == ch2) {
-            node.pre = fields[I_FIELD_PRE] + ch2;
-            node.post = fields[I_FIELD_POST] + ch2;
+        if (tail.size() >= 3 && (tail[1] == L'て' || tail[1] == L'で') && tail[2] == L'も') {
+            // 連用形「ても」「でも」
+            node.katsuyou = RENYOU_KEI;
+            node.pre = fields[I_FIELD_PRE] + ch2 + tail[1] + tail[2];
+            node.post = fields[I_FIELD_POST] + ch2 + tail[1] + tail[2];
+            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+            m_refs[index + node.pre.size()]++;
+        } else if (tail.size() >= 2 && (tail[1] == L'て' || tail[1] == L'で')) {
+            // 連用形「て」「で」
+            node.katsuyou = RENYOU_KEI;
+            node.pre = fields[I_FIELD_PRE] + ch2 + tail[1];
+            node.post = fields[I_FIELD_POST] + ch2 + tail[1];
+            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+            m_refs[index + node.pre.size()]++;
+        } else if (tail.size() >= 3 && (tail[1] == L'た' || tail[1] == L'だ') && tail[2] == L'り') {
+            // 連用形「たり」「だり」
+            node.katsuyou = RENYOU_KEI;
+            node.pre = fields[I_FIELD_PRE] + ch2 + tail[1] + tail[2];
+            node.post = fields[I_FIELD_POST] + ch2 + tail[1] + tail[2];
+            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+            m_refs[index + node.pre.size()]++;
+        } else if (tail.size() >= 3 && tail[1] == L'た') {
+            // 終止形「た」
+            node.katsuyou = SHUUSHI_KEI;
+            node.pre = fields[I_FIELD_PRE] + ch2 + tail[1];
+            node.post = fields[I_FIELD_POST] + ch2 + tail[1];
             m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
             m_refs[index + node.pre.size()]++;
         }
-        if (tail.size() >= 2 && tail[0] == ch2 && tail[1] == ch3) {
-            node.pre = fields[I_FIELD_PRE] + ch2 + ch3;
-            node.post = fields[I_FIELD_POST] + ch2 + ch3;
-            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-            m_refs[index + node.pre.size()]++;
-        }
-    } while (0);
+    }
 
     // 五段動詞の終止形。「動く」「聞き取る」
     // 五段動詞の連体形。「動く(とき)」「聞き取る(とき)」
@@ -2074,6 +2094,25 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
             break;
         node.pre += tail[1];
         node.post += tail[1];
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+    } while (0);
+
+    // 五段動詞の命令形。「動く」→「動こう」「動こうよ」、「聞き取る」→「聞き取ろう」「聞き取ろうよ」
+    do {
+        WCHAR ch = s_hiragana_table[node.gyou][DAN_O];
+        if (tail.size() < 2 || tail[0] != ch || tail[1] != L'う')
+            break;
+        node.katsuyou = MEIREI_KEI;
+        node.pre = fields[I_FIELD_PRE] + ch + L'う';
+        node.post = fields[I_FIELD_POST] + ch + L'う';
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        m_refs[index + node.pre.size()]++;
+
+        if (tail.size() < 3 || (tail[2] != L'よ' && tail[2] != L'や' && tail[2] != L'な'))
+            break;
+        node.pre += tail[2];
+        node.post += tail[2];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
         m_refs[index + node.pre.size()]++;
     } while (0);
