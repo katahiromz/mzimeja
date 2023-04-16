@@ -2323,7 +2323,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         m_refs[index + node.pre.size()]++;
     } while (0);
 
-    // 命令形「～こい」「～こいよ」
+    // 命令形「～こい」「～こいよ」「～こいや」
     node.cost -= 30;
     do {
         if (str.size() < 2 || str[0] != L'こ' || str[1] != L'い') break;
