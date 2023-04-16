@@ -2621,7 +2621,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
 
     // 名詞＋「する」「すれ」でサ変動詞に。
     if (str.size() >= 2 && str[0] == L'す' && (str[1] == L'る' || str[1] == L'れ')) {
-        DoSahenDoushi(index, fields, -10);
+        DoSahenDoushi(index, fields, deltaCost - 10);
     }
 
     // 名詞＋「し」でサ変動詞に
