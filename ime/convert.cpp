@@ -2738,7 +2738,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
     node.tags = fields[I_FIELD_TAGS];
     node.cost = node.CalcCost() + deltaCost;
 
-    // add new entries by node classification (BUNRUI)
+    // 品詞分類で場合分けする。
     switch (node.bunrui) {
     case HB_MEISHI:
         DoMeishi(index, fields, deltaCost);
