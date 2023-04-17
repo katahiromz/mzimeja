@@ -1470,14 +1470,12 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data)
 // 参照を更新する。
 void Lattice::UpdateRefs()
 {
-    const size_t length = m_pre.size();
-
     // 参照数を初期化する。
-    m_refs.assign(length + 1, 0);
+    m_refs.assign(m_pre.size() + 1, 0);
     m_refs[0] = 1;
 
     // 参照数を更新する。
-    for (size_t index = 0; index < length; ++index) {
+    for (size_t index = 0; index < m_pre.size(); ++index) {
         if (m_refs[index] == 0)
             continue;
         LatticeChunk& chunk1 = m_chunks[index];
@@ -1556,18 +1554,13 @@ void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
     WStrings fields(NUM_FIELDS);
     fields[I_FIELD_HINSHI] = { MAKEWORD(HB_UNKNOWN, 0) };
     for (size_t count = min_size; count <= max_size; ++count) {
-        if (length < index + count) continue;
+        if (length < index + count)
+            continue;
         fields[I_FIELD_PRE] = m_pre.substr(index, count);
         fields[I_FIELD_POST] = fields[I_FIELD_PRE];
         DoFields(index, fields);
     }
 } // Lattice::AddComplement
-
-// リンクされていないか？
-static inline bool IsNodeUnlinked(const LatticeNodePtr& node)
-{
-    return node->linked == 0;
-}
 
 // リンクされていないノードを削除。
 void Lattice::CutUnlinkedNodes()
@@ -1575,7 +1568,9 @@ void Lattice::CutUnlinkedNodes()
     const size_t length = m_pre.size();
     for (size_t index = 0; index < length; ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
-        auto it = std::remove_if(chunk1.begin(), chunk1.end(), IsNodeUnlinked);
+        auto it = std::remove_if(chunk1.begin(), chunk1.end(), [](const LatticeNodePtr& node) {
+            return node->linked == 0;
+        });
         chunk1.erase(it, chunk1.end());
     }
 } // Lattice::CutUnlinkedNodes
