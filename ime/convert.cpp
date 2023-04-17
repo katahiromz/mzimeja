@@ -1524,18 +1524,17 @@ void Lattice::UpdateLinks()
     }
 
     // リンクとブランチを追加する。
-    size_t num_links = 0;
     for (size_t index = 0; index < m_pre.size(); ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
         for (auto& ptr1 : chunk1) {
-            if (!ptr1->linked) continue;
+            if (!ptr1->linked)
+                continue;
             const auto& pre = ptr1->pre;
             auto& chunk2 = m_chunks[index + pre.size()];
             for (auto& ptr2 : chunk2) {
                 if (IsNodeConnectable(*ptr1.get(), *ptr2.get())) {
                     ptr1->branches.push_back(ptr2);
                     ptr2->linked++;
-                    num_links++;
                 }
             }
         }
