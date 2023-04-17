@@ -2923,12 +2923,11 @@ BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre)
     DPRINTW(L"%s\n", pre.c_str());
 
     ASSERT(pre.size() != 0);
-    const size_t length = pre.size();
 
     // ラティスを初期化。
     lattice.m_pre = pre; // 変換前の文字列。
-    lattice.m_chunks.resize(length + 1);
-    lattice.m_refs.assign(length + 1, 0);
+    lattice.m_chunks.resize(pre.size() + 1);
+    lattice.m_refs.assign(pre.size() + 1, 0);
     lattice.m_refs[0] = 1;
 
     size_t count = 0;
@@ -2939,8 +2938,8 @@ BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre)
         // ノードを追加。
         lattice.AddNodes(0, dict_data1);
 
-        // repeat until linked to tail
-        while (!lattice.MakeLatticeInternal(length, dict_data1)) {
+        // 最後までリンクを繰り返す。
+        while (!lattice.MakeLatticeInternal(pre.size(), dict_data1)) {
             ++count;
             if (count >= c_retry_count)
                 break;
@@ -2954,8 +2953,8 @@ BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre)
         // ノードを追加。
         lattice.AddNodes(0, dict_data2);
 
-        // repeat until linked to tail
-        while (!lattice.MakeLatticeInternal(length, dict_data2)) {
+        // 最後までリンクを繰り返す。
+        while (!lattice.MakeLatticeInternal(pre.size(), dict_data2)) {
             ++count;
             if (count >= c_retry_count)
                 break;
