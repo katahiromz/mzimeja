@@ -1238,7 +1238,7 @@ void Lattice::AddExtra()
     }
 } // Lattice::AddExtra
 
-// 辞書からノードを追加する。
+// 辞書からノード群を追加する。
 BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
 {
     FOOTMARK();
@@ -2906,7 +2906,7 @@ void Lattice::Dump(int num)
 //////////////////////////////////////////////////////////////////////////////
 
 // リンクを試みる。
-BOOL Lattice::TryToLinkNodes(size_t length, const WCHAR* dict_data)
+BOOL Lattice::TryToLinkNodes(size_t length)
 {
     // リンクを更新する。
     UpdateLinks();
@@ -2921,9 +2921,6 @@ BOOL Lattice::TryToLinkNodes(size_t length, const WCHAR* dict_data)
 
     // 参照を更新する。
     UpdateRefs();
-
-    AddComplement(index, 1, 5);
-    AddNodes(index + 1, dict_data);
 
     return FALSE;
 }
@@ -2941,37 +2938,30 @@ BOOL Lattice::MakeLatticeForMulti(const std::wstring& pre)
     m_refs.assign(pre.size() + 1, 0);
     m_refs[0] = 1;
 
-    size_t count = 0;
-    const DWORD c_retry_count = 64; // 再試行の最大回数。
 
     WCHAR *dict_data1 = g_basic_dict.Lock(); // 基本辞書をロック。
     if (dict_data1) {
-        // ノードを追加。
+        // ノード群を追加。
         AddNodes(0, dict_data1);
-
-        // 最後までリンクを繰り返す。
-        while (!TryToLinkNodes(pre.size(), dict_data1)) {
-            ++count;
-            if (count >= c_retry_count)
-                break;
-        }
 
         g_basic_dict.Unlock(dict_data1); // 基本辞書のロックを解除。
     }
 
     WCHAR *dict_data2 = g_name_dict.Lock(); // 人名・地名辞書をロック。
     if (dict_data2) {
-        // ノードを追加。
+        // ノード群を追加。
         AddNodes(0, dict_data2);
 
-        // 最後までリンクを繰り返す。
-        while (!TryToLinkNodes(pre.size(), dict_data2)) {
-            ++count;
-            if (count >= c_retry_count)
-                break;
-        }
-
         g_name_dict.Unlock(dict_data2); // 人名・地名辞書のロックを解除。
+    }
+
+    // 最後までリンクを繰り返す。
+    size_t count = 0;
+    const DWORD c_retry_count = 64; // 再試行の最大回数。
+    while (!TryToLinkNodes(pre.size())) {
+        ++count;
+        if (count >= c_retry_count)
+            break;
     }
 
     if (count < c_retry_count)

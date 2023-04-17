@@ -445,7 +445,7 @@ struct Lattice {
     void Dump(int num = 0);
     void Fix(const std::wstring& pre);
     void AddExtra();
-    BOOL TryToLinkNodes(size_t length, const WCHAR *dict_data);
+    BOOL TryToLinkNodes(size_t length);
 
     BOOL MakeLatticeForMulti(const std::wstring& pre);
     BOOL MakeLatticeForSingle(const std::wstring& pre);
