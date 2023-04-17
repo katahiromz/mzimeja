@@ -1517,18 +1517,18 @@ void Lattice::UpdateLinks()
         m_chunks[length].push_back(std::make_shared<LatticeNode>(node));
     }
 
-    // add links and branches
+    // リンクとブランチを追加する。
     size_t num_links = 0;
     for (size_t index = 0; index < length; ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
-        for (size_t k = 0; k < chunk1.size(); ++k) {
-            if (!chunk1[k]->linked) continue;
-            const std::wstring& pre = chunk1[k]->pre;
+        for (auto& ptr1 : chunk1) {
+            if (!ptr1->linked) continue;
+            const auto& pre = ptr1->pre;
             LatticeChunk& chunk2 = m_chunks[index + pre.size()];
-            for (size_t m = 0; m < chunk2.size(); ++m) {
-                if (IsNodeConnectable(*chunk1[k].get(), *chunk2[m].get())) {
-                    chunk1[k]->branches.push_back(chunk2[m]);
-                    chunk2[m]->linked++;
+            for (auto& ptr2 : chunk2) {
+                if (IsNodeConnectable(*ptr1.get(), *ptr2.get())) {
+                    ptr1->branches.push_back(ptr2);
+                    ptr2->linked++;
                     num_links++;
                 }
             }
@@ -1538,13 +1538,12 @@ void Lattice::UpdateLinks()
 
 void Lattice::UnlinkAllNodes()
 {
-    // clear the branch links and the linked counts
-    const size_t length = m_pre.size();
-    for (size_t index = 0; index < length; ++index) {
+    // ブランチリンクとリンク数をクリアする。
+    for (size_t index = 0; index < m_pre.size(); ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
-        for (size_t k = 0; k < chunk1.size(); ++k) {
-            chunk1[k]->linked = 0;
-            chunk1[k]->branches.clear();
+        for (auto& ptr1 : chunk1) {
+            ptr1->linked = 0;
+            ptr1->branches.clear();
         }
     }
 } // Lattice::UnlinkAllNodes
