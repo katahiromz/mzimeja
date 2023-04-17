@@ -1579,13 +1579,12 @@ void Lattice::CutUnlinkedNodes()
 size_t Lattice::GetLastLinkedIndex() const
 {
     // 最後にリンクされたノードがあるか？
-    const size_t length = m_pre.size();
-    if (m_chunks[length][0]->linked) {
-        return length; // 最後のインデックスを返す。
+    if (m_chunks[m_pre.size()][0]->linked) {
+        return m_pre.size(); // 最後のインデックスを返す。
     }
 
     // チャンクを逆順でスキャンする。
-    for (size_t index = length; index > 0; ) {
+    for (size_t index = m_pre.size(); index > 0; ) {
         --index;
         for (auto& ptr : m_chunks[index]) {
             if (ptr->linked) {
