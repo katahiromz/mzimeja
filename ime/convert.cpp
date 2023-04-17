@@ -1424,22 +1424,11 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
     return TRUE;
 } // Lattice::AddNodes
 
-// for deleting the nodes of different size
-struct DeleteDifferentSizeNode {
-    size_t m_size;
-    DeleteDifferentSizeNode(size_t size) {
-        m_size = size;
-    }
-    bool operator()(const LatticeNodePtr& n) {
-        return n->pre.size() != m_size;
-    }
-};
-
 // 単一文節変換用のノード群を追加する。
 BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data)
 {
-    std::wstring sep;
-    sep += FIELD_SEP;
+    // 区切りを準備。
+    std::wstring sep = { FIELD_SEP };
 
     // 基本辞書をスキャンする。
     WStrings fields, records;
@@ -1450,17 +1439,17 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data)
     count = ScanUserDict(records, m_pre[0], this);
     DPRINTW(L"ScanUserDict(%c) count: %d\n", m_pre[0], count);
 
-    // store data for each record
-    for (size_t k = 0; k < records.size(); ++k) {
-        const std::wstring& record = records[k];
-        str_split(fields, record, std::wstring(sep));
+    // 各レコードをフィールドに分割して処理。
+    for (auto& record : records) {
+        str_split(fields, record, sep);
         DoFields(0, fields);
     }
 
-    // delete the nodes of different size
-    DeleteDifferentSizeNode del(m_pre.size());
+    // 異なるサイズのノードを削除する。
     for (size_t i = 0; i < m_chunks[0].size(); ++i) {
-        auto it = std::remove_if(m_chunks[0].begin(), m_chunks[0].end(), del);
+        auto it = std::remove_if(m_chunks[0].begin(), m_chunks[0].end(), [this](const LatticeNodePtr& n){
+            return n->pre.size() != m_pre.size();
+        });
         m_chunks[0].erase(it, m_chunks[0].end());
     }
 
