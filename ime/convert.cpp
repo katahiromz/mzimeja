@@ -921,9 +921,12 @@ void Lattice::AddExtra()
         L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
         L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
     };
+
+    WCHAR sz[128];
+
+    // 現在の日時を取得する。
     SYSTEMTIME st;
     ::GetLocalTime(&st);
-    WCHAR sz[128];
 
     // 今日（today）
     if (m_pre == L"きょう") {
@@ -1168,8 +1171,8 @@ void Lattice::AddExtra()
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
         fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
-        for (size_t i = 0; i < items.size(); ++i) {
-            fields[I_FIELD_POST] = items[i];
+        for (auto& item : items) {
+            fields[I_FIELD_POST] = item;
             DoFields(0, fields);
         }
         return;
@@ -1235,9 +1238,8 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
     const size_t length = m_pre.size();
     ASSERT(length);
 
-    // separator
-    std::wstring sep;
-    sep += FIELD_SEP;
+    // フィールド区切り（separator）。
+    std::wstring sep = { FIELD_SEP };
 
     WStrings fields, records;
     for (; index < length; ++index) {
@@ -1268,6 +1270,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             --index;
             continue;
         }
+
         // center dots (・・・)
         if (m_pre[index] == L'・') {
             size_t saved = index;
@@ -1293,6 +1296,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             --index;
             continue;
         }
+
         // commas (、、、)
         if (is_comma(m_pre[index])) {
             size_t saved = index;
@@ -1308,6 +1312,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             --index;
             continue;
         }
+
         // arrow right (→)
         if (is_hyphen(m_pre[index]) && (m_pre[index + 1] == L'>' || m_pre[index + 1] == L'＞'))
         {
@@ -1319,6 +1324,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             ++index;
             continue;
         }
+
         // arrow left (←)
         if ((m_pre[index] == L'<' || m_pre[index] == L'＜') && is_hyphen(m_pre[index + 1]))
         {
@@ -1330,6 +1336,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
             ++index;
             continue;
         }
+
         // arrows (zh, zj, zk, zl) and z. etc.
         WCHAR ch0 = translateChar(m_pre[index], FALSE, TRUE);
         if (ch0 == L'z' || ch0 == L'Z') {
@@ -1355,7 +1362,7 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
                 continue;
             }
         }
-        // other non-hiragana
+
         if (!is_hiragana(m_pre[index])) { // ひらがなではない？
             size_t saved = index;
             do {
@@ -1446,6 +1453,7 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data)
     }
 
     // 異なるサイズのノードを削除する。
+    ASSERT(m_chunks.size() >= 1);
     for (size_t i = 0; i < m_chunks[0].size(); ++i) {
         auto it = std::remove_if(m_chunks[0].begin(), m_chunks[0].end(), [this](const LatticeNodePtr& n){
             return n->pre.size() != m_pre.size();
