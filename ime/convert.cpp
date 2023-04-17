@@ -1501,14 +1501,17 @@ void Lattice::UpdateLinks()
         m_chunks[m_pre.size()].push_back(std::make_shared<LatticeNode>(node));
     }
 
-    // リンクとブランチを追加する。
+    // 各インデックス位置について。
     for (size_t index = 0; index < m_pre.size(); ++index) {
+        // インデックス位置のノード集合を取得。
         LatticeChunk& chunk1 = m_chunks[index];
+        // 各ノードについて。
         for (auto& ptr1 : chunk1) {
+            // ノードがリンクされていなければ無視。
             if (!ptr1->linked)
                 continue;
-            const auto& pre = ptr1->pre;
-            auto& chunk2 = m_chunks[index + pre.size()];
+            // 連結可能であれば、リンク先をブランチに追加し、リンク先のリンク数を増やす。
+            auto& chunk2 = m_chunks[index + ptr1->pre.size()];
             for (auto& ptr2 : chunk2) {
                 if (IsNodeConnectable(*ptr1.get(), *ptr2.get())) {
                     ptr1->branches.push_back(ptr2);
