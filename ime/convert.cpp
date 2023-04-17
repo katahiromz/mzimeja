@@ -3379,28 +3379,30 @@ BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana, MzConvResult& r
 // 文節を左に伸縮する。
 BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
-    DWORD iClause = comp.extra.iClause;
+    DWORD iClause = comp.extra.iClause; // 現在の文節の位置。
 
-    // get the clause string
+    // 現在の文節を取得する。
     std::wstring str1 = comp.extra.hiragana_clauses[iClause];
-    if (str1.size() <= 1) return FALSE;
+    // 一文字以下の長さなら左に拡張できない。
+    if (str1.size() <= 1)
+        return FALSE;
 
-    // get the last character of this clause
+    // この文節の最後の文字。
     WCHAR ch = str1[str1.size() - 1];
-    // shrink
+    // この文節を１文字縮小する。
     str1.resize(str1.size() - 1);
 
-    // get the next clause string and add the character
+    // 次の文節を取得する。
     std::wstring str2;
-    BOOL bSplitted = FALSE;
+    BOOL bSplitted = FALSE; // 分離したか？
     if (iClause + 1 < comp.GetClauseCount()) {
         str2 = ch + comp.extra.hiragana_clauses[iClause + 1];
     } else {
         str2 += ch;
-        bSplitted = TRUE;
+        bSplitted = TRUE; // 分離した。
     }
 
-    // convert two clauses
+    // ２つの文節を単一文節変換する。
     MzConvResult result1, result2;
     if (!ConvertSingleClause(str1, result1)) {
         return FALSE;
@@ -3409,18 +3411,16 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
         return FALSE;
     }
 
-    // add one clause if the clause was splitted
+    // 文節が分離したら、新しい文節を挿入する。
     if (bSplitted) {
         std::wstring str;
-        comp.extra.hiragana_clauses.insert(
-                comp.extra.hiragana_clauses.begin() + iClause + 1, str);
-        comp.extra.comp_str_clauses.insert(
-                comp.extra.comp_str_clauses.begin() + iClause + 1, str);
+        comp.extra.hiragana_clauses.insert(comp.extra.hiragana_clauses.begin() + iClause + 1, str);
+        comp.extra.comp_str_clauses.insert(comp.extra.comp_str_clauses.begin() + iClause + 1, str);
     }
 
-    // seting composition
-    MzConvClause& clause1 = result1.clauses[0];
-    MzConvClause& clause2 = result2.clauses[0];
+    // 未確定文字列をセット。
+    auto& clause1 = result1.clauses[0];
+    auto& clause2 = result2.clauses[0];
     comp.extra.hiragana_clauses[iClause] = str1;
     comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
     comp.extra.hiragana_clauses[iClause + 1] = str2;
@@ -3460,20 +3460,25 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 // 文節を右に伸縮する。
 BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
-    DWORD iClause = comp.extra.iClause;
+    DWORD iClause = comp.extra.iClause; // 現在の文節の位置。
 
-    // get the current clause
+    // 現在の文節を取得する。
     std::wstring str1 = comp.extra.hiragana_clauses[iClause];
-    // we cannot stretch right if the clause was the right end
-    if (iClause == comp.GetClauseCount() - 1) return FALSE;
 
-    // get the next clause
+    // 右端であれば右には拡張できない。
+    if (iClause == comp.GetClauseCount() - 1)
+        return FALSE;
+
+    // 次の文節を取得する。
     std::wstring str2 = comp.extra.hiragana_clauses[iClause + 1];
-    if (str2.empty()) return FALSE;
+    // 次の文節が空ならば、右には拡張できない。
+    if (str2.empty())
+        return FALSE;
 
-    // get the first character of the second clause
+    // str2の最初の文字。
     WCHAR ch = str2[0];
-    // add the character to the first clause
+
+    // それをstr1に引っ越しする。
     str1 += ch;
     if (str2.size() == 1) {
         str2.clear();
@@ -3481,7 +3486,7 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
         str2 = str2.substr(1);
     }
 
-    // convert
+    // 関係する文節を単一文節変換。
     MzConvResult result1, result2;
     if (!ConvertSingleClause(str1, result1)) {
         return FALSE;
@@ -3490,25 +3495,24 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
         return FALSE;
     }
 
-    MzConvClause& clause1 = result1.clauses[0];
+    // 現在の文節。
+    auto& clause1 = result1.clauses[0];
 
-    // if the second clause was joined?
-    if (str2.empty()) {
-        // delete the joined clause
-        comp.extra.hiragana_clauses.erase(
-                comp.extra.hiragana_clauses.begin() + iClause + 1);
-        comp.extra.comp_str_clauses.erase(
-                comp.extra.comp_str_clauses.begin() + iClause + 1);
+    if (str2.empty()) { // 次の文節が空になったか？
+        // 次の文節を削除する。
+        comp.extra.hiragana_clauses.erase(comp.extra.hiragana_clauses.begin() + iClause + 1);
+        comp.extra.comp_str_clauses.erase(comp.extra.comp_str_clauses.begin() + iClause + 1);
         comp.extra.hiragana_clauses[iClause] = str1;
         comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
     } else {
-        // seting two clauses
-        MzConvClause& clause2 = result2.clauses[0];
+        // ２つの文節情報をセットする。
+        auto& clause2 = result2.clauses[0];
         comp.extra.hiragana_clauses[iClause] = str1;
         comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
         comp.extra.hiragana_clauses[iClause + 1] = str2;
         comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].converted;
     }
+
     // update composition by extra
     comp.UpdateFromExtra(bRoman);
 
@@ -3622,9 +3626,6 @@ inline WORD kuten_to_jis(const std::wstring& str)
 // コード変換。
 BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
 {
-    result.clauses.clear();
-    MzConvClause clause;
-
     // ノードを初期化。
     LatticeNode node;
     node.pre = strTyping;
@@ -3633,6 +3634,9 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
 
     // 16進を読み込み。
     ULONG hex_code = wcstoul(strTyping.c_str(), NULL, 16);
+
+    // 文節情報。
+    MzConvClause clause;
 
     // Unicodeのノードを文節に追加。
     WCHAR szUnicode[2];
@@ -3689,7 +3693,10 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
     node.cost++; // コストを１つ加算。
     clause.add(&node);
 
+    // 結果に文節情報をセット。
+    result.clauses.clear();
     result.clauses.push_back(clause);
+
     return TRUE;
 } // MzIme::ConvertCode
 
@@ -3707,6 +3714,7 @@ BOOL MzIme::ConvertCode(LogCompStr& comp, LogCandInfo& cand)
 // 結果を格納する。
 BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand)
 {
+    // 未確定文字列をクリア。
     comp.comp_str.clear();
     comp.extra.clear();
 
