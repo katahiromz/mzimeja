@@ -3321,26 +3321,27 @@ BOOL MzIme::ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman
 {
     DWORD iClause = comp.extra.iClause;
 
-    // convert
+    // 変換する。
     MzConvResult result;
     std::wstring strHiragana = ARRAY_AT(comp.extra.hiragana_clauses, iClause);
     if (!ConvertSingleClause(strHiragana, result)) {
         return FALSE;
     }
 
-    // setting composition
+    // 未確定文字列をセット。
     result.clauses.resize(1);
     MzConvClause& clause = ARRAY_AT(result.clauses, 0);
     comp.SetClauseCompString(iClause, ARRAY_AT(clause.candidates, 0).converted);
     comp.SetClauseCompHiragana(iClause, ARRAY_AT(clause.candidates, 0).hiragana, bRoman);
 
-    // setting cand
+    // 候補リストをセットする。
     LogCandList cand_list;
     for (auto& cand2 : clause.candidates) {
         cand_list.cand_strs.push_back(cand2.converted);
     }
     ARRAY_AT(cand.cand_lists, iClause) = cand_list;
 
+    // 現在の文節をセットする。
     cand.iClause = iClause;
     comp.extra.iClause = iClause;
 
