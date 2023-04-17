@@ -49,11 +49,6 @@ void MakeLiteralMaps() {
     }
 } // MzIme::MakeLiteralMaps
 
-// 辞書エントリを比較する。
-inline bool entry_compare_pre(const DictEntry& e1, const DictEntry& e2) {
-    return (e1.pre < e2.pre);
-}
-
 // 全角カタカナか？
 inline BOOL is_fullwidth_katakana(WCHAR ch) {
     if (0x30A0 <= ch && ch <= 0x30FF) return TRUE;
@@ -258,7 +253,9 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries)
     fclose(fp);
 
     // sort by preconversion string
-    std::sort(entries.begin(), entries.end(), entry_compare_pre);
+    std::sort(entries.begin(), entries.end(), [](const DictEntry& e1, const DictEntry& e2){
+        return (e1.pre < e2.pre);
+    });
     return TRUE;  // success
 } // LoadDictDataFile
 
