@@ -1472,16 +1472,17 @@ void Lattice::UpdateRefs()
 {
     const size_t length = m_pre.size();
 
-    // initialize the reference counts
+    // 参照数を初期化する。
     m_refs.assign(length + 1, 0);
     m_refs[0] = 1;
 
-    // update the reference counts
+    // 参照数を更新する。
     for (size_t index = 0; index < length; ++index) {
-        if (m_refs[index] == 0) continue;
+        if (m_refs[index] == 0)
+            continue;
         LatticeChunk& chunk1 = m_chunks[index];
-        for (size_t k = 0; k < chunk1.size(); ++k) {
-            m_refs[index + chunk1[k]->pre.size()]++;
+        for (auto& ptr1 : chunk1) {
+            m_refs[index + ptr1->pre.size()]++;
         }
     }
 } // Lattice::UpdateRefs
@@ -1554,7 +1555,6 @@ void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
     // add the undefined words on failure of conversion
     WStrings fields(NUM_FIELDS);
     fields[I_FIELD_HINSHI] = { MAKEWORD(HB_UNKNOWN, 0) };
-    //fields[I_FIELD_TAGS].clear();
     for (size_t count = min_size; count <= max_size; ++count) {
         if (length < index + count) continue;
         fields[I_FIELD_PRE] = m_pre.substr(index, count);
@@ -1563,6 +1563,7 @@ void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
     }
 } // Lattice::AddComplement
 
+// リンクされていないか？
 static inline bool IsNodeUnlinked(const LatticeNodePtr& node)
 {
     return node->linked == 0;
@@ -1582,18 +1583,18 @@ void Lattice::CutUnlinkedNodes()
 // 最後にリンクされたインデックスを取得する。
 size_t Lattice::GetLastLinkedIndex() const
 {
-    // is the last node linked?
+    // 最後にリンクされたノードがあるか？
     const size_t length = m_pre.size();
     if (m_chunks[length][0]->linked) {
-        return length; // return the last index
+        return length; // 最後のインデックスを返す。
     }
 
-    // scan chunks in reverse order
+    // チャンクを逆順でスキャンする。
     for (size_t index = length; index > 0; ) {
         --index;
-        for (size_t k = 0; k < m_chunks[index].size(); ++k) {
-            if (m_chunks[index][k]->linked) {
-                return index; // the linked node was found
+        for (auto& ptr : m_chunks[index]) {
+            if (ptr->linked) {
+                return index; // リンクされたノードが見つかった。
             }
         }
     }
