@@ -1454,7 +1454,6 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data)
     }
 
     // 異なるサイズのノードを削除する。
-    ASSERT(m_chunks.size() >= 1); // 失敗時にAddComplementするから失敗はあり得ない（？）
     for (size_t i = 0; i < m_chunks[0].size(); ++i) {
         auto it = std::remove_if(m_chunks[0].begin(), m_chunks[0].end(), [this](const LatticeNodePtr& n){
             return n->pre.size() != m_pre.size();
