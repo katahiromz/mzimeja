@@ -1948,7 +1948,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
             node.pre = fields[I_FIELD_PRE] + L'わ';
             node.post = fields[I_FIELD_POST] + L'わ';
         } else {
-            WCHAR ch = s_hiragana_table[node.gyou][DAN_A];
+            WCHAR ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_A);
             if (tail.empty() || tail[0] != ch)
                 break;
             node.pre = fields[I_FIELD_PRE] + ch;
@@ -1961,7 +1961,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 五段動詞の連用形。
     // 「咲く(五段)」→「咲き(ます)」、「食う(五段)」→「食い(ます)」
     node.katsuyou = RENYOU_KEI;
-    WCHAR ch = s_hiragana_table[node.gyou][DAN_I];
+    WCHAR ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_I);
     if (tail.size() >= 1 && tail[0] == ch) {
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
@@ -2035,7 +2035,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 五段動詞の終止形。「動く」「聞き取る」
     // 五段動詞の連体形。「動く(とき)」「聞き取る(とき)」
     do {
-        WCHAR ch = s_hiragana_table[node.gyou][DAN_U];
+        WCHAR ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_U);
         if (tail.size() <= 0 || tail[0] != ch)
             break;
 
@@ -2063,7 +2063,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 五段動詞の仮定形。「動く」→「動け(ば)」、「聞き取る」→「聞き取れ(ば)」
     // 五段動詞の命令形。「動く」→「動け」「動けよ」、「聞き取る」→「聞き取れ」「聞き取れよ」
     do {
-        WCHAR ch = s_hiragana_table[node.gyou][DAN_E];
+        WCHAR ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_E);
         if (tail.empty() || tail[0] != ch)
             break;
         node.katsuyou = KATEI_KEI;
@@ -2086,7 +2086,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
 
     // 五段動詞の命令形。「動く」→「動こう」「動こうよ」、「聞き取る」→「聞き取ろう」「聞き取ろうよ」
     do {
-        WCHAR ch = s_hiragana_table[node.gyou][DAN_O];
+        WCHAR ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_O);
         if (tail.size() < 2 || tail[0] != ch || tail[1] != L'う')
             break;
         node.katsuyou = MEIREI_KEI;
@@ -2109,7 +2109,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 「聞き取る(五段)」→「聞き取り(名詞)」「聞き取り方(名詞)」など。
     node.bunrui = HB_MEISHI;
     do {
-        WCHAR ch = s_hiragana_table[node.gyou][DAN_I];
+        WCHAR ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_I);
         if (tail.empty() || tail[0] != ch)
             break;
         node.pre = fields[I_FIELD_PRE] + ch;
@@ -2127,7 +2127,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 「動く(五段)」→「動ける(一段)」、
     // 「聞く(五段)」→「聞ける(一段)」など。
     do {
-        WCHAR ch = s_hiragana_table[node.gyou][DAN_E];
+        WCHAR ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_E);
         if (tail.empty() || tail[0] != ch)
             break;
         WStrings new_fields = fields;
