@@ -1496,20 +1496,20 @@ void Lattice::UpdateLinks()
 
     UnlinkAllNodes(); // すべてのノードのリンクを解除する。
 
-    // add head and link to head
+    // ヘッド（頭）を追加する。参照数は１。
     {
         LatticeNode node;
         node.bunrui = HB_HEAD;
         node.linked = 1;
         LatticeChunk& chunk1 = m_chunks[0];
-        for (size_t k = 0; k < chunk1.size(); ++k) {
-            chunk1[k]->linked = 1;
-            node.branches.push_back(chunk1[k]);
+        for (auto& ptr1 : chunk1) {
+            ptr1->linked = 1;
+            node.branches.push_back(ptr1);
         }
         m_head = std::make_shared<LatticeNode>(node);
     }
 
-    // add tail
+    // 尻尾（テイル）を追加する。
     {
         LatticeNode node;
         node.bunrui = HB_TAIL;
