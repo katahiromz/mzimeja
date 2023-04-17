@@ -769,8 +769,7 @@ WCHAR *Dict::Lock()
 {
     if (m_hFileMapping == NULL) return NULL;
     DWORD cbSize = GetSize();
-    void *pv = ::MapViewOfFile(m_hFileMapping,
-                               FILE_MAP_ALL_ACCESS, 0, 0, cbSize);
+    void *pv = ::MapViewOfFile(m_hFileMapping, FILE_MAP_ALL_ACCESS, 0, 0, cbSize);
     return reinterpret_cast<WCHAR *>(pv);
 }
 
