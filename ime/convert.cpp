@@ -3301,7 +3301,7 @@ BOOL MzIme::ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& result)
 {
     DPRINTW(L"%s\n", strHiragana.c_str());
-#if 1
+
     // make lattice and make result
     Lattice lattice;
     std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
@@ -3312,33 +3312,6 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& re
         lattice.AddExtra();
         MakeResultOnFailure(result, pre);
     }
-#else
-    // dummy sample
-    WCHAR sz[64];
-    result.clauses.clear();
-    for (DWORD iClause = 0; iClause < 5; ++iClause) {
-        MzConvClause clause;
-        for (DWORD iCand = 0; iCand < 18; ++iCand) {
-            MzConvCandidate cand;
-            ::StringCchPrintfW(sz, _countof(sz), L"こうほ%u-%u", iClause, iCand);
-            cand.hiragana = sz;
-            ::StringCchPrintfW(sz, _countof(sz), L"候補%u-%u", iClause, iCand);
-            cand.converted = sz;
-            clause.candidates.push_back(cand);
-        }
-        result.clauses.push_back(clause);
-    }
-    result.clauses[0].candidates[0].hiragana = L"ひらりー";
-    result.clauses[0].candidates[0].converted = L"ヒラリー";
-    result.clauses[1].candidates[0].hiragana = L"とらんぷ";
-    result.clauses[1].candidates[0].converted = L"トランプ";
-    result.clauses[2].candidates[0].hiragana = L"さんだーす";
-    result.clauses[2].candidates[0].converted = L"サンダース";
-    result.clauses[3].candidates[0].hiragana = L"かたやま";
-    result.clauses[3].candidates[0].converted = L"片山";
-    result.clauses[4].candidates[0].hiragana = L"うちゅうじん";
-    result.clauses[4].candidates[0].converted = L"宇宙人";
-#endif
 
     return TRUE;
 } // MzIme::ConvertMultiClause
@@ -3363,13 +3336,12 @@ BOOL MzIme::ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman
 
     // setting cand
     LogCandList cand_list;
-    for (size_t i = 0; i < clause.candidates.size(); ++i) {
-        MzConvCandidate& cand = ARRAY_AT(clause.candidates, i);
-        cand_list.cand_strs.push_back(cand.converted);
+    for (auto& cand2 : clause.candidates) {
+        cand_list.cand_strs.push_back(cand2.converted);
     }
     ARRAY_AT(cand.cand_lists, iClause) = cand_list;
-    cand.iClause = iClause;
 
+    cand.iClause = iClause;
     comp.extra.iClause = iClause;
 
     return TRUE;
