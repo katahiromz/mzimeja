@@ -1544,14 +1544,13 @@ void Lattice::UnlinkAllNodes()
     }
 } // Lattice::UnlinkAllNodes
 
+// 変換失敗時に未定義の単語を追加する。
 void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
 {
-    const size_t length = m_pre.size();
-    // add the undefined words on failure of conversion
     WStrings fields(NUM_FIELDS);
     fields[I_FIELD_HINSHI] = { MAKEWORD(HB_UNKNOWN, 0) };
     for (size_t count = min_size; count <= max_size; ++count) {
-        if (length < index + count)
+        if (m_pre.size() < index + count)
             continue;
         fields[I_FIELD_PRE] = m_pre.substr(index, count);
         fields[I_FIELD_POST] = fields[I_FIELD_PRE];
@@ -1562,8 +1561,7 @@ void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
 // リンクされていないノードを削除。
 void Lattice::CutUnlinkedNodes()
 {
-    const size_t length = m_pre.size();
-    for (size_t index = 0; index < length; ++index) {
+    for (size_t index = 0; index < m_pre.size(); ++index) {
         auto& chunk1 = m_chunks[index];
         auto it = std::remove_if(chunk1.begin(), chunk1.end(), [](const LatticeNodePtr& node) {
             return node->linked == 0;
