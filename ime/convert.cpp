@@ -1243,7 +1243,8 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
 
     WStrings fields, records;
     for (; index < length; ++index) {
-        if (m_refs[index] == 0) continue;
+        if (m_refs[index] == 0)
+            continue;
 
         // periods (。。。)
         if (is_period(m_pre[index])) {
@@ -1485,14 +1486,13 @@ void Lattice::UpdateRefs()
 // リンクを更新する。
 void Lattice::UpdateLinks()
 {
-    const size_t length = m_pre.size();
-    ASSERT(length);
-    ASSERT(length + 1 == m_chunks.size());
-    ASSERT(length + 1 == m_refs.size());
+    ASSERT(m_pre.size());
+    ASSERT(m_pre.size() + 1 == m_chunks.size());
+    ASSERT(m_pre.size() + 1 == m_refs.size());
 
     UnlinkAllNodes(); // すべてのノードのリンクを解除する。
 
-    // ヘッド（頭）を追加する。参照数は１。
+    // ヘッド（頭）を追加する。リンク数は１。
     {
         LatticeNode node;
         node.bunrui = HB_HEAD;
@@ -1509,18 +1509,18 @@ void Lattice::UpdateLinks()
     {
         LatticeNode node;
         node.bunrui = HB_TAIL;
-        m_chunks[length].clear();
-        m_chunks[length].push_back(std::make_shared<LatticeNode>(node));
+        m_chunks[m_pre.size()].clear();
+        m_chunks[m_pre.size()].push_back(std::make_shared<LatticeNode>(node));
     }
 
     // リンクとブランチを追加する。
     size_t num_links = 0;
-    for (size_t index = 0; index < length; ++index) {
+    for (size_t index = 0; index < m_pre.size(); ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
         for (auto& ptr1 : chunk1) {
             if (!ptr1->linked) continue;
             const auto& pre = ptr1->pre;
-            LatticeChunk& chunk2 = m_chunks[index + pre.size()];
+            auto& chunk2 = m_chunks[index + pre.size()];
             for (auto& ptr2 : chunk2) {
                 if (IsNodeConnectable(*ptr1.get(), *ptr2.get())) {
                     ptr1->branches.push_back(ptr2);
@@ -1564,7 +1564,7 @@ void Lattice::CutUnlinkedNodes()
 {
     const size_t length = m_pre.size();
     for (size_t index = 0; index < length; ++index) {
-        LatticeChunk& chunk1 = m_chunks[index];
+        auto& chunk1 = m_chunks[index];
         auto it = std::remove_if(chunk1.begin(), chunk1.end(), [](const LatticeNodePtr& node) {
             return node->linked == 0;
         });
