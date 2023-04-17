@@ -3427,20 +3427,18 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].converted;
     comp.UpdateFromExtra(bRoman);
 
-    // seting the candidate list
+    // 候補リストをセットする。
     {
         LogCandList cand_list;
-        for (size_t i = 0; i < clause1.candidates.size(); ++i) {
-            MzConvCandidate& cand = clause1.candidates[i];
-            cand_list.cand_strs.push_back(cand.converted);
+        for (auto& cand1 : clause1.candidates) {
+            cand_list.cand_strs.push_back(cand1.converted);
         }
         cand.cand_lists[iClause] = cand_list;
     }
     {
         LogCandList cand_list;
-        for (size_t i = 0; i < clause2.candidates.size(); ++i) {
-            MzConvCandidate& cand = clause2.candidates[i];
-            cand_list.cand_strs.push_back(cand.converted);
+        for (auto& cand2 : clause2.candidates) {
+            cand_list.cand_strs.push_back(cand2.converted);
         }
         if (bSplitted) {
             cand.cand_lists.push_back(cand_list);
@@ -3449,10 +3447,11 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
         }
     }
 
-    // set the current clause
+    // 現在の文節をセットする。
     cand.iClause = iClause;
     comp.extra.iClause = iClause;
-    // set the clause attributes
+
+    // 文節属性をセットする。
     comp.SetClauseAttr(iClause, ATTR_TARGET_CONVERTED);
 
     return TRUE;
@@ -3513,29 +3512,28 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     // update composition by extra
     comp.UpdateFromExtra(bRoman);
 
-    // seting the candidate list
+    // 候補リストをセットする。
     {
         LogCandList cand_list;
-        for (size_t i = 0; i < clause1.candidates.size(); ++i) {
-            MzConvCandidate& cand = clause1.candidates[i];
-            cand_list.cand_strs.push_back(cand.converted);
+        for (auto& cand1 : clause1.candidates) {
+            cand_list.cand_strs.push_back(cand1.converted);
         }
         cand.cand_lists[iClause] = cand_list;
     }
     if (str2.size()) {
         MzConvClause& clause2 = result2.clauses[0];
         LogCandList cand_list;
-        for (size_t i = 0; i < clause2.candidates.size(); ++i) {
-            MzConvCandidate& cand = clause2.candidates[i];
-            cand_list.cand_strs.push_back(cand.converted);
+        for (auto& cand2 : clause2.candidates) {
+            cand_list.cand_strs.push_back(cand2.converted);
         }
         cand.cand_lists[iClause + 1] = cand_list;
     }
 
-    // set the current clause
+    // 現在の文節をセットする。
     cand.iClause = iClause;
     comp.extra.iClause = iClause;
-    // set the clause attributes
+
+    // 文節属性をセットする。
     comp.SetClauseAttr(iClause, ATTR_TARGET_CONVERTED);
 
     return TRUE;
