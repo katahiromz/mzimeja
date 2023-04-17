@@ -426,8 +426,8 @@ struct Lattice {
 
     BOOL AddNodesFromDict(size_t index, const WCHAR *dict_data);
     BOOL AddNodesFromDict(const WCHAR *dict_data);
-    void UnlinkAllNodes();
-    void UpdateLinks();
+    void ResetLinksAndBranches();
+    void UpdateLinksAndBranches();
     void AddComplement(size_t index, size_t min_size, size_t max_size);
     void CutUnlinkedNodes();
     size_t GetLastLinkedIndex() const;

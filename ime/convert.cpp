@@ -1473,18 +1473,20 @@ BOOL Lattice::AddNodesFromDict(const WCHAR *dict_data)
 }
 
 // リンクを更新する。
-void Lattice::UpdateLinks()
+void Lattice::UpdateLinksAndBranches()
 {
     ASSERT(m_pre.size());
     ASSERT(m_pre.size() + 1 == m_chunks.size());
 
-    UnlinkAllNodes(); // すべてのノードのリンクを解除する。
+    // リンク数とブランチ群をリセットする。
+    ResetLinksAndBranches();
 
     // ヘッド（頭）を追加する。リンク数は１。
     {
         LatticeNode node;
         node.bunrui = HB_HEAD;
         node.linked = 1;
+        // 現在位置のノードを先頭ブランチに追加する。
         LatticeChunk& chunk1 = m_chunks[0];
         for (auto& ptr1 : chunk1) {
             ptr1->linked = 1;
@@ -1507,7 +1509,7 @@ void Lattice::UpdateLinks()
         LatticeChunk& chunk1 = m_chunks[index];
         // 各ノードについて。
         for (auto& ptr1 : chunk1) {
-            // ノードがリンクされていなければ無視。
+            // リンク数がゼロならば無視。
             if (!ptr1->linked)
                 continue;
             // 連結可能であれば、リンク先をブランチに追加し、リンク先のリンク数を増やす。
@@ -1520,11 +1522,11 @@ void Lattice::UpdateLinks()
             }
         }
     }
-} // Lattice::UpdateLinks
+} // Lattice::UpdateLinksAndBranches
 
-void Lattice::UnlinkAllNodes()
+// リンク数とブランチ群をリセットする。
+void Lattice::ResetLinksAndBranches()
 {
-    // ブランチリンクとリンク数をクリアする。
     for (size_t index = 0; index < m_pre.size(); ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
         for (auto& ptr1 : chunk1) {
@@ -1532,7 +1534,7 @@ void Lattice::UnlinkAllNodes()
             ptr1->branches.clear();
         }
     }
-} // Lattice::UnlinkAllNodes
+} // Lattice::ResetLinksAndBranches
 
 // 変換失敗時に未定義の単語を追加する。
 void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
@@ -2811,7 +2813,7 @@ void Lattice::Dump(int num)
 BOOL Lattice::TryToLinkNodes(const std::wstring& pre)
 {
     // リンクを更新する。
-    UpdateLinks();
+    UpdateLinksAndBranches();
 
     // リンクされていないノードを削除。
     CutUnlinkedNodes();
