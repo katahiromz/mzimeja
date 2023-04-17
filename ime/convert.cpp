@@ -11,6 +11,10 @@
 
 const DWORD c_dwMilliseconds = 8000;
 
+// 辞書。
+Dict g_basic_dict;
+Dict g_name_dict;
+
 // ひらがな表。品詞の活用で使用される。
 static const WCHAR s_hiragana_table[][5] =
 {
@@ -2925,61 +2929,61 @@ BOOL Lattice::TryToLinkNodes(size_t length, const WCHAR* dict_data)
 }
 
 // 複数文節変換において、ラティスを作成する。
-BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre)
+BOOL Lattice::MakeLatticeForMulti(const std::wstring& pre)
 {
     DPRINTW(L"%s\n", pre.c_str());
 
     ASSERT(pre.size() != 0);
 
     // ラティスを初期化。
-    lattice.m_pre = pre; // 変換前の文字列。
-    lattice.m_chunks.resize(pre.size() + 1);
-    lattice.m_refs.assign(pre.size() + 1, 0);
-    lattice.m_refs[0] = 1;
+    m_pre = pre; // 変換前の文字列。
+    m_chunks.resize(pre.size() + 1);
+    m_refs.assign(pre.size() + 1, 0);
+    m_refs[0] = 1;
 
     size_t count = 0;
     const DWORD c_retry_count = 64; // 再試行の最大回数。
 
-    WCHAR *dict_data1 = m_basic_dict.Lock(); // 基本辞書をロック。
+    WCHAR *dict_data1 = g_basic_dict.Lock(); // 基本辞書をロック。
     if (dict_data1) {
         // ノードを追加。
-        lattice.AddNodes(0, dict_data1);
+        AddNodes(0, dict_data1);
 
         // 最後までリンクを繰り返す。
-        while (!lattice.TryToLinkNodes(pre.size(), dict_data1)) {
+        while (!TryToLinkNodes(pre.size(), dict_data1)) {
             ++count;
             if (count >= c_retry_count)
                 break;
         }
 
-        m_basic_dict.Unlock(dict_data1); // 基本辞書のロックを解除。
+        g_basic_dict.Unlock(dict_data1); // 基本辞書のロックを解除。
     }
 
-    WCHAR *dict_data2 = m_name_dict.Lock(); // 人名・地名辞書をロック。
+    WCHAR *dict_data2 = g_name_dict.Lock(); // 人名・地名辞書をロック。
     if (dict_data2) {
         // ノードを追加。
-        lattice.AddNodes(0, dict_data2);
+        AddNodes(0, dict_data2);
 
         // 最後までリンクを繰り返す。
-        while (!lattice.TryToLinkNodes(pre.size(), dict_data2)) {
+        while (!TryToLinkNodes(pre.size(), dict_data2)) {
             ++count;
             if (count >= c_retry_count)
                 break;
         }
 
-        m_name_dict.Unlock(dict_data2); // 人名・地名辞書のロックを解除。
+        g_name_dict.Unlock(dict_data2); // 人名・地名辞書のロックを解除。
     }
 
     if (count < c_retry_count)
         return TRUE; // 成功。
 
     // ダンプ。
-    lattice.Dump(4);
+    Dump(4);
     return FALSE; // 失敗。
-} // MzIme::MakeLatticeForMulti
+} // Lattice::MakeLatticeForMulti
 
 // 単一文節変換において、ラティスを作成する。
-BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre)
+BOOL Lattice::MakeLatticeForSingle(const std::wstring& pre)
 {
     DPRINTW(L"%s\n", pre.c_str());
 
@@ -2987,33 +2991,33 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre)
     const size_t length = pre.size();
 
     // ラティスを初期化。
-    lattice.m_pre = pre;
-    lattice.m_chunks.resize(length + 1);
-    lattice.m_refs.assign(length + 1, 0);
-    lattice.m_refs[0] = 1;
+    m_pre = pre;
+    m_chunks.resize(length + 1);
+    m_refs.assign(length + 1, 0);
+    m_refs[0] = 1;
 
     BOOL bOK = TRUE;
 
-    WCHAR *dict_data1 = m_basic_dict.Lock(); // 基本辞書をロックする。
+    WCHAR *dict_data1 = g_basic_dict.Lock(); // 基本辞書をロックする。
     if (dict_data1) {
         // ノード群を追加。
-        if (!lattice.AddNodesForSingle(dict_data1)) {
-            lattice.AddComplement(0, pre.size(), pre.size());
+        if (!AddNodesForSingle(dict_data1)) {
+            AddComplement(0, pre.size(), pre.size());
         }
 
-        m_basic_dict.Unlock(dict_data1); // 基本辞書のロックを解除。
+        g_basic_dict.Unlock(dict_data1); // 基本辞書のロックを解除。
     } else {
         bOK = FALSE;
     }
 
-    WCHAR *dict_data2 = m_name_dict.Lock(); // 人名・地名辞書をロックする。
+    WCHAR *dict_data2 = g_name_dict.Lock(); // 人名・地名辞書をロックする。
     if (dict_data2) {
         // ノード群を追加。
-        if (!lattice.AddNodesForSingle(dict_data2)) {
-            lattice.AddComplement(0, pre.size(), pre.size());
+        if (!AddNodesForSingle(dict_data2)) {
+            AddComplement(0, pre.size(), pre.size());
         }
 
-        m_name_dict.Unlock(dict_data2); // 人名・地名辞書のロックを解除。
+        g_name_dict.Unlock(dict_data2); // 人名・地名辞書のロックを解除。
     } else {
         bOK = FALSE;
     }
@@ -3022,9 +3026,9 @@ BOOL MzIme::MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre)
         return TRUE;
 
     // ダンプ。
-    lattice.Dump(4);
+    Dump(4);
     return FALSE; // 失敗。
-} // MzIme::MakeLatticeForSingle
+} // Lattice::MakeLatticeForSingle
 
 // 単一文節変換において、変換結果を生成する。
 void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
@@ -3310,7 +3314,7 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& re
 
     // ラティスを作成し、結果を作成する。
     Lattice lattice;
-    if (MakeLatticeForMulti(lattice, pre)) {
+    if (lattice.MakeLatticeForMulti(pre)) {
         lattice.AddExtra();
         MakeResultForMulti(result, lattice);
     } else {
@@ -3364,7 +3368,7 @@ BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana, MzConvResult& r
 
     // ラティスを作成する。
     Lattice lattice;
-    MakeLatticeForSingle(lattice, pre);
+    lattice.MakeLatticeForSingle(pre);
     lattice.AddExtra();
 
     // 結果を作成する。

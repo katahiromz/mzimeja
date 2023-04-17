@@ -446,6 +446,9 @@ struct Lattice {
     void Fix(const std::wstring& pre);
     void AddExtra();
     BOOL TryToLinkNodes(size_t length, const WCHAR *dict_data);
+
+    BOOL MakeLatticeForMulti(const std::wstring& pre);
+    BOOL MakeLatticeForSingle(const std::wstring& pre);
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -514,6 +517,9 @@ protected:
 //////////////////////////////////////////////////////////////////////////////
 // MZ-IME
 
+extern Dict g_basic_dict;
+extern Dict g_name_dict;
+
 class MzIme {
     public:
     HINSTANCE m_hInst;
@@ -560,9 +566,7 @@ public:
     WCHAR *LockBasicDict();                 // 基本辞書をロックする。
     void UnlockBasicDict(WCHAR *data);      // 基本辞書のロックを解除する。
 
-    // make lattice
-    BOOL MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre);
-    BOOL MakeLatticeForSingle(Lattice& lattice, const std::wstring& pre);
+    // make result
     void MakeResultOnFailure(MzConvResult& result, const std::wstring& pre);
     void MakeResultForMulti(MzConvResult& result, Lattice& lattice);
     void MakeResultForSingle(MzConvResult& result, Lattice& lattice);
@@ -587,8 +591,6 @@ protected:
     InputContext *  m_lpIMC;
 
     // 辞書。
-    Dict m_basic_dict;
-    Dict m_name_dict;
     BOOL LoadDict();
     void UnloadDict();
 }; // class MzIme

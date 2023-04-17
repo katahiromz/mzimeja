@@ -89,23 +89,23 @@ BOOL MzIme::LoadDict()
     std::wstring basic;
     if (!Config_GetDWORD(L"BasicDictDisabled", FALSE)) {
         if (Config_GetSz(L"BasicDictPathName", basic)) {
-            if (!m_basic_dict.Load(basic.c_str(), L"BasicDictObject")) {
+            if (!g_basic_dict.Load(basic.c_str(), L"BasicDictObject")) {
                 ret = FALSE;
             }
         }
     } else {
-        m_basic_dict.Unload();
+        g_basic_dict.Unload();
     }
 
     std::wstring name;
     if (!Config_GetDWORD(L"NameDictDisabled", FALSE)) {
         if (Config_GetSz(L"NameDictPathName", name)) {
-            if (!m_name_dict.Load(name.c_str(), L"NameDictObject")) {
+            if (!g_name_dict.Load(name.c_str(), L"NameDictObject")) {
                 ret = FALSE;
             }
         }
     } else {
-        m_name_dict.Unload();
+        g_name_dict.Unload();
     }
 
     return ret;
@@ -114,8 +114,8 @@ BOOL MzIme::LoadDict()
 // mzimejaの辞書をアンロードする。
 void MzIme::UnloadDict()
 {
-    m_basic_dict.Unload();
-    m_name_dict.Unload();
+    g_basic_dict.Unload();
+    g_name_dict.Unload();
 }
 
 // mzimejaを初期化。
