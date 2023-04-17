@@ -422,8 +422,12 @@ struct Lattice {
     // m_pre.size() + 1 == m_chunks.size().
     // m_pre.size() + 1 == m_refs.size().
 
-    BOOL AddNodes(size_t index, const WCHAR *dict_data);
-    BOOL AddNodesForSingle(const WCHAR *dict_data);
+    BOOL AddNodesForMulti(const std::wstring& pre);
+    BOOL AddNodesForSingle(const std::wstring& pre);
+    void AddExtraNodes();
+
+    BOOL AddNodesFromDict(size_t index, const WCHAR *dict_data);
+    BOOL AddNodesFromDict(const WCHAR *dict_data);
     void UpdateRefs();
     void UnlinkAllNodes();
     void UpdateLinks();
@@ -431,8 +435,12 @@ struct Lattice {
     void CutUnlinkedNodes();
     size_t GetLastLinkedIndex() const;
 
-    void DoFields(size_t index, const WStrings& fields, INT deltaCost = 0);
+    void Dump(int num = 0);
+    void Fix(const std::wstring& pre);
+    BOOL TryToLinkNodes(const std::wstring& pre);
 
+protected:
+    void DoFields(size_t index, const WStrings& fields, INT deltaCost = 0);
     void DoMeishi(size_t index, const WStrings& fields, INT deltaCost = 0);
     void DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
     void DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
@@ -441,14 +449,6 @@ struct Lattice {
     void DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
     void DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost = 0);
     void DoFukushi(size_t index, const WStrings& fields, INT deltaCost = 0);
-
-    void Dump(int num = 0);
-    void Fix(const std::wstring& pre);
-    void AddExtra();
-    BOOL TryToLinkNodes(size_t length);
-
-    BOOL MakeLatticeForMulti(const std::wstring& pre);
-    BOOL MakeLatticeForSingle(const std::wstring& pre);
 };
 
 //////////////////////////////////////////////////////////////////////////////

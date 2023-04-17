@@ -918,7 +918,7 @@ bool LatticeNode::IsJodoushi() const
 // Lattice - ラティス
 
 // 追加情報。
-void Lattice::AddExtra()
+void Lattice::AddExtraNodes()
 {
     FOOTMARK();
     static const LPCWSTR s_weekdays[] = {
@@ -1236,10 +1236,10 @@ void Lattice::AddExtra()
             return;
         }
     }
-} // Lattice::AddExtra
+} // Lattice::AddExtraNodes
 
 // 辞書からノード群を追加する。
-BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
+BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
 {
     FOOTMARK();
     const size_t length = m_pre.size();
@@ -1437,10 +1437,10 @@ BOOL Lattice::AddNodes(size_t index, const WCHAR *dict_data)
     }
 
     return TRUE;
-} // Lattice::AddNodes
+} // Lattice::AddNodesFromDict
 
 // 単一文節変換用のノード群を追加する。
-BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data)
+BOOL Lattice::AddNodesFromDict(const WCHAR *dict_data)
 {
     // 区切りを準備。
     std::wstring sep = { FIELD_SEP };
@@ -2906,7 +2906,7 @@ void Lattice::Dump(int num)
 //////////////////////////////////////////////////////////////////////////////
 
 // リンクを試みる。
-BOOL Lattice::TryToLinkNodes(size_t length)
+BOOL Lattice::TryToLinkNodes(const std::wstring& pre)
 {
     // リンクを更新する。
     UpdateLinks();
@@ -2916,7 +2916,7 @@ BOOL Lattice::TryToLinkNodes(size_t length)
 
     // 最後にリンクされたインデックスを取得する。
     size_t index = GetLastLinkedIndex();
-    if (index == length)
+    if (index == pre.size())
         return TRUE; // 成功。
 
     // 参照を更新する。
@@ -2926,7 +2926,7 @@ BOOL Lattice::TryToLinkNodes(size_t length)
 }
 
 // 複数文節変換において、ラティスを作成する。
-BOOL Lattice::MakeLatticeForMulti(const std::wstring& pre)
+BOOL Lattice::AddNodesForMulti(const std::wstring& pre)
 {
     DPRINTW(L"%s\n", pre.c_str());
 
@@ -2940,7 +2940,7 @@ BOOL Lattice::MakeLatticeForMulti(const std::wstring& pre)
     WCHAR *dict_data1 = g_basic_dict.Lock(); // 基本辞書をロック。
     if (dict_data1) {
         // ノード群を追加。
-        AddNodes(0, dict_data1);
+        AddNodesFromDict(0, dict_data1);
 
         g_basic_dict.Unlock(dict_data1); // 基本辞書のロックを解除。
     }
@@ -2948,30 +2948,16 @@ BOOL Lattice::MakeLatticeForMulti(const std::wstring& pre)
     WCHAR *dict_data2 = g_name_dict.Lock(); // 人名・地名辞書をロック。
     if (dict_data2) {
         // ノード群を追加。
-        AddNodes(0, dict_data2);
+        AddNodesFromDict(0, dict_data2);
 
         g_name_dict.Unlock(dict_data2); // 人名・地名辞書のロックを解除。
     }
 
-    // 最後までリンクを繰り返す。
-    size_t count = 0;
-    const DWORD c_retry_count = 64; // 再試行の最大回数。
-    while (!TryToLinkNodes(pre.size())) {
-        ++count;
-        if (count >= c_retry_count)
-            break;
-    }
-
-    if (count < c_retry_count)
-        return TRUE; // 成功。
-
-    // ダンプ。
-    Dump(4);
-    return FALSE; // 失敗。
-} // Lattice::MakeLatticeForMulti
+    return TRUE;
+} // Lattice::AddNodesForMulti
 
 // 単一文節変換において、ラティスを作成する。
-BOOL Lattice::MakeLatticeForSingle(const std::wstring& pre)
+BOOL Lattice::AddNodesForSingle(const std::wstring& pre)
 {
     DPRINTW(L"%s\n", pre.c_str());
 
@@ -2987,7 +2973,7 @@ BOOL Lattice::MakeLatticeForSingle(const std::wstring& pre)
     WCHAR *dict_data1 = g_basic_dict.Lock(); // 基本辞書をロックする。
     if (dict_data1) {
         // ノード群を追加。
-        if (!AddNodesForSingle(dict_data1)) {
+        if (!AddNodesFromDict(dict_data1)) {
             AddComplement(0, pre.size(), pre.size());
         }
 
@@ -2999,7 +2985,7 @@ BOOL Lattice::MakeLatticeForSingle(const std::wstring& pre)
     WCHAR *dict_data2 = g_name_dict.Lock(); // 人名・地名辞書をロックする。
     if (dict_data2) {
         // ノード群を追加。
-        if (!AddNodesForSingle(dict_data2)) {
+        if (!AddNodesFromDict(dict_data2)) {
             AddComplement(0, pre.size(), pre.size());
         }
 
@@ -3014,7 +3000,7 @@ BOOL Lattice::MakeLatticeForSingle(const std::wstring& pre)
     // ダンプ。
     Dump(4);
     return FALSE; // 失敗。
-} // Lattice::MakeLatticeForSingle
+} // Lattice::AddNodesForSingle
 
 // 複数文節変換において、変換結果を生成する。
 void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
@@ -3300,11 +3286,12 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& re
 
     // ラティスを作成し、結果を作成する。
     Lattice lattice;
-    if (lattice.MakeLatticeForMulti(pre)) {
-        lattice.AddExtra();
+    if (lattice.AddNodesForMulti(pre)) {
+        lattice.AddExtraNodes();
+        lattice.TryToLinkNodes(pre);
         MakeResultForMulti(result, lattice);
     } else {
-        lattice.AddExtra();
+        lattice.AddExtraNodes();
         MakeResultOnFailure(result, pre);
     }
 
@@ -3354,8 +3341,8 @@ BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana, MzConvResult& r
 
     // ラティスを作成する。
     Lattice lattice;
-    lattice.MakeLatticeForSingle(pre);
-    lattice.AddExtra();
+    lattice.AddNodesForSingle(pre);
+    lattice.AddExtraNodes();
 
     // 結果を作成する。
     MakeResultForSingle(result, lattice);
