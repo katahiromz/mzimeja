@@ -510,7 +510,7 @@ static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
     // レコード区切りと文字chの組み合わせを検索する。
     // これで文字chで始まる単語を検索できる。
     // レコード群はソートされていると仮定。
-    WCHAR sz[3] = {RECORD_SEP, ch, 0};
+    WCHAR sz[] = { RECORD_SEP, ch, 0 };
     const WCHAR *pch1 = wcsstr(dict_data, sz);
     if (pch1 == NULL)
         return FALSE;
@@ -3030,7 +3030,7 @@ BOOL Lattice::MakeLatticeForSingle(const std::wstring& pre)
     return FALSE; // 失敗。
 } // Lattice::MakeLatticeForSingle
 
-// 単一文節変換において、変換結果を生成する。
+// 複数文節変換において、変換結果を生成する。
 void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
 {
     DPRINTW(L"%s\n", lattice.m_pre.c_str());
@@ -3426,6 +3426,8 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
     comp.extra.hiragana_clauses[iClause + 1] = str2;
     comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].converted;
+
+    // 余剰情報から未確定文字列を更新する。
     comp.UpdateFromExtra(bRoman);
 
     // 候補リストをセットする。
@@ -3514,7 +3516,7 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
         comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].converted;
     }
 
-    // update composition by extra
+    // 余剰情報から未確定文字列を更新する。
     comp.UpdateFromExtra(bRoman);
 
     // 候補リストをセットする。
