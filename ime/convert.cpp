@@ -631,8 +631,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
     fields[I_FIELD_POST] = post;
     fields[I_FIELD_TAGS] = L"[ユーザ辞書]";
 
-    std::wstring sep;
-    sep += FIELD_SEP;
+    std::wstring sep = { FIELD_SEP };
     std::wstring record = str_join(fields, sep);
     s_UserDictRecords.push_back(record);
 
