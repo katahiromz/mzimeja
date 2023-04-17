@@ -172,5 +172,5 @@ struct Lattice {
     void Dump(int num = 0);
     void Fix(const std::wstring& pre);
     void AddExtra();
-    BOOL MakeLatticeInternal(size_t length, const WCHAR *dict_data);
+    BOOL TryToLinkNodes(size_t length, const WCHAR *dict_data);
 };

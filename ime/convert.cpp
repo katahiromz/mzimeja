@@ -2898,19 +2898,23 @@ void Lattice::Dump(int num)
 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL Lattice::MakeLatticeInternal(size_t length, const WCHAR* dict_data)
+// リンクを試みる。
+BOOL Lattice::TryToLinkNodes(size_t length, const WCHAR* dict_data)
 {
-    // link and cut not linked
+    // リンクを更新する。
     UpdateLinks();
+
+    // リンクされていないノードを削除。
     CutUnlinkedNodes();
 
-    // does it reach the last?
+    // 最後にリンクされたインデックスを取得する。
     size_t index = GetLastLinkedIndex();
     if (index == length)
-        return TRUE;
+        return TRUE; // 成功。
 
-    // add complement
+    // 参照を更新する。
     UpdateRefs();
+
     AddComplement(index, 1, 5);
     AddNodes(index + 1, dict_data);
 
@@ -2939,7 +2943,7 @@ BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre)
         lattice.AddNodes(0, dict_data1);
 
         // 最後までリンクを繰り返す。
-        while (!lattice.MakeLatticeInternal(pre.size(), dict_data1)) {
+        while (!lattice.TryToLinkNodes(pre.size(), dict_data1)) {
             ++count;
             if (count >= c_retry_count)
                 break;
@@ -2954,7 +2958,7 @@ BOOL MzIme::MakeLatticeForMulti(Lattice& lattice, const std::wstring& pre)
         lattice.AddNodes(0, dict_data2);
 
         // 最後までリンクを繰り返す。
-        while (!lattice.MakeLatticeInternal(pre.size(), dict_data2)) {
+        while (!lattice.TryToLinkNodes(pre.size(), dict_data2)) {
             ++count;
             if (count >= c_retry_count)
                 break;
