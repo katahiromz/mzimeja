@@ -1,6 +1,8 @@
 // convert.cpp --- mzimeja kana kanji conversion
 // かな漢字変換。
 //////////////////////////////////////////////////////////////////////////////
+// 参考文献1：『自然言語処理の基礎』2010年、コロナ社。
+// 参考文献2：『新編常用国語便覧』1995年、浜島書店。
 // (Japanese, UTF-8)
 
 #include "mzimeja.h"
@@ -503,6 +505,7 @@ static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
 
     // レコード区切りと文字chの組み合わせを検索する。
     // これで文字chで始まる単語を検索できる。
+    // レコード群はソートされていると仮定。
     WCHAR sz[3] = {RECORD_SEP, ch, 0};
     const WCHAR *pch1 = wcsstr(dict_data, sz);
     if (pch1 == NULL)
@@ -513,7 +516,8 @@ static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
     for (;;) {
         // 現在の位置の次のレコード区切りと文字chの組み合わせを検索する。
         pch3 = wcsstr(pch2 + 1, sz);
-        if (pch3 == NULL) break; // なければループ終わり。
+        if (pch3 == NULL)
+            break; // なければループ終わり。
         pch2 = pch3; // 現在の位置を更新。
     }
     pch3 = wcschr(pch2 + 1, RECORD_SEP); // 現在の位置の次のレコード区切りを検索する。
