@@ -3712,18 +3712,16 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
     comp.comp_str.clear();
     comp.extra.clear();
 
-    // setting composition
+    // 未確定文字列をセット。
     comp.comp_clause.resize(result.clauses.size() + 1);
-    for (size_t k = 0; k < result.clauses.size(); ++k) {
-        const MzConvClause& clause = result.clauses[k];
-        for (size_t i = 0; i < clause.candidates.size(); ++i) {
-            const MzConvCandidate& cand = clause.candidates[i];
-            comp.comp_clause[k] = (DWORD)comp.comp_str.size();
-            comp.extra.hiragana_clauses.push_back(cand.hiragana);
-            std::wstring typing;
-            typing = hiragana_to_typing(cand.hiragana);
+    for (size_t iClause = 0; iClause < result.clauses.size(); ++iClause) {
+        const MzConvClause& clause = result.clauses[iClause];
+        for (auto& cand2 : clause.candidates) {
+            comp.comp_clause[iClause] = (DWORD)comp.comp_str.size();
+            comp.extra.hiragana_clauses.push_back(cand2.hiragana);
+            std::wstring typing = hiragana_to_typing(cand2.hiragana);
             comp.extra.typing_clauses.push_back(typing);
-            comp.comp_str += cand.converted;
+            comp.comp_str += cand2.converted;
             break;
         }
     }
@@ -3734,18 +3732,17 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
     comp.dwCursorPos = (DWORD)comp.comp_str.size();
     comp.dwDeltaStart = 0;
 
-    // setting cand
+    // 候補情報をセット。
     cand.clear();
-    for (size_t k = 0; k < result.clauses.size(); ++k) {
-        const MzConvClause& clause = result.clauses[k];
+    for (auto& clause : result.clauses) {
         LogCandList cand_list;
-        for (size_t i = 0; i < clause.candidates.size(); ++i) {
-            const MzConvCandidate& cand = clause.candidates[i];
-            cand_list.cand_strs.push_back(cand.converted);
+        for (auto& cand2 : clause.candidates) {
+            cand_list.cand_strs.push_back(cand2.converted);
         }
         cand.cand_lists.push_back(cand_list);
     }
     cand.iClause = 0;
+
     return TRUE;
 } // MzIme::StoreResult
 
