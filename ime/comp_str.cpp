@@ -1154,10 +1154,6 @@ COMPSTREXTRA *CompStr::GetExtra()
 
 void LogCompStr::AssertValid()
 {
-    if (dwCursorPos > GetCompCharCount()) {
-        Dump();
-        ASSERT(0);
-    }
     if (comp_attr.size()) {
         if (comp_attr.size() != comp_str.size()) {
             Dump();

@@ -591,8 +591,6 @@ void CompWnd_Paint(HWND hCompWnd)
     HWND hSvrWnd = (HWND) ::GetWindowLongPtr(hCompWnd, FIGWLP_SERVERWND); // UIサーバー。
     ASSERT(hSvrWnd != NULL);
     HIMC hIMC = (HIMC) ::GetWindowLongPtr(hSvrWnd, IMMGWLP_IMC); // IMC。
-    ASSERT(hIMC != NULL);
-
     if (hIMC) {
         InputContext *lpIMC = TheIME.LockIMC(hIMC); // 入力コンテキストをロック。
         ASSERT(lpIMC != NULL);
