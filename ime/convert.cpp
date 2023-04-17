@@ -834,9 +834,9 @@ void MzConvResult::sort()
     for (size_t i = 1; i < clauses.size(); ++i) {
         for (size_t iCand1 = 0; iCand1 < clauses[i - 1].candidates.size(); ++iCand1) {
             for (size_t iCand2 = 0; iCand2 < clauses[i].candidates.size(); ++iCand2) {
-                // 最小コストを計算する。
                 auto& cand1 = clauses[i - 1].candidates[iCand1];
                 auto& cand2 = clauses[i].candidates[iCand2];
+                // 該当する品詞分類の最小コストを計算する。
                 INT min_cost = 0x7FFF;
                 for (auto& bunrui1 : cand1.bunruis) {
                     for (auto& bunrui2 : cand2.bunruis) {
