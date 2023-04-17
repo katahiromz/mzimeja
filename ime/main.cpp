@@ -444,7 +444,6 @@ InputContext *MzIme::LockIMC(HIMC hIMC)
         m_hIMC = hIMC;
         m_lpIMC = context;
     }
-    ASSERT(context);
     return context;
 }
 
@@ -540,6 +539,10 @@ void DebugPrintW(const WCHAR *lpszFormat, ...)
 void DebugAssert(const char *file, int line, const char *exp)
 {
     DebugPrintA("%s (%d): ASSERT(%s) failed\n", file, line, exp);
+
+    WCHAR szText[1024];
+    StringCchPrintfW(szText, _countof(szText), L"%hs (%d): ASSERT(%hs) failed\n", file, line, exp);
+    MessageBoxW(NULL, szText, L"Assertion Failure", MB_ICONERROR);
 }
 #endif  // ndef NDEBUG
 

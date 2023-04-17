@@ -117,6 +117,7 @@
 #define IDS_HINSHI_24                       40041
 #define IDS_HINSHI_25                       40042
 #define IDS_HINSHI_26                       40043
+#define IDS_HINSHI_27                       40044
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS

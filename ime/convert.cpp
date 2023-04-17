@@ -542,7 +542,7 @@ static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
 
 static WStrings s_UserDictRecords;
 
-static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID lpData)
+static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dwStyle, LPCTSTR lpStr, LPVOID lpData)
 {
     ASSERT(lpStr && lpStr[0]);
     ASSERT(lpRead && lpRead[0]);
@@ -553,13 +553,12 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
     std::wstring pre = lpRead;
     std::wstring post = lpStr;
     Gyou gyou = GYOU_A;
-    HinshiBunrui bunrui = StyleToHinshi(dw);
+    HinshiBunrui bunrui = StyleToHinshi(dwStyle);
 
     if (pre.size() <= 1)
         return 0;
 
     // データを辞書形式に変換する。
-    std::wstring substr;
     WCHAR ch;
     size_t i;
     switch (bunrui) {
@@ -600,19 +599,22 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
         }
         break;
     case HB_SAHEN_DOUSHI: // サ変動詞
-        // 「する」「ずる」そのものは登録しない。
-        if (pre == L"する" || pre == L"ずる")
-            return TRUE;
-        //  「する」または「ずる」で終わらなければ失敗。
-        substr = pre.substr(pre.size() - 2, 2);
-        if (substr == L"する" && post.substr(post.size() - 2, 2) == L"する")
-            gyou = GYOU_SA;
-        else if (substr == L"ずる" && post.substr(post.size() - 2, 2) == L"ずる")
-            gyou = GYOU_ZA;
-        else
-            return TRUE;
-        pre = pre.substr(0, pre.size() - 2);
-        post = post.substr(0, post.size() - 2);
+        {
+            std::wstring substr;
+            // 「する」「ずる」そのものは登録しない。
+            if (pre == L"する" || pre == L"ずる")
+                return TRUE;
+            //  「する」または「ずる」で終わらなければ失敗。
+            substr = pre.substr(pre.size() - 2, 2);
+            if (substr == L"する" && post.substr(post.size() - 2, 2) == L"する")
+                gyou = GYOU_SA;
+            else if (substr == L"ずる" && post.substr(post.size() - 2, 2) == L"ずる")
+                gyou = GYOU_ZA;
+            else
+                return TRUE;
+            pre = pre.substr(0, pre.size() - 2);
+            post = post.substr(0, post.size() - 2);
+        }
         break;
     case HB_GODAN_DOUSHI: // 五段動詞
         // 写像を準備する。
@@ -622,6 +624,8 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dw, LPCTSTR lpStr, LPVOID
             return TRUE;
         ch = pre[pre.size() - 1];
         if (g_hiragana_to_dan[ch] != DAN_U)
+            return TRUE;
+        if (ch != post[post.size() - 1])
             return TRUE;
         // 終端の文字を削る。
         pre.resize(pre.size() - 1);
