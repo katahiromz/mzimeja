@@ -3389,7 +3389,7 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     // この文節を１文字縮小する。
     str1.resize(str1.size() - 1);
 
-    // 次の文節を取得する。
+    // その文字を次の文節の先頭に追加する。
     std::wstring str2;
     BOOL bSplitted = FALSE; // 分離したか？
     if (iClause + 1 < comp.GetClauseCount()) {
@@ -3475,7 +3475,7 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     // str2の最初の文字。
     WCHAR ch = str2[0];
 
-    // それをstr1に引っ越しする。
+    // それをstr1の末尾に引っ越しする。
     str1 += ch;
     if (str2.size() == 1) {
         str2.clear();
