@@ -793,12 +793,12 @@ BOOL Dict::IsLoaded() const
 void MzConvClause::add(const LatticeNode *node)
 {
     bool matched = false;
-    for (size_t i = 0; i < candidates.size(); ++i) {
-        if (candidates[i].converted == node->post) {
-            if (candidates[i].cost > node->cost)  {
-                candidates[i].cost = node->cost;
-                candidates[i].bunruis.insert(node->bunrui);
-                candidates[i].tags += node->tags;
+    for (auto& cand : candidates) {
+        if (cand.converted == node->post) {
+            if (cand.cost > node->cost)  {
+                cand.cost = node->cost;
+                cand.bunruis.insert(node->bunrui);
+                cand.tags += node->tags;
             }
             matched = true;
             break;
