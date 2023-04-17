@@ -44,10 +44,10 @@ void MakeLiteralMaps()
     const size_t count = _countof(s_hiragana_table);
     for (size_t i = 0; i < count; ++i) {
         for (size_t k = 0; k < 5; ++k) {
-            g_hiragana_to_gyou[s_hiragana_table[i][k]] = (Gyou)i;
+            g_hiragana_to_gyou[ARRAY_AT_AT(s_hiragana_table, i, k)] = (Gyou)i;
         }
         for (size_t k = 0; k < 5; ++k) {
-            g_hiragana_to_dan[s_hiragana_table[i][k]] = (Dan)k;
+            g_hiragana_to_dan[ARRAY_AT_AT(s_hiragana_table, i, k)] = (Dan)k;
         }
     }
 } // MakeLiteralMaps

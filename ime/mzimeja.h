@@ -58,6 +58,7 @@
     #define TRACE_ON()    do { g_bTrace = TRUE; } while (0)
     #define TRACE_OFF()   do { g_bTrace = FALSE; } while (0)
 
+    /* ArrayAt for std::vector */
     template <typename T_ITEM>
     T_ITEM& Array_At(std::vector<T_ITEM>& array, size_t index, const char *file, int line) {
         if (index >= array.size())
@@ -70,8 +71,25 @@
             DebugAssert(file, line, "index >= array.size()");
         return array[index];
     }
+
+    /* ArrayAt for raw array */
+    template <typename T_ITEM, size_t t_size>
+    T_ITEM& Array_At(T_ITEM (&array)[t_size], size_t index, const char *file, int line) {
+        if (index >= t_size)
+            DebugAssert(file, line, "index >= t_size");
+        return array[index];
+    }
+    template <typename T_ITEM, size_t t_size>
+    const T_ITEM& Array_At(const T_ITEM (&array)[t_size], size_t index, const char *file, int line) {
+        if (index >= t_size)
+            DebugAssert(file, line, "index >= t_size");
+        return array[index];
+    }
+
     #define ARRAY_AT(array, index) \
         Array_At((array), (index), __FILE__, __LINE__)
+    #define ARRAY_AT_AT(array, index0, index1) \
+        ARRAY_AT(ARRAY_AT((array), (index0)), (index1))
 #else
     #define DPRINT(fmt, ...)
     #define DPRINTA(fmt, ...)
@@ -80,6 +98,7 @@
     #define TRACE_ON()
     #define TRACE_OFF()
     #define ARRAY_AT(array, index)         ((array)[index])
+    #define ARRAY_AT_AT(array, index0, index1) ((array)[index0][index1])
 #endif
 
 #define FootmarkDebugPrint DPRINTA
