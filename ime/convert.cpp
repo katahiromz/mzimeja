@@ -1,9 +1,9 @@
 // convert.cpp --- mzimeja kana kanji conversion
+// (Japanese, UTF-8)
 // かな漢字変換。
 //////////////////////////////////////////////////////////////////////////////
 // 参考文献1：『自然言語処理の基礎』2010年、コロナ社。
 // 参考文献2：『新編常用国語便覧』1995年、浜島書店。
-// (Japanese, UTF-8)
 
 #include "mzimeja.h"
 #include "resource.h"
