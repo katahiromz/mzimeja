@@ -671,21 +671,20 @@ Dict::~Dict()
 // 辞書データファイルのサイズを取得する。
 DWORD Dict::GetSize() const
 {
-    DWORD ret = 0;
     WIN32_FIND_DATAW find;
-    find.nFileSizeLow = 0;
     HANDLE hFind = ::FindFirstFileW(m_strFileName.c_str(), &find);
     if (hFind != INVALID_HANDLE_VALUE) {
         ::CloseHandle(hFind);
-        ret = find.nFileSizeLow;
+        return find.nFileSizeLow;
     }
-    return ret;
+    return 0;
 }
 
 // 辞書を読み込む。
 BOOL Dict::Load(const WCHAR *file_name, const WCHAR *object_name)
 {
-    if (IsLoaded()) return TRUE; // すでに読み込み済み。
+    if (IsLoaded())
+        return TRUE; // すでに読み込み済み。
 
     m_strFileName = file_name;
     m_strObjectName = object_name;
@@ -705,7 +704,8 @@ BOOL Dict::Load(const WCHAR *file_name, const WCHAR *object_name)
 
     // ファイルサイズを取得。
     DWORD cbSize = GetSize();
-    if (cbSize == 0) return FALSE;
+    if (cbSize == 0)
+        return FALSE;
 
     BOOL ret = FALSE;
     DWORD wait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds); // 排他制御を待つ。
@@ -767,7 +767,8 @@ void Dict::Unload()
 // 辞書をロックして情報の取得を開始。
 WCHAR *Dict::Lock()
 {
-    if (m_hFileMapping == NULL) return NULL;
+    if (m_hFileMapping == NULL)
+        return NULL;
     DWORD cbSize = GetSize();
     void *pv = ::MapViewOfFile(m_hFileMapping, FILE_MAP_ALL_ACCESS, 0, 0, cbSize);
     return reinterpret_cast<WCHAR *>(pv);
