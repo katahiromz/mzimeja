@@ -2930,14 +2930,12 @@ BOOL Lattice::MakeLatticeForMulti(const std::wstring& pre)
 {
     DPRINTW(L"%s\n", pre.c_str());
 
-    ASSERT(pre.size() != 0);
-
     // ラティスを初期化。
+    ASSERT(pre.size() != 0);
     m_pre = pre; // 変換前の文字列。
     m_chunks.resize(pre.size() + 1);
     m_refs.assign(pre.size() + 1, 0);
     m_refs[0] = 1;
-
 
     WCHAR *dict_data1 = g_basic_dict.Lock(); // 基本辞書をロック。
     if (dict_data1) {
@@ -2977,14 +2975,12 @@ BOOL Lattice::MakeLatticeForSingle(const std::wstring& pre)
 {
     DPRINTW(L"%s\n", pre.c_str());
 
-    ASSERT(pre.size() != 0);
-    const size_t length = pre.size();
-
     // ラティスを初期化。
+    ASSERT(pre.size() != 0);
     m_pre = pre;
-    m_chunks.resize(length + 1);
-    m_refs.assign(length + 1, 0);
-    m_refs[0] = 1;
+    m_chunks.resize(pre.size() + 1);
+    m_refs.assign(pre.size() + 1, 0);
+    m_refs[0] = 1; // 先頭は参照される。
 
     BOOL bOK = TRUE;
 
