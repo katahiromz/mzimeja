@@ -1454,7 +1454,7 @@ BOOL Lattice::AddNodesForSingle(const WCHAR *dict_data)
     }
 
     // 異なるサイズのノードを削除する。
-    ASSERT(m_chunks.size() >= 1);
+    ASSERT(m_chunks.size() >= 1); // 失敗時にAddComplementするから失敗はあり得ない（？）
     for (size_t i = 0; i < m_chunks[0].size(); ++i) {
         auto it = std::remove_if(m_chunks[0].begin(), m_chunks[0].end(), [this](const LatticeNodePtr& n){
             return n->pre.size() != m_pre.size();
@@ -1548,7 +1548,7 @@ void Lattice::UnlinkAllNodes()
 void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
 {
     WStrings fields(NUM_FIELDS);
-    fields[I_FIELD_HINSHI] = { MAKEWORD(HB_UNKNOWN, 0) };
+    fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
     for (size_t count = min_size; count <= max_size; ++count) {
         if (m_pre.size() < index + count)
             continue;
