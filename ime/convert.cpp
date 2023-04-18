@@ -685,7 +685,7 @@ DWORD Dict::GetSize() const
     WIN32_FIND_DATAW find;
     HANDLE hFind = ::FindFirstFileW(m_strFileName.c_str(), &find);
     if (hFind != INVALID_HANDLE_VALUE) {
-        ::CloseHandle(hFind);
+        ::FindClose(hFind);
         return find.nFileSizeLow;
     }
     return 0;

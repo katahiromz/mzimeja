@@ -1,5 +1,4 @@
-// mzimeja.cpp --- MZ-IME Japanese Input (mzimeja)
-// メイン。
+// main.cpp --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
@@ -496,66 +495,44 @@ void FreeUIExtra(HWND hwndServer)
     ::SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// For debugging.
-// デバッグ用。
-
-#ifndef NDEBUG
-BOOL g_bTrace = TRUE;   // この変数がFALSEのときはデバッグ出力しない。
-
-// printf関数と同じ文法でデバッグ出力を行う関数。
-void DebugPrintA(const char *lpszFormat, ...)
+LPCTSTR findLocalFile(LPCTSTR name)
 {
-    char szMsgA[1024];
+    TCHAR szDir[MAX_PATH];
+    ::GetModuleFileName(NULL, szDir, _countof(szDir));
+    ::PathRemoveFileSpec(szDir);
 
-    if (!g_bTrace)
-        return;
+    static TCHAR s_szPath[MAX_PATH];
+    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
+    ::PathAppend(s_szPath, name);
+    if (::PathFileExists(s_szPath))
+        return s_szPath;
 
-    va_list marker;
-    va_start(marker, lpszFormat);
-    StringCchVPrintfA(szMsgA, _countof(szMsgA), lpszFormat, marker);
-    va_end(marker);
+    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
+    ::PathAppend(s_szPath, TEXT(".."));
+    ::PathAppend(s_szPath, name);
+    if (::PathFileExists(s_szPath))
+        return s_szPath;
 
-    OutputDebugStringA(szMsgA);
+    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
+    ::PathAppend(s_szPath, TEXT(".."));
+    ::PathAppend(s_szPath, TEXT(".."));
+    ::PathAppend(s_szPath, name);
+    if (::PathFileExists(s_szPath))
+        return s_szPath;
+
+    ASSERT(0);
+    return NULL;
 }
-
-// wprintf関数と同じ文法でデバッグ出力を行う関数。
-void DebugPrintW(const WCHAR *lpszFormat, ...)
-{
-    WCHAR szMsg[1024];
-
-    if (!g_bTrace)
-        return;
-
-    va_list marker;
-    va_start(marker, lpszFormat);
-    StringCchVPrintfW(szMsg, _countof(szMsg), lpszFormat, marker);
-    va_end(marker);
-
-    OutputDebugStringW(szMsg);
-}
-
-// ASSERT失敗時に呼び出される関数。
-void DebugAssert(const char *file, int line, const char *exp)
-{
-    DebugPrintA("%s (%d): ASSERT(%s) failed\n", file, line, exp);
-
-    WCHAR szText[1024];
-    StringCchPrintfW(szText, _countof(szText), L"%hs (%d): ASSERT(%hs) failed\n", file, line, exp);
-    MessageBoxW(NULL, szText, L"Assertion Failure", MB_ICONERROR);
-}
-#endif  // ndef NDEBUG
 
 //////////////////////////////////////////////////////////////////////////////
-// DLL entry point
 
 // IMEはDLLファイルの一種であるから、IMEが読み込まれたら、エントリーポイントの
 // DllMainが呼び出されるはず。
-BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot)
+BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
-    FOOTMARK_FORMAT("(%p, 0x%08lX, %p)\n", hInstDLL, dwFunction, lpNot);
+    FOOTMARK_FORMAT("(%p, 0x%08lX, %p)\n", hInstDLL, fdwReason, lpvReserved);
 
-    switch (dwFunction) {
+    switch (fdwReason) {
     case DLL_PROCESS_ATTACH:
         ::DisableThreadLibraryCalls(hInstDLL);
         TheIME.Init(hInstDLL); // 初期化。
@@ -574,7 +551,33 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD dwFunction, LPVOID lpNot)
 } // DllMain
 
 //////////////////////////////////////////////////////////////////////////////
+// wmain --- Unicode main function
 
-}  // extern "C"
+int wmain(int argc, wchar_t **argv)
+{
+    LPCTSTR pathname = findLocalFile(L"res\\mzimeja.dic");
+    if (!g_basic_dict.Load(pathname, L"BasicDictObject")) {
+        ASSERT(0);
+        return 1;
+    }
+
+    MzConvResult result;
+    TheIME.ConvertMultiClause(L"てすとです", result);
+
+    g_basic_dict.Unload();
+    return 0;
+}
+
+// for old compiles
+int main(void)
+{
+    int argc;
+    LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    int ret = wmain(argc, argv);
+    LocalFree(argv);
+    return ret;
+}
 
 //////////////////////////////////////////////////////////////////////////////
+
+}  // extern "C"
