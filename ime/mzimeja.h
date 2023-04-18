@@ -524,7 +524,7 @@ extern Dict g_basic_dict;
 extern Dict g_name_dict;
 
 class MzIme {
-    public:
+public:
     HINSTANCE m_hInst;
     HKL m_hMyKL;
     BOOL m_bWinLogOn;

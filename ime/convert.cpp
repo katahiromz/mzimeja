@@ -3169,8 +3169,8 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice)
 BOOL MzIme::ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 {
     MzConvResult result;
-    std::wstring strHiragana = ARRAY_AT(comp.extra.hiragana_clauses, comp.extra.iClause);
-    if (!ConvertMultiClause(strHiragana, result)) {
+    std::wstring str = ARRAY_AT(comp.extra.hiragana_clauses, comp.extra.iClause);
+    if (!ConvertMultiClause(str, result)) {
         return FALSE;
     }
     return StoreResult(result, comp, cand);
@@ -3205,8 +3205,8 @@ BOOL MzIme::ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman
 
     // 変換する。
     MzConvResult result;
-    std::wstring strHiragana = ARRAY_AT(comp.extra.hiragana_clauses, iClause);
-    if (!ConvertSingleClause(strHiragana, result)) {
+    std::wstring str = ARRAY_AT(comp.extra.hiragana_clauses, iClause);
+    if (!ConvertSingleClause(str, result)) {
         return FALSE;
     }
 
