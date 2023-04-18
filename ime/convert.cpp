@@ -808,7 +808,7 @@ void MzConvClause::add(const LatticeNode *node)
 {
     bool matched = false;
     for (auto& cand : candidates) {
-        if (cand.converted == node->post) {
+        if (cand.post == node->post) {
             if (cand.cost > node->word_cost)  {
                 cand.cost = node->word_cost;
                 cand.bunruis.insert(node->bunrui);
@@ -821,8 +821,8 @@ void MzConvClause::add(const LatticeNode *node)
 
     if (!matched) {
         MzConvCandidate cand;
-        cand.hiragana = node->pre;
-        cand.converted = node->post;
+        cand.pre = node->pre;
+        cand.post = node->post;
         cand.cost = node->word_cost;
         cand.bunruis.insert(node->bunrui);
         cand.tags = node->tags;
@@ -3014,7 +3014,7 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
         const LatticeChunk& chunk = ARRAY_AT(lattice.m_chunks, index);
         MzConvClause& clause = ARRAY_AT(result.clauses, iClause);
 
-        std::wstring hiragana = ARRAY_AT(clause.candidates, 0).hiragana;
+        std::wstring hiragana = ARRAY_AT(clause.candidates, 0).pre;
         const size_t size = hiragana.size();
         for (size_t i = 0; i < chunk.size(); ++i) {
             if (ARRAY_AT(chunk, i)->pre.size() == size) {
@@ -3212,13 +3212,13 @@ BOOL MzIme::ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman
     // 未確定文字列をセット。
     result.clauses.resize(1);
     MzConvClause& clause = ARRAY_AT(result.clauses, 0);
-    comp.SetClauseCompString(iClause, ARRAY_AT(clause.candidates, 0).converted);
-    comp.SetClauseCompHiragana(iClause, ARRAY_AT(clause.candidates, 0).hiragana, bRoman);
+    comp.SetClauseCompString(iClause, ARRAY_AT(clause.candidates, 0).post);
+    comp.SetClauseCompHiragana(iClause, ARRAY_AT(clause.candidates, 0).pre, bRoman);
 
     // 候補リストをセットする。
     LogCandList cand_list;
     for (auto& cand2 : clause.candidates) {
-        cand_list.cand_strs.push_back(cand2.converted);
+        cand_list.cand_strs.push_back(cand2.post);
     }
     ARRAY_AT(cand.cand_lists, iClause) = cand_list;
 
@@ -3295,9 +3295,9 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     auto& clause1 = result1.clauses[0];
     auto& clause2 = result2.clauses[0];
     comp.extra.hiragana_clauses[iClause] = str1;
-    comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
+    comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].post;
     comp.extra.hiragana_clauses[iClause + 1] = str2;
-    comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].converted;
+    comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].post;
 
     // 余剰情報から未確定文字列を更新する。
     comp.UpdateFromExtra(bRoman);
@@ -3306,14 +3306,14 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     {
         LogCandList cand_list;
         for (auto& cand1 : clause1.candidates) {
-            cand_list.cand_strs.push_back(cand1.converted);
+            cand_list.cand_strs.push_back(cand1.post);
         }
         cand.cand_lists[iClause] = cand_list;
     }
     {
         LogCandList cand_list;
         for (auto& cand2 : clause2.candidates) {
-            cand_list.cand_strs.push_back(cand2.converted);
+            cand_list.cand_strs.push_back(cand2.post);
         }
         if (bSplitted) {
             cand.cand_lists.push_back(cand_list);
@@ -3378,14 +3378,14 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
         comp.extra.hiragana_clauses.erase(comp.extra.hiragana_clauses.begin() + iClause + 1);
         comp.extra.comp_str_clauses.erase(comp.extra.comp_str_clauses.begin() + iClause + 1);
         comp.extra.hiragana_clauses[iClause] = str1;
-        comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
+        comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].post;
     } else {
         // ２つの文節情報をセットする。
         auto& clause2 = result2.clauses[0];
         comp.extra.hiragana_clauses[iClause] = str1;
-        comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].converted;
+        comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].post;
         comp.extra.hiragana_clauses[iClause + 1] = str2;
-        comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].converted;
+        comp.extra.comp_str_clauses[iClause + 1] = clause2.candidates[0].post;
     }
 
     // 余剰情報から未確定文字列を更新する。
@@ -3395,7 +3395,7 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     {
         LogCandList cand_list;
         for (auto& cand1 : clause1.candidates) {
-            cand_list.cand_strs.push_back(cand1.converted);
+            cand_list.cand_strs.push_back(cand1.post);
         }
         cand.cand_lists[iClause] = cand_list;
     }
@@ -3403,7 +3403,7 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
         MzConvClause& clause2 = result2.clauses[0];
         LogCandList cand_list;
         for (auto& cand2 : clause2.candidates) {
-            cand_list.cand_strs.push_back(cand2.converted);
+            cand_list.cand_strs.push_back(cand2.post);
         }
         cand.cand_lists[iClause + 1] = cand_list;
     }
@@ -3598,10 +3598,10 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
         const MzConvClause& clause = result.clauses[iClause];
         for (auto& cand2 : clause.candidates) {
             comp.comp_clause[iClause] = (DWORD)comp.comp_str.size();
-            comp.extra.hiragana_clauses.push_back(cand2.hiragana);
-            std::wstring typing = hiragana_to_typing(cand2.hiragana);
+            comp.extra.hiragana_clauses.push_back(cand2.pre);
+            std::wstring typing = hiragana_to_typing(cand2.pre);
             comp.extra.typing_clauses.push_back(typing);
-            comp.comp_str += cand2.converted;
+            comp.comp_str += cand2.post;
             break;
         }
     }
@@ -3617,7 +3617,7 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
     for (auto& clause : result.clauses) {
         LogCandList cand_list;
         for (auto& cand2 : clause.candidates) {
-            cand_list.cand_strs.push_back(cand2.converted);
+            cand_list.cand_strs.push_back(cand2.post);
         }
         cand.cand_lists.push_back(cand_list);
     }

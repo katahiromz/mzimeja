@@ -458,15 +458,15 @@ protected:
 
 // 変換候補。
 struct MzConvCandidate {
-    std::wstring hiragana;              // ひらがな。
-    std::wstring converted;             // 変換後。
-    INT cost;                           // コスト。
+    std::wstring pre;              // ひらがな。
+    std::wstring post;             // 変換後。
+    INT cost;                      // コスト。
     std::unordered_set<HinshiBunrui>  bunruis;    // 品詞分類集合。
-    std::wstring tags;                  // タグ。
+    std::wstring tags;             // タグ。
 
     void clear() {
-        hiragana.clear();
-        converted.clear();
+        pre.clear();
+        post.clear();
         cost = 0;
         bunruis.clear();
         tags.clear();
