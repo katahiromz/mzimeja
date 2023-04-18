@@ -489,6 +489,7 @@ struct MzConvResult {
     std::vector<MzConvClause> clauses;      // 文節群。
     void sort();                            // ソートする。
     void clear() { clauses.clear(); }       // クリアする。
+    std::wstring get_str() const;
 };
 
 //////////////////////////////////////////////////////////////////////////////

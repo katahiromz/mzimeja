@@ -569,8 +569,8 @@ void IME_Test1(void)
 void IME_Test2(void)
 {
     MzConvResult result;
-    TheIME.ConvertMultiClause(L"なった", result);
-    printf("%ls\n", result.clauses[0].candidates[0].post.c_str());
+    TheIME.ConvertMultiClause(L"そこではなしはおわりになった", result);
+    printf("%ls\n", result.get_str().c_str());
 }
 
 // Unicode版のmain関数。
@@ -585,7 +585,7 @@ int wmain(int argc, wchar_t **argv)
         return 1;
     }
 
-    // テスト。
+    // テスト1。
     IME_Test1();
 
     g_basic_dict.Unload();
@@ -596,7 +596,7 @@ int wmain(int argc, wchar_t **argv)
         return 1;
     }
 
-    // テスト。
+    // テスト2。
     IME_Test2();
 
     g_basic_dict.Unload();

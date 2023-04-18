@@ -3627,4 +3627,17 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
     return TRUE;
 } // MzIme::StoreResult
 
+std::wstring MzConvResult::get_str() const
+{
+    std::wstring ret;
+    size_t iClause = 0;
+    for (auto& clause : clauses) {
+        if (iClause)
+            ret += L"|";
+        ret += clause.candidates[0].post;
+        ++iClause;
+    }
+    return ret;
+}
+
 //////////////////////////////////////////////////////////////////////////////
