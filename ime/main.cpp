@@ -4,6 +4,7 @@
 #include "mzimeja.h"
 #include <shlobj.h>
 #include <strsafe.h>
+#include <clocale>
 #include "resource.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -555,20 +556,32 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, LPVOID lpvReserved)
 // mzimejaの単体テスト。
 void IME_UnitTest(void)
 {
-    MzConvResult result;
-    TheIME.ConvertMultiClause(L"てすとです", result);
+    {
+        MzConvResult result;
+        TheIME.ConvertMultiClause(L"てすとです", result);
 
-    ASSERT(result.clauses.size() == 2);
-    ASSERT(result.clauses[0].candidates[0].pre == L"てすと");
-    ASSERT(result.clauses[0].candidates[0].post == L"テスト");
-    ASSERT(result.clauses[1].candidates[0].pre == L"です");
-    ASSERT(result.clauses[1].candidates[0].post == L"です");
+        ASSERT(result.clauses.size() == 2);
+        ASSERT(result.clauses[0].candidates[0].pre == L"てすと");
+        ASSERT(result.clauses[0].candidates[0].post == L"テスト");
+        ASSERT(result.clauses[1].candidates[0].pre == L"です");
+        ASSERT(result.clauses[1].candidates[0].post == L"です");
+    }
+
+    {
+        MzConvResult result;
+        TheIME.ConvertMultiClause(L"なった", result);
+        printf("%ls\n", result.clauses[0].candidates[0].post.c_str());
+    }
 }
 
 // Unicode版のmain関数。
 int wmain(int argc, wchar_t **argv)
 {
+    // Unicode出力を可能に。
+    std::setlocale(LC_CTYPE, "");
+
     LPCTSTR pathname = findLocalFile(L"res\\mzimeja.dic");
+    //LPCTSTR pathname = findLocalFile(L"res\\testdata.dic");
     if (!g_basic_dict.Load(pathname, L"BasicDictObject")) {
         ASSERT(0);
         return 1;

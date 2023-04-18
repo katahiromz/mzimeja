@@ -577,11 +577,9 @@ public:
 
     // 変換。
     BOOL ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-    BOOL ConvertMultiClause(const std::wstring& strHiragana,
-                            MzConvResult& result);
+    BOOL ConvertMultiClause(const std::wstring& str, MzConvResult& result);
     BOOL ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
-    BOOL ConvertSingleClause(const std::wstring& strHiragana,
-                             MzConvResult& result);
+    BOOL ConvertSingleClause(const std::wstring& str, MzConvResult& result);
     BOOL StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
     BOOL StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman);
     BOOL ConvertCode(const std::wstring& strTyping, MzConvResult& result);

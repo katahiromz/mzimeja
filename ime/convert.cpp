@@ -1949,6 +1949,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 「持ち(て/た/たり/ても)」→「持っ(て/た/たり/ても)」
     // 「呼び(て/た/たり/ても)」→「呼ん(で/だ/だり/でも)」
     // 「書き(て/た/たり/ても)」→「書い(て/た/たり/ても)」
+    // 「担い(て/た/たり/ても)」→「担っ(て/た/たり/ても)」
     Gyou gyou = g_hiragana_to_gyou[ch];
     WCHAR ch2 = 0;
     switch (gyou) {
@@ -1992,7 +1993,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
             node.pre = fields[I_FIELD_PRE] + ch2 + tail[1] + tail[2];
             node.post = fields[I_FIELD_POST] + ch2 + tail[1] + tail[2];
             m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
-        } else if (tail.size() >= 3 && tail[1] == L'た') {
+        } else if (tail.size() >= 2 && tail[1] == L'た') {
             // 終止形「た」
             node.katsuyou = SHUUSHI_KEI;
             node.pre = fields[I_FIELD_PRE] + ch2 + tail[1];
