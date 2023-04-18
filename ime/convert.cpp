@@ -3176,12 +3176,12 @@ BOOL MzIme::ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
 } // MzIme::ConvertMultiClause
 
 // 複数文節を変換する。
-BOOL MzIme::ConvertMultiClause(const std::wstring& strHiragana, MzConvResult& result)
+BOOL MzIme::ConvertMultiClause(const std::wstring& str, MzConvResult& result)
 {
-    DPRINTW(L"%s\n", strHiragana.c_str());
+    DPRINTW(L"%s\n", str.c_str());
 
     // 変換前文字列をひらがな全角で取得。
-    std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+    std::wstring pre = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
 
     // ラティスを作成し、結果を作成する。
     Lattice lattice;
@@ -3230,13 +3230,13 @@ BOOL MzIme::ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman
 } // MzIme::ConvertSingleClause
 
 // 単一文節を変換する。
-BOOL MzIme::ConvertSingleClause(const std::wstring& strHiragana, MzConvResult& result)
+BOOL MzIme::ConvertSingleClause(const std::wstring& str, MzConvResult& result)
 {
-    DPRINTW(L"%s\n", strHiragana.c_str());
+    DPRINTW(L"%s\n", str.c_str());
     result.clear(); // 結果をクリア。
 
     // 変換前文字列をひらがな全角で取得。
-    std::wstring pre = lcmap(strHiragana, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+    std::wstring pre = lcmap(str, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
 
     // ラティスを作成する。
     Lattice lattice;
