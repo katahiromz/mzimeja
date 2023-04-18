@@ -551,8 +551,15 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, LPVOID lpvReserved)
 } // DllMain
 
 //////////////////////////////////////////////////////////////////////////////
-// wmain --- Unicode main function
 
+// mzimejaの単体テスト。
+void IME_UnitTest(void)
+{
+    MzConvResult result;
+    TheIME.ConvertMultiClause(L"てすとです", result);
+}
+
+// Unicode版のmain関数。
 int wmain(int argc, wchar_t **argv)
 {
     LPCTSTR pathname = findLocalFile(L"res\\mzimeja.dic");
@@ -561,14 +568,14 @@ int wmain(int argc, wchar_t **argv)
         return 1;
     }
 
-    MzConvResult result;
-    TheIME.ConvertMultiClause(L"てすとです", result);
+    // 単体テスト。
+    IME_UnitTest();
 
     g_basic_dict.Unload();
     return 0;
 }
 
-// for old compiles
+// 古いコンパイラのサポートのため。
 int main(void)
 {
     int argc;
