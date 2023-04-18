@@ -806,8 +806,8 @@ void MzConvClause::add(const LatticeNode *node)
     bool matched = false;
     for (auto& cand : candidates) {
         if (cand.converted == node->post) {
-            if (cand.cost > node->cost)  {
-                cand.cost = node->cost;
+            if (cand.cost > node->word_cost)  {
+                cand.cost = node->word_cost;
                 cand.bunruis.insert(node->bunrui);
                 cand.tags += node->tags;
             }
@@ -820,7 +820,7 @@ void MzConvClause::add(const LatticeNode *node)
         MzConvCandidate cand;
         cand.hiragana = node->pre;
         cand.converted = node->post;
-        cand.cost = node->cost;
+        cand.cost = node->word_cost;
         cand.bunruis.insert(node->bunrui);
         cand.tags = node->tags;
         candidates.push_back(cand);
@@ -871,8 +871,8 @@ void MzConvResult::sort()
 //////////////////////////////////////////////////////////////////////////////
 // LatticeNode - ラティス（lattice）のノード。
 
-// コストを計算。
-int LatticeNode::CalcCost() const
+// 単語コストを計算。
+int LatticeNode::CalcWordCost() const
 {
     int ret = 0;
     if (bunrui == HB_KANGO) ret += 200;
@@ -883,8 +883,6 @@ int LatticeNode::CalcCost() const
         if (HasTag(L"[人名]")) ret += 30;
         else if (HasTag(L"[駅名]")) ret += 30;
         else if (HasTag(L"[地名]")) ret += 30;
-
-        // ユーザー辞書単語はコストマイナス30。
         if (HasTag(L"[ユーザ辞書]")) ret -= 30;
     }
     return ret;
@@ -1605,7 +1603,7 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     LatticeNode node;
     node.bunrui = HB_IKEIYOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost() + deltaCost;
+    node.word_cost = node.CalcWordCost() + deltaCost;
 
     // い形容詞の未然形。
     // 「痛い」→「痛かろ(う)」
@@ -1784,7 +1782,7 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     LatticeNode node;
     node.bunrui = HB_NAKEIYOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost() + deltaCost;
+    node.word_cost = node.CalcWordCost() + deltaCost;
 
     // な形容詞の未然形。
     // 「巨大な」→「巨大だろ(う)」
@@ -1908,7 +1906,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     LatticeNode node;
     node.bunrui = HB_GODAN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost() + deltaCost;
+    node.word_cost = node.CalcWordCost() + deltaCost;
     node.gyou = (Gyou)HIBYTE(fields[I_FIELD_HINSHI][0]);
 
     // 五段動詞の未然形。
@@ -2117,7 +2115,7 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
     LatticeNode node;
     node.bunrui = HB_ICHIDAN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost() + deltaCost;
+    node.word_cost = node.CalcWordCost() + deltaCost;
 
     // 一段動詞の未然形。「寄せる」→「寄せ(ない/よう)」、「見る」→「見(ない/よう)」
     // 一段動詞の連用形。「寄せる」→「寄せ(ます/た/て)」、「見る」→「見(ます/た/て)」
@@ -2295,7 +2293,7 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     LatticeNode node;
     node.bunrui = HB_KAHEN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost() + deltaCost;
+    node.word_cost = node.CalcWordCost() + deltaCost;
 
     // 「くる」「こ(ない)」「き(ます)」などと、語幹が一致しないので、
     // 実際の辞書では「来い」を登録するなど回避策を施している。
@@ -2437,7 +2435,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     LatticeNode node;
     node.bunrui = HB_SAHEN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost() + deltaCost;
+    node.word_cost = node.CalcWordCost() + deltaCost;
     node.gyou = (Gyou)HIBYTE(fields[I_FIELD_HINSHI][0]);
 
     // 未然形
@@ -2591,7 +2589,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
     LatticeNode node;
     node.bunrui = HB_MEISHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost() + deltaCost;
+    node.word_cost = node.CalcWordCost() + deltaCost;
 
     // 名詞は活用なし。
     if (node.HasTag(L"[動植物]")) {
@@ -2600,7 +2598,7 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = lcmap(fields[I_FIELD_PRE], LCMAP_KATAKANA | LCMAP_FULLWIDTH);
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
 
-        node.cost += 30;
+        node.word_cost += 30;
         node.pre = fields[I_FIELD_PRE];
         node.post = fields[I_FIELD_POST];
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
@@ -2670,7 +2668,7 @@ void Lattice::DoFukushi(size_t index, const WStrings& fields, INT deltaCost)
     LatticeNode node;
     node.bunrui = HB_FUKUSHI;
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost() + deltaCost;
+    node.word_cost = node.CalcWordCost() + deltaCost;
 
     // 副詞。活用はない。
     node.pre = fields[I_FIELD_PRE];
@@ -2720,7 +2718,7 @@ void Lattice::DoFields(size_t index, const WStrings& fields, INT deltaCost)
     node.bunrui = (HinshiBunrui)LOBYTE(w);
     node.gyou = (Gyou)HIBYTE(w);
     node.tags = fields[I_FIELD_TAGS];
-    node.cost = node.CalcCost() + deltaCost;
+    node.word_cost = node.CalcWordCost() + deltaCost;
 
     // 品詞分類で場合分けする。
     switch (node.bunrui) {
@@ -2918,18 +2916,18 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
                 // (doushi or jodoushi) + jodoushi
                 if ((node1->IsDoushi() || node1->IsJodoushi()) && node2->IsJodoushi()) {
                     ++len;
-                    node2->cost -= 80;
+                    node2->word_cost -= 80;
                 }
                 // jodoushi + shuu joshi
                 if (node1->IsJodoushi() && node2->bunrui == HB_SHUU_JOSHI) {
                     ++len;
-                    node2->cost -= 30;
+                    node2->word_cost -= 30;
                 }
                 // suushi + (suushi or number unit)
                 if (node1->HasTag(L"[数詞]")) {
                     if (node2->HasTag(L"[数詞]") || node2->HasTag(L"[数単位]")) {
                         ++len;
-                        node2->cost -= 100;
+                        node2->word_cost -= 100;
                     }
                 }
                 if (max_len < len) {
@@ -2944,34 +2942,34 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
                     // (doushi or jodoushi) + jodoushi
                     if ((node1->IsDoushi() || node1->IsJodoushi()) && node2->IsJodoushi()) {
                         ++len;
-                        node2->cost -= 80;
+                        node2->word_cost -= 80;
                     } else {
                         if ((node2->IsDoushi() || node2->IsJodoushi()) && node3->IsJodoushi()) {
                             ++len;
-                            node2->cost -= 80;
+                            node2->word_cost -= 80;
                         }
                     }
                     // jodoushu + shuu joshi
                     if (node1->IsJodoushi() && node2->bunrui == HB_SHUU_JOSHI) {
                         ++len;
-                        node2->cost -= 30;
+                        node2->word_cost -= 30;
                     } else {
                         if (node2->IsJodoushi() && node3->bunrui == HB_SHUU_JOSHI) {
                             ++len;
-                            node2->cost -= 30;
+                            node2->word_cost -= 30;
                         }
                     }
                     // suushi + (suushi or number unit)
                     if (node1->HasTag(L"[数詞]")) {
                         if (node2->HasTag(L"[数詞]") || node2->HasTag(L"[数単位]")) {
                             ++len;
-                            node2->cost -= 100;
+                            node2->word_cost -= 100;
                         }
                     } else {
                         if (node2->HasTag(L"[数詞]")) {
                             if (node3->HasTag(L"[数詞]") || node3->HasTag(L"[数単位]")) {
                                 ++len;
-                                node2->cost -= 100;
+                                node2->word_cost -= 100;
                             }
                         }
                     }
@@ -3023,7 +3021,7 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
 
         LatticeNode node;
         node.bunrui = HB_UNKNOWN;
-        node.cost = 40; // コストは人名・地名よりも高くする。
+        node.word_cost = 40; // コストは人名・地名よりも高くする。
         node.pre = lcmap(hiragana, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
 
         // add hiragana
@@ -3081,7 +3079,7 @@ void MzIme::MakeResultOnFailure(MzConvResult& result, const std::wstring& pre)
     // ノードを初期化。
     LatticeNode node;
     node.pre = pre; // 変換前の文字列。
-    node.cost = 40; // コストは人名・地名よりも高くする。
+    node.word_cost = 40; // コストは人名・地名よりも高くする。
     node.bunrui = HB_MEISHI; // 名詞。
 
     // 文節に無変換文字列を追加。
@@ -3131,7 +3129,7 @@ void MzIme::MakeResultForSingle(MzConvResult& result, Lattice& lattice)
     LatticeNode node;
     node.pre = pre;
     node.bunrui = HB_UNKNOWN;
-    node.cost = 40; // コストは人名・地名よりも高くする。
+    node.word_cost = 40; // コストは人名・地名よりも高くする。
 
     // 文節に無変換文字列を追加。
     node.post = pre; // 変換後の文字列。
@@ -3503,7 +3501,6 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
     LatticeNode node;
     node.pre = strTyping;
     node.bunrui = HB_UNKNOWN;
-    node.cost = 0;
 
     // 16進を読み込み。
     ULONG hex_code = wcstoul(strTyping.c_str(), NULL, 16);
@@ -3517,7 +3514,7 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
     szUnicode[1] = 0;
     node.post = szUnicode; // 変換後の文字列。
     clause.add(&node);
-    node.cost++; // コストを１つ加算。
+    node.word_cost++; // コストを１つ加算。
 
     // Shift_JISコードのノードを文節に追加。
     CHAR szSJIS[8];
@@ -3528,7 +3525,7 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
         szSJIS[2] = 0;
         ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
         node.post = szUnicode; // 変換後の文字列。
-        node.cost++; // コストを１つ加算。
+        node.word_cost++; // コストを１つ加算。
         clause.add(&node);
     }
 
@@ -3541,7 +3538,7 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
             szSJIS[2] = 0;
             ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
             node.post = szUnicode; // 変換後の文字列。
-            node.cost++; // コストを１つ加算。
+            node.word_cost++; // コストを１つ加算。
             clause.add(&node);
         }
     }
@@ -3556,14 +3553,14 @@ BOOL MzIme::ConvertCode(const std::wstring& strTyping, MzConvResult& result)
             szSJIS[2] = 0;
             ::MultiByteToWideChar(932, 0, szSJIS, -1, szUnicode, 2);
             node.post = szUnicode; // 変換後の文字列。
-            node.cost++; // コストを１つ加算。
+            node.word_cost++; // コストを１つ加算。
             clause.add(&node);
         }
     }
 
     // 元の入力文字列のノードを文節に追加。
     node.post = strTyping; // 変換後の文字列。
-    node.cost++; // コストを１つ加算。
+    node.word_cost++; // コストを１つ加算。
     clause.add(&node);
 
     // 結果に文節情報をセット。

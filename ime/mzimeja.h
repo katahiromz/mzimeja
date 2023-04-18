@@ -394,14 +394,14 @@ struct LatticeNode {
     HinshiBunrui bunrui;                    // 分類。
     Gyou gyou;                              // 活用の行。
     KatsuyouKei katsuyou;                   // 動詞活用形。
-    int cost;                               // コスト。
+    INT word_cost;                          // 単語コスト。
     DWORD linked;                           // リンク先。
     std::vector<LatticeNodePtr> branches;   // 枝分かれ。
     LatticeNode() {
-        cost = 0;
+        word_cost = 0;
         linked = 0;
     }
-    int CalcCost() const;       // コストを計算。
+    INT CalcWordCost() const;   // 単語コストを計算。
     bool IsDoushi() const;      // 動詞か？
     bool IsJodoushi() const;    // 助動詞か？
 
