@@ -700,6 +700,9 @@ BOOL Dict::Load(const WCHAR *file_name, const WCHAR *object_name)
     m_strFileName = file_name;
     m_strObjectName = object_name;
 
+    if (file_name == NULL)
+        return FALSE;
+
     SECURITY_ATTRIBUTES *psa = CreateSecurityAttributes(); // セキュリティ属性を作成。
     ASSERT(psa);
 
