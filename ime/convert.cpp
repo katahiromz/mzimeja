@@ -3015,8 +3015,8 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
         const LatticeChunk& chunk = ARRAY_AT(lattice.m_chunks, index);
         MzConvClause& clause = ARRAY_AT(result.clauses, iClause);
 
-        std::wstring hiragana = ARRAY_AT(clause.candidates, 0).pre;
-        const size_t size = hiragana.size();
+        std::wstring pre = ARRAY_AT(clause.candidates, 0).pre;
+        const size_t size = pre.size();
         for (size_t i = 0; i < chunk.size(); ++i) {
             if (ARRAY_AT(chunk, i)->pre.size() == size) {
                 // add a candidate of same size
@@ -3027,42 +3027,42 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
         LatticeNode node;
         node.bunrui = HB_UNKNOWN;
         node.word_cost = 40; // コストは人名・地名よりも高くする。
-        node.pre = lcmap(hiragana, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
+        node.pre = lcmap(pre, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
 
         // add hiragana
-        node.post = lcmap(hiragana, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
+        node.post = lcmap(pre, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
         clause.add(&node);
 
         // add katakana
-        node.post = lcmap(hiragana, LCMAP_KATAKANA | LCMAP_FULLWIDTH);
+        node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_FULLWIDTH);
         clause.add(&node);
 
         // add halfwidth katakana
-        node.post = lcmap(hiragana, LCMAP_KATAKANA | LCMAP_HALFWIDTH);
+        node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_HALFWIDTH);
         clause.add(&node);
 
         // add the lowercase and fullwidth
-        node.post = lcmap(hiragana, LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
+        node.post = lcmap(pre, LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
         clause.add(&node);
 
         // add the uppercase and fullwidth
-        node.post = lcmap(hiragana, LCMAP_UPPERCASE | LCMAP_FULLWIDTH);
+        node.post = lcmap(pre, LCMAP_UPPERCASE | LCMAP_FULLWIDTH);
         clause.add(&node);
 
         // add the capital and fullwidth
-        node.post = node.post[0] + lcmap(hiragana.substr(1), LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
+        node.post = node.post[0] + lcmap(pre.substr(1), LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
         clause.add(&node);
 
         // add the lowercase and halfwidth
-        node.post = lcmap(hiragana, LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
+        node.post = lcmap(pre, LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
         clause.add(&node);
 
         // add the uppercase and halfwidth
-        node.post = lcmap(hiragana, LCMAP_UPPERCASE | LCMAP_HALFWIDTH);
+        node.post = lcmap(pre, LCMAP_UPPERCASE | LCMAP_HALFWIDTH);
         clause.add(&node);
 
         // add the capital and halfwidth
-        node.post = node.post[0] + lcmap(hiragana.substr(1), LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
+        node.post = node.post[0] + lcmap(pre.substr(1), LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
         clause.add(&node);
 
         // go to the next clause
