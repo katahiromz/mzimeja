@@ -576,6 +576,13 @@ void IME_Test2(void)
 
 void IME_Test3(void)
 {
+    auto pre = L"なった";
+    Lattice lattice;
+    lattice.AddNodesForMulti(pre);
+    lattice.TryToLinkNodes(pre);
+    MzConvResult result;
+    TheIME.MakeResultForMulti(result, lattice);
+    printf("%ls\n", result.get_str().c_str());
 }
 
 // Unicode版のmain関数。

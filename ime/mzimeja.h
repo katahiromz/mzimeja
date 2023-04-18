@@ -420,7 +420,6 @@ typedef std::vector<LatticeNodePtr>   LatticeChunk;
 
 // ラティス。
 struct Lattice {
-    size_t                          m_index;  // インデックス。
     std::wstring                    m_pre;    // 変換前。
     LatticeNodePtr                  m_head;   // 先頭ノード。
     std::vector<LatticeChunk>       m_chunks; // インデックス位置に対するノード集合。
