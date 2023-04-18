@@ -40,3 +40,4 @@ mzimeja-*-setup.exe
 *.ninja
 .ninja*
 *-old
+enc_temp_folder/
