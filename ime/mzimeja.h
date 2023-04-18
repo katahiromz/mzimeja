@@ -19,6 +19,7 @@
 #include <vector>           // for std::vector
 #include <unordered_set>    // for std::unordered_set
 #include <unordered_map>    // for std::unordered_map
+#include <memory>           // for std::weak_ptr
 
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development
@@ -395,10 +396,15 @@ struct LatticeNode {
     Gyou gyou;                              // 活用の行。
     KatsuyouKei katsuyou;                   // 動詞活用形。
     INT word_cost;                          // 単語コスト。
-    DWORD linked;                           // リンク先。
-    std::vector<LatticeNodePtr> branches;   // 枝分かれ。
+    INT subtotal_cost;                      // 部分合計コスト。
+    DWORD linked;                           // リンク数。
+    // 枝分かれ。
+    std::vector<LatticeNodePtr> branches;
+    // 逆向き枝分かれ。
+    std::unordered_set<LatticeNode*> reverse_branches;
+
     LatticeNode() {
-        word_cost = 0;
+        word_cost = subtotal_cost = 0;
         linked = 0;
     }
     INT CalcWordCost() const;   // 単語コストを計算。
@@ -426,7 +432,7 @@ struct Lattice {
 
     BOOL AddNodesFromDict(size_t index, const WCHAR *dict_data);
     BOOL AddNodesFromDict(const WCHAR *dict_data);
-    void ResetLinksAndBranches();
+    void ResetLatticeInfo();
     void UpdateLinksAndBranches();
     void AddComplement(size_t index, size_t min_size, size_t max_size);
     void CutUnlinkedNodes();

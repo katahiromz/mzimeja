@@ -1477,7 +1477,7 @@ void Lattice::UpdateLinksAndBranches()
     ASSERT(m_pre.size() + 1 == m_chunks.size());
 
     // リンク数とブランチ群をリセットする。
-    ResetLinksAndBranches();
+    ResetLatticeInfo();
 
     // ヘッド（頭）を追加する。リンク数は１。
     {
@@ -1523,16 +1523,17 @@ void Lattice::UpdateLinksAndBranches()
 } // Lattice::UpdateLinksAndBranches
 
 // リンク数とブランチ群をリセットする。
-void Lattice::ResetLinksAndBranches()
+void Lattice::ResetLatticeInfo()
 {
     for (size_t index = 0; index < m_pre.size(); ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
         for (auto& ptr1 : chunk1) {
             ptr1->linked = 0;
             ptr1->branches.clear();
+            ptr1->reverse_branches.clear();
         }
     }
-} // Lattice::ResetLinksAndBranches
+} // Lattice::ResetLatticeInfo
 
 // 変換失敗時に未定義の単語を追加する。
 void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
@@ -2905,12 +2906,12 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
 
     // 2文節最長一致法・改。
     const size_t length = lattice.m_pre.size();
-    LatticeNodePtr node1 = lattice.m_head;
-    LatticeNodePtr tail = ARRAY_AT(ARRAY_AT(lattice.m_chunks, length), 0);
+    auto node1 = lattice.m_head;
+    auto tail = ARRAY_AT(ARRAY_AT(lattice.m_chunks, length), 0);
     while (node1 != tail) {
         size_t kb1 = 0, max_len = 0, max_len1 = 0;
         for (size_t ib1 = 0; ib1 < node1->branches.size(); ++ib1) {
-            LatticeNodePtr& node2 = ARRAY_AT(node1->branches, ib1);
+            auto& node2 = ARRAY_AT(node1->branches, ib1);
             if (node2->branches.empty()) {
                 size_t len = node2->pre.size();
                 // (doushi or jodoushi) + jodoushi
