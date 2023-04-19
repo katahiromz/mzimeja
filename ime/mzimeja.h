@@ -393,22 +393,20 @@ struct LatticeNode {
     std::wstring post;                      // 変換後。
     std::wstring tags;                      // タグ。
     HinshiBunrui bunrui;                    // 分類。
+    INT word_cost = MAXLONG;                // 単語コスト。
+    INT subtotal_cost = MAXLONG;            // 部分合計コスト。
+    INT marked = 0;                         // マーキング。
     Gyou gyou;                              // 活用の行。
     KatsuyouKei katsuyou;                   // 動詞活用形。
-    INT word_cost;                          // 単語コスト。
-    INT subtotal_cost;                      // 部分合計コスト。
-    DWORD linked;                           // リンク数。
+    DWORD linked = 0;                       // リンク数。
     // 枝分かれ。
     std::vector<LatticeNodePtr> branches;
     // 逆向き枝分かれ。
     std::unordered_set<LatticeNode*> reverse_branches;
 
-    LatticeNode() {
-        word_cost = subtotal_cost = 0;
-        linked = 0;
-    }
     INT CalcWordCost() const;   // 単語コストを計算。
     bool IsDoushi() const;      // 動詞か？
+    bool IsJoshi() const;       // 助詞か？
     bool IsJodoushi() const;    // 助動詞か？
 
     // 指定したタグがあるか？
@@ -422,6 +420,7 @@ typedef std::vector<LatticeNodePtr>   LatticeChunk;
 struct Lattice {
     std::wstring                    m_pre;    // 変換前。
     LatticeNodePtr                  m_head;   // 先頭ノード。
+    LatticeNodePtr                  m_tail;   // 末端ノード。
     std::vector<LatticeChunk>       m_chunks; // インデックス位置に対するノード集合。
     // m_pre.size() + 1 == m_chunks.size().
 
@@ -436,6 +435,7 @@ struct Lattice {
     void AddComplement(size_t index, size_t min_size, size_t max_size);
     void CutUnlinkedNodes();
     void MakeReverseBranches(LatticeNode *ptr0);
+    INT CalcSubTotalCosts(LatticeNode *ptr1);
     size_t GetLastLinkedIndex() const;
 
     void Dump(int num = 0);

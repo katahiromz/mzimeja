@@ -895,9 +895,8 @@ bool LatticeNode::IsDoushi() const
     case HB_KAHEN_DOUSHI: case HB_SAHEN_DOUSHI:
         return true;
     default:
-        break;
+        return false;
     }
-    return false;
 }
 
 // 助動詞か？
@@ -910,9 +909,22 @@ bool LatticeNode::IsJodoushi() const
     case HB_KATEI_JODOUSHI: case HB_MEIREI_JODOUSHI:
         return true;
     default:
-        break;
+        return false;
     }
-    return false;
+}
+
+// 助詞か？
+bool LatticeNode::IsJoshi() const
+{
+    switch (bunrui) {
+    case HB_KAKU_JOSHI:
+    case HB_SETSUZOKU_JOSHI:
+    case HB_FUKU_JOSHI:
+    case HB_SHUU_JOSHI:
+        return true;
+    default:
+        return false;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1496,8 +1508,9 @@ void Lattice::UpdateLinksAndBranches()
     {
         LatticeNode node;
         node.bunrui = HB_TAIL;
+        m_tail = std::make_shared<LatticeNode>(node);
         m_chunks[m_pre.size()].clear();
-        m_chunks[m_pre.size()].push_back(std::make_shared<LatticeNode>(node));
+        m_chunks[m_pre.size()].push_back(m_tail);
     }
 
     // 各インデックス位置について。
