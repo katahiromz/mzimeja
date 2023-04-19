@@ -460,7 +460,7 @@ protected:
 struct MzConvCandidate {
     std::wstring pre;              // ひらがな。
     std::wstring post;             // 変換後。
-    INT cost;                      // コスト。
+    INT cost = 0;                  // コスト。
     std::unordered_set<HinshiBunrui>  bunruis;    // 品詞分類集合。
     std::wstring tags;             // タグ。
 

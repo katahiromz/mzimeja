@@ -616,7 +616,7 @@ void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
     result.clear(); // 結果をクリア。
 
     LatticeNode* ptr0 = lattice.m_head.get();
-    while (ptr0) {
+    while (ptr0 && ptr0 != lattice.m_tail.get()) {
         LatticeNode* target = NULL;
         for (auto& ptr1 : ptr0->branches) {
             if (OptimizeLattice(ptr1.get())) {
@@ -625,17 +625,26 @@ void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
             }
         }
 
-        if (!target)
+        if (!target || target->bunrui == HB_TAIL)
             break;
 
         MzConvClause clause;
         clause.add(target);
+
+        for (auto& ptr1 : ptr0->branches) {
+            if (target->pre.size() == ptr1->pre.size()) {
+                if (target != ptr1.get()) {
+                    clause.add(ptr1.get());
+                }
+            }
+        }
+
         result.clauses.push_back(clause);
         ptr0 = target;
     }
 
     // コストによりソートする。
-    result.sort();
+    //result.sort();
 } // MakeResultForMulti
 
 INT WordCost(LatticeNode *ptr1)

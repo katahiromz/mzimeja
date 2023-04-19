@@ -3654,7 +3654,19 @@ std::wstring MzConvResult::get_str() const
     for (auto& clause : clauses) {
         if (iClause)
             ret += L"|";
-        ret += clause.candidates[0].post;
+        if (clause.candidates.size() == 1) {
+            ret += clause.candidates[0].post;
+        } else {
+            ret += L"(";
+            size_t iCand = 0;
+            for (auto& cand : clause.candidates) {
+                if (iCand)
+                    ret += L"|";
+                ret += cand.post;
+                ++iCand;
+            }
+            ret += L")";
+        }
         ++iClause;
     }
     return ret;
