@@ -63,7 +63,7 @@ LPCTSTR HinshiToString(HinshiBunrui hinshi)
 {
     if (HB_MEISHI <= hinshi && hinshi <= HB_MAX)
         return TheIME.LoadSTR(IDS_HINSHI_00 + (hinshi - HB_MEISHI));
-    return NULL;
+    return TEXT("");
 }
 
 // 文字列から品詞分類を取得する関数。

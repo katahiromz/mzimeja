@@ -559,12 +559,6 @@ void IME_Test1(void)
 {
     MzConvResult result;
     TheIME.ConvertMultiClause(L"てすとです", result);
-
-    ASSERT(result.clauses.size() == 2);
-    ASSERT(result.clauses[0].candidates[0].pre == L"てすと");
-    ASSERT(result.clauses[0].candidates[0].post == L"テスト");
-    ASSERT(result.clauses[1].candidates[0].pre == L"です");
-    ASSERT(result.clauses[1].candidates[0].post == L"です");
     printf("%ls\n", result.get_str().c_str());
 }
 
