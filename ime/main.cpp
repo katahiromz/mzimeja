@@ -575,6 +575,29 @@ void IME_Test2(void)
     printf("%ls\n", result.get_str().c_str());
 }
 
+BOOL ReachMarked(LatticeNode *ptr0)
+{
+    ASSERT(ptr0);
+
+    if (!ptr0->marked) {
+        return FALSE;
+    }
+
+    BOOL reach = (ptr0->bunrui == HB_TAIL);
+    for (auto& ptr1 : ptr0->branches) {
+        if (ReachMarked(ptr1.get())) {
+            reach = TRUE;
+        }
+    }
+
+    if (!reach) {
+        ptr0->marked = 0;
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
 // 複数文節変換において、変換結果を生成する。
 void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
 {
@@ -583,19 +606,21 @@ void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
 
     LatticeNode* ptr0 = lattice.m_head.get();
     while (ptr0) {
-        std::vector<LatticeNode*> targets;
+        LatticeNode* target = NULL;
         for (auto& ptr1 : ptr0->branches) {
-            if (ptr1->marked) {
-                targets.push_back(ptr1.get());
+            if (ReachMarked(ptr1.get())) {
+                target = ptr1.get();
                 break;
             }
         }
 
+        if (!target)
+            break;
+
         MzConvClause clause;
-        for (auto& target : targets) {
-            clause.add(target);
-        }
+        clause.add(target);
         result.clauses.push_back(clause);
+        ptr0 = target;
     }
 
     // コストによりソートする。
@@ -677,6 +702,8 @@ void IME_Test3(void)
     lattice.MakeReverseBranches(lattice.m_head.get());
     lattice.m_tail->marked = 1;
     lattice.CalcSubTotalCosts(lattice.m_tail.get());
+    lattice.m_head->marked = 1;
+    ReachMarked(lattice.m_head.get());
     MzConvResult result;
     MakeResultForMulti(result, lattice);
     printf("%ls\n", result.get_str().c_str());
