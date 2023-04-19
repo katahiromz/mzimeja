@@ -435,6 +435,7 @@ struct Lattice {
     void UpdateLinksAndBranches();
     void AddComplement(size_t index, size_t min_size, size_t max_size);
     void CutUnlinkedNodes();
+    void MakeReverseBranches(LatticeNode *ptr0);
     size_t GetLastLinkedIndex() const;
 
     void Dump(int num = 0);

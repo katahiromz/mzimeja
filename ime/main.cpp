@@ -4,6 +4,7 @@
 #include "mzimeja.h"
 #include <shlobj.h>
 #include <strsafe.h>
+#include <algorithm>
 #include <clocale>
 #include "resource.h"
 
@@ -574,14 +575,127 @@ void IME_Test2(void)
     printf("%ls\n", result.get_str().c_str());
 }
 
+// 複数文節変換において、変換結果を生成する。
+void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
+{
+    DPRINTW(L"%s\n", lattice.m_pre.c_str());
+    result.clear(); // 結果をクリア。
+
+    // 2文節最長一致法・改。
+    const size_t length = lattice.m_pre.size();
+    auto node1 = lattice.m_head;
+    auto tail = ARRAY_AT(ARRAY_AT(lattice.m_chunks, length), 0);
+    while (node1 != tail) {
+        size_t kb1 = 0, max_len = 0, max_len1 = 0;
+        for (size_t ib1 = 0; ib1 < node1->branches.size(); ++ib1) {
+            auto& node2 = ARRAY_AT(node1->branches, ib1);
+            if (node2->branches.empty()) {
+                size_t len = node2->pre.size();
+                // (doushi or jodoushi) + jodoushi
+                if ((node1->IsDoushi() || node1->IsJodoushi()) && node2->IsJodoushi()) {
+                    ++len;
+                    node2->word_cost -= 80;
+                }
+                // jodoushi + shuu joshi
+                if (node1->IsJodoushi() && node2->bunrui == HB_SHUU_JOSHI) {
+                    ++len;
+                    node2->word_cost -= 30;
+                }
+                // suushi + (suushi or number unit)
+                if (node1->HasTag(L"[数詞]")) {
+                    if (node2->HasTag(L"[数詞]") || node2->HasTag(L"[数単位]")) {
+                        ++len;
+                        node2->word_cost -= 100;
+                    }
+                }
+                if (max_len < len) {
+                    max_len1 = node2->pre.size();
+                    max_len = len;
+                    kb1 = ib1;
+                }
+            } else {
+                for (size_t ib2 = 0; ib2 < node2->branches.size(); ++ib2) {
+                    LatticeNodePtr& node3 = ARRAY_AT(node2->branches, ib2);
+                    size_t len = node2->pre.size() + node3->pre.size();
+                    // (doushi or jodoushi) + jodoushi
+                    if ((node1->IsDoushi() || node1->IsJodoushi()) && node2->IsJodoushi()) {
+                        ++len;
+                        node2->word_cost -= 80;
+                    } else {
+                        if ((node2->IsDoushi() || node2->IsJodoushi()) && node3->IsJodoushi()) {
+                            ++len;
+                            node2->word_cost -= 80;
+                        }
+                    }
+                    // jodoushu + shuu joshi
+                    if (node1->IsJodoushi() && node2->bunrui == HB_SHUU_JOSHI) {
+                        ++len;
+                        node2->word_cost -= 30;
+                    } else {
+                        if (node2->IsJodoushi() && node3->bunrui == HB_SHUU_JOSHI) {
+                            ++len;
+                            node2->word_cost -= 30;
+                        }
+                    }
+                    // suushi + (suushi or number unit)
+                    if (node1->HasTag(L"[数詞]")) {
+                        if (node2->HasTag(L"[数詞]") || node2->HasTag(L"[数単位]")) {
+                            ++len;
+                            node2->word_cost -= 100;
+                        }
+                    } else {
+                        if (node2->HasTag(L"[数詞]")) {
+                            if (node3->HasTag(L"[数詞]") || node3->HasTag(L"[数単位]")) {
+                                ++len;
+                                node2->word_cost -= 100;
+                            }
+                        }
+                    }
+                    if (max_len < len) {
+                        max_len1 = node2->pre.size();
+                        max_len = len;
+                        kb1 = ib1;
+                    } else if (max_len == len) {
+                        if (max_len1 < node2->pre.size()) {
+                            max_len1 = node2->pre.size();
+                            max_len = len;
+                            kb1 = ib1;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 到達できないときは打ち切る。TODO: もっとエレガントに
+        if (kb1 >= node1->branches.size()) {
+            break;
+        }
+
+        // add clause
+        if (ARRAY_AT(node1->branches, kb1)->pre.size()) {
+            MzConvClause clause;
+            clause.add(ARRAY_AT(node1->branches, kb1).get());
+            result.clauses.push_back(clause);
+        }
+
+        // go next
+        node1 = ARRAY_AT(node1->branches, kb1);
+    }
+
+    // コストによりソートする。
+    result.sort();
+} // MakeResultForMulti
+
 void IME_Test3(void)
 {
-    auto pre = L"なった";
+    auto pre = L"ほしになった";
     Lattice lattice;
     lattice.AddNodesForMulti(pre);
-    lattice.TryToLinkNodes(pre);
+    lattice.UpdateLinksAndBranches();
+    lattice.CutUnlinkedNodes();
+    lattice.MakeReverseBranches(lattice.m_head.get());
     MzConvResult result;
-    TheIME.MakeResultForMulti(result, lattice);
+    MakeResultForMulti(result, lattice);
     printf("%ls\n", result.get_str().c_str());
 }
 
@@ -609,7 +723,7 @@ int wmain(int argc, wchar_t **argv)
     }
 
     // テスト2。
-    IME_Test2();
+    //IME_Test2();
     // テスト3。
     IME_Test3();
 

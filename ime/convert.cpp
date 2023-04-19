@@ -187,20 +187,16 @@ CandConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2)
 static BOOL
 IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
 {
-    if (node2.bunrui == HB_PERIOD || node2.bunrui == HB_COMMA) return TRUE;
-    if (node2.bunrui == HB_TAIL) return TRUE;
-    if (node1.bunrui == HB_SYMBOL || node2.bunrui == HB_SYMBOL) return TRUE;
-    if (node1.bunrui == HB_UNKNOWN || node2.bunrui == HB_UNKNOWN) return TRUE;
+    if (node1.bunrui == HB_HEAD || node2.bunrui == HB_TAIL)
+        return TRUE;
+    if (node2.bunrui == HB_PERIOD || node2.bunrui == HB_COMMA)
+        return TRUE;
+    if (node1.bunrui == HB_SYMBOL || node2.bunrui == HB_SYMBOL)
+        return TRUE;
+    if (node1.bunrui == HB_UNKNOWN || node2.bunrui == HB_UNKNOWN)
+        return TRUE;
 
     switch (node1.bunrui) {
-    case HB_HEAD:
-        switch (node2.bunrui) {
-        case HB_SHUU_JOSHI:
-            return FALSE;
-        default:
-            break;
-        }
-        return TRUE;
     case HB_MEISHI: // 名詞
         switch (node2.bunrui) {
         case HB_SETTOUJI:
@@ -2828,6 +2824,17 @@ BOOL Lattice::TryToLinkNodes(const std::wstring& pre)
 
     return FALSE;
 }
+
+// 逆向きブランチ群を追加する。
+void Lattice::MakeReverseBranches(LatticeNode *ptr0)
+{
+    ASSERT(ptr0);
+
+    for (auto& ptr1 : ptr0->branches) {
+        ptr1->reverse_branches.insert(ptr0);
+        MakeReverseBranches(ptr1.get());
+    }
+} // Lattice::MakeReverseBranches
 
 // 複数文節変換において、ラティスを作成する。
 BOOL Lattice::AddNodesForMulti(const std::wstring& pre)
