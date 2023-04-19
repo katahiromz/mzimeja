@@ -641,38 +641,88 @@ void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
     //result.sort();
 } // MakeResultForMulti
 
+// 単語コストの計算。
 INT WordCost(LatticeNode *ptr1)
 {
+    INT ret = 20;
+
     auto h = ptr1->bunrui;
     if (h == HB_MEISHI)
-        return 40;
+        ret += 40;
+    else if (ptr1->IsJodoushi())
+        ret += 10;
+    else if (ptr1->IsDoushi())
+        ret += 40;
+    else if (ptr1->IsJoshi())
+        ret += 10;
+    else if (h == HB_SETSUZOKUSHI)
+        ret += 10;
+    else
+        ret += 30;
 
-    if (ptr1->IsJodoushi())
-        return 10;
-    if (ptr1->IsDoushi())
-        return 40;
-    if (ptr1->IsJoshi())
-        return 10;
-    if (h == HB_SETSUZOKUSHI)
-        return 10;
+    if (h == HB_KANGO)
+        ret += 200;
+    if (h == HB_SYMBOL)
+        ret += 120;
 
-    return 30;
+    if (ptr1->HasTag(L"[非標準]"))
+        ret += 100;
+    if (ptr1->HasTag(L"[不謹慎]"))
+        ret += 50;
+    if (ptr1->HasTag(L"[人名]"))
+        ret += 30;
+    else if (ptr1->HasTag(L"[駅名]"))
+        ret += 30;
+    else if (ptr1->HasTag(L"[地名]"))
+        ret += 30;
+    if (ptr1->HasTag(L"[ユーザ辞書]"))
+        ret -= 20;
+
+    ret += ptr1->deltaCost;
+    return ret;
 }
 
-INT ConnectCost(LatticeNode *ptr0, LatticeNode *ptr1)
+// 連結コストの計算。
+INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
 {
-    auto h0 = ptr0->bunrui, h1 = ptr1->bunrui;
+    auto h0 = n0.bunrui, h1 = n1.bunrui;
     if (h0 == HB_HEAD || h1 == HB_TAIL)
         return 0;
-    if (h0 == HB_MEISHI && ptr1->IsDoushi())
-        return 40;
-    if (ptr0->IsDoushi() && ptr1->IsJoshi())
-        return 5;
-    if (h0 == HB_SETSUZOKUSHI && ptr1->IsJoshi())
+    if (h1 == HB_PERIOD || h1 == HB_COMMA)
         return 0;
+    if (h0 == HB_SYMBOL || h1 == HB_SYMBOL)
+        return 0;
+    if (h0 == HB_UNKNOWN || h1 == HB_UNKNOWN)
+        return 0;
+
+    INT ret = 10;
+    if (h0 == HB_MEISHI) {
+        if (h1 == HB_MEISHI)
+            ret += 10;
+        if (h1 == HB_SETTOUJI)
+            ret += 200;
+        if (n1.IsDoushi())
+            ret += 40;
+        if (n1.IsKeiyoushi())
+            ret += 20;
+    }
+    if (n0.IsKeiyoushi()) {
+        if (n1.IsKeiyoushi())
+            ret += 10;
+        if (n1.IsDoushi())
+            ret += 50;
+    }
+    if (n0.IsDoushi()) {
+        if (n1.IsJoshi())
+            ret -= 5;
+        if (n1.IsDoushi())
+            ret += 20;
+    }
+    if (h0 == HB_SETSUZOKUSHI && n1.IsJoshi())
+        ret += 5;
     if (h0 == HB_SETSUZOKUSHI && h1 == HB_MEISHI)
-        return 0;
-    return 10;
+        ret += 5;
+    return ret;
 }
 
 // 部分最小コストを計算する。
@@ -690,7 +740,7 @@ INT Lattice::CalcSubTotalCosts(LatticeNode *ptr1)
 
     for (auto& ptr0 : ptr1->reverse_branches) {
         INT word_cost = WordCost(ptr1);
-        INT connect_cost = ConnectCost(ptr0, ptr1);
+        INT connect_cost = ConnectCost(*ptr0, *ptr1);
         INT cost = CalcSubTotalCosts(ptr0);
         cost += word_cost;
         cost += connect_cost;
@@ -708,9 +758,9 @@ INT Lattice::CalcSubTotalCosts(LatticeNode *ptr1)
     return min_cost;
 } // Lattice::CalcSubTotalCosts
 
-void IME_Test3(void)
+
+void DoIt(LPCWSTR pre)
 {
-    auto pre = L"そこではなしはおわりになった";
     Lattice lattice;
     lattice.AddNodesForMulti(pre);
     lattice.UpdateLinksAndBranches();
@@ -726,6 +776,12 @@ void IME_Test3(void)
     MzConvResult result;
     MakeResultForMulti(result, lattice);
     printf("%ls\n", result.get_str().c_str());
+}
+
+void IME_Test3(void)
+{
+    DoIt(L"そこではなしはおわりになった");
+    DoIt(L"わたしがわたしたわたしのわたをわたがしみたいにたべないでください");
 }
 
 // Unicode版のmain関数。

@@ -393,7 +393,7 @@ struct LatticeNode {
     std::wstring post;                      // 変換後。
     std::wstring tags;                      // タグ。
     HinshiBunrui bunrui;                    // 分類。
-    INT word_cost = MAXLONG;                // 単語コスト。
+    INT deltaCost = 0;                      // コスト差分。
     INT subtotal_cost = MAXLONG;            // 部分合計コスト。
     INT marked = 0;                         // マーキング。
     Gyou gyou;                              // 活用の行。
@@ -404,10 +404,10 @@ struct LatticeNode {
     // 逆向き枝分かれ。
     std::unordered_set<LatticeNode*> reverse_branches;
 
-    INT CalcWordCost() const;   // 単語コストを計算。
     bool IsDoushi() const;      // 動詞か？
     bool IsJoshi() const;       // 助詞か？
     bool IsJodoushi() const;    // 助動詞か？
+    bool IsKeiyoushi() const;   // 形容詞か？
 
     // 指定したタグがあるか？
     bool HasTag(const wchar_t *tag) const {
@@ -463,6 +463,7 @@ struct MzConvCandidate {
     INT cost = 0;                  // コスト。
     std::unordered_set<HinshiBunrui>  bunruis;    // 品詞分類集合。
     std::wstring tags;             // タグ。
+    HinshiBunrui bunrui;           // 品詞分類。
 
     void clear() {
         pre.clear();
