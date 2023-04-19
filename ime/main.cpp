@@ -575,18 +575,29 @@ void IME_Test2(void)
     printf("%ls\n", result.get_str().c_str());
 }
 
-BOOL ReachMarked(LatticeNode *ptr0)
+BOOL OptimizeLattice(LatticeNode *ptr0)
 {
     ASSERT(ptr0);
 
-    if (!ptr0->marked) {
+    if (!ptr0->marked)
         return FALSE;
-    }
 
     BOOL reach = (ptr0->bunrui == HB_TAIL);
+    INT min_cost = MAXLONG;
+    LatticeNode *min_node = NULL;
     for (auto& ptr1 : ptr0->branches) {
-        if (ReachMarked(ptr1.get())) {
+        if (OptimizeLattice(ptr1.get())) {
             reach = TRUE;
+            if (ptr1->subtotal_cost < min_cost) {
+                min_cost = ptr1->subtotal_cost;
+                min_node = ptr1.get();
+            }
+        }
+    }
+
+    for (auto& ptr1 : ptr0->branches) {
+        if (ptr1.get() != min_node) {
+            ptr1->marked = 0;
         }
     }
 
@@ -608,7 +619,7 @@ void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
     while (ptr0) {
         LatticeNode* target = NULL;
         for (auto& ptr1 : ptr0->branches) {
-            if (ReachMarked(ptr1.get())) {
+            if (OptimizeLattice(ptr1.get())) {
                 target = ptr1.get();
                 break;
             }
@@ -653,8 +664,10 @@ INT ConnectCost(LatticeNode *ptr0, LatticeNode *ptr1)
     if (h0 == HB_MEISHI && ptr1->IsDoushi())
         return 40;
     if (ptr0->IsDoushi() && ptr1->IsJoshi())
-        return 0;
+        return 5;
     if (h0 == HB_SETSUZOKUSHI && ptr1->IsJoshi())
+        return 0;
+    if (h0 == HB_SETSUZOKUSHI && h1 == HB_MEISHI)
         return 0;
     return 10;
 }
@@ -694,16 +707,19 @@ INT Lattice::CalcSubTotalCosts(LatticeNode *ptr1)
 
 void IME_Test3(void)
 {
-    auto pre = L"ほしになった";
+    auto pre = L"そこではなしはおわりになった";
     Lattice lattice;
     lattice.AddNodesForMulti(pre);
     lattice.UpdateLinksAndBranches();
     lattice.CutUnlinkedNodes();
     lattice.MakeReverseBranches(lattice.m_head.get());
+
     lattice.m_tail->marked = 1;
     lattice.CalcSubTotalCosts(lattice.m_tail.get());
+
     lattice.m_head->marked = 1;
-    ReachMarked(lattice.m_head.get());
+    OptimizeLattice(lattice.m_head.get());
+
     MzConvResult result;
     MakeResultForMulti(result, lattice);
     printf("%ls\n", result.get_str().c_str());
