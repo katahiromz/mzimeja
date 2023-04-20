@@ -164,6 +164,7 @@ InputDialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+// ダイアログを用いてテストする。
 void IME_Test2(void)
 {
     while (::DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_INPUTBOX),
