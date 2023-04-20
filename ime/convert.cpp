@@ -493,6 +493,125 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
     return TRUE;
 } // IsNodeConnectable
 
+// 単語コストの計算。
+INT WordCost(LatticeNode *ptr1)
+{
+    INT ret = 20;
+
+    auto h = ptr1->bunrui;
+    if (h == HB_MEISHI)
+        ret += 40;
+    else if (ptr1->IsJodoushi())
+        ret += 10;
+    else if (ptr1->IsDoushi())
+        ret += 40;
+    else if (ptr1->IsJoshi())
+        ret += 10;
+    else if (h == HB_SETSUZOKUSHI)
+        ret += 10;
+    else
+        ret += 30;
+
+    if (h == HB_KANGO)
+        ret += 200;
+    if (h == HB_SYMBOL)
+        ret += 120;
+
+    if (ptr1->HasTag(L"[非標準]"))
+        ret += 100;
+    if (ptr1->HasTag(L"[不謹慎]"))
+        ret += 50;
+    if (ptr1->HasTag(L"[人名]"))
+        ret += 30;
+    else if (ptr1->HasTag(L"[駅名]"))
+        ret += 30;
+    else if (ptr1->HasTag(L"[地名]"))
+        ret += 30;
+    if (ptr1->HasTag(L"[ユーザ辞書]"))
+        ret -= 20;
+
+    ret += ptr1->deltaCost;
+    return ret;
+}
+
+// 連結コストの計算。
+INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
+{
+    auto h0 = n0.bunrui, h1 = n1.bunrui;
+    if (h0 == HB_HEAD || h1 == HB_TAIL)
+        return 0;
+    if (h1 == HB_PERIOD || h1 == HB_COMMA)
+        return 0;
+    if (h0 == HB_SYMBOL || h1 == HB_SYMBOL)
+        return 0;
+    if (h0 == HB_UNKNOWN || h1 == HB_UNKNOWN)
+        return 0;
+
+    INT ret = 10;
+    if (h0 == HB_MEISHI) {
+        if (h1 == HB_MEISHI)
+            ret += 10;
+        if (h1 == HB_SETTOUJI)
+            ret += 200;
+        if (n1.IsDoushi())
+            ret += 40;
+        if (n1.IsKeiyoushi())
+            ret += 20;
+    }
+    if (n0.IsKeiyoushi()) {
+        if (n1.IsKeiyoushi())
+            ret += 10;
+        if (n1.IsDoushi())
+            ret += 50;
+    }
+    if (n0.IsDoushi()) {
+        if (n1.IsJoshi())
+            ret -= 5;
+        if (n1.IsDoushi())
+            ret += 20;
+    }
+    if (h0 == HB_SETSUZOKUSHI && n1.IsJoshi())
+        ret += 5;
+    if (h0 == HB_SETSUZOKUSHI && h1 == HB_MEISHI)
+        ret += 5;
+    return ret;
+}
+
+// 部分最小コストにより、ラティスを最適化する。
+BOOL Lattice::OptimizeLattice(LatticeNode *ptr0)
+{
+    ASSERT(ptr0);
+
+    if (!ptr0->marked)
+        return FALSE;
+
+    BOOL reach = (ptr0->bunrui == HB_TAIL);
+    INT min_cost = MAXLONG;
+    LatticeNode *min_node = NULL;
+    for (auto& ptr1 : ptr0->branches) {
+        if (OptimizeLattice(ptr1.get())) {
+            reach = TRUE;
+            if (ptr1->subtotal_cost < min_cost) {
+                min_cost = ptr1->subtotal_cost;
+                min_node = ptr1.get();
+            }
+        }
+    }
+
+    for (auto& ptr1 : ptr0->branches) {
+        if (ptr1.get() != min_node) {
+            ptr1->marked = 0;
+        }
+    }
+
+    if (!reach) {
+        ptr0->marked = 0;
+        return FALSE;
+    }
+
+    return TRUE;
+} // Lattice::OptimizeLattice
+
 // 基本辞書データをスキャンする。
 static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
 {
@@ -1448,6 +1567,39 @@ BOOL Lattice::AddNodesFromDict(const WCHAR *dict_data)
     return !m_chunks[0].empty();
 }
 
+// 部分最小コストを計算する。
+INT Lattice::CalcSubTotalCosts(LatticeNode *ptr1)
+{
+    ASSERT(ptr1);
+
+    if (ptr1->subtotal_cost != MAXLONG)
+        return ptr1->subtotal_cost;
+
+    INT min_cost = MAXLONG;
+    LatticeNode *min_node = NULL;
+    if (ptr1->reverse_branches.empty())
+        min_cost = 0;
+
+    for (auto& ptr0 : ptr1->reverse_branches) {
+        INT word_cost = WordCost(ptr1);
+        INT connect_cost = ConnectCost(*ptr0, *ptr1);
+        INT cost = CalcSubTotalCosts(ptr0);
+        cost += word_cost;
+        cost += connect_cost;
+        if (cost < min_cost) {
+            min_cost = cost;
+            min_node = ptr0;
+        }
+    }
+
+    if (min_node) {
+        min_node->marked = 1;
+    }
+
+    ptr1->subtotal_cost = min_cost;
+    return min_cost;
+} // Lattice::CalcSubTotalCosts
+
 // リンクを更新する。
 void Lattice::UpdateLinksAndBranches()
 {
@@ -1513,6 +1665,23 @@ void Lattice::ResetLatticeInfo()
         }
     }
 } // Lattice::ResetLatticeInfo
+
+// 変換失敗時に未定義の単語を追加する。
+void Lattice::AddComplement()
+{
+    size_t lastIndex = GetLastLinkedIndex();
+    if (lastIndex == m_pre.size())
+        return;
+
+    lastIndex += m_chunks[lastIndex][0]->pre.size();
+
+    LatticeNode node;
+    node.bunrui = HB_UNKNOWN;
+    node.deltaCost = 0;
+    node.pre = node.post = m_pre.substr(lastIndex);
+    m_chunks[lastIndex].push_back(std::make_shared<LatticeNode>(node));
+    UpdateLinksAndBranches();
+} // Lattice::AddComplement
 
 // 変換失敗時に未定義の単語を追加する。
 void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
@@ -2903,166 +3072,66 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
     DPRINTW(L"%s\n", lattice.m_pre.c_str());
     result.clear(); // 結果をクリア。
 
-    // 2文節最長一致法・改。
-    const size_t length = lattice.m_pre.size();
-    auto node1 = lattice.m_head;
-    auto tail = ARRAY_AT(ARRAY_AT(lattice.m_chunks, length), 0);
-    while (node1 != tail) {
-        size_t kb1 = 0, max_len = 0, max_len1 = 0;
-        for (size_t ib1 = 0; ib1 < node1->branches.size(); ++ib1) {
-            auto& node2 = ARRAY_AT(node1->branches, ib1);
-            if (node2->branches.empty()) {
-                size_t len = node2->pre.size();
-                // (doushi or jodoushi) + jodoushi
-                if ((node1->IsDoushi() || node1->IsJodoushi()) && node2->IsJodoushi()) {
-                    ++len;
-                    node2->deltaCost -= 80;
-                }
-                // jodoushi + shuu joshi
-                if (node1->IsJodoushi() && node2->bunrui == HB_SHUU_JOSHI) {
-                    ++len;
-                    node2->deltaCost -= 30;
-                }
-                // suushi + (suushi or number unit)
-                if (node1->HasTag(L"[数詞]")) {
-                    if (node2->HasTag(L"[数詞]") || node2->HasTag(L"[数単位]")) {
-                        ++len;
-                        node2->deltaCost -= 100;
-                    }
-                }
-                if (max_len < len) {
-                    max_len1 = node2->pre.size();
-                    max_len = len;
-                    kb1 = ib1;
-                }
-            } else {
-                for (size_t ib2 = 0; ib2 < node2->branches.size(); ++ib2) {
-                    LatticeNodePtr& node3 = ARRAY_AT(node2->branches, ib2);
-                    size_t len = node2->pre.size() + node3->pre.size();
-                    // (doushi or jodoushi) + jodoushi
-                    if ((node1->IsDoushi() || node1->IsJodoushi()) && node2->IsJodoushi()) {
-                        ++len;
-                        node2->deltaCost -= 80;
-                    } else {
-                        if ((node2->IsDoushi() || node2->IsJodoushi()) && node3->IsJodoushi()) {
-                            ++len;
-                            node2->deltaCost -= 80;
-                        }
-                    }
-                    // jodoushu + shuu joshi
-                    if (node1->IsJodoushi() && node2->bunrui == HB_SHUU_JOSHI) {
-                        ++len;
-                        node2->deltaCost -= 30;
-                    } else {
-                        if (node2->IsJodoushi() && node3->bunrui == HB_SHUU_JOSHI) {
-                            ++len;
-                            node2->deltaCost -= 30;
-                        }
-                    }
-                    // suushi + (suushi or number unit)
-                    if (node1->HasTag(L"[数詞]")) {
-                        if (node2->HasTag(L"[数詞]") || node2->HasTag(L"[数単位]")) {
-                            ++len;
-                            node2->deltaCost -= 100;
-                        }
-                    } else {
-                        if (node2->HasTag(L"[数詞]")) {
-                            if (node3->HasTag(L"[数詞]") || node3->HasTag(L"[数単位]")) {
-                                ++len;
-                                node2->deltaCost -= 100;
-                            }
-                        }
-                    }
-                    if (max_len < len) {
-                        max_len1 = node2->pre.size();
-                        max_len = len;
-                        kb1 = ib1;
-                    } else if (max_len == len) {
-                        if (max_len1 < node2->pre.size()) {
-                            max_len1 = node2->pre.size();
-                            max_len = len;
-                            kb1 = ib1;
-                        }
-                    }
-                }
+    LatticeNode* ptr0 = lattice.m_head.get();
+    while (ptr0 && ptr0 != lattice.m_tail.get()) {
+        LatticeNode* target = NULL;
+        for (auto& ptr1 : ptr0->branches) {
+            if (lattice.OptimizeLattice(ptr1.get())) {
+                target = ptr1.get();
+                break;
             }
         }
 
-        // 到達できないときは打ち切る。TODO: もっとエレガントに
-        if (kb1 >= node1->branches.size()) {
+        if (!target || target->bunrui == HB_TAIL)
             break;
-        }
 
-        // add clause
-        if (ARRAY_AT(node1->branches, kb1)->pre.size()) {
-            MzConvClause clause;
-            clause.add(ARRAY_AT(node1->branches, kb1).get());
-            result.clauses.push_back(clause);
-        }
+        MzConvClause clause;
+        clause.add(target);
 
-        // go next
-        node1 = ARRAY_AT(node1->branches, kb1);
-    }
-
-    // add other candidates
-    size_t index = 0, iClause = 0;
-    while (index < length && iClause < result.clauses.size()) {
-        const LatticeChunk& chunk = ARRAY_AT(lattice.m_chunks, index);
-        MzConvClause& clause = ARRAY_AT(result.clauses, iClause);
-
-        std::wstring pre = ARRAY_AT(clause.candidates, 0).pre;
-        const size_t size = pre.size();
-        for (size_t i = 0; i < chunk.size(); ++i) {
-            if (ARRAY_AT(chunk, i)->pre.size() == size) {
-                // add a candidate of same size
-                clause.add(ARRAY_AT(chunk, i).get());
+        for (auto& ptr1 : ptr0->branches) {
+            if (target->pre.size() == ptr1->pre.size()) {
+                if (target != ptr1.get()) {
+                    clause.add(ptr1.get());
+                }
             }
         }
+
+        std::wstring pre = target->pre;
 
         LatticeNode node;
         node.bunrui = HB_UNKNOWN;
-        node.deltaCost = 40; // コストは人名・地名よりも高くする。
+        node.deltaCost = 3000;
         node.pre = lcmap(pre, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
 
-        // add hiragana
         node.post = lcmap(pre, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
         clause.add(&node);
 
-        // add katakana
         node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_FULLWIDTH);
         clause.add(&node);
 
-        // add halfwidth katakana
         node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_HALFWIDTH);
         clause.add(&node);
 
-        // add the lowercase and fullwidth
         node.post = lcmap(pre, LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
         clause.add(&node);
 
-        // add the uppercase and fullwidth
         node.post = lcmap(pre, LCMAP_UPPERCASE | LCMAP_FULLWIDTH);
         clause.add(&node);
 
-        // add the capital and fullwidth
         node.post = node.post[0] + lcmap(pre.substr(1), LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
         clause.add(&node);
 
-        // add the lowercase and halfwidth
         node.post = lcmap(pre, LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
         clause.add(&node);
 
-        // add the uppercase and halfwidth
         node.post = lcmap(pre, LCMAP_UPPERCASE | LCMAP_HALFWIDTH);
         clause.add(&node);
 
-        // add the capital and halfwidth
         node.post = node.post[0] + lcmap(pre.substr(1), LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
         clause.add(&node);
 
-        // go to the next clause
-        index += size;
-        ++iClause;
+        result.clauses.push_back(clause);
+        ptr0 = target;
     }
 
     // コストによりソートする。
@@ -3181,14 +3250,19 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& str, MzConvResult& result)
 
     // ラティスを作成し、結果を作成する。
     Lattice lattice;
-    if (lattice.AddNodesForMulti(pre)) {
-        lattice.AddExtraNodes();
-        lattice.TryToLinkNodes(pre);
-        MakeResultForMulti(result, lattice);
-    } else {
-        lattice.AddExtraNodes();
-        MakeResultOnFailure(result, pre);
-    }
+    lattice.AddNodesForMulti(pre);
+    lattice.UpdateLinksAndBranches();
+    lattice.CutUnlinkedNodes();
+    lattice.AddComplement();
+    lattice.MakeReverseBranches(lattice.m_head.get());
+
+    lattice.m_tail->marked = 1;
+    lattice.CalcSubTotalCosts(lattice.m_tail.get());
+
+    lattice.m_head->marked = 1;
+    lattice.OptimizeLattice(lattice.m_head.get());
+
+    MakeResultForMulti(result, lattice);
 
     return TRUE;
 } // MzIme::ConvertMultiClause
@@ -3639,7 +3713,10 @@ std::wstring MzConvResult::get_str() const
                     ret += L"|";
                 ret += cand.post;
                 ret += L":";
-                ret += std::to_wstring(cand.cost);
+                if (cand.cost == MAXLONG)
+                    ret += L"∞";
+                else
+                    ret += std::to_wstring(cand.cost);
                 ++iCand;
             }
             ret += L")";

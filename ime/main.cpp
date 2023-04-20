@@ -569,40 +569,6 @@ void IME_Test2(void)
     printf("%ls\n", result.get_str().c_str());
 }
 
-BOOL OptimizeLattice(LatticeNode *ptr0)
-{
-    ASSERT(ptr0);
-
-    if (!ptr0->marked)
-        return FALSE;
-
-    BOOL reach = (ptr0->bunrui == HB_TAIL);
-    INT min_cost = MAXLONG;
-    LatticeNode *min_node = NULL;
-    for (auto& ptr1 : ptr0->branches) {
-        if (OptimizeLattice(ptr1.get())) {
-            reach = TRUE;
-            if (ptr1->subtotal_cost < min_cost) {
-                min_cost = ptr1->subtotal_cost;
-                min_node = ptr1.get();
-            }
-        }
-    }
-
-    for (auto& ptr1 : ptr0->branches) {
-        if (ptr1.get() != min_node) {
-            ptr1->marked = 0;
-        }
-    }
-
-    if (!reach) {
-        ptr0->marked = 0;
-        return FALSE;
-    }
-
-    return TRUE;
-}
-
 // 複数文節変換において、変換結果を生成する。
 void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
 {
@@ -613,7 +579,7 @@ void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
     while (ptr0 && ptr0 != lattice.m_tail.get()) {
         LatticeNode* target = NULL;
         for (auto& ptr1 : ptr0->branches) {
-            if (OptimizeLattice(ptr1.get())) {
+            if (lattice.OptimizeLattice(ptr1.get())) {
                 target = ptr1.get();
                 break;
             }
@@ -638,143 +604,13 @@ void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
     }
 
     // コストによりソートする。
-    //result.sort();
+    result.sort();
 } // MakeResultForMulti
 
-// 単語コストの計算。
-INT WordCost(LatticeNode *ptr1)
+void DoIt(const std::wstring& pre)
 {
-    INT ret = 20;
-
-    auto h = ptr1->bunrui;
-    if (h == HB_MEISHI)
-        ret += 40;
-    else if (ptr1->IsJodoushi())
-        ret += 10;
-    else if (ptr1->IsDoushi())
-        ret += 40;
-    else if (ptr1->IsJoshi())
-        ret += 10;
-    else if (h == HB_SETSUZOKUSHI)
-        ret += 10;
-    else
-        ret += 30;
-
-    if (h == HB_KANGO)
-        ret += 200;
-    if (h == HB_SYMBOL)
-        ret += 120;
-
-    if (ptr1->HasTag(L"[非標準]"))
-        ret += 100;
-    if (ptr1->HasTag(L"[不謹慎]"))
-        ret += 50;
-    if (ptr1->HasTag(L"[人名]"))
-        ret += 30;
-    else if (ptr1->HasTag(L"[駅名]"))
-        ret += 30;
-    else if (ptr1->HasTag(L"[地名]"))
-        ret += 30;
-    if (ptr1->HasTag(L"[ユーザ辞書]"))
-        ret -= 20;
-
-    ret += ptr1->deltaCost;
-    return ret;
-}
-
-// 連結コストの計算。
-INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
-{
-    auto h0 = n0.bunrui, h1 = n1.bunrui;
-    if (h0 == HB_HEAD || h1 == HB_TAIL)
-        return 0;
-    if (h1 == HB_PERIOD || h1 == HB_COMMA)
-        return 0;
-    if (h0 == HB_SYMBOL || h1 == HB_SYMBOL)
-        return 0;
-    if (h0 == HB_UNKNOWN || h1 == HB_UNKNOWN)
-        return 0;
-
-    INT ret = 10;
-    if (h0 == HB_MEISHI) {
-        if (h1 == HB_MEISHI)
-            ret += 10;
-        if (h1 == HB_SETTOUJI)
-            ret += 200;
-        if (n1.IsDoushi())
-            ret += 40;
-        if (n1.IsKeiyoushi())
-            ret += 20;
-    }
-    if (n0.IsKeiyoushi()) {
-        if (n1.IsKeiyoushi())
-            ret += 10;
-        if (n1.IsDoushi())
-            ret += 50;
-    }
-    if (n0.IsDoushi()) {
-        if (n1.IsJoshi())
-            ret -= 5;
-        if (n1.IsDoushi())
-            ret += 20;
-    }
-    if (h0 == HB_SETSUZOKUSHI && n1.IsJoshi())
-        ret += 5;
-    if (h0 == HB_SETSUZOKUSHI && h1 == HB_MEISHI)
-        ret += 5;
-    return ret;
-}
-
-// 部分最小コストを計算する。
-INT Lattice::CalcSubTotalCosts(LatticeNode *ptr1)
-{
-    ASSERT(ptr1);
-
-    if (ptr1->subtotal_cost != MAXLONG)
-        return ptr1->subtotal_cost;
-
-    INT min_cost = MAXLONG;
-    LatticeNode *min_node = NULL;
-    if (ptr1->reverse_branches.empty())
-        min_cost = 0;
-
-    for (auto& ptr0 : ptr1->reverse_branches) {
-        INT word_cost = WordCost(ptr1);
-        INT connect_cost = ConnectCost(*ptr0, *ptr1);
-        INT cost = CalcSubTotalCosts(ptr0);
-        cost += word_cost;
-        cost += connect_cost;
-        if (cost < min_cost) {
-            min_cost = cost;
-            min_node = ptr0;
-        }
-    }
-
-    if (min_node) {
-        min_node->marked = 1;
-    }
-
-    ptr1->subtotal_cost = min_cost;
-    return min_cost;
-} // Lattice::CalcSubTotalCosts
-
-
-void DoIt(LPCWSTR pre)
-{
-    Lattice lattice;
-    lattice.AddNodesForMulti(pre);
-    lattice.UpdateLinksAndBranches();
-    lattice.CutUnlinkedNodes();
-    lattice.MakeReverseBranches(lattice.m_head.get());
-
-    lattice.m_tail->marked = 1;
-    lattice.CalcSubTotalCosts(lattice.m_tail.get());
-
-    lattice.m_head->marked = 1;
-    OptimizeLattice(lattice.m_head.get());
-
     MzConvResult result;
-    MakeResultForMulti(result, lattice);
+    TheIME.ConvertMultiClause(pre, result);
     printf("%ls\n", result.get_str().c_str());
 }
 
