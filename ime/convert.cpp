@@ -876,12 +876,12 @@ void MzConvClause::add(const LatticeNode *node)
         if (cand.post == node->post) {
             if (node->subtotal_cost < cand.cost) {
                 cand.cost = node->subtotal_cost;
+                cand.bunrui = node->bunrui;
             }
             if (WordCost(node) < cand.word_cost) {
                 cand.word_cost = WordCost(node);
             }
             cand.bunruis.insert(node->bunrui);
-            cand.bunrui = node->bunrui;
             cand.tags += node->tags;
             return;
         }
