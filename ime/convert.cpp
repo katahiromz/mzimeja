@@ -456,6 +456,8 @@ INT WordCost(const LatticeNode *ptr1)
     if (h == HB_SETTOUJI)
         ret += 200;
 
+    if (ptr1->HasTag(L"[数単位]"))
+        ret += 10;
     if (ptr1->HasTag(L"[非標準]"))
         ret += 100;
     if (ptr1->HasTag(L"[不謹慎]"))

@@ -558,10 +558,11 @@ void DoTest(const std::wstring& pre, LPCWSTR post = NULL)
 {
     MzConvResult result;
     TheIME.ConvertMultiClause(pre, result);
-    printf("%ls\n\n", result.get_str().c_str());
+    auto got = result.get_str();
+    printf("%ls\n\n", got.c_str());
     if (post)
     {
-        if (lstrcmpW(result.get_str().c_str(), post) != 0)
+        if (got != post)
         {
             printf("%ls\n\n", result.get_str(true).c_str());
             ASSERT(0);
@@ -573,10 +574,13 @@ void DoTest(const std::wstring& pre, LPCWSTR post = NULL)
     }
 }
 
-// mzimejaのテスト。
-void IME_Test1(void)
+// 動詞のテスト。
+void DoDoushi(void)
 {
-    DoTest(L"てすとです", L"テスト|です");
+    DoTest(L"よせる。よせない。よせるとき。よせれば。よせろよ。よせてよ。");
+
+    DoTest(L"たべる。たべない。たべます。たべた。たべるとき。たべれば。たべろ。たべよう。",
+           L"食べる|。|食べ|ない|。|食べ|ます|。|食べ|た|。|食べる|とき|。|食べれ|ば|。|食べ ろ|。|食べよう|。");
 
     DoTest(L"かきます。かいて。かかない。かく。かいた。かける。かこう。",
            L"書き|ます|。|書いて|。|書か|ない|。|書く|。|書いた|。|書ける|。|書こう|。");
@@ -596,10 +600,36 @@ void IME_Test1(void)
     DoTest(L"かいてんする。かいてんした。かいてんできる。かいてんしよう。");
     DoTest(L"かいてんしろ。かいてんするな。かいてんすれば。");
     DoTest(L"かいてんされる。かいてんさせる。かいてんさせられる。");
+}
 
+// 形容詞のテスト。
+void DoKeiyoushi(void)
+{
+    DoTest(L"すくない。すくなかろう。すくなかった。すくなく。すくなければ。");
+    DoTest(L"ただしい。ただしかろう。ただしかった。ただしく。ただしければ。");
+
+    DoTest(L"ゆたかだ。ゆたかだろう。ゆたかだった。ゆたかで。ゆたかに。ゆたかなこと。ゆたかならば。");
+}
+
+// 基本的なイディオムのテスト。
+void DoIdeoms(void)
+{
+    DoTest(L"かのじょはにほんごがおじょうずですね。",
+           L"彼女|は|日本語|が|お上手|ですね|。");
+    DoTest(L"わたしはしゅうきょうじょうのりゆうでおにくがたべられません。",
+           L"私|は|宗教|上|の|理由|で|お肉|が|食べ|られ|ません|。");
     DoTest(L"そこではなしはおわりになった", L"そこで|話|は|終わり|に|なった");
-
     DoTest(L"わたしがわたしたわたをわたがしみたいにたべないでくださいませんか");
+}
+
+// mzimejaのテスト。
+void IME_Test1(void)
+{
+    DoTest(L"てすとです", L"テスト|です");
+
+    DoDoushi();
+    DoKeiyoushi();
+    DoIdeoms();
 }
 
 BOOL OnOK(HWND hwnd)
