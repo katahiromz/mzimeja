@@ -2732,6 +2732,13 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         DoIkeiyoushi(index, new_fields, deltaCost);
     }
 
+    // 名詞＋「みたいな」でな形容詞に。
+    if (tail.size() >= 3 && tail[0] == L'み' && tail[1] == L'た' && tail[2] == L'い') {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += L"みたい";
+        new_fields[I_FIELD_POST] += L"みたい";
+        DoNakeiyoushi(index, new_fields, deltaCost);
+    }
     // 名詞＋「みたい」でい形容詞に。
     if (tail.size() >= 2 && tail[0] == L'み' && tail[1] == L'た') {
         WStrings new_fields = fields;
