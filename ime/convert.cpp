@@ -2023,19 +2023,24 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 「咲く(五段)」→「咲か(ない)」、「食う(五段)」→「食わ(ない)」
     do {
         node.katsuyou = MIZEN_KEI;
+        WCHAR ch;
         if (node.gyou == GYOU_A) {
-            if (tail.empty() || tail[0] != L'わ')
-                break;
-            node.pre = fields[I_FIELD_PRE] + L'わ';
-            node.post = fields[I_FIELD_POST] + L'わ';
+            ch = L'わ';
         } else {
-            WCHAR ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_A);
-            if (tail.empty() || tail[0] != ch)
-                break;
-            node.pre = fields[I_FIELD_PRE] + ch;
-            node.post = fields[I_FIELD_POST] + ch;
+            ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_A);
         }
+        if (tail.empty() || tail[0] != ch)
+            break;
+        node.pre = fields[I_FIELD_PRE] + ch;
+        node.post = fields[I_FIELD_POST] + ch;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+
+        // 「咲かせ」「食わせ」～られる
+        if (tail.size() >= 2 && tail[1] == L'せ') {
+            node.pre = fields[I_FIELD_PRE] + ch + tail[1];
+            node.post = fields[I_FIELD_POST] + ch + tail[1];
+            m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        }
     } while (0);
 
     // 五段動詞の連用形。
@@ -2207,7 +2212,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += ch;
         new_fields[I_FIELD_POST] += ch;
-        DoIchidanDoushi(index, new_fields, deltaCost);
+        DoIchidanDoushi(index, new_fields, deltaCost + 30);
     } while (0);
 } // Lattice::DoGodanDoushi
 
