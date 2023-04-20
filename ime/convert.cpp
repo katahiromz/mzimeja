@@ -468,8 +468,10 @@ INT WordCost(const LatticeNode *ptr1)
         ret += 30;
     if (ptr1->HasTag(L"[ユーザ辞書]"))
         ret -= 20;
-    if (ptr1->HasTag(L"[優先]"))
-        ret -= 100;
+    if (ptr1->HasTag(L"[優先1]"))
+        ret -= 90;
+    if (ptr1->HasTag(L"[優先2]"))
+        ret -= 30;
 
     ret += ptr1->deltaCost;
     return ret;

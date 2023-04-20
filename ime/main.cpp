@@ -554,20 +554,50 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void DoIt(const std::wstring& pre)
+void DoTest(const std::wstring& pre, LPCWSTR post = NULL)
 {
     MzConvResult result;
     TheIME.ConvertMultiClause(pre, result);
-    printf("%ls\n\n", result.get_str(false).c_str());
-    printf("%ls\n\n", result.get_str(true).c_str());
+    printf("%ls\n\n", result.get_str().c_str());
+    if (post)
+    {
+        if (lstrcmpW(result.get_str().c_str(), post) != 0)
+        {
+            printf("%ls\n\n", result.get_str(true).c_str());
+            ASSERT(0);
+        }
+    }
+    else
+    {
+        printf("%ls\n\n", result.get_str(true).c_str());
+    }
 }
 
 // mzimejaのテスト。
 void IME_Test1(void)
 {
-    DoIt(L"てすとです");
-    DoIt(L"そこではなしはおわりになった");
-    DoIt(L"わたしがわたしたわたをわたがしみたいにたべないでくださいませんか");
+    DoTest(L"てすとです", L"テスト|です");
+
+    DoTest(L"かきます。かいて。かかない。かく。かいた。かける。かこう。");
+    DoTest(L"かけ。かくな。かけば。かかれる。かかせる。かかせられる。");
+
+    DoTest(L"みます。みて。みない。みる。みた。みられる。みよう。",
+           L"見|ます|。|見て|。|見ない|。|見る|。|見た|。|見られる|。|見よう|。");
+    DoTest(L"みろ。みるな。みれば。みられる。みさせる。みさせられる。",
+           L"見ろ|。|見るな|。|見れ|ば|。|見られる|。|見させる|。|見させ|られる|。");
+
+    DoTest(L"きます。きて。こない。くる。きた。こられる。こよう。");
+    DoTest(L"こい。くるな。くれば。こられる。こさせる。こさせられる。",
+           L"来い|。|来るな|。|来れ|ば|。|来られる|。|来させる|。|来させ|られる|。");
+
+    DoTest(L"けっこんします。けっこんして。けっこんしない。");
+    DoTest(L"けっこんする。けっこんした。けっこんできる。けっこんしよう。");
+    DoTest(L"けっこんしろ。けっこんするな。けっこんすれば。");
+    DoTest(L"けっこんされる。けっこんさせる。けっこんさせられる。");
+
+    DoTest(L"そこではなしはおわりになった", L"そこで|話|は|終わり|に|なった");
+
+    DoTest(L"わたしがわたしたわたをわたがしみたいにたべないでくださいませんか");
 }
 
 BOOL OnOK(HWND hwnd)
@@ -579,7 +609,7 @@ BOOL OnOK(HWND hwnd)
         MessageBoxW(hwnd, L"空ではない文字列を入力して下さい", NULL, 0);
         return FALSE;
     }
-    DoIt(szText);
+    DoTest(szText);
     return TRUE;
 }
 
