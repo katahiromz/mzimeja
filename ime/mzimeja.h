@@ -462,6 +462,7 @@ struct MzConvCandidate {
     std::wstring pre;              // ひらがな。
     std::wstring post;             // 変換後。
     INT cost = 0;                  // コスト。
+    INT word_cost = 0;             // 単語コスト。
     std::unordered_set<HinshiBunrui>  bunruis;    // 品詞分類集合。
     std::wstring tags;             // タグ。
     HinshiBunrui bunrui;           // 品詞分類。

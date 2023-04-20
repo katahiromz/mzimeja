@@ -435,11 +435,11 @@ INT WordCost(const LatticeNode *ptr1)
 
     auto h = ptr1->bunrui;
     if (h == HB_MEISHI)
-        ret += 40;
+        ret += 30;
     else if (ptr1->IsJodoushi())
         ret += 10;
     else if (ptr1->IsDoushi())
-        ret += 40;
+        ret += 20;
     else if (ptr1->IsJoshi())
         ret += 10;
     else if (h == HB_SETSUZOKUSHI)
@@ -451,6 +451,8 @@ INT WordCost(const LatticeNode *ptr1)
         ret += 200;
     if (h == HB_SYMBOL)
         ret += 120;
+    if (h == HB_GODAN_DOUSHI && ptr1->katsuyou == RENYOU_KEI)
+        ret += 30;
 
     if (ptr1->HasTag(L"[非標準]"))
         ret += 100;
@@ -489,9 +491,11 @@ INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
         if (h1 == HB_SETTOUJI)
             ret += 200;
         if (n1.IsDoushi())
-            ret += 40;
+            ret += 60;
         if (n1.IsKeiyoushi())
             ret += 20;
+        if (n1.IsJodoushi())
+            ret += 50;
     }
     if (n0.IsKeiyoushi()) {
         if (n1.IsKeiyoushi())
@@ -504,13 +508,15 @@ INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
             ret -= 5;
         if (n1.IsDoushi())
             ret += 20;
+        if (n1.IsJodoushi())
+            ret -= 10;
     }
     if (h0 == HB_SETSUZOKUSHI && n1.IsJoshi())
         ret += 5;
     if (h0 == HB_SETSUZOKUSHI && h1 == HB_MEISHI)
         ret += 5;
     return ret;
-}
+} // ConnectCost
 
 // マーキングを最適化する。
 BOOL Lattice::OptimizeMarking(LatticeNode *ptr0)
@@ -856,39 +862,37 @@ BOOL Dict::IsLoaded() const
 // 文節にノードを追加する。
 void MzConvClause::add(const LatticeNode *node)
 {
-    bool matched = false;
-    for (auto& cand : candidates) {
-        if (cand.post == node->post) {
-            if (node->subtotal_cost < cand.cost)  {
-                cand.cost = node->subtotal_cost;
-                cand.bunruis.insert(node->bunrui);
-                cand.bunrui = node->bunrui;
-                cand.tags += node->tags;
-            }
-            return;
-        }
-    }
-
     MzConvCandidate cand;
     cand.pre = node->pre;
     cand.post = node->post;
     cand.cost = node->subtotal_cost;
+    cand.word_cost = WordCost(node);
     cand.bunruis.insert(node->bunrui);
     cand.bunrui = node->bunrui;
     cand.tags = node->tags;
     candidates.push_back(cand);
 }
 
-static inline bool
-CandidateCompare(const MzConvCandidate& cand1, const MzConvCandidate& cand2)
-{
-    return cand1.cost < cand2.cost;
-}
-
 // コストで候補をソートする。
 void MzConvClause::sort()
 {
-    std::sort(candidates.begin(), candidates.end(), CandidateCompare);
+    std::sort(candidates.begin(), candidates.end(), [](const MzConvCandidate& cand1, const MzConvCandidate& cand2){
+        if (cand1.cost < cand2.cost)
+            return true;
+        if (cand1.cost > cand2.cost)
+            return false;
+        if (cand1.post < cand2.post)
+            return true;
+        if (cand1.post > cand2.post)
+            return false;
+        return false;
+    });
+    candidates.erase(std::unique(candidates.begin(), candidates.end(),
+        [](const MzConvCandidate& cand1, const MzConvCandidate& cand2){
+            return cand1.post == cand2.post;
+        }),
+        candidates.end()
+    );
 }
 
 // コストで結果をソートする。
@@ -2030,9 +2034,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 「呼び(て/た/たり/ても)」→「呼ん(で/だ/だり/でも)」
     // 「書き(て/た/たり/ても)」→「書い(て/た/たり/ても)」
     // 「担い(て/た/たり/ても)」→「担っ(て/た/たり/ても)」
-    Gyou gyou = g_hiragana_to_gyou[ch];
     WCHAR ch2 = 0;
-    switch (gyou) {
+    switch (node.gyou) {
     case GYOU_KA: case GYOU_GA:
         ch2 = L'い';
         break;
@@ -2047,7 +2050,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
 
     case GYOU_SA: case GYOU_ZA: case GYOU_DA: case GYOU_HA: case GYOU_PA:
     case GYOU_YA: case GYOU_NN:
-        ch2 = 0;
+        ch2 = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_I);
         break;
     }
     if (ch2 != 0 && tail.size() >= 1 && tail[0] == ch2) {
@@ -2162,7 +2165,7 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
             break;
         node.pre = fields[I_FIELD_PRE] + ch;
         node.post = fields[I_FIELD_POST] + ch;
-        node.deltaCost = deltaCost + 300;
+        node.deltaCost = deltaCost + 40;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
 
         if (tail[1] != L'か' || tail[2] != L'た')
@@ -3626,7 +3629,7 @@ std::wstring MzConvResult::get_str(bool detailed) const
     for (auto& clause : clauses) {
         if (iClause)
             ret += L"|";
-        if (clause.candidates.size() == 1) {
+        if (clause.candidates.size() == 1 || !detailed) {
             ret += clause.candidates[0].post;
         } else {
             ret += L"(";
@@ -3635,13 +3638,18 @@ std::wstring MzConvResult::get_str(bool detailed) const
                 if (iCand)
                     ret += L"|";
                 ret += cand.post;
-                if (detailed) {
-                    ret += L":";
-                    if (cand.cost == MAXLONG)
-                        ret += L"∞";
-                    else
-                        ret += std::to_wstring(cand.cost);
-                }
+                ret += L":";
+                if (cand.word_cost == MAXLONG)
+                    ret += L"∞";
+                else
+                    ret += std::to_wstring(cand.word_cost);
+                ret += L":";
+                if (cand.cost == MAXLONG)
+                    ret += L"∞";
+                else
+                    ret += std::to_wstring(cand.cost);
+                ret += L":";
+                ret += HinshiToString(cand.bunrui);
                 ++iCand;
             }
             ret += L")";
