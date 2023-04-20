@@ -442,7 +442,6 @@ struct Lattice {
 
     void Dump(int num = 0);
     void Fix(const std::wstring& pre);
-    BOOL TryToLinkNodes(const std::wstring& pre);
 
 protected:
     void DoFields(size_t index, const WStrings& fields, INT deltaCost = 0);

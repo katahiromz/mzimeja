@@ -554,23 +554,6 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
 //////////////////////////////////////////////////////////////////////////////
 
-// mzimejaのテスト。
-void IME_Test1(void)
-{
-    MzConvResult result;
-    TheIME.ConvertMultiClause(L"てすとです", result);
-    printf("%ls\n", result.get_str(false).c_str());
-    printf("%ls\n", result.get_str(true).c_str());
-}
-
-void IME_Test2(void)
-{
-    MzConvResult result;
-    TheIME.ConvertMultiClause(L"そこではなしはおわりになった", result);
-    printf("%ls\n", result.get_str(false).c_str());
-    printf("%ls\n", result.get_str(true).c_str());
-}
-
 void DoIt(const std::wstring& pre)
 {
     MzConvResult result;
@@ -579,10 +562,17 @@ void DoIt(const std::wstring& pre)
     printf("%ls\n", result.get_str(true).c_str());
 }
 
-void IME_Test3(void)
+// mzimejaのテスト。
+void IME_Test1(void)
+{
+    DoIt(L"てすとです");
+    DoIt(L"そこではなしはおわりになった");
+}
+
+void IME_Test2(void)
 {
     DoIt(L"そこではなしはおわりになった");
-    DoIt(L"わたしがわたしたわたしのわたをわたがしみたいにたべないでください");
+    DoIt(L"わたしがわたしたわたしのわたをわたがしみたいにたべないでくださいませんか");
 }
 
 // Unicode版のmain関数。
@@ -609,9 +599,7 @@ int wmain(int argc, wchar_t **argv)
     }
 
     // テスト2。
-    //IME_Test2();
-    // テスト3。
-    IME_Test3();
+    IME_Test2();
 
     g_basic_dict.Unload();
 

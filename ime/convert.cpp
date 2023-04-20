@@ -2900,31 +2900,21 @@ void Lattice::Dump(int num)
 
 //////////////////////////////////////////////////////////////////////////////
 
-// リンクを試みる。
-BOOL Lattice::TryToLinkNodes(const std::wstring& pre)
-{
-    // リンクを更新する。
-    UpdateLinksAndBranches();
-
-    // リンクされていないノードを削除。
-    CutUnlinkedNodes();
-
-    // 最後にリンクされたインデックスを取得する。
-    size_t index = GetLastLinkedIndex();
-    if (index == pre.size())
-        return TRUE; // 成功。
-
-    return FALSE;
-}
-
 // 逆向きブランチ群を追加する。
 void Lattice::MakeReverseBranches(LatticeNode *ptr0)
 {
     ASSERT(ptr0);
 
+    if (!ptr0->linked || ptr0->bunrui == HB_TAIL)
+        return;
+
+    size_t i = 0;
     for (auto& ptr1 : ptr0->branches) {
-        ptr1->reverse_branches.insert(ptr0);
-        MakeReverseBranches(ptr1.get());
+        if (ptr1->reverse_branches.count(ptr0) == 0) {
+            ptr1->reverse_branches.insert(ptr0);
+            MakeReverseBranches(ptr1.get());
+        }
+        ++i;
     }
 } // Lattice::MakeReverseBranches
 
