@@ -429,7 +429,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
 } // IsNodeConnectable
 
 // 単語コストの計算。
-INT WordCost(LatticeNode *ptr1)
+INT WordCost(const LatticeNode *ptr1)
 {
     INT ret = 20;
 
