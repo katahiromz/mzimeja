@@ -3695,12 +3695,12 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
 LPCTSTR KatsuyouToString(KatsuyouKei kk) {
     static const LPCWSTR s_array[] =
     {
-        L"未然形",
-        L"連用形",
-        L"終止形",
-        L"連体形",
-        L"仮定形",
-        L"命令形",
+        L"未然形", // MIZEN_KEI
+        L"連用形", // RENYOU_KEI
+        L"終止形", // SHUUSHI_KEI
+        L"連体形", // RENTAI_KEI
+        L"仮定形", // KATEI_KEI
+        L"命令形", // MEIREI_KEI
     };
     ASSERT(kk < _countof(s_array));
     return s_array[kk];

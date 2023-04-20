@@ -5,7 +5,6 @@
 #include <shlobj.h>
 #include <strsafe.h>
 #include <algorithm>
-#include <clocale>
 #include "resource.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -497,35 +496,6 @@ void FreeUIExtra(HWND hwndServer)
     ::SetWindowLongPtr(hwndServer, IMMGWLP_PRIVATE, (LONG_PTR)NULL);
 }
 
-LPCTSTR findLocalFile(LPCTSTR name)
-{
-    TCHAR szDir[MAX_PATH];
-    ::GetModuleFileName(NULL, szDir, _countof(szDir));
-    ::PathRemoveFileSpec(szDir);
-
-    static TCHAR s_szPath[MAX_PATH];
-    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
-    ::PathAppend(s_szPath, name);
-    if (::PathFileExists(s_szPath))
-        return s_szPath;
-
-    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
-    ::PathAppend(s_szPath, TEXT(".."));
-    ::PathAppend(s_szPath, name);
-    if (::PathFileExists(s_szPath))
-        return s_szPath;
-
-    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
-    ::PathAppend(s_szPath, TEXT(".."));
-    ::PathAppend(s_szPath, TEXT(".."));
-    ::PathAppend(s_szPath, name);
-    if (::PathFileExists(s_szPath))
-        return s_szPath;
-
-    ASSERT(0);
-    return NULL;
-}
-
 //////////////////////////////////////////////////////////////////////////////
 
 // IMEはDLLファイルの一種であるから、IMEが読み込まれたら、エントリーポイントの
@@ -551,165 +521,6 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
     FOOTMARK_RETURN_INT(TRUE);
 } // DllMain
-
-//////////////////////////////////////////////////////////////////////////////
-
-void DoTest(const std::wstring& pre, LPCWSTR post = NULL)
-{
-    MzConvResult result;
-    TheIME.ConvertMultiClause(pre, result);
-    auto got = result.get_str();
-    printf("%ls\n\n", got.c_str());
-    if (post)
-    {
-        if (got != post)
-        {
-            printf("%ls\n\n", result.get_str(true).c_str());
-            ASSERT(0);
-        }
-    }
-    else
-    {
-        printf("%ls\n\n", result.get_str(true).c_str());
-    }
-}
-
-// 動詞のテスト。
-void DoDoushi(void)
-{
-    DoTest(L"よせる。よせない。よせるとき。よせれば。よせろよ。よせてよ。");
-
-    DoTest(L"たべる。たべない。たべます。たべた。たべるとき。たべれば。たべろ。たべよう。",
-           L"食べる|。|食べ|ない|。|食べ|ます|。|食べ|た|。|食べる|とき|。|食べれ|ば|。|食べろ|。|食べよう|。");
-
-    DoTest(L"かきます。かいて。かかない。かく。かいた。かける。かこう。",
-           L"書き|ます|。|書いて|。|書か|ない|。|書く|。|書いた|。|書ける|。|書こう|。");
-    DoTest(L"かけ。かくな。かけば。かかれる。かかせる。かかせられる。",
-           L"書け|。|書くな|。|書け|ば|。|書か|れる|。|書か|せる|。|書かせ|られる|。");
-
-    DoTest(L"みます。みて。みない。みる。みた。みられる。みよう。",
-           L"見|ます|。|見て|。|見ない|。|見る|。|見た|。|見られる|。|見よう|。");
-    DoTest(L"みろ。みるな。みれば。みられる。みさせる。みさせられる。",
-           L"見ろ|。|見るな|。|見れ|ば|。|見られる|。|見させる|。|見させ|られる|。");
-
-    DoTest(L"きます。きて。こない。くる。きた。こられる。こよう。");
-    DoTest(L"こい。くるな。くれば。こられる。こさせる。こさせられる。",
-           L"来い|。|来るな|。|来れ|ば|。|来られる|。|来させる|。|来させ|られる|。");
-
-    DoTest(L"かいてんします。かいてんして。かいてんしない。");
-    DoTest(L"かいてんする。かいてんした。かいてんできる。かいてんしよう。");
-    DoTest(L"かいてんしろ。かいてんするな。かいてんすれば。");
-    DoTest(L"かいてんされる。かいてんさせる。かいてんさせられる。",
-           L"回転|される|。|回転|させる|。|回転|させ|られる|。");
-}
-
-// 形容詞のテスト。
-void DoKeiyoushi(void)
-{
-    DoTest(L"すくない。すくなかろう。すくなかった。すくなく。すくなければ。",
-           L"少ない|。|少なかろう|。|少なかった|。|少なく|。|少なければ|。");
-    DoTest(L"ただしい。ただしかろう。ただしかった。ただしく。ただしければ。",
-           L"正しい|。|正しかろう|。|正しかった|。|正しく|。|正しければ|。");
-
-    DoTest(L"ゆたかだ。ゆたかだろう。ゆたかだった。ゆたかで。ゆたかに。ゆたかなこと。ゆたかならば。",
-           L"豊かだ|。|豊かだろう|。|豊かだった|。|豊かで|。|豊かに|。|豊かな|こと|。|豊かならば|。");
-}
-
-// フレーズのテスト。
-void DoPhrases(void)
-{
-    DoTest(L"かのじょはにほんごがおじょうずですね。",
-           L"彼女|は|日本語|が|お上手|ですね|。");
-    DoTest(L"わたしはしゅうきょうじょうのりゆうでおにくがたべられません。",
-           L"私|は|宗教|上|の|理由|で|お肉|が|食べ|られ|ません|。");
-    DoTest(L"そこではなしはおわりになった", L"そこで|話|は|終わり|に|なった");
-    DoTest(L"わたしがわたしたわたをわたがしみたいにたべないでくださいませんか");
-}
-
-// mzimejaのテスト。
-void IME_Test1(void)
-{
-    DoTest(L"てすとです", L"テスト|です");
-
-    DoDoushi();
-    DoKeiyoushi();
-    DoPhrases();
-}
-
-BOOL OnOK(HWND hwnd)
-{
-    WCHAR szText[1024];
-    GetDlgItemTextW(hwnd, edt1, szText, _countof(szText));
-    StrTrimW(szText, L" \t\r\n");
-    if (szText[0] == 0) {
-        MessageBoxW(hwnd, L"空ではない文字列を入力して下さい", NULL, 0);
-        return FALSE;
-    }
-    DoTest(szText);
-    return TRUE;
-}
-
-static INT_PTR CALLBACK
-InputDialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    switch (uMsg) {
-    case WM_COMMAND:
-        switch (LOWORD(wParam)) {
-        case IDOK:
-            if (OnOK(hwnd)) {
-                EndDialog(hwnd, IDOK);
-            }
-            break;
-        case IDCANCEL:
-            EndDialog(hwnd, IDCANCEL);
-            break;
-        }
-    }
-    return 0;
-}
-
-void IME_Test2(void)
-{
-    while (::DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_INPUTBOX),
-                       NULL, InputDialogProc) == IDOK)
-    {
-        ;
-    }
-}
-
-// Unicode版のmain関数。
-int wmain(int argc, wchar_t **argv)
-{
-    // Unicode出力を可能に。
-    std::setlocale(LC_CTYPE, "");
-
-    LPCTSTR pathname = findLocalFile(L"res\\mzimeja.dic");
-    //LPCTSTR pathname = findLocalFile(L"res\\testdata.dic");
-    if (!g_basic_dict.Load(pathname, L"BasicDictObject")) {
-        ASSERT(0);
-        return 1;
-    }
-
-    // テスト1。
-    IME_Test1();
-
-    // テスト2。
-    IME_Test2();
-
-    g_basic_dict.Unload();
-
-    return 0;
-}
-
-// 古いコンパイラのサポートのため。
-int main(void)
-{
-    int argc;
-    LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-    int ret = wmain(argc, argv);
-    LocalFree(argv);
-    return ret;
-}
 
 //////////////////////////////////////////////////////////////////////////////
 

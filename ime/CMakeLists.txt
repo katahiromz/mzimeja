@@ -9,6 +9,7 @@ add_library(libime STATIC
     immsec.cpp
     input.cpp
     keychar.cpp
+    main.cpp
     postal.cpp
     process.cpp
     regword.cpp
@@ -21,7 +22,6 @@ set_target_properties(libime PROPERTIES PREFIX "")
 
 # mzimeja.ime
 add_library(ime SHARED
-    main.cpp
     mzimeja.def
     mzimeja_res.rc)
 target_link_libraries(ime libime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
@@ -31,7 +31,7 @@ set_target_properties(ime PROPERTIES SUFFIX "")
 set_target_properties(ime PROPERTIES OUTPUT_NAME "mzimeja.ime")
 
 # imetests.exe
-add_executable(imetests main.cpp mzimeja_res.rc)
+add_executable(imetests tests.cpp mzimeja_res.rc)
 target_link_libraries(imetests libime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 
 # UTF-8
