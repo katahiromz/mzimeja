@@ -229,7 +229,7 @@ extern const MZGUIDELINE glTable[];
 
 extern "C" {
 
-// convert.c
+// convert.cpp
 extern std::unordered_map<WCHAR,Dan>  g_hiragana_to_dan;  // 母音写像。
 extern std::unordered_map<WCHAR,Gyou> g_hiragana_to_gyou; // 子音写像。
 void MakeLiteralMaps(); // 子音の写像と母音の写像を作成する。
@@ -237,12 +237,7 @@ LPCWSTR BunruiToString(HinshiBunrui bunrui);
 LPCTSTR HinshiToString(HinshiBunrui hinshi);
 HinshiBunrui StringToHinshi(LPCTSTR str);
 
-// notify.c
-BOOL PASCAL NotifyUCSetOpen(HIMC hIMC);
-BOOL PASCAL NotifyUCConversionMode(HIMC hIMC);
-BOOL PASCAL NotifyUCSetCompositionWindow(HIMC hIMC);
-
-// ui.c
+// ui.cpp
 LRESULT CALLBACK MZIMEWndProc(HWND, UINT, WPARAM, LPARAM);
 LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam);
 LONG ControlCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam);
@@ -252,12 +247,12 @@ int GetCompFontHeight(UIEXTRA *lpUIExtra);
 BOOL IsImeMessage(UINT message);
 BOOL IsImeMessage2(UINT message);
 
-// uistate.c
+// uistate.cpp
 HWND StatusWnd_Create(HWND hWnd, UIEXTRA *lpUIExtra);
 LRESULT CALLBACK StatusWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void StatusWnd_Update(UIEXTRA *lpUIExtra);
 
-// uicand.c
+// uicand.cpp
 LRESULT CALLBACK CandWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CandWnd_Paint(HWND hCandWnd);
 void CandWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC);
@@ -266,7 +261,7 @@ void CandWnd_Resize(UIEXTRA *lpUIExtra, InputContext *lpIMC);
 void CandWnd_Hide(UIEXTRA *lpUIExtra);
 void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC);
 
-// uicomp.c
+// uicomp.cpp
 LRESULT CALLBACK CompWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void CompWnd_Paint(HWND hCompWnd);
 void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC);
@@ -276,14 +271,14 @@ void CompWnd_SetFont(UIEXTRA *lpUIExtra);
 HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
                             DWORD iClause, LPPOINT ppt, LPSIZE psizText);
 
-// uiguide.c
+// uiguide.cpp
 LRESULT CALLBACK GuideWnd_WindowProc(HWND, UINT, WPARAM, LPARAM);
 void GuideWnd_Paint(HWND hGuideWnd, HDC hDC, LPPOINT lppt, DWORD dwPushedGuide);
 void GuideWnd_Button(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void GuideWnd_Update(UIEXTRA *lpUIExtra);
 LRESULT CALLBACK LineWndProc(HWND, UINT, WPARAM, LPARAM);
 
-// config.c
+// config.cpp
 HKEY Config_OpenAppKey(VOID);
 HKEY Config_CreateAppKey(VOID);
 DWORD Config_GetDWORD(LPCTSTR name, DWORD dwDefault);
@@ -312,9 +307,15 @@ UIEXTRA * LockUIExtra(HWND hwndServer);
 void      UnlockUIExtra(HWND hwndServer);
 void      FreeUIExtra(HWND hwndServer);
 
-//////////////////////////////////////////////////////////////////////////////
+// main.cpp
+LPCTSTR findLocalFile(LPCTSTR name);
+LPCTSTR findGraphviz(void);
 
 }  // extern "C"
+
+// postal.cpp
+std::wstring normalize_postal_code(const std::wstring& str);
+std::wstring convert_postal_code(const std::wstring& code);
 
 //////////////////////////////////////////////////////////////////////////////
 // keychar.cpp
@@ -603,9 +604,5 @@ protected:
 }; // class MzIme
 
 extern MzIme TheIME;
-
-// postal.cpp
-std::wstring normalize_postal_code(const std::wstring& str);
-std::wstring convert_postal_code(const std::wstring& code);
 
 //////////////////////////////////////////////////////////////////////////////

@@ -498,6 +498,53 @@ void FreeUIExtra(HWND hwndServer)
 
 //////////////////////////////////////////////////////////////////////////////
 
+// ローカルファイルを検索する。
+LPCTSTR findLocalFile(LPCTSTR name)
+{
+    TCHAR szDir[MAX_PATH];
+    ::GetModuleFileName(NULL, szDir, _countof(szDir));
+    ::PathRemoveFileSpec(szDir);
+
+    static TCHAR s_szPath[MAX_PATH];
+    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
+    ::PathAppend(s_szPath, name);
+    if (::PathFileExists(s_szPath))
+        return s_szPath;
+
+    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
+    ::PathAppend(s_szPath, TEXT(".."));
+    ::PathAppend(s_szPath, name);
+    if (::PathFileExists(s_szPath))
+        return s_szPath;
+
+    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
+    ::PathAppend(s_szPath, TEXT(".."));
+    ::PathAppend(s_szPath, TEXT(".."));
+    ::PathAppend(s_szPath, name);
+    if (::PathFileExists(s_szPath))
+        return s_szPath;
+
+    ASSERT(0);
+    return NULL;
+}
+
+// グラフを描画するプログラムGraphvizを探す。
+LPCTSTR findGraphviz(void)
+{
+    static std::wstring s_strPath;
+    auto str1 = TEXT("C:\\Program Files\\Graphviz\\bin\\dot.exe");
+    auto str2 = TEXT("C:\\Program Files (x86)\\Graphviz\\bin\\dot.exe");
+    if (s_strPath.empty()) {
+        if (PathFileExists(str1))
+            s_strPath = str1;
+        else if (PathFileExists(str2))
+            s_strPath = str2;
+    }
+    return s_strPath.c_str();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 // IMEはDLLファイルの一種であるから、IMEが読み込まれたら、エントリーポイントの
 // DllMainが呼び出されるはず。
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, LPVOID lpvReserved)

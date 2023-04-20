@@ -9,36 +9,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-// ローカルファイルを検索する。
-LPCTSTR findLocalFile(LPCTSTR name)
-{
-    TCHAR szDir[MAX_PATH];
-    ::GetModuleFileName(NULL, szDir, _countof(szDir));
-    ::PathRemoveFileSpec(szDir);
-
-    static TCHAR s_szPath[MAX_PATH];
-    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
-    ::PathAppend(s_szPath, name);
-    if (::PathFileExists(s_szPath))
-        return s_szPath;
-
-    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
-    ::PathAppend(s_szPath, TEXT(".."));
-    ::PathAppend(s_szPath, name);
-    if (::PathFileExists(s_szPath))
-        return s_szPath;
-
-    StringCchCopy(s_szPath, _countof(s_szPath), szDir);
-    ::PathAppend(s_szPath, TEXT(".."));
-    ::PathAppend(s_szPath, TEXT(".."));
-    ::PathAppend(s_szPath, name);
-    if (::PathFileExists(s_szPath))
-        return s_szPath;
-
-    ASSERT(0);
-    return NULL;
-}
-
 // テストエントリーを処理する。
 void DoEntry(const std::wstring& pre, LPCWSTR post = NULL)
 {
@@ -100,7 +70,7 @@ void DoDoushi(void)
     DoEntry(L"そうします。そうしてください。そうしないでください。");
     DoEntry(L"そうするよ。そうしたぞ。それはできるな。そうしよう。");
     DoEntry(L"そうしろ。そんなことはするな。そうすればそうなる。");
-    DoEntry(L"そのようにされる。そうさせる。きょうせいさせられる。",
+    DoEntry(L"そのようにされる。そうさせる。きょうせいさせられる。");
 }
 
 // 形容詞のテスト。
