@@ -1720,10 +1720,10 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     // い形容詞の未然形。
     // 「痛い」→「痛かろ(う)」
     do {
-        if (tail.empty() || tail.substr(0, 2) != L"かろ") break;
+        if (tail.empty() || tail.substr(0, 3) != L"かろう") break;
         node.katsuyou = MIZEN_KEI;
-        node.pre = fields[I_FIELD_PRE] + L"かろ";
-        node.post = fields[I_FIELD_POST] + L"かろ";
+        node.pre = fields[I_FIELD_PRE] + L"かろう";
+        node.post = fields[I_FIELD_POST] + L"かろう";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
     } while (0);
 
@@ -1813,6 +1813,11 @@ void Lattice::DoIkeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.pre = fields[I_FIELD_PRE] + L"けれ";
         node.post = fields[I_FIELD_POST] + L"けれ";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        if (tail.empty() || tail.substr(0, 3) != L"ければ") break;
+        node.katsuyou = KATEI_KEI;
+        node.pre = fields[I_FIELD_PRE] + L"ければ";
+        node.post = fields[I_FIELD_POST] + L"ければ";
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
     } while (0);
 
     // い形容詞の名詞形。
@@ -1899,11 +1904,17 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
     // な形容詞の未然形。
     // 「巨大な」→「巨大だろ(う)」
     do {
-        if (tail.empty() || tail.substr(0, 2) != L"だろ") break;
+        if (tail.empty() || tail.substr(0, 3) != L"だろう") break;
         node.katsuyou = MIZEN_KEI;
-        node.pre = fields[I_FIELD_PRE] + L"だろ";
-        node.post = fields[I_FIELD_POST] + L"だろ";
+        node.pre = fields[I_FIELD_PRE] + L"だろう";
+        node.post = fields[I_FIELD_POST] + L"だろう";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        if (tail.empty() || tail.substr(0, 4) != L"だろうに") break;
+        node.pre = fields[I_FIELD_PRE] + L"だろうに";
+        node.post = fields[I_FIELD_POST] + L"だろうに";
+        node.bunrui = HB_FUKUSHI;
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        node.bunrui = HB_NAKEIYOUSHI;
     } while (0);
 
     // な形容詞の連用形。
@@ -1969,6 +1980,11 @@ void Lattice::DoNakeiyoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.katsuyou = KATEI_KEI;
         node.pre = fields[I_FIELD_PRE] + L"なら";
         node.post = fields[I_FIELD_POST] + L"なら";
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        if (tail.empty() || tail.substr(0, 3) != L"ならば") break;
+        node.katsuyou = KATEI_KEI;
+        node.pre = fields[I_FIELD_PRE] + L"ならば";
+        node.post = fields[I_FIELD_POST] + L"ならば";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
     } while (0);
 
@@ -2512,12 +2528,20 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post = fields[I_FIELD_POST] + L"来";
         node.katsuyou = MIZEN_KEI;
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        if (tail.substr(0, 3) != L"こさせ") break;
+        node.pre = fields[I_FIELD_PRE] + L"こさせ";
+        node.post = fields[I_FIELD_POST] + L"来させ";
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
     } while (0);
     do {
         if (fields[I_FIELD_PRE] != L"こ") break;
         node.pre = fields[I_FIELD_PRE];
         node.post = fields[I_FIELD_POST];
         node.katsuyou = MIZEN_KEI;
+        m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+        if (tail.substr(0, 3) != L"させ") break;
+        node.pre = fields[I_FIELD_PRE] + L"させ";
+        node.post = fields[I_FIELD_POST] + L"させ";
         m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
     } while (0);
 
