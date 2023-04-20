@@ -559,59 +559,24 @@ void IME_Test1(void)
 {
     MzConvResult result;
     TheIME.ConvertMultiClause(L"てすとです", result);
-    printf("%ls\n", result.get_str().c_str());
+    printf("%ls\n", result.get_str(false).c_str());
+    printf("%ls\n", result.get_str(true).c_str());
 }
 
 void IME_Test2(void)
 {
     MzConvResult result;
     TheIME.ConvertMultiClause(L"そこではなしはおわりになった", result);
-    printf("%ls\n", result.get_str().c_str());
+    printf("%ls\n", result.get_str(false).c_str());
+    printf("%ls\n", result.get_str(true).c_str());
 }
-
-// 複数文節変換において、変換結果を生成する。
-void MakeResultForMulti(MzConvResult& result, Lattice& lattice)
-{
-    DPRINTW(L"%s\n", lattice.m_pre.c_str());
-    result.clear(); // 結果をクリア。
-
-    LatticeNode* ptr0 = lattice.m_head.get();
-    while (ptr0 && ptr0 != lattice.m_tail.get()) {
-        LatticeNode* target = NULL;
-        for (auto& ptr1 : ptr0->branches) {
-            if (lattice.OptimizeLattice(ptr1.get())) {
-                target = ptr1.get();
-                break;
-            }
-        }
-
-        if (!target || target->bunrui == HB_TAIL)
-            break;
-
-        MzConvClause clause;
-        clause.add(target);
-
-        for (auto& ptr1 : ptr0->branches) {
-            if (target->pre.size() == ptr1->pre.size()) {
-                if (target != ptr1.get()) {
-                    clause.add(ptr1.get());
-                }
-            }
-        }
-
-        result.clauses.push_back(clause);
-        ptr0 = target;
-    }
-
-    // コストによりソートする。
-    result.sort();
-} // MakeResultForMulti
 
 void DoIt(const std::wstring& pre)
 {
     MzConvResult result;
     TheIME.ConvertMultiClause(pre, result);
-    printf("%ls\n", result.get_str().c_str());
+    printf("%ls\n", result.get_str(false).c_str());
+    printf("%ls\n", result.get_str(true).c_str());
 }
 
 void IME_Test3(void)

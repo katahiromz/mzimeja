@@ -3696,7 +3696,7 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
     return TRUE;
 } // MzIme::StoreResult
 
-std::wstring MzConvResult::get_str() const
+std::wstring MzConvResult::get_str(bool detailed) const
 {
     std::wstring ret;
     size_t iClause = 0;
@@ -3712,11 +3712,13 @@ std::wstring MzConvResult::get_str() const
                 if (iCand)
                     ret += L"|";
                 ret += cand.post;
-                ret += L":";
-                if (cand.cost == MAXLONG)
-                    ret += L"∞";
-                else
-                    ret += std::to_wstring(cand.cost);
+                if (detailed) {
+                    ret += L":";
+                    if (cand.cost == MAXLONG)
+                        ret += L"∞";
+                    else
+                        ret += std::to_wstring(cand.cost);
+                }
                 ++iCand;
             }
             ret += L")";
