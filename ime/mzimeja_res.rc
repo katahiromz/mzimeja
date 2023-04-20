@@ -121,6 +121,16 @@ FONT 10, "ＭＳ Ｐゴシック"
     PUSHBUTTON "OK", IDOK, 55, 70, 60, 15
 }
 
+IDD_INPUTBOX DIALOG 0, 0, 215, 135
+CAPTION "文字列を入力して下さい"
+STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
+FONT 9, "MS UI Gothic"
+{
+    EDITTEXT edt1, 7, 9, 203, 96, ES_MULTILINE | WS_VSCROLL | WS_HSCROLL
+    DEFPUSHBUTTON "OK", IDOK, 35, 115, 60, 14
+    PUSHBUTTON "キャンセル", IDCANCEL, 115, 115, 60, 14
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // RT_GROUP_ICON
 

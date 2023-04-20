@@ -558,8 +558,8 @@ void DoIt(const std::wstring& pre)
 {
     MzConvResult result;
     TheIME.ConvertMultiClause(pre, result);
-    printf("%ls\n", result.get_str(false).c_str());
-    printf("%ls\n", result.get_str(true).c_str());
+    printf("%ls\n\n", result.get_str(false).c_str());
+    printf("%ls\n\n", result.get_str(true).c_str());
 }
 
 // mzimejaのテスト。
@@ -567,12 +567,48 @@ void IME_Test1(void)
 {
     DoIt(L"てすとです");
     DoIt(L"そこではなしはおわりになった");
+    DoIt(L"わたしがわたしたわたしのわたをわたがしみたいにたべないでくださいませんか");
+}
+
+BOOL OnOK(HWND hwnd)
+{
+    WCHAR szText[1024];
+    GetDlgItemTextW(hwnd, edt1, szText, _countof(szText));
+    StrTrimW(szText, L" \t\r\n");
+    if (szText[0] == 0) {
+        MessageBoxW(hwnd, L"空ではない文字列を入力して下さい", NULL, 0);
+        return FALSE;
+    }
+    DoIt(szText);
+    return TRUE;
+}
+
+static INT_PTR CALLBACK
+InputDialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg) {
+    case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+        case IDOK:
+            if (OnOK(hwnd)) {
+                EndDialog(hwnd, IDOK);
+            }
+            break;
+        case IDCANCEL:
+            EndDialog(hwnd, IDCANCEL);
+            break;
+        }
+    }
+    return 0;
 }
 
 void IME_Test2(void)
 {
-    DoIt(L"そこではなしはおわりになった");
-    DoIt(L"わたしがわたしたわたしのわたをわたがしみたいにたべないでくださいませんか");
+    while (::DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_INPUTBOX),
+                       NULL, InputDialogProc) == IDOK)
+    {
+        ;
+    }
 }
 
 // Unicode版のmain関数。
@@ -582,6 +618,7 @@ int wmain(int argc, wchar_t **argv)
     std::setlocale(LC_CTYPE, "");
 
     LPCTSTR pathname = findLocalFile(L"res\\mzimeja.dic");
+    //LPCTSTR pathname = findLocalFile(L"res\\testdata.dic");
     if (!g_basic_dict.Load(pathname, L"BasicDictObject")) {
         ASSERT(0);
         return 1;
@@ -589,14 +626,6 @@ int wmain(int argc, wchar_t **argv)
 
     // テスト1。
     IME_Test1();
-
-    g_basic_dict.Unload();
-
-    pathname = findLocalFile(L"res\\testdata.dic");
-    if (!g_basic_dict.Load(pathname, L"BasicDictObject")) {
-        ASSERT(0);
-        return 1;
-    }
 
     // テスト2。
     IME_Test2();

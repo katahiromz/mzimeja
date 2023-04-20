@@ -9,6 +9,7 @@
 #define IDD_ABOUTIME                        103
 #define IDD_DEBUG                           104
 #define IDD_ADDWORD                         105
+#define IDD_INPUTBOX                        106
 
 #define IDM_RECONVERT                       40001
 #define IDM_ABOUT                           40002

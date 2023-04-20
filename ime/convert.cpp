@@ -448,11 +448,13 @@ INT WordCost(const LatticeNode *ptr1)
         ret += 30;
 
     if (h == HB_KANGO)
-        ret += 200;
+        ret += 300;
     if (h == HB_SYMBOL)
         ret += 120;
     if (h == HB_GODAN_DOUSHI && ptr1->katsuyou == RENYOU_KEI)
         ret += 30;
+    if (h == HB_SETTOUJI)
+        ret += 200;
 
     if (ptr1->HasTag(L"[非標準]"))
         ret += 100;
@@ -466,6 +468,8 @@ INT WordCost(const LatticeNode *ptr1)
         ret += 30;
     if (ptr1->HasTag(L"[ユーザ辞書]"))
         ret -= 20;
+    if (ptr1->HasTag(L"[優先]"))
+        ret -= 100;
 
     ret += ptr1->deltaCost;
     return ret;
@@ -515,6 +519,8 @@ INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
         ret += 5;
     if (h0 == HB_SETSUZOKUSHI && h1 == HB_MEISHI)
         ret += 5;
+    if (h0 == HB_KANDOUSHI && h1 == HB_SHUU_JOSHI)
+        ret += 300;
     return ret;
 } // ConnectCost
 
@@ -862,6 +868,20 @@ BOOL Dict::IsLoaded() const
 // 文節にノードを追加する。
 void MzConvClause::add(const LatticeNode *node)
 {
+    for (auto& cand : candidates) {
+        if (cand.post == node->post) {
+            if (node->subtotal_cost < cand.cost) {
+                cand.cost = node->subtotal_cost;
+            }
+            if (WordCost(node) < cand.word_cost) {
+                cand.word_cost = WordCost(node);
+            }
+            cand.bunruis.insert(node->bunrui);
+            cand.bunrui = node->bunrui;
+            cand.tags += node->tags;
+            return;
+        }
+    }
     MzConvCandidate cand;
     cand.pre = node->pre;
     cand.post = node->post;
@@ -2709,6 +2729,14 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L"っぽ";
         new_fields[I_FIELD_POST] += L"っぽ";
+        DoIkeiyoushi(index, new_fields, deltaCost);
+    }
+
+    // 名詞＋「みたい」でい形容詞に。
+    if (tail.size() >= 2 && tail[0] == L'み' && tail[1] == L'た') {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += L"みた";
+        new_fields[I_FIELD_POST] += L"みた";
         DoIkeiyoushi(index, new_fields, deltaCost);
     }
 
