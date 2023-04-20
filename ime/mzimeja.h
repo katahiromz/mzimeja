@@ -432,7 +432,7 @@ struct Lattice {
     BOOL AddNodesFromDict(const WCHAR *dict_data);
     void ResetLatticeInfo();
     void UpdateLinksAndBranches();
-    BOOL OptimizeLattice(LatticeNode *ptr0);
+    BOOL OptimizeMarking(LatticeNode *ptr0);
     void AddComplement();
     void AddComplement(size_t index, size_t min_size, size_t max_size);
     void CutUnlinkedNodes();

@@ -118,71 +118,6 @@ LPCWSTR BunruiToString(HinshiBunrui bunrui)
     return s_array[index];
 } // BunruiToString
 
-// 品詞の連結コスト。
-static int
-CandConnectCost(HinshiBunrui bunrui1, HinshiBunrui bunrui2)
-{
-    if (bunrui2 == HB_PERIOD || bunrui2 == HB_COMMA) return 0;
-    if (bunrui2 == HB_TAIL) return 0;
-    if (bunrui1 == HB_SYMBOL || bunrui2 == HB_SYMBOL) return 0;
-    if (bunrui1 == HB_UNKNOWN || bunrui2 == HB_UNKNOWN) return 0;
-    switch (bunrui1) {
-    case HB_HEAD:
-        switch (bunrui2) {
-        case HB_JODOUSHI: case HB_SHUU_JOSHI:
-            return 5;
-        default:
-            break;
-        }
-        break;
-    case HB_MEISHI: // 名詞
-        switch (bunrui2) {
-        case HB_MEISHI:
-            return 10;
-        case HB_SETTOUJI:
-            return 10;
-        case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI:
-            return 5;
-        default:
-            break;
-        }
-        break;
-    case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI: // い形容詞、な形容詞
-        switch (bunrui1) {
-        case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI:
-            return 10;
-        case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
-        case HB_KAHEN_DOUSHI: case HB_SAHEN_DOUSHI:
-            return 3;
-        default:
-            break;
-        }
-        break;
-    case HB_MIZEN_JODOUSHI: case HB_RENYOU_JODOUSHI:
-    case HB_SHUUSHI_JODOUSHI: case HB_RENTAI_JODOUSHI:
-    case HB_KATEI_JODOUSHI: case HB_MEIREI_JODOUSHI:
-        ASSERT(0);
-        break;
-    case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI: case HB_KAHEN_DOUSHI:
-    case HB_SAHEN_DOUSHI: case HB_SETTOUJI:
-        switch (bunrui2) {
-        case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI: case HB_KAHEN_DOUSHI:
-        case HB_SAHEN_DOUSHI: case HB_SETTOUJI:
-            return 5;
-        default:
-            break;
-        }
-        break;
-    case HB_RENTAISHI: case HB_FUKUSHI: case HB_SETSUZOKUSHI:
-    case HB_KANDOUSHI: case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
-    case HB_FUKU_JOSHI: case HB_SHUU_JOSHI: case HB_JODOUSHI:
-    case HB_SETSUBIJI: case HB_COMMA: case HB_PERIOD:
-    default:
-        break;
-    }
-    return 1;
-} // CandConnectCost
-
 // 品詞の連結可能性。
 static BOOL
 IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
@@ -577,8 +512,8 @@ INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
     return ret;
 }
 
-// 部分最小コストにより、ラティスを最適化する。
-BOOL Lattice::OptimizeLattice(LatticeNode *ptr0)
+// マーキングを最適化する。
+BOOL Lattice::OptimizeMarking(LatticeNode *ptr0)
 {
     ASSERT(ptr0);
 
@@ -589,7 +524,7 @@ BOOL Lattice::OptimizeLattice(LatticeNode *ptr0)
     INT min_cost = MAXLONG;
     LatticeNode *min_node = NULL;
     for (auto& ptr1 : ptr0->branches) {
-        if (OptimizeLattice(ptr1.get())) {
+        if (OptimizeMarking(ptr1.get())) {
             reach = TRUE;
             if (ptr1->subtotal_cost < min_cost) {
                 min_cost = ptr1->subtotal_cost;
@@ -610,7 +545,7 @@ BOOL Lattice::OptimizeLattice(LatticeNode *ptr0)
     }
 
     return TRUE;
-} // Lattice::OptimizeLattice
+} // Lattice::OptimizeMarking
 
 // 基本辞書データをスキャンする。
 static size_t ScanBasicDict(WStrings& records, const WCHAR *dict_data, WCHAR ch)
@@ -3076,7 +3011,7 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
     while (ptr0 && ptr0 != lattice.m_tail.get()) {
         LatticeNode* target = NULL;
         for (auto& ptr1 : ptr0->branches) {
-            if (lattice.OptimizeLattice(ptr1.get())) {
+            if (lattice.OptimizeMarking(ptr1.get())) {
                 target = ptr1.get();
                 break;
             }
@@ -3096,38 +3031,36 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
             }
         }
 
-        std::wstring pre = target->pre;
-
         LatticeNode node;
         node.bunrui = HB_UNKNOWN;
         node.deltaCost = 3000;
-        node.pre = lcmap(pre, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
+        node.pre = lcmap(target->pre, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
 
-        node.post = lcmap(pre, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
+        node.post = lcmap(node.pre, LCMAP_HIRAGANA | LCMAP_FULLWIDTH);
         clause.add(&node);
 
-        node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_FULLWIDTH);
+        node.post = lcmap(node.pre, LCMAP_KATAKANA | LCMAP_FULLWIDTH);
         clause.add(&node);
 
-        node.post = lcmap(pre, LCMAP_KATAKANA | LCMAP_HALFWIDTH);
+        node.post = lcmap(node.pre, LCMAP_KATAKANA | LCMAP_HALFWIDTH);
         clause.add(&node);
 
-        node.post = lcmap(pre, LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
+        node.post = lcmap(node.pre, LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
         clause.add(&node);
 
-        node.post = lcmap(pre, LCMAP_UPPERCASE | LCMAP_FULLWIDTH);
+        node.post = lcmap(node.pre, LCMAP_UPPERCASE | LCMAP_FULLWIDTH);
         clause.add(&node);
 
-        node.post = node.post[0] + lcmap(pre.substr(1), LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
+        node.post = node.post[0] + lcmap(node.pre.substr(1), LCMAP_LOWERCASE | LCMAP_FULLWIDTH);
         clause.add(&node);
 
-        node.post = lcmap(pre, LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
+        node.post = lcmap(node.pre, LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
         clause.add(&node);
 
-        node.post = lcmap(pre, LCMAP_UPPERCASE | LCMAP_HALFWIDTH);
+        node.post = lcmap(node.pre, LCMAP_UPPERCASE | LCMAP_HALFWIDTH);
         clause.add(&node);
 
-        node.post = node.post[0] + lcmap(pre.substr(1), LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
+        node.post = node.post[0] + lcmap(node.pre.substr(1), LCMAP_LOWERCASE | LCMAP_HALFWIDTH);
         clause.add(&node);
 
         result.clauses.push_back(clause);
@@ -3260,7 +3193,7 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& str, MzConvResult& result)
     lattice.CalcSubTotalCosts(lattice.m_tail.get());
 
     lattice.m_head->marked = 1;
-    lattice.OptimizeLattice(lattice.m_head.get());
+    lattice.OptimizeMarking(lattice.m_head.get());
 
     MakeResultForMulti(result, lattice);
 
