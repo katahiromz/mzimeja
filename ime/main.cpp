@@ -615,8 +615,8 @@ void DoKeiyoushi(void)
            L"豊かだ|。|豊かだろう|。|豊かだった|。|豊かで|。|豊かに|。|豊かな|こと|。|豊かならば|。");
 }
 
-// 基本的なイディオムのテスト。
-void DoIdeoms(void)
+// フレーズのテスト。
+void DoPhrases(void)
 {
     DoTest(L"かのじょはにほんごがおじょうずですね。",
            L"彼女|は|日本語|が|お上手|ですね|。");
@@ -633,7 +633,7 @@ void IME_Test1(void)
 
     DoDoushi();
     DoKeiyoushi();
-    DoIdeoms();
+    DoPhrases();
 }
 
 BOOL OnOK(HWND hwnd)
