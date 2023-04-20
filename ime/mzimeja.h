@@ -442,6 +442,7 @@ struct Lattice {
 
     void Dump(int num = 0);
     void Fix(const std::wstring& pre);
+    void AddNode(size_t index, const LatticeNode& node);
 
 protected:
     void DoFields(size_t index, const WStrings& fields, INT deltaCost = 0);
