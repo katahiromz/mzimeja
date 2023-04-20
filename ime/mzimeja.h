@@ -466,6 +466,7 @@ struct MzConvCandidate {
     std::unordered_set<HinshiBunrui>  bunruis;    // 品詞分類集合。
     std::wstring tags;             // タグ。
     HinshiBunrui bunrui;           // 品詞分類。
+    KatsuyouKei katsuyou;          // 活用形。
 
     void clear() {
         pre.clear();

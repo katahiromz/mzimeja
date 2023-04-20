@@ -877,6 +877,7 @@ void MzConvClause::add(const LatticeNode *node)
             if (node->subtotal_cost < cand.cost) {
                 cand.cost = node->subtotal_cost;
                 cand.bunrui = node->bunrui;
+                cand.katsuyou = node->katsuyou;
             }
             if (WordCost(node) < cand.word_cost) {
                 cand.word_cost = WordCost(node);
@@ -893,6 +894,7 @@ void MzConvClause::add(const LatticeNode *node)
     cand.word_cost = WordCost(node);
     cand.bunruis.insert(node->bunrui);
     cand.bunrui = node->bunrui;
+    cand.katsuyou = node->katsuyou;
     cand.tags = node->tags;
     candidates.push_back(cand);
 }
@@ -3690,6 +3692,20 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
     return TRUE;
 } // MzIme::StoreResult
 
+LPCTSTR KatsuyouToString(KatsuyouKei kk) {
+    static const LPCWSTR s_array[] =
+    {
+        L"未然形",
+        L"連用形",
+        L"終止形",
+        L"連体形",
+        L"仮定形",
+        L"命令形",
+    };
+    ASSERT(kk < _countof(s_array));
+    return s_array[kk];
+}
+
 std::wstring MzConvResult::get_str(bool detailed) const
 {
     std::wstring ret;
@@ -3718,6 +3734,10 @@ std::wstring MzConvResult::get_str(bool detailed) const
                     ret += std::to_wstring(cand.cost);
                 ret += L":";
                 ret += HinshiToString(cand.bunrui);
+                if (cand.bunrui == HB_GODAN_DOUSHI) {
+                    ret += L":";
+                    ret += KatsuyouToString(cand.katsuyou);
+                }
                 ++iCand;
             }
             ret += L")";
