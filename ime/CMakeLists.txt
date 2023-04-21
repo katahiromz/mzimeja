@@ -21,9 +21,7 @@ add_library(libime STATIC
 set_target_properties(libime PROPERTIES PREFIX "")
 
 # mzimeja.ime
-add_library(ime SHARED
-    mzimeja.def
-    mzimeja_res.rc)
+add_library(ime SHARED mzimeja.def mzimeja_res.rc)
 target_link_libraries(ime libime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 target_compile_options(ime PRIVATE -DIME_DLL=1)
 set_target_properties(ime PROPERTIES PREFIX "")
