@@ -122,7 +122,7 @@ FONT 10, "ＭＳ Ｐゴシック"
 }
 
 IDD_INPUTBOX DIALOG 0, 0, 215, 135
-CAPTION "文字列を入力して下さい"
+CAPTION "変換したい文字列を入力して下さい"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
 FONT 9, "MS UI Gothic"
 {

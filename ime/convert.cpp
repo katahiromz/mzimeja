@@ -3089,6 +3089,12 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
         if (!target || target->bunrui == HB_TAIL)
             break;
 
+        for (auto& ptr1 : ptr0->branches) {
+            if (ptr1.get() != target) {
+                ptr1->marked = FALSE;
+            }
+        }
+
         MzConvClause clause;
         clause.add(target);
 
@@ -3242,8 +3248,87 @@ BOOL MzIme::ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     return StoreResult(result, comp, cand);
 } // MzIme::ConvertMultiClause
 
+std::string GetCandText(const MzConvCandidate* cand, BOOL bFirst)
+{
+    if (!cand) {
+        if (bFirst)
+            return "HEAD";
+        else
+            return "TAIL";
+    }
+    static CHAR sz[MAX_PATH];
+    ::WideCharToMultiByte(CP_UTF8, 0, cand->post.c_str(), -1, sz, _countof(sz), NULL, NULL);
+    sz[_countof(sz) - 1] = 0;
+    return sz;
+}
+
+void OutputGraphvizEdge(FILE* fout, const MzConvCandidate *cand0, const MzConvCandidate *cand1)
+{
+    std::string str1 = GetCandText(cand0, TRUE);
+    std::string str2 = GetCandText(cand1, FALSE);
+    if (!cand0)
+        cand0 = (MzConvCandidate*)0xDEAD;
+    if (!cand1)
+        cand1 = (MzConvCandidate*)0xFACE;
+    fprintf(fout, "L%p [label=\"%s\"];\n", cand0, str1.c_str());
+    fprintf(fout, "L%p [label=\"%s\"];\n", cand1, str2.c_str());
+    fprintf(fout, "L%p -> L%p;\n", cand0, cand1);
+}
+
+// Graphvizでグラフ構造を表示する。
+void ShowGraphviz(const MzConvResult& result)
+{
+    if (!findGraphviz()[0])
+        return;
+
+    TCHAR path0[MAX_PATH], path1[MAX_PATH];
+    ExpandEnvironmentStrings(TEXT("%TEMP%\\graph.dot"), path0, _countof(path0));
+    ExpandEnvironmentStrings(TEXT("%TEMP%\\graph.png"), path1, _countof(path1));
+    ::DeleteFile(path1);
+
+    if (FILE *fout = _tfopen(path0, _T("wb"))) {
+        fprintf(fout, "digraph test {\n");
+        fprintf(fout, "  graph [fontname=\"MS UI Gothic\"];\n");
+        fprintf(fout, "  node [fontname=\"MS UI Gothic\"];\n");
+        fprintf(fout, "  edge [fontname=\"MS UI Gothic\"];\n");
+
+        size_t i = 0;
+        for (auto& clause : result.clauses) {
+            for (auto& cand1 : clause.candidates) {
+                if (i == 0) {
+                    OutputGraphvizEdge(fout, NULL, &cand1);
+                } else {
+                    for (auto& cand0 : result.clauses[i - 1].candidates) {
+                        OutputGraphvizEdge(fout, &cand0, &cand1);
+                    }
+                }
+            }
+            ++i;
+        }
+        for (auto& cand : result.clauses[i - 1].candidates) {
+            OutputGraphvizEdge(fout, &cand, NULL);
+        }
+
+        fprintf(fout, "}\n");
+        fclose(fout);
+
+        TCHAR cmdline[MAX_PATH * 2];
+        StringCchPrintf(cmdline, _countof(cmdline), TEXT("-Tpng \"%s\" -o \"%s\""), path0, path1);
+        ::ShellExecute(NULL, NULL, findGraphviz(), cmdline, NULL, SW_SHOWNORMAL);
+        for (INT i = 0; i < 20; ++i) {
+            ::Sleep(100);
+            if (PathFileExists(path1))
+                break;
+        }
+        ::Sleep(100);
+        ::ShellExecute(NULL, NULL, path1, NULL, NULL, SW_SHOWNORMAL);
+    }
+
+    ::DeleteFile(path0);
+}
+
 // 複数文節を変換する。
-BOOL MzIme::ConvertMultiClause(const std::wstring& str, MzConvResult& result)
+BOOL MzIme::ConvertMultiClause(const std::wstring& str, MzConvResult& result, BOOL show_graphviz)
 {
     DPRINTW(L"%s\n", str.c_str());
 
@@ -3265,6 +3350,9 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& str, MzConvResult& result)
     lattice.OptimizeMarking(lattice.m_head.get());
 
     MakeResultForMulti(result, lattice);
+
+    if (show_graphviz)
+        ShowGraphviz(result);
 
     return TRUE;
 } // MzIme::ConvertMultiClause

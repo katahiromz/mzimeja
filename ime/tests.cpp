@@ -10,10 +10,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // テストエントリーを処理する。
-void DoEntry(const std::wstring& pre, LPCWSTR post = NULL)
+void DoEntry(const std::wstring& pre, LPCWSTR post = NULL, BOOL show_graphviz = FALSE)
 {
     MzConvResult result;
-    TheIME.ConvertMultiClause(pre, result);
+    TheIME.ConvertMultiClause(pre, result, show_graphviz);
     auto got = result.get_str();
     printf("%ls\n\n", got.c_str());
     if (post)
@@ -116,7 +116,7 @@ BOOL OnOK(HWND hwnd)
         MessageBoxW(hwnd, L"空ではない文字列を入力して下さい", NULL, 0);
         return FALSE;
     }
-    DoEntry(szText);
+    DoEntry(szText, NULL, TRUE);
     return TRUE;
 }
 
