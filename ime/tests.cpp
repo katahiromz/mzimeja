@@ -67,10 +67,10 @@ void DoDoushi(void)
     DoEntry(L"かいてんされる。かいてんさせる。かいてんさせられる。",
             L"回転|される|。|回転|させる|。|回転|させ|られる|。");
 
-    DoEntry(L"そうします。そうしてください。そうしないでください。");
-    DoEntry(L"そうするよ。そうしたぞ。それはできるな。そうしよう。");
-    DoEntry(L"そうしろ。そんなことはするな。そうすればそうなる。");
-    DoEntry(L"そのようにされる。そうさせる。きょうせいさせられる。");
+    DoEntry(L"ぜったいします。ぜったいしてください。ぜったいにしないでください。");
+    DoEntry(L"ぜったいするよ。ぜったいしたぞ。ぜったいできるな。ぜったいにしよう。");
+    DoEntry(L"ぜったいしろ。ぜったいするな。ぜったいされる。");
+    DoEntry(L"ぜったいさせる。ぜったいさせられる。");
 }
 
 // 形容詞のテスト。
@@ -124,6 +124,9 @@ static INT_PTR CALLBACK
 InputDialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg) {
+    case WM_INITDIALOG:
+        SetDlgItemText(hwnd, edt1, L"かのじょはにほんごがおじょうずですね。");
+        return TRUE;
     case WM_COMMAND:
         switch (LOWORD(wParam)) {
         case IDOK:
