@@ -246,6 +246,8 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         // 終助詞以外の助詞
         switch (node2.bunrui) {
         case HB_SETSUBIJI:
+        case HB_JODOUSHI:
+        case HB_SHUU_JOSHI:
             return FALSE;
         default:
             return TRUE;
@@ -1610,6 +1612,10 @@ void Lattice::UpdateLinksAndBranches()
             // リンク数がゼロならば無視。
             if (!ptr1->linked)
                 continue;
+            // 区間チェック。
+            ASSERT(index + ptr1->pre.size() <= m_pre.size());
+            if (!(index + ptr1->pre.size() <= m_pre.size()))
+                continue;
             // 連結可能であれば、リンク先をブランチに追加し、リンク先のリンク数を増やす。
             auto& chunk2 = m_chunks[index + ptr1->pre.size()];
             for (auto& ptr2 : chunk2) {
@@ -1701,6 +1707,7 @@ size_t Lattice::GetLastLinkedIndex() const
 // ノードを追加する。
 void Lattice::AddNode(size_t index, const LatticeNode& node)
 {
+    ASSERT(index + node.pre.size() <= m_pre.size());
     m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
 }
 
@@ -2195,28 +2202,37 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 五段動詞の仮定形。「動く」→「動け(ば)」、「聞き取る」→「聞き取れ(ば)」
     // 五段動詞の命令形。
     // 「動く」→「動け」「動けよ」、「聞き取る」→「聞き取れ」「聞き取れよ」
-    // 「くださる」→「ください」
     do {
         WCHAR ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_E);
-        if (tail.empty() || tail[0] != ch) {
-            ch = L'い';
-            if (tail.empty() || tail[0] != ch) {
-                break;
+        if (tail.size() >= 1) {
+            if (tail[0] == ch) {
+                node.katsuyou = KATEI_KEI;
+                node.pre = fields[I_FIELD_PRE] + ch;
+                node.post = fields[I_FIELD_POST] + ch;
+                AddNode(index, node);
+
+                node.katsuyou = MEIREI_KEI;
+                AddNode(index, node);
+
+                if (tail.size() >= 2 && (tail[1] == L'よ' || tail[1] == L'や')) {
+                    node.pre += tail[1];
+                    node.post += tail[1];
+                    AddNode(index, node);
+                }
+            }
+            // 「くだされ」→「ください」
+            // 「なされ」→「なさい」
+            std::wstring pre = fields[I_FIELD_PRE];
+            if (pre[pre.size() - 1] == L'さ' && ch == L'れ') {
+                ch = L'い';
+                if (tail[0] == ch) {
+                    node.katsuyou = MEIREI_KEI;
+                    node.pre = fields[I_FIELD_PRE] + ch;
+                    node.post = fields[I_FIELD_POST] + ch;
+                    AddNode(index, node);
+                }
             }
         }
-        node.katsuyou = KATEI_KEI;
-        node.pre = fields[I_FIELD_PRE] + ch;
-        node.post = fields[I_FIELD_POST] + ch;
-        AddNode(index, node);
-
-        node.katsuyou = MEIREI_KEI;
-        AddNode(index, node);
-
-        if (tail.size() < 2 || (tail[1] != L'よ' && tail[1] != L'や'))
-            break;
-        node.pre += tail[1];
-        node.post += tail[1];
-        AddNode(index, node);
     } while (0);
 
     // 五段動詞の命令形。「動く」→「動こう」「動こうよ」、「聞き取る」→「聞き取ろう」「聞き取ろうよ」
@@ -2363,6 +2379,13 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
                     }
                 }
             }
+        }
+        // 終止形「見ない」
+        if (tail.size() >= 2 && tail.substr(0, 2) == L"ない") {
+            node.pre = fields[I_FIELD_PRE] + L"ない";
+            node.post = fields[I_FIELD_POST] + L"ない";
+            node.katsuyou = SHUUSHI_KEI;
+            AddNode(index, node);
         }
         // 終止形「見よう」「見ようね」「見ようや」「見ような」「見ようぞ」
         if (tail.size() >= 2 && tail[0] == L'よ' && tail[1] == L'う') {
