@@ -88,12 +88,13 @@ FONT 10, "ＭＳ Ｐゴシック"
     PUSHBUTTON "選択(&S)", psh1, 123, 43, 40, 14
 }
 
-IDD_ABOUTIME DIALOG 30, 65, 137, 118
+IDD_ABOUTIME DIALOG 30, 65, 140, 64
 CAPTION "このIMEについて"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 FONT 10, "ＭＳ Ｐゴシック"
 {
-    LTEXT "MZ-IME日本語入力 (mzimeja) by katahiromz", 109, 14, 8, 100, 22
+    ICON 0, ico1, 8, 8, 20, 20
+    LTEXT "MZ-IME日本語入力 (mzimeja) by katahiromz", 109, 33, 8, 100, 22
 }
 
 IDD_DEBUG DIALOG 30, 65, 138, 122

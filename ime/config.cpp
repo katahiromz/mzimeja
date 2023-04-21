@@ -495,6 +495,10 @@ AboutDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg) {
     case WM_INITDIALOG:
+        {
+            HICON hIcon = LoadIcon(TheIME.m_hInst, TEXT("INDICOPENICON"));
+            SendDlgItemMessage(hDlg, ico1, STM_SETICON, (WPARAM)hIcon, 0);
+        }
         return TRUE;
 
     default:
