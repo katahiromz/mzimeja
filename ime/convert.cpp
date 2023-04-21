@@ -470,10 +470,14 @@ INT WordCost(const LatticeNode *ptr1)
         ret += 30;
     if (ptr1->HasTag(L"[ユーザ辞書]"))
         ret -= 20;
-    if (ptr1->HasTag(L"[優先1]"))
+    if (ptr1->HasTag(L"[優先++]"))
         ret -= 90;
-    if (ptr1->HasTag(L"[優先2]"))
+    if (ptr1->HasTag(L"[優先+]"))
         ret -= 30;
+    if (ptr1->HasTag(L"[優先--]"))
+        ret += 90;
+    if (ptr1->HasTag(L"[優先-]"))
+        ret += 30;
 
     ret += ptr1->deltaCost;
     return ret;
@@ -2079,59 +2083,84 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         AddNode(index, node);
     }
 
-    // 五段動詞の連用形の音便処理。
-    // 「咲き(て/た/たり/ても)」→「咲い(て/た/たり/ても)」
-    // 「食い(て/た/たり/ても)」→「食っ(て/た/たり/ても)」
-    // 「泣き(て/た/たり/ても)」→「泣い(て/た/たり/ても)」
-    // 「持ち(て/た/たり/ても)」→「持っ(て/た/たり/ても)」
-    // 「呼び(て/た/たり/ても)」→「呼ん(で/だ/だり/でも)」
-    // 「書き(て/た/たり/ても)」→「書い(て/た/たり/ても)」
-    // 「担い(て/た/たり/ても)」→「担っ(て/た/たり/ても)」
-    WCHAR ch2 = 0;
+    // 五段動詞の連用形の音便の分類。
+    WCHAR ch2 = 0, ch3 = 0, ch4 = 0;
     switch (node.gyou) {
-    case GYOU_KA: case GYOU_GA:
-        ch2 = L'い';
-        break;
-
-    case GYOU_NA: case GYOU_BA: case GYOU_MA:
+    case GYOU_NA:
+    case GYOU_MA:
+    case GYOU_BA:
+        // あそんだ、あんだ、うんだ、かんだ、くんだ、こんだ、しんだ、すんだ、
+        // つんだ、とんだ、のんだ、ふんだ、もんだ、やんだ、よんだ
         ch2 = L'ん';
+        ch3 = L'だ';
+        ch4 = L'で';
         break;
 
-    case GYOU_A: case GYOU_TA: case GYOU_RA: case GYOU_WA:
+    case GYOU_A:
+    case GYOU_TA:
+    case GYOU_RA:
+        // あった、うった、うつった、おった、かった、きった、くった、
+        // けった、さった、しった、すった、そった、たった、ちった、
+        // つった、とった、なった、ぬった、のった、はった、ふった、
+        // へった、ほった、まった、もった、やった、ゆった、よった、
+        // わった、わらった
         ch2 = L'っ';
+        ch3 = L'た';
+        ch4 = L'て';
         break;
 
-    case GYOU_SA: case GYOU_ZA: case GYOU_DA: case GYOU_HA: case GYOU_PA:
-    case GYOU_YA: case GYOU_NN:
+    case GYOU_KA:
+        // ういた、えがいた、かいた、きいた、さいた、しいた、たいた、
+        // だいた、ついた、といた、どいた、ないた、ぬいた、のいた、
+        // はいた、ひいた、ふいた、ふぶいた、やいた、わいた
+        ch2 = L'い';
+        ch3 = L'た';
+        ch4 = L'て';
+        break;
+
+    case GYOU_GA:
+        // かいだ、さわいだ、そいだ、みついだ
+        ch2 = L'い';
+        ch3 = L'だ';
+        ch4 = L'で';
+        break;
+
+    default:
+        // よくわからない
         ch2 = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_I);
+        ch3 = L'た';
+        ch4 = L'て';
         break;
     }
-    if (ch2 != 0 && tail.size() >= 1 && tail[0] == ch2) {
-        node.pre = fields[I_FIELD_PRE] + ch2;
-        node.post = fields[I_FIELD_POST] + ch2;
-        AddNode(index, node);
 
-        if (tail.size() >= 3 && (tail[1] == L'て' || tail[1] == L'で') && tail[2] == L'も') {
+    // 上記の分類に基づいて、五段動詞の連用形の音便を処理する。
+    if (ch2 != 0 && tail.size() >= 1 && tail[0] == ch2) {
+        if (tail.size() >= 3 && tail[1] == ch4 && tail[2] == L'も') {
             // 連用形「ても」「でも」
             node.katsuyou = RENYOU_KEI;
             node.pre = fields[I_FIELD_PRE] + ch2 + tail[1] + tail[2];
             node.post = fields[I_FIELD_POST] + ch2 + tail[1] + tail[2];
             AddNode(index, node);
-        } else if (tail.size() >= 2 && (tail[1] == L'て' || tail[1] == L'で')) {
+        } else if (tail.size() >= 2 && tail[1] == ch4) {
             // 連用形「て」「で」
             node.katsuyou = RENYOU_KEI;
             node.pre = fields[I_FIELD_PRE] + ch2 + tail[1];
             node.post = fields[I_FIELD_POST] + ch2 + tail[1];
             AddNode(index, node);
-        } else if (tail.size() >= 3 && (tail[1] == L'た' || tail[1] == L'だ') && tail[2] == L'り') {
+        } else if (tail.size() >= 3 && tail[1] == ch3 && tail[2] == L'り') {
             // 連用形「たり」「だり」
             node.katsuyou = RENYOU_KEI;
             node.pre = fields[I_FIELD_PRE] + ch2 + tail[1] + tail[2];
             node.post = fields[I_FIELD_POST] + ch2 + tail[1] + tail[2];
             AddNode(index, node);
-        } else if (tail.size() >= 2 && tail[1] == L'た') {
-            // 終止形「た」
+        } else if (tail.size() >= 2 && tail[1] == ch3) {
+            // 終止形「た」「だ」
             node.katsuyou = SHUUSHI_KEI;
+            node.pre = fields[I_FIELD_PRE] + ch2 + tail[1];
+            node.post = fields[I_FIELD_POST] + ch2 + tail[1];
+            AddNode(index, node);
+            // 連用形「た」「だ」
+            node.katsuyou = RENYOU_KEI;
             node.pre = fields[I_FIELD_PRE] + ch2 + tail[1];
             node.post = fields[I_FIELD_POST] + ch2 + tail[1];
             AddNode(index, node);
