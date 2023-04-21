@@ -3248,7 +3248,8 @@ BOOL MzIme::ConvertMultiClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     return StoreResult(result, comp, cand);
 } // MzIme::ConvertMultiClause
 
-std::string GetCandText(const MzConvCandidate* cand, BOOL bFirst)
+// Graphvizの候補テキストを取得する。
+std::string GetGraphvizCandText(const MzConvCandidate* cand, BOOL bFirst)
 {
     if (!cand) {
         if (bFirst)
@@ -3262,10 +3263,11 @@ std::string GetCandText(const MzConvCandidate* cand, BOOL bFirst)
     return sz;
 }
 
+// Graphvizのエッジを出力する。
 void OutputGraphvizEdge(FILE* fout, const MzConvCandidate *cand0, const MzConvCandidate *cand1)
 {
-    std::string str1 = GetCandText(cand0, TRUE);
-    std::string str2 = GetCandText(cand1, FALSE);
+    std::string str1 = GetGraphvizCandText(cand0, TRUE);
+    std::string str2 = GetGraphvizCandText(cand1, FALSE);
     if (!cand0)
         cand0 = (MzConvCandidate*)0xDEAD;
     if (!cand1)
