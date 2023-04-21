@@ -118,7 +118,7 @@ LPCWSTR BunruiToString(HinshiBunrui bunrui)
     return s_array[index];
 } // BunruiToString
 
-// 品詞の連結可能性。
+// 品詞の連結可能性を計算する関数。
 static BOOL
 IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
 {
@@ -416,13 +416,8 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         }
         break;
     case HB_COMMA: case HB_PERIOD: // 、。
-        switch (node2.bunrui) {
-        case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI: case HB_FUKU_JOSHI:
-        case HB_SHUU_JOSHI: case HB_SETSUBIJI: case HB_JODOUSHI:
+        if (node2.IsJoshi())
             return FALSE;
-        default:
-            break;
-        }
         break;
     default:
         break;
