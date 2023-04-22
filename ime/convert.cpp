@@ -2252,12 +2252,12 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
     // 「動く(五段)」→「動き(名詞)」「動き方(名詞)」、
     // 「聞き取る(五段)」→「聞き取り(名詞)」「聞き取り方(名詞)」など。
     node.bunrui = HB_MEISHI;
+    WCHAR ch1 = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_I);
     do {
-        WCHAR ch = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_I);
-        if (tail.empty() || tail[0] != ch)
+        if (tail.empty() || tail[0] != ch1)
             break;
-        node.pre = fields[I_FIELD_PRE] + ch;
-        node.post = fields[I_FIELD_POST] + ch;
+        node.pre = fields[I_FIELD_PRE] + ch1;
+        node.post = fields[I_FIELD_POST] + ch1;
         node.deltaCost = deltaCost + 40;
         AddNode(index, node);
 
@@ -2267,6 +2267,62 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.post += L"方";
         node.deltaCost = deltaCost;
         AddNode(index, node);
+    } while (0);
+
+    do {
+        if (tail.empty() || tail[0] != ch1)
+            break;
+        // 「動きやすい」「聞き取りやすい」
+        if (tail.size() >= 3 && tail.substr(1, 2) == L"やす") {
+            WStrings new_fields = fields;
+            new_fields[I_FIELD_PRE] += ch;
+            new_fields[I_FIELD_POST] += ch;
+            new_fields[I_FIELD_PRE] += L"やす";
+            new_fields[I_FIELD_POST] += L"やす";
+            DoIkeiyoushi(index, new_fields, deltaCost);
+
+            new_fields = fields;
+            new_fields[I_FIELD_PRE] += ch;
+            new_fields[I_FIELD_POST] += ch;
+            new_fields[I_FIELD_PRE] += L"やす";
+            new_fields[I_FIELD_POST] += L"易い";
+            DoIkeiyoushi(index, new_fields, deltaCost + 10);
+        }
+
+        // 「動きにくい」「聞き取りにくい」
+        if (tail.size() >= 3 && tail.substr(1, 2) == L"にく") {
+            WStrings new_fields = fields;
+            new_fields[I_FIELD_PRE] += ch;
+            new_fields[I_FIELD_POST] += ch;
+            new_fields[I_FIELD_PRE] += L"にく";
+            new_fields[I_FIELD_POST] += L"にく";
+            DoIkeiyoushi(index, new_fields, deltaCost);
+
+            new_fields = fields;
+            new_fields[I_FIELD_PRE] += ch;
+            new_fields[I_FIELD_POST] += ch;
+            new_fields[I_FIELD_PRE] += L"にく";
+            new_fields[I_FIELD_POST] += L"難";
+            DoIkeiyoushi(index, new_fields, deltaCost + 10);
+        }
+
+        // 「動きづらい」「聞き取りづらい」
+        // 「動きにくい」「聞き取りにくい」
+        if (tail.size() >= 3 && tail.substr(1, 2) == L"づら") {
+            WStrings new_fields = fields;
+            new_fields[I_FIELD_PRE] += ch;
+            new_fields[I_FIELD_POST] += ch;
+            new_fields[I_FIELD_PRE] += L"づら";
+            new_fields[I_FIELD_POST] += L"づら";
+            DoIkeiyoushi(index, new_fields, deltaCost);
+
+            new_fields = fields;
+            new_fields[I_FIELD_PRE] += ch;
+            new_fields[I_FIELD_POST] += ch;
+            new_fields[I_FIELD_PRE] += L"づら";
+            new_fields[I_FIELD_POST] += L"辛";
+            DoIkeiyoushi(index, new_fields, deltaCost + 10);
+        }
     } while (0);
 
     // 「動く(五段)」→「動ける(一段)」、
@@ -2398,6 +2454,46 @@ void Lattice::DoIchidanDoushi(size_t index, const WStrings& fields, INT deltaCos
             }
         }
     } while (0);
+
+    // 「～やすい」「～にくい」「～づらい」で、い形容詞の形。
+    if (tail.size() >= 2) {
+        // 「寄せやすい」
+        if (tail.substr(0, 2) == L"やす") {
+            WStrings new_fields = fields;
+            new_fields[I_FIELD_PRE] += L"やす";
+            new_fields[I_FIELD_POST] += L"やす";
+            DoIkeiyoushi(index, new_fields, deltaCost);
+
+            new_fields = fields;
+            new_fields[I_FIELD_PRE] += L"やす";
+            new_fields[I_FIELD_POST] += L"易";
+            DoIkeiyoushi(index, new_fields, deltaCost + 10);
+        }
+        // 「寄せにくい」
+        if (tail.substr(0, 2) == L"にく") {
+            WStrings new_fields = fields;
+            new_fields[I_FIELD_PRE] += L"にく";
+            new_fields[I_FIELD_POST] += L"にく";
+            DoIkeiyoushi(index, new_fields, deltaCost);
+
+            new_fields = fields;
+            new_fields[I_FIELD_PRE] += L"にく";
+            new_fields[I_FIELD_POST] += L"難";
+            DoIkeiyoushi(index, new_fields, deltaCost + 10);
+        }
+        // 「寄せづらい」
+        if (tail.substr(0, 2) == L"づら") {
+            WStrings new_fields = fields;
+            new_fields[I_FIELD_PRE] += L"づら";
+            new_fields[I_FIELD_POST] += L"づら";
+            DoIkeiyoushi(index, new_fields, deltaCost);
+
+            new_fields = fields;
+            new_fields[I_FIELD_PRE] += L"づら";
+            new_fields[I_FIELD_POST] += L"辛い";
+            DoIkeiyoushi(index, new_fields, deltaCost + 10);
+        }
+    }
 
     // 一段動詞の終止形。「寄せる」「見る」
     // 一段動詞の連体形。「寄せる(とき)」「見る(とき)」
