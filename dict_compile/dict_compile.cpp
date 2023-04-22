@@ -151,23 +151,23 @@ bool MakeDictFormat(DictEntry& entry, const std::wstring& strBunrui)
         }
         break;
     case HB_SAHEN_DOUSHI: // 「サ変動詞」
-        {
-            std::wstring substr;
-            // 「する」「ずる」そのものは登録しない。
-            if (entry.pre == L"する" || entry.pre == L"ずる")
-                return false;
-            //  「する」または「ずる」で終わらなければ失敗。
-
-            substr = entry.pre.substr(entry.pre.size() - 2, 2);
-            if (substr == L"する" && entry.post.substr(entry.post.size() - 2, 2) == L"する")
-                entry.gyou = GYOU_SA;
-            else if (substr == L"ずる" && entry.post.substr(entry.post.size() - 2, 2) == L"ずる")
+        entry.gyou = GYOU_SA;
+        if (entry.pre.size() >= 3 && entry.post.size() >= 3) { // 三文字以上のとき。
+            // 「する」「ずる」ならば「する」「ずる」を削る。
+            if (entry.pre.substr(entry.pre.size() - 2) == L"する" && 
+                entry.post.substr(entry.post.size() - 2) == L"する")
+            {
                 entry.gyou = GYOU_ZA;
-            else
-                return false;
-            // 終端の「する」または「ずる」を削る。
-            entry.pre = entry.pre.substr(0, entry.pre.size() - 2);
-            entry.post = entry.post.substr(0, entry.post.size() - 2);
+                entry.pre.resize(entry.pre.size() - 2);
+                entry.post.resize(entry.post.size() - 2);
+            }
+            else if (entry.pre.substr(entry.pre.size() - 2) == L"ずる" &&
+                     entry.post.substr(entry.post.size() - 2) == L"ずる")
+            {
+                entry.gyou = GYOU_SA;
+                entry.pre.resize(entry.pre.size() - 2);
+                entry.post.resize(entry.post.size() - 2);
+            }
         }
         break;
     case HB_GODAN_DOUSHI: // 「五段動詞」
