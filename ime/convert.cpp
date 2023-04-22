@@ -1703,7 +1703,7 @@ size_t Lattice::GetLastLinkedIndex() const
 void Lattice::AddNode(size_t index, const LatticeNode& node)
 {
     // ノードを追加するとき、必ずこの関数を通る。
-    // 条件付きブレークポイントを設定して、呼び出し履歴を取得すれば、
+    // ここで条件付きでブレークさせて、呼び出し履歴を取得すれば、
     // どのようにノードが追加されているのかが観測できる。
     ASSERT(index + node.pre.size() <= m_pre.size());
     m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
