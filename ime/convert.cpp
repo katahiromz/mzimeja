@@ -536,6 +536,8 @@ INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
         ret += 300;
     if (n0.post == L"し" && n1.post == L"ます")
         ret -= 100;
+    if ((n0.post == L"でき" || n0.post == L"出来") && n1.post == L"ます")
+        ret -= 100;
 
     return ret;
 } // ConnectCost
