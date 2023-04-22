@@ -122,18 +122,24 @@ LPCWSTR BunruiToString(HinshiBunrui bunrui)
 static BOOL
 IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
 {
-    if (node1.bunrui == HB_HEAD || node2.bunrui == HB_TAIL)
+    auto h0 = node1.bunrui, h1 = node2.bunrui;
+
+    if (h0 == HB_HEAD && h1 == HB_SETSUBIJI)
+        return FALSE;
+    if (h0 == HB_SETTOUJI && h1 == HB_TAIL)
+        return FALSE;
+    if (h0 == HB_HEAD || h1 == HB_TAIL)
         return TRUE;
-    if (node2.bunrui == HB_PERIOD || node2.bunrui == HB_COMMA)
+    if (h1 == HB_PERIOD || h1 == HB_COMMA)
         return TRUE;
-    if (node1.bunrui == HB_SYMBOL || node2.bunrui == HB_SYMBOL)
+    if (h0 == HB_SYMBOL || h1 == HB_SYMBOL)
         return TRUE;
-    if (node1.bunrui == HB_UNKNOWN || node2.bunrui == HB_UNKNOWN)
+    if (h0 == HB_UNKNOWN || h1 == HB_UNKNOWN)
         return TRUE;
 
-    switch (node1.bunrui) {
+    switch (h0) {
     case HB_MEISHI: // 名詞
-        switch (node2.bunrui) {
+        switch (h1) {
         case HB_SETTOUJI:
             return FALSE;
         default:
@@ -143,7 +149,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
     case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI: // い形容詞、な形容詞
         switch (node1.katsuyou) {
         case MIZEN_KEI:
-            if (node2.bunrui == HB_JODOUSHI) {
+            if (h1 == HB_JODOUSHI) {
                 if (node2.HasTag(L"[未然形に連結]")) {
                     if (node2.pre[0] == L'な' || node2.pre == L"う") {
                         return TRUE;
@@ -152,7 +158,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
             }
             return FALSE;
         case RENYOU_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_JODOUSHI:
                 if (node2.HasTag(L"[連用形に連結]")) {
                     return TRUE;
@@ -168,7 +174,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
             }
             break;
         case SHUUSHI_KEI:
-            if (node2.bunrui == HB_JODOUSHI) {
+            if (h1 == HB_JODOUSHI) {
                 if (node2.HasTag(L"[終止形に連結]")) {
                     return TRUE;
                 }
@@ -176,19 +182,19 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
                     return TRUE;
                 }
             }
-            if (node2.bunrui == HB_SHUU_JOSHI) {
+            if (h1 == HB_SHUU_JOSHI) {
                 return TRUE;
             }
             return FALSE;
         case RENTAI_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_KANDOUSHI: case HB_JODOUSHI:
                 return FALSE;
             default:
                 return TRUE;
             }
         case KATEI_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_SETSUZOKU_JOSHI:
                 if (node2.pre == L"ば" || node2.pre == L"ども" || node2.pre == L"ど") {
                     return TRUE;
@@ -198,7 +204,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
             }
             return FALSE;
         case MEIREI_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_SHUU_JOSHI: case HB_MEISHI: case HB_SETTOUJI:
                 return TRUE;
             default:
@@ -208,7 +214,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         }
         break;
     case HB_RENTAISHI: // 連体詞
-        switch (node2.bunrui) {
+        switch (h1) {
         case HB_KANDOUSHI: case HB_JODOUSHI: case HB_SETSUBIJI:
             return FALSE;
         default:
@@ -216,7 +222,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         }
         break;
     case HB_FUKUSHI: // 副詞
-        switch (node2.bunrui) {
+        switch (h1) {
         case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI: case HB_FUKU_JOSHI:
         case HB_SETSUBIJI:
             return FALSE;
@@ -225,7 +231,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         }
         break;
     case HB_SETSUZOKUSHI: // 接続詞
-        switch (node2.bunrui) {
+        switch (h1) {
         case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
         case HB_FUKU_JOSHI: case HB_SETSUBIJI:
             return FALSE;
@@ -234,7 +240,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         }
         break;
     case HB_KANDOUSHI: // 感動詞
-        switch (node2.bunrui) {
+        switch (h1) {
         case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI:
         case HB_FUKU_JOSHI: case HB_SETSUBIJI: case HB_JODOUSHI:
             return FALSE;
@@ -244,7 +250,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         break;
     case HB_KAKU_JOSHI: case HB_SETSUZOKU_JOSHI: case HB_FUKU_JOSHI:
         // 終助詞以外の助詞
-        switch (node2.bunrui) {
+        switch (h1) {
         case HB_SETSUBIJI:
         case HB_JODOUSHI:
         case HB_SHUU_JOSHI:
@@ -254,7 +260,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         }
         break;
     case HB_SHUU_JOSHI: // 終助詞
-        switch (node2.bunrui) {
+        switch (h1) {
         case HB_MEISHI: case HB_SETTOUJI: case HB_SHUU_JOSHI:
             return TRUE;
         default:
@@ -264,14 +270,14 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
     case HB_JODOUSHI: // 助動詞
         switch (node1.katsuyou) {
         case MIZEN_KEI:
-            if (node2.bunrui == HB_JODOUSHI) {
+            if (h1 == HB_JODOUSHI) {
                 if (node2.HasTag(L"[未然形に連結]")) {
                     return TRUE;
                 }
             }
             return FALSE;
         case RENYOU_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_JODOUSHI:
                 if (node2.HasTag(L"[連用形に連結]")) {
                     return TRUE;
@@ -287,7 +293,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
             }
             break;
         case SHUUSHI_KEI:
-            if (node2.bunrui == HB_JODOUSHI) {
+            if (h1 == HB_JODOUSHI) {
                 if (node2.HasTag(L"[終止形に連結]")) {
                     return TRUE;
                 }
@@ -295,19 +301,19 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
                     return TRUE;
                 }
             }
-            if (node2.bunrui == HB_SHUU_JOSHI) {
+            if (h1 == HB_SHUU_JOSHI) {
                 return TRUE;
             }
             return FALSE;
         case RENTAI_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_KANDOUSHI: case HB_JODOUSHI:
                 return FALSE;
             default:
                 return TRUE;
             }
         case KATEI_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_SETSUZOKU_JOSHI:
                 if (node2.pre == L"ば" || node2.pre == L"ども" || node2.pre == L"ど") {
                     return TRUE;
@@ -318,7 +324,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
             }
             return FALSE;
         case MEIREI_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_SHUU_JOSHI: case HB_MEISHI: case HB_SETTOUJI:
                 return TRUE;
             default:
@@ -336,14 +342,14 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         // 動詞
         switch (node1.katsuyou) {
         case MIZEN_KEI:
-            if (node2.bunrui == HB_JODOUSHI) {
+            if (h1 == HB_JODOUSHI) {
                 if (node2.HasTag(L"[未然形に連結]")) {
                     return TRUE;
                 }
             }
             return FALSE;
         case RENYOU_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_JODOUSHI:
                 if (node2.HasTag(L"[連用形に連結]")) {
                     return TRUE;
@@ -359,7 +365,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
             }
             break;
         case SHUUSHI_KEI:
-            if (node2.bunrui == HB_JODOUSHI) {
+            if (h1 == HB_JODOUSHI) {
                 if (node2.HasTag(L"[終止形に連結]")) {
                     return TRUE;
                 }
@@ -367,12 +373,12 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
                     return TRUE;
                 }
             }
-            if (node2.bunrui == HB_SHUU_JOSHI) {
+            if (h1 == HB_SHUU_JOSHI) {
                 return TRUE;
             }
             return FALSE;
         case RENTAI_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_KANDOUSHI: case HB_JODOUSHI:
                 return FALSE;
             default:
@@ -380,7 +386,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
             }
             break;
         case KATEI_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_SETSUZOKU_JOSHI:
                 if (node2.pre == L"ば" || node2.pre == L"ども" || node2.pre == L"ど") {
                     return TRUE;
@@ -390,7 +396,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
             }
             return FALSE;
         case MEIREI_KEI:
-            switch (node2.bunrui) {
+            switch (h1) {
             case HB_SHUU_JOSHI: case HB_MEISHI: case HB_SETTOUJI:
                 return TRUE;
             default:
@@ -400,7 +406,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         }
         break;
     case HB_SETTOUJI: // 接頭辞
-        switch (node2.bunrui) {
+        switch (h1) {
         case HB_MEISHI:
             return TRUE;
         default:
@@ -408,7 +414,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
         }
         break;
     case HB_SETSUBIJI: // 接尾辞
-        switch (node2.bunrui) {
+        switch (h1) {
         case HB_SETTOUJI:
             return FALSE;
         default:
@@ -505,6 +511,8 @@ INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
             ret += 20;
         if (n1.IsJodoushi())
             ret += 50;
+        if (h1 == HB_SAHEN_DOUSHI)
+            ret -= 50;
     }
     if (n0.IsKeiyoushi()) {
         if (n1.IsKeiyoushi())
@@ -1576,8 +1584,11 @@ void Lattice::UpdateLinksAndBranches()
         // 現在位置のノードを先頭ブランチに追加する。
         LatticeChunk& chunk1 = m_chunks[0];
         for (auto& ptr1 : chunk1) {
-            ptr1->linked = 1;
-            node.branches.push_back(ptr1);
+            if (IsNodeConnectable(node, *ptr1))
+            {
+                ptr1->linked = 1;
+                node.branches.push_back(ptr1);
+            }
         }
         m_head = std::make_shared<LatticeNode>(node);
     }
