@@ -124,7 +124,7 @@ IsNodeConnectable(const LatticeNode& node1, const LatticeNode& node2)
 {
     auto h0 = node1.bunrui, h1 = node2.bunrui;
 
-    if (h0 == HB_HEAD && h1 == HB_SETSUBIJI)
+    if (h0 == HB_HEAD && (h1 == HB_SETSUBIJI || h1 == HB_SHUU_JOSHI))
         return FALSE;
     if (h0 == HB_SETTOUJI && h1 == HB_TAIL)
         return FALSE;
@@ -511,7 +511,7 @@ INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
             ret += 20;
         if (n1.IsJodoushi())
             ret += 50;
-        if (h1 == HB_SAHEN_DOUSHI)
+        if (h1 == HB_SAHEN_DOUSHI && n1.pre.size() <= 2)
             ret -= 50;
     }
     if (n0.IsKeiyoushi()) {
@@ -678,7 +678,7 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dwStyle, LPCTSTR lpStr, L
         break;
     case HB_SAHEN_DOUSHI: // サ変動詞
         gyou = GYOU_SA;
-        if (pre.size() >= 3 && post.size() >= 3) { // 三文字以上のとき。
+        if (pre.size() >= 2 && post.size() >= 2) { // 三文字以上のとき。
             // 「する」「ずる」ならば「する」「ずる」を削る。
             if (pre.substr(pre.size() - 2) == L"する" &&
                 post.substr(post.size() - 2) == L"する")
@@ -723,9 +723,94 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dwStyle, LPCTSTR lpStr, L
     fields[I_FIELD_POST] = post;
     fields[I_FIELD_TAGS] = L"[ユーザ辞書]";
 
+    std::wstring record;
     std::wstring sep = { FIELD_SEP };
-    std::wstring record = str_join(fields, sep);
-    s_UserDictRecords.push_back(record);
+    if (bunrui == HB_SAHEN_DOUSHI) {
+        if (gyou == GYOU_ZA) {
+            fields[I_FIELD_PRE] = pre + L"ざ";
+            fields[I_FIELD_POST] = post + L"ざ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"じ";
+            fields[I_FIELD_POST] = post + L"じ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"ぜ";
+            fields[I_FIELD_POST] = post + L"ぜ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"ずる";
+            fields[I_FIELD_POST] = post + L"ずる";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"ずれ";
+            fields[I_FIELD_POST] = post + L"ずれ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"じろ";
+            fields[I_FIELD_POST] = post + L"じろ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"ぜよ";
+            fields[I_FIELD_POST] = post + L"ぜよ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"じよう";
+            fields[I_FIELD_POST] = post + L"じよう";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+        } else {
+            fields[I_FIELD_PRE] = pre + L"さ";
+            fields[I_FIELD_POST] = post + L"さ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"し";
+            fields[I_FIELD_POST] = post + L"し";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"せ";
+            fields[I_FIELD_POST] = post + L"せ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"する";
+            fields[I_FIELD_POST] = post + L"する";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"すれ";
+            fields[I_FIELD_POST] = post + L"すれ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"しろ";
+            fields[I_FIELD_POST] = post + L"しろ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"せよ";
+            fields[I_FIELD_POST] = post + L"せよ";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+
+            fields[I_FIELD_PRE] = pre + L"しよう";
+            fields[I_FIELD_POST] = post + L"しよう";
+            record = str_join(fields, sep);
+            s_UserDictRecords.push_back(record);
+        }
+    } else {
+        record = str_join(fields, sep);
+        s_UserDictRecords.push_back(record);
+    }
 
     return TRUE;
 }
@@ -1706,6 +1791,8 @@ size_t Lattice::GetLastLinkedIndex() const
 // ノードを一つ追加する。
 void Lattice::AddNode(size_t index, const LatticeNode& node)
 {
+    if (node.bunrui == HB_SAHEN_DOUSHI && node.pre.empty())
+        ASSERT(0);
     // ノードを追加するとき、必ずこの関数を通る。
     // ここで条件付きでブレークさせて、呼び出し履歴を取得すれば、
     // どのようにノードが追加されているのかが観測できる。
@@ -2758,188 +2845,138 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     LatticeNode node;
     node.bunrui = HB_SAHEN_DOUSHI;
     node.tags = fields[I_FIELD_TAGS];
+    node.pre = pre;
+    node.post = post;
     node.deltaCost = deltaCost;
 
     // カ変動詞と同様に、サ変動詞は語幹が変化するので、「回避策」が必要になる。
     // 回避策として、辞書にそれぞれ異なる語幹を登録している。
-    if (pre == L"さ" || pre == L"し" || pre == L"せ" || pre == L"する" ||
-        pre == L"すれ" || pre == L"しろ" || pre == L"せい")
-    {
-        tail = pre + tail;
-        pre.clear();
-        post.clear();
-    }
+
+    WCHAR lastChar = pre[pre.size() - 1];
 
     // 未然形「～さ」「～ざ」
     // 未然形「～し」「～じ」
     // 未然形「～せ」「～ぜ」
     node.katsuyou = MIZEN_KEI;
     if (tail.size() >= 1) {
+        node.deltaCost += 50;
         if (node.gyou == GYOU_ZA) {
-            if (tail[0] == L'ざ') {
-                node.pre = pre + tail[0];
-                node.post = post + tail[0];
+            if (lastChar == L'ざ' || lastChar == L'じ' || lastChar == L'ぜ')
                 AddNode(index, node);
-            }
-            if (tail[0] == L'じ') {
-                node.pre = pre + tail[0];
-                node.post = post + tail[0];
-                AddNode(index, node);
-            }
-            if (tail[0] == L'ぜ') {
-                node.pre = pre + tail[0];
-                node.post = post + tail[0];
-                AddNode(index, node);
-            }
         } else {
-            if (tail[0] == L'さ') {
-                node.pre = pre + tail[0];
-                node.post = post + tail[0];
+            if (lastChar == L'さ' || lastChar == L'し' || lastChar == L'せ')
                 AddNode(index, node);
-            }
-            if (tail[0] == L'し') {
-                node.pre = pre + tail[0];
-                node.post = post + tail[0];
-                AddNode(index, node);
-            }
-            if (tail[0] == L'せ') {
-                node.pre = pre + tail[0];
-                node.post = post + tail[0];
-                AddNode(index, node);
-            }
         }
+        node.deltaCost -= 50;
     }
 
     // 連用形「～し」「～じ」
     node.katsuyou = RENYOU_KEI;
     if (tail.size() >= 1) {
+        node.deltaCost += 50;
         if (node.gyou == GYOU_ZA) {
-            if (tail[0] == L'じ') {
-                node.pre = pre + tail[0];
-                node.post = post + tail[0];
+            if (lastChar == L'じ')
                 AddNode(index, node);
-            }
         } else {
-            if (tail[0] == L'し') {
-                node.pre = pre + tail[0];
-                node.post = post + tail[0];
+            if (lastChar == L'し')
                 AddNode(index, node);
-            }
         }
+        node.deltaCost -= 50;
     }
 
-    // 終止形「～する」「～ずる」
-    // 連用形「～する(とき)」「～ずる(とき)」
-    if (tail.size() >= 2) {
+    if (pre.size() >= 2) {
+        auto lastTwoChars = pre.substr(pre.size() - 2);
+        // 終止形「～する」「～ずる」
+        // 連用形「～する(とき)」「～ずる(とき)」
         if (node.gyou == GYOU_ZA) {
-            if (tail.substr(0, 2) == L"ずる") {
-                node.pre = pre + L"ずる";
-                node.post = post + L"ずる";
-
+            if (lastTwoChars == L"ずる") {
                 node.katsuyou = SHUUSHI_KEI;
                 AddNode(index, node);
 
                 node.katsuyou = RENYOU_KEI;
                 AddNode(index, node);
+
+                // 「ずるな」「ずるよ」
+                if (tail.size() && (tail[0] == L'な' || tail[0] == L'よ')) {
+                    node.pre = pre + tail[0];
+                    node.post = post + tail[0];
+                    AddNode(index, node);
+                }
+                // 「ずるなよ」
+                if (tail.size() >= 2 && tail.substr(0, 2) == L"なよ") {
+                    node.pre = pre + L"なよ";
+                    node.post = post + L"なよ";
+                    AddNode(index, node);
+                }
             }
         } else {
-            if (tail.substr(0, 2) == L"する") {
-                node.pre = pre + L"する";
-                node.post = post + L"する";
-
+            if (lastTwoChars == L"する") {
                 node.katsuyou = SHUUSHI_KEI;
                 AddNode(index, node);
 
                 node.katsuyou = RENYOU_KEI;
                 AddNode(index, node);
+
+                // 「するな」「するよ」
+                if (tail.size() && (tail[0] == L'な' || tail[0] == L'よ')) {
+                    node.pre = pre + tail[0];
+                    node.post = post + tail[0];
+                    AddNode(index, node);
+                }
+                // 「するなよ」
+                if (tail.size() >= 2 && tail.substr(0, 2) == L"なよ") {
+                    node.pre = pre + L"なよ";
+                    node.post = post + L"なよ";
+                    AddNode(index, node);
+                }
+            }
+        }
+
+        // 仮定形「～すれ(ば)」「～ずれ(ば)」
+        node.katsuyou = KATEI_KEI;
+        if (node.gyou == GYOU_ZA) {
+            if (lastTwoChars == L"ずれ") {
+                node.pre = pre;
+                node.post = post;
+                AddNode(index, node);
+            }
+        } else {
+            if (lastTwoChars == L"すれ") {
+                node.pre = pre;
+                node.post = post;
+                AddNode(index, node);
+            }
+        }
+
+        // 命令形「～しろ」「～じろ」「せよ」「ぜよ」「せい」「ぜい」
+        node.katsuyou = MEIREI_KEI;
+        if (node.gyou == GYOU_ZA) {
+            if (lastTwoChars == L"じろ" || lastTwoChars == L"ぜよ" || lastTwoChars == L"ぜい") {
+                node.pre = pre;
+                node.post = post;
+                AddNode(index, node);
+            }
+        } else {
+            if (lastTwoChars == L"しろ" || lastTwoChars == L"せよ" || lastTwoChars == L"せい") {
+                node.pre = pre;
+                node.post = post;
+                AddNode(index, node);
             }
         }
     }
 
-    // 禁止「するな」「ずるな」
-    if (tail.size() >= 3) {
+    if (pre.size() >= 3) {
+        auto lastTriChars = pre.substr(pre.size() - 3);
         if (node.gyou == GYOU_ZA) {
-            if (tail.substr(0, 2) == L"ずるな") {
-                node.pre = pre + L"ずるな";
-                node.post = post + L"ずるな";
-
-                node.katsuyou = SHUUSHI_KEI;
+            if (lastTriChars == L"じよう") {
+                node.pre = pre;
+                node.post = post;
                 AddNode(index, node);
             }
         } else {
-            if (tail.substr(0, 2) == L"するな") {
-                node.pre = pre + L"するな";
-                node.post = post + L"するな";
-
-                node.katsuyou = SHUUSHI_KEI;
-                AddNode(index, node);
-            }
-        }
-    }
-
-    // 仮定形「～すれ(ば)」「～ずれ(ば)」
-    node.katsuyou = KATEI_KEI;
-    if (tail.size() >= 2) {
-        if (node.gyou == GYOU_ZA) {
-            if (tail.substr(0, 2) == L"ずれ") {
-                node.pre = pre + L"ずれ";
-                node.post = post + L"ずれ";
-                AddNode(index, node);
-            }
-        } else {
-            if (tail.substr(0, 2) == L"すれ") {
-                node.pre = pre + L"すれ";
-                node.post = post + L"すれ";
-                AddNode(index, node);
-            }
-        }
-    }
-
-    // 命令形「～しろ」「～じろ」
-    node.katsuyou = MEIREI_KEI;
-    if (tail.size() >= 2) {
-        if (node.gyou == GYOU_ZA) {
-            if (tail.substr(0, 2) == L"じろ") {
-                node.pre = pre + L"じろ";
-                node.post = post + L"じろ";
-                AddNode(index, node);
-            }
-        } else {
-            if (tail.substr(0, 2) == L"しろ") {
-                node.pre = pre + L"しろ";
-                node.post = post + L"しろ";
-                AddNode(index, node);
-            }
-        }
-    }
-    // 命令形「～せよ」「～ぜよ」
-    if (tail.size() >= 2) {
-        if (node.gyou == GYOU_ZA) {
-            if (tail.substr(0, 2) == L"ぜよ") {
-                node.pre = pre + L"ぜよ";
-                node.post = post + L"ぜよ";
-                AddNode(index, node);
-            }
-        } else {
-            if (tail.substr(0, 2) == L"せよ") {
-                node.pre = pre + L"せよ";
-                node.post = post + L"せよ";
-                AddNode(index, node);
-            }
-        }
-    }
-    // 命令形「～せい」「～ぜい」
-    if (tail.size() >= 2) {
-        if (node.gyou == GYOU_ZA) {
-            if (tail.substr(0, 2) == L"ぜい") {
-                node.pre = pre + L"ぜい";
-                node.post = post + L"ぜい";
-                AddNode(index, node);
-            }
-        } else {
-            if (tail.substr(0, 2) == L"せい") {
-                node.pre = pre + L"せい";
-                node.post = post + L"せい";
+            if (lastTriChars == L"しよう") {
+                node.pre = pre;
+                node.post = post;
                 AddNode(index, node);
             }
         }
@@ -3012,18 +3049,32 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
 
     // 名詞＋「さ」、名詞＋「し」、名詞＋「せ」でサ変動詞に
     if (tail.size() >= 1 && (tail[0] == L'さ' || tail[0] == L'し' || tail[0] == L'せ')) {
-        DoSahenDoushi(index, fields, deltaCost + 80);
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += tail[0];
+        new_fields[I_FIELD_POST] += tail[0];
+        DoSahenDoushi(index, new_fields, deltaCost - 10);
     }
 
     // 名詞＋「する」、名詞＋「すれ」、名詞＋「せよ」、名詞＋「しろ」、名詞＋「せい」でサ変動詞に。
     if (tail.size() >= 2 &&
-        (tail.substr(tail.size() - 2) == L"する" ||
-         tail.substr(tail.size() - 2) == L"すれ" ||
-         tail.substr(tail.size() - 2) == L"せよ" ||
-         tail.substr(tail.size() - 2) == L"しろ" ||
+        (tail.substr(tail.size() - 2) == L"する" || tail.substr(tail.size() - 2) == L"すれ" ||
+         tail.substr(tail.size() - 2) == L"せよ" || tail.substr(tail.size() - 2) == L"しろ" ||
          tail.substr(tail.size() - 2) == L"せい"))
     {
-        DoSahenDoushi(index, fields, deltaCost - 10);
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += tail.substr(tail.size() - 2);
+        new_fields[I_FIELD_POST] += tail.substr(tail.size() - 2);
+        DoSahenDoushi(index, new_fields, deltaCost - 60);
+        // 「するよ」「するな」「せいよ」「せいな」
+        if (tail.substr(tail.size() - 2) == L"する" || tail.substr(tail.size() - 2) == L"せい") {
+            new_fields[I_FIELD_PRE] += L'よ';
+            new_fields[I_FIELD_POST] += L'よ';
+            DoSahenDoushi(index, new_fields, deltaCost - 60);
+            new_fields = fields;
+            new_fields[I_FIELD_PRE] += tail.substr(tail.size() - 2) + L'な';
+            new_fields[I_FIELD_POST] += tail.substr(tail.size() - 2) + L'な';
+            DoSahenDoushi(index, new_fields, deltaCost - 60);
+        }
     }
 
     // 名詞＋「な」でな形容詞に。
@@ -3038,6 +3089,15 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         new_fields[I_FIELD_POST] += L'た';
         new_fields[I_FIELD_HINSHI] = { MAKEWORD(HB_GODAN_DOUSHI, GYOU_RA) };
         DoGodanDoushi(index, new_fields, deltaCost);
+    }
+
+    // 名詞＋「でき(る)」でな形容詞に。
+    if (tail.size() >= 2 && tail.substr(0, 2) == L"でき") {
+        WStrings new_fields = fields;
+        new_fields[I_FIELD_PRE] += L"でき";
+        new_fields[I_FIELD_POST] += L"でき";
+        new_fields[I_FIELD_HINSHI] = { MAKEWORD(HB_ICHIDAN_DOUSHI, GYOU_RA) };
+        DoIchidanDoushi(index, fields, deltaCost - 10);
     }
 } // Lattice::DoMeishi
 

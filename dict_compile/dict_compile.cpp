@@ -152,19 +152,19 @@ bool MakeDictFormat(DictEntry& entry, const std::wstring& strBunrui)
         break;
     case HB_SAHEN_DOUSHI: // 「サ変動詞」
         entry.gyou = GYOU_SA;
-        if (entry.pre.size() >= 3 && entry.post.size() >= 3) { // 三文字以上のとき。
+        if (entry.pre.size() >= 2 && entry.post.size() >= 2) { // 三文字以上のとき。
             // 「する」「ずる」ならば「する」「ずる」を削る。
             if (entry.pre.substr(entry.pre.size() - 2) == L"する" && 
                 entry.post.substr(entry.post.size() - 2) == L"する")
             {
-                entry.gyou = GYOU_ZA;
+                entry.gyou = GYOU_SA;
                 entry.pre.resize(entry.pre.size() - 2);
                 entry.post.resize(entry.post.size() - 2);
             }
             else if (entry.pre.substr(entry.pre.size() - 2) == L"ずる" &&
                      entry.post.substr(entry.post.size() - 2) == L"ずる")
             {
-                entry.gyou = GYOU_SA;
+                entry.gyou = GYOU_ZA;
                 entry.pre.resize(entry.pre.size() - 2);
                 entry.post.resize(entry.post.size() - 2);
             }
@@ -236,17 +236,73 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries)
 
         // 辞書にエントリーを追加する準備をする。
         DictEntry entry;
-        entry.pre = fields[I_FIELD_PRE];
+        auto pre = entry.pre = fields[I_FIELD_PRE];
         entry.gyou = GYOU_A;
-        entry.post = fields[I_FIELD_POST];
+        auto post = entry.post = fields[I_FIELD_POST];
         entry.tags = fields[I_FIELD_TAGS];
 
         // 辞書形式にする。
         if (!MakeDictFormat(entry, fields[I_FIELD_HINSHI]))
             continue;
 
-        // エントリーを追加する。
-        entries.push_back(entry);
+        if (fields[I_FIELD_HINSHI] == L"サ変動詞") {
+            pre = entry.pre;
+            post = entry.post;
+            if (entry.gyou == GYOU_ZA) {
+                entry.pre = pre + L"ざ";
+                entry.post = post + L"ざ";
+                entries.push_back(entry);
+                entry.pre = pre + L"じ";
+                entry.post = post + L"じ";
+                entries.push_back(entry);
+                entry.pre = pre + L"ぜ";
+                entry.post = post + L"ぜ";
+                entries.push_back(entry);
+                entry.pre = pre + L"ずる";
+                entry.post = post + L"ずる";
+                entries.push_back(entry);
+                entry.pre = pre + L"ずれ";
+                entry.post = post + L"ずれ";
+                entries.push_back(entry);
+                entry.pre = pre + L"じろ";
+                entry.post = post + L"じろ";
+                entries.push_back(entry);
+                entry.pre = pre + L"ぜよ";
+                entry.post = post + L"ぜよ";
+                entries.push_back(entry);
+                entry.pre = pre + L"じよう";
+                entry.post = post + L"じよう";
+                entries.push_back(entry);
+            } else {
+                entry.pre = pre + L"さ";
+                entry.post = post + L"さ";
+                entries.push_back(entry);
+                entry.pre = pre + L"し";
+                entry.post = post + L"し";
+                entries.push_back(entry);
+                entry.pre = pre + L"せ";
+                entry.post = post + L"せ";
+                entries.push_back(entry);
+                entry.pre = pre + L"する";
+                entry.post = post + L"する";
+                entries.push_back(entry);
+                entry.pre = pre + L"すれ";
+                entry.post = post + L"すれ";
+                entries.push_back(entry);
+                entry.pre = pre + L"しろ";
+                entry.post = post + L"しろ";
+                entries.push_back(entry);
+                entry.pre = pre + L"せよ";
+                entry.post = post + L"せよ";
+                entries.push_back(entry);
+                entry.pre = pre + L"しよう";
+                entry.post = post + L"しよう";
+                entries.push_back(entry);
+            }
+        } else {
+            // エントリーを追加する。
+            entries.push_back(entry);
+        }
     }
 
     // close the file
