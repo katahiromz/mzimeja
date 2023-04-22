@@ -1699,9 +1699,12 @@ size_t Lattice::GetLastLinkedIndex() const
     return 0; // not found
 } // Lattice::GetLastLinkedIndex
 
-// ノードを追加する。
+// ノードを一つ追加する。
 void Lattice::AddNode(size_t index, const LatticeNode& node)
 {
+    // ノードを追加するとき、必ずこの関数を通る。
+    // 条件付きブレークポイントを設定して、呼び出し履歴を取得すれば、
+    // どのようにノードが追加されているのかが観測できる。
     ASSERT(index + node.pre.size() <= m_pre.size());
     m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
 }
