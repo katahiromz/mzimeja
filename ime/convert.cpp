@@ -2077,7 +2077,8 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
             AddNode(index, node);
         }
     } while (0);
-    // 「とまん(ない)」「さわん(ない)」
+    // 「とまら(ない)」→「とまん(ない)」
+    // 「さわら(ない)」→「さわん(ない)」
     do {
         WCHAR ch = L'ん';
         if (tail.empty() || tail[0] != ch || node.gyou != GYOU_RA) {
