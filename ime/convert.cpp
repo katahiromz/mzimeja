@@ -526,6 +526,9 @@ INT ConnectCost(const LatticeNode& n0, const LatticeNode& n1)
         ret += 5;
     if (h0 == HB_KANDOUSHI && h1 == HB_SHUU_JOSHI)
         ret += 300;
+    if (n0.post == L"し" && n1.post == L"ます")
+        ret -= 100;
+
     return ret;
 } // ConnectCost
 
@@ -2837,6 +2840,27 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
                 AddNode(index, node);
 
                 node.katsuyou = RENYOU_KEI;
+                AddNode(index, node);
+            }
+        }
+    }
+
+    // 禁止「するな」「ずるな」
+    if (tail.size() >= 3) {
+        if (node.gyou == GYOU_ZA) {
+            if (tail.substr(0, 2) == L"ずるな") {
+                node.pre = pre + L"ずるな";
+                node.post = post + L"ずるな";
+
+                node.katsuyou = SHUUSHI_KEI;
+                AddNode(index, node);
+            }
+        } else {
+            if (tail.substr(0, 2) == L"するな") {
+                node.pre = pre + L"するな";
+                node.post = post + L"するな";
+
+                node.katsuyou = SHUUSHI_KEI;
                 AddNode(index, node);
             }
         }
