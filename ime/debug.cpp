@@ -52,7 +52,7 @@ void DebugAssert(const char *file, int line, const char *exp)
 {
     DebugPrintA("%s (%d): ASSERT(%s) failed\n", file, line, exp);
 
-#if 1
+#if 0
     WCHAR szText[1024];
     StringCchPrintfW(szText, _countof(szText), L"%hs (%d): ASSERT(%hs) failed\n", file, line, exp);
     MessageBoxW(NULL, szText, L"Assertion Failure", MB_ICONERROR);
