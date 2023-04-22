@@ -1791,8 +1791,6 @@ size_t Lattice::GetLastLinkedIndex() const
 // ノードを一つ追加する。
 void Lattice::AddNode(size_t index, const LatticeNode& node)
 {
-    if (node.bunrui == HB_SAHEN_DOUSHI && node.pre.empty())
-        ASSERT(0);
     // ノードを追加するとき、必ずこの関数を通る。
     // ここで条件付きでブレークさせて、呼び出し履歴を取得すれば、
     // どのようにノードが追加されているのかが観測できる。
