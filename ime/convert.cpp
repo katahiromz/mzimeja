@@ -2074,6 +2074,17 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
             AddNode(index, node);
         }
     } while (0);
+    // 「とまん(ない)」「さわん(ない)」
+    do {
+        WCHAR ch = L'ん';
+        if (tail.empty() || tail[0] != ch || node.gyou != GYOU_RA) {
+            break;
+        }
+        node.katsuyou = MIZEN_KEI;
+        node.pre = fields[I_FIELD_PRE] + ch;
+        node.post = fields[I_FIELD_POST] + ch;
+        AddNode(index, node);
+    } while (0);
 
     // 五段動詞の連用形。
     // 「咲く(五段)」→「咲き(ます)」、「食う(五段)」→「食い(ます)」
@@ -3495,6 +3506,10 @@ BOOL MzIme::ConvertMultiClause(const std::wstring& str, MzConvResult& result, BO
     lattice.OptimizeMarking(lattice.m_head.get());
 
     MakeResultForMulti(result, lattice);
+
+    if (result.clauses.empty()) {
+        MakeResultOnFailure(result, pre);
+    }
 
     if (show_graphviz)
         ShowGraphviz(result);
