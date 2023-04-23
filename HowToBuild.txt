@@ -6,3 +6,12 @@ MinGW+MSYS2でもビルドできますが、WinXPサポートがありません�
 
 インストーラー作成には、Inno Setupを使います。
 WinXPにインストールするのであれば、古いInno Setup (5.6.1 (u))を使う必要があります。
+
+# How to build mzimeja
+
+To run on WinXP/Win2k3, build using the XP toolset in Visual Studio with WinXP support and Visual C++ installed.
+In the project settings, select the toolset with "xp" and build. Then it will run on XP.
+You can also build with MinGW+MSYS2, but it does not have WinXP support, and RosBE or older MinGW will not build.
+
+Inno Setup is used to create the installer.
+If you are installing on WinXP, you must use the older Inno Setup (5.6.1 (u)).
