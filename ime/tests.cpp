@@ -121,7 +121,7 @@ void DoPhrases(void)
 }
 
 // mzimejaのテスト。
-void IME_Test1(void)
+void IME_AutoTest(void)
 {
     DoEntry(L"てすとです", L"テスト|です");
 
@@ -166,7 +166,7 @@ InputDialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 // ダイアログを用いてテストする。
-void IME_Test2(void)
+void IME_ManualTest(void)
 {
     while (::DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_INPUTBOX),
                        NULL, InputDialogProc) == IDOK)
@@ -188,11 +188,11 @@ int wmain(int argc, wchar_t **argv)
         return 1;
     }
 
-    // テスト1。
-    IME_Test1();
+    // 自動テスト。
+    IME_AutoTest();
 
-    // テスト2。
-    IME_Test2();
+    // マニュアルテスト。
+    IME_ManualTest();
 
     g_basic_dict.Unload();
 
