@@ -7,28 +7,24 @@ echo ERROR: dict_compile.exe not found
 exit /b 1
 
 :label1
-build\dict_compile.exe res\mzimeja.dat res\mzimeja.dic
-build\dict_compile.exe res\name.dat res\name.dic
-build\dict_compile.exe res\testdata.dat res\testdata.dic
+set DICT_COMPILE=build\dict_compile.exe
 goto label5
 
 :label2
-build\Debug\dict_compile.exe res\mzimeja.dat res\mzimeja.dic
-build\Debug\dict_compile.exe res\name.dat res\name.dic
-build\Debug\dict_compile.exe res\testdata.dat res\testdata.dic
+set DICT_COMPILE=build\Debug\dict_compile.exe
 goto label5
 
 :label3
-build\Release\dict_compile.exe res\mzimeja.dat res\mzimeja.dic
-build\Release\dict_compile.exe res\name.dat res\name.dic
-build\Release\dict_compile.exe res\testdata.dat res\testdata.dic
+set DICT_COMPILE=build\Release\dict_compile.exe
 goto label5
 
 :label4
-..\build\Release\dict_compile.exe res\mzimeja.dat res\mzimeja.dic
-..\build\Release\dict_compile.exe res\name.dat res\name.dic
-..\build\Release\dict_compile.exe res\testdata.dat res\testdata.dic
+set DICT_COMPILE=..\build\Release\dict_compile.exe
 goto label5
 
 :label5
+%DICT_COMPILE% res\mzimeja.dat res\mzimeja.dic
+%DICT_COMPILE% res\name.dat res\name.dic
+%DICT_COMPILE% res\testdata.dat res\testdata.dic
+
 exit /b 0
