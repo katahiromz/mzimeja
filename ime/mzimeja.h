@@ -414,6 +414,12 @@ struct LatticeNode {
     bool HasTag(const wchar_t *tag) const {
         return tags.find(tag) != std::wstring::npos;
     }
+    // 単語コスト。
+    INT WordCost() const;
+    // 連結コスト。
+    INT ConnectCost(const LatticeNode& other) const;
+    // 連結可能性。
+    BOOL CanConnectTo(const LatticeNode& other) const;
 };
 typedef std::vector<LatticeNodePtr>   LatticeChunk;
 
