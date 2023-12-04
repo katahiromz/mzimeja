@@ -393,8 +393,7 @@ INT DoInstall(VOID) {
         return 3;
     }
 
-    DoMakeMZIMEJADefault();
-    //ShellExecuteW(NULL, NULL, L"control.exe", L"input.dll", NULL, SW_SHOWNORMAL);
+    ShellExecuteW(NULL, NULL, L"control.exe", L"input.dll", NULL, SW_SHOWNORMAL);
     return 0;
 } // DoInstall
 
