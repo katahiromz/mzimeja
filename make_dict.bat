@@ -23,7 +23,7 @@ set DICT_COMPILE=..\build\Release\dict_compile.exe
 goto label5
 
 :label5
-%DICT_COMPILE% res\mzimeja.dat res\mzimeja.dic
+%DICT_COMPILE% res\basic.dat res\basic.dic
 %DICT_COMPILE% res\name.dat res\name.dic
 %DICT_COMPILE% res\testdata.dat res\testdata.dic
 

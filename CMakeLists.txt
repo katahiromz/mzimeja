@@ -72,7 +72,7 @@ add_subdirectory(dict_compile)
 
 # Build the dictionary data
 add_custom_target(make_dict COMMAND cmd /C make_dict.bat
-    DEPENDS res/mzimeja.dat res/name.dat)
+    DEPENDS res/basic.dat res/name.dat)
 add_dependencies(make_dict dict_compile)
 
 ##############################################################################

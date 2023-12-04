@@ -122,7 +122,7 @@ bool do_load(void) {
 
   g_entries.reserve(60000);
 
-  FILE *fp = fopen("..\\mzimeja.dic", "rb");
+  FILE *fp = fopen("..\\basic.dic", "rb");
   if (fp == NULL) return false;
 
   int lineno = 0;
@@ -141,7 +141,7 @@ bool do_load(void) {
             str.find(L"[地名]") == std::wstring::npos &&
             str.find(L"[動植物]") == std::wstring::npos)
         {
-          //printf("..\\mzimeja.dic (%d): WARNING: non-common-use kanji found\n", lineno);
+          //printf("..\\basic.dic (%d): WARNING: non-common-use kanji found\n", lineno);
           break;
         }
       }
@@ -152,7 +152,7 @@ bool do_load(void) {
     unboost::split(fields, str, unboost::is_any_of(L"\t"));
 
     if (fields.empty()) {
-      printf("..\\mzimeja.dic (%d): WARNING: empty line\n", lineno);
+      printf("..\\basic.dic (%d): WARNING: empty line\n", lineno);
       continue;
     }
 
@@ -190,7 +190,7 @@ bool do_load(void) {
       else if (bunrui_str == L"接頭辞")       entry.bunrui = HB_SETTOUJI;
       else if (bunrui_str == L"接尾辞")       entry.bunrui = HB_SETSUBIJI;
       else {
-        printf("..\\mzimeja.dic (%d): WARNING: invalid bunrui\n", lineno);
+        printf("..\\basic.dic (%d): WARNING: invalid bunrui\n", lineno);
         continue;
       }
 

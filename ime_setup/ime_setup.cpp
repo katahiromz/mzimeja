@@ -53,7 +53,7 @@ LPWSTR GetSystemImePathName(LPWSTR pszPath) {
 }
 
 LPWSTR GetBasicDictPathName(LPWSTR pszPath) {
-    return FindLocalFile(pszPath, L"res\\mzimeja.dic");
+    return FindLocalFile(pszPath, L"res\\basic.dic");
 }
 
 LPWSTR GetNameDictPathName(LPWSTR pszPath) {
