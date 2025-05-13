@@ -972,7 +972,7 @@ BOOL Dict::IsLoaded() const
 // 文節にノードを追加する。
 void MzConvClause::add(const LatticeNode *node)
 {
-    for (auto& cand : candidates) {
+    for (MzConvCandidate& cand : candidates) {
         if (cand.post == node->post) {
             if (node->subtotal_cost < cand.cost) {
                 cand.cost = node->subtotal_cost;
@@ -1633,7 +1633,7 @@ INT Lattice::CalcSubTotalCosts(LatticeNode *ptr1)
     if (ptr1->reverse_branches.empty())
         min_cost = 0;
 
-    for (auto& ptr0 : ptr1->reverse_branches) {
+    for (LatticeNode *ptr0 : ptr1->reverse_branches) {
         INT word_cost = ptr1->WordCost();
         INT connect_cost = ptr0->ConnectCost(*ptr1);
         INT cost = CalcSubTotalCosts(ptr0);
@@ -1669,7 +1669,7 @@ void Lattice::UpdateLinksAndBranches()
         node.linked = 1;
         // 現在位置のノードを先頭ブランチに追加する。
         LatticeChunk& chunk1 = m_chunks[0];
-        for (auto& ptr1 : chunk1) {
+        for (LatticeNodePtr& ptr1 : chunk1) {
             if (node.CanConnectTo(*ptr1))
             {
                 ptr1->linked = 1;
@@ -1693,7 +1693,7 @@ void Lattice::UpdateLinksAndBranches()
         // インデックス位置のノード集合を取得。
         LatticeChunk& chunk1 = m_chunks[index];
         // 各ノードについて。
-        for (auto& ptr1 : chunk1) {
+        for (LatticeNodePtr& ptr1 : chunk1) {
             // リンク数がゼロならば無視。
             if (!ptr1->linked)
                 continue;
@@ -1703,7 +1703,7 @@ void Lattice::UpdateLinksAndBranches()
                 continue;
             // 連結可能であれば、リンク先をブランチに追加し、リンク先のリンク数を増やす。
             auto& chunk2 = m_chunks[index + ptr1->pre.size()];
-            for (auto& ptr2 : chunk2) {
+            for (LatticeNodePtr& ptr2 : chunk2) {
                 if (ptr1->CanConnectTo(*ptr2.get())) {
                     ptr1->branches.push_back(ptr2);
                     ptr2->linked++;
@@ -1718,7 +1718,7 @@ void Lattice::ResetLatticeInfo()
 {
     for (size_t index = 0; index < m_pre.size(); ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
-        for (auto& ptr1 : chunk1) {
+        for (LatticeNodePtr& ptr1 : chunk1) {
             ptr1->linked = 0;
             ptr1->branches.clear();
             ptr1->reverse_branches.clear();
@@ -1780,7 +1780,7 @@ size_t Lattice::GetLastLinkedIndex() const
     // チャンクを逆順でスキャンする。
     for (size_t index = m_pre.size(); index > 0; ) {
         --index;
-        for (auto& ptr : m_chunks[index]) {
+        for (std::shared_ptr<LatticeNode> ptr : m_chunks[index]) {
             if (ptr->linked) {
                 return index; // リンクされたノードが見つかった。
             }
@@ -2965,7 +2965,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     }
 
     if (pre.size() >= 3) {
-        auto lastTriChars = pre.substr(pre.size() - 3);
+        std::wstring lastTriChars = pre.substr(pre.size() - 3);
         if (node.gyou == GYOU_ZA) {
             if (lastTriChars == L"じよう") {
                 node.pre = pre;
@@ -3270,7 +3270,7 @@ void Lattice::MakeReverseBranches(LatticeNode *ptr0)
         return;
 
     size_t i = 0;
-    for (auto& ptr1 : ptr0->branches) {
+    for (LatticeNodePtr& ptr1 : ptr0->branches) {
         if (ptr1->reverse_branches.count(ptr0) == 0) {
             ptr1->reverse_branches.insert(ptr0);
             MakeReverseBranches(ptr1.get());
@@ -3361,7 +3361,7 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
     LatticeNode* ptr0 = lattice.m_head.get();
     while (ptr0 && ptr0 != lattice.m_tail.get()) {
         LatticeNode* target = NULL;
-        for (auto& ptr1 : ptr0->branches) {
+        for (LatticeNodePtr& ptr1 : ptr0->branches) {
             if (lattice.OptimizeMarking(ptr1.get())) {
                 target = ptr1.get();
                 break;
@@ -3371,7 +3371,7 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
         if (!target || target->bunrui == HB_TAIL)
             break;
 
-        for (auto& ptr1 : ptr0->branches) {
+        for (LatticeNodePtr& ptr1 : ptr0->branches) {
             if (ptr1.get() != target) {
                 ptr1->marked = FALSE;
             }
@@ -3380,7 +3380,7 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
         MzConvClause clause;
         clause.add(target);
 
-        for (auto& ptr1 : ptr0->branches) {
+        for (LatticeNodePtr& ptr1 : ptr0->branches) {
             if (target->pre.size() == ptr1->pre.size()) {
                 if (target != ptr1.get()) {
                     clause.add(ptr1.get());
@@ -3577,12 +3577,12 @@ void ShowGraphviz(const MzConvResult& result)
         fprintf(fout, "  edge [fontname=\"MS UI Gothic\"];\n");
 
         size_t i = 0;
-        for (auto& clause : result.clauses) {
-            for (auto& cand1 : clause.candidates) {
+        for (const MzConvClause& clause : result.clauses) {
+            for (const MzConvCandidate& cand1 : clause.candidates) {
                 if (i == 0) {
                     OutputGraphvizEdge(fout, NULL, &cand1);
                 } else {
-                    for (auto& cand0 : result.clauses[i - 1].candidates) {
+                    for (const MzConvCandidate& cand0 : result.clauses[i - 1].candidates) {
                         OutputGraphvizEdge(fout, &cand0, &cand1);
                     }
                 }
@@ -3665,7 +3665,7 @@ BOOL MzIme::ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman
 
     // 候補リストをセットする。
     LogCandList cand_list;
-    for (auto& cand2 : clause.candidates) {
+    for (MzConvCandidate& cand2 : clause.candidates) {
         cand_list.cand_strs.push_back(cand2.post);
     }
     ARRAY_AT(cand.cand_lists, iClause) = cand_list;
@@ -3829,7 +3829,7 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
         comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].post;
     } else {
         // ２つの文節情報をセットする。
-        auto& clause2 = result2.clauses[0];
+        MzConvClause& clause2 = result2.clauses[0];
         comp.extra.hiragana_clauses[iClause] = str1;
         comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].post;
         comp.extra.hiragana_clauses[iClause + 1] = str2;
@@ -3842,7 +3842,7 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     // 候補リストをセットする。
     {
         LogCandList cand_list;
-        for (auto& cand1 : clause1.candidates) {
+        for (MzConvCandidate& cand1 : clause1.candidates) {
             cand_list.cand_strs.push_back(cand1.post);
         }
         cand.cand_lists[iClause] = cand_list;
