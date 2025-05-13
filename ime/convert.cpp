@@ -1677,14 +1677,14 @@ void Lattice::UpdateLinksAndBranches()
                 node.branches.push_back(ptr1);
             }
         }
-        m_head = std::make_shared<LatticeNode>(node);
+        m_head = unboost::make_shared<LatticeNode>(node);
     }
 
     // 尻尾（テイル）を追加する。
     {
         LatticeNode node;
         node.bunrui = HB_TAIL;
-        m_tail = std::make_shared<LatticeNode>(node);
+        m_tail = unboost::make_shared<LatticeNode>(node);
         m_chunks[m_pre.size()].clear();
         m_chunks[m_pre.size()].push_back(m_tail);
     }
@@ -1740,7 +1740,7 @@ void Lattice::AddComplement()
     node.bunrui = HB_UNKNOWN;
     node.deltaCost = 0;
     node.pre = node.post = m_pre.substr(lastIndex);
-    m_chunks[lastIndex].push_back(std::make_shared<LatticeNode>(node));
+    m_chunks[lastIndex].push_back(unboost::make_shared<LatticeNode>(node));
     UpdateLinksAndBranches();
 } // Lattice::AddComplement
 
@@ -1782,7 +1782,7 @@ size_t Lattice::GetLastLinkedIndex() const
     // チャンクを逆順でスキャンする。
     for (size_t index = m_pre.size(); index > 0; ) {
         --index;
-        for (std::shared_ptr<LatticeNode> ptr : m_chunks[index]) {
+        for (unboost::shared_ptr<LatticeNode> ptr : m_chunks[index]) {
             if (ptr->linked) {
                 return index; // リンクされたノードが見つかった。
             }
@@ -1798,7 +1798,7 @@ void Lattice::AddNode(size_t index, const LatticeNode& node)
     // ここで条件付きでブレークさせて、呼び出し履歴を取得すれば、
     // どのようにノードが追加されているのかが観測できる。
     ASSERT(index + node.pre.size() <= m_pre.size());
-    m_chunks[index].push_back(std::make_shared<LatticeNode>(node));
+    m_chunks[index].push_back(unboost::make_shared<LatticeNode>(node));
 }
 
 // イ形容詞を変換する。

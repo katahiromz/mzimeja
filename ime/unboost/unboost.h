@@ -134,7 +134,7 @@
 /****************************************************************************/
 /* dependencies */
 
-/} Unboost's filesystem depends on system-specific system */
+/* Unboost's filesystem depends on system-specific system */
 #ifdef UNBOOST_USE_UNBOOST_FILESYSTEM
     #ifdef _WIN32
         #ifndef UNBOOST_USE_WIN32_SYSTEM

@@ -8,6 +8,9 @@
 
 #include "../targetver.h"   // target Windows version
 
+#include "unboost/unboost.h"
+#include "unboost/shared_ptr.hpp"
+
 #ifndef _INC_WINDOWS
     #include <windows.h>    // Windows
 #endif
@@ -19,7 +22,6 @@
 #include <vector>           // for std::vector
 #include <set>              // for std::unordered_set
 #include <map>              // for std::unordered_map
-#include <memory>           // for std::weak_ptr
 
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development
