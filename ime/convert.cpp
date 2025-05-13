@@ -435,7 +435,7 @@ INT LatticeNode::WordCost() const
 {
     INT ret = 20;
 
-    auto h = bunrui;
+    HinshiBunrui h = bunrui;
     if (h == HB_MEISHI)
         ret += 30;
     else if (IsJodoushi())
@@ -1702,7 +1702,7 @@ void Lattice::UpdateLinksAndBranches()
             if (!(index + ptr1->pre.size() <= m_pre.size()))
                 continue;
             // 連結可能であれば、リンク先をブランチに追加し、リンク先のリンク数を増やす。
-            auto& chunk2 = m_chunks[index + ptr1->pre.size()];
+            LatticeChunk& chunk2 = m_chunks[index + ptr1->pre.size()];
             for (LatticeNodePtr& ptr2 : chunk2) {
                 if (ptr1->CanConnectTo(*ptr2.get())) {
                     ptr1->branches.push_back(ptr2);
@@ -1761,7 +1761,7 @@ void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
 void Lattice::CutUnlinkedNodes()
 {
     for (size_t index = 0; index < m_pre.size(); ++index) {
-        auto& chunk1 = m_chunks[index];
+        LatticeChunk& chunk1 = m_chunks[index];
         auto it = std::remove_if(chunk1.begin(), chunk1.end(), [](const LatticeNodePtr& node) {
             return node->linked == 0;
         });
@@ -2884,7 +2884,7 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
     }
 
     if (pre.size() >= 2) {
-        auto lastTwoChars = pre.substr(pre.size() - 2);
+        std::wstring lastTwoChars = pre.substr(pre.size() - 2);
         // 終止形「～する」「～ずる」
         // 連用形「～する(とき)」「～ずる(とき)」
         if (node.gyou == GYOU_ZA) {
@@ -3589,7 +3589,7 @@ void ShowGraphviz(const MzConvResult& result)
             }
             ++i;
         }
-        for (auto& cand : result.clauses[i - 1].candidates) {
+        for (const MzConvCandidate& cand : result.clauses[i - 1].candidates) {
             OutputGraphvizEdge(fout, &cand, NULL);
         }
 
