@@ -1,4 +1,4 @@
-// keychar.cpp --- mzimeja keys and characters
+﻿// keychar.cpp --- mzimeja keys and characters
 // キー入力と文字。
 // (Japanese, UTF-8)
 
@@ -55,7 +55,8 @@ std::wstring translateString(const std::wstring& str)
     BOOL bNoZenkakuAscii = Config_GetDWORD(L"bNoZenkakuAscii", FALSE);
 
     std::wstring ret = str;
-    for (WCHAR& ch : ret) {
+    for (size_t ich = 0; ich < ret.size(); ++ich) {
+        WCHAR& ch = ret[ich];
         ch = translateChar(ch, bCommaPeriod, bNoZenkakuAscii);
     }
     return ret;

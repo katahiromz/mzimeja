@@ -1,4 +1,4 @@
-// input.cpp --- mzimeja input context and related
+﻿// input.cpp --- mzimeja input context and related
 // 入力コンテキスト関連。
 //////////////////////////////////////////////////////////////////////////////
 

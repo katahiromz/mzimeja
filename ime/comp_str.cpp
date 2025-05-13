@@ -1,4 +1,4 @@
-// comp_str.cpp --- composition string of mzimeja
+﻿// comp_str.cpp --- composition string of mzimeja
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"

@@ -1,4 +1,4 @@
-// convert.cpp --- mzimeja kana kanji conversion
+﻿// convert.cpp --- mzimeja kana kanji conversion
 // (Japanese, UTF-8)
 // かな漢字変換。
 //////////////////////////////////////////////////////////////////////////////
@@ -552,7 +552,9 @@ BOOL Lattice::OptimizeMarking(LatticeNode *ptr0)
     BOOL reach = (ptr0->bunrui == HB_TAIL);
     INT min_cost = MAXLONG;
     LatticeNode *min_node = NULL;
-    for (LatticeNodePtr& ptr1 : ptr0->branches) {
+    branches_t::iterator it, end = ptr0->branches.end();
+    for (it = ptr0->branches.begin(); it != end; ++it) {
+        LatticeNodePtr ptr1 = *it;
         if (OptimizeMarking(ptr1.get())) {
             reach = TRUE;
             if (ptr1->subtotal_cost < min_cost) {
@@ -562,9 +564,13 @@ BOOL Lattice::OptimizeMarking(LatticeNode *ptr0)
         }
     }
 
-    for (LatticeNodePtr& ptr1 : ptr0->branches) {
-        if (ptr1.get() != min_node) {
-            ptr1->marked = 0;
+    {
+        branches_t::iterator it, end = ptr0->branches.end();
+        for (it = ptr0->branches.begin(); it != end; ++it) {
+            LatticeNodePtr& ptr1 = *it;
+            if (ptr1.get() != min_node) {
+                ptr1->marked = 0;
+            }
         }
     }
 
@@ -720,12 +726,15 @@ static INT CALLBACK UserDictProc(LPCTSTR lpRead, DWORD dwStyle, LPCTSTR lpStr, L
 
     WStrings fields(NUM_FIELDS);
     fields[I_FIELD_PRE] = pre;
-    fields[I_FIELD_HINSHI] = { MAKEWORD(bunrui, gyou) };
+    fields[I_FIELD_HINSHI].resize(1);
+    fields[I_FIELD_HINSHI][0] = MAKEWORD(bunrui, gyou);
     fields[I_FIELD_POST] = post;
     fields[I_FIELD_TAGS] = L"[ユーザ辞書]";
 
     std::wstring record;
-    std::wstring sep = { FIELD_SEP };
+    std::wstring sep;
+    sep.resize(1);
+    sep[0] = FIELD_SEP;
     if (bunrui == HB_SAHEN_DOUSHI) {
         if (gyou == GYOU_ZA) {
             fields[I_FIELD_PRE] = pre + L"ざ";
@@ -972,7 +981,9 @@ BOOL Dict::IsLoaded() const
 // 文節にノードを追加する。
 void MzConvClause::add(const LatticeNode *node)
 {
-    for (MzConvCandidate& cand : candidates) {
+    candidates_t::iterator it, end = candidates.end();
+    for (it = candidates.begin(); it != end; ++it) {
+        MzConvCandidate& cand = *it;
         if (cand.post == node->post) {
             if (node->subtotal_cost < cand.cost) {
                 cand.cost = node->subtotal_cost;
@@ -999,24 +1010,29 @@ void MzConvClause::add(const LatticeNode *node)
     candidates.push_back(cand);
 }
 
+static inline bool 
+compare_candidate(const MzConvCandidate& cand1, const MzConvCandidate& cand2){
+    if (cand1.cost < cand2.cost)
+        return true;
+    if (cand1.cost > cand2.cost)
+        return false;
+    if (cand1.post < cand2.post)
+        return true;
+    if (cand1.post > cand2.post)
+        return false;
+    return false;
+}
+
+static inline bool 
+compare_candidate_by_post(const MzConvCandidate& cand1, const MzConvCandidate& cand2) {
+    return cand1.post == cand2.post;
+}
+
 // コストで候補をソートする。
 void MzConvClause::sort()
 {
-    std::sort(candidates.begin(), candidates.end(), [](const MzConvCandidate& cand1, const MzConvCandidate& cand2){
-        if (cand1.cost < cand2.cost)
-            return true;
-        if (cand1.cost > cand2.cost)
-            return false;
-        if (cand1.post < cand2.post)
-            return true;
-        if (cand1.post > cand2.post)
-            return false;
-        return false;
-    });
-    candidates.erase(std::unique(candidates.begin(), candidates.end(),
-        [](const MzConvCandidate& cand1, const MzConvCandidate& cand2){
-            return cand1.post == cand2.post;
-        }),
+    std::sort(candidates.begin(), candidates.end(), compare_candidate);
+    candidates.erase(std::unique(candidates.begin(), candidates.end(), compare_candidate_by_post),
         candidates.end()
     );
 }
@@ -1024,7 +1040,9 @@ void MzConvClause::sort()
 // コストで結果をソートする。
 void MzConvResult::sort()
 {
-    for (MzConvClause& clause : clauses) {
+    clauses_t::iterator it, end = clauses.end();
+    for (it = clauses.begin(); it != end; ++it) {
+        MzConvClause& clause = *it;
         clause.sort();
     }
 }
@@ -1103,7 +1121,8 @@ void Lattice::AddExtraNodes()
     if (m_pre == L"きょう") {
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
-        fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
+        fields[I_FIELD_HINSHI].resize(1);
+        fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_MEISHI, 0);
 
         StringCchPrintfW(sz, _countof(sz), L"%u年%u月%u日", st.wYear, st.wMonth, st.wDay);
         fields[I_FIELD_POST] = sz;
@@ -1166,7 +1185,8 @@ void Lattice::AddExtraNodes()
     if (m_pre == L"ことし") {
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
-        fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
+        fields[I_FIELD_HINSHI].resize(1);
+        fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_MEISHI, 0);
 
         StringCchPrintfW(sz, _countof(sz), L"%u年", st.wYear);
         fields[I_FIELD_POST] = sz;
@@ -1185,7 +1205,8 @@ void Lattice::AddExtraNodes()
     if (m_pre == L"こんげつ") {
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
-        fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
+        fields[I_FIELD_HINSHI].resize(1);
+        fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_MEISHI, 0);
 
         StringCchPrintfW(sz, _countof(sz), L"%u年%u月", st.wYear, st.wMonth);
         fields[I_FIELD_POST] = sz;
@@ -1214,7 +1235,8 @@ void Lattice::AddExtraNodes()
     if (m_pre == L"じこく" || m_pre == L"ただいま") {
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
-        fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
+        fields[I_FIELD_HINSHI].resize(1);
+        fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_MEISHI, 0);
 
         if (m_pre == L"ただいま") {
             fields[I_FIELD_POST] = L"ただ今";
@@ -1294,7 +1316,8 @@ void Lattice::AddExtraNodes()
     if (m_pre == L"にちじ") { // date and time
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
-        fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
+        fields[I_FIELD_HINSHI].resize(1);
+        fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_MEISHI, 0);
 
         StringCchPrintfW(sz, _countof(sz), L"%u年%u月%u日%u時%u分%u秒",
                          st.wYear, st.wMonth, st.wDay,
@@ -1327,7 +1350,8 @@ void Lattice::AddExtraNodes()
         if (::GetUserNameW(sz, &dwSize)) {
             WStrings fields(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre;
-            fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
+            fields[I_FIELD_HINSHI].resize(1);
+            fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_MEISHI, 0);
             fields[I_FIELD_POST] = sz;
             DoFields(0, fields);
         }
@@ -1341,8 +1365,10 @@ void Lattice::AddExtraNodes()
 
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
-        fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
-        for (std::wstring& item : items) {
+        fields[I_FIELD_HINSHI].resize(1);
+        fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_SYMBOL, 0);
+        for (size_t i = 0; i < items.size(); ++i) {
+            std::wstring& item = items[i];
             fields[I_FIELD_POST] = item;
             DoFields(0, fields);
         }
@@ -1390,7 +1416,8 @@ void Lattice::AddExtraNodes()
             WCHAR *pch = TheIME.LoadSTR(IDS_SYMBOLS + INT(i));
             WStrings fields(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre;
-            fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
+            fields[I_FIELD_HINSHI].resize(1);
+            fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_SYMBOL, 0);
             int cost = 0;
             while (*pch) {
                 fields[I_FIELD_POST].assign(1, *pch++);
@@ -1410,7 +1437,9 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
     ASSERT(length);
 
     // フィールド区切り（separator）。
-    std::wstring sep = { FIELD_SEP };
+    std::wstring sep;
+    sep.resize(1);
+    sep[0] = FIELD_SEP;
 
     WStrings fields, records;
     for (; index < length; ++index) {
@@ -1423,7 +1452,8 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
 
             fields.resize(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre.substr(saved, index - saved);
-            fields[I_FIELD_HINSHI] = { MAKEWORD(HB_PERIOD, 0) };
+            fields[I_FIELD_HINSHI].resize(1);
+            fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_PERIOD, 0);
             switch (index - saved) {
             case 2:
                 fields[I_FIELD_POST] += L'‥';
@@ -1449,7 +1479,8 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
 
             fields.resize(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre.substr(saved, index - saved);
-            fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
+            fields[I_FIELD_HINSHI].resize(1);
+            fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_SYMBOL, 0);
             switch (index - saved) {
             case 2:
                 fields[I_FIELD_POST] += L'‥';
@@ -1475,7 +1506,8 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
 
             fields.resize(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre.substr(saved, index - saved);
-            fields[I_FIELD_HINSHI] = { MAKEWORD(HB_COMMA, 0) };
+            fields[I_FIELD_HINSHI].resize(1);
+            fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_COMMA, 0);
             fields[I_FIELD_POST] = fields[I_FIELD_PRE];
             DoFields(saved, fields);
             --index;
@@ -1487,8 +1519,10 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
         {
             fields.resize(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre.substr(index, 2);
-            fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
-            fields[I_FIELD_POST] = { L'→' };
+            fields[I_FIELD_HINSHI].resize(1);
+            fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_SYMBOL, 0);
+            fields[I_FIELD_POST].resize(1);
+            fields[I_FIELD_POST][0] = L'→';
             DoFields(index, fields);
             ++index;
             continue;
@@ -1499,8 +1533,10 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
         {
             fields.resize(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre.substr(index, 2);
-            fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
-            fields[I_FIELD_POST] = { L'←' };
+            fields[I_FIELD_HINSHI].resize(1);
+            fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_SYMBOL, 0);
+            fields[I_FIELD_POST].resize(1);
+            fields[I_FIELD_POST][0] = L'←';
             DoFields(index, fields);
             ++index;
             continue;
@@ -1524,8 +1560,10 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
             if (ch2) {
                 fields.resize(NUM_FIELDS);
                 fields[I_FIELD_PRE] = m_pre.substr(index, 2);
-                fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
-                fields[I_FIELD_POST] = { ch2 };
+                fields[I_FIELD_HINSHI].resize(1);
+                fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_SYMBOL, 0);
+                fields[I_FIELD_POST].resize(1);
+                fields[I_FIELD_POST][0] = ch2;
                 DoFields(index, fields, -100);
                 ++index;
                 continue;
@@ -1540,7 +1578,8 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
 
             fields.resize(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre.substr(saved, index - saved);
-            fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
+            fields[I_FIELD_HINSHI].resize(1);
+            fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_MEISHI, 0);
             fields[I_FIELD_POST] = fields[I_FIELD_PRE];
             DoMeishi(saved, fields);
 
@@ -1579,7 +1618,8 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
         DPRINTW(L"ScanUserDict(%c) count: %d\n", m_pre[index], count);
 
         // 各レコードをフィールドに分割し、処理する。
-        for (std::wstring& record : records) {
+        for (size_t i = 0; i < records.size(); ++i) {
+            std::wstring& record = records[i];
             str_split(fields, record, sep);
             DoFields(index, fields);
         }
@@ -1588,11 +1628,25 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
     return TRUE;
 } // Lattice::AddNodesFromDict
 
+struct lattice_compare
+{
+    std::wstring m_pre;
+    lattice_compare(std::wstring pre) : m_pre(pre)
+    {
+    }
+
+    bool operator()(const LatticeNodePtr& n) const {
+        return n->pre.size() != m_pre.size();
+    }
+};
+
 // 単一文節変換用のノード群を追加する。
 BOOL Lattice::AddNodesFromDict(const WCHAR *dict_data)
 {
     // 区切りを準備。
-    std::wstring sep = { FIELD_SEP };
+    std::wstring sep;
+    sep.resize(1);
+    sep[0] = FIELD_SEP;
 
     // 基本辞書をスキャンする。
     WStrings fields, records;
@@ -1604,17 +1658,18 @@ BOOL Lattice::AddNodesFromDict(const WCHAR *dict_data)
     DPRINTW(L"ScanUserDict(%c) count: %d\n", m_pre[0], count);
 
     // 各レコードをフィールドに分割して処理。
-    for (std::wstring& record : records) {
+    for (size_t i = 0; i < records.size(); ++i) {
+        std::wstring& record = records[i];
         str_split(fields, record, sep);
         DoFields(0, fields);
     }
 
+    lattice_compare compare(m_pre);
+
     // 異なるサイズのノードを削除する。
     for (size_t i = 0; i < m_chunks[0].size(); ++i) {
         LatticeChunk::iterator it;
-        it = std::remove_if(m_chunks[0].begin(), m_chunks[0].end(), [this](const LatticeNodePtr& n) {
-            return n->pre.size() != m_pre.size();
-        });
+        it = std::remove_if(m_chunks[0].begin(), m_chunks[0].end(), compare);
         m_chunks[0].erase(it, m_chunks[0].end());
     }
 
@@ -1634,7 +1689,9 @@ INT Lattice::CalcSubTotalCosts(LatticeNode *ptr1)
     if (ptr1->reverse_branches.empty())
         min_cost = 0;
 
-    for (LatticeNode *ptr0 : ptr1->reverse_branches) {
+    reverse_branches_t::iterator it, end = ptr1->reverse_branches.end();
+    for (it = ptr1->reverse_branches.begin(); it != end; ++it) {
+        LatticeNode *ptr0 = *it;
         INT word_cost = ptr1->WordCost();
         INT connect_cost = ptr0->ConnectCost(*ptr1);
         INT cost = CalcSubTotalCosts(ptr0);
@@ -1670,9 +1727,10 @@ void Lattice::UpdateLinksAndBranches()
         node.linked = 1;
         // 現在位置のノードを先頭ブランチに追加する。
         LatticeChunk& chunk1 = m_chunks[0];
-        for (LatticeNodePtr& ptr1 : chunk1) {
-            if (node.CanConnectTo(*ptr1))
-            {
+        LatticeChunk::iterator it, end = chunk1.end();
+        for (it = chunk1.begin(); it != end; ++it) {
+            LatticeNodePtr& ptr1 = *it;
+            if (node.CanConnectTo(*ptr1)) {
                 ptr1->linked = 1;
                 node.branches.push_back(ptr1);
             }
@@ -1694,7 +1752,9 @@ void Lattice::UpdateLinksAndBranches()
         // インデックス位置のノード集合を取得。
         LatticeChunk& chunk1 = m_chunks[index];
         // 各ノードについて。
-        for (LatticeNodePtr& ptr1 : chunk1) {
+        LatticeChunk::iterator it, end = chunk1.end();
+        for (it = chunk1.begin(); it != end; ++it) {
+            LatticeNodePtr& ptr1 = *it;
             // リンク数がゼロならば無視。
             if (!ptr1->linked)
                 continue;
@@ -1704,10 +1764,14 @@ void Lattice::UpdateLinksAndBranches()
                 continue;
             // 連結可能であれば、リンク先をブランチに追加し、リンク先のリンク数を増やす。
             LatticeChunk& chunk2 = m_chunks[index + ptr1->pre.size()];
-            for (LatticeNodePtr& ptr2 : chunk2) {
-                if (ptr1->CanConnectTo(*ptr2.get())) {
-                    ptr1->branches.push_back(ptr2);
-                    ptr2->linked++;
+            {
+                LatticeChunk::iterator it, end = chunk2.end();
+                for (it = chunk2.begin(); it != end; ++it) {
+                    LatticeNodePtr& ptr2 = *it;
+                    if (ptr1->CanConnectTo(*ptr2.get())) {
+                        ptr1->branches.push_back(ptr2);
+                        ptr2->linked++;
+                    }
                 }
             }
         }
@@ -1719,7 +1783,9 @@ void Lattice::ResetLatticeInfo()
 {
     for (size_t index = 0; index < m_pre.size(); ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
-        for (LatticeNodePtr& ptr1 : chunk1) {
+        LatticeChunk::iterator it, end = chunk1.end();
+        for (it = chunk1.begin(); it != end; ++it) {
+            LatticeNodePtr& ptr1 = *it;
             ptr1->linked = 0;
             ptr1->branches.clear();
             ptr1->reverse_branches.clear();
@@ -1748,7 +1814,8 @@ void Lattice::AddComplement()
 void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
 {
     WStrings fields(NUM_FIELDS);
-    fields[I_FIELD_HINSHI] = { MAKEWORD(HB_MEISHI, 0) };
+    fields[I_FIELD_HINSHI].resize(1);
+    fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_MEISHI, 0);
     for (size_t count = min_size; count <= max_size; ++count) {
         if (m_pre.size() < index + count)
             continue;
@@ -1758,15 +1825,17 @@ void Lattice::AddComplement(size_t index, size_t min_size, size_t max_size)
     }
 } // Lattice::AddComplement
 
+static inline bool latice_compare_by_linked(const LatticeNodePtr& node) {
+    return node->linked == 0;
+}
+
 // リンクされていないノードを削除。
 void Lattice::CutUnlinkedNodes()
 {
     for (size_t index = 0; index < m_pre.size(); ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
         LatticeChunk::iterator it;
-        it = std::remove_if(chunk1.begin(), chunk1.end(), [](const LatticeNodePtr& node) {
-            return node->linked == 0;
-        });
+        it = std::remove_if(chunk1.begin(), chunk1.end(), latice_compare_by_linked);
         chunk1.erase(it, chunk1.end());
     }
 } // Lattice::CutUnlinkedNodes
@@ -1782,7 +1851,10 @@ size_t Lattice::GetLastLinkedIndex() const
     // チャンクを逆順でスキャンする。
     for (size_t index = m_pre.size(); index > 0; ) {
         --index;
-        for (unboost::shared_ptr<LatticeNode> ptr : m_chunks[index]) {
+        const LatticeChunk& chunk = m_chunks[index];
+        LatticeChunk::const_iterator it, end = chunk.end();
+        for (it = chunk.begin(); it != end; ++it) {
+            unboost::shared_ptr<LatticeNode> ptr = *it;
             if (ptr->linked) {
                 return index; // リンクされたノードが見つかった。
             }
@@ -3088,7 +3160,8 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L'た';
         new_fields[I_FIELD_POST] += L'た';
-        new_fields[I_FIELD_HINSHI] = { MAKEWORD(HB_GODAN_DOUSHI, GYOU_RA) };
+        new_fields[I_FIELD_HINSHI].resize(1);
+        new_fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_GODAN_DOUSHI, GYOU_RA);
         DoGodanDoushi(index, new_fields, deltaCost);
     }
 
@@ -3097,7 +3170,8 @@ void Lattice::DoMeishi(size_t index, const WStrings& fields, INT deltaCost)
         WStrings new_fields = fields;
         new_fields[I_FIELD_PRE] += L"でき";
         new_fields[I_FIELD_POST] += L"でき";
-        new_fields[I_FIELD_HINSHI] = { MAKEWORD(HB_ICHIDAN_DOUSHI, GYOU_RA) };
+        new_fields[I_FIELD_HINSHI].resize(1);
+        new_fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_ICHIDAN_DOUSHI, GYOU_RA);
         DoIchidanDoushi(index, fields, deltaCost - 10);
     }
 } // Lattice::DoMeishi
@@ -3272,7 +3346,9 @@ void Lattice::MakeReverseBranches(LatticeNode *ptr0)
         return;
 
     size_t i = 0;
-    for (LatticeNodePtr& ptr1 : ptr0->branches) {
+    branches_t::iterator it, end = ptr0->branches.end();
+    for (it = ptr0->branches.begin(); it != end; ++it) {
+        LatticeNodePtr& ptr1 = *it;
         if (ptr1->reverse_branches.count(ptr0) == 0) {
             ptr1->reverse_branches.insert(ptr0);
             MakeReverseBranches(ptr1.get());
@@ -3363,29 +3439,41 @@ void MzIme::MakeResultForMulti(MzConvResult& result, Lattice& lattice)
     LatticeNode* ptr0 = lattice.m_head.get();
     while (ptr0 && ptr0 != lattice.m_tail.get()) {
         LatticeNode* target = NULL;
-        for (LatticeNodePtr& ptr1 : ptr0->branches) {
-            if (lattice.OptimizeMarking(ptr1.get())) {
-                target = ptr1.get();
-                break;
+        {
+            branches_t::iterator it, end = ptr0->branches.end();
+            for (it = ptr0->branches.begin(); it != end; ++it) {
+                LatticeNodePtr& ptr1 = *it;
+                if (lattice.OptimizeMarking(ptr1.get())) {
+                    target = ptr1.get();
+                    break;
+                }
             }
         }
 
         if (!target || target->bunrui == HB_TAIL)
             break;
 
-        for (LatticeNodePtr& ptr1 : ptr0->branches) {
-            if (ptr1.get() != target) {
-                ptr1->marked = FALSE;
+        {
+            branches_t::iterator it, end = ptr0->branches.end();
+            for (it = ptr0->branches.begin(); it != end; ++it) {
+                LatticeNodePtr& ptr1 = *it;
+                if (ptr1.get() != target) {
+                    ptr1->marked = FALSE;
+                }
             }
         }
 
         MzConvClause clause;
         clause.add(target);
 
-        for (LatticeNodePtr& ptr1 : ptr0->branches) {
-            if (target->pre.size() == ptr1->pre.size()) {
-                if (target != ptr1.get()) {
-                    clause.add(ptr1.get());
+        {
+            branches_t::iterator it, end = ptr0->branches.end();
+            for (it = ptr0->branches.begin(); it != end; ++it) {
+                LatticeNodePtr& ptr1 = *it;
+                if (target->pre.size() == ptr1->pre.size()) {
+                    if (target != ptr1.get()) {
+                        clause.add(ptr1.get());
+                    }
                 }
             }
         }
@@ -3579,20 +3667,34 @@ void ShowGraphviz(const MzConvResult& result)
         fprintf(fout, "  edge [fontname=\"MS UI Gothic\"];\n");
 
         size_t i = 0;
-        for (const MzConvClause& clause : result.clauses) {
-            for (const MzConvCandidate& cand1 : clause.candidates) {
-                if (i == 0) {
-                    OutputGraphvizEdge(fout, NULL, &cand1);
-                } else {
-                    for (const MzConvCandidate& cand0 : result.clauses[i - 1].candidates) {
-                        OutputGraphvizEdge(fout, &cand0, &cand1);
+        {
+            clauses_t::const_iterator it0, end0 = result.clauses.end();
+            for (it0 = result.clauses.begin(); it0 != end0; ++it0) {
+                const MzConvClause& clause = *it0;
+
+                candidates_t::const_iterator it1, end1 = clause.candidates.end();
+                for (it1 = clause.candidates.begin(); it1 != end1; ++it1) {
+                    const MzConvCandidate& cand1 = *it1;
+                    if (i == 0) {
+                        OutputGraphvizEdge(fout, NULL, &cand1);
+                    } else {
+                        candidates_t::const_iterator it2, end2 = result.clauses[i - 1].candidates.end();
+                        for (it2 = result.clauses[i - 1].candidates.begin(); it2 != end2; ++it2) {
+                            const MzConvCandidate& cand0 = *it2;
+                            OutputGraphvizEdge(fout, &cand0, &cand1);
+                        }
                     }
                 }
+                ++i;
             }
-            ++i;
         }
-        for (const MzConvCandidate& cand : result.clauses[i - 1].candidates) {
-            OutputGraphvizEdge(fout, &cand, NULL);
+
+        {
+            candidates_t::const_iterator it, end = result.clauses[i - 1].candidates.end();
+            for (it = result.clauses[i - 1].candidates.begin(); it != end; ++it) {
+                const MzConvCandidate& cand = *it;
+                OutputGraphvizEdge(fout, &cand, NULL);
+            }
         }
 
         fprintf(fout, "}\n");
@@ -3667,8 +3769,12 @@ BOOL MzIme::ConvertSingleClause(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman
 
     // 候補リストをセットする。
     LogCandList cand_list;
-    for (MzConvCandidate& cand2 : clause.candidates) {
-        cand_list.cand_strs.push_back(cand2.post);
+    {
+        candidates_t::iterator it, end = clause.candidates.end();
+        for (it = clause.candidates.begin(); it != end; ++it) {
+            MzConvCandidate& cand2 = *it;
+            cand_list.cand_strs.push_back(cand2.post);
+        }
     }
     ARRAY_AT(cand.cand_lists, iClause) = cand_list;
 
@@ -3755,15 +3861,21 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     // 候補リストをセットする。
     {
         LogCandList cand_list;
-        for (MzConvCandidate& cand1 : clause1.candidates) {
+        candidates_t::iterator it, end = clause1.candidates.end();
+        for (it = clause1.candidates.begin(); it != end; ++it) {
+            MzConvCandidate& cand1 = *it;
             cand_list.cand_strs.push_back(cand1.post);
         }
         cand.cand_lists[iClause] = cand_list;
     }
     {
         LogCandList cand_list;
-        for (MzConvCandidate& cand2 : clause2.candidates) {
-            cand_list.cand_strs.push_back(cand2.post);
+        {
+            candidates_t::iterator it, end = clause2.candidates.end();
+            for (it = clause2.candidates.begin(); it != end; ++it) {
+                MzConvCandidate& cand2 = *it;
+                cand_list.cand_strs.push_back(cand2.post);
+            }
         }
         if (bSplitted) {
             cand.cand_lists.push_back(cand_list);
@@ -3844,7 +3956,9 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     // 候補リストをセットする。
     {
         LogCandList cand_list;
-        for (MzConvCandidate& cand1 : clause1.candidates) {
+        candidates_t::iterator it, end = clause1.candidates.end();
+        for (it = clause1.candidates.begin(); it != end; ++it) {
+            MzConvCandidate& cand1 = *it;
             cand_list.cand_strs.push_back(cand1.post);
         }
         cand.cand_lists[iClause] = cand_list;
@@ -3852,7 +3966,9 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     if (str2.size()) {
         MzConvClause& clause2 = result2.clauses[0];
         LogCandList cand_list;
-        for (MzConvCandidate& cand2 : clause2.candidates) {
+        candidates_t::iterator it, end = clause2.candidates.end();
+        for (it = clause2.candidates.begin(); it != end; ++it) {
+            MzConvCandidate& cand2 = *it;
             cand_list.cand_strs.push_back(cand2.post);
         }
         cand.cand_lists[iClause + 1] = cand_list;
@@ -4046,7 +4162,9 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
     comp.comp_clause.resize(result.clauses.size() + 1);
     for (size_t iClause = 0; iClause < result.clauses.size(); ++iClause) {
         const MzConvClause& clause = result.clauses[iClause];
-        for (const MzConvCandidate& cand2 : clause.candidates) {
+        candidates_t::const_iterator it, end = clause.candidates.end();
+        for (it = clause.candidates.begin(); it != end; ++it) {
+            const MzConvCandidate& cand2 = *it;
             comp.comp_clause[iClause] = (DWORD)comp.comp_str.size();
             comp.extra.hiragana_clauses.push_back(cand2.pre);
             std::wstring typing = hiragana_to_typing(cand2.pre);
@@ -4064,9 +4182,13 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
 
     // 候補情報をセット。
     cand.clear();
-    for (const MzConvClause& clause : result.clauses) {
+    clauses_t::const_iterator it0, end0 = result.clauses.end();
+    for (it0 = result.clauses.begin(); it0 != end0; ++it0) {
+        const MzConvClause& clause = *it0;
         LogCandList cand_list;
-        for (const MzConvCandidate& cand2 : clause.candidates) {
+        candidates_t::const_iterator it1, end1 = clause.candidates.end();
+        for (it1 = clause.candidates.begin(); it1 != end1; ++it1) {
+            const MzConvCandidate& cand2 = *it1;
             cand_list.cand_strs.push_back(cand2.post);
         }
         cand.cand_lists.push_back(cand_list);
@@ -4094,7 +4216,9 @@ std::wstring MzConvResult::get_str(bool detailed) const
 {
     std::wstring ret;
     size_t iClause = 0;
-    for (const MzConvClause& clause : clauses) {
+    clauses_t::const_iterator it0, end0 = clauses.end();
+    for (it0 = clauses.begin(); it0 != end0; ++it0) {
+        const MzConvClause& clause = *it0;
         if (iClause)
             ret += L"|";
         if (clause.candidates.size() == 1 || !detailed) {
@@ -4102,7 +4226,9 @@ std::wstring MzConvResult::get_str(bool detailed) const
         } else {
             ret += L"(";
             size_t iCand = 0;
-            for (const MzConvCandidate& cand : clause.candidates) {
+            candidates_t::const_iterator it1, end1 = clause.candidates.end();
+            for (it1 = clause.candidates.begin(); it1 != end1; ++it1) {
+                const MzConvCandidate& cand = *it1;
                 if (iCand)
                     ret += L"|";
                 ret += cand.post;
@@ -4110,12 +4236,12 @@ std::wstring MzConvResult::get_str(bool detailed) const
                 if (cand.word_cost == MAXLONG)
                     ret += L"∞";
                 else
-                    ret += std::to_wstring(cand.word_cost);
+                    ret += unboost::to_wstring(cand.word_cost);
                 ret += L":";
                 if (cand.cost == MAXLONG)
                     ret += L"∞";
                 else
-                    ret += std::to_wstring(cand.cost);
+                    ret += unboost::to_wstring(cand.cost);
                 ret += L":";
                 ret += HinshiToString(cand.bunrui);
                 if (cand.bunrui == HB_GODAN_DOUSHI) {

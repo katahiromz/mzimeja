@@ -1,4 +1,4 @@
-// mzimeja.h --- MZ-IME Japanese Input (mzimeja)
+﻿// mzimeja.h --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
 // (Japanese, UTF-8)
 
@@ -10,6 +10,7 @@
 
 #include "unboost/unboost.h"
 #include "unboost/shared_ptr.hpp"
+#include "unboost/conversion.hpp"
 
 #ifndef _INC_WINDOWS
     #include <windows.h>    // Windows
@@ -20,8 +21,8 @@
 
 #include <string>           // for std::string, std::wstring, ...
 #include <vector>           // for std::vector
-#include <set>              // for std::unordered_set
-#include <map>              // for std::unordered_map
+#include <set>              // for std::set
+#include <map>              // for std::map
 
 #include "indicml.h"        // for system indicator
 #include "immdev.h"         // for IME/IMM development
@@ -388,7 +389,9 @@ std::wstring translateString(const std::wstring& str);
 // 言語学でよく扱われるラティス構造を実現する。
 
 struct LatticeNode;
-typedef std::shared_ptr<LatticeNode>  LatticeNodePtr;
+typedef unboost::shared_ptr<LatticeNode>  LatticeNodePtr;
+typedef std::vector<LatticeNodePtr> branches_t;
+typedef std::set<LatticeNode*> reverse_branches_t;
 
 // ラティス（lattice）ノード。
 struct LatticeNode {
@@ -396,16 +399,24 @@ struct LatticeNode {
     std::wstring post;                      // 変換後。
     std::wstring tags;                      // タグ。
     HinshiBunrui bunrui;                    // 分類。
-    INT deltaCost = 0;                      // コスト差分。
-    INT subtotal_cost = MAXLONG;            // 部分合計コスト。
-    INT marked = 0;                         // マーキング。
+    INT deltaCost;                          // コスト差分。
+    INT subtotal_cost;                      // 部分合計コスト。
+    INT marked;                             // マーキング。
     Gyou gyou;                              // 活用の行。
     KatsuyouKei katsuyou;                   // 動詞活用形。
-    DWORD linked = 0;                       // リンク数。
+    DWORD linked;                           // リンク数。
     // 枝分かれ。
-    std::vector<LatticeNodePtr> branches;
+    branches_t branches;
     // 逆向き枝分かれ。
-    std::set<LatticeNode*> reverse_branches;
+    reverse_branches_t reverse_branches;
+
+    LatticeNode()
+        : deltaCost(0)
+        , subtotal_cost(MAXLONG)
+        , marked(0)
+        , linked(0)
+    {
+    }
 
     bool IsDoushi() const;      // 動詞か？
     bool IsJoshi() const;       // 助詞か？
@@ -423,7 +434,7 @@ struct LatticeNode {
     // 連結可能性。
     BOOL CanConnectTo(const LatticeNode& other) const;
 };
-typedef std::vector<LatticeNodePtr>   LatticeChunk;
+typedef std::vector<LatticeNodePtr> LatticeChunk;
 
 // ラティス。
 struct Lattice {
@@ -471,12 +482,18 @@ protected:
 struct MzConvCandidate {
     std::wstring pre;              // ひらがな。
     std::wstring post;             // 変換後。
-    INT cost = 0;                  // コスト。
-    INT word_cost = 0;             // 単語コスト。
-    std::set<HinshiBunrui>  bunruis;    // 品詞分類集合。
+    INT cost;                      // コスト。
+    INT word_cost;                 // 単語コスト。
+    std::set<HinshiBunrui> bunruis; // 品詞分類集合。
     std::wstring tags;             // タグ。
     HinshiBunrui bunrui;           // 品詞分類。
     KatsuyouKei katsuyou;          // 活用形。
+
+    MzConvCandidate()
+        : cost(0)
+        , word_cost(0)
+    {
+    }
 
     void clear() {
         pre.clear();
@@ -487,9 +504,11 @@ struct MzConvCandidate {
     }
 };
 
+typedef std::vector<MzConvCandidate> candidates_t;
+
 // 変換文節。
 struct MzConvClause {
-    std::vector<MzConvCandidate> candidates;    // 候補群。
+    candidates_t candidates; // 候補群。
     void sort();                                // ソートする。
     void add(const LatticeNode *node);          // ノードを追加する。
 
@@ -498,9 +517,11 @@ struct MzConvClause {
     }
 };
 
+typedef std::vector<MzConvClause> clauses_t;
+
 // 変換結果。
 struct MzConvResult {
-    std::vector<MzConvClause> clauses;      // 文節群。
+    clauses_t clauses;      // 文節群。
     void sort();                            // ソートする。
     void clear() { clauses.clear(); }       // クリアする。
     std::wstring get_str(bool detailed = false) const;

@@ -1,4 +1,4 @@
-// dict_compile.cpp --- dictionary compiler of MZ-IME Japanese Input
+﻿// dict_compile.cpp --- dictionary compiler of MZ-IME Japanese Input
 /////////////////////////////////////////////////////////////////////////////
 // (Japanese, UTF-8)
 
@@ -28,8 +28,8 @@ static const wchar_t s_hiragana_table[][5] = {
     {L'ん', 0, 0, 0, 0},                   // GYOU_NN
 };
 
-std::unordered_map<WCHAR,Dan>   g_hiragana_to_dan;      // 母音写像。
-std::unordered_map<WCHAR,Gyou>  g_hiragana_to_gyou;  // 子音写像。
+std::map<WCHAR,Dan>   g_hiragana_to_dan;   // 母音写像。
+std::map<WCHAR,Gyou>  g_hiragana_to_gyou;  // 子音写像。
 
 // 写像を準備する。
 void MakeLiteralMaps() {

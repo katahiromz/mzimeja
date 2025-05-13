@@ -13,7 +13,6 @@
 #include <vector>           // for std::vector
 #include <set>              // for std::set
 #include <map>              // for std::map
-#include <unordered_map>    // for std::unordered_map
 #include <algorithm>        // for std::sort
 
 #include <cstdlib>          // for C standard library

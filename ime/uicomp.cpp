@@ -1,4 +1,4 @@
-// uicomp.cpp --- mzimeja composition window UI
+﻿// uicomp.cpp --- mzimeja composition window UI
 // 未確定文字列ウィンドウ。
 //////////////////////////////////////////////////////////////////////////////
 

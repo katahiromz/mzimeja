@@ -1,4 +1,4 @@
-// main.cpp --- MZ-IME Japanese Input (mzimeja)
+﻿// main.cpp --- MZ-IME Japanese Input (mzimeja)
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"

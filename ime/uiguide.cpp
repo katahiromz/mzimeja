@@ -1,4 +1,4 @@
-// uiguide.cpp --- mzimeja guideline window UI
+﻿// uiguide.cpp --- mzimeja guideline window UI
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"

@@ -1,4 +1,4 @@
-// input.h --- mzimeja input context and related
+﻿// input.h --- mzimeja input context and related
 //////////////////////////////////////////////////////////////////////////////
 // (Japanese, UTF-8)
 
