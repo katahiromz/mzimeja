@@ -121,7 +121,7 @@ LPCWSTR BunruiToString(HinshiBunrui bunrui)
 // 品詞の連結可能性を計算する関数。
 BOOL LatticeNode::CanConnectTo(const LatticeNode& other) const
 {
-    auto h0 = bunrui, h1 = other.bunrui;
+    HinshiBunrui h0 = bunrui, h1 = other.bunrui;
 
     if (h0 == HB_HEAD && (h1 == HB_SETSUBIJI || h1 == HB_SHUU_JOSHI))
         return FALSE;
@@ -488,7 +488,7 @@ INT LatticeNode::WordCost() const
 // 連結コストの計算。
 INT LatticeNode::ConnectCost(const LatticeNode& other) const
 {
-    auto h0 = bunrui, h1 = other.bunrui;
+    HinshiBunrui h0 = bunrui, h1 = other.bunrui;
     if (h0 == HB_HEAD || h1 == HB_TAIL)
         return 0;
     if (h1 == HB_PERIOD || h1 == HB_COMMA)
@@ -552,7 +552,7 @@ BOOL Lattice::OptimizeMarking(LatticeNode *ptr0)
     BOOL reach = (ptr0->bunrui == HB_TAIL);
     INT min_cost = MAXLONG;
     LatticeNode *min_node = NULL;
-    for (auto& ptr1 : ptr0->branches) {
+    for (LatticeNodePtr& ptr1 : ptr0->branches) {
         if (OptimizeMarking(ptr1.get())) {
             reach = TRUE;
             if (ptr1->subtotal_cost < min_cost) {
@@ -562,7 +562,7 @@ BOOL Lattice::OptimizeMarking(LatticeNode *ptr0)
         }
     }
 
-    for (auto& ptr1 : ptr0->branches) {
+    for (LatticeNodePtr& ptr1 : ptr0->branches) {
         if (ptr1.get() != min_node) {
             ptr1->marked = 0;
         }
@@ -1024,7 +1024,7 @@ void MzConvClause::sort()
 // コストで結果をソートする。
 void MzConvResult::sort()
 {
-    for (auto& clause : clauses) {
+    for (MzConvClause& clause : clauses) {
         clause.sort();
     }
 }
@@ -1342,7 +1342,7 @@ void Lattice::AddExtraNodes()
         WStrings fields(NUM_FIELDS);
         fields[I_FIELD_PRE] = m_pre;
         fields[I_FIELD_HINSHI] = { MAKEWORD(HB_SYMBOL, 0) };
-        for (auto& item : items) {
+        for (std::wstring& item : items) {
             fields[I_FIELD_POST] = item;
             DoFields(0, fields);
         }
@@ -1579,7 +1579,7 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
         DPRINTW(L"ScanUserDict(%c) count: %d\n", m_pre[index], count);
 
         // 各レコードをフィールドに分割し、処理する。
-        for (auto& record : records) {
+        for (std::wstring& record : records) {
             str_split(fields, record, sep);
             DoFields(index, fields);
         }
@@ -1604,7 +1604,7 @@ BOOL Lattice::AddNodesFromDict(const WCHAR *dict_data)
     DPRINTW(L"ScanUserDict(%c) count: %d\n", m_pre[0], count);
 
     // 各レコードをフィールドに分割して処理。
-    for (auto& record : records) {
+    for (std::wstring& record : records) {
         str_split(fields, record, sep);
         DoFields(0, fields);
     }
@@ -3740,8 +3740,8 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     }
 
     // 未確定文字列をセット。
-    auto& clause1 = result1.clauses[0];
-    auto& clause2 = result2.clauses[0];
+    MzConvClause& clause1 = result1.clauses[0];
+    MzConvClause& clause2 = result2.clauses[0];
     comp.extra.hiragana_clauses[iClause] = str1;
     comp.extra.comp_str_clauses[iClause] = clause1.candidates[0].post;
     comp.extra.hiragana_clauses[iClause + 1] = str2;
@@ -3753,14 +3753,14 @@ BOOL MzIme::StretchClauseLeft(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     // 候補リストをセットする。
     {
         LogCandList cand_list;
-        for (auto& cand1 : clause1.candidates) {
+        for (MzConvCandidate& cand1 : clause1.candidates) {
             cand_list.cand_strs.push_back(cand1.post);
         }
         cand.cand_lists[iClause] = cand_list;
     }
     {
         LogCandList cand_list;
-        for (auto& cand2 : clause2.candidates) {
+        for (MzConvCandidate& cand2 : clause2.candidates) {
             cand_list.cand_strs.push_back(cand2.post);
         }
         if (bSplitted) {
@@ -3819,7 +3819,7 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     }
 
     // 現在の文節。
-    auto& clause1 = result1.clauses[0];
+    MzConvClause& clause1 = result1.clauses[0];
 
     if (str2.empty()) { // 次の文節が空になったか？
         // 次の文節を削除する。
@@ -3850,7 +3850,7 @@ BOOL MzIme::StretchClauseRight(LogCompStr& comp, LogCandInfo& cand, BOOL bRoman)
     if (str2.size()) {
         MzConvClause& clause2 = result2.clauses[0];
         LogCandList cand_list;
-        for (auto& cand2 : clause2.candidates) {
+        for (MzConvCandidate& cand2 : clause2.candidates) {
             cand_list.cand_strs.push_back(cand2.post);
         }
         cand.cand_lists[iClause + 1] = cand_list;
@@ -4044,7 +4044,7 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
     comp.comp_clause.resize(result.clauses.size() + 1);
     for (size_t iClause = 0; iClause < result.clauses.size(); ++iClause) {
         const MzConvClause& clause = result.clauses[iClause];
-        for (auto& cand2 : clause.candidates) {
+        for (const MzConvCandidate& cand2 : clause.candidates) {
             comp.comp_clause[iClause] = (DWORD)comp.comp_str.size();
             comp.extra.hiragana_clauses.push_back(cand2.pre);
             std::wstring typing = hiragana_to_typing(cand2.pre);
@@ -4062,9 +4062,9 @@ BOOL MzIme::StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInf
 
     // 候補情報をセット。
     cand.clear();
-    for (auto& clause : result.clauses) {
+    for (const MzConvClause& clause : result.clauses) {
         LogCandList cand_list;
-        for (auto& cand2 : clause.candidates) {
+        for (const MzConvCandidate& cand2 : clause.candidates) {
             cand_list.cand_strs.push_back(cand2.post);
         }
         cand.cand_lists.push_back(cand_list);
@@ -4092,7 +4092,7 @@ std::wstring MzConvResult::get_str(bool detailed) const
 {
     std::wstring ret;
     size_t iClause = 0;
-    for (auto& clause : clauses) {
+    for (const MzConvClause& clause : clauses) {
         if (iClause)
             ret += L"|";
         if (clause.candidates.size() == 1 || !detailed) {
@@ -4100,7 +4100,7 @@ std::wstring MzConvResult::get_str(bool detailed) const
         } else {
             ret += L"(";
             size_t iCand = 0;
-            for (auto& cand : clause.candidates) {
+            for (const MzConvCandidate& cand : clause.candidates) {
                 if (iCand)
                     ret += L"|";
                 ret += cand.post;

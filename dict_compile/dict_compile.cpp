@@ -236,9 +236,9 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries)
 
         // 辞書にエントリーを追加する準備をする。
         DictEntry entry;
-        auto pre = entry.pre = fields[I_FIELD_PRE];
+        std::wstring pre = entry.pre = fields[I_FIELD_PRE];
         entry.gyou = GYOU_A;
-        auto post = entry.post = fields[I_FIELD_POST];
+        std::wstring post = entry.post = fields[I_FIELD_POST];
         entry.tags = fields[I_FIELD_TAGS];
 
         // 辞書形式にする。

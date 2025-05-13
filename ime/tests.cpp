@@ -14,7 +14,7 @@ void DoEntry(const std::wstring& pre, LPCWSTR post = NULL, BOOL show_graphviz = 
 {
     MzConvResult result;
     TheIME.ConvertMultiClause(pre, result, show_graphviz);
-    auto got = result.get_str();
+    std::wstring got = result.get_str();
     printf("%ls\n\n", got.c_str());
     if (post)
     {

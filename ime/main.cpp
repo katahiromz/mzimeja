@@ -532,8 +532,8 @@ LPCTSTR findLocalFile(LPCTSTR name)
 LPCTSTR findGraphviz(void)
 {
     static std::wstring s_strPath;
-    auto str1 = TEXT("C:\\Program Files\\Graphviz\\bin\\dot.exe");
-    auto str2 = TEXT("C:\\Program Files (x86)\\Graphviz\\bin\\dot.exe");
+    LPCTSTR str1 = TEXT("C:\\Program Files\\Graphviz\\bin\\dot.exe");
+    LPCTSTR str2 = TEXT("C:\\Program Files (x86)\\Graphviz\\bin\\dot.exe");
     if (s_strPath.empty()) {
         if (PathFileExists(str1))
             s_strPath = str1;
