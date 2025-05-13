@@ -31,7 +31,7 @@ void DebugPrintA(const char *lpszFormat, ...)
 
 #ifdef USE_LOGFILE
     FILE *fout = fopen("C:\\mzimeja.log", "a");
-    fprintf("%s", szMsgA);
+    fprintf(fp, "%s", szMsgA);
     fclose(fout);
 #else
     OutputDebugStringA(szMsgA);
@@ -53,7 +53,7 @@ void DebugPrintW(const WCHAR *lpszFormat, ...)
 
 #ifdef USE_LOGFILE
     FILE *fout = fopen("C:\\mzimeja.log", "a");
-    fprintf("%ls", szMsg);
+    fprintf(fp, "%ls", szMsg);
     fclose(fout);
 #else
     OutputDebugStringW(szMsg);
