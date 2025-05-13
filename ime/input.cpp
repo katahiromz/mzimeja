@@ -104,7 +104,11 @@ INPUT_MODE NextInputMode(INPUT_MODE imode)
 // 入力モードを設定。
 void SetInputMode(HIMC hIMC, INPUT_MODE imode)
 {
+    HKL hKL = GetKeyboardLayout(0);
+    HWND hwndIndicator = FindWindow(INDICATOR_CLASS, NULL);
     if (imode == IMODE_DISABLED) {
+        if (hwndIndicator)
+            PostMessage(hwndIndicator, INDICM_SETIMEICON, 6, (LPARAM)hKL);
         return;
     }
     DWORD dwConversion, dwSentence;
@@ -114,24 +118,34 @@ void SetInputMode(HIMC hIMC, INPUT_MODE imode)
         ImmSetOpenStatus(hIMC, TRUE);
         dwConversion &= ~IME_CMODE_KATAKANA;
         dwConversion |= IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE;
+        if (hwndIndicator)
+            PostMessage(hwndIndicator, INDICM_SETIMEICON, 1, (LPARAM)hKL);
         break;
     case IMODE_FULL_KATAKANA: // 全角カタカナモード。
         ImmSetOpenStatus(hIMC, TRUE);
         dwConversion |= IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE | IME_CMODE_KATAKANA;
+        if (hwndIndicator)
+            PostMessage(hwndIndicator, INDICM_SETIMEICON, 2, (LPARAM)hKL);
         break;
     case IMODE_FULL_ASCII: // 全角英数モード。
         ImmSetOpenStatus(hIMC, TRUE);
         dwConversion &= ~(IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
         dwConversion |= IME_CMODE_FULLSHAPE;
+        if (hwndIndicator)
+            PostMessage(hwndIndicator, INDICM_SETIMEICON, 3, (LPARAM)hKL);
         break;
     case IMODE_HALF_KANA: // 半角カナモード。
         ImmSetOpenStatus(hIMC, TRUE);
         dwConversion &= ~IME_CMODE_FULLSHAPE;
         dwConversion |= IME_CMODE_JAPANESE | IME_CMODE_KATAKANA;
+        if (hwndIndicator)
+            PostMessage(hwndIndicator, INDICM_SETIMEICON, 4, (LPARAM)hKL);
         break;
     case IMODE_HALF_ASCII: // 半角英数モード。
         ImmSetOpenStatus(hIMC, FALSE);
         dwConversion &= ~(IME_CMODE_FULLSHAPE | IME_CMODE_JAPANESE | IME_CMODE_KATAKANA);
+        if (hwndIndicator)
+            PostMessage(hwndIndicator, INDICM_SETIMEICON, 5, (LPARAM)hKL);
         break;
     case IMODE_DISABLED: // 無効。
         ASSERT(0);
