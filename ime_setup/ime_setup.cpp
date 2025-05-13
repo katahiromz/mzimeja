@@ -53,23 +53,23 @@ LPWSTR GetSystemImePathName(LPWSTR pszPath) {
 }
 
 LPWSTR GetBasicDictPathName(LPWSTR pszPath) {
-    return FindLocalFile(pszPath, L"res\\basic.dic");
+    return FindLocalFile(pszPath, L"basic.dic");
 }
 
 LPWSTR GetNameDictPathName(LPWSTR pszPath) {
-    return FindLocalFile(pszPath, L"res\\name.dic");
+    return FindLocalFile(pszPath, L"name.dic");
 }
 
 LPWSTR GetPostalDictPathName(LPWSTR pszPath) {
-    return FindLocalFile(pszPath, L"res\\postal.dat");
+    return FindLocalFile(pszPath, L"postal.dat");
 }
 
 LPWSTR GetKanjiDataPathName(LPWSTR pszPath) {
-    return FindLocalFile(pszPath, L"res\\kanji.dat");
+    return FindLocalFile(pszPath, L"kanji.dat");
 }
 
 LPWSTR GetRadicalDataPathName(LPWSTR pszPath) {
-    return FindLocalFile(pszPath, L"res\\radical.dat");
+    return FindLocalFile(pszPath, L"radical.dat");
 }
 
 LPWSTR GetImePadPathName(LPWSTR pszPath) {
@@ -165,7 +165,7 @@ INT DoSetRegistry1(VOID) {
     LONG result = OpenRegKey(HKEY_LOCAL_MACHINE, s_szKeyboardLayouts, TRUE, &hKey);
     if (result == ERROR_SUCCESS && hKey) {
         HKEY hkLayouts;
-        result = CreateRegKey(hKey, L"E0120411", &hkLayouts);
+        result = CreateRegKey(hKey, L"E9120411", &hkLayouts);
         if (result == ERROR_SUCCESS && hkLayouts) {
             if (DoSetRegSz(hkLayouts, L"Layout File", L"kbdjpn.kbd") &&
                 DoSetRegSz(hkLayouts, L"Layout Text", DoLoadString(4)) &&
@@ -304,7 +304,7 @@ INT DoUnsetRegistry1(VOID) {
                                s_szKeyboardLayouts, 0, KEY_ALL_ACCESS, &hKey);
     }
     if (result == ERROR_SUCCESS && hKey) {
-        result = MyDeleteRegKey(hKey, L"E0120411");
+        result = MyDeleteRegKey(hKey, L"E9120411");
         if (result == ERROR_SUCCESS) {
             ret = TRUE;
         }
@@ -353,7 +353,7 @@ INT DoMakeMZIMEJADefault(VOID)
             break;
     }
 
-    error = RegSetValueExW(hKey, L"1", 0, REG_SZ, (LPBYTE)L"E0120411", (8 + 1) * sizeof(WCHAR));
+    error = RegSetValueExW(hKey, L"1", 0, REG_SZ, (LPBYTE)L"E9120411", (8 + 1) * sizeof(WCHAR));
 
     RegCloseKey(hKey);
     return (error ? -1 : 0);

@@ -29,11 +29,11 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 Source: "READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "HISTORY.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "res\basic.dic"; DestDir: "{app}\res"; Flags: ignoreversion
-Source: "res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion
-Source: "res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
-Source: "res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
-Source: "res\postal.dat"; DestDir: "{app}\res"; Flags: ignoreversion
+Source: "res\basic.dic"; DestDir: "{app}"; Flags: ignoreversion
+Source: "res\name.dic"; DestDir: "{app}"; Flags: ignoreversion
+Source: "res\kanji.dat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "res\radical.dat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "res\postal.dat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion

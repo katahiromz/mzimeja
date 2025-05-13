@@ -354,11 +354,11 @@ LPWSTR FindLocalFile(LPWSTR pszPath, LPCWSTR pszFileName)
 }
 
 LPWSTR GetKanjiDataPathName(LPWSTR pszPath) {
-    return FindLocalFile(pszPath, L"res\\kanji.dat");
+    return FindLocalFile(pszPath, L"kanji.dat");
 }
 
 LPWSTR GetRadicalDataPathName(LPWSTR pszPath) {
-    return FindLocalFile(pszPath, L"res\\radical.dat");
+    return FindLocalFile(pszPath, L"radical.dat");
 }
 
 BOOL ImePad::LoadKanjiData() {

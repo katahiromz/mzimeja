@@ -41,3 +41,5 @@ mzimeja-*-setup.exe
 .ninja*
 *-old
 enc_temp_folder/
+archive.7z
+mzimeja-*-low-level-setup/

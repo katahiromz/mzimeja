@@ -181,8 +181,8 @@ int wmain(int argc, wchar_t **argv)
     // Unicode出力を可能に。
     std::setlocale(LC_CTYPE, "");
 
-    LPCTSTR pathname = findLocalFile(L"res\\basic.dic");
-    //LPCTSTR pathname = findLocalFile(L"res\\testdata.dic");
+    LPCTSTR pathname = findLocalFile(L"basic.dic");
+    //LPCTSTR pathname = findLocalFile(L"testdata.dic");
     if (!g_basic_dict.Load(pathname, L"BasicDictObject")) {
         ASSERT(0);
         return 1;

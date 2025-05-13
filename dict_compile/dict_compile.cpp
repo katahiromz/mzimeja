@@ -6,6 +6,7 @@
 #include "../dict.hpp"
 #include "../str.hpp"
 #include <algorithm>
+#include <map>
 #include <cassert>
 
 static const wchar_t s_hiragana_table[][5] = {
@@ -191,6 +192,12 @@ bool MakeDictFormat(DictEntry& entry, const std::wstring& strBunrui)
     return true;
 }
 
+static inline bool 
+dict_entry_compare_by_pre(const DictEntry& e1, const DictEntry& e2)
+{
+    return (e1.pre < e2.pre);
+}
+
 // 辞書データファイルを読み込む。
 BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries)
 {
@@ -309,9 +316,7 @@ BOOL LoadDictDataFile(const wchar_t *fname, std::vector<DictEntry>& entries)
     fclose(fp);
 
     // sort by preconversion string
-    std::sort(entries.begin(), entries.end(), [](const DictEntry& e1, const DictEntry& e2){
-        return (e1.pre < e2.pre);
-    });
+    std::sort(entries.begin(), entries.end(), dict_entry_compare_by_pre);
     return TRUE;  // success
 } // LoadDictDataFile
 
