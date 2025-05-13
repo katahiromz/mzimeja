@@ -1,4 +1,4 @@
-// ime_setup.cpp --- MZ-IME setup program
+﻿// ime_setup.cpp --- MZ-IME setup program
 //////////////////////////////////////////////////////////////////////////////
 
 #define _CRT_SECURE_NO_WARNINGS   // use fopen
@@ -393,7 +393,17 @@ INT DoInstall(VOID) {
         return 3;
     }
 
-    ShellExecuteW(NULL, NULL, L"control.exe", L"input.dll", NULL, SW_SHOWNORMAL);
+    HINSTANCE hInputDll = LoadLibraryEx(TEXT("input.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE);
+    if (hInputDll)
+    {
+        FreeLibrary(hInputDll);
+        ShellExecuteW(NULL, NULL, L"control.exe", L"input.dll", NULL, SW_SHOWNORMAL);
+    }
+    else
+    {
+        WinExec("rundll32.exe shell32.dll,Control_RunDLL intl.cpl,,5", SW_SHOWNORMAL);
+    }
+
     return 0;
 } // DoInstall
 
@@ -453,6 +463,7 @@ wWinMain(
     g_hInstance = hInstance;
 
     int ret;
+    TCHAR szText[128];
     switch (__argc) {
     case 2:
         if (lstrcmpiW(__wargv[1], L"/i") == 0) {
@@ -466,9 +477,21 @@ wWinMain(
         ret = (INT)::DialogBoxW(hInstance, MAKEINTRESOURCEW(1), NULL, DialogProc);
         switch (ret) {
         case rad1:
-            return DoInstall();
+            if (DoInstall() == 0) {
+                LoadString(hInstance, 9, szText, _countof(szText));
+                MessageBox(NULL, szText, TEXT("MZ-IME"), MB_ICONINFORMATION);
+            } else {
+                LoadString(hInstance, 10, szText, _countof(szText));
+                MessageBox(NULL, szText, TEXT("MZ-IME"), MB_ICONERROR);
+            }
         case rad2:
-            return DoUninstall();
+            if (DoUninstall() == 0) {
+                LoadString(hInstance, 9, szText, _countof(szText));
+                MessageBox(NULL, szText, TEXT("MZ-IME"), MB_ICONINFORMATION);
+            } else {
+                LoadString(hInstance, 10, szText, _countof(szText));
+                MessageBox(NULL, szText, TEXT("MZ-IME"), MB_ICONERROR);
+            }
         default:
             break;
         }

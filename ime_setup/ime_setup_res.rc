@@ -25,6 +25,8 @@ STRINGTABLE
     6, "Registry deletion failed."
     7, "Failed to delete files."
     8, "Registry setup failed (#2)."
+    9, "MZ-IME setup succeeded."
+    10, "MZ-IME setup failed."
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -40,7 +42,7 @@ STYLE DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
 FONT 9, "MS Shell Dlg"
 {
     AUTORADIOBUTTON "&Install", rad1, 10, 10, 85, 14, WS_TABSTOP
-    AUTORADIOBUTTON "&Uninstalll", rad2, 10, 25, 85, 14, WS_TABSTOP
+    AUTORADIOBUTTON "&Uninstall", rad2, 10, 25, 85, 14, WS_TABSTOP
     DEFPUSHBUTTON "OK", IDOK, 5, 45, 60, 14
     PUSHBUTTON "Cancel", IDCANCEL, 70, 45, 60, 14
 }
@@ -70,24 +72,6 @@ FILETYPE        0x1
     {
         VALUE "Translation", 0x0411, 0x03A4
     }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
-
-//////////////////////////////////////////////////////////////////////////////
-// RT_DIALOG
-
-1 DIALOG 30, 28, 180, 63
-CAPTION "MZ-IME 日本語入力セットアップ"
-STYLE DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
-FONT 10, "ＭＳ Ｐゴシック"
-{
-    AUTORADIOBUTTON "インストール(&I)", rad1, 10, 10, 85, 14, WS_TABSTOP
-    AUTORADIOBUTTON "アンインストール(&U)", rad2, 10, 25, 85, 14, WS_TABSTOP
-    DEFPUSHBUTTON "OK", IDOK, 5, 45, 60, 14
-    PUSHBUTTON "キャンセル", IDCANCEL, 70, 45, 60, 14
 }
 
 //////////////////////////////////////////////////////////////////////////////
