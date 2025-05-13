@@ -1611,7 +1611,8 @@ BOOL Lattice::AddNodesFromDict(const WCHAR *dict_data)
 
     // 異なるサイズのノードを削除する。
     for (size_t i = 0; i < m_chunks[0].size(); ++i) {
-        auto it = std::remove_if(m_chunks[0].begin(), m_chunks[0].end(), [this](const LatticeNodePtr& n){
+        LatticeChunk::iterator it;
+        it = std::remove_if(m_chunks[0].begin(), m_chunks[0].end(), [this](const LatticeNodePtr& n) {
             return n->pre.size() != m_pre.size();
         });
         m_chunks[0].erase(it, m_chunks[0].end());
@@ -1762,7 +1763,8 @@ void Lattice::CutUnlinkedNodes()
 {
     for (size_t index = 0; index < m_pre.size(); ++index) {
         LatticeChunk& chunk1 = m_chunks[index];
-        auto it = std::remove_if(chunk1.begin(), chunk1.end(), [](const LatticeNodePtr& node) {
+        LatticeChunk::iterator it;
+        it = std::remove_if(chunk1.begin(), chunk1.end(), [](const LatticeNodePtr& node) {
             return node->linked == 0;
         });
         chunk1.erase(it, chunk1.end());
