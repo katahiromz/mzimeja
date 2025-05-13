@@ -11,6 +11,7 @@
 #include <cstdlib>    // for __argc, __wargv
 #include <cstring>    // for wcsrchr
 #include <algorithm>  // for std::max
+#include "resource.h"
 
 HINSTANCE g_hInstance;
 
@@ -168,7 +169,7 @@ INT DoSetRegistry1(VOID) {
         result = CreateRegKey(hKey, L"E9120411", &hkLayouts);
         if (result == ERROR_SUCCESS && hkLayouts) {
             if (DoSetRegSz(hkLayouts, L"Layout File", L"kbdjpn.kbd") &&
-                DoSetRegSz(hkLayouts, L"Layout Text", DoLoadString(4)) &&
+                DoSetRegSz(hkLayouts, L"Layout Text", DoLoadString(IDS_IMELAYOUTTEXT)) &&
                 DoSetRegSz(hkLayouts, L"Layout Display Name", L"@%SystemRoot%\\system32\\mzimeja.ime,-1024") &&
                 DoSetRegSz(hkLayouts, L"IME File", L"mzimeja.ime"))
             {
@@ -364,31 +365,31 @@ INT DoMakeMZIMEJADefault(VOID)
 INT DoInstall(VOID) {
     if (0 != DoSetRegistry1()) {
         // failure
-        ::MessageBoxW(NULL, DoLoadString(2), NULL, MB_ICONERROR);
+        ::MessageBoxW(NULL, DoLoadString(IDS_REGFAILED), NULL, MB_ICONERROR);
         return 2;
     }
     if (0 != DoSetRegistry2(HKEY_LOCAL_MACHINE) ||
         0 != DoSetRegistry2(HKEY_CURRENT_USER))
     {
         // failure
-        ::MessageBoxW(NULL, DoLoadString(8), NULL, MB_ICONERROR);
+        ::MessageBoxW(NULL, DoLoadString(IDS_REGSETUPFAIL), NULL, MB_ICONERROR);
         return 2;
     }
 
     if (0 != DoCopyFiles()) {
         // failure
-        ::MessageBoxW(NULL, DoLoadString(3), NULL, MB_ICONERROR);
+        ::MessageBoxW(NULL, DoLoadString(IDS_FAILCOPYFILE), NULL, MB_ICONERROR);
         return 1;
     }
 
     WCHAR szPath[MAX_PATH];
     ::GetSystemDirectoryW(szPath, MAX_PATH);
     wcscat(szPath, L"\\mzimeja.ime");
-    if (!ImmInstallIME(szPath, DoLoadString(4))) {
+    if (!ImmInstallIME(szPath, DoLoadString(IDS_IMELAYOUTTEXT))) {
         // failure
         WCHAR szMsg[128];
         DWORD dwError = ::GetLastError();
-        ::wsprintfW(szMsg, DoLoadString(5), dwError);
+        ::wsprintfW(szMsg, DoLoadString(IDS_FAILDOCONTACT), dwError);
         ::MessageBoxW(NULL, szMsg, NULL, MB_ICONERROR);
         return 3;
     }
@@ -410,13 +411,13 @@ INT DoInstall(VOID) {
 INT DoUninstall(VOID) {
     if (0 != DoDeleteFiles()) {
         // failure
-        ::MessageBoxW(NULL, DoLoadString(7), NULL, MB_ICONERROR);
+        ::MessageBoxW(NULL, DoLoadString(IDS_FAILDELETEFILE), NULL, MB_ICONERROR);
         return 1;
     }
 
     if (0 != DoUnsetRegistry1() || 0 != DoUnsetRegistry2()) {
         // failure
-        ::MessageBoxW(NULL, DoLoadString(6), NULL, MB_ICONERROR);
+        ::MessageBoxW(NULL, DoLoadString(IDS_REGDELETEFAIL), NULL, MB_ICONERROR);
         return 2;
     }
 
@@ -478,18 +479,18 @@ wWinMain(
         switch (ret) {
         case rad1:
             if (DoInstall() == 0) {
-                LoadString(hInstance, 9, szText, _countof(szText));
+                LoadString(hInstance, IDS_SETUPOK, szText, _countof(szText));
                 MessageBox(NULL, szText, TEXT("MZ-IME"), MB_ICONINFORMATION);
             } else {
-                LoadString(hInstance, 10, szText, _countof(szText));
+                LoadString(hInstance, IDS_SETUPFAIL, szText, _countof(szText));
                 MessageBox(NULL, szText, TEXT("MZ-IME"), MB_ICONERROR);
             }
         case rad2:
             if (DoUninstall() == 0) {
-                LoadString(hInstance, 9, szText, _countof(szText));
+                LoadString(hInstance, IDS_SETUPOK, szText, _countof(szText));
                 MessageBox(NULL, szText, TEXT("MZ-IME"), MB_ICONINFORMATION);
             } else {
-                LoadString(hInstance, 10, szText, _countof(szText));
+                LoadString(hInstance, IDS_SETUPFAIL, szText, _countof(szText));
                 MessageBox(NULL, szText, TEXT("MZ-IME"), MB_ICONERROR);
             }
         default:
