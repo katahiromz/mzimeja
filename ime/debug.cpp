@@ -29,7 +29,7 @@ void DebugPrintA(const char *lpszFormat, ...)
     StringCchVPrintfA(szMsgA, _countof(szMsgA), lpszFormat, marker);
     va_end(marker);
 
-#ifdef USE_LOGFILE
+#if defined(USE_LOGFILE) && !defined(NDEBUG)
     FILE *fout = fopen("C:\\mzimeja.log", "a");
     fprintf(fout, "%s", szMsgA);
     fclose(fout);
@@ -51,7 +51,7 @@ void DebugPrintW(const WCHAR *lpszFormat, ...)
     StringCchVPrintfW(szMsg, _countof(szMsg), lpszFormat, marker);
     va_end(marker);
 
-#ifdef USE_LOGFILE
+#if defined(USE_LOGFILE) && !defined(NDEBUG)
     FILE *fout = fopen("C:\\mzimeja.log", "a");
     fprintf(fout, "%ls", szMsg);
     fclose(fout);
