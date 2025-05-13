@@ -5,10 +5,6 @@
 #include "mzimeja.h"
 #include "vksub.h"
 
-#define IsCtrlPressed(x)  ((x)[VK_CONTROL] & 0x80)
-#define IsShiftPressed(x) ((x)[VK_SHIFT] & 0x80)
-#define IsAltPressed(x)   ((x)[VK_ALT] & 0x80)
-
 extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -49,10 +45,10 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
                         lpIMC->AddChar(L' ', L'\0');
                     }
                 }
-                return TRUE;
+                FOOTMARK_RETURN_INT(TRUE);
             }
         }
-        return FALSE;
+        FOOTMARK_RETURN_INT(FALSE);
     }
 
     // Get translated char. 可能なら文字をひらがなにする。
@@ -82,7 +78,7 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
             }
             TheIME.UnlockIMC(hIMC); // 入力コンテキストのロックを解除。
         }
-        return TRUE;
+        FOOTMARK_RETURN_INT(TRUE);
     }
 
     switch (vk) {
@@ -398,9 +394,9 @@ BOOL IMEKeyDownHandler(HIMC hIMC, WPARAM wParam, BYTE *lpbKeyState,
         break;
 
     default:
-        return FALSE;
+        FOOTMARK_RETURN_INT(FALSE);
     }
-    return TRUE;
+    FOOTMARK_RETURN_INT(TRUE);
 } // IMEKeyDownHandler
 
 BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
@@ -412,7 +408,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
 
     BOOL bKeyUp = (lKeyData & 0x80000000);
     if (bKeyUp) {
-        return FALSE;
+        FOOTMARK_RETURN_INT(FALSE);
     }
 
     DPRINTA("ImeProcessKey: vKey: %u\n", vKey);
@@ -436,7 +432,8 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
         }
         break;
     default:
-        if (lpIMC == NULL) return FALSE;
+        if (lpIMC == NULL)
+            FOOTMARK_RETURN_INT(FALSE);
         break;
     }
 
@@ -556,7 +553,7 @@ BOOL WINAPI ImeProcessKey(HIMC hIMC, UINT vKey, LPARAM lKeyData,
     }
 
     TheIME.UnlockIMC(hIMC);
-    return ret;
+    FOOTMARK_RETURN_INT(ret);
 } // ImeProcessKey
 
 UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
@@ -586,7 +583,7 @@ UINT WINAPI ImeToAsciiEx(UINT uVKey, UINT uScanCode, CONST LPBYTE lpbKeyState,
     }
 
     TheIME.m_lpCurTransKey = NULL;
-    return ret;
+    FOOTMARK_RETURN_INT(ret);
 } // ImeToAsciiEx
 
 //////////////////////////////////////////////////////////////////////////////
