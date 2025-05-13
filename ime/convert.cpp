@@ -37,8 +37,8 @@ static const WCHAR s_hiragana_table[][5] =
     {L'ん',     0,     0,     0,     0}, // GYOU_NN
 }; // ※ s_hiragana_table[GYOU_DA][DAN_U] のように使用する。
 
-std::unordered_map<WCHAR,Dan>   g_hiragana_to_dan;  // 母音写像。
-std::unordered_map<WCHAR,Gyou>  g_hiragana_to_gyou; // 子音写像。
+std::map<WCHAR,Dan>   g_hiragana_to_dan;  // 母音写像。
+std::map<WCHAR,Gyou>  g_hiragana_to_gyou; // 子音写像。
 
 // 子音の写像と母音の写像を作成する。
 void MakeLiteralMaps()

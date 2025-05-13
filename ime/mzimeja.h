@@ -17,8 +17,8 @@
 
 #include <string>           // for std::string, std::wstring, ...
 #include <vector>           // for std::vector
-#include <unordered_set>    // for std::unordered_set
-#include <unordered_map>    // for std::unordered_map
+#include <set>              // for std::unordered_set
+#include <map>              // for std::unordered_map
 #include <memory>           // for std::weak_ptr
 
 #include "indicml.h"        // for system indicator
@@ -230,8 +230,8 @@ extern const MZGUIDELINE glTable[];
 extern "C" {
 
 // convert.cpp
-extern std::unordered_map<WCHAR,Dan>  g_hiragana_to_dan;  // 母音写像。
-extern std::unordered_map<WCHAR,Gyou> g_hiragana_to_gyou; // 子音写像。
+extern std::map<WCHAR, Dan>  g_hiragana_to_dan;  // 母音写像。
+extern std::map<WCHAR, Gyou> g_hiragana_to_gyou; // 子音写像。
 void MakeLiteralMaps(); // 子音の写像と母音の写像を作成する。
 LPCWSTR BunruiToString(HinshiBunrui bunrui);
 LPCTSTR HinshiToString(HinshiBunrui hinshi);
@@ -403,7 +403,7 @@ struct LatticeNode {
     // 枝分かれ。
     std::vector<LatticeNodePtr> branches;
     // 逆向き枝分かれ。
-    std::unordered_set<LatticeNode*> reverse_branches;
+    std::set<LatticeNode*> reverse_branches;
 
     bool IsDoushi() const;      // 動詞か？
     bool IsJoshi() const;       // 助詞か？
@@ -471,7 +471,7 @@ struct MzConvCandidate {
     std::wstring post;             // 変換後。
     INT cost = 0;                  // コスト。
     INT word_cost = 0;             // 単語コスト。
-    std::unordered_set<HinshiBunrui>  bunruis;    // 品詞分類集合。
+    std::set<HinshiBunrui>  bunruis;    // 品詞分類集合。
     std::wstring tags;             // タグ。
     HinshiBunrui bunrui;           // 品詞分類。
     KatsuyouKei katsuyou;          // 活用形。
