@@ -343,6 +343,9 @@ void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
     FOOTMARK_FORMAT("%p, %p\n", lpUIExtra, lpIMC);
 
     HWND hwndCand = lpUIExtra->hwndCand;
+    if (!hwndCand)
+        return;
+
     HWND hSvrWnd = (HWND)::GetWindowLongPtr(hwndCand, FIGWLP_SERVERWND);
 
     // ワークエリアを取得。
