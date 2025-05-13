@@ -66,12 +66,12 @@ protected:
 HWND m_hWnd;
 
 // data
-std::vector<KANJI_ENTRY>                      m_kanji_table;
-std::unordered_map<WORD, std::vector<WORD> >  m_kanji_stroke_map;
-std::vector<RADICAL_ENTRY>                    m_radical_table;
-std::unordered_map<WORD, std::vector<WORD> >  m_radical_stroke_map;
-std::unordered_map<WORD, WORD>                m_radical_id_map;
-std::unordered_map<WORD, std::vector<WORD> >  m_radical2_to_kanji_map;
+std::vector<KANJI_ENTRY>            m_kanji_table;
+std::map<WORD, std::vector<WORD> >  m_kanji_stroke_map;
+std::vector<RADICAL_ENTRY>          m_radical_table;
+std::map<WORD, std::vector<WORD> >  m_radical_stroke_map;
+std::map<WORD, WORD>                m_radical_id_map;
+std::map<WORD, std::vector<WORD> >  m_radical2_to_kanji_map;
 BOOL LoadKanjiData();
 BOOL LoadRadicalData();
 BOOL LoadKanjiAndRadical();
