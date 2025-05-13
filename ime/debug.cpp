@@ -4,6 +4,7 @@
 #include "mzimeja.h"
 #include <shlobj.h>
 #include <strsafe.h>
+#include <stdio.h>
 #include "resource.h"
 
 extern "C"
@@ -28,7 +29,13 @@ void DebugPrintA(const char *lpszFormat, ...)
     StringCchVPrintfA(szMsgA, _countof(szMsgA), lpszFormat, marker);
     va_end(marker);
 
+#ifdef USE_LOGFILE
+    FILE *fout = fopen("C:\\mzimeja.log", "a");
+    fprintf("%s", szMsgA);
+    fclose(fout);
+#else
     OutputDebugStringA(szMsgA);
+#endif
 }
 
 // wprintf関数と同じ文法でデバッグ出力を行う関数。
@@ -44,7 +51,13 @@ void DebugPrintW(const WCHAR *lpszFormat, ...)
     StringCchVPrintfW(szMsg, _countof(szMsg), lpszFormat, marker);
     va_end(marker);
 
+#ifdef USE_LOGFILE
+    FILE *fout = fopen("C:\\mzimeja.log", "a");
+    fprintf("%ls", szMsg);
+    fclose(fout);
+#else
     OutputDebugStringW(szMsg);
+#endif
 }
 
 // ASSERT失敗時に呼び出される関数。

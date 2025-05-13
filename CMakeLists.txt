@@ -60,6 +60,13 @@ endif()
 # Unicode support
 add_definitions(-DUNICODE=1 -D_UNICODE=1)
 
+# USE_LOGFILE option
+option(USE_LOGFILE "Use log file" ON)
+if(USE_LOGFILE)
+    add_definitions(-DUSE_LOGFILE)
+endif()
+message(STATUS "USE_LOGFILE = ${USE_LOGFILE}")
+
 # Add include directories
 include_directories(include)
 
