@@ -166,7 +166,7 @@ INT DoSetRegistry1(VOID) {
     LONG result = OpenRegKey(HKEY_LOCAL_MACHINE, s_szKeyboardLayouts, TRUE, &hKey);
     if (result == ERROR_SUCCESS && hKey) {
         HKEY hkLayouts;
-        result = CreateRegKey(hKey, L"E9120411", &hkLayouts);
+        result = CreateRegKey(hKey, L"E0E20411", &hkLayouts);
         if (result == ERROR_SUCCESS && hkLayouts) {
             if (DoSetRegSz(hkLayouts, L"Layout File", L"kbdjpn.kbd") &&
                 DoSetRegSz(hkLayouts, L"Layout Text", DoLoadString(IDS_IMELAYOUTTEXT)) &&
@@ -305,7 +305,7 @@ INT DoUnsetRegistry1(VOID) {
                                s_szKeyboardLayouts, 0, KEY_ALL_ACCESS, &hKey);
     }
     if (result == ERROR_SUCCESS && hKey) {
-        result = MyDeleteRegKey(hKey, L"E9120411");
+        result = MyDeleteRegKey(hKey, L"E0E20411");
         if (result == ERROR_SUCCESS) {
             ret = TRUE;
         }
@@ -354,7 +354,7 @@ INT DoMakeMZIMEJADefault(VOID)
             break;
     }
 
-    error = RegSetValueExW(hKey, L"1", 0, REG_SZ, (LPBYTE)L"E9120411", (8 + 1) * sizeof(WCHAR));
+    error = RegSetValueExW(hKey, L"1", 0, REG_SZ, (LPBYTE)L"E0E20411", (8 + 1) * sizeof(WCHAR));
 
     RegCloseKey(hKey);
     return (error ? -1 : 0);
