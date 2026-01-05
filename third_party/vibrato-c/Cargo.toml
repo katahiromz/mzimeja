@@ -1,0 +1,15 @@
+[package]
+name = "vibrato-c"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+vibrato = "0.5"
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1

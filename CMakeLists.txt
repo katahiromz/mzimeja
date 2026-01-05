@@ -81,40 +81,55 @@ option(USE_VIBRATO "Use Vibrato for morphological analysis" OFF)
 if(USE_VIBRATO)
     message(STATUS "Vibrato support enabled")
     
-    # Try to find Vibrato library
-    find_library(VIBRATO_LIBRARY 
-        NAMES vibrato libvibrato
-        PATHS ${CMAKE_SOURCE_DIR}/third_party/vibrato/lib
-              ${CMAKE_BINARY_DIR}/vibrato/src/vibrato_build/target/release
-    )
+    # Check if vibrato-c library exists
+    set(VIBRATO_C_DIR "${CMAKE_SOURCE_DIR}/third_party/vibrato-c")
+    set(VIBRATO_LIBRARY "${VIBRATO_C_DIR}/target/release/libvibrato_c.a")
+    set(VIBRATO_INCLUDE_DIR "${VIBRATO_C_DIR}/include")
     
-    find_path(VIBRATO_INCLUDE_DIR
-        NAMES vibrato.h
-        PATHS ${CMAKE_SOURCE_DIR}/third_party/vibrato/include
-              ${CMAKE_BINARY_DIR}/vibrato/src/vibrato_build/vibrato-c/include
-    )
-    
-    if(VIBRATO_LIBRARY AND VIBRATO_INCLUDE_DIR)
-        message(STATUS "Vibrato found: ${VIBRATO_LIBRARY}")
+    if(EXISTS "${VIBRATO_LIBRARY}" AND EXISTS "${VIBRATO_INCLUDE_DIR}/vibrato.h")
+        message(STATUS "Found prebuilt Vibrato library: ${VIBRATO_LIBRARY}")
         add_definitions(-DHAVE_VIBRATO=1)
         include_directories(${VIBRATO_INCLUDE_DIR})
         set(VIBRATO_FOUND TRUE)
     else()
-        message(STATUS "Vibrato not found in prebuilt locations")
+        message(STATUS "Vibrato library not found in ${VIBRATO_C_DIR}")
         
         # Check if Rust/Cargo is available for building from source
         find_program(CARGO_EXECUTABLE cargo)
-        if(CARGO_EXECUTABLE)
-            message(STATUS "Cargo found, Vibrato can be built from source if needed")
-            message(STATUS "Note: Vibrato building from source not yet implemented")
-            message(STATUS "Please install Vibrato manually or disable USE_VIBRATO")
+        if(CARGO_EXECUTABLE AND EXISTS "${VIBRATO_C_DIR}/Cargo.toml")
+            message(STATUS "Cargo found, building Vibrato from source...")
+            
+            # Build vibrato-c library
+            execute_process(
+                COMMAND ${CARGO_EXECUTABLE} build --release
+                WORKING_DIRECTORY ${VIBRATO_C_DIR}
+                RESULT_VARIABLE CARGO_BUILD_RESULT
+                OUTPUT_VARIABLE CARGO_BUILD_OUTPUT
+                ERROR_VARIABLE CARGO_BUILD_ERROR
+            )
+            
+            if(CARGO_BUILD_RESULT EQUAL 0)
+                if(EXISTS "${VIBRATO_LIBRARY}")
+                    message(STATUS "Successfully built Vibrato library")
+                    add_definitions(-DHAVE_VIBRATO=1)
+                    include_directories(${VIBRATO_INCLUDE_DIR})
+                    set(VIBRATO_FOUND TRUE)
+                else()
+                    message(WARNING "Cargo build succeeded but library not found")
+                    set(USE_VIBRATO OFF)
+                    set(VIBRATO_FOUND FALSE)
+                endif()
+            else()
+                message(WARNING "Failed to build Vibrato library: ${CARGO_BUILD_ERROR}")
+                set(USE_VIBRATO OFF)
+                set(VIBRATO_FOUND FALSE)
+            endif()
         else()
-            message(WARNING "Cargo not found. Please install Rust to build Vibrato.")
+            message(WARNING "Cargo not found or Vibrato source not available. Please install Rust to build Vibrato.")
             message(STATUS "Vibrato support will be disabled")
+            set(USE_VIBRATO OFF)
+            set(VIBRATO_FOUND FALSE)
         endif()
-        
-        set(USE_VIBRATO OFF)
-        set(VIBRATO_FOUND FALSE)
     endif()
 else()
     message(STATUS "Vibrato support disabled")

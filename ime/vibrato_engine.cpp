@@ -9,8 +9,7 @@
 
 // Vibratoがコンパイル時に有効な場合のみ、実際のVibrato APIを使用
 #ifdef HAVE_VIBRATO
-    // TODO: Vibrato C APIのヘッダーをインクルード
-    // #include <vibrato.h>
+    #include <vibrato.h>
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -19,21 +18,15 @@
 VibratoEngine::VibratoEngine()
     : initialized_(FALSE)
     , tokenizer_(nullptr)
-    , dict_(nullptr)
 {
 }
 
 VibratoEngine::~VibratoEngine()
 {
 #ifdef HAVE_VIBRATO
-    // TODO: Vibratoリソースのクリーンアップ
     if (tokenizer_) {
-        // vibrato_tokenizer_free(tokenizer_);
+        vibrato_tokenizer_free(tokenizer_);
         tokenizer_ = nullptr;
-    }
-    if (dict_) {
-        // vibrato_dict_free(dict_);
-        dict_ = nullptr;
     }
 #endif
     initialized_ = FALSE;
@@ -48,7 +41,6 @@ BOOL VibratoEngine::Initialize(const std::wstring& dict_path)
     
 #ifdef HAVE_VIBRATO
     // Vibratoが有効な場合の初期化処理
-    // TODO: 実際のVibrato初期化コード
     
     // 辞書パスの検証
     if (dict_path.empty()) {
@@ -59,29 +51,16 @@ BOOL VibratoEngine::Initialize(const std::wstring& dict_path)
     // UTF-8に変換
     std::string dict_path_utf8 = WideToUTF8(dict_path);
     
-    // 辞書の読み込み
-    // dict_ = vibrato_dict_load(dict_path_utf8.c_str());
-    // if (!dict_) {
-    //     DPRINTW(L"VibratoEngine: Failed to load dictionary\n");
-    //     return FALSE;
-    // }
+    // 辞書の読み込みとトークナイザーの初期化
+    tokenizer_ = vibrato_tokenizer_load(dict_path_utf8.c_str());
+    if (!tokenizer_) {
+        DPRINTW(L"VibratoEngine: Failed to load dictionary or create tokenizer\n");
+        return FALSE;
+    }
     
-    // トークナイザーの初期化
-    // tokenizer_ = vibrato_tokenizer_new(dict_);
-    // if (!tokenizer_) {
-    //     DPRINTW(L"VibratoEngine: Failed to create tokenizer\n");
-    //     vibrato_dict_free(dict_);
-    //     dict_ = nullptr;
-    //     return FALSE;
-    // }
-    
-    // initialized_ = TRUE;
-    // DPRINTW(L"VibratoEngine: Initialized successfully\n");
-    // return TRUE;
-    
-    // 現在はスタブ実装のため、常にFALSEを返す
-    DPRINTW(L"VibratoEngine: Vibrato support not fully implemented yet\n");
-    return FALSE;
+    initialized_ = TRUE;
+    DPRINTW(L"VibratoEngine: Initialized successfully\n");
+    return TRUE;
     
 #else
     // Vibratoが無効な場合
@@ -101,13 +80,54 @@ BOOL VibratoEngine::AnalyzeToLattice(const std::wstring& text, Lattice& lattice)
     }
     
 #ifdef HAVE_VIBRATO
-    // TODO: Vibratoを使用した形態素解析
-    // 1. テキストをUTF-8に変換
-    // 2. Vibratoで形態素解析を実行
-    // 3. 結果をLattice構造に変換
+    // Vibratoを使用した形態素解析
     
-    DPRINTW(L"VibratoEngine::AnalyzeToLattice: Not implemented\n");
-    return FALSE;
+    // テキストをUTF-8に変換
+    std::string text_utf8 = WideToUTF8(text);
+    
+    // Vibratoで形態素解析を実行
+    VibratoToken* tokens = nullptr;
+    size_t num_tokens = 0;
+    
+    int result = vibrato_tokenize(tokenizer_, text_utf8.c_str(), &tokens, &num_tokens);
+    if (result < 0 || tokens == nullptr) {
+        DPRINTW(L"VibratoEngine::AnalyzeToLattice: Tokenization failed\n");
+        return FALSE;
+    }
+    
+    // Lattice構造を初期化
+    lattice.m_pre = text;
+    lattice.m_chunks.clear();
+    lattice.m_chunks.resize(text.size() + 1);
+    
+    // 先頭ノードと末端ノードを作成
+    lattice.m_head = LatticeNodePtr(new LatticeNode());
+    lattice.m_head->bunrui = HB_HEAD;
+    lattice.m_head->deltaCost = 0;
+    lattice.m_head->subtotal_cost = 0;
+    
+    lattice.m_tail = LatticeNodePtr(new LatticeNode());
+    lattice.m_tail->bunrui = HB_TAIL;
+    lattice.m_tail->deltaCost = 0;
+    
+    // Vibratoトークンをラティスノードに変換
+    for (size_t i = 0; i < num_tokens; ++i) {
+        LatticeNodePtr node_ptr(new LatticeNode());
+        VibratoTokenToLatticeNode(&tokens[i], text, *node_ptr);
+        
+        // ノードを適切なチャンクに追加
+        size_t start_pos = tokens[i].range_start;
+        if (start_pos < lattice.m_chunks.size()) {
+            lattice.m_chunks[start_pos].push_back(node_ptr);
+        }
+    }
+    
+    // トークンを解放
+    vibrato_tokens_free(tokens, num_tokens);
+    
+    DPRINTW(L"VibratoEngine::AnalyzeToLattice: Success (%zu tokens)\n", num_tokens);
+    return TRUE;
+    
 #else
     return FALSE;
 #endif
@@ -121,12 +141,16 @@ BOOL VibratoEngine::ConvertMultiClause(const std::wstring& text, MzConvResult& r
     }
     
 #ifdef HAVE_VIBRATO
-    // TODO: 文節変換の実装
-    // 1. AnalyzeToLatticeを呼び出してラティス構造を作成
-    // 2. ビタビアルゴリズムで最適パスを見つける
-    // 3. 結果をMzConvResultに変換
+    // ラティスを作成
+    Lattice lattice;
+    if (!AnalyzeToLattice(text, lattice)) {
+        return FALSE;
+    }
     
-    DPRINTW(L"VibratoEngine::ConvertMultiClause: Not implemented\n");
+    // TODO: ビタビアルゴリズムで最適パスを見つけてMzConvResultに変換
+    // 現時点では基本的な実装のみ
+    
+    DPRINTW(L"VibratoEngine::ConvertMultiClause: Not fully implemented\n");
     return FALSE;
 #else
     return FALSE;
@@ -141,10 +165,8 @@ BOOL VibratoEngine::ConvertSingleClause(const std::wstring& text, MzConvResult& 
     }
     
 #ifdef HAVE_VIBRATO
-    // TODO: 単文節変換の実装
-    
-    DPRINTW(L"VibratoEngine::ConvertSingleClause: Not implemented\n");
-    return FALSE;
+    // 単文節変換は文節変換の特殊ケース
+    return ConvertMultiClause(text, result);
 #else
     return FALSE;
 #endif
@@ -153,44 +175,84 @@ BOOL VibratoEngine::ConvertSingleClause(const std::wstring& text, MzConvResult& 
 //////////////////////////////////////////////////////////////////////////////
 // Private helper methods
 
-void VibratoEngine::VibratoTokenToLatticeNode(const vibrato_token_t* token, LatticeNode& node)
+void VibratoEngine::VibratoTokenToLatticeNode(const VibratoToken* token, const std::wstring& text, LatticeNode& node)
 {
 #ifdef HAVE_VIBRATO
-    // TODO: Vibratoトークンの情報をLatticeNodeに変換
-    // - surface (表層形) -> node.pre
-    // - feature (品詞情報) -> node.bunrui, node.gyou
-    // - cost -> node.deltaCost
+    if (!token) return;
+    
+    // 表層形（変換前）を取得
+    size_t start = token->range_start;
+    size_t len = token->surface_len;
+    if (start + len <= text.size()) {
+        node.pre = text.substr(start, len);
+        node.post = node.pre;  // デフォルトでは変換後も同じ
+    }
+    
+    // 品詞情報を変換
+    if (token->feature) {
+        std::string feature_str(token->feature);
+        node.bunrui = ConvertPartOfSpeech(token->feature);
+        
+        // タグとして保存
+        node.tags = UTF8ToWide(feature_str);
+    } else {
+        node.bunrui = HB_UNKNOWN;
+    }
+    
+    // コストの初期化（TODO: 実際のコストを計算）
+    node.deltaCost = 100;  // デフォルトコスト
+    node.subtotal_cost = MAXLONG;
+    node.gyou = GYOU_NN;
+    node.katsuyou = SHUUSHI_KEI;
 #endif
 }
 
 HinshiBunrui VibratoEngine::ConvertPartOfSpeech(const char* pos)
 {
 #ifdef HAVE_VIBRATO
-    // TODO: MeCab/Vibratoの品詞をMZ-IMEjaの品詞分類に変換
+    // MeCab/Vibratoの品詞をMZ-IMEjaの品詞分類に変換
     // 
-    // MeCab IPA辞書の品詞体系:
-    // 名詞,一般 -> HB_MEISHI
-    // 動詞,自立 -> HB_GODAN_DOUSHI または HB_ICHIDAN_DOUSHI
-    // 形容詞,自立 -> HB_IKEIYOUSHI
-    // 助詞,格助詞 -> HB_KAKU_JOSHI
-    // など
+    // MeCab IPA辞書の品詞体系（CSV形式）:
+    // 品詞,品詞細分類1,品詞細分類2,品詞細分類3,活用型,活用形,原形,読み,発音
     
     if (!pos) return HB_UNKNOWN;
     
-    // 簡単な実装例（実際にはもっと詳細なマッピングが必要）
     std::string pos_str(pos);
     
-    if (pos_str.find("名詞") != std::string::npos) {
+    // CSVの最初のフィールドを取得
+    size_t comma_pos = pos_str.find(',');
+    std::string main_pos = (comma_pos != std::string::npos) 
+                          ? pos_str.substr(0, comma_pos) 
+                          : pos_str;
+    
+    // 品詞マッピング
+    if (main_pos.find("名詞") != std::string::npos) {
         return HB_MEISHI;
     }
-    else if (pos_str.find("動詞") != std::string::npos) {
+    else if (main_pos.find("動詞") != std::string::npos) {
         // TODO: 五段/一段/カ変/サ変の判定
         return HB_GODAN_DOUSHI;
     }
-    else if (pos_str.find("形容詞") != std::string::npos) {
+    else if (main_pos.find("形容詞") != std::string::npos) {
         return HB_IKEIYOUSHI;
     }
-    else if (pos_str.find("助詞") != std::string::npos) {
+    else if (main_pos.find("形容動詞") != std::string::npos) {
+        return HB_NAKEIYOUSHI;
+    }
+    else if (main_pos.find("連体詞") != std::string::npos) {
+        return HB_RENTAISHI;
+    }
+    else if (main_pos.find("副詞") != std::string::npos) {
+        return HB_FUKUSHI;
+    }
+    else if (main_pos.find("接続詞") != std::string::npos) {
+        return HB_SETSUZOKUSHI;
+    }
+    else if (main_pos.find("感動詞") != std::string::npos) {
+        return HB_KANDOUSHI;
+    }
+    else if (main_pos.find("助詞") != std::string::npos) {
+        // 助詞の細分類をチェック
         if (pos_str.find("格助詞") != std::string::npos) {
             return HB_KAKU_JOSHI;
         } else if (pos_str.find("接続助詞") != std::string::npos) {
@@ -201,6 +263,23 @@ HinshiBunrui VibratoEngine::ConvertPartOfSpeech(const char* pos)
             return HB_SHUU_JOSHI;
         }
         return HB_KAKU_JOSHI;  // デフォルト
+    }
+    else if (main_pos.find("助動詞") != std::string::npos) {
+        return HB_JODOUSHI;
+    }
+    else if (main_pos.find("接頭詞") != std::string::npos) {
+        return HB_SETTOUJI;
+    }
+    else if (main_pos.find("接尾") != std::string::npos) {
+        return HB_SETSUBIJI;
+    }
+    else if (main_pos.find("記号") != std::string::npos) {
+        if (pos_str.find("句点") != std::string::npos) {
+            return HB_PERIOD;
+        } else if (pos_str.find("読点") != std::string::npos) {
+            return HB_COMMA;
+        }
+        return HB_SYMBOL;
     }
     
     return HB_UNKNOWN;
