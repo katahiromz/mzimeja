@@ -46,3 +46,7 @@ mzimeja-*-setup.exe
 enc_temp_folder/
 archive.7z
 mzimeja*-LL-setup/
+
+# Rust build artifacts
+third_party/vibrato-c/target/
+third_party/vibrato-c/Cargo.lock
