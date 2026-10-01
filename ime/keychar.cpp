@@ -559,6 +559,8 @@ static KEYVALUEEXTRA reverse_roman_table[] = {
     {L"～", L"~"},
     {L"「", L"["},
     {L"」", L"]"},
+    {L"ゑ", L"wye"},
+    {L"ゐ", L"wyi"},
 };
 
 // ローマ字変換のテーブル。
@@ -845,6 +847,8 @@ static KEYVALUEEXTRA normal_roman_table[] = {
     {L"nn", L"ん"},
     {L"n’", L"ん"},
     {L"xn", L"ん"},
+    {L"wye", L"ゑ"},
+    {L"wyi", L"ゐ"},
     {L"nb", L"ん", L"b"},
     {L"nc", L"ん", L"c"},
     {L"nd", L"ん", L"d"},

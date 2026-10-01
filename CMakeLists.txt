@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # project name, version, and languages
-project(mzimeja VERSION 1.0.0.9 LANGUAGES CXX RC)
+project(mzimeja VERSION 1.0.1.0 LANGUAGES CXX RC)
 
 # -D_DEBUG or -DNDEBUG ?
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
