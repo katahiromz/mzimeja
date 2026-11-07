@@ -3690,6 +3690,65 @@ void Lattice::DoSahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.deltaCost -= 50;
     }
 
+    // サ変動詞の否定形を単一ノードとして追加
+    // 「しない」「しないで」「しなくて」「しなかった」など
+    do {
+        // 語幹が「し」または「じ」で終わっている場合
+        if (pre.size() >= 1) {
+            WCHAR last = pre[pre.size() - 1];
+            bool is_shi = (last == L'し');
+            bool is_ji  = (last == L'じ');
+
+            if (is_shi || is_ji) {
+                // しない / じない
+                if (tail.size() >= 2 && tail.substr(0, 2) == L"ない") {
+                    node.katsuyou = SHUUSHI_KEI;
+                    node.pre  = pre + L"ない";
+                    node.post = post + L"ない";
+                    AddNode(index, node);
+
+                    // しないで / じないで
+                    if (tail.size() >= 3 && tail[2] == L'で') {
+                        node.pre  += L"で";
+                        node.post += L"で";
+                        node.katsuyou = RENYOU_KEI;
+                        AddNode(index, node);
+                    }
+                    // しないか / よ / ね など
+                    if (tail.size() >= 3 &&
+                        (tail[2] == L'か' || tail[2] == L'よ' || tail[2] == L'ね' ||
+                         tail[2] == L'な' || tail[2] == L'ぞ')) {
+                        node.pre  = pre + L"ない" + tail[2];
+                        node.post = post + L"ない" + tail[2];
+                        node.katsuyou = SHUUSHI_KEI;
+                        AddNode(index, node);
+                    }
+                }
+                // しなくて / じなくて
+                if (tail.size() >= 3 && tail.substr(0, 3) == L"なくて") {
+                    node.katsuyou = RENYOU_KEI;
+                    node.pre  = pre + L"なくて";
+                    node.post = post + L"なくて";
+                    AddNode(index, node);
+                }
+                // しなかった / じなかった
+                if (tail.size() >= 4 && tail.substr(0, 4) == L"なかった") {
+                    node.katsuyou = SHUUSHI_KEI;
+                    node.pre  = pre + L"なかった";
+                    node.post = post + L"なかった";
+                    AddNode(index, node);
+                }
+                // しなければ / じなければ
+                if (tail.size() >= 4 && tail.substr(0, 4) == L"なければ") {
+                    node.katsuyou = KATEI_KEI;
+                    node.pre  = pre + L"なければ";
+                    node.post = post + L"なければ";
+                    AddNode(index, node);
+                }
+            }
+        }
+    } while (0);
+
     if (pre.size() >= 2) {
         std::wstring lastTwoChars = pre.substr(pre.size() - 2);
         // 終止形「～する」「～ずる」
