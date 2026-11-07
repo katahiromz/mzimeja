@@ -371,6 +371,12 @@ BOOL LatticeNode::CanConnectTo(const LatticeNode& other) const
                     return TRUE;
                 }
                 return FALSE;
+            case HB_SETSUZOKU_JOSHI:
+                // 否定の連用形「なく」+「て」（例：「咲かなくて」）。
+                if (other.pre == L"て") {
+                    return TRUE;
+                }
+                return FALSE;
             case HB_MEISHI: case HB_SETTOUJI:
             case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI:
             case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
@@ -2739,6 +2745,96 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
             node.pre = fields[I_FIELD_PRE] + ch + tail[1];
             node.post = fields[I_FIELD_POST] + ch + tail[1];
             AddNode(index, node);
+        }
+    } while (0);
+    // 五段動詞の否定形を単一ノードとして追加（一段動詞の「見ない」と対称）
+    // 「とまらない」「とまんない」など
+    do {
+        WCHAR ch_mizen;
+        if (node.gyou == GYOU_A) {
+            ch_mizen = L'わ';
+        } else {
+            ch_mizen = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_A);
+        }
+
+        // 標準の未然＋ない（とまらない）
+        if (tail.size() >= 3 && tail[0] == ch_mizen && tail.substr(1, 2) == L"ない") {
+            node.katsuyou = SHUUSHI_KEI;  // 一段側に合わせて終止形扱い
+            node.pre  = fields[I_FIELD_PRE] + ch_mizen + L"ない";
+            node.post = fields[I_FIELD_POST] + ch_mizen + L"ない";
+            AddNode(index, node);
+        }
+
+        // ら行の撥音便＋ない（とまんない）
+        if (node.gyou == GYOU_RA && tail.size() >= 3 && tail.substr(0, 3) == L"んない") {
+            node.katsuyou = SHUUSHI_KEI;
+            node.pre  = fields[I_FIELD_PRE] + L"んない";
+            node.post = fields[I_FIELD_POST] + L"んない";
+            AddNode(index, node);
+        }
+    } while (0);
+    // 五段動詞の否定形＋よく続く形を単一ノードとして追加
+    // （一段動詞の「見ない」系と対称に扱う）
+    do {
+        WCHAR ch_mizen;
+        if (node.gyou == GYOU_A) {
+            ch_mizen = L'わ';
+        } else {
+            ch_mizen = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_A);
+        }
+
+        // 標準の未然形（とまら…）
+        if (tail.size() >= 1 && tail[0] == ch_mizen) {
+            // とまらない
+            if (tail.size() >= 3 && tail.substr(1, 2) == L"ない") {
+                node.katsuyou = SHUUSHI_KEI;
+                node.pre  = fields[I_FIELD_PRE] + ch_mizen + L"ない";
+                node.post = fields[I_FIELD_POST] + ch_mizen + L"ない";
+                AddNode(index, node);
+
+                // とまらないで
+                if (tail.size() >= 4 && tail[3] == L'で') {
+                    node.pre  += L"で";
+                    node.post += L"で";
+                    node.katsuyou = RENYOU_KEI;  // 「ないで」は連用助動詞扱い
+                    AddNode(index, node);
+                }
+                // とまらないか / とまらないよ / とまらないね など必要に応じて追加可
+            }
+
+            // とまらなくて（よく使われる否定＋て形）
+            if (tail.size() >= 4 && tail.substr(1, 3) == L"なくて") {
+                node.katsuyou = RENYOU_KEI;
+                node.pre  = fields[I_FIELD_PRE] + ch_mizen + L"なくて";
+                node.post = fields[I_FIELD_POST] + ch_mizen + L"なくて";
+                AddNode(index, node);
+            }
+        }
+
+        // ら行の撥音便（とまん…）
+        if (node.gyou == GYOU_RA && tail.size() >= 1 && tail[0] == L'ん') {
+            // とまんない
+            if (tail.size() >= 3 && tail.substr(1, 2) == L"ない") {
+                node.katsuyou = SHUUSHI_KEI;
+                node.pre  = fields[I_FIELD_PRE] + L"んない";
+                node.post = fields[I_FIELD_POST] + L"んない";
+                AddNode(index, node);
+
+                // とまんないで
+                if (tail.size() >= 4 && tail[3] == L'で') {
+                    node.pre  += L"で";
+                    node.post += L"で";
+                    node.katsuyou = RENYOU_KEI;
+                    AddNode(index, node);
+                }
+            }
+            // とまんなくて
+            if (tail.size() >= 4 && tail.substr(1, 3) == L"なくて") {
+                node.katsuyou = RENYOU_KEI;
+                node.pre  = fields[I_FIELD_PRE] + L"んなくて";
+                node.post = fields[I_FIELD_POST] + L"んなくて";
+                AddNode(index, node);
+            }
         }
     } while (0);
     // 「とまら(ない)」→「とまん(ない)」
