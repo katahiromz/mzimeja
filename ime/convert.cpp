@@ -755,17 +755,30 @@ INT LatticeNode::WordCost() const
     if (HasTag(L"[動植物]")) cost += 80;  // 動植物は重い
 
     // 長さによる調整（長い単語を優先）
-    if (pre.size() >= 3) cost -= 30;
-    if (pre.size() >= 4) cost -= 50;
-    if (pre.size() >= 6) cost -= 100;
-    if (pre.size() >= 8) cost -= 150;
+    if (pre.size() >= 3) cost -= 40;
+    if (pre.size() >= 4) cost -= 60;
+    if (pre.size() >= 5) cost -= 40;
+    if (pre.size() >= 6) cost -= 80;
+    if (pre.size() >= 8) cost -= 120;
 
-    // 活用形が付いている動詞はさらに優遇
+    // 活用形が付いている動詞はさらに優遇（否定形・連用形など）
     if ((bunrui == HB_GODAN_DOUSHI || bunrui == HB_ICHIDAN_DOUSHI ||
-         bunrui == HB_KAHEN_DOUSHI || bunrui == HB_SAHEN_DOUSHI) &&
-        katsuyou != MIZEN_KEI /* 基本形以外 */)
+         bunrui == HB_KAHEN_DOUSHI || bunrui == HB_SAHEN_DOUSHI))
     {
-        cost -= 40;  // 活用形ノードを優先
+        if (katsuyou != MIZEN_KEI) { // 未然形以外（終止・連用など）
+            cost -= 50;
+        } else {
+            // 未然形単体は少しだけ優遇（後続の助動詞と繋がりやすく）
+            cost -= 20;
+        }
+    }
+
+    // 否定形らしい長いノードを特に優遇（「〜ない」「〜ないで」「〜なくて」など）
+    if (pre.size() >= 4 &&
+        (pre.find(L"ない") != std::wstring::npos ||
+         pre.find(L"なくて") != std::wstring::npos))
+    {
+        cost -= 60;  // 否定形結合ノードを強く優先
     }
 
     // deltaCostを加算（ユーザーによる動的な調整）
@@ -797,15 +810,24 @@ INT LatticeNode::ConnectCost(const LatticeNode& other) const
     if (IsDoushi() || IsKeiyoushi()) {
         // 連用形→助動詞の接続は自然
         if (katsuyou == RENYOU_KEI && other.IsJodoushi()) {
-            cost -= 15;
+            cost -= 20;
         }
-        // 未然形→助動詞（「ない」「れる」など）
+        // 未然形→助動詞（「ない」「れる」「ないで」など）
         if (katsuyou == MIZEN_KEI && other.IsJodoushi()) {
-            cost -= 35;
+            cost -= 50;   // 否定形を特に優遇
         }
         // 仮定形→助詞「ば」
         if (katsuyou == KATEI_KEI && other.IsJoshi()) {
-            cost -= 10;
+            cost -= 15;
+        }
+    }
+
+    // 動詞の未然形＋「ない」系をさらに明示的に優遇
+    if (IsDoushi() && katsuyou == MIZEN_KEI && other.IsJodoushi()) {
+        if (other.pre.find(L"ない") != std::wstring::npos ||
+            other.pre == L"ないで" || other.pre == L"なくて")
+        {
+            cost -= 30;  // 追加ボーナス
         }
     }
 
