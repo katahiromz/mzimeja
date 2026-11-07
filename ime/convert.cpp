@@ -361,18 +361,17 @@ BOOL LatticeNode::CanConnectTo(const LatticeNode& other) const
             }
             return FALSE;
         case RENYOU_KEI:
-            switch (h1) {
-            case HB_JODOUSHI:
-                if (other.HasTag(L"[連用形に連結]")) {
-                    return TRUE;
-                }
-                return FALSE;
-            case HB_SETSUZOKU_JOSHI:
-                // 否定の連用形「なく」+「て」（例：「咲かなくて」）。
+            if (other.IsJodoushi() && other.HasTag(L"[連用形に連結]")) {
+                return TRUE;
+            }
+            if (h1 == HB_SETSUZOKU_JOSHI) {
+                // 否定の連用形「なく」+「て」
                 if (other.pre == L"て") {
                     return TRUE;
                 }
                 return FALSE;
+            }
+            switch (h1) {
             case HB_MEISHI: case HB_SETTOUJI:
             case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI:
             case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
@@ -383,11 +382,8 @@ BOOL LatticeNode::CanConnectTo(const LatticeNode& other) const
             }
             break;
         case SHUUSHI_KEI:
-            if (h1 == HB_JODOUSHI) {
-                if (other.HasTag(L"[終止形に連結]")) {
-                    return TRUE;
-                }
-                if (other.HasTag(L"[種々の語]")) {
+            if (other.IsJodoushi()) {
+                if (other.HasTag(L"[終止形に連結]") || other.HasTag(L"[種々の語]")) {
                     return TRUE;
                 }
             }
@@ -479,19 +475,15 @@ BOOL LatticeNode::CanConnectTo(const LatticeNode& other) const
     case HB_JODOUSHI: // 助動詞
         switch (katsuyou) {
         case MIZEN_KEI:
-            if (h1 == HB_JODOUSHI) {
-                if (other.HasTag(L"[未然形に連結]")) {
-                    return TRUE;
-                }
+            if (other.IsJodoushi() && other.HasTag(L"[未然形に連結]")) {
+                return TRUE;
             }
             return FALSE;
         case RENYOU_KEI:
+            if (other.IsJodoushi() && other.HasTag(L"[連用形に連結]")) {
+                return TRUE;
+            }
             switch (h1) {
-            case HB_JODOUSHI:
-                if (other.HasTag(L"[連用形に連結]")) {
-                    return TRUE;
-                }
-                return FALSE;
             case HB_MEISHI: case HB_SETTOUJI:
             case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI:
             case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
@@ -502,11 +494,8 @@ BOOL LatticeNode::CanConnectTo(const LatticeNode& other) const
             }
             break;
         case SHUUSHI_KEI:
-            if (h1 == HB_JODOUSHI) {
-                if (other.HasTag(L"[終止形に連結]")) {
-                    return TRUE;
-                }
-                if (other.HasTag(L"[種々の語]")) {
+            if (other.IsJodoushi()) {
+                if (other.HasTag(L"[終止形に連結]") || other.HasTag(L"[種々の語]")) {
                     return TRUE;
                 }
             }
@@ -551,19 +540,15 @@ BOOL LatticeNode::CanConnectTo(const LatticeNode& other) const
         // 動詞
         switch (katsuyou) {
         case MIZEN_KEI:
-            if (h1 == HB_JODOUSHI) {
-                if (other.HasTag(L"[未然形に連結]")) {
-                    return TRUE;
-                }
+            if (other.IsJodoushi() && other.HasTag(L"[未然形に連結]")) {
+                return TRUE;
             }
             return FALSE;
         case RENYOU_KEI:
+            if (other.IsJodoushi() && other.HasTag(L"[連用形に連結]")) {
+                return TRUE;
+            }
             switch (h1) {
-            case HB_JODOUSHI:
-                if (other.HasTag(L"[連用形に連結]")) {
-                    return TRUE;
-                }
-                return FALSE;
             case HB_MEISHI: case HB_SETTOUJI:
             case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI:
             case HB_GODAN_DOUSHI: case HB_ICHIDAN_DOUSHI:
@@ -574,11 +559,8 @@ BOOL LatticeNode::CanConnectTo(const LatticeNode& other) const
             }
             break;
         case SHUUSHI_KEI:
-            if (h1 == HB_JODOUSHI) {
-                if (other.HasTag(L"[終止形に連結]")) {
-                    return TRUE;
-                }
-                if (other.HasTag(L"[種々の語]")) {
+            if (other.IsJodoushi()) {
+                if (other.HasTag(L"[終止形に連結]") || other.HasTag(L"[種々の語]")) {
                     return TRUE;
                 }
             }
@@ -2810,6 +2792,22 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
                 node.post = fields[I_FIELD_POST] + ch_mizen + L"なくて";
                 AddNode(index, node);
             }
+
+            // とまらなかった
+            if (tail.size() >= 5 && tail.substr(1, 4) == L"なかった") {
+                node.katsuyou = SHUUSHI_KEI;
+                node.pre  = fields[I_FIELD_PRE] + ch_mizen + L"なかった";
+                node.post = fields[I_FIELD_POST] + ch_mizen + L"なかった";
+                AddNode(index, node);
+            }
+
+            // とまらなければ
+            if (tail.size() >= 5 && tail.substr(1, 4) == L"なければ") {
+                node.katsuyou = KATEI_KEI;
+                node.pre  = fields[I_FIELD_PRE] + ch_mizen + L"なければ";
+                node.post = fields[I_FIELD_POST] + ch_mizen + L"なければ";
+                AddNode(index, node);
+            }
         }
 
         // ら行の撥音便（とまん…）
@@ -2834,6 +2832,21 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
                 node.katsuyou = RENYOU_KEI;
                 node.pre  = fields[I_FIELD_PRE] + L"んなくて";
                 node.post = fields[I_FIELD_POST] + L"んなくて";
+                AddNode(index, node);
+            }
+
+            // とまんなかった
+            if (tail.size() >= 5 && tail.substr(1, 4) == L"なかった") {
+                node.katsuyou = SHUUSHI_KEI;
+                node.pre  = fields[I_FIELD_PRE] + L"んなかった";
+                node.post = fields[I_FIELD_POST] + L"んなかった";
+                AddNode(index, node);
+            }
+            // とまんなければ
+            if (tail.size() >= 5 && tail.substr(1, 4) == L"なければ") {
+                node.katsuyou = KATEI_KEI;
+                node.pre  = fields[I_FIELD_PRE] + L"んなければ";
+                node.post = fields[I_FIELD_POST] + L"んなければ";
                 AddNode(index, node);
             }
         }
