@@ -356,12 +356,8 @@ BOOL LatticeNode::CanConnectTo(const LatticeNode& other) const
     case HB_IKEIYOUSHI: case HB_NAKEIYOUSHI: // い形容詞、な形容詞
         switch (katsuyou) {
         case MIZEN_KEI:
-            if (h1 == HB_JODOUSHI) {
-                if (other.HasTag(L"[未然形に連結]")) {
-                    if (other.pre[0] == L'な' || other.pre == L"う") {
-                        return TRUE;
-                    }
-                }
+            if (other.IsJodoushi() && other.HasTag(L"[未然形に連結]")) {
+                return TRUE;
             }
             return FALSE;
         case RENYOU_KEI:
@@ -759,9 +755,18 @@ INT LatticeNode::WordCost() const
     if (HasTag(L"[動植物]")) cost += 80;  // 動植物は重い
 
     // 長さによる調整（長い単語を優先）
+    if (pre.size() >= 3) cost -= 30;
     if (pre.size() >= 4) cost -= 50;
     if (pre.size() >= 6) cost -= 100;
     if (pre.size() >= 8) cost -= 150;
+
+    // 活用形が付いている動詞はさらに優遇
+    if ((bunrui == HB_GODAN_DOUSHI || bunrui == HB_ICHIDAN_DOUSHI ||
+         bunrui == HB_KAHEN_DOUSHI || bunrui == HB_SAHEN_DOUSHI) &&
+        katsuyou != MIZEN_KEI /* 基本形以外 */)
+    {
+        cost -= 40;  // 活用形ノードを優先
+    }
 
     // deltaCostを加算（ユーザーによる動的な調整）
     cost += deltaCost;
@@ -2747,32 +2752,6 @@ void Lattice::DoGodanDoushi(size_t index, const WStrings& fields, INT deltaCost)
             AddNode(index, node);
         }
     } while (0);
-    // 五段動詞の否定形を単一ノードとして追加（一段動詞の「見ない」と対称）
-    // 「とまらない」「とまんない」など
-    do {
-        WCHAR ch_mizen;
-        if (node.gyou == GYOU_A) {
-            ch_mizen = L'わ';
-        } else {
-            ch_mizen = ARRAY_AT_AT(s_hiragana_table, node.gyou, DAN_A);
-        }
-
-        // 標準の未然＋ない（とまらない）
-        if (tail.size() >= 3 && tail[0] == ch_mizen && tail.substr(1, 2) == L"ない") {
-            node.katsuyou = SHUUSHI_KEI;  // 一段側に合わせて終止形扱い
-            node.pre  = fields[I_FIELD_PRE] + ch_mizen + L"ない";
-            node.post = fields[I_FIELD_POST] + ch_mizen + L"ない";
-            AddNode(index, node);
-        }
-
-        // ら行の撥音便＋ない（とまんない）
-        if (node.gyou == GYOU_RA && tail.size() >= 3 && tail.substr(0, 3) == L"んない") {
-            node.katsuyou = SHUUSHI_KEI;
-            node.pre  = fields[I_FIELD_PRE] + L"んない";
-            node.post = fields[I_FIELD_POST] + L"んない";
-            AddNode(index, node);
-        }
-    } while (0);
     // 五段動詞の否定形＋よく続く形を単一ノードとして追加
     // （一段動詞の「見ない」系と対称に扱う）
     do {
@@ -3545,6 +3524,88 @@ void Lattice::DoKahenDoushi(size_t index, const WStrings& fields, INT deltaCost)
         node.pre = fields[I_FIELD_PRE] + L"させ";
         node.post = fields[I_FIELD_POST] + L"させ";
         AddNode(index, node);
+    } while (0);
+
+    // カ変動詞の否定形を単一ノードとして追加（五段・一段と対称）
+    // 「こない」「こないで」「こなくて」「こなかった」など
+    do {
+        // 「こ」で始まる未然形の後
+        if (tail.size() >= 1 && tail[0] == L'こ') {
+            // こない
+            if (tail.size() >= 3 && tail.substr(1, 2) == L"ない") {
+                node.katsuyou = SHUUSHI_KEI;
+                node.pre  = fields[I_FIELD_PRE] + L"こない";
+                node.post = fields[I_FIELD_POST] + L"来ない";
+                AddNode(index, node);
+
+                // こないで
+                if (tail.size() >= 4 && tail[3] == L'で') {
+                    node.pre  += L"で";
+                    node.post += L"で";
+                    node.katsuyou = RENYOU_KEI;
+                    AddNode(index, node);
+                }
+                // こないか / よ / ね / な / ぞ
+                if (tail.size() >= 4 &&
+                    (tail[3] == L'か' || tail[3] == L'よ' || tail[3] == L'ね' ||
+                     tail[3] == L'な' || tail[3] == L'ぞ')) {
+                    node.pre  = fields[I_FIELD_PRE] + L"こない" + tail[3];
+                    node.post = fields[I_FIELD_POST] + L"来ない" + tail[3];
+                    node.katsuyou = SHUUSHI_KEI;
+                    AddNode(index, node);
+                }
+            }
+            // こなくて
+            if (tail.size() >= 4 && tail.substr(1, 3) == L"なくて") {
+                node.katsuyou = RENYOU_KEI;
+                node.pre  = fields[I_FIELD_PRE] + L"こなくて";
+                node.post = fields[I_FIELD_POST] + L"来なくて";
+                AddNode(index, node);
+            }
+            // こなかった
+            if (tail.size() >= 5 && tail.substr(1, 4) == L"なかった") {
+                node.katsuyou = SHUUSHI_KEI;
+                node.pre  = fields[I_FIELD_PRE] + L"こなかった";
+                node.post = fields[I_FIELD_POST] + L"来なかった";
+                AddNode(index, node);
+            }
+            // こなければ
+            if (tail.size() >= 5 && tail.substr(1, 4) == L"なければ") {
+                node.katsuyou = KATEI_KEI;
+                node.pre  = fields[I_FIELD_PRE] + L"こなければ";
+                node.post = fields[I_FIELD_POST] + L"来なければ";
+                AddNode(index, node);
+            }
+        }
+
+        // 辞書に「こ」が直接登録されている場合（fields[I_FIELD_PRE] == L"こ"）
+        if (fields[I_FIELD_PRE] == L"こ") {
+            if (tail.size() >= 2 && tail.substr(0, 2) == L"ない") {
+                node.katsuyou = SHUUSHI_KEI;
+                node.pre  = L"こない";
+                node.post = L"来ない";
+                AddNode(index, node);
+
+                if (tail.size() >= 3 && tail[2] == L'で') {
+                    node.pre  += L"で";
+                    node.post += L"で";
+                    node.katsuyou = RENYOU_KEI;
+                    AddNode(index, node);
+                }
+            }
+            if (tail.size() >= 3 && tail.substr(0, 3) == L"なくて") {
+                node.katsuyou = RENYOU_KEI;
+                node.pre  = L"こなくて";
+                node.post = L"来なくて";
+                AddNode(index, node);
+            }
+            if (tail.size() >= 4 && tail.substr(0, 4) == L"なかった") {
+                node.katsuyou = SHUUSHI_KEI;
+                node.pre  = L"こなかった";
+                node.post = L"来なかった";
+                AddNode(index, node);
+            }
+        }
     } while (0);
 
     // 連用形「～来」（き）
