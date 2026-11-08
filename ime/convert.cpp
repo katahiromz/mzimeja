@@ -349,6 +349,14 @@ BOOL LatticeNode::CanConnectTo(const LatticeNode& other) const
         switch (h1) {
         case HB_SETTOUJI:
             return FALSE;
+        case HB_JODOUSHI: case HB_MIZEN_JODOUSHI: case HB_RENYOU_JODOUSHI: case HB_SHUUSHI_JODOUSHI:
+        case HB_RENTAI_JODOUSHI: case HB_KATEI_JODOUSHI: case HB_MEIREI_JODOUSHI:
+            // 名詞に直接「た」（連用形連結）などが付くのは不自然。
+            // 「だ」「です」などは[回避策]タグのため許可し、「た」など[連用形に連結]は禁止する。
+            if (other.HasTag(L"[連用形に連結]")) {
+                return FALSE;
+            }
+            return TRUE;
         default:
             return TRUE;
         }
