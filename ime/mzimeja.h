@@ -211,6 +211,7 @@ static inline DWORD HinshiToStyle(HinshiBunrui hinshi) {
 struct UIEXTRA {
     HIMC hIMC;
     HWND hwndStatus;
+    BOOL bStatusOpen;
     HWND hwndCand;
     POINT ptCand;
     DWORD dwCompStyle;

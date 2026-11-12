@@ -76,6 +76,9 @@ void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam)
                 lpIMC->UnlockCompStr();
                 lpIMC->UnlockCandInfo();
                 StatusWnd_Update(lpUIExtra);
+                if (lpUIExtra->bStatusOpen && ::IsWindow(lpUIExtra->hwndStatus)) {
+                    ::ShowWindow(lpUIExtra->hwndStatus, SW_SHOWNOACTIVATE);
+                }
                 TheIME.UnlockIMC(hIMC);
             } else {
                 ShowUIWindows(hWnd, FALSE);
@@ -343,10 +346,12 @@ LONG NotifyCommand(HIMC hIMC, HWND hWnd, WPARAM wParam, LPARAM lParam)
 
             ::ShowWindow(lpUIExtra->hwndStatus, SW_HIDE); // 実際には破棄されるのではなく隠される。
         }
+        lpUIExtra->bStatusOpen = FALSE;
         break;
 
     case IMN_OPENSTATUSWINDOW: // 状態ウィンドウが開かれる。
         DPRINTA("IMN_OPENSTATUSWINDOW\n");
+        lpUIExtra->bStatusOpen = TRUE;
         StatusWnd_Create(hWnd, lpUIExtra); // 状態ウィンドウを作成する。
         break;
 
