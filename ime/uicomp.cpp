@@ -226,8 +226,13 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
         ::ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.left);
         ::ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.right);
 
-        // check the start position
-        if (!::PtInRect(&rcSrc, ptSrc)) {
+        if (lpIMC->cfCompForm.dwStyle & CFS_FORCE_POSITION) {
+            MONITORINFO mi = { sizeof(mi) };
+            HMONITOR hMonitor = ::MonitorFromPoint(ptSrc, MONITOR_DEFAULTTONEAREST);
+            if (::GetMonitorInfo(hMonitor, &mi)) {
+                rcSrc = mi.rcMonitor;
+            }
+        } else if (!::PtInRect(&rcSrc, ptSrc)) {
             DPRINTA("!::PtInRect\n");
             lpIMC->UnlockCompStr();
             return;
