@@ -1887,6 +1887,22 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
     FOOTMARK();
     const size_t length = m_pre.size();
     ASSERT(length);
+    auto is_parenthesis = [](WCHAR ch) {
+        switch (ch) {
+        case L'(': case L')': case L'（': case L'）':
+        case L'[': case L']': case L'［': case L'］':
+        case L'{': case L'}': case L'｛': case L'｝':
+        case L'<': case L'>': case L'＜': case L'＞':
+        case L'「': case L'」': case L'『': case L'』':
+        case L'〈': case L'〉': case L'《': case L'》':
+        case L'【': case L'】': case L'〔': case L'〕':
+        case L'〖': case L'〗': case L'〘': case L'〙':
+        case L'〚': case L'〛':
+            return true;
+        default:
+            return false;
+        }
+    };
 
     // フィールド区切り（separator）。
     std::wstring sep;
@@ -2024,9 +2040,24 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
 
         if (!mz_is_hiragana(m_pre[index])) { // ひらがなではない？
             size_t saved = index;
+            if (is_parenthesis(m_pre[index])) {
+                do {
+                    ++index;
+                } while (is_parenthesis(m_pre[index]));
+
+                fields.resize(NUM_FIELDS);
+                fields[I_FIELD_PRE] = m_pre.substr(saved, index - saved);
+                fields[I_FIELD_HINSHI].resize(1);
+                fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_SYMBOL, 0);
+                fields[I_FIELD_POST] = fields[I_FIELD_PRE];
+                DoFields(saved, fields);
+                --index;
+                continue;
+            }
             do {
                 ++index;
-            } while ((!mz_is_hiragana(m_pre[index]) || mz_is_hyphen(m_pre[index])) && m_pre[index]);
+            } while ((!mz_is_hiragana(m_pre[index]) || mz_is_hyphen(m_pre[index])) &&
+                     m_pre[index] && !is_parenthesis(m_pre[index]));
 
             fields.resize(NUM_FIELDS);
             fields[I_FIELD_PRE] = m_pre.substr(saved, index - saved);
