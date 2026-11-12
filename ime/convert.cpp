@@ -2028,6 +2028,7 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
                 do {
                     ++index;
                 } while (iswpunct(m_pre[index]));
+                size_t end = index;
 
                 fields.resize(NUM_FIELDS);
                 fields[I_FIELD_PRE] = m_pre.substr(saved, index - saved);
@@ -2035,6 +2036,19 @@ BOOL Lattice::AddNodesFromDict(size_t index, const WCHAR *dict_data)
                 fields[I_FIELD_HINSHI][0] = MAKEWORD(HB_SYMBOL, 0);
                 fields[I_FIELD_POST] = fields[I_FIELD_PRE];
                 DoFields(saved, fields);
+
+                for (size_t dict_index = saved; dict_index < end; ++dict_index) {
+                    records.clear();
+                    ScanBasicDict(records, dict_data, m_pre[dict_index]);
+                    ScanUserDict(records, m_pre[dict_index], this);
+
+                    for (size_t i = 0; i < records.size(); ++i) {
+                        std::wstring& record = records[i];
+                        str_split(fields, record, sep);
+                        DoFields(dict_index, fields);
+                    }
+                }
+
                 --index;
                 continue;
             }
