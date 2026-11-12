@@ -58,6 +58,65 @@ static int NumCharInDY(HDC hDC, const WCHAR *psz, int dy)
 
 //////////////////////////////////////////////////////////////////////////////
 
+// アプリが未確定文字列の表示を拒否しているか? (ui.cpp で管理)
+BOOL UI_IsCompHiddenByApp(HWND hUIWnd);
+
+static BOOL CompWnd_IsHiddenByApp(UIEXTRA *lpUIExtra)
+{
+    HWND hwnd = lpUIExtra->hwndDefComp;
+    if (!::IsWindow(hwnd)) hwnd = lpUIExtra->hwndComp[0];
+    if (!::IsWindow(hwnd)) return FALSE;
+    HWND hUIWnd = (HWND)::GetWindowLongPtr(hwnd, FIGWLP_SERVERWND);
+    return UI_IsCompHiddenByApp(hUIWnd);
+}
+
+// 有効な未確定文字列のスタイルと、開始位置(スクリーン座標)を求める。
+// アプリが CFS_DEFAULT のままでも、システムキャレットを持っている場合
+// (Chrome など)は、キャレット位置を使って CFS_POINT 相当として扱う。
+static DWORD CompWnd_GetStyle(InputContext *lpIMC, POINT *pptScreen = NULL)
+{
+    DWORD dwStyle = lpIMC->cfCompForm.dwStyle;
+    if (dwStyle) {
+        if (pptScreen) {
+            POINT pt = lpIMC->cfCompForm.ptCurrentPos;
+            ::ClientToScreen(lpIMC->hWnd, &pt);
+            *pptScreen = pt;
+        }
+        return dwStyle;
+    }
+
+    // アプリに、未確定文字列の先頭文字の位置(スクリーン座標)を問い合わせる。
+    // Chrome などは、ImmSetCompositionWindow ではなくこの方法で位置を伝える。
+    {
+        IMECHARPOSITION pos;
+        ::ZeroMemory(&pos, sizeof(pos));
+        pos.dwSize = sizeof(pos);
+        pos.dwCharPos = 0;
+        LRESULT lres = ::SendMessage(lpIMC->hWnd, WM_IME_REQUEST,
+                                     IMR_QUERYCHARPOSITION, (LPARAM)&pos);
+        DPRINTA("IMR_QUERYCHARPOSITION: lres=%ld, pt=(%ld, %ld), lineHeight=%u\n",
+                (long)lres, pos.pt.x, pos.pt.y, pos.cLineHeight);
+        if (lres && (pos.pt.x != 0 || pos.pt.y != 0)) {
+            if (pptScreen) *pptScreen = pos.pt;
+            return CFS_POINT;
+        }
+    }
+
+    GUITHREADINFO gti = { sizeof(gti) };
+    DWORD dwThreadID = ::GetWindowThreadProcessId(lpIMC->hWnd, NULL);
+    if (dwThreadID && ::GetGUIThreadInfo(dwThreadID, &gti) && gti.hwndCaret) {
+        if (pptScreen) {
+            POINT pt = { gti.rcCaret.left, gti.rcCaret.top };
+            ::ClientToScreen(gti.hwndCaret, &pt);
+            *pptScreen = pt;
+        }
+        return CFS_POINT;
+    }
+    return 0; // 本当に CFS_DEFAULT。
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 // 未確定文字列ウィンドウの作成時。
 void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC)
 {
@@ -107,6 +166,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
 
     // is it vertical?
     BOOL fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
+    const DWORD dwCompStyle = lpUIExtra->dwCompStyle; // CompWnd_Move で決定済み
 
     // get comp str
     CompStr *lpCompStr = lpIMC->LockCompStr();
@@ -124,7 +184,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
     DWORD ich = 0;
     DWORD dwClauseIndex = 0;
     for (int i = 0; i < MAXCOMPWND; i++) {
-        if (lpIMC->cfCompForm.dwStyle) {
+        if (dwCompStyle) {
             hCompWnd = lpUIExtra->hwndComp[i];
         } else {
             hCompWnd = lpUIExtra->hwndDefComp;
@@ -190,7 +250,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
         ::SelectObject(hDC, hOldFont);
         ::ReleaseDC(hCompWnd, hDC);
 
-        if (bIsDone || lpIMC->cfCompForm.dwStyle == 0) {
+        if (bIsDone || dwCompStyle == 0) {
             break;
         }
     }
@@ -203,40 +263,58 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
 void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 {
     FOOTMARK_FORMAT("%p, %p\n", lpUIExtra, lpIMC);
-    lpUIExtra->dwCompStyle = lpIMC->cfCompForm.dwStyle;
+
+    DPRINTA("CompWnd_Move: build %s %s, IMC style=0x%08X, hWnd=%p, hidden=%d\n",
+            __DATE__, __TIME__, (unsigned)lpIMC->cfCompForm.dwStyle,
+            (void *)lpIMC->hWnd, (int)CompWnd_IsHiddenByApp(lpUIExtra));
+
+    // アプリ(Chromeなど)が自前で未確定文字列を描画する場合は、IME側では表示しない。
+    if (CompWnd_IsHiddenByApp(lpUIExtra)) {
+        DPRINTA("hidden by app (ISC_SHOWUICOMPOSITIONWINDOW is off)\n");
+        CompWnd_Hide(lpUIExtra);
+        return;
+    }
+
+    POINT ptCompPos = { 0, 0 };
+    const DWORD dwStyle = CompWnd_GetStyle(lpIMC, &ptCompPos);
+    lpUIExtra->dwCompStyle = dwStyle;
 
     HFONT hFont = NULL;
     HFONT hOldFont = NULL;
-    DPRINTA("dwStyle: 0x%08X\n", lpIMC->cfCompForm.dwStyle);
-    if (lpIMC->cfCompForm.dwStyle) { // style is not CFS_DEFAULT
+    DPRINTA("dwStyle: 0x%08X (IMC: 0x%08X)\n", dwStyle, lpIMC->cfCompForm.dwStyle);
+    if (dwStyle) { // style is not CFS_DEFAULT
         // lock the COMPOSITIONSTRING structure
         if (!lpIMC->HasCompStr()) return;
         CompStr *lpCompStr = lpIMC->LockCompStr();
         if (lpCompStr == NULL) return;
 
-        // set the rectangle for the composition string
+        // 変換先の矩形(rcSrc)と開始位置(ptSrc)をスクリーン座標で求める。
+        POINT ptSrc = ptCompPos;
+
         RECT rcSrc;
-        if (lpIMC->cfCompForm.dwStyle & CFS_RECT)
+        if (dwStyle & CFS_RECT) {
             rcSrc = lpIMC->cfCompForm.rcArea;
-        else
-            ::GetClientRect(lpIMC->hWnd, &rcSrc);
+            ::MapWindowPoints(lpIMC->hWnd, NULL, (LPPOINT)&rcSrc, 2);
 
-        POINT ptSrc = lpIMC->cfCompForm.ptCurrentPos;
-        ::ClientToScreen(lpIMC->hWnd, &ptSrc);
-        ::ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.left);
-        ::ClientToScreen(lpIMC->hWnd, (LPPOINT)&rcSrc.right);
-
-        if (lpIMC->cfCompForm.dwStyle & CFS_FORCE_POSITION) {
+            // 範囲外でも中止せず、矩形内に収める。
+            if (ptSrc.x < rcSrc.left)       ptSrc.x = rcSrc.left;
+            if (ptSrc.x > rcSrc.right - 1)  ptSrc.x = rcSrc.right - 1;
+            if (ptSrc.y < rcSrc.top)        ptSrc.y = rcSrc.top;
+            if (ptSrc.y > rcSrc.bottom - 1) ptSrc.y = rcSrc.bottom - 1;
+        } else {
+            // CFS_POINT / CFS_FORCE_POSITION:
+            // クライアント矩形ではなく、モニターの作業領域で折り返す。
             MONITORINFO mi = { sizeof(mi) };
             HMONITOR hMonitor = ::MonitorFromPoint(ptSrc, MONITOR_DEFAULTTONEAREST);
             if (::GetMonitorInfo(hMonitor, &mi)) {
-                rcSrc = mi.rcMonitor;
+                rcSrc = mi.rcWork;
+            } else {
+                ::GetClientRect(lpIMC->hWnd, &rcSrc);
+                ::MapWindowPoints(lpIMC->hWnd, NULL, (LPPOINT)&rcSrc, 2);
             }
-        } else if (!::PtInRect(&rcSrc, ptSrc)) {
-            DPRINTA("!::PtInRect\n");
-            lpIMC->UnlockCompStr();
-            return;
         }
+        DPRINTA("ptSrc: (%ld, %ld), rcSrc: (%ld, %ld, %ld, %ld)\n",
+                ptSrc.x, ptSrc.y, rcSrc.left, rcSrc.top, rcSrc.right, rcSrc.bottom);
 
         // hide the default composition window
         HWND hwndDef = lpUIExtra->hwndDefComp;
@@ -254,7 +332,8 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
         DWORD *pdwEnd = pdw + lpCompStr->dwCompClauseLen / sizeof(DWORD);
         std::set<DWORD> clauses(pdw, pdwEnd);
 
-        if (!lpUIExtra->bVertical) { // not vertical font
+        const BOOL fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
+        if (!fVert) { // not vertical font
             int dx = rcSrc.right - ptSrc.x;
             int curx = ptSrc.x, cury = ptSrc.y;
 
@@ -265,6 +344,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
                 HWND hwnd = lpUIExtra->hwndComp[i];
                 if (::IsWindow(hwnd)) {
                     HDC hDC = ::GetDC(hwnd);
+                    hOldFont = NULL;
                     hFont = (HFONT) ::GetWindowLongPtr(hwnd, FIGWLP_FONT);
                     if (hFont) hOldFont = (HFONT) ::SelectObject(hDC, hFont);
 
@@ -303,7 +383,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 
                     dx = rcSrc.right - rcSrc.left;
                     curx = rcSrc.left;
-                    cury += siz.cy + UNDERLINE_HEIGHT;
+                    cury += siz.cy; // siz.cy は UNDERLINE_HEIGHT 込み
 
                     if (hOldFont) ::SelectObject(hDC, hOldFont);
                     ::ReleaseDC(hwnd, hDC);
@@ -317,6 +397,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
                 HWND hwnd = lpUIExtra->hwndComp[i];
                 if (::IsWindow(hwnd)) {
                     HDC hDC = ::GetDC(hwnd);
+                    hOldFont = NULL;
                     hFont = (HFONT) ::GetWindowLongPtr(hwnd, FIGWLP_FONT);
                     if (hFont) hOldFont = (HFONT) ::SelectObject(hDC, hFont);
 
@@ -354,7 +435,7 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
 
                     dy = rcSrc.bottom - rcSrc.top;
                     cury = rcSrc.top;
-                    curx -= siz.cy + UNDERLINE_HEIGHT;
+                    curx -= siz.cy; // siz.cy は UNDERLINE_HEIGHT 込み
 
                     if (hOldFont) ::SelectObject(hDC, hOldFont);
                     ::ReleaseDC(hwnd, hDC);
@@ -402,6 +483,19 @@ void CompWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
             Config_SetData(L"ptDefComp", REG_BINARY, &pt, sizeof(pt));
             width += 2 * ::GetSystemMetrics(SM_CXEDGE) + CARET_WIDTH;
             height += 2 * ::GetSystemMetrics(SM_CYEDGE) + UNDERLINE_HEIGHT;
+
+            // 画面外やタスクバーの下に隠れないように、モニターの作業領域に収める。
+            {
+                POINT ptTopLeft = { rc.left, rc.top };
+                HMONITOR hMon = ::MonitorFromPoint(ptTopLeft, MONITOR_DEFAULTTONEAREST);
+                MONITORINFO mi = { sizeof(mi) };
+                if (::GetMonitorInfo(hMon, &mi)) {
+                    if (rc.left + width > mi.rcWork.right)   rc.left = mi.rcWork.right - width;
+                    if (rc.top + height > mi.rcWork.bottom)  rc.top = mi.rcWork.bottom - height;
+                    if (rc.left < mi.rcWork.left)            rc.left = mi.rcWork.left;
+                    if (rc.top < mi.rcWork.top)              rc.top = mi.rcWork.top;
+                }
+            }
 
             // move and show window
             DPRINTA("%d, %d, %d, %d\n", rc.left, rc.top, width, height);
@@ -554,18 +648,20 @@ void CompWnd_Draw(HWND hCompWnd, HDC hDC, InputContext *lpIMC, CompStr *lpCompSt
     BOOL fVert = (lpIMC->lfFont.A.lfEscapement == 2700);
 
     // さらにヘルパー関数を用いて描画する。
-    if (lpIMC->cfCompForm.dwStyle) {
+    // 分割表示用ウィンドウは表示文字数(FIGWL_COMPSTARTNUM)が設定されている。
+    // 既定のウィンドウは 0 なので、IMC のスタイルではなくウィンドウ自身の状態で判断する。
+    DWORD cch = (DWORD)::GetWindowLongPtr(hCompWnd, FIGWL_COMPSTARTNUM);
+    if (cch) {
         ::SetBkMode(hDC, OPAQUE);
 
         DWORD ich = (DWORD)::GetWindowLongPtr(hCompWnd, FIGWL_COMPSTARTSTR);
-        DWORD cch = (DWORD)::GetWindowLongPtr(hCompWnd, FIGWL_COMPSTARTNUM);
-        if (cch && ich + cch <= DWORD(::lstrlenW(pch))) {
+        if (ich + cch <= DWORD(::lstrlenW(pch))) {
             pch += ich;
             DrawTextOneLine(hCompWnd, hDC, pch, ich, cch, lpCompStr, fVert);
         }
     } else {
-        int cch = int(str.size());
-        DrawTextOneLine(hCompWnd, hDC, pch, 0, cch, lpCompStr, fVert);
+        int cchAll = int(str.size());
+        DrawTextOneLine(hCompWnd, hDC, pch, 0, cchAll, lpCompStr, fVert);
     }
 }
 

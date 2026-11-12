@@ -9,6 +9,16 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////////
 
+// アプリが未確定文字列の表示を拒否しているか(ISC_SHOWUICOMPOSITIONWINDOW が
+// WM_IME_SETCONTEXT で落とされているか)を、UIサーバーウィンドウのプロパティで覚える。
+// Chrome などは自前でインライン表示するため、このフラグを落としてくる。
+#define PROP_HIDE_COMP  TEXT("mzimeja.HideComp")
+
+BOOL UI_IsCompHiddenByApp(HWND hUIWnd)
+{
+    return (hUIWnd != NULL && ::GetProp(hUIWnd, PROP_HIDE_COMP) != NULL);
+}
+
 // 指定されているUIウィンドウを表示する／非表示にする。
 void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag)
 {
@@ -35,6 +45,15 @@ void PASCAL ShowUIWindows(HWND hwndServer, BOOL fFlag)
 
 void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam)
 {
+    DPRINTA("OnImeSetContext: build %s %s, lParam=0x%08lX\n", __DATE__, __TIME__, (unsigned long)lParam);
+
+    // 未確定文字列ウィンドウを表示してよいか記憶する。
+    if (lParam & ISC_SHOWUICOMPOSITIONWINDOW) {
+        ::RemoveProp(hWnd, PROP_HIDE_COMP);
+    } else {
+        ::SetProp(hWnd, PROP_HIDE_COMP, (HANDLE)1);
+    }
+
     UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
     if (lpUIExtra) {
         // input context was changed.
@@ -92,6 +111,8 @@ void OnImeSetContext(HWND hWnd, HIMC hIMC, LPARAM lParam)
 
 void OnDestroy(HWND hWnd)
 {
+    ::RemoveProp(hWnd, PROP_HIDE_COMP);
+
     UIEXTRA *lpUIExtra = LockUIExtra(hWnd);
     if (lpUIExtra) {
         if (::IsWindow(lpUIExtra->hwndStatus))
