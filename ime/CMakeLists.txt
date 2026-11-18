@@ -26,15 +26,16 @@ if(USE_VIBRATO AND VIBRATO_FOUND)
     message(STATUS "Adding vibrato_engine.cpp to build")
 endif()
 
-add_library(libime STATIC ${LIBIME_SOURCES})
+# Link objects directly into the IME so exports are not omitted by archive extraction.
+add_library(libime_objects OBJECT ${LIBIME_SOURCES})
+target_include_directories(libime_objects PRIVATE ${CMAKE_SOURCE_DIR})
+
+add_library(libime STATIC $<TARGET_OBJECTS:libime_objects>)
 set_target_properties(libime PROPERTIES PREFIX "")
 
-# Add parent directory for str.hpp
-target_include_directories(libime PRIVATE ${CMAKE_SOURCE_DIR})
-
 # mzimeja.ime
-add_library(ime SHARED mzimeja.def mzimeja_res.rc)
-target_link_libraries(ime libime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
+add_library(ime SHARED mzimeja.def mzimeja_res.rc $<TARGET_OBJECTS:libime_objects>)
+target_link_libraries(ime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 
 # Link Vibrato library if enabled
 if(USE_VIBRATO AND VIBRATO_FOUND)
