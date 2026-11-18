@@ -38,6 +38,10 @@ mzimeja_resource(IME_RESOURCE mzimeja_res.rc)
 # mzimeja.ime
 add_library(ime SHARED mzimeja.def ${IME_RESOURCE} $<TARGET_OBJECTS:libime_objects>)
 target_link_libraries(ime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
+if(MZIMEJA_USE_MINGW_WINDRES)
+    set_property(TARGET ime APPEND_STRING PROPERTY LINK_FLAGS
+        " -Wl,--exclude-all-symbols")
+endif()
 
 # Link Vibrato library if enabled
 if(USE_VIBRATO AND VIBRATO_FOUND)
