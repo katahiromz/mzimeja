@@ -1,0 +1,57 @@
+name: MinGW CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        include:
+          - bits: 32
+            package: g++-mingw-w64-i686
+            prefix: i686-w64-mingw32
+            build_dir: build32
+          - bits: 64
+            package: g++-mingw-w64-x86-64
+            prefix: x86_64-w64-mingw32
+            build_dir: build64
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install MinGW-w64
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends -y ${{ matrix.package }}
+
+    - name: Configure CMake
+      run: |
+        cmake -S . -B build-mingw \
+          -DCMAKE_SYSTEM_NAME=Windows \
+          -DCMAKE_CXX_COMPILER=${{ matrix.prefix }}-g++ \
+          -DCMAKE_RC_COMPILER=${{ matrix.prefix }}-windres
+
+    - name: Build with MinGW
+      run: |
+        cmake --build build-mingw --parallel 2 --target \
+          ime imepad ime_setup verinfo dict_compile imetests ime_load_test
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: mzimeja-mingw-${{ matrix.bits }}-bit
+        path: |
+          ${{ matrix.build_dir }}/**/*.exe
+          ${{ matrix.build_dir }}/**/*.ime
+          ${{ matrix.build_dir }}/**/*.dll
+        if-no-files-found: error
