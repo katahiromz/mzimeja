@@ -58,26 +58,27 @@ int wmain()
         return 1;
     ShowWindow(client, SW_SHOWNOACTIVATE);
 
-    InputContext imc = { 0 };
+    HIMC context = ImmCreateContext();
+    InputContext *imc = (InputContext *)ImmLockIMC(context);
+    if (!Check(imc != NULL, "ImmCreateContext or ImmLockIMC failed"))
+        return 1;
     UIEXTRA ui = { 0 };
-    imc.hWnd = client;
-    imc.hCompStr = ImmCreateIMCC(sizeof(COMPOSITIONSTRING));
-    imc.hCompStr = CompStr::ReCreate(imc.hCompStr);
-    imc.hCandInfo = ImmCreateIMCC(sizeof(CANDIDATEINFO));
+    imc->hWnd = client;
+    imc->hCompStr = CompStr::ReCreate(imc->hCompStr);
     LogCandInfo info;
     LogCandList list;
     list.cand_strs.push_back(L"candidate");
     info.cand_lists.push_back(list);
-    imc.hCandInfo = CandInfo::ReCreate(imc.hCandInfo, &info);
-    if (!Check(imc.hCompStr && imc.hCandInfo, "IME context allocation failed"))
+    imc->hCandInfo = CandInfo::ReCreate(imc->hCandInfo, &info);
+    if (!Check(imc->hCompStr && imc->hCandInfo, "IME context allocation failed"))
         return 1;
     ui.hwndCand = candidate;
-    imc.cfCandForm[0].dwIndex = 0;
-    imc.cfCandForm[0].dwStyle = CFS_EXCLUDE;
-    imc.cfCandForm[0].ptCurrentPos.x = 40;
-    imc.cfCandForm[0].ptCurrentPos.y = 50;
-    SetRect(&imc.cfCandForm[0].rcArea, 40, 50, 80, 70);
-    CandWnd_Move(&ui, &imc);
+    imc->cfCandForm[0].dwIndex = 0;
+    imc->cfCandForm[0].dwStyle = CFS_EXCLUDE;
+    imc->cfCandForm[0].ptCurrentPos.x = 40;
+    imc->cfCandForm[0].ptCurrentPos.y = 50;
+    SetRect(&imc->cfCandForm[0].rcArea, 40, 50, 80, 70);
+    CandWnd_Move(&ui, imc);
     RECT rect;
     GetWindowRect(candidate, &rect);
     POINT expected = { 40, 70 };
@@ -86,23 +87,23 @@ int wmain()
                 rect.top == expected.y, "CFS_EXCLUDE candidate placement");
 
     ShowWindow(candidate, SW_HIDE);
-    imc.cfCandForm[0].dwIndex = (DWORD)-1;
-    CandWnd_Move(&ui, &imc);
+    imc->cfCandForm[0].dwIndex = (DWORD)-1;
+    CandWnd_Move(&ui, imc);
     GetWindowRect(candidate, &rect);
     ok &= Check(IsWindowVisible(candidate) && rect.left == expected.x &&
                 rect.top == expected.y, "hidden composition position fallback");
 
     ShowWindow(candidate, SW_HIDE);
-    imc.cfCandForm[0].dwIndex = 0;
-    imc.cfCandForm[0].dwStyle = CFS_CANDIDATEPOS;
-    CandWnd_Move(&ui, &imc);
+    imc->cfCandForm[0].dwIndex = 0;
+    imc->cfCandForm[0].dwStyle = CFS_CANDIDATEPOS;
+    CandWnd_Move(&ui, imc);
     GetWindowRect(candidate, &rect);
     expected.y -= 20;
     ok &= Check(IsWindowVisible(candidate) && rect.left == expected.x &&
                 rect.top == expected.y, "CFS_CANDIDATEPOS placement");
 
-    ImmDestroyIMCC(imc.hCandInfo);
-    ImmDestroyIMCC(imc.hCompStr);
+    ImmUnlockIMC(context);
+    ImmDestroyContext(context);
     DestroyWindow(candidate);
     DestroyWindow(client);
     UnregisterClass(wc.lpszClassName, wc.hInstance);
