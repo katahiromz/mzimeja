@@ -54,6 +54,15 @@ jobs:
         if (!$test -or !$ime) { throw "IME or test executable not found" }
         & $test.FullName $ime.FullName
         if ($LASTEXITCODE -ne 0) { throw "IME load test failed: $LASTEXITCODE" }
+
+    - name: Test candidate window placement
+      shell: pwsh
+      run: |
+        $build = if ("${{ matrix.platform }}" -eq "Win32") { "build32" } else { "build64" }
+        $test = Get-ChildItem $build -Recurse -Filter candidate_window_test.exe | Select-Object -First 1
+        if (!$test) { throw "Candidate window test executable not found" }
+        & $test.FullName
+        if ($LASTEXITCODE -ne 0) { throw "Candidate window test failed: $LASTEXITCODE" }
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
