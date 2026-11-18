@@ -40,9 +40,9 @@ jobs:
     - name: Build with CMake
       run: |
         if ("${{ matrix.platform }}" -eq "Win32") {
-          cmake --build build32 --config Release
+          cmake --build build32 --config Release --verbose
         } else {
-          cmake --build build64 --config Release
+          cmake --build build64 --config Release --verbose
         }
 
     - name: Test IME loading and initialization
