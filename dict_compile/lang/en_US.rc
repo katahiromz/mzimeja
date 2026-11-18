@@ -1,0 +1,35 @@
+// このファイルは リソーエディタ 6.2.3 によって自動生成されました。
+// † <-- このダガー記号は、UTF-8の検出に役立ちます。
+
+#pragma code_page(932) // Japan
+
+LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_VERSION
+
+1 VERSIONINFO
+FILEVERSION     1, 0, 1, 2
+PRODUCTVERSION  1, 0, 1, 2
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+{
+    BLOCK "StringFileInfo"
+    {
+        BLOCK "041103A4" // ja_JP, Japan (Shift_JIS)
+        {
+            VALUE "CompanyName", "片山博文MZ"
+            VALUE "FileDescription", "MZ-IME日本語入力 辞書コンパイラ"
+            VALUE "FileVersion", "1.0.1.2"
+            VALUE "LegalCopyright", "Copyright (C) 2016-2017 片山博文MZ."
+            VALUE "ProductName", "MZ-IME日本語入力"
+            VALUE "ProductVersion", "1.0.1.2"
+        }
+    }
+    BLOCK "VarFileInfo"
+    {
+        VALUE "Translation", 0x0411, 0x03A4
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
