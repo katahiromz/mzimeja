@@ -20,7 +20,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
+      
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
       
@@ -40,9 +40,9 @@ jobs:
     - name: Build with CMake
       run: |
         if ("${{ matrix.platform }}" -eq "Win32") {
-          cmake --build build32 --config Release --verbose
+          cmake --build build32 --config Release
         } else {
-          cmake --build build64 --config Release --verbose
+          cmake --build build64 --config Release
         }
 
     - name: Test IME loading and initialization
