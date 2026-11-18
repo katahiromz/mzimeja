@@ -1,4 +1,5 @@
-add_executable(verinfo WIN32 verinfo.cpp verinfo_res.rc)
+add_executable(verinfo WIN32 verinfo.cpp)
+add_project_resource(verinfo verinfo_res.rc utf8)
 target_link_libraries(verinfo kernel32 user32)
 
 # do statically link

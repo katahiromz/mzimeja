@@ -1,4 +1,5 @@
-add_executable(imepad WIN32 imepad.cpp imepad_res.rc)
+add_executable(imepad WIN32 imepad.cpp)
+add_project_resource(imepad imepad_res.rc utf8)
 target_link_libraries(imepad kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 
 # do statically link

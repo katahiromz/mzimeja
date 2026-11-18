@@ -34,7 +34,8 @@ add_library(libime STATIC $<TARGET_OBJECTS:libime_objects>)
 set_target_properties(libime PROPERTIES PREFIX "")
 
 # mzimeja.ime
-add_library(ime SHARED mzimeja.def mzimeja_res.rc $<TARGET_OBJECTS:libime_objects>)
+add_library(ime SHARED mzimeja.def $<TARGET_OBJECTS:libime_objects>)
+add_project_resource(ime mzimeja_res.rc utf8)
 target_link_libraries(ime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 
 # Link Vibrato library if enabled
@@ -58,7 +59,8 @@ set_target_properties(ime PROPERTIES SUFFIX "")
 set_target_properties(ime PROPERTIES OUTPUT_NAME "mzimeja.ime")
 
 # imetests.exe
-add_executable(imetests tests.cpp mzimeja_res.rc)
+add_executable(imetests tests.cpp)
+add_project_resource(imetests mzimeja_res.rc utf8)
 target_link_libraries(imetests libime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 
 add_executable(ime_load_test ../test/ime_load_test.cpp)
