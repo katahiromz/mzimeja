@@ -4,10 +4,13 @@
 ##############################################################################
 
 # CMake minimum version
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 
 # project name, version, and languages
-project(mzimeja VERSION 1.0.1.2 LANGUAGES CXX RC)
+project(mzimeja VERSION 1.0.1.2 LANGUAGES CXX)
+if(NOT MSVC)
+    enable_language(RC)
+endif()
 
 # -D_DEBUG or -DNDEBUG ?
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
@@ -58,6 +61,48 @@ if(MSVC)
         string(REPLACE "/MD" "/MT" ${CompilerFlags} "${${CompilerFlags}}")
     endforeach()
 endif()
+
+if(MSVC)
+    set(BUILD_TOOLS_DIR "${CMAKE_SOURCE_DIR}/build_tools")
+    set(MCPP_EXECUTABLE "${BUILD_TOOLS_DIR}/mcpp.exe")
+    set(WINDRES_EXECUTABLE "${BUILD_TOOLS_DIR}/windres.exe")
+    if(NOT EXISTS "${MCPP_EXECUTABLE}" OR NOT EXISTS "${WINDRES_EXECUTABLE}")
+        message(FATAL_ERROR "build_tools/mcpp.exe and build_tools/windres.exe are required for MSVC builds")
+    endif()
+endif()
+
+function(add_project_resource target source encoding)
+    if(NOT MSVC)
+        target_sources(${target} PRIVATE "${source}")
+        return()
+    endif()
+
+    file(GLOB_RECURSE resource_dependencies CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.rc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/res/*"
+        "${BUILD_TOOLS_DIR}/include/*.h")
+    set(resource_output "${CMAKE_CURRENT_BINARY_DIR}/${target}_resource.res")
+    add_custom_command(
+        OUTPUT "${resource_output}"
+        COMMAND "${WINDRES_EXECUTABLE}"
+            --preprocessor=mcpp.exe
+            --preprocessor-arg=-e "--preprocessor-arg=${encoding}"
+            -I "${BUILD_TOOLS_DIR}/include"
+            -I "${CMAKE_CURRENT_SOURCE_DIR}"
+            -I "${CMAKE_SOURCE_DIR}/include"
+            -DRC_INVOKED=1 -DUNICODE=1 -D_UNICODE=1
+            -i "${CMAKE_CURRENT_SOURCE_DIR}/${source}"
+            -O res -o "${resource_output}"
+        DEPENDS ${resource_dependencies} "${WINDRES_EXECUTABLE}" "${MCPP_EXECUTABLE}"
+        WORKING_DIRECTORY "${BUILD_TOOLS_DIR}"
+        COMMENT "Compiling ${source} with windres"
+        VERBATIM)
+    add_custom_target(${target}_resource_build DEPENDS "${resource_output}")
+    add_dependencies(${target} ${target}_resource_build)
+    target_link_libraries(${target} "${resource_output}")
+    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS "${resource_output}")
+endfunction()
 
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
