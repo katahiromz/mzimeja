@@ -83,15 +83,9 @@ function(add_project_resource target source encoding)
         "${CMAKE_CURRENT_SOURCE_DIR}/res/*"
         "${BUILD_TOOLS_DIR}/include/*.h")
     set(resource_output "${CMAKE_CURRENT_BINARY_DIR}/${target}_resource.res")
-    if(CMAKE_HOST_WIN32)
-        set(path_separator ";")
-    else()
-        set(path_separator ":")
-    endif()
     add_custom_command(
         OUTPUT "${resource_output}"
-        COMMAND "${CMAKE_COMMAND}" -E env "PATH=${BUILD_TOOLS_DIR}${path_separator}$ENV{PATH}"
-            "${WINDRES_EXECUTABLE}"
+        COMMAND "${WINDRES_EXECUTABLE}"
             --preprocessor=mcpp.exe
             --preprocessor-arg=-e "--preprocessor-arg=${encoding}"
             -I "${BUILD_TOOLS_DIR}/include"
@@ -101,7 +95,7 @@ function(add_project_resource target source encoding)
             -i "${CMAKE_CURRENT_SOURCE_DIR}/${source}"
             -O res -o "${resource_output}"
         DEPENDS ${resource_dependencies} "${WINDRES_EXECUTABLE}" "${MCPP_EXECUTABLE}"
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        WORKING_DIRECTORY "${BUILD_TOOLS_DIR}"
         COMMENT "Compiling ${source} with windres"
         VERBATIM)
     add_custom_target(${target}_resource_build DEPENDS "${resource_output}")
