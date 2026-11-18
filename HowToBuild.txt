@@ -4,6 +4,10 @@ WinXP/Win2K3で動かすには、Visual C++をインストールしたWinXPサ�
 プロジェクトの設定で「xp」が付いたツールセットを選んでビルドして下さい。そうするとXPで動きます。
 MinGW+MSYS2でもビルドできますが、WinXPサポートがありません。RosBEや古い方のMinGWではビルドできません。
 
+リソースをMinGW x86のwindresでビルドする場合は、次のように設定します。
+   cmake -S . -B build32 -G Ninja -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++ -DMZIMEJA_USE_MINGW_WINDRES=ON
+   cmake --build build32
+
 インストーラー作成には、Inno Setupを使います。
 WinXPにインストールするのであれば、古いInno Setup (5.6.1 (u))を使う必要があります。
 
@@ -41,6 +45,10 @@ Vibratoを使用すると、かな漢字変換が約3倍高速になります。
 To run on WinXP/Win2K3, build using the XP toolset in Visual Studio with WinXP support and Visual C++ installed.
 In the project settings, select the toolset with "xp" and build. Then it will run on XP.
 You can also build with MinGW+MSYS2, but it does not have WinXP support, and RosBE or older MinGW will not build.
+
+To compile resources with MinGW x86 windres, configure the build as follows:
+   cmake -S . -B build32 -G Ninja -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++ -DMZIMEJA_USE_MINGW_WINDRES=ON
+   cmake --build build32
 
 Inno Setup is used to create the installer.
 If you are installing on WinXP, you must use the older Inno Setup (5.6.1 (u)).

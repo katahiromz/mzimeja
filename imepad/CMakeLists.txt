@@ -1,4 +1,5 @@
-add_executable(imepad WIN32 imepad.cpp imepad_res.rc)
+mzimeja_resource(IMEPAD_RESOURCE imepad_res.rc)
+add_executable(imepad WIN32 imepad.cpp ${IMEPAD_RESOURCE})
 target_link_libraries(imepad kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 
 # do statically link

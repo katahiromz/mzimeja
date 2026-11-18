@@ -78,7 +78,7 @@ jobs:
         cmake -S . -B build32 -G Ninja \
           -DCMAKE_SYSTEM_NAME=Windows \
           -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++ \
-          -DCMAKE_RC_COMPILER=i686-w64-mingw32-windres \
+          -DMZIMEJA_USE_MINGW_WINDRES=ON \
           -DCMAKE_BUILD_TYPE=Release
         cmake --build build32 --target ime imetests ime_load_test
     - name: Check IME exports

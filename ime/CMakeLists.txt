@@ -33,8 +33,10 @@ target_include_directories(libime_objects PRIVATE ${CMAKE_SOURCE_DIR})
 add_library(libime STATIC $<TARGET_OBJECTS:libime_objects>)
 set_target_properties(libime PROPERTIES PREFIX "")
 
+mzimeja_resource(IME_RESOURCE mzimeja_res.rc)
+
 # mzimeja.ime
-add_library(ime SHARED mzimeja.def mzimeja_res.rc $<TARGET_OBJECTS:libime_objects>)
+add_library(ime SHARED mzimeja.def ${IME_RESOURCE} $<TARGET_OBJECTS:libime_objects>)
 target_link_libraries(ime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 
 # Link Vibrato library if enabled
@@ -58,7 +60,7 @@ set_target_properties(ime PROPERTIES SUFFIX "")
 set_target_properties(ime PROPERTIES OUTPUT_NAME "mzimeja.ime")
 
 # imetests.exe
-add_executable(imetests tests.cpp mzimeja_res.rc)
+add_executable(imetests tests.cpp ${IME_RESOURCE})
 target_link_libraries(imetests libime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 
 add_executable(ime_load_test ../test/ime_load_test.cpp)

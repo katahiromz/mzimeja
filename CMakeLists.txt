@@ -7,7 +7,27 @@
 cmake_minimum_required(VERSION 3.10)
 
 # project name, version, and languages
-project(mzimeja VERSION 1.0.1.2 LANGUAGES CXX RC)
+project(mzimeja VERSION 1.0.1.2 LANGUAGES CXX)
+
+option(MZIMEJA_USE_MINGW_WINDRES
+    "Build resources with the external MinGW x86 windres command" OFF)
+
+if(MZIMEJA_USE_MINGW_WINDRES)
+    if(NOT WIN32 OR NOT CMAKE_SIZEOF_VOID_P EQUAL 4 OR
+       NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        message(FATAL_ERROR
+            "MZIMEJA_USE_MINGW_WINDRES requires a 32-bit MinGW GCC Windows build")
+    endif()
+
+    find_program(MZIMEJA_WINDRES_EXECUTABLE
+        NAMES i686-w64-mingw32-windres windres)
+    if(NOT MZIMEJA_WINDRES_EXECUTABLE)
+        message(FATAL_ERROR
+            "MinGW windres not found; set MZIMEJA_WINDRES_EXECUTABLE to its path")
+    endif()
+else()
+    enable_language(RC)
+endif()
 
 # -D_DEBUG or -DNDEBUG ?
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
@@ -72,6 +92,36 @@ add_definitions(-DUNICODE=1 -D_UNICODE=1)
 
 # Add include directories
 include_directories(include)
+
+function(mzimeja_resource out_var rc_file)
+    if(MZIMEJA_USE_MINGW_WINDRES)
+        get_filename_component(_rc_file
+            "${rc_file}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+        get_filename_component(_rc_name "${rc_file}" NAME_WE)
+        set(_resource_object "${CMAKE_CURRENT_BINARY_DIR}/${_rc_name}_resource.o")
+        file(GLOB_RECURSE _resource_dependencies LIST_DIRECTORIES false
+            "${CMAKE_CURRENT_SOURCE_DIR}/*.rc"
+            "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/res/*")
+        add_custom_command(
+            OUTPUT "${_resource_object}"
+            COMMAND "${MZIMEJA_WINDRES_EXECUTABLE}"
+                -J rc -O coff -F pe-i386
+                -I "${CMAKE_CURRENT_SOURCE_DIR}"
+                -I "${CMAKE_SOURCE_DIR}/include"
+                -i "${_rc_file}" -o "${_resource_object}"
+            DEPENDS ${_resource_dependencies}
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+            COMMENT "Compiling ${rc_file} with MinGW windres (x86)"
+            VERBATIM)
+        set_source_files_properties("${_resource_object}" PROPERTIES
+            GENERATED TRUE
+            EXTERNAL_OBJECT TRUE)
+        set(${out_var} "${_resource_object}" PARENT_SCOPE)
+    else()
+        set(${out_var} "${rc_file}" PARENT_SCOPE)
+    endif()
+endfunction()
 
 ##############################################################################
 # Vibrato support (optional)
