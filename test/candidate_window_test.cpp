@@ -64,6 +64,12 @@ int wmain()
         return 1;
     UIEXTRA ui = { 0 };
     imc->hWnd = client;
+    if (!imc->hCompStr)
+        imc->hCompStr = ImmCreateIMCC(sizeof(COMPOSITIONSTRING));
+    if (!imc->hCandInfo)
+        imc->hCandInfo = ImmCreateIMCC(sizeof(CANDIDATEINFO));
+    if (!Check(imc->hCompStr && imc->hCandInfo, "IME context allocation failed"))
+        return 1;
     imc->hCompStr = CompStr::ReCreate(imc->hCompStr);
     LogCandInfo info;
     LogCandList list;
