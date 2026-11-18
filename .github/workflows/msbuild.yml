@@ -44,6 +44,16 @@ jobs:
         } else {
           cmake --build build64 --config Release
         }
+
+    - name: Test IME loading and initialization
+      shell: pwsh
+      run: |
+        $build = if ("${{ matrix.platform }}" -eq "Win32") { "build32" } else { "build64" }
+        $test = Get-ChildItem $build -Recurse -Filter ime_load_test.exe | Select-Object -First 1
+        $ime = Get-ChildItem $build -Recurse -Filter mzimeja.ime | Select-Object -First 1
+        if (!$test -or !$ime) { throw "IME or test executable not found" }
+        & $test.FullName $ime.FullName
+        if ($LASTEXITCODE -ne 0) { throw "IME load test failed: $LASTEXITCODE" }
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4

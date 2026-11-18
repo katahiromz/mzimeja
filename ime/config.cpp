@@ -178,11 +178,21 @@ BOOL FindLocalFile(std::wstring& path, LPCWSTR filename) {
 
 // アプリフォルダのファイルを探す
 BOOL FindAppFile(std::wstring& path, LPCTSTR filename) {
-    LPITEMIDLIST pidl;
-    SHGetSpecialFolderLocation(NULL, CSIDL_PROGRAM_FILES, &pidl);
+    LPITEMIDLIST pidl = NULL;
+    HRESULT hr = SHGetSpecialFolderLocation(NULL, CSIDL_PROGRAM_FILES, &pidl);
+    if (FAILED(hr)) {
+        DPRINTA("SHGetSpecialFolderLocation failed: 0x%08lX\n", hr);
+        path.clear();
+        return FALSE;
+    }
     WCHAR szPath[MAX_PATH];
-    SHGetPathFromIDListW(pidl, szPath);
+    BOOL found = SHGetPathFromIDListW(pidl, szPath);
     CoTaskMemFree(pidl);
+    if (!found) {
+        DPRINTA("SHGetPathFromIDListW failed\n");
+        path.clear();
+        return FALSE;
+    }
     PathAppendW(szPath, L"mzimeja");
     PathAppendW(szPath, filename);
     if (PathFileExistsW(szPath)) {

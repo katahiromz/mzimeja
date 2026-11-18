@@ -60,6 +60,9 @@ set_target_properties(ime PROPERTIES OUTPUT_NAME "mzimeja.ime")
 add_executable(imetests tests.cpp mzimeja_res.rc)
 target_link_libraries(imetests libime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
 
+add_executable(ime_load_test ../test/ime_load_test.cpp)
+add_dependencies(ime_load_test ime)
+
 # Link Vibrato for tests too
 if(USE_VIBRATO AND VIBRATO_FOUND)
     add_dependencies(imetests vibrato_c_build)

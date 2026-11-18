@@ -59,6 +59,7 @@ MzIme::MzIme()
     m_hInst = NULL;
     m_hMyKL = NULL;
     m_bWinLogOn = FALSE;
+    m_initialized = FALSE;
 
     m_lpCurTransKey = NULL;
     m_uNumTransKey = 0;
@@ -68,6 +69,34 @@ MzIme::MzIme()
     m_hIMC = NULL;
     m_lpIMC = NULL;
     ZeroMemory(m_atoms, sizeof(m_atoms));
+}
+
+void MzIme::Attach(HINSTANCE hInstance)
+{
+    m_hInst = hInstance;
+    ::InitializeCriticalSection(&m_initLock);
+}
+
+BOOL MzIme::EnsureInitialized(DWORD dwSystemInfoFlags)
+{
+    ::EnterCriticalSection(&m_initLock);
+    if (dwSystemInfoFlags & IME_SYSINFO_WINLOGON)
+        m_bWinLogOn = TRUE;
+    if (!m_initialized) {
+        m_initialized = Init(m_hInst);
+        if (!m_initialized)
+            Uninit();
+    }
+    BOOL initialized = m_initialized;
+    ::LeaveCriticalSection(&m_initLock);
+    return initialized;
+}
+
+void MzIme::Detach()
+{
+    if (m_initialized)
+        Uninit();
+    ::DeleteCriticalSection(&m_initLock);
 }
 
 // mzimejaの辞書を読み込む。
@@ -484,6 +513,7 @@ void MzIme::UnregisterClasses()
     ::UnregisterClass(szCompStrClassName, m_hInst);
     ::UnregisterClass(szCandClassName, m_hInst);
     ::UnregisterClass(szStatusClassName, m_hInst);
+    ::UnregisterClass(szGuideClassName, m_hInst);
 }
 
 // ビットマップをリソースから読み込む。
@@ -613,16 +643,14 @@ LPCTSTR mz_find_graphviz(void)
 // DllMainが呼び出されるはず。
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
-    FOOTMARK_FORMAT("(%p, 0x%08lX, %p)\n", hInstDLL, fdwReason, lpvReserved);
-
     switch (fdwReason) {
     case DLL_PROCESS_ATTACH:
         ::DisableThreadLibraryCalls(hInstDLL);
-        TheIME.Init(hInstDLL); // 初期化。
+        TheIME.Attach(hInstDLL);
         break;
 
     case DLL_PROCESS_DETACH:
-        TheIME.Uninit(); // 逆初期化。
+        TheIME.Detach();
         break;
 
     case DLL_THREAD_ATTACH:
@@ -630,7 +658,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, LPVOID lpvReserved)
         break;
     }
 
-    FOOTMARK_RETURN_INT(TRUE);
+    return TRUE;
 } // DllMain
 
 //////////////////////////////////////////////////////////////////////////////

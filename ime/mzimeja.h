@@ -605,8 +605,11 @@ public:
 public:
     // TheIMEのコンストラクタ。
     MzIme();
+    void Attach(HINSTANCE hInstance);
+    void Detach();
     // 初期化。
     BOOL Init(HINSTANCE hInstance);
+    BOOL EnsureInitialized(DWORD dwSystemInfoFlags);
     // ウィンドウクラスの登録。
     BOOL RegisterClasses(HINSTANCE hInstance);
     void UnregisterClasses();
@@ -657,6 +660,9 @@ public:
     BOOL StoreResult(const MzConvResult& result, LogCompStr& comp, LogCandInfo& cand);
 
 protected:
+    CRITICAL_SECTION m_initLock;
+    BOOL m_initialized;
+
     // 入力コンテキスト（input context）
     HIMC m_hIMC;
     InputContext *  m_lpIMC;
