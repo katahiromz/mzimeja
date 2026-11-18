@@ -142,3 +142,4 @@
     - Google Chromeの未確定文字列の位置を修正。
 - 2026-XX-YY Ver.1.0.1.2
     - リソースのエンコードをUTF-8に変更。
+    - build_toolsのwindres.exeを使ってリソースをコンパイルするようにした。
