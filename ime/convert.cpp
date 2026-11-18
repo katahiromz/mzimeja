@@ -1232,20 +1232,13 @@ BOOL Dict::Load(const WCHAR *file_name, const WCHAR *object_name)
 // 辞書をアンロードする。
 void Dict::Unload()
 {
+    // Closing a mapping handle does not invalidate other processes' handles.
+    // Do not wait for the shared mutex during DLL_PROCESS_DETACH.
+    if (m_hFileMapping) {
+        ::CloseHandle(m_hFileMapping);
+        m_hFileMapping = NULL;
+    }
     if (m_hMutex) {
-        if (m_hFileMapping) {
-            DWORD wait = ::WaitForSingleObject(m_hMutex, c_dwMilliseconds); // 排他制御を待つ。
-            if (wait == WAIT_OBJECT_0) {
-                // ファイルマッピングを閉じる。
-                if (m_hFileMapping) {
-                    ::CloseHandle(m_hFileMapping);
-                    m_hFileMapping = NULL;
-                }
-                // 排他制御を解放。
-                ::ReleaseMutex(m_hMutex);
-            }
-        }
-        // ミューテックスを閉じる。
         ::CloseHandle(m_hMutex);
         m_hMutex = NULL;
     }

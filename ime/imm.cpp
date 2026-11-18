@@ -13,15 +13,11 @@ extern "C" {
 BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
                        DWORD dwSystemInfoFlags)
 {
-    FOOTMARK_FORMAT("((0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX, 0x%08lX), 0x%08lX)\n",
-                    lpIMEInfo->dwPrivateDataSize,
-                    lpIMEInfo->fdwProperty,
-                    lpIMEInfo->fdwConversionCaps,
-                    lpIMEInfo->fdwSentenceCaps,
-                    lpIMEInfo->fdwUICaps,
-                    lpIMEInfo->fdwSCSCaps,
-                    lpIMEInfo->fdwSelectCaps,
-                    dwSystemInfoFlags);
+    FOOTMARK_FORMAT("(%p, %p, 0x%08lX)\n",
+                    lpIMEInfo, lpszClassName, dwSystemInfoFlags);
+
+    if (!TheIME.EnsureInitialized(dwSystemInfoFlags))
+        FOOTMARK_RETURN_INT(FALSE);
 
     lpIMEInfo->dwPrivateDataSize = sizeof(UIEXTRA);
     lpIMEInfo->fdwProperty =
@@ -42,10 +38,6 @@ BOOL WINAPI ImeInquire(LPIMEINFO lpIMEInfo, TCHAR *lpszClassName,
     lpIMEInfo->fdwSelectCaps = SELECT_CAP_CONVERSION;
 
     StringCchCopy(lpszClassName, 64, szUIServerClassName);
-
-    if (dwSystemInfoFlags & IME_SYSINFO_WINLOGON) {
-        TheIME.m_bWinLogOn = TRUE;
-    }
 
     FOOTMARK_RETURN_INT(TRUE);
 }
