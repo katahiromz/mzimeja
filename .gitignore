@@ -54,3 +54,4 @@ third_party/vibrato-c/target/
 third_party/vibrato-c/Cargo.lock
 
 !build_tools
+!build_tools/*.exe
