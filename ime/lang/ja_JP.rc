@@ -1,7 +1,7 @@
-// ‚±‚Ìƒtƒ@ƒCƒ‹‚Í ƒŠƒ\[ƒGƒfƒBƒ^ 6.2.3 ‚É‚æ‚Á‚ÄŽ©“®¶¬‚³‚ê‚Ü‚µ‚½B
-// õ <-- ‚±‚Ìƒ_ƒK[‹L†‚ÍAUTF-8‚ÌŒŸo‚É–ð—§‚¿‚Ü‚·B
+// ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ ãƒªã‚½ãƒ¼ã‚¨ãƒ‡ã‚£ã‚¿ 6.2.3 ã«ã‚ˆã£ã¦è‡ªå‹•ç”Ÿæˆã•ã‚Œã¾ã—ãŸã€‚
+// â€  <-- ã“ã®ãƒ€ã‚¬ãƒ¼è¨˜å·ã¯ã€UTF-8ã®æ¤œå‡ºã«å½¹ç«‹ã¡ã¾ã™ã€‚
 
-#pragma code_page(932) // Japan
+#pragma code_page(65001) // UTF-8
 
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
@@ -17,19 +17,19 @@ STATUSRMENU MENU
 {
     POPUP ""
     {
-        MENUITEM "‚Ð‚ç‚ª‚È", IDM_HIRAGANA
-        MENUITEM "‘SŠpƒJƒ^ƒJƒi", IDM_FULL_KATAKANA
-        MENUITEM "‘SŠp‰p”", IDM_FULL_ASCII
-        MENUITEM "”¼ŠpƒJƒ^ƒJƒi", IDM_HALF_KATAKANA
-        MENUITEM "”¼Šp‰p”", IDM_HALF_ASCII
+        MENUITEM "ã²ã‚‰ãŒãª", IDM_HIRAGANA
+        MENUITEM "å…¨è§’ã‚«ã‚¿ã‚«ãƒŠ", IDM_FULL_KATAKANA
+        MENUITEM "å…¨è§’è‹±æ•°", IDM_FULL_ASCII
+        MENUITEM "åŠè§’ã‚«ã‚¿ã‚«ãƒŠ", IDM_HALF_KATAKANA
+        MENUITEM "åŠè§’è‹±æ•°", IDM_HALF_ASCII
         MENUITEM SEPARATOR
-        MENUITEM "ƒ[ƒ}Žš“ü—Í", IDM_ROMAN_INPUT
-        MENUITEM "‚©‚È“ü—Í", IDM_KANA_INPUT
+        MENUITEM "ãƒ­ãƒ¼ãƒžå­—å…¥åŠ›", IDM_ROMAN_INPUT
+        MENUITEM "ã‹ãªå…¥åŠ›", IDM_KANA_INPUT
         MENUITEM SEPARATOR
-        MENUITEM "IMEƒpƒbƒh", IDM_IME_PAD
-        MENUITEM "ƒvƒƒpƒeƒB", IDM_IME_PROPERTY
+        MENUITEM "IMEãƒ‘ãƒƒãƒ‰", IDM_IME_PAD
+        MENUITEM "ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£", IDM_IME_PROPERTY
         MENUITEM SEPARATOR
-        MENUITEM "ƒLƒƒƒ“ƒZƒ‹", IDM_CANCEL
+        MENUITEM "ã‚­ãƒ£ãƒ³ã‚»ãƒ«", IDM_CANCEL
     }
 }
 
@@ -37,51 +37,51 @@ STATUSRMENU MENU
 // RT_DIALOG
 
 IDD_GENERAL DIALOG 0, 0, 185, 132
-CAPTION "‘S”ÊÝ’è"
+CAPTION "å…¨èˆ¬è¨­å®š"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
-FONT 10, "‚l‚r ‚oƒSƒVƒbƒN"
+FONT 10, "ï¼­ï¼³ ï¼°ã‚´ã‚·ãƒƒã‚¯"
 {
-    AUTOCHECKBOX "uAvuBv‚Ì‘ã‚í‚è‚ÉuCvuDv‚ðŽg—p‚·‚é", chx1, 5, 5, 175, 15
-    AUTOCHECKBOX "‘SŠp‰p”‚ðŽg‚í‚È‚¢", chx2, 5, 25, 170, 15
-    AUTOCHECKBOX "‘SŠp‹ó”’‚ð‹ÖŽ~‚·‚é", chx3, 5, 45, 170, 15
-    AUTOCHECKBOX "‘SŠpƒJƒ^ƒJƒi‚ð—Dæ‚·‚é", chx4, 5, 65, 170, 15
-    AUTOCHECKBOX "”¼ŠpƒJƒi‚ð—Dæ‚·‚é", chx5, 5, 85, 170, 15
+    AUTOCHECKBOX "ã€Œã€ã€ã€Œã€‚ã€ã®ä»£ã‚ã‚Šã«ã€Œï¼Œã€ã€Œï¼Žã€ã‚’ä½¿ç”¨ã™ã‚‹", chx1, 5, 5, 175, 15
+    AUTOCHECKBOX "å…¨è§’è‹±æ•°ã‚’ä½¿ã‚ãªã„", chx2, 5, 25, 170, 15
+    AUTOCHECKBOX "å…¨è§’ç©ºç™½ã‚’ç¦æ­¢ã™ã‚‹", chx3, 5, 45, 170, 15
+    AUTOCHECKBOX "å…¨è§’ã‚«ã‚¿ã‚«ãƒŠã‚’å„ªå…ˆã™ã‚‹", chx4, 5, 65, 170, 15
+    AUTOCHECKBOX "åŠè§’ã‚«ãƒŠã‚’å„ªå…ˆã™ã‚‹", chx5, 5, 85, 170, 15
 }
 
 IDD_WORDLIST DIALOG 0, 0, 185, 132
-CAPTION "ƒ†[ƒU[Ž«‘"
+CAPTION "ãƒ¦ãƒ¼ã‚¶ãƒ¼è¾žæ›¸"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
-FONT 10, "‚l‚r ‚oƒSƒVƒbƒN"
+FONT 10, "ï¼­ï¼³ ï¼°ã‚´ã‚·ãƒƒã‚¯"
 {
-    LTEXT "’PŒêƒŠƒXƒg(&L):", -1, 6, 5, 50, 10
+    LTEXT "å˜èªžãƒªã‚¹ãƒˆ(&L):", -1, 6, 5, 50, 10
     CONTROL "", lst1, "SysListView32", LVS_REPORT | WS_BORDER | WS_VSCROLL, 5, 18, 175, 68
-    PUSHBUTTON "’Ç‰Á(&A)...", psh1, 40, 92, 60, 14
-    PUSHBUTTON "íœ(&R)...", psh2, 107, 92, 60, 14
+    PUSHBUTTON "è¿½åŠ (&A)...", psh1, 40, 92, 60, 14
+    PUSHBUTTON "å‰Šé™¤(&R)...", psh2, 107, 92, 60, 14
 }
 
 IDD_CHOOSEDICT DIALOG 0, 0, 185, 132
-CAPTION "Ž«‘‚Ì‘I‘ð"
+CAPTION "è¾žæ›¸ã®é¸æŠž"
 STYLE WS_POPUPWINDOW | WS_CAPTION
-FONT 10, "‚l‚r ‚oƒSƒVƒbƒN"
+FONT 10, "ï¼­ï¼³ ï¼°ã‚´ã‚·ãƒƒã‚¯"
 {
-    LTEXT "Œ»Ý‚ÌŽ«‘:", -1, 5, 15, 84, 8
+    LTEXT "ç¾åœ¨ã®è¾žæ›¸:", -1, 5, 15, 84, 8
     COMBOBOX cmb1, 5, 28, 175, 9, CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON "‘I‘ð(&S)", psh1, 123, 43, 40, 14
+    PUSHBUTTON "é¸æŠž(&S)", psh1, 123, 43, 40, 14
 }
 
 IDD_ABOUTIME DIALOG 0, 0, 185, 132
-CAPTION "‚±‚ÌIME‚É‚Â‚¢‚Ä"
+CAPTION "ã“ã®IMEã«ã¤ã„ã¦"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
-FONT 10, "‚l‚r ‚oƒSƒVƒbƒN"
+FONT 10, "ï¼­ï¼³ ï¼°ã‚´ã‚·ãƒƒã‚¯"
 {
     ICON 0, ico1, 8, 8, 0, 0
-    LTEXT "MZ-IME“ú–{Œê“ü—Í (mzimeja)\nVersion 1.0.1.2\nby katahiromz", 109, 33, 8, 100, 30
+    LTEXT "MZ-IMEæ—¥æœ¬èªžå…¥åŠ› (mzimeja)\nVersion 1.0.1.2\nby katahiromz", 109, 33, 8, 100, 30
 }
 
 IDD_DEBUG DIALOG 0, 0, 185, 132
-CAPTION "ƒfƒoƒbƒO ƒIƒvƒVƒ‡ƒ“"
+CAPTION "ãƒ‡ãƒãƒƒã‚° ã‚ªãƒ—ã‚·ãƒ§ãƒ³"
 STYLE DS_NOIDLEMSG | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
-FONT 10, "‚l‚r ‚oƒSƒVƒbƒN"
+FONT 10, "ï¼­ï¼³ ï¼°ã‚´ã‚·ãƒƒã‚¯"
 {
     EDITTEXT edt1, 5, 5, 130, 38, ES_MULTILINE | WS_VSCROLL | WS_HSCROLL
     PUSHBUTTON "Test &1", psh1, 40, 50, 60, 15
@@ -90,27 +90,27 @@ FONT 10, "‚l‚r ‚oƒSƒVƒbƒN"
 }
 
 IDD_ADDWORD DIALOG 46, 36, 172, 94
-CAPTION "’PŒê‚Ì“o˜^"
+CAPTION "å˜èªžã®ç™»éŒ²"
 STYLE WS_POPUPWINDOW | WS_CAPTION
-FONT 10, "‚l‚r ‚oƒSƒVƒbƒN"
+FONT 10, "ï¼­ï¼³ ï¼°ã‚´ã‚·ãƒƒã‚¯"
 {
-    LTEXT "‚æ‚Ý‚ª‚È(&R):", -1, 10, 7, 50, 10
+    LTEXT "ã‚ˆã¿ãŒãª(&R):", -1, 10, 7, 50, 10
     EDITTEXT edt2, 65, 5, 85, 15, ES_AUTOHSCROLL
-    LTEXT "’PŒê(&W):", -1, 10, 27, 50, 10
+    LTEXT "å˜èªž(&W):", -1, 10, 27, 50, 10
     EDITTEXT edt1, 65, 25, 85, 15, ES_AUTOHSCROLL
-    LTEXT "•iŽŒ(&T):", -1, 10, 50, 50, 10
+    LTEXT "å“è©ž(&T):", -1, 10, 50, 50, 10
     COMBOBOX cmb1, 65, 50, 85, 35, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON "OK", IDOK, 55, 70, 60, 15
 }
 
 IDD_INPUTBOX DIALOG 0, 0, 215, 135
-CAPTION "•ÏŠ·‚µ‚½‚¢•¶Žš—ñ‚ð“ü—Í‚µ‚Ä‚­‚¾‚³‚¢"
+CAPTION "å¤‰æ›ã—ãŸã„æ–‡å­—åˆ—ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
-FONT 10, "‚l‚r ‚oƒSƒVƒbƒN"
+FONT 10, "ï¼­ï¼³ ï¼°ã‚´ã‚·ãƒƒã‚¯"
 {
     EDITTEXT edt1, 7, 9, 203, 96, ES_MULTILINE | WS_VSCROLL | WS_HSCROLL
-    DEFPUSHBUTTON "Žè“®ƒeƒXƒg", psh1, 35, 115, 60, 14
-    PUSHBUTTON "Ž©“®ƒeƒXƒg", psh2, 115, 115, 60, 14
+    DEFPUSHBUTTON "æ‰‹å‹•ãƒ†ã‚¹ãƒˆ", psh1, 35, 115, 60, 14
+    PUSHBUTTON "è‡ªå‹•ãƒ†ã‚¹ãƒˆ", psh2, 115, 115, 60, 14
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -142,13 +142,13 @@ FILESUBTYPE     VFT2_DRV_INPUTMETHOD
     {
         BLOCK "041103A4" // ja_JP, Japan (Shift_JIS)
         {
-            VALUE "CompanyName", "•ÐŽR”Ž•¶MZ"
-            VALUE "FileDescription", "MZ-IME“ú–{Œê“ü—Í 1.0.1.2"
+            VALUE "CompanyName", "ç‰‡å±±åšæ–‡MZ"
+            VALUE "FileDescription", "MZ-IMEæ—¥æœ¬èªžå…¥åŠ› 1.0.1.2"
             VALUE "FileVersion", "1.0.1.2"
             VALUE "InternalName", "mzimeja"
-            VALUE "LegalCopyright", "Copyright (C) 2016-2025 •ÐŽR”Ž•¶MZ."
+            VALUE "LegalCopyright", "Copyright (C) 2016-2025 ç‰‡å±±åšæ–‡MZ."
             VALUE "OriginalFilename", "mzimeja.ime"
-            VALUE "ProductName", "MZ-IME“ú–{Œê“ü—Í"
+            VALUE "ProductName", "MZ-IMEæ—¥æœ¬èªžå…¥åŠ›"
             VALUE "ProductVersion", "1.0.1.2"
         }
     }
@@ -163,98 +163,98 @@ FILESUBTYPE     VFT2_DRV_INPUTMETHOD
 
 STRINGTABLE
 {
-    IDS_PAREN "yz\twx\tst\tg""\tuv\tqr\top\tmn\tij\táâ\t¢£\t{}\t[]\t<>\t()\t<>\tef\tkl"
-    IDS_SYMBOLS "VWTUXYS\]^ZRQPNMLKJ_˜OâÊËÌÍÎÚÛÜÝÞßÉáõãäåæçèðñòóôö`Œà~aÈbc}€‚…†‡ˆ‰Š¾d‹½¼»¿º¹¸¬§¦"
-    IDS_KEISEN "„Ÿ„ „¡„¢„£„¤„¥„¦„§„¨„©„ª„«„¬„­„®„¯„°„±„²„³„´„µ„¶„·„¸„¹„º„»„¼„½„¾"
-    IDS_MATH "†€}|~{‚ƒ…„"
-    IDS_SANKAKU "£¤¢¥"
-    IDS_SHIKAKU "žŸ ¡"
-    IDS_ZUKEI "š›¥¤£¢¡ Ÿžœ™"
-    IDS_MARU "D¡ZBœ›"
-    IDS_STARS "™¦š"
-    IDS_HISHI "Ÿž"
-    IDS_POINTS "KJGFDCAL.EMNcdæ¥:;Þßˆ"
-    IDS_UNITS "ŒŽð‘’“ñ‹"
-    IDS_FUTOUGOU "†…‚"
-    IDS_TATE "„ „«"
-    IDS_TATE_HIDARI "„·„¼„§„²"
-    IDS_TATE_MIGI "„°„µ„º„¥"
-    IDS_HIDARI_UE "„¡„¬"
-    IDS_HIDARI_SHITA "„¤„¯"
-    IDS_FUTO_WAKU "„¯„³„ª„®„¬„±„ª„­"
-    IDS_HOSO_WAKU "„¤„¨„Ÿ„£„¡„¦„Ÿ„¢"
-    IDS_MANNAKA "„©„´„¹„¾"
-    IDS_MIGI_UE "„¢„­"
-    IDS_MIGI_SHITA "„£„®"
-    IDS_YOKO "„Ÿ„ª"
-    IDS_YOKO_UE "„³„¸„½„¨"
-    IDS_YOKO_SHITA "„±„¶„»„¦"
-    IDS_SAME "VWUTSRX"
-    IDS_ARROWS "¨«©ªËÌ"
-    IDS_GREEK "ƒ¿ƒÀƒÁƒÂƒÃƒÄƒÅƒÆƒÆƒÇƒÈƒÉƒÊƒËƒÌƒÍƒÎƒÏƒÐƒÑƒÒƒÓƒÔƒÕƒÖƒŸƒ ƒ¡ƒ¢ƒ£ƒ¤ƒ¥ƒ¦ƒ¦ƒ§ƒ¨ƒ©ƒªƒ«ƒ¬ƒ­ƒ®ƒ¯ƒ°ƒ±ƒ²ƒ³ƒ´ƒµƒ¶"
-    IDS_UP "ª"
-    IDS_DOWN "«"
-    IDS_LEFT "©"
-    IDS_RIGHT "¨Ë"
-    IDS_ARROWS2 "¨«©ªËÌ"
-    IDS_WORD "’PŒê"
-    IDS_READING "‚æ‚Ý‚ª‚È"
-    IDS_HINSHI "•iŽŒ"
-    IDS_WANNADELETEWORD "‚±‚Ì’PŒê‚ðíœ‚µ‚Ü‚·‚©H"
-    IDS_HINSHIWRONG "’PŒê‚Ü‚½‚Í•iŽŒ‚ªŠÔˆá‚Á‚Ä‚¢‚Ü‚·BIŽ~Œ`‚Å“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B"
-    IDS_IMEDISABLED "MZ-IME ‚Í–³Œøó‘Ô‚Å‚·"
+    IDS_PAREN "ã€ã€‘\tã€Žã€\tã€Šã€‹\tâ€œ""\tã€Œã€\tã€ˆã€‰\tï½›ï½\tï¼»ï¼½\tï¼ˆï¼‰\tâ‰ªâ‰«\tï½¢ï½£\t{}\t[]\t<>\t()\t<>\tâ€˜â€™\tã€”ã€•"
+    IDS_SYMBOLS "ã€ƒä»ã‚ã‚žã€…ã€†ãƒ¾â€•â€ï¼ã€‡ãƒ½ï¼¿ï¿£Â¨ï½€Â´ã‚œã‚›ï¼¼Â§ï¼¾â‰«ï¿¢â‡’â‡”âˆ€âˆƒâˆ âŠ¥âŒ’âˆ‚âˆ‡â‰¡âˆ¨â‰ªâ€ âˆšâˆ½âˆâˆµâˆ«âˆ¬â„«â€°â™¯â™­â™ªâ€¡ï½žâ€²â‰’Ã—âˆ¥âˆ§ï½œâ€¦Â±Ã·â‰ â‰¦â‰§âˆžâˆ´â™‚â™€âˆªâ€¥Â°âŠƒâŠ‚âŠ‡âˆ©âŠ†âˆ‹âˆˆã€“ã€’â€»â€³"
+    IDS_KEISEN "â”€â”‚â”Œâ”â”˜â””â”œâ”¬â”¤â”´â”¼â”â”ƒâ”â”“â”›â”—â”£â”³â”«â”»â•‹â” â”¯â”¨â”·â”¿â”â”°â”¥â”¸â•‚"
+    IDS_MATH "â‰§Ã·Â±ï¼Ã—ï¼‹ï¼â‰ ï¼œâ‰¦ï¼ž"
+    IDS_SANKAKU "â–²â–½â–³â–¼"
+    IDS_SHIKAKU "â—‡â—†â–¡â– "
+    IDS_ZUKEI "â˜…â—‹â–¼â–½â–²â–³â– â–¡â—†â—‡â—Žâ—â˜†"
+    IDS_MARU "ï¼Žï½¡ã€‡ã€‚â—â—‹â—Ž"
+    IDS_STARS "â˜†â€»â˜…"
+    IDS_HISHI "â—†â—‡"
+    IDS_POINTS "ã‚œã‚›ï¼›ï¼šï¼Žï¼Œã€Â´.ãƒ»ï½€Â¨â€¦â€¥âˆµï½¥:;ï¾žï¾Ÿâˆ´"
+    IDS_UNITS "â€²â€³â„ƒï¿¥â„«ï¿ ï¿¡ï¼…â€°ï¼„Â°"
+    IDS_FUTOUGOU "â‰§â‰¦â‰ "
+    IDS_TATE "â”‚â”ƒ"
+    IDS_TATE_HIDARI "â”¨â”¥â”¤â”«"
+    IDS_TATE_MIGI "â”£â” â”â”œ"
+    IDS_HIDARI_UE "â”Œâ”"
+    IDS_HIDARI_SHITA "â””â”—"
+    IDS_FUTO_WAKU "â”—â”»â”â”›â”â”³â”â”“"
+    IDS_HOSO_WAKU "â””â”´â”€â”˜â”Œâ”¬â”€â”"
+    IDS_MANNAKA "â”¼â•‹â”¿â•‚"
+    IDS_MIGI_UE "â”â”“"
+    IDS_MIGI_SHITA "â”˜â”›"
+    IDS_YOKO "â”€â”"
+    IDS_YOKO_UE "â”»â”·â”¸â”´"
+    IDS_YOKO_SHITA "â”³â”¯â”°â”¬"
+    IDS_SAME "ã€ƒä»ã‚žã‚ãƒ¾ãƒ½ã€…"
+    IDS_ARROWS "â†’â†“â†â†‘â‡’â‡”"
+    IDS_GREEK "Î±Î²Î³Î´ÎµÎ¶Î·Î¸Î¸Î¹ÎºÎ»Î¼Î½Î¾Î¿Ï€ÏÏƒÏ„Ï…Ï†Ï‡ÏˆÏ‰Î‘Î’Î“Î”Î•Î–Î—Î˜Î˜Î™ÎšÎ›ÎœÎÎžÎŸÎ Î¡Î£Î¤Î¥Î¦Î§Î¨Î©"
+    IDS_UP "â†‘"
+    IDS_DOWN "â†“"
+    IDS_LEFT "â†"
+    IDS_RIGHT "â†’â‡’"
+    IDS_ARROWS2 "â†’â†“â†â†‘â‡’â‡”"
+    IDS_WORD "å˜èªž"
+    IDS_READING "ã‚ˆã¿ãŒãª"
+    IDS_HINSHI "å“è©ž"
+    IDS_WANNADELETEWORD "ã“ã®å˜èªžã‚’å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ"
+    IDS_HINSHIWRONG "å˜èªžã¾ãŸã¯å“è©žãŒé–“é•ã£ã¦ã„ã¾ã™ã€‚çµ‚æ­¢å½¢ã§å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚"
+    IDS_IMEDISABLED "MZ-IME ã¯ç„¡åŠ¹çŠ¶æ…‹ã§ã™"
     IDS_DICFILENAME "basic.dic"
-    IDS_CONFIGNAME "MZ-IME “ú–{Œê“ü—Í"
-    IDS_GL_NODICTIONARY "Ž«‘‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB"
-    IDS_GL_TYPINGERROR "ƒ[ƒ}Žš‚ª‚ ‚è‚Ü‚¹‚ñB"
-    IDS_GL_TESTGUIDELINESTR "ƒKƒCƒhƒ‰ƒCƒ“‚ÌƒeƒXƒg•¶Žš—ñ"
-    IDS_GL_TESTGUIDELINEPRIVATE "ƒKƒCƒhƒ‰ƒCƒ“‚Ìƒvƒ‰ƒCƒx[ƒg"
-    IDS_NOREADING "‚æ‚Ý‚ª‚È‚ð“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B"
-    IDS_NOSTRING "’PŒê‚ð“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B"
-    IDS_NOMEMORY "ƒƒ‚ƒŠ[‚ª‘«‚è‚Ü‚¹‚ñB"
-    IDS_REGWORDRET "’PŒê“o˜^‚ÉŽ¸”s‚µ‚Ü‚µ‚½B"
-    IDS_IMENAME "MZ-IME“ú–{Œê“ü—Íimzimejaj"
-    IDS_RECONVERT "Ä•ÏŠ·"
-    IDS_VERSIONINFO "ƒo[ƒWƒ‡ƒ“î•ñ"
-    IDS_HIRAGANA "‚Ð‚ç‚ª‚È"
-    IDS_ZENKAKU_KATAKANA "‘SŠpƒJƒ^ƒJƒi"
-    IDS_ZENKAKU_EISUU "‘SŠp‰p”"
-    IDS_HANKAKU_KANA "”¼ŠpƒJƒ^ƒJƒi"
-    IDS_HANKAKU_EISUU "”¼Šp‰p”"
-    IDS_CANCEL "ƒLƒƒƒ“ƒZƒ‹"
-    IDS_ROMAJI_INPUT "ƒ[ƒ}Žš“ü—Í"
-    IDS_KANA_INPUT "‚©‚È“ü—Í"
-    IDS_PROPERTY "ƒvƒƒpƒeƒB"
-    IDS_REGISTERWORD "’PŒê“o˜^"
-    IDS_IMEPAD "MZ-IMEƒpƒbƒh"
-    IDS_HINSHI_00 "–¼ŽŒ"
-    IDS_HINSHI_01 "‚¢Œ`—eŽŒ"
-    IDS_HINSHI_02 "‚ÈŒ`—eŽŒ"
-    IDS_HINSHI_03 "˜A‘ÌŽŒ"
-    IDS_HINSHI_04 "•›ŽŒ"
-    IDS_HINSHI_05 "Ú‘±ŽŒ"
-    IDS_HINSHI_06 "Š´“®ŽŒ"
-    IDS_HINSHI_07 "Ši•ŽŒ"
-    IDS_HINSHI_08 "Ú‘±•ŽŒ"
-    IDS_HINSHI_09 "•›•ŽŒ"
-    IDS_HINSHI_10 "I•ŽŒ"
-    IDS_HINSHI_11 "•“®ŽŒ"
-    IDS_HINSHI_12 "–¢‘R•“®ŽŒ"
-    IDS_HINSHI_13 "˜A—p•“®ŽŒ"
-    IDS_HINSHI_14 "IŽ~•“®ŽŒ"
-    IDS_HINSHI_15 "˜A‘Ì•“®ŽŒ"
-    IDS_HINSHI_16 "‰¼’è•“®ŽŒ"
-    IDS_HINSHI_17 "–½—ß•“®ŽŒ"
-    IDS_HINSHI_18 "ŒÜ’i“®ŽŒ"
-    IDS_HINSHI_19 "ˆê’i“®ŽŒ"
-    IDS_HINSHI_20 "ƒJ•Ï“®ŽŒ"
-    IDS_HINSHI_21 "ƒT•Ï“®ŽŒ"
-    IDS_HINSHI_22 "Š¿Œê"
-    IDS_HINSHI_23 "Ú“ªŽ«"
-    IDS_HINSHI_24 "Ú”öŽ«"
-    IDS_HINSHI_25 "ƒsƒŠƒIƒh"
-    IDS_HINSHI_26 "ƒJƒ“ƒ}"
-    IDS_HINSHI_27 "‹L†—Þ"
+    IDS_CONFIGNAME "MZ-IME æ—¥æœ¬èªžå…¥åŠ›"
+    IDS_GL_NODICTIONARY "è¾žæ›¸ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚"
+    IDS_GL_TYPINGERROR "ãƒ­ãƒ¼ãƒžå­—ãŒã‚ã‚Šã¾ã›ã‚“ã€‚"
+    IDS_GL_TESTGUIDELINESTR "ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®ãƒ†ã‚¹ãƒˆæ–‡å­—åˆ—"
+    IDS_GL_TESTGUIDELINEPRIVATE "ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆ"
+    IDS_NOREADING "ã‚ˆã¿ãŒãªã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚"
+    IDS_NOSTRING "å˜èªžã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚"
+    IDS_NOMEMORY "ãƒ¡ãƒ¢ãƒªãƒ¼ãŒè¶³ã‚Šã¾ã›ã‚“ã€‚"
+    IDS_REGWORDRET "å˜èªžç™»éŒ²ã«å¤±æ•—ã—ã¾ã—ãŸã€‚"
+    IDS_IMENAME "MZ-IMEæ—¥æœ¬èªžå…¥åŠ›ï¼ˆmzimejaï¼‰"
+    IDS_RECONVERT "å†å¤‰æ›"
+    IDS_VERSIONINFO "ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±"
+    IDS_HIRAGANA "ã²ã‚‰ãŒãª"
+    IDS_ZENKAKU_KATAKANA "å…¨è§’ã‚«ã‚¿ã‚«ãƒŠ"
+    IDS_ZENKAKU_EISUU "å…¨è§’è‹±æ•°"
+    IDS_HANKAKU_KANA "åŠè§’ã‚«ã‚¿ã‚«ãƒŠ"
+    IDS_HANKAKU_EISUU "åŠè§’è‹±æ•°"
+    IDS_CANCEL "ã‚­ãƒ£ãƒ³ã‚»ãƒ«"
+    IDS_ROMAJI_INPUT "ãƒ­ãƒ¼ãƒžå­—å…¥åŠ›"
+    IDS_KANA_INPUT "ã‹ãªå…¥åŠ›"
+    IDS_PROPERTY "ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£"
+    IDS_REGISTERWORD "å˜èªžç™»éŒ²"
+    IDS_IMEPAD "MZ-IMEãƒ‘ãƒƒãƒ‰"
+    IDS_HINSHI_00 "åè©ž"
+    IDS_HINSHI_01 "ã„å½¢å®¹è©ž"
+    IDS_HINSHI_02 "ãªå½¢å®¹è©ž"
+    IDS_HINSHI_03 "é€£ä½“è©ž"
+    IDS_HINSHI_04 "å‰¯è©ž"
+    IDS_HINSHI_05 "æŽ¥ç¶šè©ž"
+    IDS_HINSHI_06 "æ„Ÿå‹•è©ž"
+    IDS_HINSHI_07 "æ ¼åŠ©è©ž"
+    IDS_HINSHI_08 "æŽ¥ç¶šåŠ©è©ž"
+    IDS_HINSHI_09 "å‰¯åŠ©è©ž"
+    IDS_HINSHI_10 "çµ‚åŠ©è©ž"
+    IDS_HINSHI_11 "åŠ©å‹•è©ž"
+    IDS_HINSHI_12 "æœªç„¶åŠ©å‹•è©ž"
+    IDS_HINSHI_13 "é€£ç”¨åŠ©å‹•è©ž"
+    IDS_HINSHI_14 "çµ‚æ­¢åŠ©å‹•è©ž"
+    IDS_HINSHI_15 "é€£ä½“åŠ©å‹•è©ž"
+    IDS_HINSHI_16 "ä»®å®šåŠ©å‹•è©ž"
+    IDS_HINSHI_17 "å‘½ä»¤åŠ©å‹•è©ž"
+    IDS_HINSHI_18 "äº”æ®µå‹•è©ž"
+    IDS_HINSHI_19 "ä¸€æ®µå‹•è©ž"
+    IDS_HINSHI_20 "ã‚«å¤‰å‹•è©ž"
+    IDS_HINSHI_21 "ã‚µå¤‰å‹•è©ž"
+    IDS_HINSHI_22 "æ¼¢èªž"
+    IDS_HINSHI_23 "æŽ¥é ­è¾ž"
+    IDS_HINSHI_24 "æŽ¥å°¾è¾ž"
+    IDS_HINSHI_25 "ãƒ”ãƒªã‚ªãƒ‰"
+    IDS_HINSHI_26 "ã‚«ãƒ³ãƒž"
+    IDS_HINSHI_27 "è¨˜å·é¡ž"
 }
 
 //////////////////////////////////////////////////////////////////////////////

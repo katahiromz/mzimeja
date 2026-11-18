@@ -1,7 +1,7 @@
-// ‚±‚Ìƒtƒ@ƒCƒ‹‚Í ƒŠƒ\[ƒGƒfƒBƒ^ 6.2.3 ‚É‚æ‚Á‚ÄŽ©“®¶¬‚³‚ê‚Ü‚µ‚½B
-// õ <-- ‚±‚Ìƒ_ƒK[‹L†‚ÍAUTF-8‚ÌŒŸo‚É–ð—§‚¿‚Ü‚·B
+// ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ ãƒªã‚½ãƒ¼ã‚¨ãƒ‡ã‚£ã‚¿ 6.2.3 ã«ã‚ˆã£ã¦è‡ªå‹•ç”Ÿæˆã•ã‚Œã¾ã—ãŸã€‚
+// â€  <-- ã“ã®ãƒ€ã‚¬ãƒ¼è¨˜å·ã¯ã€UTF-8ã®æ¤œå‡ºã«å½¹ç«‹ã¡ã¾ã™ã€‚
 
-#pragma code_page(932) // Japan
+#pragma code_page(65001) // UTF-8
 
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
@@ -10,11 +10,11 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 1 MENU
 {
-    POPUP "ƒ|ƒbƒvƒAƒbƒv #0"
+    POPUP "ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ— #0"
     {
-        MENUITEM "ƒNƒŠƒbƒvƒ{[ƒh‚ÉƒRƒs[", 100
+        MENUITEM "ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«ã‚³ãƒ”ãƒ¼", 100
         MENUITEM SEPARATOR
-        MENUITEM "“\‚è•t‚¯", 101
+        MENUITEM "è²¼ã‚Šä»˜ã‘", 101
     }
 }
 
@@ -31,11 +31,11 @@ FILETYPE        VFT_APP
     {
         BLOCK "041103A4" // ja_JP, Japan (Shift_JIS)
         {
-            VALUE "CompanyName", "•ÐŽR”Ž•¶MZ"
-            VALUE "FileDescription", "MZ-IME“ú–{Œê“ü—Í IMEƒpƒbƒh"
+            VALUE "CompanyName", "ç‰‡å±±åšæ–‡MZ"
+            VALUE "FileDescription", "MZ-IMEæ—¥æœ¬èªžå…¥åŠ› IMEãƒ‘ãƒƒãƒ‰"
             VALUE "FileVersion", "1.0.1.2"
-            VALUE "LegalCopyright", "Copyright (C) 2016-2017 •ÐŽR”Ž•¶MZ."
-            VALUE "ProductName", "MZ-IME“ú–{Œê“ü—Í"
+            VALUE "LegalCopyright", "Copyright (C) 2016-2017 ç‰‡å±±åšæ–‡MZ."
+            VALUE "ProductName", "MZ-IMEæ—¥æœ¬èªžå…¥åŠ›"
             VALUE "ProductVersion", "1.0.1.2"
         }
     }
@@ -50,11 +50,11 @@ FILETYPE        VFT_APP
 
 STRINGTABLE
 {
-    40016 "MZ-IMEƒpƒbƒh"
-    40017 "‘Žš‰æ"
-    40018 "•”Žñ"
-    40020 "%u‰æ"
-    40021 "ƒf[ƒ^‚ªŒ©‚Â‚©‚ç‚È‚¢‚©A“Ç‚Ýž‚ß‚Ü‚¹‚ñB"
+    40016 "MZ-IMEãƒ‘ãƒƒãƒ‰"
+    40017 "ç·å­—ç”»"
+    40018 "éƒ¨é¦–"
+    40020 "%uç”»"
+    40021 "ãƒ‡ãƒ¼ã‚¿ãŒè¦‹ã¤ã‹ã‚‰ãªã„ã‹ã€èª­ã¿è¾¼ã‚ã¾ã›ã‚“ã€‚"
 }
 
 //////////////////////////////////////////////////////////////////////////////

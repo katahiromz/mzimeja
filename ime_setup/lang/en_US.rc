@@ -1,7 +1,7 @@
-// ‚±‚Ìƒtƒ@ƒCƒ‹‚Í ƒŠƒ\[ƒGƒfƒBƒ^ 6.2.3 ‚É‚æ‚Á‚ÄŽ©“®¶¬‚³‚ê‚Ü‚µ‚½B
-// õ <-- ‚±‚Ìƒ_ƒK[‹L†‚ÍAUTF-8‚ÌŒŸo‚É–ð—§‚¿‚Ü‚·B
+// ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ ãƒªã‚½ãƒ¼ã‚¨ãƒ‡ã‚£ã‚¿ 6.2.3 ã«ã‚ˆã£ã¦è‡ªå‹•ç”Ÿæˆã•ã‚Œã¾ã—ãŸã€‚
+// â€  <-- ã“ã®ãƒ€ã‚¬ãƒ¼è¨˜å·ã¯ã€UTF-8ã®æ¤œå‡ºã«å½¹ç«‹ã¡ã¾ã™ã€‚
 
-#pragma code_page(932) // Japan
+#pragma code_page(65001) // UTF-8
 
 LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
 
@@ -32,11 +32,11 @@ FILETYPE        VFT_APP
     {
         BLOCK "041103A4" // ja_JP, Japan (Shift_JIS)
         {
-            VALUE "CompanyName", "•ÐŽR”Ž•¶MZ"
-            VALUE "FileDescription", "MZ-IME“ú–{Œê“ü—Í ƒZƒbƒgƒAƒbƒv"
+            VALUE "CompanyName", "ç‰‡å±±åšæ–‡MZ"
+            VALUE "FileDescription", "MZ-IMEæ—¥æœ¬èªžå…¥åŠ› ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—"
             VALUE "FileVersion", "1.0.1.2"
-            VALUE "LegalCopyright", "Copyright (C) 2016-2017 •ÐŽR”Ž•¶MZ."
-            VALUE "ProductName", "MZ-IME“ú–{Œê“ü—Í"
+            VALUE "LegalCopyright", "Copyright (C) 2016-2017 ç‰‡å±±åšæ–‡MZ."
+            VALUE "ProductName", "MZ-IMEæ—¥æœ¬èªžå…¥åŠ›"
             VALUE "ProductVersion", "1.0.1.2"
         }
     }

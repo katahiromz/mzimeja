@@ -1,7 +1,7 @@
-// ���̃t�@�C���� ���\�[�G�f�B�^ 6.2.3 �ɂ���Ď�����������܂����B
-// �� <-- ���̃_�K�[�L���́AUTF-8�̌��o�ɖ𗧂��܂��B
+// このファイルは リソーエディタ 6.2.3 によって自動生成されました。
+// † <-- このダガー記号は、UTF-8の検出に役立ちます。
 
-#pragma code_page(932) // Japan
+#pragma code_page(65001) // UTF-8
 
 LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
 

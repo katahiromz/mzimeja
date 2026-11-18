@@ -1,13 +1,13 @@
 // ime_setup_res.rc
-// Ç±ÇÃÉtÉ@ÉCÉãÇÕ ÉäÉ\Å[ÉGÉfÉBÉ^ 6.2.3 Ç…ÇÊÇ¡Çƒé©ìÆê∂ê¨Ç≥ÇÍÇ‹ÇµÇΩÅB
-// Åı <-- Ç±ÇÃÉ_ÉKÅ[ãLçÜÇÕÅAUTF-8ÇÃåüèoÇ…ñóßÇøÇ‹Ç∑ÅB
+// „Åì„ÅÆ„Éï„Ç°„Ç§„É´„ÅØ „É™„ÇΩ„Éº„Ç®„Éá„Ç£„Çø 6.2.3 „Å´„Çà„Å£„Å¶Ëá™ÂãïÁîüÊàê„Åï„Çå„Åæ„Åó„Åü„ÄÇ
+// ‚Ä† <-- „Åì„ÅÆ„ÉÄ„Ç¨„ÉºË®òÂè∑„ÅØ„ÄÅUTF-8„ÅÆÊ§úÂá∫„Å´ÂΩπÁ´ã„Å°„Åæ„Åô„ÄÇ
 //////////////////////////////////////////////////////////////////////////////
-// TEXTINCLUDE 1 Ç©ÇÁê∂ê¨Ç≥ÇÍÇ‹ÇµÇΩ
+// TEXTINCLUDE 1 „Åã„ÇâÁîüÊàê„Åï„Çå„Åæ„Åó„Åü
 
 #include "resource.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// TEXTINCLUDE 2 Ç©ÇÁê∂ê¨Ç≥ÇÍÇ‹ÇµÇΩ
+// TEXTINCLUDE 2 „Åã„ÇâÁîüÊàê„Åï„Çå„Åæ„Åó„Åü
 
 #define APSTUDIO_HIDDEN_SYMBOLS
 #include <windows.h>
@@ -16,7 +16,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-#pragma code_page(932) // Japan
+#pragma code_page(65001) // UTF-8
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
@@ -28,7 +28,7 @@ STRINGTABLE
     IDS_APPNAME "MZ-IME Setup"
     IDS_REGFAILED "Registry setup failed (#1)."
     IDS_FAILCOPYFILE "Failed to copy files."
-    IDS_IMELAYOUTTEXT "ì˙ñ{åÍ (MZ-IME)"
+    IDS_IMELAYOUTTEXT "Êó•Êú¨Ë™û (MZ-IME)"
     IDS_FAILDOCONTACT "IME installation failed. Please contact the author with error code %d."
     IDS_REGDELETEFAIL "Registry deletion failed."
     IDS_FAILDELETEFILE "Failed to delete files."
@@ -73,7 +73,7 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 #endif // def APSTUDIO_INVOKED
 
 //////////////////////////////////////////////////////////////////////////////
-// TEXTINCLUDE 3 Ç©ÇÁê∂ê¨Ç≥ÇÍÇ‹ÇµÇΩ
+// TEXTINCLUDE 3 „Åã„ÇâÁîüÊàê„Åï„Çå„Åæ„Åó„Åü
 
 #ifndef APSTUDIO_INVOKED
 
