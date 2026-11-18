@@ -161,7 +161,8 @@ void CompWnd_Create(HWND hUIWnd, UIEXTRA *lpUIExtra, InputContext *lpIMC)
 HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
                             DWORD iClause, LPPOINT ppt, LPSIZE psizText)
 {
-    HWND hCompWnd;
+    HWND hCompWnd = NULL;
+    HWND hFoundWnd = NULL;
     FOOTMARK_FORMAT("%p, %p, %d, %p\n", lpUIExtra, lpIMC, iClause, ppt);
 
     // is it vertical?
@@ -203,7 +204,9 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
             x = y = 0;
         }
 
-        DWORD cch = (DWORD)::GetWindowLongPtr(hCompWnd, FIGWL_COMPSTARTNUM);
+        DWORD cch = dwCompStyle
+            ? (DWORD)::GetWindowLongPtr(hCompWnd, FIGWL_COMPSTARTNUM)
+            : (DWORD)str.size();
         DPRINTA("ich: %d, cch: %d, dwClauseIndex: %d\n", ich, cch, dwClauseIndex);
 
         HDC hDC = ::GetDC(hCompWnd);
@@ -231,6 +234,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
                     *psizText = siz;
                 ::ClientToScreen(hCompWnd, ppt);
                 bIsDone = TRUE;
+                hFoundWnd = hCompWnd;
                 break;
             }
 
@@ -256,7 +260,7 @@ HWND GetCandPosHintFromComp(UIEXTRA *lpUIExtra, InputContext *lpIMC,
     }
 
     lpIMC->UnlockCompStr();
-    return hCompWnd;
+    return hFoundWnd;
 } // GetCandPosHintFromComp
 
 // calc the position of composition windows and move them

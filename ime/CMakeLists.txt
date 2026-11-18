@@ -66,12 +66,18 @@ target_link_libraries(imetests libime kernel32 user32 gdi32 advapi32 comctl32 im
 add_executable(ime_load_test ../test/ime_load_test.cpp)
 add_dependencies(ime_load_test ime)
 
+add_executable(candidate_window_test ../test/candidate_window_test.cpp)
+target_link_libraries(candidate_window_test libime kernel32 user32 gdi32 advapi32 comctl32 imm32 shlwapi)
+
 # Link Vibrato for tests too
 if(USE_VIBRATO AND VIBRATO_FOUND)
     add_dependencies(imetests vibrato_c_build)
+    add_dependencies(candidate_window_test vibrato_c_build)
     target_link_libraries(imetests ${VIBRATO_LIBRARY})
+    target_link_libraries(candidate_window_test ${VIBRATO_LIBRARY})
     if(WIN32)
         target_link_libraries(imetests ws2_32 userenv bcrypt ntdll)
+        target_link_libraries(candidate_window_test ws2_32 userenv bcrypt ntdll)
     endif()
 endif()
 

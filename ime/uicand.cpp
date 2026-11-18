@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mzimeja.h"
+#include "candidate_position.h"
 
 // 寸法。
 #define CX_HEADER 32
@@ -343,79 +344,85 @@ void CandWnd_Move(UIEXTRA *lpUIExtra, InputContext *lpIMC)
     FOOTMARK_FORMAT("%p, %p\n", lpUIExtra, lpIMC);
 
     HWND hwndCand = lpUIExtra->hwndCand;
-    if (!hwndCand)
+    if (!::IsWindow(hwndCand) || !lpIMC->HasCandInfo())
         return;
 
     HWND hSvrWnd = (HWND)::GetWindowLongPtr(hwndCand, FIGWLP_SERVERWND);
-
-    // ワークエリアを取得。
-    RECT rcWork;
-    HMONITOR hMonitor = ::MonitorFromWindow(hwndCand, MONITOR_DEFAULTTONEAREST);
-    MONITORINFO mi = { sizeof(mi) };
-    if (::GetMonitorInfo(hMonitor, &mi))
-        rcWork = mi.rcWork;
-    else
-        ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
 
     // 現在のウィンドウの長方形を取得。
     RECT rcCand;
     ::GetWindowRect(hwndCand, &rcCand);
     INT cx = rcCand.right - rcCand.left, cy = rcCand.bottom - rcCand.top;
 
-    // 位置を決める。
-    POINT pt;
-    SIZE sizText;
-    GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt, &sizText);
-    if (lpUIExtra->bVertical) { // 縦書き。
-        if (pt.x - cx < rcWork.left) {
-            pt.x += sizText.cx;
-        } else {
-            pt.x -= cx;
+    const CANDIDATEFORM& form = lpIMC->cfCandForm[0];
+    POINT pt = { 0, 0 };
+    SIZE sizText = { 0, 0 };
+    RECT rcExclude = { 0, 0, 0, 0 };
+    BOOL bExclude = FALSE;
+    BOOL bCompPos = FALSE;
+    BOOL bFallback = FALSE;
+    if (form.dwIndex != (DWORD)-1 && form.dwStyle == CFS_CANDIDATEPOS) {
+        pt = form.ptCurrentPos;
+        ::ClientToScreen(lpIMC->hWnd, &pt);
+    } else if (form.dwIndex != (DWORD)-1 && form.dwStyle == CFS_EXCLUDE) {
+        pt = form.ptCurrentPos;
+        rcExclude = form.rcArea;
+        ::ClientToScreen(lpIMC->hWnd, &pt);
+        ::MapWindowPoints(lpIMC->hWnd, NULL, (LPPOINT)&rcExclude, 2);
+        bExclude = TRUE;
+    } else if (form.dwIndex == (DWORD)-1 || form.dwStyle == CFS_DEFAULT) {
+        bCompPos = GetCandPosFromCompWnd(lpIMC, lpUIExtra, &pt, &sizText);
+        if (!bCompPos) {
+            bFallback = TRUE;
+            IMECHARPOSITION pos = { 0 };
+            pos.dwSize = sizeof(pos);
+            if (::SendMessage(lpIMC->hWnd, WM_IME_REQUEST, IMR_QUERYCHARPOSITION,
+                              (LPARAM)&pos)) {
+                pt = pos.pt;
+                sizText.cy = pos.cLineHeight;
+                pt.y += pos.cLineHeight;
+            } else {
+                RECT rcClient;
+                if (!::GetClientRect(lpIMC->hWnd, &rcClient)) {
+                    DPRINTA("Cannot determine candidate position\n");
+                    return;
+                }
+                pt.x = rcClient.left;
+                pt.y = rcClient.bottom;
+                ::ClientToScreen(lpIMC->hWnd, &pt);
+            }
         }
-    } else { // 横書き。
-        if (pt.y + cy > rcWork.bottom) {
+    } else {
+        DPRINTA("Unsupported candidate style: 0x%08lX\n", form.dwStyle);
+        return;
+    }
+
+    if (bExclude || bCompPos || bFallback) {
+        RECT rcWork;
+        HMONITOR hMonitor = ::MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+        MONITORINFO mi = { sizeof(mi) };
+        if (::GetMonitorInfo(hMonitor, &mi))
+            rcWork = mi.rcWork;
+        else
+            ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWork, FALSE);
+
+        if (bExclude) {
+            SIZE size = { cx, cy };
+            pt = CandidatePosExclude(pt, rcExclude, rcWork, size, lpUIExtra->bVertical);
+        } else if (bCompPos && lpUIExtra->bVertical) {
+            pt.x += (pt.x - cx < rcWork.left) ? sizText.cx : -cx;
+        } else if (pt.y + cy > rcWork.bottom) {
             pt.y -= cy + sizText.cy;
         }
+        if (bFallback) {
+            if (pt.x + cx > rcWork.right) pt.x = rcWork.right - cx;
+            if (pt.y + cy > rcWork.bottom) pt.y = rcWork.bottom - cy;
+            if (pt.x < rcWork.left) pt.x = rcWork.left;
+            if (pt.y < rcWork.top) pt.y = rcWork.top;
+        }
     }
 
-    // 初期化されてないか？
-    if (lpIMC->cfCandForm[0].dwIndex == (DWORD)-1) {
-        lpIMC->DumpCandInfo();
-        lpUIExtra->ptCand.x = pt.x;
-        lpUIExtra->ptCand.y = pt.y;
-
-        DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
-        ::MoveWindow(hwndCand, pt.x, pt.y, cx, cy, TRUE);
-        ::ShowWindow(hwndCand, SW_SHOWNOACTIVATE);
-        InvalidateRectWrap(hwndCand, NULL, FALSE, __FILE__, __LINE__);
-
-        // 動いたことをUIサーバーに通知。
-        ::SendMessage(hSvrWnd, WM_UI_CANDMOVE, 0, 0);
-        return;
-    }
-
-    // 候補があるか？
-    if (!lpIMC->HasCandInfo()) {
-        FOOTMARK_POINT();
-        lpIMC->DumpCandInfo();
-        return;
-    }
-
-    // スタイルをチェックする。
-    DWORD dwStyle = lpIMC->cfCandForm[0].dwStyle;
-    if (dwStyle == CFS_EXCLUDE) {
-        DPRINTA("CFS_EXCLUDE\n");
-    } else if (dwStyle == CFS_CANDIDATEPOS) {
-        DPRINTA("CFS_CANDIDATEPOS\n");
-        // 位置情報を取得する。
-        pt.x = lpIMC->cfCandForm[0].ptCurrentPos.x;
-        pt.y = lpIMC->cfCandForm[0].ptCurrentPos.y;
-        ::ClientToScreen(lpIMC->hWnd, &pt);
-    } else {
-        DPRINTA("dwStyle: 0x%08lX\n", dwStyle);
-        return;
-    }
-
+    lpUIExtra->ptCand = pt;
     // 候補ウィンドウを移動・表示する。
     if (::IsWindow(hwndCand)) {
         DPRINTA("%d, %d, %d, %d\n", pt.x, pt.y, cx, cy);
