@@ -61,6 +61,20 @@ int wmain(int argc, wchar_t **argv)
     WaitForSuccess(thread, 3000, "LoadLibrary while dictionary mutex is held");
     ReleaseMutex(mutex);
 
+    const char *exports[] = {
+        "ImeConversionList", "ImeConfigure", "ImeDestroy", "ImeEscape",
+        "ImeInquire", "ImeProcessKey", "ImeSelect", "ImeSetActiveContext",
+        "ImeToAsciiEx", "NotifyIME", "ImeRegisterWord", "ImeUnregisterWord",
+        "ImeGetRegisterWordStyle", "ImeEnumRegisterWord",
+        "ImeSetCompositionString", "ImeGetImeMenuItems"
+    };
+    for (size_t i = 0; i < sizeof(exports) / sizeof(exports[0]); ++i) {
+        if (!GetProcAddress(data.module, exports[i])) {
+            fprintf(stderr, "Missing IME export: %s\n", exports[i]);
+            return 1;
+        }
+    }
+
     ImeInquireProc inquire = reinterpret_cast<ImeInquireProc>(
         GetProcAddress(data.module, "ImeInquire"));
     if (!inquire)

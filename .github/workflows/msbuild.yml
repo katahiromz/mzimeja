@@ -64,3 +64,27 @@ jobs:
           build${{ matrix.platform == 'Win32' && '32' || '64' }}/**/*.ime
           build${{ matrix.platform == 'Win32' && '32' || '64' }}/**/*.dll
         if-no-files-found: warn
+
+  mingw32:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install MinGW
+      run: sudo apt-get update && sudo apt-get install -y g++-mingw-w64-i686 ninja-build
+    - name: Build 32-bit IME
+      run: |
+        cmake -S . -B build32 -G Ninja \
+          -DCMAKE_SYSTEM_NAME=Windows \
+          -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++ \
+          -DCMAKE_RC_COMPILER=i686-w64-mingw32-windres \
+          -DCMAKE_BUILD_TYPE=Release
+        cmake --build build32 --target ime imetests ime_load_test
+    - name: Check IME exports
+      shell: bash
+      run: |
+        diff -u \
+          <(awk '/^EXPORTS/{found=1; next} found && NF {print $1}' ime/mzimeja.def | tr -d '\r' | sort) \
+          <(i686-w64-mingw32-objdump -p build32/mzimeja.ime |
+            awk '/^\[Ordinal\/Name Pointer\] Table/{found=1; next} found && NF == 0 {exit} found {print $NF}' | sort)
