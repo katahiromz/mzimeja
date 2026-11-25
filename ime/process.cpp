@@ -28,6 +28,8 @@ inline BOOL isOpenCloseKey(UINT vk) {
     return vk == VK_KANJI || vk == VK_DBE_DBCSCHAR || vk == VK_DBE_SBCSCHAR;
 }
 
+static BOOL s_bOpenCloseHandled = FALSE; // 今回の押下で既に切り替えたか
+
 //////////////////////////////////////////////////////////////////////////////
 
 BOOL
@@ -375,20 +377,18 @@ ImeProcessKey(
     LPARAM lKeyData,
     CONST LPBYTE lpbKeyState)
 {
-    // lKeyData の bit30 = 前回も押下中
-    BOOL bRepeat = !!(lKeyData & 0x40000000);
-    if (bRepeat && isOpenCloseKey(vKey))
-        return FALSE;
+    BOOL bKeyUp = !!(lKeyData & 0x80000000);
 
-    // キー判定
+    // 開閉キーを離したら、次の押下で再び切り替えられるようにする
+    if (bKeyUp && isOpenCloseKey(vKey))
+        s_bOpenCloseHandled = FALSE;
+
     BOOL ret = FALSE;
     InputContext *lpIMC = NULL;
     if (hIMC && (lpIMC = TheIME.LockIMC(hIMC))) {
-        BOOL bKeyUp = !!(lKeyData & 0x80000000);
         ret = DoProcessKey(hIMC, lpIMC, vKey, lpbKeyState, bKeyUp, FALSE);
         TheIME.UnlockIMC(hIMC);
     }
-
     return ret;
 }
 
@@ -404,10 +404,12 @@ ImeToAsciiEx(
     FOOTMARK_FORMAT("(%u (0x%X), 0x%X, %p, %p, 0x%X, %p)\n",
                     uVKey, uVKey, uScanCode, lpbKeyState, lpTransBuf, fuState, hIMC);
 
-    // ImeToAsciiEx: uScanCode の bit14 = 前回も押下中
-    BOOL bRepeat = !!(uScanCode & 0x4000);
-    if (bRepeat && isOpenCloseKey(uVKey))
-        return 0; // 何もしない(下の DoProcessKey も呼ばない)
+    // 開閉キーは、押下ごとに 1 回だけ処理する(リピートは無視)
+    if (isOpenCloseKey(uVKey) && !(uScanCode & 0x8000)) {
+        if (s_bOpenCloseHandled)
+            FOOTMARK_RETURN_INT(0);
+        s_bOpenCloseHandled = TRUE;
+    }
 
     TheIME.m_lpCurTransKey = lpTransBuf;
     TheIME.m_uNumTransKey = 0;
