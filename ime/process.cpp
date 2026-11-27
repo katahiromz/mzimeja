@@ -29,6 +29,7 @@ inline BOOL isOpenCloseKey(UINT vk) {
 }
 
 static BOOL s_bOpenCloseHandled = FALSE; // 今回の押下で既に切り替えたか
+static BOOL s_bOpenAtProcessKey = FALSE; // VK_KANJI 用
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -378,14 +379,14 @@ ImeProcessKey(
     CONST LPBYTE lpbKeyState)
 {
     BOOL bKeyUp = !!(lKeyData & 0x80000000);
-
-    // 開閉キーを離したら、次の押下で再び切り替えられるようにする
-    if (bKeyUp && isOpenCloseKey(vKey))
+    if (bKeyUp && (vKey == VK_DBE_SBCSCHAR || vKey == VK_DBE_DBCSCHAR))
         s_bOpenCloseHandled = FALSE;
 
     BOOL ret = FALSE;
     InputContext *lpIMC = NULL;
     if (hIMC && (lpIMC = TheIME.LockIMC(hIMC))) {
+        if (!bKeyUp && vKey == VK_KANJI)
+            s_bOpenAtProcessKey = lpIMC->IsOpen();
         ret = DoProcessKey(hIMC, lpIMC, vKey, lpbKeyState, bKeyUp, FALSE);
         TheIME.UnlockIMC(hIMC);
     }
@@ -404,20 +405,23 @@ ImeToAsciiEx(
     FOOTMARK_FORMAT("(%u (0x%X), 0x%X, %p, %p, 0x%X, %p)\n",
                     uVKey, uVKey, uScanCode, lpbKeyState, lpTransBuf, fuState, hIMC);
 
-    // 開閉キーは、押下ごとに 1 回だけ処理する(リピートは無視)
-    if (isOpenCloseKey(uVKey) && !(uScanCode & 0x8000)) {
-        if (s_bOpenCloseHandled)
-            FOOTMARK_RETURN_INT(0);
-        s_bOpenCloseHandled = TRUE;
-    }
-
     TheIME.m_lpCurTransKey = lpTransBuf;
     TheIME.m_uNumTransKey = 0;
 
     InputContext *lpIMC;
     if (hIMC && (lpIMC = TheIME.LockIMC(hIMC))) {
         BOOL bKeyUp = !!(uScanCode & 0x8000);
-        DoProcessKey(hIMC, lpIMC, uVKey, lpbKeyState, bKeyUp, TRUE);
+        BOOL bSkip = FALSE;
+        if (isOpenCloseKey(uVKey) && !bKeyUp) {
+            if (uVKey == VK_KANJI) {
+                bSkip = (lpIMC->IsOpen() != s_bOpenAtProcessKey); // システムが切り替え済み
+            } else {                                              // F3 / F4
+                bSkip = s_bOpenCloseHandled;
+                s_bOpenCloseHandled = TRUE;
+            }
+        }
+        if (!bSkip)
+            DoProcessKey(hIMC, lpIMC, uVKey, lpbKeyState, bKeyUp, TRUE);
 
         TheIME.m_lpCurTransKey = NULL;
         TheIME.UnlockIMC(hIMC);
